@@ -1,4 +1,4 @@
-# habivt
+# habiTv
 
 habiTv est un logiciel permettant de télécharger automatiquement et régulièrement des vidéos sur les sites de Replay TV.
 
