@@ -22,7 +22,7 @@
   </repositories>  	
 	
 	<properties>
-		<habitv.version>4.1.0</habitv.version>
+		<habitv.version>4.1.1</habitv.version>
 		<package.version>4.1.0</package.version>
 		<exec.mainClass>com.dabi.habitv.packaging.HabiTvFxRunner</exec.mainClass>
 		<javafx.min.version>2.2</javafx.min.version>
