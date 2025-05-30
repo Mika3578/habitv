@@ -1,5 +1,13 @@
 package com.dabi.habitv.plugin.youtube;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,14 +23,50 @@ import com.dabi.habitv.framework.plugin.api.update.BaseUpdatablePlugin;
 public class YoutubePluginDownloader extends BaseUpdatablePlugin implements PluginDownloaderInterface {
 
 	private static final Pattern VERSION_PATTERN = Pattern.compile("([\\-0-9A-Za-z.-]*)");
+	private static final String YT_DLP_URL = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe";
+	private static final String YT_DLP_BIN_PATH = "bin/yt-dlp.exe";
+	private static final Logger LOGGER = Logger.getLogger(YoutubePluginDownloader.class.getName());
 
 	@Override
 	public String getName() {
 		return YoutubeConf.NAME;
 	}
 
+	private void ensureYtDlpPresentAndUpdated() {
+		try {
+			File binFile = new File(YT_DLP_BIN_PATH);
+			if (!binFile.exists()) {
+				LOGGER.info("yt-dlp.exe not found, downloading...");
+				binFile.getParentFile().mkdirs();
+				URL url = new URL(YT_DLP_URL);
+				HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+				connection.setRequestProperty("User-Agent", "Mozilla/5.0");
+				try (InputStream in = connection.getInputStream();
+					 FileOutputStream out = new FileOutputStream(binFile)) {
+					byte[] buffer = new byte[8192];
+					int len;
+					while ((len = in.read(buffer)) != -1) {
+						out.write(buffer, 0, len);
+					}
+				}
+				binFile.setExecutable(true);
+				LOGGER.info("yt-dlp.exe downloaded successfully.");
+			} else {
+				LOGGER.info("yt-dlp.exe found, updating...");
+				ProcessBuilder pb = new ProcessBuilder(YT_DLP_BIN_PATH, "-U");
+				pb.inheritIO();
+				Process process = pb.start();
+				process.waitFor();
+				LOGGER.info("yt-dlp.exe update check complete.");
+			}
+		} catch (Exception e) {
+			LOGGER.warning("Failed to ensure yt-dlp.exe is present and updated: " + e.getMessage());
+		}
+	}
+
 	@Override
 	public ProcessHolder download(final DownloadParamDTO downloadParam, final DownloaderPluginHolder downloaders) throws DownloadFailedException {
+		ensureYtDlpPresentAndUpdated();
 		final String binParam = getBinParam(downloaders);
 		String cmd = binParam + " ";
 		final String cmdParam = downloadParam.getParam(FrameworkConf.PARAMETER_ARGS);
@@ -69,7 +113,7 @@ public class YoutubePluginDownloader extends BaseUpdatablePlugin implements Plug
 
 	@Override
 	protected String[] getFilesToUpdate() {
-		return new String[] { "youtube-dl" };
+		return new String[] { "yt-dlp" };
 	}
 
 	@Override

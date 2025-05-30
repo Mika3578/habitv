@@ -13,8 +13,8 @@ public final class YoutubeConf {
 	public static final String DUMP_CMD_MP3 = " \"#VIDEO_URL#\" -o \"#FILE_DEST#\"  --extract-audio --audio-format mp3 --no-check-certificate";
 
 	public static final long MAX_HUNG_TIME = 300000L;
-	public static final String DEFAULT_WINDOWS_EXE = "youtube-dl.exe";
-	public static final String DEFAULT_LINUX_BIN_PATH = "youtube-dl";
+	public static final String DEFAULT_WINDOWS_EXE = "yt-dlp.exe";
+	public static final String DEFAULT_LINUX_BIN_PATH = "yt-dlp";
 	public static final String API_KEY = "AIzaSyCg3WitBUQl5ifC2QygQaZUPOSRMKfSD5E";
 	public static final String BASE_URL = "https://www.youtube.com";
 
