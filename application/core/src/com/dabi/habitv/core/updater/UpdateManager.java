@@ -1,5 +1,9 @@
 package com.dabi.habitv.core.updater;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 import com.dabi.habitv.api.plugin.pub.Publisher;
@@ -13,6 +17,9 @@ import com.dabi.habitv.framework.plugin.utils.update.Updater;
 public class UpdateManager {
 
 	private static final Logger LOG = Logger.getLogger(UpdateManager.class);
+
+	// Liste des plugins à exclure de la mise à jour automatique
+	private static final Set<String> EXCLUDED_PLUGINS = new HashSet<>(Arrays.asList("youtube"));
 
 	private final String site;
 
@@ -46,11 +53,19 @@ public class UpdateManager {
 			LOG.info("Checking plugin updates...");
 			String[] toUpdate = RetrieverUtils.getUrlContent(
 					site + "/plugins.txt", null).split("\\r\\n");
+
+			// Filtrer les plugins exclus de la mise à jour
+			String[] filteredPlugins = Arrays.stream(toUpdate)
+					.filter(plugin -> !isExcluded(plugin))
+					.toArray(String[]::new);
+
+			LOG.info("Excluded plugins from update: " + EXCLUDED_PLUGINS);
+
 			updatePublisher.addNews(new UpdatePluginEvent(
-					UpdatePluginStateEnum.STARTING_ALL, toUpdate.length));
+					UpdatePluginStateEnum.STARTING_ALL, filteredPlugins.length));
 			final Updater updater = new JarUpdater(pluginFolder, groupId,
 					coreVersion, autoriseSnapshot, updatePublisher);
-			updater.update(toUpdate);
+			updater.update(filteredPlugins);
 
 			updatePublisher.addNews(new UpdatePluginEvent(
 					UpdatePluginStateEnum.ALL_DONE));
@@ -58,6 +73,21 @@ public class UpdateManager {
 		} catch (Exception e) {
 			LOG.error("Erreur lors de la mise à jour : ", e);
 		}
+	}
+
+	/**
+	 * Vérifie si un plugin doit être exclu de la mise à jour automatique
+	 * @param pluginName Nom du plugin à vérifier
+	 * @return true si le plugin est dans la liste des exclusions
+	 */
+	private boolean isExcluded(String pluginName) {
+		for (String excludedPlugin : EXCLUDED_PLUGINS) {
+			if (pluginName.toLowerCase().contains(excludedPlugin.toLowerCase())) {
+				LOG.info("Skipping update for excluded plugin: " + pluginName);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public Publisher<UpdatePluginEvent> getUpdatePublisher() {
