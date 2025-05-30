@@ -60,8 +60,7 @@ public abstract class MyCheckBoxTreeCell<T> extends TreeCell<T> {
 				return null;
 			}
 		}, strConverter);
-	}
-
+	}	@SuppressWarnings("rawtypes")
 	private final static StringConverter defaultTreeItemStringConverter = new StringConverter<TreeItem>() {
 		@Override
 		public String toString(TreeItem treeItem) {
@@ -74,7 +73,7 @@ public abstract class MyCheckBoxTreeCell<T> extends TreeCell<T> {
 			return new TreeItem(string);
 		}
 	};
-
+	@SuppressWarnings("unchecked")
 	public MyCheckBoxTreeCell(
 			final Callback<TreeItem<T>, ObservableValue<Boolean>> getSelectedProperty) {
 		this(getSelectedProperty, defaultTreeItemStringConverter);
