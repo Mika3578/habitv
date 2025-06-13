@@ -171,3 +171,14 @@ Si vous rencontrez des erreurs de compilation liées à ces packages, assurez-vo
 - All modules now use Java 21 for compilation
 - Legacy Java 1.7/1.8 support and references removed
 - Maven build system updated for modern Java
+- Network-dependent tests are now marked as integration tests and skipped in CI
+- Duplicate entity sources (manual/generated) have been resolved; only generated entities are used
+
+## Entity Class Regeneration (2025-06-13)
+- Regenerated all JAXB entity classes from XSD schemas to fix compilation issues
+- Fixed boolean getter method names in generated classes (using 'is' prefix instead of 'get' for boolean properties)
+- Updated code to use correct method names: `isUpdateOnStartup()`, `isAutoriseSnapshot()`, `isDownload()`, etc.
+- Fixed JAXB marshalling to use FileOutputStream instead of File directly
+- Added missing maven-compiler-plugin configurations to ensure Java 21 compatibility
+- Core and consoleView modules now compile successfully
+- Resolved "cannot resolve type" and "syntax error" issues in generated entity classes

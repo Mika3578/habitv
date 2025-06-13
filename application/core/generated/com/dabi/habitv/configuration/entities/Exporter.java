@@ -6,7 +6,7 @@
 //
 
 
-package com.dabi.habitv.grabconfig.entities;
+package com.dabi.habitv.configuration.entities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,29 +17,30 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for plugin complex type.
+ * <p>Java class for exporter complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="plugin">
+ * &lt;complexType name="exporter">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;all>
- *         &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="categories">
+ *         &lt;element name="condition" type="{http://www.dabi.com/habitv/configuration/entities}conditionType" minOccurs="0"/>
+ *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="label" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="command" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="subexporters">
  *           &lt;complexType>
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
- *                   &lt;element name="category" type="{http://www.dabi.com/habitv/grabconfig/entities}categoryType" maxOccurs="unbounded" minOccurs="0"/>
+ *                   &lt;element name="exporter" type="{http://www.dabi.com/habitv/configuration/entities}exporter" maxOccurs="unbounded" minOccurs="0"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
- *         &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="deleted" type="{http://www.w3.org/2001/XMLSchema}boolean" minOccurs="0"/>
  *       &lt;/all>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -49,112 +50,139 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "plugin", propOrder = {
+@XmlType(name = "exporter", propOrder = {
 
 })
-public class Plugin {
+public class Exporter {
 
+    protected ConditionType condition;
     @XmlElement(required = true)
-    protected String name;
+    protected String id;
     @XmlElement(required = true)
-    protected Plugin.Categories categories;
-    protected String status;
-    protected Boolean deleted;
+    protected String label;
+    @XmlElement(required = true)
+    protected String command;
+    @XmlElement(required = true)
+    protected Exporter.Subexporters subexporters;
 
     /**
-     * Gets the value of the name property.
+     * Gets the value of the condition property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link ConditionType }
+     *     
+     */
+    public ConditionType getCondition() {
+        return condition;
+    }
+
+    /**
+     * Sets the value of the condition property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link ConditionType }
+     *     
+     */
+    public void setCondition(ConditionType value) {
+        this.condition = value;
+    }
+
+    /**
+     * Gets the value of the id property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getName() {
-        return name;
+    public String getId() {
+        return id;
     }
 
     /**
-     * Sets the value of the name property.
+     * Sets the value of the id property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setName(String value) {
-        this.name = value;
+    public void setId(String value) {
+        this.id = value;
     }
 
     /**
-     * Gets the value of the categories property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Plugin.Categories }
-     *     
-     */
-    public Plugin.Categories getCategories() {
-        return categories;
-    }
-
-    /**
-     * Sets the value of the categories property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Plugin.Categories }
-     *     
-     */
-    public void setCategories(Plugin.Categories value) {
-        this.categories = value;
-    }
-
-    /**
-     * Gets the value of the status property.
+     * Gets the value of the label property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getStatus() {
-        return status;
+    public String getLabel() {
+        return label;
     }
 
     /**
-     * Sets the value of the status property.
+     * Sets the value of the label property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setStatus(String value) {
-        this.status = value;
+    public void setLabel(String value) {
+        this.label = value;
     }
 
     /**
-     * Gets the value of the deleted property.
+     * Gets the value of the command property.
      * 
      * @return
      *     possible object is
-     *     {@link Boolean }
+     *     {@link String }
      *     
      */
-    public Boolean isDeleted() {
-        return deleted;
+    public String getCommand() {
+        return command;
     }
 
     /**
-     * Sets the value of the deleted property.
+     * Sets the value of the command property.
      * 
      * @param value
      *     allowed object is
-     *     {@link Boolean }
+     *     {@link String }
      *     
      */
-    public void setDeleted(Boolean value) {
-        this.deleted = value;
+    public void setCommand(String value) {
+        this.command = value;
+    }
+
+    /**
+     * Gets the value of the subexporters property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Exporter.Subexporters }
+     *     
+     */
+    public Exporter.Subexporters getSubexporters() {
+        return subexporters;
+    }
+
+    /**
+     * Sets the value of the subexporters property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Exporter.Subexporters }
+     *     
+     */
+    public void setSubexporters(Exporter.Subexporters value) {
+        this.subexporters = value;
     }
 
 
@@ -168,7 +196,7 @@ public class Plugin {
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
-     *         &lt;element name="category" type="{http://www.dabi.com/habitv/grabconfig/entities}categoryType" maxOccurs="unbounded" minOccurs="0"/>
+     *         &lt;element name="exporter" type="{http://www.dabi.com/habitv/configuration/entities}exporter" maxOccurs="unbounded" minOccurs="0"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -179,39 +207,39 @@ public class Plugin {
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "category"
+        "exporter"
     })
-    public static class Categories {
+    public static class Subexporters {
 
-        protected List<CategoryType> category;
+        protected List<Exporter> exporter;
 
         /**
-         * Gets the value of the category property.
+         * Gets the value of the exporter property.
          * 
          * <p>
          * This accessor method returns a reference to the live list,
          * not a snapshot. Therefore any modification you make to the
          * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the category property.
+         * This is why there is not a <CODE>set</CODE> method for the exporter property.
          * 
          * <p>
          * For example, to add a new item, do as follows:
          * <pre>
-         *    getCategory().add(newItem);
+         *    getExporter().add(newItem);
          * </pre>
          * 
          * 
          * <p>
          * Objects of the following type(s) are allowed in the list
-         * {@link CategoryType }
+         * {@link Exporter }
          * 
          * 
          */
-        public List<CategoryType> getCategory() {
-            if (category == null) {
-                category = new ArrayList<CategoryType>();
+        public List<Exporter> getExporter() {
+            if (exporter == null) {
+                exporter = new ArrayList<Exporter>();
             }
-            return this.category;
+            return this.exporter;
         }
 
     }

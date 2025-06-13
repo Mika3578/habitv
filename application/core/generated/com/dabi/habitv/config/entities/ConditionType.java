@@ -6,7 +6,7 @@
 //
 
 
-package com.dabi.habitv.grabconfig.entities;
+package com.dabi.habitv.config.entities;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -15,17 +15,17 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for parameter complex type.
+ * <p>Java class for conditionType complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="parameter">
+ * &lt;complexType name="conditionType">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="key" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="value" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="reference" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="pattern" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -35,63 +35,63 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "parameter", propOrder = {
-    "key",
-    "value"
+@XmlType(name = "conditionType", propOrder = {
+    "reference",
+    "pattern"
 })
-public class Parameter {
+public class ConditionType {
 
     @XmlElement(required = true)
-    protected String key;
+    protected String reference;
     @XmlElement(required = true)
-    protected String value;
+    protected String pattern;
 
     /**
-     * Gets the value of the key property.
+     * Gets the value of the reference property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getKey() {
-        return key;
+    public String getReference() {
+        return reference;
     }
 
     /**
-     * Sets the value of the key property.
+     * Sets the value of the reference property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setKey(String value) {
-        this.key = value;
+    public void setReference(String value) {
+        this.reference = value;
     }
 
     /**
-     * Gets the value of the value property.
+     * Gets the value of the pattern property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getValue() {
-        return value;
+    public String getPattern() {
+        return pattern;
     }
 
     /**
-     * Sets the value of the value property.
+     * Sets the value of the pattern property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setValue(String value) {
-        this.value = value;
+    public void setPattern(String value) {
+        this.pattern = value;
     }
 
 }

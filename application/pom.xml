@@ -3,8 +3,16 @@
 	<parent>
 		<groupId>com.dabi.habitv</groupId>
 		<artifactId>parent</artifactId>
-		<version>4.1.0-SNAPSHOT</version>
+		<version>4.1.0</version>
+		<relativePath/>
 	</parent>
+
+	<repositories>
+		<repository>
+			<id>habitv-mirror</id>
+			<url>https://mika3578.github.io/habitv/repository/</url>
+		</repository>
+	</repositories>
 
 	<artifactId>application</artifactId>
 	<packaging>pom</packaging>

@@ -5,5 +5,5 @@
 // Generated on: 2025.06.13 at 09:19:13 PM CEST 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.dabi.com/habitv/grabconfig/entities")
-package com.dabi.habitv.grabconfig.entities;
+@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.dabi.com/habitv/config/entities")
+package com.dabi.habitv.config.entities;
