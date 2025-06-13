@@ -1,10 +1,12 @@
 package com.dabi.habitv.framework.plugin.utils;
 
 import org.junit.Test;
+import org.junit.Ignore;
 
 public class TestUrl {
 
 	@Test
+	@Ignore("Network-dependent test; skipped in CI.")
 	public void test() {
 
 		RetrieverUtils.getTitleByUrl("http://www.beinsports.fr");
