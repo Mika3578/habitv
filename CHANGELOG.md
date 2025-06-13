@@ -20,6 +20,9 @@ All notable changes to this project will be documented in this file.
 - Removed all references to Java 1.7/1.8
 - Updated maven-compiler-plugin to 3.11.0 where needed
 - Ensured all submodules inherit or override Java 21 config
+- Main application (GUI/CLI) is now built as a fat JAR with all dependencies using Maven Shade Plugin.
+- Java 21 and JavaFX 21.0.2 compatibility for all modules.
+- All entity classes are generated from XSDs and included in the build.
 
 ### Fixed
 - Fixed Maven parent POM resolution issues:
@@ -44,6 +47,8 @@ All notable changes to this project will be documented in this file.
   - Added missing maven-compiler-plugin configurations to consoleView and trayView modules for Java 21 compatibility
   - Core and consoleView modules now compile successfully
   - Resolved all "cannot resolve type" and "syntax error" issues in generated entity classes
+- Removed legacy JavaFX classpath code from HabitvLauncher for Java 21 compatibility.
+- All modules now build without 'cannot resolve type' or syntax errors.
 
 ## [4.1.0-SNAPSHOT] - Current Development Version
 

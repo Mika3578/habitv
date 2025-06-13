@@ -182,3 +182,23 @@ Si vous rencontrez des erreurs de compilation liées à ces packages, assurez-vo
 - Added missing maven-compiler-plugin configurations to ensure Java 21 compatibility
 - Core and consoleView modules now compile successfully
 - Resolved "cannot resolve type" and "syntax error" issues in generated entity classes
+
+## Building and Running the Main Executable JAR
+
+- The main application (GUI and CLI) is built as a fat JAR using the Maven Shade Plugin.
+- Requires Java 21 and JavaFX 21.0.2 (all dependencies are included in the JAR).
+- To build:
+  ```sh
+  mvn clean package -pl application/habiTv -am -DskipTests
+  ```
+- The executable JAR will be at:
+  `application/habiTv/target/habiTv-4.1.0-SNAPSHOT.jar`
+- To run the GUI (default):
+  ```sh
+  java -jar application/habiTv/target/habiTv-4.1.0-SNAPSHOT.jar
+  ```
+- To run the CLI:
+  ```sh
+  java -jar application/habiTv/target/habiTv-4.1.0-SNAPSHOT.jar --help
+  ```
+- All entity classes are generated from XSDs and included in the build.
