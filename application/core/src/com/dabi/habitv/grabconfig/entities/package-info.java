@@ -1,0 +1,2 @@
+@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.dabi.com/habitv/grabconfig/entities", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+package com.dabi.habitv.grabconfig.entities;
