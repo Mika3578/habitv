@@ -1,15 +1,59 @@
-application/core/grabconfig.xml
-application/core/testGrabConfig.xml
-application/core/testOldGrabconfig.xml
-plugins/plugin-tester/habiTv.log
-.metadata/
-*.project
-*.classpath
-.settings
-application/core/export.index
-application/core/generated/
-application/core/index/
-application/core/plugins/
-application/core/habiTv.lock
-application/core/habiTv.log
-application/core/bin/
+# Ignorer les dossiers de build Maven
+/target/
+**/target/
+
+# Fichiers de logs
+*.log
+
+# Fichiers temporaires et de sauvegarde
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Fichiers de configuration d'IDE
+/.idea/
+*.iml
+*.ipr
+*.iws
+*.class
+.vscode/
+
+# Fichiers de configuration Eclipse
+.settings/
+.project
+.classpath
+
+# Fichiers de configuration NetBeans
+/nbproject/private/
+/build/
+/dist/
+
+# Dossiers de sortie spécifiques
+application/habiTv-linux/package/windows/
+application/habiTv-windows/package/windows/
+
+# Fichiers de configuration locaux
+config.xml
+configuration.xml
+
+# Exclure les fichiers générés par les tests
+**/test-output/
+
+# Exclure les fichiers de dépendances téléchargées
+/.mvn/
+
+# Exclure les fichiers de cache
+/.cache/
+
+# Exclure les fichiers de backup XML
+*.xml.old
+
+# Exclure les fichiers de configuration utilisateur
+*.user
+

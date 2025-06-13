@@ -188,4 +188,9 @@
       </plugin>			
 		</plugins>
 	</build>
+	<modules>
+		<module>application</module>
+		<module>fwk</module>
+		<module>plugins</module>
+	</modules>
 </project>
