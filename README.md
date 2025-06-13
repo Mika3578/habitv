@@ -9,7 +9,7 @@ Avec habiTv, vous spécifiez les séries/documentaires/programmes que vous souha
 
 Il est ensuite possible de spécifier une série de commande à exécuter dès qu'un épisode est disponible pour par exemple l'exporter vers un support (encodage de la vidéo, transfert FTP, rangement, ...).
 
- 
+
 
 habiTv est utilisable de 2 manières : 
 
@@ -20,7 +20,7 @@ habiTv est utilisable de 2 manières :
         habiTv propose plusieurs paramètres pour rechercher et télécharger des épisodes en ligne de commande
         habiTv peut se lancer en mode démon depuis la ligne de commande et log dans un fichier
 
- 
+
 
 Il supporte actuellement les fournisseurs suivant : 
 
@@ -41,6 +41,24 @@ habiTv est développé en Java 1.7, il se base sur différents outils externes p
     plugin de téléchargement (rtmpDump, curl, aria2c) : encapsule les utilitaires de téléchargement pour une meilleure interaction avec habiTv.
     plugin d'export (ffmpeg, curl) : améliore l'interaction entre les utilitaires permettant d'exporter les vidéos et habiTv
 
- 
+
 
 habiTv est actuellement développé et testé sous Windows et linux.
+
+## Structure du projet
+
+habiTv est un projet Maven multi-modules avec la structure suivante :
+
+### Modules principaux
+- **application** : Contient les modules d'application
+  - core : Cœur de l'application
+  - consoleView : Interface en ligne de commande
+  - trayView : Interface graphique dans la barre des tâches
+  - habiTv : Application principale
+  - habiTv-linux : Distribution pour Linux
+  - habiTv-windows : Distribution pour Windows
+- **fwk** : Contient les modules du framework
+  - api : API du framework
+  - framework : Implémentation du framework
+- **plugins** : Contient tous les plugins pour les différents fournisseurs et outils
+  - 6play, adobeHDS, aria2, arte, beinsport, canalPlus, clubic, cmd, curl, email, ffmpeg, file, footyroom, globalnews, lequipe, mlssoccer, pluzz, RSS, rtmpDump, sfr, youtube, wat, plugin-tester

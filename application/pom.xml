@@ -3,22 +3,24 @@
 	<parent>
 		<groupId>com.dabi.habitv</groupId>
 		<artifactId>parent</artifactId>
-		<version>4.1.0</version>
+		<version>4.1.0-SNAPSHOT</version>
 	</parent>
-	
+
 	<artifactId>application</artifactId>
 	<packaging>pom</packaging>
 
 	<name>habiTv application part</name>
 	<version>4.1.0-SNAPSHOT</version>	
-	
+
 	<modules>
 		<module>core</module>
 		<module>consoleView</module>
 		<module>trayView</module>		
 		<module>habiTv</module>
+		<module>habiTv-linux</module>
+		<module>habiTv-windows</module>
 	</modules>
-	
+
 	<dependencyManagement>
 	<dependencies>
 		<dependency>

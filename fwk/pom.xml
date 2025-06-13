@@ -5,10 +5,15 @@
 		<artifactId>parent</artifactId>
 		<version>4.1.0-SNAPSHOT</version>
 	</parent>
-	
+
 	<artifactId>fwk</artifactId>
 	<packaging>pom</packaging>
 
 	<name>fwk habiTv</name>
+
+	<modules>
+		<module>api</module>
+		<module>framework</module>
+	</modules>
 
 </project>
