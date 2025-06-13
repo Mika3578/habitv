@@ -196,6 +196,27 @@ Si vous rencontrez des erreurs de compilation liées à ces packages, assurez-vo
 - Core and consoleView modules now compile successfully
 - Resolved "cannot resolve type" and "syntax error" issues in generated entity classes
 
+## Exécutable JavaFX (habiTv)
+
+Depuis la modernisation Java 21, le module principal `habiTv` est généré sous forme de JAR exécutable autonome (fat JAR) incluant toutes les dépendances, y compris JavaFX 21.0.2.
+
+### Prérequis
+- Java 21 (https://adoptium.net ou https://jdk.java.net/21/)
+
+### Construction
+```sh
+mvn clean package -pl application/habiTv -am -DskipTests
+```
+
+### Lancement de l'interface graphique JavaFX
+```sh
+java -jar application/habiTv/target/habiTv-4.1.0-SNAPSHOT-shaded.jar
+```
+
+Ce JAR contient tout le nécessaire pour lancer l'interface graphique habiTv (JavaFX). Aucune dépendance externe n'est requise côté JavaFX.
+
+---
+
 ## Building and Running the Main Executable JAR
 
 - The main application (GUI and CLI) is built as a fat JAR using the Maven Shade Plugin.

@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 - Main application (GUI/CLI) is now built as a fat JAR with all dependencies using Maven Shade Plugin.
 - Java 21 and JavaFX 21.0.2 compatibility for all modules.
 - All entity classes are generated from XSDs and included in the build.
+- build: generate JavaFX executable JAR for habiTv with Maven Shade
 
 ### Fixed
 - Fixed Maven parent POM resolution issues:

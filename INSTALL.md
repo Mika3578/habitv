@@ -46,4 +46,16 @@
 4. Build the project with:
    ```sh
    mvn clean install -DskipTests
-   ``` 
+   ```
+
+## Lancer l'interface graphique habiTv (JavaFX)
+
+Après compilation, le JAR exécutable autonome (fat JAR) se trouve ici :
+
+    application/habiTv/target/habiTv-4.1.0-SNAPSHOT-shaded.jar
+
+Lancez-le avec :
+
+    java -jar application/habiTv/target/habiTv-4.1.0-SNAPSHOT-shaded.jar
+
+Ce JAR contient toutes les dépendances nécessaires (JavaFX inclus). Seul Java 21 doit être installé sur votre système. 
