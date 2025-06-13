@@ -1,0 +1,34 @@
+# .gitignore for GitHub Pages branch
+
+# IDE files
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.swp
+*.swo
+
+# Build files
+target/
+build/
+out/
+bin/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.bak
+*~
+
+# Keep all repository files for Maven artifacts
+!repository/

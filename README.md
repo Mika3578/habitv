@@ -20,4 +20,12 @@ This repository contains all Maven artifacts from the original HabiTV repository
 - Plugins
 - Dependencies
 
+The following third-party dependencies are mirrored in this repository:
+- junit 4.11
+- jsoup 1.6.3
+- hamcrest-core 1.3
+- activation 1.1
+- jaxb-api 2.0
+- plugin-tester 4.1.0
+
 All artifacts are served over HTTPS through GitHub Pages.
