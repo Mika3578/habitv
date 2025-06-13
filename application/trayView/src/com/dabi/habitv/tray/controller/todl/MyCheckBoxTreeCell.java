@@ -62,22 +62,24 @@ public abstract class MyCheckBoxTreeCell<T> extends TreeCell<T> {
 		}, strConverter);
 	}
 
-	private final static StringConverter defaultTreeItemStringConverter = new StringConverter<TreeItem>() {
-		@Override
-		public String toString(TreeItem treeItem) {
-			return (treeItem == null || treeItem.getValue() == null) ? ""
-					: treeItem.getValue().toString();
-		}
+	private static <T> StringConverter<TreeItem<T>> createDefaultTreeItemStringConverter() {
+		return new StringConverter<TreeItem<T>>() {
+			@Override
+			public String toString(TreeItem<T> treeItem) {
+				return (treeItem == null || treeItem.getValue() == null) ? ""
+						: treeItem.getValue().toString();
+			}
 
-		@Override
-		public TreeItem fromString(String string) {
-			return new TreeItem(string);
-		}
-	};
+			@Override
+			public TreeItem<T> fromString(String string) {
+				return new TreeItem<T>((T) string);
+			}
+		};
+	}
 
 	public MyCheckBoxTreeCell(
 			final Callback<TreeItem<T>, ObservableValue<Boolean>> getSelectedProperty) {
-		this(getSelectedProperty, defaultTreeItemStringConverter);
+		this(getSelectedProperty, MyCheckBoxTreeCell.<T>createDefaultTreeItemStringConverter());
 	}
 
 	public MyCheckBoxTreeCell(

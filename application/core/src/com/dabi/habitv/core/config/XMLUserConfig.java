@@ -20,6 +20,8 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 
+import org.apache.log4j.Logger;
+
 import com.dabi.habitv.api.plugin.dto.ExportDTO;
 import com.dabi.habitv.api.plugin.dto.ProxyDTO;
 import com.dabi.habitv.api.plugin.dto.ProxyDTO.ProtocolEnum;
@@ -48,6 +50,8 @@ import com.dabi.habitv.utils.FileUtils;
 import com.dabi.habitv.utils.XMLUtils;
 
 public class XMLUserConfig implements UserConfig {
+
+	private static final Logger LOG = Logger.getLogger(XMLUserConfig.class);
 
 	private static final int DEFAULT_MAX_ATTEMPTS = 5;
 
@@ -83,7 +87,9 @@ public class XMLUserConfig implements UserConfig {
 			final File confFile = new File(DirUtils.getConfFile());
 			if (oldConfFile.exists()) {
 				Config oldConfig = readOldConfig(oldConfFile);
-				oldConfFile.delete();
+				if (!oldConfFile.delete()) {
+					LOG.warn("Failed to delete old configuration file: " + oldConfFile.getAbsolutePath());
+				}
 				config = convertOldConfig(oldConfig);
 				saveConfig(confFile, config);
 			} else {

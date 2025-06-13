@@ -2,8 +2,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.dabi.habitv</groupId>
-		<artifactId>parent</artifactId>
+		<artifactId>application</artifactId>
 		<version>4.1.0-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>habiTv-windows</artifactId>
 	<packaging>jar</packaging>

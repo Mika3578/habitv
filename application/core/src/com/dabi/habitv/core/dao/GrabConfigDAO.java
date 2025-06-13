@@ -29,7 +29,6 @@ import com.dabi.habitv.api.plugin.exception.TechnicalException;
 import com.dabi.habitv.core.config.HabitTvConf;
 import com.dabi.habitv.grabconfig.entities.Category;
 import com.dabi.habitv.grabconfig.entities.CategoryType;
-import com.dabi.habitv.grabconfig.entities.CategoryType.Configuration;
 import com.dabi.habitv.grabconfig.entities.CategoryType.Excludes;
 import com.dabi.habitv.grabconfig.entities.CategoryType.Includes;
 import com.dabi.habitv.grabconfig.entities.CategoryType.Subcategories;
@@ -39,6 +38,7 @@ import com.dabi.habitv.grabconfig.entities.GrabConfig.Plugins;
 import com.dabi.habitv.grabconfig.entities.Parameter;
 import com.dabi.habitv.grabconfig.entities.Plugin;
 import com.dabi.habitv.grabconfig.entities.Plugin.Categories;
+import com.dabi.habitv.configuration.entities.Configuration;
 import com.dabi.habitv.utils.FileUtils;
 import com.dabi.habitv.utils.XMLUtils;
 
@@ -134,7 +134,7 @@ public class GrabConfigDAO {
 
 		if (categoryDTO.getParameters() != null
 				&& !categoryDTO.getParameters().isEmpty()) {
-			Configuration configuration = new Configuration();
+			CategoryType.Configuration configuration = new CategoryType.Configuration();
 			category.setConfiguration(configuration);
 			for (final Entry<String, String> entry : categoryDTO
 					.getParameters().entrySet()) {
@@ -220,11 +220,13 @@ public class GrabConfigDAO {
 				: StatusEnum.valueOf(category.getStatus()));
 
 		categoryDTO.addSubCategories(subCategoriesDTO);
-		if (category.getConfiguration() != null
-				&& !category.getConfiguration().getAny().isEmpty()) {
-			for (final Object parameter : category.getConfiguration().getAny()) {
-				categoryDTO.addParameter(XMLUtils.getTagName(parameter),
+		if (category.getConfiguration() instanceof CategoryType.Configuration) {
+			CategoryType.Configuration config = (CategoryType.Configuration) category.getConfiguration();
+			if (config.getAny() != null && !config.getAny().isEmpty()) {
+				for (final Object parameter : config.getAny()) {
+					categoryDTO.addParameter(XMLUtils.getTagName(parameter),
 						XMLUtils.getTagValue(parameter));
+				}
 			}
 		}
 		return categoryDTO;
@@ -331,7 +333,7 @@ public class GrabConfigDAO {
 
 	private void buildCategoryConfiguration(Category oldCategory,
 			CategoryType categoryType) {
-		Configuration configuration = new Configuration();
+		CategoryType.Configuration configuration = new CategoryType.Configuration();
 		for (Parameter oldParameter : oldCategory.getParameter()) {
 			configuration.getAny().add(
 					XMLUtils.buildAnyElement(oldParameter.getKey(),

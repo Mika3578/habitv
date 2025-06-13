@@ -46,14 +46,14 @@ class PluginsLoader {
 		for (final Plugin plugin : this.classPlugins) {
 			try {
 				final PluginBaseInterface pluginProviderInterface = plugin
-						.getClassPluginProvider().newInstance();
+						.getClassPluginProvider().getDeclaredConstructor().newInstance();
 				if (PluginClassLoaderInterface.class
 						.isInstance(pluginProviderInterface)) {
 					((PluginClassLoaderInterface) pluginProviderInterface)
 							.setClassLoader(plugin.getClassLoaders());
 				}
 				tmpPlugins.add(pluginProviderInterface);
-			} catch (InstantiationException | IllegalAccessException e) {
+			} catch (Exception e) {
 				throw new TechnicalException(e);
 			}
 		}
