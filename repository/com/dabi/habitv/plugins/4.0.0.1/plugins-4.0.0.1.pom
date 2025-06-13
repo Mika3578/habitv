@@ -1,0 +1,31 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.dabi.habitv</groupId>
+		<artifactId>parent</artifactId>
+		<version>4.0.0.1</version>
+	</parent>
+	<artifactId>plugins</artifactId>
+	<packaging>pom</packaging>
+
+	<name>plugins habiTv</name>
+
+	<modules>
+		<module>canalPlus</module>
+		<module>cmd</module>
+		<module>pluzz</module>
+		<module>aria2</module>
+		<module>curl</module>
+		<module>youtube</module>
+		<module>ffmpeg</module>
+		<module>rtmpDump</module>
+		<module>RSS</module>
+		<module>lequipe</module>
+		<module>beinsport</module>
+		<module>arte</module>
+		<module>nrj12</module>
+		<module>file</module>		
+		<module>tf1</module>
+		<module>clubic</module>
+	</modules>
+</project>

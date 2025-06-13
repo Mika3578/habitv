@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>com.dabi.habitv</groupId>
+  <artifactId>RSS</artifactId>
+  <version>4.0.6-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <timestamp>20150805.060232</timestamp>
+      <buildNumber>5</buildNumber>
+    </snapshot>
+    <lastUpdated>20150805060232</lastUpdated>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>jar</extension>
+        <value>4.0.6-20150805.060232-5</value>
+        <updated>20150805060232</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>4.0.6-20150805.060232-5</value>
+        <updated>20150805060232</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+</metadata>
