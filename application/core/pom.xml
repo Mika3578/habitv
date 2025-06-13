@@ -8,6 +8,28 @@
 	</parent>
 	<artifactId>core</artifactId>
 	<name>core</name>
+
+	<repositories>
+		<repository>
+			<id>maven-central</id>
+			<name>Maven Central</name>
+			<url>https://repo.maven.apache.org/maven2</url>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>maven-central</id>
+			<name>Maven Central</name>
+			<url>https://repo.maven.apache.org/maven2</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>java.net</id>
+			<name>Java.net Repository</name>
+			<url>https://maven.java.net/content/repositories/public/</url>
+		</pluginRepository>
+	</pluginRepositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -41,6 +63,7 @@
 			<plugin>
 				<groupId>com.sun.tools.xjc.maven2</groupId>
 				<artifactId>maven-jaxb-plugin</artifactId>
+				<version>1.1.1</version>
 				<executions>
 					<execution>
 						<id>config</id>
@@ -85,6 +108,14 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.11.0</version>
+				<configuration>
+					<release>21</release>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

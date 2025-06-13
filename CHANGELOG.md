@@ -10,11 +10,31 @@ All notable changes to this project will be documented in this file.
   - Added `api` and `framework` modules to `fwk/pom.xml`
   - Added `plugin-tester` module to `plugins/pom.xml`
 - Added project structure documentation to README.md
+- Migrated to Java 21 and JavaFX 21.0.2:
+  - Updated maven-compiler-plugin to use Java 21
+  - Replaced system dependencies on `javafx:jfxrt` with org.openjfx modules (javafx-controls, javafx-fxml, javafx-graphics)
+  - Added org.openjfx:javafx-maven-plugin to modules with JavaFX main classes
+  - Updated documentation to reflect the migration
+- Modernized build for Java 21 and JavaFX 21.0.2
+- All modules now use Java 21 for compilation
+- Removed all references to Java 1.7/1.8
+- Updated maven-compiler-plugin to 3.11.0 where needed
+- Ensured all submodules inherit or override Java 21 config
 
 ### Fixed
+- Fixed Maven parent POM resolution issues:
+  - Updated parent version in root `pom.xml` from `4.1.0-SNAPSHOT` to `4.1.0`
+  - Updated parent version in all module POMs to consistently use `4.1.0`
+  - Added `<relativePath/>` to all parent references to force repository resolution
+  - Added repository configuration to all POMs to ensure access to the Maven mirror
+  - Fixed invalid repository tag in root POM (`<n>` to `<name>`)
+- Fixed JAXB code generation issues:
+  - Added version (1.1.1) to maven-jaxb-plugin in core module
+  - Added Maven Central and Java.net repositories to core module for plugin resolution
+  - Ensured proper generation of com.dabi.habitv.grabconfig.entities, com.dabi.habitv.config.entities, and com.dabi.habitv.configuration.entities packages
 - Fixed version mismatch in parent POM references:
-  - Updated parent version in `application/pom.xml` from `4.1.0` to `4.1.0-SNAPSHOT`
-  - Updated parent version in `plugins/pom.xml` from `4.1.0` to `4.1.0-SNAPSHOT`
+  - Updated parent version in `application/pom.xml` from `4.1.0` to `4.1.0-SNAPSHOT` (reverted)
+  - Updated parent version in `plugins/pom.xml` from `4.1.0` to `4.1.0-SNAPSHOT` (reverted)
 
 ## [4.1.0-SNAPSHOT] - Current Development Version
 

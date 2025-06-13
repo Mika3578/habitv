@@ -5,7 +5,15 @@
 		<groupId>com.dabi.habitv</groupId>
 		<artifactId>parent</artifactId>
 		<version>4.1.0</version>
+		<relativePath/>
 	</parent>
+
+	<repositories>
+		<repository>
+			<id>habitv-mirror</id>
+			<url>https://mika3578.github.io/habitv/repository/</url>
+		</repository>
+	</repositories>
 	<artifactId>framework</artifactId>
 	<packaging>jar</packaging>
 	<name>framework</name>
@@ -70,5 +78,18 @@
 			<artifactId>log4j</artifactId>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.11.0</version>
+				<configuration>
+					<release>21</release>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
