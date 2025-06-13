@@ -32,4 +32,18 @@
 ## Troubleshooting
 - Ensure JAVA_HOME points to a Java 21 JDK.
 - Use `mvn -version` to confirm Maven and Java versions.
-- For further help, see README.md or open an issue. 
+- For further help, see README.md or open an issue.
+
+## Installation Notes
+
+1. Ensure your Maven settings do not block HTTPS or central repositories.
+2. The project uses the secure GitHub Pages Maven mirror:
+   https://mika3578.github.io/habitv/repository/
+3. If you encounter dependency issues, purge your local repository:
+   ```sh
+   mvn dependency:purge-local-repository -DactTransitively=false -DreResolve=true
+   ```
+4. Build the project with:
+   ```sh
+   mvn clean install -DskipTests
+   ``` 

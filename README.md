@@ -89,6 +89,19 @@ Si vous rencontrez des problèmes de résolution du POM parent, assurez-vous que
    ```
 3. Vous pouvez également essayer de supprimer le cache Maven local pour le POM parent (~/.m2/repository/com/dabi/habitv/parent/4.1.0)
 
+## Maven Repository Mirror
+
+This project uses a secure GitHub Pages Maven mirror for all Habitv dependencies:
+
+```
+<repository>
+  <id>habitv-mirror</id>
+  <url>https://mika3578.github.io/habitv/repository/</url>
+</repository>
+```
+
+This ensures reliable and secure dependency resolution for all modules.
+
 ## JavaFX et Java 21
 
 Le projet a été migré vers Java 21 et utilise les modules JavaFX 21.0.2 pour l'interface graphique. Les principales modifications sont :

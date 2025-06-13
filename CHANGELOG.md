@@ -56,3 +56,5 @@ This is the current development version of habiTv.
 
 - Removed duplicate manual sources in core module; now only generated entity classes are used (Category, CategoryType, Channel, GrabConfig, ObjectFactory, Parameter, Plugin, Config)
 - Marked network-dependent test TestUrl as @Ignore to skip in CI (integration test)
+
+chore: replaced legacy dabiboo HTTP references with secure GitHub Pages Maven mirror
