@@ -32,6 +32,11 @@
 			<artifactId>jsoup</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20231013</version>
+		</dependency>
+		<dependency>
 			<groupId>com.dabi.habitv</groupId>
 			<artifactId>plugin-tester</artifactId>
 			<version>4.1.0-SNAPSHOT</version>

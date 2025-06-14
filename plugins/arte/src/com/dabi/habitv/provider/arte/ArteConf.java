@@ -6,17 +6,24 @@ interface ArteConf {
 
 	String NAME = "arte";
 
-	String CAT_PAGE = "http://www.arte.tv/guide/fr/plus7";
-
-	String ID_EMISSION_TOKEN = "#ID_EMISSION#";
-
-	String RSS_CATEGORY_URL = "http://videos.arte.tv/fr/do_delegate/videos/programmes/" + ID_EMISSION_TOKEN + ",view,rss.xml";
-
-	String ID_EPISODE_TOKEN = "#ID_EPISODE#";
-
-	String RTMPDUMP_CMD = "-r \"#VIDEO_URL#\" -c 1935 -m 10 -o \"#FILE_DEST#\"";
-
-	String HOME_URL = "http://www.arte.tv";
+	// New Arte API URLs
+	String HOME_URL = "https://www.arte.tv";
+	String API_BASE_URL = "https://api.arte.tv/api/emac/v4";
+	
+	// Language codes for different Arte sites
+	String[] LANGUAGES = {"en", "fr", "de", "es", "pl", "it"};
+	
+	// Main category IDs
+	String[] CATEGORIES = {
+		"CIN",    // Cinema
+		"DOR",    // Documentaries and Reportage
+		"CRE",    // Creative
+		"POL",    // Politics and Society
+		"SCI",    // Science
+		"CON",    // Concerts
+		"JEU",    // Youth
+		"SPO"     // Sports
+	};
 
 	String EXTENSION = FrameworkConf.MP4;
 

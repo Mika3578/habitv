@@ -3,8 +3,12 @@ package com.dabi.habitv.provider.arte;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,100 +24,191 @@ import com.dabi.habitv.api.plugin.holder.ProcessHolder;
 import com.dabi.habitv.framework.plugin.api.BasePluginWithProxy;
 import com.dabi.habitv.framework.plugin.utils.DownloadUtils;
 
-public class ArtePluginManager extends BasePluginWithProxy implements PluginProviderDownloaderInterface { // NO_UCD
+public class ArtePluginManager extends BasePluginWithProxy implements PluginProviderDownloaderInterface {
+
+	private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36";
+
+	@Override
+	public Set<EpisodeDTO> findEpisode(CategoryDTO category) {
+		Set<EpisodeDTO> episodes = new LinkedHashSet<>();
+		
+		try {
+			String categoryUrl = category.getId();
+			String language = extractLanguageFromUrl(categoryUrl);
+			String categoryCode = extractCategoryFromUrl(categoryUrl);
+			
+			// Build the category URL
+			String url = String.format("https://www.arte.tv/%s/videos/%s/", language, getCategorySlug(categoryCode));
+			
+			// Get the page content
+			Document doc = Jsoup.connect(url)
+					.userAgent(USER_AGENT)
+					.timeout(30000)
+					.get();
+			
+			// Extract embedded JSON data
+			String jsonData = extractJsonData(doc);
+			if (jsonData != null) {
+				JSONObject json = new JSONObject(jsonData);
+				episodes.addAll(parseEpisodesFromJson(json, language));
+			}
+			
+		} catch (Exception e) {
+			getLog().error("Error parsing Arte category " + category.getName() + ": " + e.getMessage(), e);
+		}
+		
+		return episodes;
+	}
+
+	@Override
+	public Set<CategoryDTO> findCategory() {
+		Set<CategoryDTO> categories = new LinkedHashSet<>();
+		
+		for (String language : ArteConf.LANGUAGES) {
+			for (String categoryCode : ArteConf.CATEGORIES) {
+				try {
+					String categoryName = getCategoryName(categoryCode, language);
+					String categoryId = String.format("%s/%s", language, categoryCode);
+					
+					CategoryDTO category = new CategoryDTO(ArteConf.NAME, categoryName, categoryId, ArteConf.EXTENSION);
+					categories.add(category);
+					
+				} catch (Exception e) {
+					getLog().error("Error creating Arte category " + language + "/" + categoryCode + ": " + e.getMessage());
+				}
+			}
+		}
+		
+		return categories;
+	}
+
+	@Override
+	public ProcessHolder download(DownloadParamDTO downloadParam, DownloaderPluginHolder downloaders) throws DownloadFailedException {
+		// This would need to be implemented to actually download the video
+		// For now, we'll use youtube-dl as a fallback
+		return DownloadUtils.download(downloadParam, downloaders, "youtube");
+	}
 
 	@Override
 	public String getName() {
 		return ArteConf.NAME;
 	}
 
-	@Override
-	public Set<EpisodeDTO> findEpisode(final CategoryDTO category) {
-		final Set<EpisodeDTO> episodes = new LinkedHashSet<>();
-
-		Document doc = Jsoup.parse(getUrlContent(category.getId()));
-		for (Element aEp : doc.select("section#videos article a")) {
-			String url = ArteConf.HOME_URL + aEp.attr("href");
-			final String name = aEp.select("h3").first().text();
-			if (!StringUtils.isEmpty(name)) {
-				episodes.add(new EpisodeDTO(category, name, url));
+	private String extractJsonData(Document doc) {
+		// Look for the embedded JSON data in script tags
+		Elements scripts = doc.select("script");
+		for (Element script : scripts) {
+			String scriptContent = script.html();
+			if (scriptContent.contains("window.__INITIAL_STATE__")) {
+				// Extract the JSON data from the script
+				Pattern pattern = Pattern.compile("window\\.__INITIAL_STATE__\\s*=\\s*({.*?});", Pattern.DOTALL);
+				Matcher matcher = pattern.matcher(scriptContent);
+				if (matcher.find()) {
+					return matcher.group(1);
+				}
 			}
 		}
-//		for (Element aEp : doc.select("div#playlistContainer li")) {
-//			String url = ArteConf.HOME_URL + aEp.attr("href");
-//			final String name = aEp.select("h3").first().text();
-//			if (!StringUtils.isEmpty(name)) {
-//				episodes.add(new EpisodeDTO(category, name, url));
-//			}
-//		}		
+		return null;
+	}
+
+	private Set<EpisodeDTO> parseEpisodesFromJson(JSONObject json, String language) {
+		Set<EpisodeDTO> episodes = new LinkedHashSet<>();
+		
+		try {
+			// Navigate through the JSON structure to find video data
+			if (json.has("data")) {
+				JSONObject data = json.getJSONObject("data");
+				if (data.has("zones")) {
+					JSONArray zones = data.getJSONArray("zones");
+					for (int i = 0; i < zones.length(); i++) {
+						JSONObject zone = zones.getJSONObject(i);
+						if (zone.has("content") && zone.getJSONObject("content").has("data")) {
+							JSONArray contentData = zone.getJSONObject("content").getJSONArray("data");
+							for (int j = 0; j < contentData.length(); j++) {
+								JSONObject video = contentData.getJSONObject(j);
+								EpisodeDTO episode = createEpisodeFromVideo(video, language);
+								if (episode != null) {
+									episodes.add(episode);
+								}
+							}
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			getLog().error("Error parsing episodes from JSON: " + e.getMessage(), e);
+		}
+		
 		return episodes;
 	}
 
-	@Override
-	public Set<CategoryDTO> findCategory() {
-		final Set<CategoryDTO> categories = new LinkedHashSet<>();
-
-		final Document doc = Jsoup.parse(getUrlContent(ArteConf.HOME_URL));
-
-		final Elements aChannels = doc.select("ul.next-language__list li.next-language__list-item a");
-
-		for (final Element aLanguage : aChannels) {
-			String href = aLanguage.attr("href");
-			String language = aLanguage.text();
-			CategoryDTO languageCat = new CategoryDTO(ArteConf.NAME, language, href, ArteConf.EXTENSION);
-			languageCat.setDownloadable(false);
-			languageCat.addSubCategories(findCategoryByLanguage(href));
-			categories.add(languageCat);
-		}
-
-		return categories;
-	}
-
-	private Collection<CategoryDTO> findCategoryByLanguage(String languageUrl) {
-		final Set<CategoryDTO> categories = new LinkedHashSet<>();
-
-		final Document doc = Jsoup.parse(getUrlContent(languageUrl));
-
-		final Elements aMainCats = doc.select("ul.next-menu-nav__main-menu li.next-menu-nav__menu-item a");
-
-		for (final Element aMainCat : aMainCats) {
-			String url = ArteConf.HOME_URL + aMainCat.attr("href");
-			String text = aMainCat.text();
-			CategoryDTO mainCat = new CategoryDTO(ArteConf.NAME, text, url, ArteConf.EXTENSION);
-			mainCat.setDownloadable(false);
-			mainCat.addSubCategories(findSubCategory(url));
-			categories.add(mainCat);
-		}
-
-		return categories;
-	}
-
-	private Collection<CategoryDTO> findSubCategory(String catUrl) {
-		final Set<CategoryDTO> categories = new LinkedHashSet<>();
-
-		final Document doc = Jsoup.parse(getUrlContent(catUrl));
-
-		addSubCategories(categories, doc, "collections");
-		//addSubCategories(categories, doc, "playlists_");
-
-		return categories;
-	}
-
-	private void addSubCategories(final Set<CategoryDTO> categories, final Document doc, String clazz) {
-		final Elements aMainCats = doc.select("div[class~="+clazz+"_] article a");
-
-		for (final Element aMainCat : aMainCats) {
-			String href = aMainCat.attr("href");
-			String text = aMainCat.select("h3").first().text();
-			CategoryDTO cat = new CategoryDTO(ArteConf.NAME, text, href, ArteConf.EXTENSION);
-			cat.setDownloadable(true);
-			categories.add(cat);
+	private EpisodeDTO createEpisodeFromVideo(JSONObject video, String language) {
+		try {
+			String programId = video.getString("programId");
+			String title = video.getString("title");
+			String url = video.getString("url");
+			
+			// Build the full URL
+			String fullUrl = "https://www.arte.tv" + url;
+			
+			// Create episode name
+			String episodeName = title;
+			if (video.has("durationLabel")) {
+				episodeName += " (" + video.getString("durationLabel") + ")";
+			}
+			
+			return new EpisodeDTO(null, episodeName, fullUrl);
+			
+		} catch (Exception e) {
+			getLog().error("Error creating episode from video data: " + e.getMessage());
+			return null;
 		}
 	}
 
-	@Override
-	public ProcessHolder download(final DownloadParamDTO downloadParam, final DownloaderPluginHolder downloaders) throws DownloadFailedException {
-		return DownloadUtils.download(downloadParam, downloaders, "youtube");
+	private String extractLanguageFromUrl(String url) {
+		if (url.startsWith("en/")) return "en";
+		if (url.startsWith("fr/")) return "fr";
+		if (url.startsWith("de/")) return "de";
+		if (url.startsWith("es/")) return "es";
+		if (url.startsWith("pl/")) return "pl";
+		if (url.startsWith("it/")) return "it";
+		return "en"; // default
+	}
+
+	private String extractCategoryFromUrl(String url) {
+		String[] parts = url.split("/");
+		if (parts.length > 1) {
+			return parts[1];
+		}
+		return "CIN"; // default
+	}
+
+	private String getCategorySlug(String categoryCode) {
+		switch (categoryCode) {
+			case "CIN": return "cinema";
+			case "DOR": return "documentaries-and-reportage";
+			case "CRE": return "creative";
+			case "POL": return "politics-and-society";
+			case "SCI": return "science";
+			case "CON": return "concerts";
+			case "JEU": return "youth";
+			case "SPO": return "sports";
+			default: return "cinema";
+		}
+	}
+
+	private String getCategoryName(String categoryCode, String language) {
+		switch (categoryCode) {
+			case "CIN": return "Cinema";
+			case "DOR": return "Documentaries and Reportage";
+			case "CRE": return "Creative";
+			case "POL": return "Politics and Society";
+			case "SCI": return "Science";
+			case "CON": return "Concerts";
+			case "JEU": return "Youth";
+			case "SPO": return "Sports";
+			default: return "Cinema";
+		}
 	}
 
 	@Override
