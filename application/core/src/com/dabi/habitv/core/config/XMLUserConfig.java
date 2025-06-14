@@ -223,7 +223,6 @@ public class XMLUserConfig implements UserConfig {
 		config.setDownloadConfig(downloadConfig);
 	}
 
-	@SuppressWarnings("unchecked")
 	private static Config readOldConfig(final File confFile)
 			throws JAXBException, UnsupportedEncodingException,
 			FileNotFoundException {
@@ -235,7 +234,7 @@ public class XMLUserConfig implements UserConfig {
 		FileUtils.setValidation(unmarshaller, OLD_CONF_XSD);
 		config = ((JAXBElement<Config>) unmarshaller
 				.unmarshal(new InputStreamReader(new FileInputStream(confFile),
-						HabitTvConf.ENCODING))).getValue();
+					HabitTvConf.ENCODING))).getValue();
 		return config;
 	}
 

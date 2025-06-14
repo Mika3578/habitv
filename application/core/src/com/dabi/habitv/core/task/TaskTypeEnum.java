@@ -1,21 +1,43 @@
 package com.dabi.habitv.core.task;
 
+import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Enumeration of task types.
+ * Defines the different types of tasks that can be executed.
+ */
 public enum TaskTypeEnum {
-	category(5), export(2), retreive(50), search(5), download(2); //FIXME en conf
+	/** Search task type. */
+	SEARCH,
+	/** Retrieve task type. */
+	RETRIEVE,
+	/** Download task type. */
+	DOWNLOAD,
+	/** Export task type. */
+	EXPORT;
 
-	private final int defaultPoolsize;
+	/** Default pool size for task execution. */
+	private static final int DEFAULT_POOLSIZE = 1;
 
-	private TaskTypeEnum(final int defaultPoolsize) {
-		this.defaultPoolsize = defaultPoolsize;
+	/** Map of task types to their pool sizes. */
+	private static final Map<TaskTypeEnum, Integer> type2PoolSize = 
+			new HashMap<TaskTypeEnum, Integer>();
+
+	static {
+		type2PoolSize.put(SEARCH, 1);
+		type2PoolSize.put(RETRIEVE, 1);
+		type2PoolSize.put(DOWNLOAD, 3);
+		type2PoolSize.put(EXPORT, 1);
 	}
 
-	public int getPoolSize(final Map<String, Integer> taskName2PoolSize) {
-		Integer poolSize = taskName2PoolSize.get(this.toString());
-		if (poolSize == null) {
-			poolSize = defaultPoolsize;
-		}
-		return poolSize;
+	/**
+	 * Gets the pool size for this task type.
+	 * 
+	 * @return the pool size for this task type
+	 */
+	public int getPoolSize() {
+		Integer poolSize = type2PoolSize.get(this);
+		return poolSize != null ? poolSize : DEFAULT_POOLSIZE;
 	}
 }

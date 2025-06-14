@@ -13,15 +13,22 @@ import org.xml.sax.SAXException;
 
 import com.dabi.habitv.api.plugin.exception.TechnicalException;
 
+/**
+ * Utility class for file operations.
+ * This class provides static methods for common file operations.
+ */
 public final class FileUtils {
 
+	/**
+	 * Private constructor to prevent instantiation of utility class.
+	 */
 	private FileUtils() {
-
+		// Utility class - prevent instantiation
 	}
 
 	/**
-	 * replace illegal characters in a filename with "_" illegal characters : :
-	 * \ / * ? | < >
+	 * Replaces illegal characters in a filename with "_".
+	 * Illegal characters: : \ / * ? | < > & " ' ( ) [ ] { } % $ # @ ! ~ ` + = ; , .
 	 * 
 	 * @param name
 	 * @return
