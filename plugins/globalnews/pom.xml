@@ -4,7 +4,8 @@
 	<parent>
 		<groupId>com.dabi.habitv</groupId>
 		<artifactId>parent</artifactId>
-		<version>4.1.0</version>
+		<version>4.1.0-SNAPSHOT</version>
+		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<artifactId>globalnews</artifactId>
 	<version>4.1.0-SNAPSHOT</version>
@@ -14,7 +15,7 @@
 		<dependency>
 			<groupId>com.dabi.habitv</groupId>
 			<artifactId>plugin-tester</artifactId>
-			<version>4.1.0</version>
+			<version>4.1.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>	
 		<dependency>
@@ -32,3 +33,5 @@
 		</dependency>
 	</dependencies>
 </project>
+
+

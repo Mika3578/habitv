@@ -42,8 +42,8 @@ public class BasePluginUpdateTester implements Subscriber<UpdatablePluginEvent> 
 	
 	}
 
-	protected void testUpdatablePlugin(final Class<? extends UpdatablePluginInterface> class1) throws InstantiationException, IllegalAccessException {
-		final UpdatablePluginInterface updatablePlugin = class1.newInstance();
+	protected void testUpdatablePlugin(final Class<? extends UpdatablePluginInterface> class1) throws InstantiationException, IllegalAccessException, ReflectiveOperationException {
+		final UpdatablePluginInterface updatablePlugin = class1.getDeclaredConstructor().newInstance();
 		updatablePlugin.update(publisher, downloaders);
 	}
 

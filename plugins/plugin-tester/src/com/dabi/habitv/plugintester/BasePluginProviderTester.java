@@ -152,8 +152,8 @@ public class BasePluginProviderTester {
 	}
 
 	public void testPluginProvider(final Class<? extends PluginProviderInterface> prDlPluginClass, final boolean episodeOnlyOnLeaf)
-	        throws InstantiationException, IllegalAccessException, DownloadFailedException {
-		final PluginProviderInterface plugin = prDlPluginClass.newInstance();
+	        throws InstantiationException, IllegalAccessException, DownloadFailedException, ReflectiveOperationException {
+		final PluginProviderInterface plugin = prDlPluginClass.getDeclaredConstructor().newInstance();
 		testPluginProvider(plugin, episodeOnlyOnLeaf);
 	}
 

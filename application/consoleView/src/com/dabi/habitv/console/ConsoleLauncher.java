@@ -309,7 +309,7 @@ public final class ConsoleLauncher {
 			CategoryDTO categoryDTO = it.next();
 			boolean subCatFound = checkAndDLMode(categoryDTO.getSubCategories(), categoryList);
 			if (!(subCatFound || categoryDTO.isSelected() || (categoryList != null && categoryList
-					.contains(categoryDTO)))) {
+					.contains(categoryDTO.getId())))) {
 				it.remove();
 			} else {
 				found = true;

@@ -51,8 +51,7 @@ public class UpdateController {
 		new Thread(runTask).start();
 	}
 
-	class RunHabitvTask extends Task<Void> implements UpdateSubscriber,
-			CoreSubscriber {
+	class RunHabitvTask extends Task<Void> implements CoreSubscriber {
 
 		private Stage stage;
 		private int updateSize;

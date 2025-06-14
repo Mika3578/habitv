@@ -1,8 +1,6 @@
 package com.dabi.habitv.tray.controller.todl;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,7 +15,6 @@ import java.util.TreeMap;
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
 import com.dabi.habitv.api.plugin.dto.StatusEnum;
-import com.dabi.habitv.api.plugin.exception.TechnicalException;
 import com.dabi.habitv.api.plugin.pub.UpdatablePluginEvent;
 import com.dabi.habitv.core.event.RetreiveEvent;
 import com.dabi.habitv.core.event.SearchCategoryEvent;
@@ -754,9 +751,9 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 		});
 	}
 
-	private static final StringConverter STR_CONVERTER = new StringConverter<TreeItem>() {
+	private static final StringConverter<TreeItem<CategoryDTO>> STR_CONVERTER = new StringConverter<TreeItem<CategoryDTO>>() {
 		@Override
-		public String toString(TreeItem treeItem) {
+		public String toString(TreeItem<CategoryDTO> treeItem) {
 			CategoryTreeItem categoryTreeItem = (CategoryTreeItem) treeItem;
 			return (treeItem == null || treeItem.getValue() == null) ? "" : categoryTreeItem.getValue().getName();
 			// + (hasSelectedChild(categoryTreeItem.getValue()) ? "*"
@@ -777,8 +774,8 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 	    // }
 
 		@Override
-		public TreeItem fromString(String string) {
-			return new TreeItem(string);
+		public TreeItem<CategoryDTO> fromString(String string) {
+			return new TreeItem<CategoryDTO>(new CategoryDTO(null, string, string, null));
 		}
 	};
 

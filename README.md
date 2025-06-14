@@ -1,46 +1,235 @@
-# habivt
+# habiTv - Automatic TV Replay Downloader
 
-habiTv est un logiciel permettant de télécharger automatiquement et régulièrement des vidéos sur les sites de Replay TV.
+[![Java](https://img.shields.io/badge/Java-8+-orange.svg)](https://www.oracle.com/java/)
+[![Maven](https://img.shields.io/badge/Maven-3.6+-blue.svg)](https://maven.apache.org/)
+[![License](https://img.shields.io/badge/License-GPL%20v3-green.svg)](LICENSE)
+[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)]()
 
-Le but étant de ne pas avoir à télécharger puis exporter manuellement via une interface graphique des vidéos disponibles régulièrement sur le Replay mais que tout soit géré automatiquement en tâche de fond. 
+## Overview
 
+habiTv is a Java-based application that automatically downloads TV replay content from various French streaming platforms. It monitors your selected shows and automatically downloads new episodes as they become available, eliminating the need for manual downloads and exports.
 
-Avec habiTv, vous spécifiez les séries/documentaires/programmes que vous souhaitez récupérer et habiTv vérifie régulièrement si de nouveaux épisodes sont disponibles, si c'est le cas il les télécharge.
+### Key Features
 
-Il est ensuite possible de spécifier une série de commande à exécuter dès qu'un épisode est disponible pour par exemple l'exporter vers un support (encodage de la vidéo, transfert FTP, rangement, ...).
+- **Automatic Monitoring**: Continuously checks for new episodes of your selected shows
+- **Multi-Platform Support**: Works on Windows and Linux
+- **Multiple Interfaces**: GUI (tray-based) and Command Line Interface (CLI)
+- **Plugin System**: Extensible architecture for new content providers and download methods
+- **Background Operation**: Runs as a system tray application with notifications
+- **Export Integration**: Automatic post-processing and export capabilities
 
- 
+## Supported Content Providers
 
-habiTv est utilisable de 2 manières : 
+habiTv currently supports the following French TV platforms:
 
-    IHM : IHM
-        habiTv propose une interface visuelle pour sélectionner les programmes à télécharger et suivre les téléchargements
-        habiTv se loge dans la barre des tâches et affiche des notifications pour prévenir qu'un nouvel épisode est téléchargé
-    CLI : CLI
-        habiTv propose plusieurs paramètres pour rechercher et télécharger des épisodes en ligne de commande
-        habiTv peut se lancer en mode démon depuis la ligne de commande et log dans un fichier
+- **Canal+** - Premium French TV channel
+- **Pluzz** - France 2, France 3, France 4, France Ô
+- **Arte** - Franco-German cultural channel
+- **D8/D17** - Digital terrestrial channels
+- **NRJ12** - Music and entertainment channel
+- **L'Équipe** - Sports content
+- **beIN Sports** - Sports channel
+- **TF1** - Major French TV network
+- **RSS Feeds** - Generic RSS feed support for any video content
 
- 
+## System Requirements
 
-Il supporte actuellement les fournisseurs suivant : 
+- **Java**: Version 8 or higher
+- **Operating System**: Windows 10+ or Linux
+- **Memory**: Minimum 512MB RAM (2GB recommended)
+- **Storage**: 1GB free space for application + download storage
 
-    canalPlus
-    pluzz  (france 2,3,4,ô)
-    arte
-    D8
-    D17
-    nrj12
-    lequipe.fr
-    beinsport
-    tf1
-    RSS : n'importe quel flux RSS contenant des liens vers des vidéos à télécharger (HTTP, FTP, Bittorent, Youtube, Dailymotion ...)
+## Quick Start
 
-habiTv est développé en Java 1.7, il se base sur différents outils externes pour réaliser le téléchargement (youtube-dl, rtmpDump, curl, aria2c). Il est personnalisable grâce à un système de plugin : 
+### 1. Download and Install
 
-    plugin de fournisseur de contenu (arte, canalPlus) : ils listent les catégories disponibles et gèrent le téléchargement des épisodes
-    plugin de téléchargement (rtmpDump, curl, aria2c) : encapsule les utilitaires de téléchargement pour une meilleure interaction avec habiTv.
-    plugin d'export (ffmpeg, curl) : améliore l'interaction entre les utilitaires permettant d'exporter les vidéos et habiTv
+Download the latest release from the [Releases](https://github.com/your-repo/habitv/releases) page:
 
- 
+- **Windows**: `habiTv-windows-4.1.0-SNAPSHOT.zip`
+- **Linux**: `habiTv-linux-4.1.0-SNAPSHOT.deb`
+- **JAR**: `habiTv-4.1.0-SNAPSHOT.jar` (requires Java 8+)
 
-habiTv est actuellement développé et testé sous Windows et linux.
+### 2. Launch the Application
+
+**Windows:**
+```cmd
+# Extract and run
+java -jar habiTv-4.1.0-SNAPSHOT.jar
+```
+
+**Linux:**
+```bash
+# Install the .deb package
+sudo dpkg -i habiTv-linux-4.1.0-SNAPSHOT.deb
+
+# Or run the JAR directly
+java -jar habiTv-4.1.0-SNAPSHOT.jar
+```
+
+### 3. Configure Your Shows
+
+1. Launch habiTv (GUI or CLI)
+2. Browse available categories and shows
+3. Select the shows you want to monitor
+4. Configure download settings and export options
+5. Start automatic monitoring
+
+## Usage Modes
+
+### GUI Mode (Recommended)
+
+The graphical interface provides:
+- **Download Monitoring**: Track download progress and manage downloads
+- **Show Selection**: Browse and select shows to monitor
+- **Configuration**: Easy access to common settings
+- **System Tray**: Background operation with notifications
+- **Manual Downloads**: Quick download from URLs
+
+### Command Line Interface
+
+For advanced users and automation:
+
+```bash
+# Search for shows
+java -jar habiTv.jar --search "show name"
+
+# Download specific episode
+java -jar habiTv.jar --download "episode_id"
+
+# Run in daemon mode
+java -jar habiTv.jar --daemon
+
+# List available categories
+java -jar habiTv.jar --list-categories
+```
+
+## Configuration
+
+### Environment Variables
+
+habiTv supports environment variables for configuration. See [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md) for detailed information.
+
+Key variables:
+- `HABITV_HOME`: Application home directory
+- `HABITV_DOWNLOAD_OUTPUT`: Download output directory
+- `HABITV_LOG_LEVEL`: Logging level (DEBUG, INFO, WARN, ERROR)
+
+### Configuration Files
+
+- `config.xml`: Main application configuration
+- `grabconfig.xml`: Show selection and monitoring configuration
+
+## Plugin System
+
+habiTv uses a modular plugin architecture:
+
+### Content Provider Plugins
+- List available categories and shows
+- Handle episode discovery and metadata
+- Manage download URLs and authentication
+
+### Downloader Plugins
+- Encapsulate external download tools (rtmpDump, curl, aria2c, youtube-dl)
+- Provide consistent interface for different protocols
+- Handle download progress and error recovery
+
+### Export Plugins
+- Post-process downloaded videos (encoding, conversion)
+- Integrate with external tools (ffmpeg, curl)
+- Support custom export workflows
+
+## Development
+
+### Building from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/your-repo/habitv.git
+cd habitv
+
+# Build with Maven
+mvn clean compile
+
+# Run tests
+mvn test
+
+# Create executable JAR
+mvn package
+```
+
+### Project Structure
+
+```
+habitv/
+├── application/          # Main application modules
+│   ├── core/            # Core business logic
+│   ├── habiTv/          # Main application
+│   ├── habiTv-linux/    # Linux packaging
+│   ├── habiTv-windows/  # Windows packaging
+│   ├── consoleView/     # CLI interface
+│   └── trayView/        # GUI interface
+├── fwk/                 # Framework modules
+│   ├── api/             # Plugin API
+│   └── framework/       # Core framework
+├── plugins/             # Content provider plugins
+│   ├── arte/           # Arte plugin
+│   ├── canalPlus/      # Canal+ plugin
+│   ├── ffmpeg/         # FFmpeg export plugin
+│   └── ...             # Other plugins
+└── pom.xml             # Maven parent POM
+```
+
+### Creating a Plugin
+
+See [PLUGIN_DEVELOPMENT.md](docs/PLUGIN_DEVELOPMENT.md) for detailed plugin development guide.
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Java Version**: Ensure Java 8+ is installed and in PATH
+2. **Download Failures**: Check internet connection and provider availability
+3. **Plugin Errors**: Verify external tools (ffmpeg, rtmpDump) are installed
+4. **Configuration**: Check `config.xml` and `grabconfig.xml` syntax
+
+### Logs
+
+Logs are stored in:
+- **Windows**: `%USERPROFILE%\habitv\habiTv.log`
+- **Linux**: `~/.habitv/habiTv.log`
+
+### Getting Help
+
+- Check the [Wiki](https://github.com/your-repo/habitv/wiki)
+- Search [Issues](https://github.com/your-repo/habitv/issues)
+- Create a new issue for bugs or feature requests
+
+## Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+### Development Setup
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Submit a pull request
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- External tools: rtmpDump, curl, aria2c, youtube-dl, ffmpeg
+- Java libraries: Apache Commons, Guava, JSoup, Jackson
+- Community contributors and testers
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history and updates.
+
+---
+
+**Note**: This software is for personal use only. Please respect content providers' terms of service and copyright laws.

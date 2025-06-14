@@ -1,6 +1,5 @@
 package com.dabi.habitv.tray;
 
-import com.dabi.habitv.tray.HabiTvSplashScreen;
 import com.dabi.habitv.utils.LogUtils;
 
 import javafx.application.Application;

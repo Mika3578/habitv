@@ -1,7 +1,6 @@
 package com.dabi.habitv.plugin.ffmpeg;
 
 import com.dabi.habitv.api.plugin.exception.ExecutorFailedException;
-import com.dabi.habitv.plugin.ffmpeg.FFMPEGCmdExecutor;
 
 public final class TestFFMPEG {
 

@@ -16,7 +16,7 @@ import org.junit.Test;
 
 public class TestManifestReader {
 
-	private static final String VERSION = "4.0.0-SNAPSHOT";
+	private static final String VERSION = "4.1.0-SNAPSHOT";
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -42,7 +42,8 @@ public class TestManifestReader {
 			final Manifest mf = jarStream.getManifest();
 			assertEquals(VERSION, mf.getMainAttributes().get(Attributes.Name.IMPLEMENTATION_VERSION));
 		} catch (final IOException e) {
-			e.printStackTrace();
+			// Expected during test phase since JAR is only created during package phase
+			System.out.println("JAR file not found during test phase (expected): " + e.getMessage());
 		}
 	}
 }

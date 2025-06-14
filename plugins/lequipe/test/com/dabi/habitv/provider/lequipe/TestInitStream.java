@@ -6,7 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.net.URL;
+import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.regex.Matcher;
@@ -46,7 +46,7 @@ public class TestInitStream {
 	public final void test() {
 		try {
 			final String url = "http://api.kewego.com/config/getStreamInit/";
-			final URLConnection hc = (new URL(url)).openConnection();
+			final URLConnection hc = (new java.net.URI(url).toURL()).openConnection();
 			hc.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:14.0) Gecko/20100101 Firefox/14.0.1");
 			// hc.setRequestProperty("Referer",
 			// "http://s.kewego.com/swf/kp.swf?v=20120530");
@@ -90,7 +90,7 @@ public class TestInitStream {
 			assertEquals(160, ret.length());
 			System.out.println("curl \"http://api.kewego.com/video/getStream/?appToken=" + ret + "&sig=" + sig + "&format=w640&v=2749\""
 					+ "  -C - -L -g -A \"Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)\" -o \"test.mp4\" ");
-		} catch (final IOException e) {
+		} catch (final IOException | URISyntaxException e) {
 			throw new TechnicalException(e);
 		}
 	}
