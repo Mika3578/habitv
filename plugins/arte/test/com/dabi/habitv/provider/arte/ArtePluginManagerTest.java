@@ -8,7 +8,7 @@ import com.dabi.habitv.plugintester.BasePluginProviderTester;
 public class ArtePluginManagerTest extends BasePluginProviderTester {
 
 	@Test
-	public final void testArtePluginManager() throws InstantiationException, IllegalAccessException, DownloadFailedException {
+	public final void testArtePluginManager() throws InstantiationException, IllegalAccessException, DownloadFailedException, ReflectiveOperationException {
 		testPluginProvider(ArtePluginManager.class, true);
 	}
 }

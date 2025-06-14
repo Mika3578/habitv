@@ -8,7 +8,7 @@ import com.dabi.habitv.plugintester.BasePluginProviderTester;
 public class ClubicPluginManagerTest extends BasePluginProviderTester {
 
 	@Test
-	public final void testProviderClubic() throws InstantiationException, IllegalAccessException, DownloadFailedException {
+	public final void testProviderClubic() throws InstantiationException, IllegalAccessException, DownloadFailedException, ReflectiveOperationException {
 		testPluginProvider(ClubicPluginManager.class, true);
 	}
 

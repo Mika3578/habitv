@@ -23,7 +23,7 @@ public class YoutubePluginDownloaderTest extends BasePluginUpdateTester {
 	}
 
 	@Test
-	public final void testYoutube() throws InstantiationException, IllegalAccessException {
+	public final void testYoutube() throws InstantiationException, IllegalAccessException, ReflectiveOperationException {
 		testUpdatablePlugin(YoutubePluginDownloader.class);
 	}
 }

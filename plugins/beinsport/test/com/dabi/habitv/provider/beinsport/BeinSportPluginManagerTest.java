@@ -8,7 +8,7 @@ import com.dabi.habitv.plugintester.BasePluginProviderTester;
 public class BeinSportPluginManagerTest extends BasePluginProviderTester {
 
 	@Test
-	public final void testBeinSport() throws InstantiationException, IllegalAccessException, DownloadFailedException {
+	public final void testBeinSport() throws InstantiationException, IllegalAccessException, DownloadFailedException, ReflectiveOperationException {
 		testPluginProvider(BeinSportPluginManager.class, true);
 	}
 }

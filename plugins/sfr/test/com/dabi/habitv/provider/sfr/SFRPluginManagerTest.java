@@ -12,7 +12,7 @@ import com.dabi.habitv.plugintester.BasePluginProviderTester;
 public class SFRPluginManagerTest extends BasePluginProviderTester {
 
 	@Test
-	public final void testSFR() throws InstantiationException, IllegalAccessException, DownloadFailedException {
+	public final void testSFR() throws InstantiationException, IllegalAccessException, DownloadFailedException, ReflectiveOperationException {
 		testPluginProvider(SFRPluginManager.class, true);
 	}
 	

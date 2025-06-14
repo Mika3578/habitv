@@ -8,7 +8,7 @@ import com.dabi.habitv.plugintester.BasePluginProviderTester;
 public class YoutubePluginManagerTest extends BasePluginProviderTester {
 
 	@Test
-	public final void test() throws InstantiationException, IllegalAccessException, DownloadFailedException {
+	public final void test() throws InstantiationException, IllegalAccessException, DownloadFailedException, ReflectiveOperationException {
 		testPluginProvider(YoutubePluginManager.class, true);
 	}
 

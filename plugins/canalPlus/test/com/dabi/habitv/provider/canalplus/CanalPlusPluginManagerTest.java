@@ -13,7 +13,7 @@ import com.dabi.habitv.plugintester.BasePluginProviderTester;
 public class CanalPlusPluginManagerTest extends BasePluginProviderTester{
 
 	@Test
-	public final void testProviderCanalPlus() throws InstantiationException, IllegalAccessException, DownloadFailedException {
+	public final void testProviderCanalPlus() throws InstantiationException, IllegalAccessException, DownloadFailedException, ReflectiveOperationException {
 		testPluginProvider(CanalPlusPluginManager.class, false);
 	}
 

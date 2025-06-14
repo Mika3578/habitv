@@ -8,7 +8,7 @@ import com.dabi.habitv.plugintester.BasePluginProviderTester;
 public class WatPluginManagerTest extends BasePluginProviderTester {
 
 	@Test
-	public final void testProviderWat() throws InstantiationException, IllegalAccessException, DownloadFailedException {
+	public final void testProviderWat() throws InstantiationException, IllegalAccessException, DownloadFailedException, ReflectiveOperationException {
 		testPluginProvider(WatPluginManager.class, true);
 	}
 

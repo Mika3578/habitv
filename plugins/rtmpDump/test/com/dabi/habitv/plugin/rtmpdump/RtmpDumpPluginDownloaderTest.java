@@ -7,7 +7,7 @@ import com.dabi.habitv.plugintester.BasePluginUpdateTester;
 public class RtmpDumpPluginDownloaderTest extends BasePluginUpdateTester{
 
 	@Test
-	public final void testRtmpDump() throws InstantiationException, IllegalAccessException {
+	public final void testRtmpDump() throws InstantiationException, IllegalAccessException, ReflectiveOperationException {
 		testUpdatablePlugin(RtmpDumpPluginDownloader.class);
 	}
 

@@ -8,7 +8,7 @@ import com.dabi.habitv.plugintester.BasePluginProviderTester;
 public class LEquipePluginManagerTest extends BasePluginProviderTester {
 	
 	@Test
-	public final void testProviderLEquipe() throws InstantiationException, IllegalAccessException, DownloadFailedException {
+	public final void testProviderLEquipe() throws InstantiationException, IllegalAccessException, DownloadFailedException, ReflectiveOperationException {
 		testPluginProvider(LEquipePluginManager.class, true);
 	}
 

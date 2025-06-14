@@ -8,7 +8,7 @@ import com.dabi.habitv.plugintester.BasePluginProviderTester;
 public class PluzzPluginManagerTest extends BasePluginProviderTester {
 
 	@Test
-	public void test() throws InstantiationException, IllegalAccessException, DownloadFailedException {
+	public void test() throws InstantiationException, IllegalAccessException, DownloadFailedException, ReflectiveOperationException {
 		testPluginProvider(PluzzPluginManager.class, true);
 	}
 
