@@ -11,66 +11,63 @@ import com.dabi.habitv.api.plugin.dto.CategoryDTO;
  */
 public class SearchCategoryResult {
 
-	/** The channel name. */
-	private final String channel;
+    /** The channel name. */
+    private final String channel;
 
-	/** The list of categories found. */
-	private final Set<CategoryDTO> categoryList;
-	
-	/** Whether the search was successful. */
-	private final boolean success;
+    /** The list of categories found. */
+    private final Set<CategoryDTO> categoryList;
 
-	/**
-	 * Constructs a successful search result.
-	 * 
-	 * @param channelName the channel name
-	 * @param categories the list of categories found
-	 */
-	SearchCategoryResult(final String channelName, final Set<CategoryDTO> categories) {
-		super();
-		this.channel = channelName;
-		this.categoryList = categories;
-		this.success = true;
-	}
-	
-	/**
-	 * Constructs a failed search result.
-	 * 
-	 * @param channelName the channel name
-	 */
-	public SearchCategoryResult(final String channelName) {
-		super();
-		this.channel = channelName;
-		this.categoryList = Collections.emptySet();
-		this.success = false;
-	}
+    /** Whether the search was successful. */
+    private final boolean success;
 
-	/**
-	 * Gets the channel name.
-	 * 
-	 * @return the channel name
-	 */
-	public String getChannel() {
-		return channel;
-	}
+    /**
+     * Constructs a successful search result.
+     * 
+     * @param channelName the channel name
+     * @param categories the list of categories found
+     */
+    public SearchCategoryResult(final String channelName,
+            final Set<CategoryDTO> categories) {
+        this.channel = channelName;
+        this.categoryList = categories;
+        this.success = true;
+    }
 
-	/**
-	 * Gets the list of categories.
-	 * 
-	 * @return the list of categories
-	 */
-	public Set<CategoryDTO> getCategoryList() {
-		return categoryList;
-	}
+    /**
+     * Constructs a failed search result.
+     * 
+     * @param channelName the channel name
+     */
+    public SearchCategoryResult(final String channelName) {
+        this.channel = channelName;
+        this.categoryList = Collections.emptySet();
+        this.success = false;
+    }
 
-	/**
-	 * Checks if the search was successful.
-	 * 
-	 * @return true if the search was successful
-	 */
-	public boolean isSuccess() {
-		return success;
-	}
+    /**
+     * Gets the channel name.
+     * 
+     * @return the channel name
+     */
+    public String getChannel() {
+        return channel;
+    }
 
-	
-}
+    /**
+     * Gets the list of categories found.
+     * 
+     * @return the list of categories
+     */
+    public Set<CategoryDTO> getCategoryList() {
+        return categoryList;
+    }
+
+    /**
+     * Checks if the search was successful.
+     * 
+     * @return true if the search was successful
+     */
+    public boolean isSuccess() {
+        return success;
+    }
+} 
