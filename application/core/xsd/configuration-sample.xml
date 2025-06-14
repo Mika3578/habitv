@@ -24,6 +24,22 @@
     <updateOnStartup>true</updateOnStartup>
     <autoriseSnapshot>true</autoriseSnapshot>
   </updateConfig>
+  <credentialsConfig>
+    <credential>
+      <service>m6plus</service>
+      <username>your_email@example.com</username>
+      <password>your_password</password>
+      <enabled>true</enabled>
+      <description>M6+ account for accessing premium content</description>
+    </credential>
+    <credential>
+      <service>arte</service>
+      <username>your_arte_username</username>
+      <password>your_arte_password</password>
+      <enabled>false</enabled>
+      <description>Arte account (disabled)</description>
+    </credential>
+  </credentialsConfig>
   <exportConfig>
     <exporters>
       <exporter>

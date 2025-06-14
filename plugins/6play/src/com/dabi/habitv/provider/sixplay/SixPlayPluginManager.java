@@ -46,13 +46,26 @@ public class SixPlayPluginManager extends BasePluginWithProxy implements PluginP
 
 		final Document doc = Jsoup.parse(getUrlContent(SixPlayConf.HOME_URL));
 
-		for (final Element mainCatA : doc.select(".folders__list a")) {
+		// Try multiple selectors for main categories
+		Elements mainCatElements = doc.select(".folders__list a");
+		if (mainCatElements.isEmpty()) {
+			// Try alternative selectors
+			mainCatElements = doc.select("nav a, .navigation a, .menu a, .categories a");
+		}
+		if (mainCatElements.isEmpty()) {
+			// Try even more generic selectors
+			mainCatElements = doc.select("a[href*='/']");
+		}
+
+		for (final Element mainCatA : mainCatElements) {
 			String href = mainCatA.attr("href");
-			if (href != null && href.length() > 5) {
-				String channel = mainCatA.text();
-				CategoryDTO channelCat = new CategoryDTO(SixPlayConf.NAME, channel, getFullUrl(href), SixPlayConf.EXTENSION);
-				channelCat.addSubCategories(findCategoryByMainCat(getFullUrl(href)));
-				categories.add(channelCat);
+			if (href != null && href.length() > 5 && !href.startsWith("#") && !href.startsWith("javascript:")) {
+				String channel = mainCatA.text().trim();
+				if (!channel.isEmpty() && channel.length() > 1) {
+					CategoryDTO channelCat = new CategoryDTO(SixPlayConf.NAME, channel, getFullUrl(href), SixPlayConf.EXTENSION);
+					channelCat.addSubCategories(findCategoryByMainCat(getFullUrl(href)));
+					categories.add(channelCat);
+				}
 			}
 		}
 
@@ -62,14 +75,34 @@ public class SixPlayPluginManager extends BasePluginWithProxy implements PluginP
 	private Collection<CategoryDTO> findCategoryByMainCat(String mainCatUrl) {
 		final Set<CategoryDTO> categories = new LinkedHashSet<>();
 		final Document doc = Jsoup.parse(getUrlContent(mainCatUrl));
-		for (Element aCat : doc.select(".mosaic-programs a")) {
+		
+		// Try multiple selectors for sub-categories
+		Elements aCatElements = doc.select(".mosaic-programs a");
+		if (aCatElements.isEmpty()) {
+			// Try alternative selectors
+			aCatElements = doc.select(".programs a, .shows a, .content a, .videos a");
+		}
+		if (aCatElements.isEmpty()) {
+			// Try even more generic selectors
+			aCatElements = doc.select("a[href*='/']");
+		}
+		
+		for (Element aCat : aCatElements) {
 			Elements title = aCat.select(".tile__title");
+			if (title.isEmpty()) {
+				// Try alternative title selectors
+				title = aCat.select("h1, h2, h3, h4, .title, .name");
+			}
 			if (title.size() > 0) {
-				String name = title.first().text();
-				String href = aCat.attr("href");
-				CategoryDTO catCat = new CategoryDTO(SixPlayConf.NAME, name, getFullUrl(href), SixPlayConf.EXTENSION);
-				catCat.setDownloadable(true);
-				categories.add(catCat);
+				String name = title.first().text().trim();
+				if (!name.isEmpty()) {
+					String href = aCat.attr("href");
+					if (href != null && !href.isEmpty()) {
+						CategoryDTO catCat = new CategoryDTO(SixPlayConf.NAME, name, getFullUrl(href), SixPlayConf.EXTENSION);
+						catCat.setDownloadable(true);
+						categories.add(catCat);
+					}
+				}
 			}
 		}
 		return categories;

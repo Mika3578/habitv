@@ -47,6 +47,14 @@
 						</all>
 					</complexType>
 				</element>
+				<element name="credentialsConfig" minOccurs="0">
+					<complexType>
+						<sequence>
+							<element name="credential" type="tns:Credential" maxOccurs="unbounded"
+								minOccurs="0" />
+						</sequence>
+					</complexType>
+				</element>
 				<element name="exportConfig" minOccurs="0">
 					<complexType>
 						<all>
@@ -112,5 +120,15 @@
 			<element name="plugin" type="string" maxOccurs="unbounded"
 				minOccurs="1"></element>
 		</sequence>
+	</complexType>
+
+	<complexType name="Credential">
+		<all>
+			<element name="service" type="string" />
+			<element name="username" type="string" />
+			<element name="password" type="string" />
+			<element name="enabled" type="boolean" minOccurs="0" />
+			<element name="description" type="string" minOccurs="0" />
+		</all>
 	</complexType>
 </schema>

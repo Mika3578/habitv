@@ -268,6 +268,47 @@
 						</AnchorPane>
 					</content>
 				</Tab>
+				<Tab fx:id="credentialsTab" text="Credentials">
+					<content>
+						<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="400.0"
+							prefWidth="600.0">
+							<children>
+								<VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+									AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+									<children>
+										<TableView fx:id="credentialsTable" VBox.vgrow="ALWAYS">
+											<columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+											<columns>
+												<TableColumn editable="false" prefWidth="150.0" text="Service" />
+												<TableColumn editable="false" prefWidth="200.0" text="Username" />
+												<TableColumn editable="false" prefWidth="80.0" text="Enabled" />
+												<TableColumn editable="false" prefWidth="200.0" text="Description" />
+											</columns>
+										</TableView>
+										<HBox alignment="CENTER_LEFT" spacing="10.0">
+											<children>
+												<Button fx:id="addCredentialButton" mnemonicParsing="false"
+													text="Add Credential" />
+												<Button fx:id="editCredentialButton" mnemonicParsing="false"
+													text="Edit Credential" />
+												<Button fx:id="removeCredentialButton" mnemonicParsing="false"
+													text="Remove Credential" />
+												<Button fx:id="refreshCredentialsButton" mnemonicParsing="false"
+													text="Refresh" />
+											</children>
+											<padding>
+												<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+											</padding>
+										</HBox>
+									</children>
+									<padding>
+										<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+									</padding>
+								</VBox>
+							</children>
+						</AnchorPane>
+					</content>
+				</Tab>
 			</tabs>
 		</TabPane>
 	</children>

@@ -526,4 +526,101 @@ public class XMLUserConfig implements UserConfig {
 		downloadConfig.setDemonCheckTime(demonCheckTime);
 	}
 
+	@Override
+	public List<CredentialConfig> getCredentials() {
+		if (config.getCredentialsConfig() == null || config.getCredentialsConfig().getCredential() == null) {
+			return new ArrayList<>();
+		}
+		
+		List<CredentialConfig> credentials = new ArrayList<>();
+		for (com.dabi.habitv.configuration.entities.Credential xmlCredential : config.getCredentialsConfig().getCredential()) {
+			CredentialConfig credential = new CredentialConfig(
+				xmlCredential.getService(),
+				xmlCredential.getUsername(),
+				xmlCredential.getPassword()
+			);
+			credential.setEnabled(xmlCredential.getEnabled() != null ? xmlCredential.getEnabled() : true);
+			credential.setDescription(xmlCredential.getDescription());
+			credentials.add(credential);
+		}
+		return credentials;
+	}
+
+	@Override
+	public void setCredentials(List<CredentialConfig> credentials) {
+		com.dabi.habitv.configuration.entities.Configuration.CredentialsConfig credentialsConfig = 
+			config.getCredentialsConfig();
+		if (credentialsConfig == null) {
+			credentialsConfig = new com.dabi.habitv.configuration.entities.Configuration.CredentialsConfig();
+			config.setCredentialsConfig(credentialsConfig);
+		}
+		
+		credentialsConfig.getCredential().clear();
+		for (CredentialConfig credential : credentials) {
+			com.dabi.habitv.configuration.entities.Credential xmlCredential = 
+				new com.dabi.habitv.configuration.entities.Credential();
+			xmlCredential.setService(credential.getService());
+			xmlCredential.setUsername(credential.getUsername());
+			xmlCredential.setPassword(credential.getPassword());
+			xmlCredential.setEnabled(credential.getEnabled());
+			xmlCredential.setDescription(credential.getDescription());
+			credentialsConfig.getCredential().add(xmlCredential);
+		}
+	}
+
+	@Override
+	public void addCredential(CredentialConfig credential) {
+		com.dabi.habitv.configuration.entities.Configuration.CredentialsConfig credentialsConfig = 
+			config.getCredentialsConfig();
+		if (credentialsConfig == null) {
+			credentialsConfig = new com.dabi.habitv.configuration.entities.Configuration.CredentialsConfig();
+			config.setCredentialsConfig(credentialsConfig);
+		}
+		
+		// Remove existing credential for the same service
+		credentialsConfig.getCredential().removeIf(c -> 
+			credential.getService().equalsIgnoreCase(c.getService()));
+		
+		// Add new credential
+		com.dabi.habitv.configuration.entities.Credential xmlCredential = 
+			new com.dabi.habitv.configuration.entities.Credential();
+		xmlCredential.setService(credential.getService());
+		xmlCredential.setUsername(credential.getUsername());
+		xmlCredential.setPassword(credential.getPassword());
+		xmlCredential.setEnabled(credential.getEnabled());
+		xmlCredential.setDescription(credential.getDescription());
+		credentialsConfig.getCredential().add(xmlCredential);
+	}
+
+	@Override
+	public void removeCredential(String service) {
+		com.dabi.habitv.configuration.entities.Configuration.CredentialsConfig credentialsConfig = 
+			config.getCredentialsConfig();
+		if (credentialsConfig != null) {
+			credentialsConfig.getCredential().removeIf(c -> 
+				service.equalsIgnoreCase(c.getService()));
+		}
+	}
+
+	@Override
+	public CredentialConfig getCredential(String service) {
+		if (config.getCredentialsConfig() == null || config.getCredentialsConfig().getCredential() == null) {
+			return null;
+		}
+		
+		for (com.dabi.habitv.configuration.entities.Credential xmlCredential : config.getCredentialsConfig().getCredential()) {
+			if (service.equalsIgnoreCase(xmlCredential.getService())) {
+				CredentialConfig credential = new CredentialConfig(
+					xmlCredential.getService(),
+					xmlCredential.getUsername(),
+					xmlCredential.getPassword()
+				);
+				credential.setEnabled(xmlCredential.getEnabled() != null ? xmlCredential.getEnabled() : true);
+				credential.setDescription(xmlCredential.getDescription());
+				return credential;
+			}
+		}
+		return null;
+	}
+
 }

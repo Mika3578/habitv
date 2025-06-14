@@ -45,4 +45,14 @@ public interface UserConfig {
 
 	void setDemonCheckTime(int demonCheckTime);
 
+	List<CredentialConfig> getCredentials();
+
+	void setCredentials(List<CredentialConfig> credentials);
+
+	void addCredential(CredentialConfig credential);
+
+	void removeCredential(String service);
+
+	CredentialConfig getCredential(String service);
+
 }

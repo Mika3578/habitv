@@ -8,6 +8,6 @@ interface SixPlayConf {
 
 	String EXTENSION = FrameworkConf.MP4;
 
-	String HOME_URL = "http://www.6play.fr/";
+	String HOME_URL = "https://www.6play.fr/";
 
 }

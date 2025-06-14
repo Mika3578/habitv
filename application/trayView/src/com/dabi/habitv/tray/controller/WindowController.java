@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
+import com.dabi.habitv.core.config.CredentialConfig;
 import com.dabi.habitv.tray.Popin;
 import com.dabi.habitv.tray.controller.dl.DownloadController;
 import com.dabi.habitv.tray.controller.todl.IncludeExcludeEnum;
@@ -135,6 +136,28 @@ public class WindowController {
 	@FXML
 	private CheckBox autoUpdate;
 
+	/*
+	 * CREDENTIALS
+	 */
+
+	@FXML
+	private Tab credentialsTab;
+
+	@FXML
+	private TableView<CredentialConfig> credentialsTable;
+
+	@FXML
+	private Button addCredentialButton;
+
+	@FXML
+	private Button editCredentialButton;
+
+	@FXML
+	private Button removeCredentialButton;
+
+	@FXML
+	private Button refreshCredentialsButton;
+
 	private boolean trayMode = false;
 
 	public WindowController() {
@@ -198,6 +221,8 @@ public class WindowController {
 			new ConfigController(downloadOuput, nbrMaxAttempts,
 					daemonCheckTimeSec, autoUpdate).init(controller, manager,
 					primaryStage);
+
+			new CredentialController().init(controller, manager, primaryStage);
 
 			controller.startDownloadCheckDemon();
 

@@ -12,4 +12,22 @@ public class SixPlayPluginManagerTest extends BasePluginProviderTester {
 		testPluginProvider(SixPlayPluginManager.class, true);
 	}
 
+	@Test
+	public final void testDebugWebsite() throws Exception {
+		SixPlayPluginManager plugin = new SixPlayPluginManager();
+		
+		// Test the findCategory method directly
+		System.out.println("Testing findCategory method...");
+		try {
+			java.util.Set<com.dabi.habitv.api.plugin.dto.CategoryDTO> categories = plugin.findCategory();
+			System.out.println("Categories found: " + categories.size());
+			for (com.dabi.habitv.api.plugin.dto.CategoryDTO cat : categories) {
+				System.out.println("Category: " + cat.getName() + " -> " + cat.getId());
+			}
+		} catch (Exception e) {
+			System.out.println("Exception during findCategory: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
 }
