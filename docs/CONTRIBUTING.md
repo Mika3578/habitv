@@ -2,6 +2,7 @@
 
 Thank you for your interest in contributing to habiTv! This guide explains how to contribute to the project.
 
+**Version**: 4.1.0-SNAPSHOT  
 **Last Updated**: June 14, 2025
 
 ## Getting Started

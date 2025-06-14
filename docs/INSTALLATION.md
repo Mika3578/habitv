@@ -2,6 +2,7 @@
 
 This guide covers installing habiTv on different operating systems and configurations.
 
+**Version**: 4.1.0-SNAPSHOT  
 **Last Updated**: June 14, 2025
 
 ## Prerequisites
@@ -158,11 +159,13 @@ Key files:
 
 You can override default settings using environment variables:
 
-```bash
+```cmd
 # Windows
 set HABITV_HOME=C:\MyHabitv
 set HABITV_DOWNLOAD_OUTPUT=D:\Downloads\TV
+```
 
+```bash
 # Linux
 export HABITV_HOME=/opt/habitv
 export HABITV_DOWNLOAD_OUTPUT=/home/user/Downloads/TV
@@ -215,7 +218,7 @@ sudo yum install ffmpeg curl aria2
 2. **Check for errors** in the console output
 
 3. **Verify configuration files** are created:
-   ```bash
+   ```cmd
    # Windows
    dir %USERPROFILE%\habitv
 

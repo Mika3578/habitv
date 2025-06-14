@@ -1,608 +1,640 @@
 # habiTv Plugin Development Guide
 
-This guide explains how to create plugins for habiTv to extend its functionality.
+This guide explains how to develop plugins for the habiTv application.
 
+**Version**: 4.1.0-SNAPSHOT  
 **Last Updated**: June 14, 2025
 
-This guide covers developing plugins for habiTv, including content providers, downloaders, and exporters.
+## Overview
 
-## Plugin Architecture Overview
-
-habiTv uses a modular plugin system with three main types:
+habiTv uses a plugin-based architecture where content providers are implemented as separate plugins. This allows for easy extension and maintenance of the application.
 
 ### Plugin Types
 
-1. **Content Provider Plugins**: Discover and list available content
-2. **Downloader Plugins**: Handle actual file downloads
-3. **Export Plugins**: Post-process downloaded content
+- **Content Provider Plugins**: Provide video content from specific sources
+- **Export Plugins**: Handle video export and post-processing
+- **Utility Plugins**: Provide additional functionality
 
-### Plugin Structure
+## Plugin API
 
-```
-plugins/
-├── myplugin/
-│   ├── src/
-│   │   └── com/dabi/habitv/plugin/myplugin/
-│   │       ├── MyPluginProvider.java
-│   │       ├── MyPluginDownloader.java
-│   │       └── MyPluginExporter.java
-│   ├── test/
-│   │   └── com/dabi/habitv/plugin/myplugin/
-│   │       └── TestMyPlugin.java
-│   └── pom.xml
-```
+### Core Interfaces
 
-## Content Provider Plugin Development
+#### HabiTvPlugin
 
-### Basic Structure
+Base interface for all plugins:
 
 ```java
-package com.dabi.habitv.plugin.myplugin;
-
-import com.dabi.habitv.api.plugin.api.PluginProviderInterface;
-import com.dabi.habitv.api.plugin.dto.CategoryDTO;
-import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
-import com.dabi.habitv.api.plugin.exception.TechnicalException;
-
-public class MyPluginProvider implements PluginProviderInterface {
-    
-    @Override
-    public String getName() {
-        return "MyPlugin";
-    }
-    
-    @Override
-    public Set<CategoryDTO> findCategory() throws TechnicalException {
-        // Return available categories
-    }
-    
-    @Override
-    public Set<EpisodeDTO> findEpisode(CategoryDTO category) throws TechnicalException {
-        // Return episodes for the given category
-    }
+public interface HabiTvPlugin {
+    void initialize();
+    void shutdown();
 }
 ```
 
-### Key Components
+#### HabiTvVideoProvider
 
-#### CategoryDTO
-Represents a content category (show, series, etc.):
+Interface for content provider plugins:
 
 ```java
-CategoryDTO category = new CategoryDTO();
-category.setId("unique-category-id");
-category.setName("Category Name");
-category.setDownloadable(true); // Can contain episodes
-category.setSubCategories(new HashSet<>()); // Child categories
+public interface HabiTvVideoProvider extends HabiTvPlugin {
+    List<HabiTvVideo> getVideos();
+    String getProviderName();
+}
+```
+
+#### HabiTvExportPlugin
+
+Interface for export plugins:
+
+```java
+public interface HabiTvExportPlugin extends HabiTvPlugin {
+    void exportVideo(HabiTvVideo video, String outputPath);
+    String getExportFormat();
+    String getExportDescription();
+}
+```
+
+### Data Transfer Objects
+
+#### CategoryDTO
+
+Represents a content category:
+
+```java
+public class CategoryDTO {
+    private String name;
+    private String url;
+    private List<EpisodeDTO> episodes;
+    
+    // Getters and setters
+}
 ```
 
 #### EpisodeDTO
-Represents an individual episode or video:
+
+Represents a video episode:
 
 ```java
-EpisodeDTO episode = new EpisodeDTO();
-episode.setId("unique-episode-id");
-episode.setName("Episode Title");
-episode.setCategory(category);
-episode.setUrl("http://example.com/video.mp4");
-```
-
-### Implementation Example
-
-```java
-public class YouTubeProvider implements PluginProviderInterface {
+public class EpisodeDTO {
+    private String title;
+    private String url;
+    private String description;
+    private int duration;
+    private String thumbnailUrl;
     
-    private static final String BASE_URL = "https://www.youtube.com";
-    
-    @Override
-    public String getName() {
-        return "YouTube";
-    }
-    
-    @Override
-    public Set<CategoryDTO> findCategory() throws TechnicalException {
-        Set<CategoryDTO> categories = new HashSet<>();
-        
-        // Create main category
-        CategoryDTO mainCategory = new CategoryDTO();
-        mainCategory.setId("youtube-main");
-        mainCategory.setName("YouTube");
-        mainCategory.setDownloadable(false);
-        
-        // Add subcategories (channels, playlists, etc.)
-        Set<CategoryDTO> subCategories = new HashSet<>();
-        // ... populate subcategories
-        
-        mainCategory.setSubCategories(subCategories);
-        categories.add(mainCategory);
-        
-        return categories;
-    }
-    
-    @Override
-    public Set<EpisodeDTO> findEpisode(CategoryDTO category) throws TechnicalException {
-        Set<EpisodeDTO> episodes = new HashSet<>();
-        
-        try {
-            // Fetch episodes from YouTube API or web scraping
-            Document doc = Jsoup.connect(category.getUrl()).get();
-            
-            // Parse video elements
-            Elements videos = doc.select(".video-item");
-            for (Element video : videos) {
-                EpisodeDTO episode = new EpisodeDTO();
-                episode.setId(video.attr("data-video-id"));
-                episode.setName(video.select(".title").text());
-                episode.setCategory(category);
-                episode.setUrl(BASE_URL + video.attr("href"));
-                
-                episodes.add(episode);
-            }
-        } catch (IOException e) {
-            throw new TechnicalException("Failed to fetch episodes", e);
-        }
-        
-        return episodes;
-    }
+    // Getters and setters
 }
 ```
 
-## Downloader Plugin Development
+## Plugin Development
 
 ### Basic Structure
 
-```java
-package com.dabi.habitv.plugin.myplugin;
-
-import com.dabi.habitv.api.plugin.api.PluginDownloaderInterface;
-import com.dabi.habitv.api.plugin.dto.DownloadParamDTO;
-import com.dabi.habitv.api.plugin.exception.DownloadFailedException;
-
-public class MyPluginDownloader implements PluginDownloaderInterface {
-    
-    @Override
-    public String getName() {
-        return "MyDownloader";
-    }
-    
-    @Override
-    public void download(DownloadParamDTO downloadParam, 
-                        DownloaderPluginHolder downloaders) throws DownloadFailedException {
-        // Implement download logic
-    }
-}
-```
-
-### Download Implementation
-
-```java
-public class HTTPDownloader implements PluginDownloaderInterface {
-    
-    @Override
-    public String getName() {
-        return "HTTP";
-    }
-    
-    @Override
-    public void download(DownloadParamDTO downloadParam, 
-                        DownloaderPluginHolder downloaders) throws DownloadFailedException {
-        
-        String url = downloadParam.getUrl();
-        String outputPath = downloadParam.getOutputPath();
-        
-        try {
-            // Use curl or other HTTP client
-            ProcessBuilder pb = new ProcessBuilder("curl", "-L", "-o", outputPath, url);
-            Process process = pb.start();
-            
-            // Monitor download progress
-            int exitCode = process.waitFor();
-            
-            if (exitCode != 0) {
-                throw new DownloadFailedException("Download failed with exit code: " + exitCode);
-            }
-            
-        } catch (IOException | InterruptedException e) {
-            throw new DownloadFailedException("Download failed", e);
-        }
-    }
-}
-```
-
-## Export Plugin Development
-
-### Basic Structure
-
-```java
-package com.dabi.habitv.plugin.myplugin;
-
-import com.dabi.habitv.api.plugin.api.PluginExporterInterface;
-import com.dabi.habitv.api.plugin.dto.ExportParamDTO;
-import com.dabi.habitv.api.plugin.exception.ExportFailedException;
-
-public class MyPluginExporter implements PluginExporterInterface {
-    
-    @Override
-    public String getName() {
-        return "MyExporter";
-    }
-    
-    @Override
-    public void export(ExportParamDTO exportParam) throws ExportFailedException {
-        // Implement export logic
-    }
-}
-```
-
-### Export Implementation
-
-```java
-public class FFmpegExporter implements PluginExporterInterface {
-    
-    @Override
-    public String getName() {
-        return "FFmpeg";
-    }
-    
-    @Override
-    public void export(ExportParamDTO exportParam) throws ExportFailedException {
-        
-        String inputFile = exportParam.getInputPath();
-        String outputFile = exportParam.getOutputPath();
-        
-        try {
-            // Build FFmpeg command
-            List<String> command = Arrays.asList(
-                "ffmpeg", "-i", inputFile,
-                "-c:v", "libx264",
-                "-c:a", "aac",
-                outputFile
-            );
-            
-            ProcessBuilder pb = new ProcessBuilder(command);
-            Process process = pb.start();
-            
-            // Monitor export progress
-            int exitCode = process.waitFor();
-            
-            if (exitCode != 0) {
-                throw new ExportFailedException("Export failed with exit code: " + exitCode);
-            }
-            
-        } catch (IOException | InterruptedException e) {
-            throw new ExportFailedException("Export failed", e);
-        }
-    }
-}
-```
-
-## Plugin Configuration
-
-### Maven Configuration
+Create a new Maven module for your plugin:
 
 ```xml
-<project xmlns="http://maven.apache.org/POM/4.0.0">
+<project>
     <modelVersion>4.0.0</modelVersion>
-    
-    <parent>
-        <groupId>com.dabi.habitv</groupId>
-        <artifactId>parent</artifactId>
-        <version>4.1.0-SNAPSHOT</version>
-    </parent>
-    
-    <artifactId>myplugin</artifactId>
-    <packaging>jar</packaging>
+    <groupId>fr.mika3578.habitv</groupId>
+    <artifactId>my-plugin</artifactId>
+    <version>1.0.0</version>
     
     <dependencies>
         <dependency>
-            <groupId>com.dabi.habitv</groupId>
+            <groupId>fr.mika3578.habitv</groupId>
             <artifactId>api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.dabi.habitv</groupId>
-            <artifactId>framework</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
+            <version>4.1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
 ```
 
-### Plugin Manifest
+### Plugin Implementation
 
-Create a `plugin.properties` file in your plugin's resources:
-
-```properties
-plugin.name=MyPlugin
-plugin.version=1.0.0
-plugin.description=My custom plugin for habiTv
-plugin.author=Your Name
-plugin.website=https://github.com/your-repo/myplugin
-```
-
-## Testing Your Plugin
-
-### Unit Testing
+#### Basic Plugin
 
 ```java
-package com.dabi.habitv.plugin.myplugin;
+package fr.mika3578.habitv.plugin;
 
-import org.junit.Test;
-import org.junit.Before;
-import static org.junit.Assert.*;
+import fr.mika3578.habitv.api.HabiTvPlugin;
+import fr.mika3578.habitv.api.HabiTvPluginInfo;
 
-public class TestMyPlugin {
+@HabiTvPluginInfo(
+    name = "My Plugin",
+    version = "1.0.0",
+    description = "My custom plugin"
+)
+public class MyPlugin implements HabiTvPlugin {
     
-    private MyPluginProvider provider;
-    
-    @Before
-    public void setUp() {
-        provider = new MyPluginProvider();
+    @Override
+    public void initialize() {
+        System.out.println("My plugin initialized");
     }
     
-    @Test
-    public void testFindCategories() throws TechnicalException {
-        Set<CategoryDTO> categories = provider.findCategory();
-        assertNotNull(categories);
-        assertFalse(categories.isEmpty());
-    }
-    
-    @Test
-    public void testFindEpisodes() throws TechnicalException {
-        CategoryDTO category = new CategoryDTO();
-        category.setId("test-category");
-        
-        Set<EpisodeDTO> episodes = provider.findEpisode(category);
-        assertNotNull(episodes);
+    @Override
+    public void shutdown() {
+        System.out.println("My plugin shutdown");
     }
 }
 ```
 
-### Integration Testing
-
-Use the plugin tester framework:
+#### Content Provider Plugin
 
 ```java
-public class TestMyPluginIntegration extends BasePluginProviderTester {
+package fr.mika3578.habitv.plugin;
+
+import fr.mika3578.habitv.api.HabiTvVideoProvider;
+import fr.mika3578.habitv.api.HabiTvVideo;
+import fr.mika3578.habitv.api.HabiTvPluginInfo;
+
+import java.util.List;
+import java.util.ArrayList;
+
+@HabiTvPluginInfo(
+    name = "My Content Provider",
+    version = "1.0.0",
+    description = "Provides content from my source"
+)
+public class MyContentProvider implements HabiTvVideoProvider {
+    
+    @Override
+    public void initialize() {
+        // Initialize connection to content source
+    }
+    
+    @Override
+    public void shutdown() {
+        // Clean up resources
+    }
+    
+    @Override
+    public List<HabiTvVideo> getVideos() {
+        List<HabiTvVideo> videos = new ArrayList<>();
+        
+        // Fetch videos from your source
+        HabiTvVideo video = new HabiTvVideo();
+        video.setTitle("Example Video");
+        video.setUrl("http://example.com/video.mp4");
+        video.setDescription("Example video description");
+        video.setDuration(3600); // 1 hour in seconds
+        
+        videos.add(video);
+        return videos;
+    }
+    
+    @Override
+    public String getProviderName() {
+        return "My Provider";
+    }
+}
+```
+
+#### Export Plugin
+
+```java
+package fr.mika3578.habitv.plugin;
+
+import fr.mika3578.habitv.api.HabiTvExportPlugin;
+import fr.mika3578.habitv.api.HabiTvVideo;
+import fr.mika3578.habitv.api.HabiTvPluginInfo;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+@HabiTvPluginInfo(
+    name = "My Export Plugin",
+    version = "1.0.0",
+    description = "Exports videos in custom format"
+)
+public class MyExportPlugin implements HabiTvExportPlugin {
+    
+    @Override
+    public void initialize() {
+        // Initialize export functionality
+    }
+    
+    @Override
+    public void shutdown() {
+        // Clean up resources
+    }
+    
+    @Override
+    public void exportVideo(HabiTvVideo video, String outputPath) 
+            throws Exception {
+        File outputFile = new File(outputPath);
+        FileWriter writer = new FileWriter(outputFile);
+        
+        try {
+            writer.write("Title: " + video.getTitle() + "\n");
+            writer.write("URL: " + video.getUrl() + "\n");
+            writer.write("Description: " + video.getDescription() + "\n");
+            writer.write("Duration: " + video.getDuration() + " seconds\n");
+        } finally {
+            writer.close();
+        }
+    }
+    
+    @Override
+    public String getExportFormat() {
+        return "txt";
+    }
+    
+    @Override
+    public String getExportDescription() {
+        return "Simple text export";
+    }
+}
+```
+
+### Web Scraping Example
+
+Here's an example of a plugin that scrapes content from a website:
+
+```java
+package fr.mika3578.habitv.plugin;
+
+import fr.mika3578.habitv.api.HabiTvVideoProvider;
+import fr.mika3578.habitv.api.HabiTvVideo;
+import fr.mika3578.habitv.api.HabiTvPluginInfo;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.HttpURLConnection;
+
+@HabiTvPluginInfo(
+    name = "Web Scraping Provider",
+    version = "1.0.0",
+    description = "Scrapes videos from a website"
+)
+public class WebScrapingProvider implements HabiTvVideoProvider {
+    
+    private static final String BASE_URL = "http://example.com/videos";
+    
+    @Override
+    public void initialize() {
+        // Initialize HTTP client or other resources
+    }
+    
+    @Override
+    public void shutdown() {
+        // Clean up resources
+    }
+    
+    @Override
+    public List<HabiTvVideo> getVideos() {
+        List<HabiTvVideo> videos = new ArrayList<>();
+        
+        try {
+            // Fetch webpage content
+            String content = fetchWebPage(BASE_URL);
+            
+            // Parse HTML content (simplified example)
+            String[] lines = content.split("\n");
+            for (String line : lines) {
+                if (line.contains("video-url")) {
+                    HabiTvVideo video = parseVideoFromLine(line);
+                    if (video != null) {
+                        videos.add(video);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error fetching videos: " + e.getMessage());
+        }
+        
+        return videos;
+    }
+    
+    private String fetchWebPage(String urlString) throws Exception {
+        URL url = new URL(urlString);
+        HttpURLConnection connection = 
+            (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("User-Agent", "habiTv/1.0");
+        
+        BufferedReader reader = new BufferedReader(
+            new InputStreamReader(connection.getInputStream())
+        );
+        
+        StringBuilder content = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            content.append(line).append("\n");
+        }
+        reader.close();
+        
+        return content.toString();
+    }
+    
+    private HabiTvVideo parseVideoFromLine(String line) {
+        // Simplified parsing - in real implementation, use proper HTML parser
+        if (line.contains("title=") && line.contains("url=")) {
+            HabiTvVideo video = new HabiTvVideo();
+            
+            // Extract title
+            int titleStart = line.indexOf("title=\"") + 7;
+            int titleEnd = line.indexOf("\"", titleStart);
+            String title = line.substring(titleStart, titleEnd);
+            video.setTitle(title);
+            
+            // Extract URL
+            int urlStart = line.indexOf("url=\"") + 5;
+            int urlEnd = line.indexOf("\"", urlStart);
+            String url = line.substring(urlStart, urlEnd);
+            video.setUrl(url);
+            
+            return video;
+        }
+        return null;
+    }
+    
+    @Override
+    public String getProviderName() {
+        return "Web Scraping Provider";
+    }
+}
+```
+
+## Testing
+
+### Unit Testing
+
+#### Test Structure
+
+```java
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
+import static org.junit.jupiter.api.Assertions.*;
+
+class MyPluginTest {
+    
+    private MyPlugin plugin;
+    
+    @BeforeEach
+    void setUp() {
+        plugin = new MyPlugin();
+    }
+    
+    @AfterEach
+    void tearDown() {
+        plugin.shutdown();
+    }
     
     @Test
-    public void testPluginProvider() throws Exception {
-        testPluginProvider(MyPluginProvider.class, false);
+    void testInitialization() {
+        assertDoesNotThrow(() -> plugin.initialize());
+    }
+    
+    @Test
+    void testShutdown() {
+        plugin.initialize();
+        assertDoesNotThrow(() -> plugin.shutdown());
+    }
+}
+```
+
+#### Test with Main Application
+
+```bash
+# Build your plugin
+mvn clean package
+
+# Copy to habiTv plugins directory
+cp target/my-plugin-1.0.0.jar ../habitv/plugins/
+
+# Run habiTv and test your plugin
+java -jar ../habitv/target/habiTv.jar
+```
+
+#### Test Plugin Loading
+
+1. Copy your JAR to the plugin directory
+2. Start habiTv application
+3. Check logs for plugin loading messages
+4. Verify plugin appears in plugin list
+
+## Deployment
+
+### Repository Information
+
+The habiTv plugin repository is hosted at:
+
+- **URL**: `http://dabiboo.free.fr/repository/habitv/`
+- **Structure**: Organized by plugin name and version
+- **Access**: Public read access, write access by request
+
+### Deployment Process
+
+#### Step 1: Build the Plugin
+
+```bash
+# Build your plugin
+mvn clean package
+
+# Verify JAR contents
+jar -tf target/my-plugin-1.0.0.jar
+```
+
+#### Step 2: Update plugins.txt
+
+Add your plugin to the plugins.txt file:
+
+```
+my-plugin
+```
+
+#### Step 3: Upload the JAR
+
+Upload your JAR file to the repository:
+
+```bash
+# Upload to repository
+curl -T target/my-plugin-1.0.0.jar \
+  http://dabiboo.free.fr/repository/habitv/plugins/my-plugin/my-plugin-1.0.0.jar
+```
+
+#### Step 4: Verify Deployment
+
+Test your plugin deployment:
+
+```bash
+# Test repository access
+curl -I http://dabiboo.free.fr/repository/habitv/plugins/my-plugin/my-plugin-1.0.0.jar
+
+# Check plugins.txt
+curl http://dabiboo.free.fr/repository/habitv/plugins.txt
+```
+
+### Version Management
+
+- **Next Startup**: All habiTv clients will automatically download and install your plugin
+- **Version Updates**: Increment version number and repeat deployment process
+- **Rollback**: Keep previous versions available for rollback
+
+## Plugin Configuration
+
+### Configuration Properties
+
+#### Required Properties
+
+- **NAME**: Unique plugin identifier
+- **VERSION**: Plugin version (semantic versioning)
+- **DESCRIPTION**: Human-readable description
+
+#### Optional Properties
+
+- **ENCODING**: Character encoding (default: UTF-8)
+- **DEBUG**: Enable debug mode (default: false)
+- **TIMEOUT**: Request timeout in milliseconds (default: 30000)
+
+#### Exception Handling
+
+```java
+@Override
+public List<HabiTvVideo> getVideos() {
+    try {
+        // Fetch videos
+        return fetchVideosFromSource();
+    } catch (Exception e) {
+        logger.error("Failed to fetch videos", e);
+        return new ArrayList<>(); // Return empty list instead of throwing
+    }
+}
+```
+
+#### Logging
+
+```java
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class MyPlugin implements HabiTvPlugin {
+    private static final Logger logger = 
+        LoggerFactory.getLogger(MyPlugin.class);
+    
+    @Override
+    public void initialize() {
+        logger.info("Initializing MyPlugin");
+        // Initialization code
     }
 }
 ```
 
 ## Best Practices
 
-### Error Handling
+### Code Quality
 
-```java
-public class RobustPluginProvider implements PluginProviderInterface {
-    
-    @Override
-    public Set<CategoryDTO> findCategory() throws TechnicalException {
-        try {
-            // Implementation
-        } catch (IOException e) {
-            throw new TechnicalException("Network error while fetching categories", e);
-        } catch (ParseException e) {
-            throw new TechnicalException("Failed to parse category data", e);
-        } catch (Exception e) {
-            throw new TechnicalException("Unexpected error", e);
-        }
-    }
-}
-```
+- **Follow Naming Conventions**: Use consistent naming for classes, methods, and variables
+- **Handle Exceptions Gracefully**: Don't let exceptions crash the application
+- **Use Logging**: Log important events and errors
+- **Validate Input**: Always validate external input
 
-### Logging
+### Testing
 
-```java
-import org.apache.log4j.Logger;
+- **Unit Tests**: Write tests for all plugin functionality
+- **Integration Tests**: Test plugin with main application
+- **Error Handling**: Test error conditions and edge cases
+- **Performance**: Test with large datasets
 
-public class LoggedPluginProvider implements PluginProviderInterface {
-    
-    private static final Logger LOG = Logger.getLogger(LoggedPluginProvider.class);
-    
-    @Override
-    public Set<CategoryDTO> findCategory() throws TechnicalException {
-        LOG.info("Starting category discovery");
-        
-        try {
-            Set<CategoryDTO> categories = fetchCategories();
-            LOG.info("Found " + categories.size() + " categories");
-            return categories;
-        } catch (Exception e) {
-            LOG.error("Failed to fetch categories", e);
-            throw new TechnicalException("Category discovery failed", e);
-        }
-    }
-}
-```
+### Version Management
 
-### Configuration
+- **Semantic Versioning**: Use MAJOR.MINOR.PATCH format
+- **Backward Compatibility**: Maintain compatibility when possible
+- **Changelog**: Document changes between versions
+- **Deprecation**: Mark deprecated features clearly
 
-```java
-public class ConfigurablePluginProvider implements PluginProviderInterface {
-    
-    private final String baseUrl;
-    private final int timeout;
-    
-    public ConfigurablePluginProvider() {
-        // Load from configuration
-        this.baseUrl = System.getProperty("myplugin.baseUrl", "https://default.com");
-        this.timeout = Integer.parseInt(System.getProperty("myplugin.timeout", "30000"));
-    }
-}
-```
+### Deployment
 
-## Advanced Features
+- **Staged Rollout**: Consider gradual deployment for major changes
+- **Testing**: Test thoroughly before deployment
+- **Documentation**: Update documentation with new features
+- **Monitoring**: Monitor plugin performance after deployment
 
-### Caching
+### Updates
 
-```java
-public class CachedPluginProvider implements PluginProviderInterface {
-    
-    private final Map<String, Set<EpisodeDTO>> episodeCache = new ConcurrentHashMap<>();
-    private final long cacheTimeout = 300000; // 5 minutes
-    
-    @Override
-    public Set<EpisodeDTO> findEpisode(CategoryDTO category) throws TechnicalException {
-        String cacheKey = category.getId();
-        
-        // Check cache
-        Set<EpisodeDTO> cached = episodeCache.get(cacheKey);
-        if (cached != null && !isCacheExpired(cacheKey)) {
-            return cached;
-        }
-        
-        // Fetch fresh data
-        Set<EpisodeDTO> episodes = fetchEpisodes(category);
-        episodeCache.put(cacheKey, episodes);
-        
-        return episodes;
-    }
-}
-```
+- **Regular Updates**: Keep plugins updated with latest API changes
+- **Security Updates**: Apply security patches promptly
+- **Performance**: Monitor and optimize performance
+- **User Feedback**: Incorporate user feedback into updates
 
-### Authentication
+### Monitoring
 
-```java
-public class AuthenticatedPluginProvider implements PluginProviderInterface {
-    
-    private String authToken;
-    
-    private void authenticate() throws TechnicalException {
-        try {
-            // Perform authentication
-            Document loginPage = Jsoup.connect("https://example.com/login")
-                .data("username", getUsername())
-                .data("password", getPassword())
-                .post();
-            
-            // Extract auth token
-            this.authToken = loginPage.select("input[name=token]").val();
-            
-        } catch (IOException e) {
-            throw new TechnicalException("Authentication failed", e);
-        }
-    }
-    
-    @Override
-    public Set<CategoryDTO> findCategory() throws TechnicalException {
-        if (authToken == null) {
-            authenticate();
-        }
-        
-        // Use auth token in requests
-        // ...
-    }
-}
-```
-
-## Deployment
-
-### Building Your Plugin
-
-```bash
-# Build the plugin
-mvn clean package
-
-# The JAR will be in target/myplugin-1.0.0.jar
-```
-
-### Installing Your Plugin
-
-1. **Copy JAR**: Place your plugin JAR in the plugins directory
-2. **Restart habiTv**: Restart the application to load the plugin
-3. **Verify**: Check that your plugin appears in the available plugins list
-
-### Distribution
-
-- **GitHub Release**: Create a release with your plugin JAR
-- **Maven Repository**: Publish to a Maven repository
-- **Direct Distribution**: Share the JAR file directly
+- **Error Logs**: Monitor for errors and exceptions
+- **Performance Metrics**: Track response times and resource usage
+- **User Reports**: Monitor user feedback and bug reports
+- **Usage Statistics**: Track plugin usage patterns
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Plugin Not Loading**: Check JAR file is in the correct location
-2. **Class Not Found**: Ensure all dependencies are included
-3. **Configuration Errors**: Verify plugin.properties file
-4. **Network Issues**: Check internet connectivity and proxy settings
+#### Plugin Not Loading
 
-### Debugging
+1. **Check JAR**: Verify the JAR file is valid and contains required classes
+2. **Check Dependencies**: Ensure all dependencies are included
+3. **Check Logs**: Review application logs for error messages
+4. **Check Permissions**: Verify file permissions are correct
 
-```java
-// Enable debug logging
-System.setProperty("log4j.logger.com.dabi.habitv.plugin.myplugin", "DEBUG");
+#### Plugin Not Working
 
-// Add debug output
-LOG.debug("Processing category: " + category.getName());
-LOG.debug("Found episodes: " + episodes.size());
+1. **Check Website**: Verify the target website is accessible
+2. **Check Selectors**: Verify HTML selectors are still valid
+3. **Check API**: Verify API endpoints and authentication
+4. **Check Network**: Verify network connectivity and firewalls
+
+#### Deployment Issues
+
+1. **Check Access**: Verify repository access and permissions
+2. **Check URLs**: Verify JAR URLs are accessible
+3. **Check plugins.txt**: Verify plugin is listed correctly
+4. **Check Version**: Verify version numbers are correct
+
+### Debug Mode
+
+#### Enable Debug Logging
+
+```xml
+<Logger name="fr.mika3578.habitv.plugin" level="DEBUG"/>
 ```
 
-### Getting Help
+#### Test Locally
 
-- **Check Logs**: Review habiTv logs for error messages
-- **Test Isolation**: Test your plugin in isolation first
-- **Community**: Ask questions in the habiTv community
-- **Documentation**: Refer to the API documentation
+```bash
+# Run with debug logging
+java -Dlog.level=DEBUG -jar habiTv.jar
 
-## Example Plugins
-
-### Simple RSS Plugin
-
-```java
-public class RSSPluginProvider implements PluginProviderInterface {
-    
-    @Override
-    public String getName() {
-        return "RSS";
-    }
-    
-    @Override
-    public Set<CategoryDTO> findCategory() throws TechnicalException {
-        Set<CategoryDTO> categories = new HashSet<>();
-        
-        // Create RSS category
-        CategoryDTO rssCategory = new CategoryDTO();
-        rssCategory.setId("rss-feed");
-        rssCategory.setName("RSS Feed");
-        rssCategory.setDownloadable(true);
-        rssCategory.setUrl("https://example.com/feed.xml");
-        
-        categories.add(rssCategory);
-        return categories;
-    }
-    
-    @Override
-    public Set<EpisodeDTO> findEpisode(CategoryDTO category) throws TechnicalException {
-        Set<EpisodeDTO> episodes = new HashSet<>();
-        
-        try {
-            Document doc = Jsoup.connect(category.getUrl()).get();
-            Elements items = doc.select("item");
-            
-            for (Element item : items) {
-                EpisodeDTO episode = new EpisodeDTO();
-                episode.setId(item.select("guid").text());
-                episode.setName(item.select("title").text());
-                episode.setCategory(category);
-                episode.setUrl(item.select("link").text());
-                
-                episodes.add(episode);
-            }
-        } catch (IOException e) {
-            throw new TechnicalException("Failed to parse RSS feed", e);
-        }
-        
-        return episodes;
-    }
-}
+# Check debug output
+tail -f logs/habitv.log | grep DEBUG
 ```
 
-This guide provides a comprehensive overview of plugin development for habiTv. For more specific examples and advanced topics, refer to the existing plugins in the `plugins/` directory. 
+#### Check JAR Contents
+
+```bash
+# List JAR contents
+jar -tf my-plugin-1.0.0.jar
+
+# Extract and examine
+jar -xf my-plugin-1.0.0.jar
+ls -la META-INF/
+```
+
+## Planned Improvements
+
+1. **Plugin Marketplace**: Web interface for plugin discovery and management
+2. **Plugin Signing**: Digital signatures for plugin verification
+3. **Plugin Sandboxing**: Isolated execution environment for plugins
+4. **Plugin Dependencies**: Support for plugin dependencies and conflicts
+5. **Plugin Versioning**: Better version management and compatibility checking
+
+### Development Tools
+
+1. **Plugin Generator**: Tool to generate plugin templates
+2. **Plugin Validator**: Tool to validate plugin structure and configuration
+3. **Plugin Simulator**: Tool to test plugins without deployment
+4. **Plugin Documentation**: Automated documentation generation
+
+This guide provides comprehensive information for developing plugins for habiTv. Follow these guidelines to create robust, maintainable plugins that integrate seamlessly with the application. 

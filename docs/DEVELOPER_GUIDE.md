@@ -1,110 +1,135 @@
 # habiTv Developer Guide
 
-This guide provides information for developers who want to understand, modify, or extend the habiTv application.
+This guide provides comprehensive information for developers working on the habiTv project.
 
+**Version**: 4.1.0-SNAPSHOT  
 **Last Updated**: June 14, 2025
 
-## Architecture Overview
+## Table of Contents
 
-### Project Structure
+- [Getting Started](#getting-started)
+- [Project Structure](#project-structure)
+- [Build System](#build-system)
+- [Plugin System](#plugin-system)
+- [Configuration System](#configuration-system)
+- [Download System](#download-system)
+- [Core Classes](#core-classes)
+- [Testing](#testing)
+- [Performance Optimization](#performance-optimization)
+- [Debugging](#debugging)
+- [Code Quality](#code-quality)
 
-```
-habitv/
-├── application/              # Main application modules
-│   ├── core/                # Core business logic
-│   │   ├── src/            # Source code
-│   │   ├── test/           # Unit tests
-│   │   └── pom.xml         # Module POM
-│   ├── habiTv/             # Main application
-│   ├── habiTv-linux/       # Linux packaging
-│   ├── habiTv-windows/     # Windows packaging
-│   ├── consoleView/        # CLI interface
-│   ├── trayView/           # GUI interface
-│   └── pom.xml             # Application POM
-├── fwk/                     # Framework modules
-│   ├── api/                # Plugin API definitions
-│   ├── framework/          # Core framework implementation
-│   └── pom.xml             # Framework POM
-├── plugins/                 # Content provider plugins
-│   ├── arte/              # Arte plugin
-│   ├── canalPlus/         # Canal+ plugin
-│   ├── ffmpeg/            # FFmpeg export plugin
-│   └── ...                # Other plugins
-├── docs/                   # Documentation
-├── pom.xml                 # Parent POM
-└── README.md              # Project overview
-```
-
-### Core Components
-
-#### 1. Application Layer
-- **Main Application**: Entry point and application lifecycle
-- **GUI Interface**: System tray and window management
-- **CLI Interface**: Command-line interface
-- **Configuration**: Settings and preferences management
-
-#### 2. Core Business Logic
-- **Content Management**: Episode discovery and metadata
-- **Download Engine**: File download orchestration
-- **Plugin System**: Plugin loading and management
-- **Export System**: Post-processing and file operations
-
-#### 3. Framework Layer
-- **Plugin API**: Interfaces and contracts
-- **Common Utilities**: Shared functionality
-- **Exception Handling**: Error management
-- **Logging**: Application logging
-
-#### 4. Plugin Layer
-- **Content Providers**: Content discovery plugins
-- **Downloaders**: Download method plugins
-- **Exporters**: Post-processing plugins
-
-## Development Environment Setup
+## Getting Started
 
 ### Prerequisites
 
-```bash
-# Required tools
-Java 8+ (OpenJDK or Oracle)
-Maven 3.6+
-Git
-IDE (IntelliJ IDEA, Eclipse, or VS Code)
+- **Java 8 or higher** (OpenJDK or Oracle JDK)
+- **Maven 3.6+** for building
+- **Git** for version control
+- **IDE** (IntelliJ IDEA, Eclipse, or VS Code)
+
+### Development Environment Setup
+
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/Mika3578/habitv.git
+   cd habitv
+   ```
+
+2. **Build the Project**:
+   ```bash
+   mvn clean install
+   ```
+
+3. **Run Tests**:
+   ```bash
+   mvn test
+   ```
+
+4. **Launch Application**:
+   ```bash
+   java -jar target/habiTv.jar
+   ```
+
+## Project Structure
+
+### Directory Layout
+
+```
+habitv/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── fr/mika3578/habitv/
+│   │   │       ├── api/           # Plugin API
+│   │   │       ├── core/          # Core application logic
+│   │   │       ├── gui/           # GUI components
+│   │   │       ├── plugin/        # Plugin management
+│   │   │       └── util/          # Utility classes
+│   │   └── resources/
+│   │       ├── config/            # Configuration files
+│   │       └── log4j.xml          # Logging configuration
+│   └── test/
+│       └── java/                  # Test classes
+├── plugins/                       # Plugin modules
+│   ├── arte/                      # Arte plugin
+│   ├── canalplus/                 # Canal+ plugin
+│   └── pluzz/                     # Pluzz plugin
+├── docs/                          # Documentation
+├── pom.xml                        # Parent POM
+└── README.md
 ```
 
-### IDE Configuration
+### Module Structure
 
-#### IntelliJ IDEA
-1. **Import Project**: Open the root `pom.xml` as a Maven project
-2. **Configure SDK**: Set Java 8 as project SDK
-3. **Import Maven Projects**: Let IntelliJ import all modules
-4. **Run Configuration**: Create run configuration for main class
+Each module follows this structure:
 
-#### Eclipse
-1. **Import Maven Projects**: File → Import → Maven → Existing Maven Projects
-2. **Select Root Directory**: Choose the habitv root directory
-3. **Configure Java**: Set Java 8 as project JRE
-4. **Update Project**: Right-click project → Maven → Update Project
+```
+module-name/
+├── src/
+│   ├── main/
+│   │   ├── java/                  # Source code
+│   │   └── resources/             # Resources
+│   └── test/
+│       └── java/                  # Test code
+├── pom.xml                        # Module POM
+└── README.md                      # Module documentation
+```
 
-#### VS Code
-1. **Install Extensions**: Java Extension Pack, Maven for Java
-2. **Open Workspace**: Open the habitv root directory
-3. **Configure Java**: Set Java 8 as default runtime
-4. **Maven Integration**: Use Maven sidebar for project management
+## Build System
 
-### Build Configuration
+### Maven Configuration
 
-#### Maven Settings
+The project uses Maven for build management with a multi-module structure.
+
+#### Parent POM
+
 ```xml
-<!-- Parent POM configuration -->
-<properties>
-    <maven.compiler.source>8</maven.compiler.source>
-    <maven.compiler.target>8</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-</properties>
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>fr.mika3578</groupId>
+    <artifactId>habitv</artifactId>
+    <version>4.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    
+    <modules>
+        <module>habiTv</module>
+        <module>consoleView</module>
+        <module>plugins/arte</module>
+        <module>plugins/canalplus</module>
+        <module>plugins/pluzz</module>
+    </modules>
+    
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+</project>
 ```
 
 #### Build Commands
+
 ```bash
 # Clean and compile
 mvn clean compile
@@ -112,135 +137,158 @@ mvn clean compile
 # Run tests
 mvn test
 
-# Package application
+# Package JARs
 mvn package
 
 # Install to local repository
 mvn install
 
-# Run specific module
-cd application/core && mvn exec:java
+# Skip tests
+mvn install -DskipTests
 ```
 
-## Core Architecture
+### Plugin Development
 
-### Plugin System
+#### Plugin Structure
 
-#### Plugin Types
-
-1. **Content Provider Plugins**
-   ```java
-   public interface PluginProviderInterface {
-       String getName();
-       Set<CategoryDTO> findCategory() throws TechnicalException;
-       Set<EpisodeDTO> findEpisode(CategoryDTO category) throws TechnicalException;
-   }
-   ```
-
-2. **Downloader Plugins**
-   ```java
-   public interface PluginDownloaderInterface {
-       String getName();
-       void download(DownloadParamDTO downloadParam, 
-                    DownloaderPluginHolder downloaders) throws DownloadFailedException;
-   }
-   ```
-
-3. **Export Plugins**
-   ```java
-   public interface PluginExporterInterface {
-       String getName();
-       void export(ExportParamDTO exportParam) throws ExportFailedException;
-   }
-   ```
-
-#### Plugin Loading
 ```java
-// Plugin discovery and loading
-PluginLoader loader = new PluginLoader();
-List<PluginProviderInterface> providers = loader.loadProviders();
-List<PluginDownloaderInterface> downloaders = loader.loadDownloaders();
-List<PluginExporterInterface> exporters = loader.loadExporters();
-```
+package fr.mika3578.habitv.plugin;
 
-### Configuration Management
+import fr.mika3578.habitv.api.HabiTvPlugin;
+import fr.mika3578.habitv.api.HabiTvPluginInfo;
 
-#### Configuration Hierarchy
-1. **Environment Variables**: Highest priority
-2. **System Properties**: JVM arguments
-3. **Configuration Files**: XML configuration
-4. **Default Values**: Hardcoded defaults
-
-#### Configuration Loading
-```java
-public class ConfigurationManager {
-    public void loadConfiguration() {
-        // Load from multiple sources
-        loadEnvironmentVariables();
-        loadSystemProperties();
-        loadConfigurationFiles();
-        applyDefaults();
+@HabiTvPluginInfo(
+    name = "Example Plugin",
+    version = "1.0.0",
+    description = "Example plugin"
+)
+public class ExamplePlugin implements HabiTvPlugin {
+    
+    @Override
+    public void initialize() {
+        // Plugin initialization
+    }
+    
+    @Override
+    public void shutdown() {
+        // Plugin cleanup
     }
 }
 ```
 
-### Download Engine
+#### Plugin Loading
 
-#### Download Pipeline
+```java
+// Plugin loading mechanism
+PluginManager pluginManager = new PluginManager();
+pluginManager.loadPlugins("plugins/");
+List<HabiTvPlugin> plugins = pluginManager.getLoadedPlugins();
+```
+
+## Configuration System
+
+### Configuration Hierarchy
+
+The configuration system follows this precedence order:
+
+1. **Environment Variables**: Override all other settings
+2. **Java System Properties**: Override file-based configuration
+3. **Configuration Files**: Application and plugin config files
+4. **Default Values**: Built-in application defaults
+
+#### Configuration Loading
+
+```java
+// Configuration loading order
+Configuration config = new Configuration();
+
+// 1. Load defaults
+config.loadDefaults();
+
+// 2. Load configuration files
+config.loadFromFile("config.properties");
+
+// 3. Load system properties
+config.loadFromSystemProperties();
+
+// 4. Load environment variables
+config.loadFromEnvironment();
+```
+
+## Download System
+
+### Download Pipeline
+
+The download system follows this pipeline:
+
 1. **Episode Discovery**: Find available episodes
-2. **Download Planning**: Determine download method
-3. **Download Execution**: Execute download
-4. **Post-Processing**: Apply export operations
-5. **Notification**: Notify completion
+2. **URL Extraction**: Extract download URLs
+3. **Download Queue**: Add to download queue
+4. **Download Execution**: Execute downloads
+5. **Post-Processing**: Apply post-processing
 
 #### Download States
+
 ```java
 public enum DownloadState {
-    PENDING,      // Queued for download
-    DOWNLOADING,  // Currently downloading
-    PAUSED,       // Temporarily paused
-    COMPLETED,    // Successfully completed
-    FAILED,       // Download failed
-    CANCELLED     // Manually cancelled
+    PENDING,        // Waiting in queue
+    DOWNLOADING,    // Currently downloading
+    COMPLETED,      // Download finished
+    FAILED,         // Download failed
+    CANCELLED       // Download cancelled
 }
 ```
 
-## Key Classes and Interfaces
+## Core Classes
 
-### Core Classes
+### HabiTvLauncher
 
-#### HabiTvLauncher
-Main application entry point:
+Main application launcher class.
+
 ```java
 public class HabiTvLauncher {
     public static void main(String[] args) {
         // Initialize application
-        // Load configuration
-        // Start appropriate interface
+        HabiTvApplication app = new HabiTvApplication();
+        app.start(args);
     }
 }
 ```
 
 #### DownloadManager
-Orchestrates download operations:
+
+Manages download operations.
+
 ```java
 public class DownloadManager {
-    public void startDownload(EpisodeDTO episode) {
-        // Find appropriate downloader
-        // Execute download
-        // Handle completion
+    private Queue<DownloadTask> downloadQueue;
+    private ExecutorService executor;
+    
+    public void addDownload(DownloadTask task) {
+        downloadQueue.offer(task);
+    }
+    
+    public void startDownload(DownloadTask task) {
+        executor.submit(() -> downloadTask(task));
     }
 }
 ```
 
 #### PluginManager
-Manages plugin lifecycle:
+
+Manages plugin loading and lifecycle.
+
 ```java
 public class PluginManager {
-    public void loadPlugins() {
-        // Discover plugins
-        // Load plugin classes
-        // Initialize plugins
+    private List<HabiTvPlugin> loadedPlugins;
+    private Map<String, PluginInfo> pluginInfo;
+    
+    public void loadPlugins(String pluginDirectory) {
+        // Load plugins from directory
+    }
+    
+    public void initializePlugins() {
+        // Initialize all loaded plugins
     }
 }
 ```
@@ -248,183 +296,199 @@ public class PluginManager {
 ### Data Transfer Objects
 
 #### CategoryDTO
-Represents content categories:
+
+Represents a content category.
+
 ```java
 public class CategoryDTO {
-    private String id;
     private String name;
-    private boolean downloadable;
-    private Set<CategoryDTO> subCategories;
-    // getters and setters
+    private String url;
+    private List<EpisodeDTO> episodes;
+    
+    // Getters and setters
 }
 ```
 
 #### EpisodeDTO
-Represents individual episodes:
+
+Represents a video episode.
+
 ```java
 public class EpisodeDTO {
-    private String id;
-    private String name;
-    private CategoryDTO category;
+    private String title;
     private String url;
-    // getters and setters
+    private String description;
+    private int duration;
+    private String thumbnailUrl;
+    
+    // Getters and setters
 }
 ```
 
 #### DownloadParamDTO
-Download parameters:
+
+Represents download parameters.
+
 ```java
 public class DownloadParamDTO {
-    private String url;
     private String outputPath;
-    private String extension;
-    // getters and setters
+    private String format;
+    private int quality;
+    private boolean includeSubtitles;
+    
+    // Getters and setters
 }
 ```
 
-## Testing Framework
+## Testing
 
-### Unit Testing
+### Test Structure
 
-#### Test Structure
 ```java
-public class DownloadManagerTest {
+@ExtendWith(MockitoExtension.class)
+class DownloadManagerTest {
     
-    @Before
-    public void setUp() {
-        // Initialize test environment
-    }
+    @Mock
+    private PluginManager pluginManager;
     
-    @Test
-    public void testDownloadSuccess() {
-        // Test successful download
-    }
+    @InjectMocks
+    private DownloadManager downloadManager;
     
     @Test
-    public void testDownloadFailure() {
-        // Test download failure
+    void testAddDownload() {
+        // Test implementation
     }
 }
 ```
 
 #### Mocking
+
 ```java
-@Mock
-private PluginDownloaderInterface mockDownloader;
+// Mock plugin behavior
+when(pluginManager.getPlugin("arte"))
+    .thenReturn(mockArtePlugin);
 
-@Test
-public void testWithMock() {
-    when(mockDownloader.getName()).thenReturn("TestDownloader");
-    // Test implementation
-}
+// Verify interactions
+verify(pluginManager).loadPlugins(anyString());
 ```
-
-### Integration Testing
 
 #### Plugin Testing
+
 ```java
-public class PluginIntegrationTest extends BasePluginProviderTester {
+@Test
+void testArtePlugin() {
+    ArtePlugin plugin = new ArtePlugin();
+    plugin.initialize();
     
-    @Test
-    public void testPluginProvider() throws Exception {
-        testPluginProvider(MyPluginProvider.class, false);
-    }
+    List<EpisodeDTO> episodes = plugin.getEpisodes();
+    assertNotNull(episodes);
+    assertFalse(episodes.isEmpty());
 }
 ```
-
-### Test Utilities
 
 #### Test Data Builders
+
 ```java
-public class TestDataBuilder {
-    public static CategoryDTO createTestCategory() {
-        CategoryDTO category = new CategoryDTO();
-        category.setId("test-category");
-        category.setName("Test Category");
-        category.setDownloadable(true);
-        return category;
+public class EpisodeDTOBuilder {
+    private String title = "Test Episode";
+    private String url = "http://example.com/video";
+    private String description = "Test description";
+    private int duration = 3600;
+    
+    public EpisodeDTOBuilder withTitle(String title) {
+        this.title = title;
+        return this;
+    }
+    
+    public EpisodeDTO build() {
+        EpisodeDTO episode = new EpisodeDTO();
+        episode.setTitle(title);
+        episode.setUrl(url);
+        episode.setDescription(description);
+        episode.setDuration(duration);
+        return episode;
     }
 }
 ```
 
-## Build and Deployment
-
-### Maven Configuration
+### Maven Test Configuration
 
 #### Parent POM
+
 ```xml
-<project>
-    <groupId>com.dabi.habitv</groupId>
-    <artifactId>parent</artifactId>
-    <version>4.1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    
-    <modules>
-        <module>fwk/api</module>
-        <module>fwk/framework</module>
-        <module>application/core</module>
-        <!-- other modules -->
-    </modules>
-</project>
+<dependencies>
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>5.8.2</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>4.5.1</version>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
 ```
 
 #### Module POM
-```xml
-<project>
-    <parent>
-        <groupId>com.dabi.habitv</groupId>
-        <artifactId>parent</artifactId>
-        <version>4.1.0-SNAPSHOT</version>
-    </parent>
-    
-    <artifactId>my-module</artifactId>
-    <packaging>jar</packaging>
-    
-    <dependencies>
-        <dependency>
-            <groupId>com.dabi.habitv</groupId>
-            <artifactId>api</artifactId>
-        </dependency>
-    </dependencies>
-</project>
-```
 
-### Packaging
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>3.0.0-M5</version>
+            <configuration>
+                <includes>
+                    <include>**/*Test.java</include>
+                </includes>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+```
 
 #### JAR Creation
-```xml
-<plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-jar-plugin</artifactId>
-    <configuration>
-        <archive>
-            <manifest>
-                <mainClass>com.dabi.habitv.HabiTvLauncher</mainClass>
-                <addClasspath>true</addClasspath>
-            </manifest>
-        </archive>
-    </configuration>
-</plugin>
-```
 
-#### Native Packaging
 ```xml
 <plugin>
     <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-antrun-plugin</artifactId>
+    <artifactId>maven-shade-plugin</artifactId>
+    <version>3.2.4</version>
     <executions>
         <execution>
             <phase>package</phase>
             <goals>
-                <goal>run</goal>
+                <goal>shade</goal>
             </goals>
             <configuration>
-                <target>
-                    <!-- Native packaging configuration -->
-                </target>
+                <transformers>
+                    <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                        <mainClass>fr.mika3578.habitv.HabiTvLauncher</mainClass>
+                    </transformer>
+                </transformers>
             </configuration>
         </execution>
     </executions>
+</plugin>
+```
+
+#### Native Packaging
+
+```xml
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-jlink-plugin</artifactId>
+    <version>3.1.0</version>
+    <configuration>
+        <launcher>
+            <name>habitv</name>
+            <mainClass>fr.mika3578.habitv.HabiTvLauncher</mainClass>
+        </launcher>
+    </configuration>
 </plugin>
 ```
 
@@ -433,6 +497,7 @@ public class TestDataBuilder {
 ### Memory Management
 
 #### Object Pooling
+
 ```java
 public class ObjectPool<T> {
     private final Queue<T> pool;
@@ -443,13 +508,14 @@ public class ObjectPool<T> {
         return obj != null ? obj : factory.get();
     }
     
-    public void returnObject(T obj) {
+    public void return(T obj) {
         pool.offer(obj);
     }
 }
 ```
 
 #### Resource Management
+
 ```java
 public class ResourceManager implements AutoCloseable {
     private final List<AutoCloseable> resources = new ArrayList<>();
@@ -462,106 +528,142 @@ public class ResourceManager implements AutoCloseable {
     @Override
     public void close() throws Exception {
         for (AutoCloseable resource : resources) {
-            resource.close();
+            try {
+                resource.close();
+            } catch (Exception e) {
+                // Log error but continue closing other resources
+            }
         }
     }
 }
 ```
 
-### Concurrency
-
 #### Thread Pool Management
+
 ```java
-public class DownloadExecutor {
+public class ThreadPoolManager {
     private final ExecutorService executor;
     
-    public DownloadExecutor(int threadCount) {
-        this.executor = Executors.newFixedThreadPool(threadCount);
+    public ThreadPoolManager(int coreThreads, int maxThreads) {
+        executor = new ThreadPoolExecutor(
+            coreThreads, maxThreads,
+            60L, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(),
+            new ThreadPoolExecutor.CallerRunsPolicy()
+        );
     }
     
-    public Future<DownloadResult> submitDownload(DownloadTask task) {
-        return executor.submit(task);
+    public void shutdown() {
+        executor.shutdown();
+        try {
+            if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 }
 ```
 
 #### Concurrent Collections
+
 ```java
 public class DownloadQueue {
-    private final ConcurrentLinkedQueue<DownloadTask> queue;
-    private final Map<String, DownloadState> states;
+    private final ConcurrentLinkedQueue<DownloadTask> queue = 
+        new ConcurrentLinkedQueue<>();
+    private final Map<String, DownloadState> states = 
+        new ConcurrentHashMap<>();
     
-    public DownloadQueue() {
-        this.queue = new ConcurrentLinkedQueue<>();
-        this.states = new ConcurrentHashMap<>();
+    public void addTask(DownloadTask task) {
+        queue.offer(task);
+        states.put(task.getId(), DownloadState.PENDING);
+    }
+    
+    public DownloadTask getNextTask() {
+        return queue.poll();
     }
 }
 ```
 
-## Debugging and Troubleshooting
-
 ### Logging Configuration
 
 #### Log4j Configuration
+
 ```xml
-<log4j:configuration>
-    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
-        <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n"/>
-        </layout>
-    </appender>
-    
-    <appender name="FILE" class="org.apache.log4j.RollingFileAppender">
-        <param name="File" value="${user.home}/habitv/habiTv.log"/>
-        <param name="MaxFileSize" value="10MB"/>
-        <param name="MaxBackupIndex" value="5"/>
-        <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n"/>
-        </layout>
-    </appender>
-    
-    <root>
-        <priority value="INFO"/>
-        <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="FILE"/>
-    </root>
-</log4j:configuration>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+        <File name="File" fileName="logs/habitv.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </File>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
+        </Root>
+    </Loggers>
+</Configuration>
 ```
 
-### Debug Mode
+## Debugging
 
-#### Debug Configuration
+### Debug Configuration
+
 ```java
 public class DebugConfig {
-    public static void enableDebugMode() {
-        System.setProperty("log4j.logger.com.dabi.habitv", "DEBUG");
-        System.setProperty("habitv.debug", "true");
+    public static final boolean DEBUG_MODE = 
+        Boolean.getBoolean("habitv.debug");
+    
+    public static void logDebug(String message) {
+        if (DEBUG_MODE) {
+            System.out.println("[DEBUG] " + message);
+        }
     }
 }
 ```
 
 #### Debug Utilities
+
 ```java
 public class DebugUtils {
-    public static void logMemoryUsage() {
-        Runtime runtime = Runtime.getRuntime();
-        long usedMemory = runtime.totalMemory() - runtime.freeMemory();
-        LOG.info("Memory usage: " + usedMemory / 1024 / 1024 + "MB");
+    public static void dumpThreadInfo() {
+        ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
+        ThreadInfo[] threadInfos = threadBean.dumpAllThreads(true, true);
+        
+        for (ThreadInfo info : threadInfos) {
+            System.out.println("Thread: " + info.getThreadName());
+            System.out.println("State: " + info.getThreadState());
+        }
     }
 }
 ```
 
-## Security Considerations
-
-### Input Validation
+### Validation Utilities
 
 #### URL Validation
+
 ```java
-public class UrlValidator {
+public class ValidationUtils {
     public static boolean isValidUrl(String url) {
         try {
-            new URI(url).toURL();
+            new URL(url);
             return true;
+        } catch (MalformedURLException e) {
+            return false;
+        }
+    }
+    
+    public static boolean isAccessibleUrl(String url) {
+        try {
+            HttpURLConnection connection = 
+                (HttpURLConnection) new URL(url).openConnection();
+            connection.setRequestMethod("HEAD");
+            return connection.getResponseCode() == 200;
         } catch (Exception e) {
             return false;
         }
@@ -570,86 +672,118 @@ public class UrlValidator {
 ```
 
 #### File Path Validation
+
 ```java
-public class PathValidator {
+public class FileUtils {
     public static boolean isValidPath(String path) {
         try {
-            Path normalized = Paths.get(path).normalize();
-            return !normalized.startsWith(Paths.get(".."));
-        } catch (Exception e) {
+            Paths.get(path);
+            return true;
+        } catch (InvalidPathException e) {
             return false;
         }
     }
-}
-```
-
-### Secure Configuration
-
-#### Sensitive Data Handling
-```java
-public class SecureConfig {
-    public static String getPassword() {
-        // Read from environment variable or secure storage
-        return System.getenv("HABITV_PASSWORD");
+    
+    public static boolean isWritableDirectory(String path) {
+        File dir = new File(path);
+        return dir.exists() && dir.isDirectory() && dir.canWrite();
     }
 }
 ```
 
-## Best Practices
+#### Sensitive Data Handling
 
-### Code Organization
-
-#### Package Structure
+```java
+public class SecurityUtils {
+    public static String maskPassword(String password) {
+        if (password == null || password.length() <= 2) {
+            return "***";
+        }
+        return password.charAt(0) + 
+               "*".repeat(password.length() - 2) + 
+               password.charAt(password.length() - 1);
+    }
+    
+    public static String sanitizeUrl(String url) {
+        // Remove sensitive parameters
+        return url.replaceAll("password=[^&]*", "password=***");
+    }
+}
 ```
-com.dabi.habitv.plugin.myplugin/
-├── MyPluginProvider.java      # Main plugin class
-├── MyPluginDownloader.java    # Downloader implementation
-├── MyPluginExporter.java      # Exporter implementation
-├── config/                    # Configuration classes
-├── model/                     # Data models
-├── service/                   # Business logic
-└── util/                      # Utility classes
+
+## Code Quality
+
+### Package Structure
+
+```
+fr.mika3578.habitv/
+├── api/                    # Public API interfaces
+├── core/                   # Core application logic
+│   ├── download/           # Download management
+│   ├── plugin/             # Plugin system
+│   └── config/             # Configuration
+├── gui/                    # User interface
+├── util/                   # Utility classes
+└── exception/              # Custom exceptions
 ```
 
 #### Naming Conventions
-- **Classes**: PascalCase (e.g., `MyPluginProvider`)
-- **Methods**: camelCase (e.g., `findCategory()`)
-- **Constants**: UPPER_SNAKE_CASE (e.g., `MAX_RETRY_ATTEMPTS`)
-- **Packages**: lowercase (e.g., `com.dabi.habitv.plugin`)
 
-### Error Handling
+- **Classes**: PascalCase (e.g., `DownloadManager`)
+- **Methods**: camelCase (e.g., `startDownload`)
+- **Constants**: UPPER_SNAKE_CASE (e.g., `MAX_RETRY_COUNT`)
+- **Packages**: lowercase (e.g., `fr.mika3578.habitv.core`)
 
 #### Exception Hierarchy
+
 ```java
 public class HabiTvException extends Exception {
-    // Base exception for all habiTv errors
+    public HabiTvException(String message) {
+        super(message);
+    }
+    
+    public HabiTvException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }
 
-public class TechnicalException extends HabiTvException {
-    // Technical/implementation errors
+public class PluginLoadException extends HabiTvException {
+    public PluginLoadException(String pluginName, Throwable cause) {
+        super("Failed to load plugin: " + pluginName, cause);
+    }
 }
 
-public class DownloadFailedException extends HabiTvException {
-    // Download-specific errors
+public class DownloadException extends HabiTvException {
+    public DownloadException(String url, Throwable cause) {
+        super("Download failed for: " + url, cause);
+    }
 }
 ```
 
 #### Graceful Degradation
+
 ```java
-public class RobustPluginProvider implements PluginProviderInterface {
-    @Override
-    public Set<CategoryDTO> findCategory() throws TechnicalException {
+public class PluginManager {
+    public void loadPlugins(String directory) {
         try {
-            return fetchCategories();
-        } catch (NetworkException e) {
-            LOG.warn("Network error, using cached data", e);
-            return getCachedCategories();
+            // Load plugins
+            loadPluginFiles(directory);
         } catch (Exception e) {
-            LOG.error("Unexpected error", e);
-            throw new TechnicalException("Category discovery failed", e);
+            logger.warn("Failed to load plugins from: " + directory, e);
+            // Continue with available plugins
         }
+    }
+    
+    private void loadPluginFiles(String directory) {
+        File dir = new File(directory);
+        if (!dir.exists() || !dir.isDirectory()) {
+            logger.warn("Plugin directory does not exist: " + directory);
+            return;
+        }
+        
+        // Load plugin files
     }
 }
 ```
 
-This developer guide provides a comprehensive overview of the habiTv codebase. For specific implementation details, refer to the source code and API documentation. 
+This developer guide provides comprehensive information for working with the habiTv project. Follow these guidelines to maintain code quality and contribute effectively to the project. 

@@ -1,173 +1,165 @@
 # habiTv Documentation
 
-Welcome to the habiTv documentation! This directory contains comprehensive documentation for users, developers, and contributors.
+This directory contains comprehensive documentation for the habiTv project.
 
+**Version**: 4.1.0-SNAPSHOT  
 **Last Updated**: June 14, 2025
 
-## Documentation Overview
-
-### For Users
-
-- **[Installation Guide](INSTALLATION.md)** - Complete installation instructions for all platforms
-- **[User Guide](USER_GUIDE.md)** - Comprehensive guide for using habiTv (GUI and CLI)
-- **[Environment Variables](../ENVIRONMENT_VARIABLES.md)** - Configuration via environment variables
-
-### For Developers
-
-- **[Developer Guide](DEVELOPER_GUIDE.md)** - Architecture overview and development setup
-- **[API Reference](API_REFERENCE.md)** - Complete API documentation
-- **[Plugin Development Guide](PLUGIN_DEVELOPMENT.md)** - Guide for creating plugins
-
-### For Contributors
-
-- **[Contributing Guide](../CONTRIBUTING.md)** - How to contribute to the project
-- **[Changelog](../CHANGELOG.md)** - Version history and release notes
-
-## Quick Navigation
+## Quick Start
 
 ### Getting Started
+
 1. **New to habiTv?** Start with the [Installation Guide](INSTALLATION.md)
 2. **Want to use habiTv?** Read the [User Guide](USER_GUIDE.md)
-3. **Need to configure?** Check [Environment Variables](../ENVIRONMENT_VARIABLES.md)
+3. **Need help?** Check the [Troubleshooting Guide](TROUBLESHOOTING.md)
 
 ### Development
+
 1. **Want to understand the code?** Read the [Developer Guide](DEVELOPER_GUIDE.md)
-2. **Need API details?** Check the [API Reference](API_REFERENCE.md)
-3. **Creating a plugin?** Use the [Plugin Development Guide](PLUGIN_DEVELOPMENT.md)
+2. **Want to create plugins?** See the [Plugin Development Guide](PLUGIN_DEVELOPMENT.md)
+3. **Need API reference?** Check the [API Reference](API_REFERENCE.md)
 
 ### Contributing
-1. **Want to contribute?** Read the [Contributing Guide](../CONTRIBUTING.md)
-2. **Check recent changes?** View the [Changelog](../CHANGELOG.md)
+
+1. **Want to contribute?** Read the [Contributing Guide](CONTRIBUTING.md)
+2. **Want to publish plugins?** See the [Plugin Publishing Guide](PLUGIN_PUBLISHING_GUIDE.md)
+3. **Want to see examples?** Check [Plugin Examples](PLUGIN_EXAMPLES.md)
 
 ## Documentation Structure
 
-```
+```text
 docs/
 ├── README.md                 # This file - documentation index
 ├── INSTALLATION.md          # Installation instructions
 ├── USER_GUIDE.md            # User manual
+├── CONFIGURATION_REFERENCE.md # Complete configuration guide
+├── TROUBLESHOOTING.md       # Problem solving guide
 ├── DEVELOPER_GUIDE.md       # Developer documentation
 ├── API_REFERENCE.md         # API documentation
-└── PLUGIN_DEVELOPMENT.md    # Plugin development guide
+├── PLUGIN_DEVELOPMENT.md    # Plugin development guide
+├── PLUGIN_PUBLISHING_GUIDE.md # Plugin publishing guide
+├── PLUGIN_EXAMPLES.md       # Plugin code examples
+├── SECURITY.md              # Security policies and practices
+└── TODO.md                  # Development roadmap and tasks
 
 ../ (root directory)
 ├── README.md                # Project overview
-├── ENVIRONMENT_VARIABLES.md # Environment configuration
-├── CONTRIBUTING.md          # Contribution guidelines
-└── CHANGELOG.md            # Version history
+├── CHANGELOG.md             # Version history
+├── ENVIRONMENT_VARIABLES.md # Environment variables
+└── BUILD_SUMMARY.md         # Build information
 ```
 
-## Documentation Standards
-
-### Writing Guidelines
-
-- **Clear and concise** - Use simple, direct language
-- **Examples included** - Provide practical examples
-- **Code formatting** - Use proper syntax highlighting
-- **Cross-references** - Link to related documentation
-- **Regular updates** - Keep documentation current
+## Documentation Features
 
 ### Code Examples
 
-All code examples follow these standards:
-- **Java**: Proper syntax highlighting and formatting
-- **XML**: Well-formed and properly indented
-- **Bash/CMD**: Platform-specific commands clearly marked
-- **Comments**: Explanatory comments for complex examples
+All documentation includes properly formatted code examples with syntax highlighting:
 
-### Markdown Standards
+- **Java**: Proper syntax highlighting for Java code
+- **XML**: Configuration file examples
+- **Bash**: Shell commands for Linux/Mac
+- **CMD**: Windows command examples
+- **Properties**: Configuration properties
 
-- **Headers**: Use proper heading hierarchy (H1 → H2 → H3)
-- **Links**: Use relative links for internal references
-- **Code blocks**: Use appropriate language tags
-- **Lists**: Use consistent list formatting
-- **Tables**: Use proper table formatting
+### Cross-References
 
-## Contributing to Documentation
+Documentation files are cross-referenced for easy navigation:
 
-### Reporting Issues
+- Links between related documents
+- Consistent terminology
+- Cross-referenced sections
+- Related topic suggestions
 
-If you find documentation issues:
-1. **Check existing issues** - Search for similar reports
-2. **Create new issue** - Include specific details
-3. **Provide context** - Include page, section, and problem description
+### Version Information
 
-### Suggesting Improvements
+Each document includes:
 
-For documentation improvements:
-1. **Fork the repository**
-2. **Create a branch** for your changes
-3. **Make your changes** following the standards
-4. **Submit a pull request** with clear description
-
-### Documentation Types
-
-#### User Documentation
-- **Installation guides** - Step-by-step instructions
-- **User manuals** - Feature explanations and usage
-- **Configuration guides** - Setup and customization
-- **Troubleshooting** - Common problems and solutions
-
-#### Developer Documentation
-- **Architecture overview** - System design and components
-- **API documentation** - Interface specifications
-- **Code examples** - Practical implementation examples
-- **Best practices** - Recommended approaches
-
-#### Contributor Documentation
-- **Setup guides** - Development environment setup
-- **Contribution guidelines** - Process and standards
-- **Code style guides** - Formatting and conventions
-- **Review processes** - Quality assurance procedures
-
-## Documentation Maintenance
-
-### Regular Reviews
-
-- **Monthly reviews** - Check for accuracy and completeness
-- **Version updates** - Update with each release
-- **User feedback** - Incorporate user suggestions
-- **Technical changes** - Update when APIs change
-
-### Quality Assurance
-
-- **Technical accuracy** - Verify all technical information
-- **Completeness** - Ensure all features are documented
-- **Clarity** - Ensure explanations are clear
-- **Consistency** - Maintain consistent style and format
-
-### Version Control
-
-- **Git tracking** - All documentation is version controlled
-- **Change history** - Track all documentation changes
-- **Branch strategy** - Use feature branches for updates
-- **Review process** - All changes require review
+- **Version**: Current project version
+- **Last Updated**: Last modification date
+- **Compatibility**: Version compatibility notes
 
 ## Getting Help
 
 ### Documentation Issues
 
-If you have questions about the documentation:
-- **Search existing issues** on GitHub
-- **Create a new issue** with specific details
-- **Contact maintainers** for urgent issues
+1. **Check existing issues** - Search for similar problems
+2. **Read related docs** - Check linked documentation
+3. **Check troubleshooting** - Review troubleshooting guide
 
-### Content Questions
+### Contributing to Documentation
 
-For questions about habiTv functionality:
-- **Check user documentation** first
-- **Search GitHub issues** for similar questions
-- **Create a new issue** if needed
-- **Join community discussions** for help
+1. **Fork the repository**
+2. **Create a feature branch**
+3. **Make your changes**
+4. **Submit a pull request**
 
-### Technical Support
+### Documentation Categories
 
-For technical problems:
-- **Check troubleshooting guides**
-- **Review log files** for error details
-- **Search existing issues** for solutions
-- **Create detailed bug reports** with logs
+#### User Documentation
 
----
+- **Installation guides** - Step-by-step installation instructions
+- **User manuals** - How to use the application
+- **Configuration guides** - Setting up and configuring
+- **Troubleshooting guides** - Problem solving
 
-Thank you for using habiTv! We hope this documentation helps you get the most out of the application. 
+#### Developer Documentation
+
+- **Architecture overview** - System design and structure
+- **API documentation** - Programming interfaces
+- **Plugin development** - Creating custom plugins
+- **Code examples** - Working code samples
+
+#### Contributor Documentation
+
+- **Setup guides** - Development environment setup
+- **Contributing guidelines** - How to contribute
+- **Code standards** - Coding conventions
+- **Review process** - Code review guidelines
+
+## Documentation Standards
+
+### Writing Guidelines
+
+- **Clear and concise** - Easy to understand language
+- **Consistent terminology** - Use same terms throughout
+- **Proper formatting** - Follow markdown standards
+- **Code examples** - Include working examples
+
+### Quality Standards
+
+- **Accuracy** - Information must be correct
+- **Completeness** - Cover all necessary topics
+- **Up-to-date** - Keep documentation current
+- **Accessible** - Easy to find and navigate
+
+### Maintenance
+
+- **Regular reviews** - Monthly documentation review
+- **Version updates** - Update with each release
+- **User feedback** - Incorporate user suggestions
+- **Continuous improvement** - Ongoing enhancements
+
+## Support and Feedback
+
+### Getting Help
+
+- **Search existing issues** or create a new one
+- **Check user documentation** for common solutions
+- **Review troubleshooting guide** for known issues
+- **Ask in community forums** for additional help
+
+### Providing Feedback
+
+- **Report documentation issues** - Create GitHub issues
+- **Suggest improvements** - Submit enhancement requests
+- **Contribute fixes** - Submit pull requests
+- **Share examples** - Provide additional examples
+
+### Community Resources
+
+- **GitHub Discussions** - Community discussions
+- **Issue Tracker** - Bug reports and feature requests
+- **Wiki Pages** - Community-maintained documentation
+- **Code Examples** - Community-contributed examples
+
+This documentation provides comprehensive information for users, developers, and contributors to the habiTv project. 

@@ -1,271 +1,737 @@
 # habiTv Startup Update System
 
+This document describes the automatic update system that runs when habiTv starts up.
+
+**Version**: 4.1.0-SNAPSHOT  
 **Last Updated**: June 14, 2025
 
 ## Overview
 
-habiTv includes an automatic update system that runs at startup to ensure all plugins and external tools are up to date. This document explains how the update system works, what gets updated, and how to configure it.
+habiTv includes an automatic update system that checks for and downloads plugin updates when the application starts. This system ensures users always have the latest versions of plugins without manual intervention.
 
 ## Update System Architecture
 
-### 1. Plugin JAR Updates
+### Components
 
-#### How It Works
-- **Repository**: `http://dabiboo.free.fr/repository`
-- **Process**: Downloads `plugins.txt` to get list of plugins to update
-- **Location**: `{app.dir}/plugins/` or `{user.home}/habitv/plugins/`
-- **Format**: JAR files with version information in manifest
+#### 1. Update Manager
 
-#### Update Process
-1. **Check**: Downloads `http://dabiboo.free.fr/repository/plugins.txt`
-2. **Parse**: Reads list of plugins to update
-3. **Compare**: Checks current version vs repository version
-4. **Download**: Downloads newer versions if available
-5. **Replace**: Replaces local JAR files with updated versions
+- **Class**: `com.dabi.habitv.framework.plugin.api.update.impl.BaseUpdatablePluginManager`
+- **Purpose**: Manages plugin updates and version checking
+- **Location**: Framework module
 
-#### Affected Plugins
-- All provider plugins (arte, canalPlus, pluzz, etc.)
-- All downloader plugins (rtmpDump, curl, aria2, etc.)
-- All exporter plugins (ffmpeg, email, etc.)
+#### 2. Repository Client
 
-### 2. External Tool Updates
+- **Class**: `com.dabi.habitv.framework.plugin.api.update.impl.RepositoryClient`
+- **Purpose**: Downloads plugins from the repository
+- **Location**: Framework module
 
-#### How It Works
-- **Repository**: Same repository as plugins
-- **Process**: Updates external executable tools
-- **Location**: `{app.dir}/bin/` or `{user.home}/habitv/bin/`
-- **Format**: ZIP files containing executables
+#### 3. Plugin Loader
 
-#### Update Process
-1. **Check**: For each updatable tool (ffmpeg, rtmpdump, etc.)
-2. **Version**: Gets current version by running tool with version flag
-3. **Compare**: Compares with repository version
-4. **Download**: Downloads ZIP file if newer version available
-5. **Extract**: Extracts executable to bin directory
+- **Class**: `com.dabi.habitv.framework.plugin.api.PluginLoader`
+- **Purpose**: Loads and initializes plugins
+- **Location**: Framework module
 
-#### Affected Tools
-- **rtmpdump**: RTMP streaming downloader
-- **curl**: HTTP/FTP downloader
-- **aria2**: Multi-threaded downloader
-- **ffmpeg**: Media processing tool
-- **youtube-dl**: YouTube video downloader
+### Update Flow
 
-### 3. Configuration Updates
-
-#### How It Works
-- **Location**: `{app.dir}/configuration.xml` or `{user.home}/habitv/configuration.xml`
-- **Process**: Created automatically on first run
-- **Format**: XML configuration file
-
-#### Default Configuration
-```xml
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:configuration xmlns:ns2="http://www.dabi.com/habitv/configuration/entities">
-    <updateConfig>
-        <updateOnStartup>true</updateOnStartup>
-        <autoriseSnapshot>false</autoriseSnapshot>
-    </updateConfig>
-    <downloadConfig>
-        <downloadOuput>{user.home}/Downloads/#TVSHOW_NAME#-#EPISODE_NAME_CUT#.#EXTENSION#</downloadOuput>
-        <maxAttempts>5</maxAttempts>
-        <demonCheckTime>1800</demonCheckTime>
-        <fileNameCutSize>40</fileNameCutSize>
-    </downloadConfig>
-</ns2:configuration>
+```java
+// Simplified update flow
+public class StartupUpdateManager {
+    
+    public void performStartupUpdates() {
+        // 1. Load current plugins
+        List<PluginInfo> currentPlugins = loadCurrentPlugins();
+        
+        // 2. Check repository for updates
+        List<PluginInfo> availablePlugins = checkRepository();
+        
+        // 3. Compare versions
+        List<PluginInfo> updatesNeeded = findUpdates(currentPlugins, availablePlugins);
+        
+        // 4. Download updates
+        for (PluginInfo plugin : updatesNeeded) {
+            downloadPlugin(plugin);
+        }
+        
+        // 5. Reload plugins
+        reloadPlugins();
+    }
+}
 ```
 
-## Configuration Options
+## Repository Information
 
-### Update Configuration
+### Repository URL
 
-#### updateOnStartup
-- **Type**: Boolean
-- **Default**: `true`
-- **Description**: Controls whether updates run at application startup
-- **Usage**: Set to `false` to disable all startup updates
+```
+http://dabiboo.free.fr/repository
+```
 
-#### autoriseSnapshot
-- **Type**: Boolean
-- **Default**: `false`
-- **Description**: Controls whether SNAPSHOT versions are allowed
-- **Usage**: Set to `true` to allow development/beta versions
+### Repository Structure
 
-### Example Configuration
+```text
+http://dabiboo.free.fr/repository/
+├── plugins.txt                              # List of all available plugins
+└── com/
+    └── dabi/
+        └── habitv/
+            ├── arte/
+            │   └── 4.1.0-SNAPSHOT/
+            │       └── arte-4.1.0-SNAPSHOT.jar
+            ├── canalPlus/
+            │   └── 4.1.0-SNAPSHOT/
+            │       └── canalPlus-4.1.0-SNAPSHOT.jar
+            ├── pluzz/
+            │   └── 4.1.0-SNAPSHOT/
+            │       └── pluzz-4.1.0-SNAPSHOT.jar
+            └── ffmpeg/
+                └── 4.1.0-SNAPSHOT/
+                    └── ffmpeg-4.1.0-SNAPSHOT.jar
+```
+
+### plugins.txt Format
+
+```text
+arte
+canalPlus
+pluzz
+ffmpeg
+```
+
+## Update Process
+
+### 1. Startup Trigger
+
+#### When Updates Run
+
+- **Application Startup**: Every time habiTv starts
+- **Plugin Loading**: Before plugins are loaded
+- **Background Process**: Non-blocking update check
+
+#### Update Conditions
+
+```java
+public class UpdateConditions {
+    
+    public boolean shouldCheckForUpdates() {
+        // Check if updates are enabled
+        if (!isUpdateEnabled()) {
+            return false;
+        }
+        
+        // Check if enough time has passed since last check
+        if (!isTimeToCheck()) {
+            return false;
+        }
+        
+        // Check network connectivity
+        if (!isNetworkAvailable()) {
+            return false;
+        }
+        
+        return true;
+    }
+}
+```
+
+### 2. Repository Check
+
+#### Fetching Plugin List
+
+```java
+public class RepositoryClient {
+    
+    public List<String> getAvailablePlugins() throws IOException {
+        String pluginsUrl = "http://dabiboo.free.fr/repository/plugins.txt";
+        
+        // Download plugins.txt
+        String content = HttpUtils.get(pluginsUrl);
+        
+        // Parse plugin names
+        List<String> plugins = new ArrayList<>();
+        for (String line : content.split("\n")) {
+            String plugin = line.trim();
+            if (!plugin.isEmpty() && !plugin.startsWith("#")) {
+                plugins.add(plugin);
+            }
+        }
+        
+        return plugins;
+    }
+}
+```
+
+#### Version Comparison
+
+```java
+public class VersionComparator {
+    
+    public boolean isUpdateAvailable(String currentVersion, String availableVersion) {
+        // Parse version strings
+        Version current = parseVersion(currentVersion);
+        Version available = parseVersion(availableVersion);
+        
+        // Compare versions
+        return available.isNewerThan(current);
+    }
+    
+    private Version parseVersion(String versionString) {
+        // Handle different version formats
+        if (versionString.contains("-SNAPSHOT")) {
+            return new SnapshotVersion(versionString);
+        } else {
+            return new ReleaseVersion(versionString);
+        }
+    }
+}
+```
+
+### 3. Plugin Download
+
+#### Download Process
+
+```java
+public class PluginDownloader {
+    
+    public void downloadPlugin(String pluginName, String version) throws IOException {
+        // Construct download URL
+        String downloadUrl = String.format(
+            "http://dabiboo.free.fr/repository/com/dabi/habitv/%s/%s/%s-%s.jar",
+            pluginName, version, pluginName, version
+        );
+        
+        // Download to temporary location
+        String tempFile = downloadToTemp(downloadUrl);
+        
+        // Verify download
+        if (!verifyDownload(tempFile)) {
+            throw new IOException("Download verification failed");
+        }
+        
+        // Move to plugins directory
+        moveToPluginsDirectory(tempFile, pluginName, version);
+    }
+}
+```
+
+#### Download Verification
+
+```java
+public class DownloadVerifier {
+    
+    public boolean verifyDownload(String filePath) {
+        try {
+            // Check file size
+            long fileSize = Files.size(Paths.get(filePath));
+            if (fileSize < 1000) { // Minimum size check
+                return false;
+            }
+            
+            // Check if it's a valid JAR
+            try (JarFile jar = new JarFile(filePath)) {
+                // Check for required files
+                return jar.getEntry("META-INF/MANIFEST.MF") != null;
+            }
+            
+        } catch (IOException e) {
+            return false;
+        }
+    }
+}
+```
+
+### 4. Plugin Loading
+
+#### Loading Process
+
+```java
+public class PluginLoader {
+    
+    public void loadPlugins() {
+        // Get plugins directory
+        File pluginsDir = new File(getPluginsDirectory());
+        
+        // Load each JAR file
+        for (File jarFile : pluginsDir.listFiles(f -> f.getName().endsWith(".jar"))) {
+            try {
+                loadPlugin(jarFile);
+            } catch (Exception e) {
+                LOG.error("Failed to load plugin: " + jarFile.getName(), e);
+            }
+        }
+    }
+    
+    private void loadPlugin(File jarFile) throws Exception {
+        // Add JAR to classpath
+        URLClassLoader classLoader = new URLClassLoader(
+            new URL[]{jarFile.toURI().toURL()},
+            getClass().getClassLoader()
+        );
+        
+        // Find plugin classes
+        List<Class<?>> pluginClasses = findPluginClasses(jarFile, classLoader);
+        
+        // Instantiate plugins
+        for (Class<?> pluginClass : pluginClasses) {
+            instantiatePlugin(pluginClass);
+        }
+    }
+}
+```
+
+## Configuration
+
+### Environment Variables
+
+#### Update Configuration
+
+```properties
+# Enable/disable updates
+HABITV_UPDATE_ON_STARTUP=true              # Check for updates on startup
+HABITV_AUTORISE_SNAPSHOT=false             # Allow snapshot updates
+
+# Repository configuration
+HABITV_REPOSITORY_URL=http://dabiboo.free.fr/repository
+HABITV_REPOSITORY_TIMEOUT=30000            # Timeout in milliseconds
+
+# Update frequency
+HABITV_UPDATE_CHECK_INTERVAL=86400         # Check interval in seconds (24 hours)
+HABITV_UPDATE_RETRY_ATTEMPTS=3             # Number of retry attempts
+
+# Network configuration
+HABITV_UPDATE_PROXY_HOST=                  # Proxy host (optional)
+HABITV_UPDATE_PROXY_PORT=                  # Proxy port (optional)
+HABITV_UPDATE_PROXY_USER=                  # Proxy username (optional)
+HABITV_UPDATE_PROXY_PASSWORD=              # Proxy password (optional)
+```
+
+### Configuration Files
+
+#### config.xml Settings
+
 ```xml
-<updateConfig>
-    <updateOnStartup>false</updateOnStartup>
-    <autoriseSnapshot>false</autoriseSnapshot>
-</updateConfig>
+<configuration>
+    <update>
+        <enabled>true</enabled>
+        <checkOnStartup>true</checkOnStartup>
+        <allowSnapshots>false</allowSnapshots>
+        <repositoryUrl>http://dabiboo.free.fr/repository</repositoryUrl>
+        <timeout>30000</timeout>
+        <retryAttempts>3</retryAttempts>
+        <checkInterval>86400</checkInterval>
+    </update>
+    
+    <proxy>
+        <host></host>
+        <port></port>
+        <username></username>
+        <password></password>
+    </proxy>
+</configuration>
 ```
 
 ## Directory Structure
 
-### User Mode (Default)
-```
-{user.home}/habitv/
-├── configuration.xml      # Main configuration
-├── grabconfig.xml         # Show/episode configuration
-├── habiTv.log            # Application log
-├── plugins/              # Plugin JAR files
-│   ├── arte-4.1.0-SNAPSHOT.jar
-│   ├── canalPlus-4.1.0-SNAPSHOT.jar
-│   └── ...
-├── bin/                  # External tools
-│   ├── rtmpdump.exe
-│   ├── curl.exe
-│   ├── ffmpeg.exe
-│   └── ...
-└── index/                # Download tracking
-    ├── arte_Cinema.index
-    └── ...
+### Plugin Directories
+
+#### Default Locations
+
+```text
+# Windows
+C:\Users\{username}\habitv\plugins\
+
+# Linux/Mac
+~/habitv/plugins/
+
+# Application directory
+./plugins/
 ```
 
-### Local Mode
+#### Directory Contents
+
+```text
+plugins/
+├── arte-4.1.0-SNAPSHOT.jar
+├── canalPlus-4.1.0-SNAPSHOT.jar
+├── pluzz-4.1.0-SNAPSHOT.jar
+├── ffmpeg-4.1.0-SNAPSHOT.jar
+└── cache/                                  # Temporary files
+    ├── download/
+    └── temp/
 ```
-{app.dir}/
-├── configuration.xml      # Local configuration
-├── grabconfig.xml         # Local show configuration
-├── habiTv.log            # Application log
-├── plugins/              # Local plugin JAR files
-├── bin/                  # Local external tools
-└── index/                # Local download tracking
+
+### Cache Directories
+
+#### Temporary Files
+
+```text
+cache/
+├── download/                               # Downloaded files
+│   ├── arte-4.1.0-SNAPSHOT.jar.tmp
+│   └── canalPlus-4.1.0-SNAPSHOT.jar.tmp
+├── temp/                                   # Temporary processing
+│   └── plugin-extract/
+└── metadata/                               # Update metadata
+    ├── last-check.txt
+    ├── plugin-versions.txt
+    └── update-log.txt
 ```
 
-## Update System Classes
+## Key Classes
 
-### Core Classes
+### BaseUpdatablePluginManager
 
-#### UpdateManager
-- **Location**: `application/core/src/com/dabi/habitv/core/updater/UpdateManager.java`
-- **Purpose**: Manages plugin JAR updates
-- **Key Methods**:
-  - `process()`: Main update process
-  - `getUpdatePublisher()`: Event publisher for update notifications
+#### Purpose
 
-#### JarUpdater
-- **Location**: `application/core/src/com/dabi/habitv/core/updater/JarUpdater.java`
-- **Purpose**: Handles JAR file updates
-- **Key Methods**:
-  - `getCurrentVersion()`: Reads version from JAR manifest
-  - `performUpdate()`: Downloads and replaces JAR files
+Base class for plugins that support automatic updates.
 
-#### ZipExeUpdater
-- **Location**: `fwk/framework/src/com/dabi/habitv/framework/plugin/utils/update/ZipExeUpdater.java`
-- **Purpose**: Handles external tool updates
-- **Key Methods**:
-  - `updateFile()`: Extracts ZIP files to bin directory
-  - `getCurrentVersion()`: Gets tool version by executing it
+#### Key Methods
 
-#### BaseUpdatablePlugin
-- **Location**: `fwk/framework/src/com/dabi/habitv/framework/plugin/api/update/BaseUpdatablePlugin.java`
-- **Purpose**: Base class for updatable plugins
-- **Key Methods**:
-  - `update()`: Triggers update process
-  - `getCurrentVersion()`: Gets current plugin version
+```java
+public abstract class BaseUpdatablePluginManager<C, E> {
+    
+    /**
+     * Gets the plugin name
+     */
+    public abstract String getName();
+    
+    /**
+     * Gets the current plugin version
+     */
+    public String getVersion() {
+        return "4.1.0-SNAPSHOT";
+    }
+    
+    /**
+     * Checks if an update is available
+     */
+    public boolean isUpdateAvailable() {
+        // Implementation checks repository
+    }
+    
+    /**
+     * Downloads the latest version
+     */
+    public void downloadUpdate() {
+        // Implementation downloads from repository
+    }
+}
+```
 
-### Configuration Classes
+### RepositoryClient
 
-#### XMLUserConfig
-- **Location**: `application/core/src/com/dabi/habitv/core/config/XMLUserConfig.java`
-- **Purpose**: Manages configuration file
-- **Key Methods**:
-  - `initConfig()`: Initializes configuration on first run
-  - `updateOnStartup()`: Returns update configuration
-  - `autoriseSnapshot()`: Returns snapshot configuration
+#### Purpose
 
-#### DirUtils
-- **Location**: `application/core/src/com/dabi/habitv/utils/DirUtils.java`
-- **Purpose**: Manages directory paths
-- **Key Methods**:
-  - `getAppDir()`: Returns application directory
-  - `getConfFile()`: Returns configuration file path
-  - `getBinDir()`: Returns bin directory path
+Handles communication with the plugin repository.
 
-## Update Events
+#### Key Methods
 
-### UpdatePluginEvent
-- **States**: `STARTING_ALL`, `CHECKING`, `DOWNLOADING`, `DONE`, `ERROR`, `ALL_DONE`
-- **Usage**: Notifies UI of plugin update progress
+```java
+public class RepositoryClient {
+    
+    /**
+     * Gets list of available plugins
+     */
+    public List<String> getAvailablePlugins() throws IOException;
+    
+    /**
+     * Gets plugin version information
+     */
+    public PluginVersionInfo getPluginVersion(String pluginName) throws IOException;
+    
+    /**
+     * Downloads a plugin
+     */
+    public void downloadPlugin(String pluginName, String version, File outputFile) throws IOException;
+    
+    /**
+     * Verifies plugin integrity
+     */
+    public boolean verifyPlugin(File pluginFile, String expectedChecksum);
+}
+```
 
-### UpdatablePluginEvent
-- **States**: `STARTING_ALL`, `DOWNLOADING`, `DONE`, `ERROR`, `ALL_DONE`
-- **Usage**: Notifies UI of external tool update progress
+### PluginLoader
+
+#### Purpose
+
+Loads and manages plugin instances.
+
+#### Key Methods
+
+```java
+public class PluginLoader {
+    
+    /**
+     * Loads all available plugins
+     */
+    public void loadAllPlugins();
+    
+    /**
+     * Loads a specific plugin
+     */
+    public <T> T loadPlugin(String className, Class<T> type);
+    
+    /**
+     * Gets loaded plugins
+     */
+    public <T> List<T> getLoadedPlugins(Class<T> type);
+    
+    /**
+     * Reloads a plugin
+     */
+    public void reloadPlugin(String pluginName);
+}
+```
+
+## Events and Notifications
+
+### Update Events
+
+#### Event Types
+
+```java
+public enum UpdateEventType {
+    UPDATE_CHECK_STARTED,
+    UPDATE_CHECK_COMPLETED,
+    UPDATE_AVAILABLE,
+    UPDATE_DOWNLOAD_STARTED,
+    UPDATE_DOWNLOAD_COMPLETED,
+    UPDATE_DOWNLOAD_FAILED,
+    PLUGIN_LOADED,
+    PLUGIN_LOAD_FAILED
+}
+```
+
+#### Event Handling
+
+```java
+public class UpdateEventListener {
+    
+    public void onUpdateEvent(UpdateEvent event) {
+        switch (event.getType()) {
+            case UPDATE_AVAILABLE:
+                LOG.info("Update available for plugin: " + event.getPluginName());
+                break;
+                
+            case UPDATE_DOWNLOAD_COMPLETED:
+                LOG.info("Update downloaded for plugin: " + event.getPluginName());
+                break;
+                
+            case UPDATE_DOWNLOAD_FAILED:
+                LOG.error("Update failed for plugin: " + event.getPluginName(), event.getException());
+                break;
+        }
+    }
+}
+```
 
 ## Troubleshooting
 
 ### Common Issues
 
-#### Updates Not Working
-1. **Check Network**: Ensure internet connection is available
-2. **Check Repository**: Verify `http://dabiboo.free.fr/repository` is accessible
-3. **Check Configuration**: Verify `updateOnStartup` is set to `true`
-4. **Check Logs**: Review `habiTv.log` for error messages
+#### 1. Updates Not Working
 
-#### Local Development Issues
-1. **Disable Updates**: Set `updateOnStartup` to `false`
-2. **Use Local Mode**: Place configuration in app directory
-3. **Block Repository**: Add `127.0.0.1 dabiboo.free.fr` to hosts file
+**Symptoms:**
 
-#### Plugin Conflicts
-1. **Check Versions**: Ensure plugin versions are compatible
-2. **Clear Cache**: Delete plugins directory and restart
-3. **Manual Update**: Download plugins manually from repository
+- No plugin updates downloaded
+- Old plugin versions still in use
+- No update check messages in logs
 
-### Debugging
+**Solutions:**
 
-#### Enable Debug Logging
-```xml
-<updateConfig>
-    <updateOnStartup>true</updateOnStartup>
-    <autoriseSnapshot>true</autoriseSnapshot>
-</updateConfig>
+```bash
+# Check configuration
+grep -i update config.xml
+
+# Check network connectivity
+curl -I http://dabiboo.free.fr/repository/plugins.txt
+
+# Check logs
+tail -f habiTv.log | grep -i update
+
+# Force update check
+java -jar habiTv.jar --force-update
 ```
 
-#### Check Update Status
-- **GUI**: Check system tray for update notifications
-- **CLI**: Use `--listPlugin` to see loaded plugins
-- **Logs**: Review `habiTv.log` for update messages
+#### 2. Download Failures
+
+**Symptoms:**
+
+- Plugin downloads fail
+- Incomplete or corrupted files
+- Network timeout errors
+
+**Solutions:**
+
+```bash
+# Check network connectivity
+ping dabiboo.free.fr
+
+# Check proxy settings
+echo $HTTP_PROXY
+echo $HTTPS_PROXY
+
+# Clear cache
+rm -rf plugins/cache/
+
+# Increase timeout
+export HABITV_REPOSITORY_TIMEOUT=60000
+```
+
+#### 3. Plugin Loading Issues
+
+**Symptoms:**
+
+- Plugins not loading after update
+- Class not found errors
+- Plugin initialization failures
+
+**Solutions:**
+
+```bash
+# Check JAR files
+jar tf plugins/arte-4.1.0-SNAPSHOT.jar
+
+# Check classpath
+java -cp "plugins/*" -jar habiTv.jar
+
+# Remove corrupted plugins
+rm plugins/corrupted-plugin.jar
+
+# Restart application
+java -jar habiTv.jar
+```
+
+### Debug Mode
+
+#### Enable Debug Logging
+
+```xml
+<!-- In log4j.properties -->
+log4j.logger.com.dabi.habitv.framework.plugin.api.update=DEBUG
+log4j.logger.com.dabi.habitv.framework.plugin.api.PluginLoader=DEBUG
+```
+
+#### Debug Commands
+
+```bash
+# Check update status
+java -jar habiTv.jar --debug-updates
+
+# List available plugins
+java -jar habiTv.jar --list-available-plugins
+
+# Check plugin versions
+java -jar habiTv.jar --check-versions
+
+# Force update check
+java -jar habiTv.jar --force-update-check
+```
 
 ## Best Practices
 
-### For Users
-1. **Keep Updates Enabled**: Ensures latest bug fixes and features
-2. **Monitor Logs**: Check for update errors
-3. **Backup Configuration**: Keep copies of working configurations
+### 1. For Users
 
-### For Developers
-1. **Test Locally**: Disable updates during development
-2. **Version Management**: Use proper versioning for plugins
-3. **Error Handling**: Implement proper error handling in plugins
+#### Update Management
 
-### For System Administrators
-1. **Network Access**: Ensure repository access from deployment environment
-2. **Proxy Configuration**: Configure proxy settings if needed
-3. **Monitoring**: Monitor update success/failure rates
+- **Keep Updates Enabled**: Allow automatic updates
+- **Monitor Logs**: Check for update-related messages
+- **Report Issues**: Report update problems
+- **Backup Configuration**: Backup before major updates
+
+#### Network Configuration
+
+- **Use Reliable Connection**: Ensure stable internet
+- **Configure Proxy**: If behind corporate firewall
+- **Monitor Bandwidth**: Updates can use significant bandwidth
+- **Check Firewall**: Ensure repository access allowed
+
+### 2. For Developers
+
+#### Plugin Development
+
+```java
+// Implement proper version checking
+public class MyPlugin extends BaseUpdatablePluginManager<CategoryDTO, EpisodeDTO> {
+    
+    @Override
+    public String getVersion() {
+        return "1.0.0"; // Use semantic versioning
+    }
+    
+    @Override
+    public boolean isUpdateAvailable() {
+        // Implement version comparison logic
+        return super.isUpdateAvailable();
+    }
+}
+```
+
+#### Update Testing
+
+- **Test Update Process**: Verify updates work correctly
+- **Version Compatibility**: Ensure backward compatibility
+- **Error Handling**: Handle update failures gracefully
+- **Logging**: Add appropriate log messages
+
+### 3. For Administrators
+
+#### System Configuration
+
+```bash
+# Configure update directory permissions
+chmod 755 ~/habitv/plugins/
+chmod 644 ~/habitv/plugins/*.jar
+
+# Configure network access
+iptables -A OUTPUT -p tcp --dport 80 -d dabiboo.free.fr -j ACCEPT
+
+# Configure proxy if needed
+export HTTP_PROXY=http://proxy.company.com:8080
+```
+
+#### Monitoring
+
+- **Monitor Update Logs**: Watch for update issues
+- **Check Disk Space**: Ensure sufficient space for updates
+- **Monitor Network**: Watch for excessive bandwidth usage
+- **Backup Plugins**: Regular backup of plugin directory
 
 ## Security Considerations
 
 ### Repository Security
-- **HTTPS**: Repository uses HTTP (consider HTTPS for production)
-- **Authentication**: No authentication required (public repository)
-- **Validation**: JAR files are validated before loading
 
-### Local Security
-- **File Permissions**: Ensure proper file permissions on bin directory
-- **Executable Validation**: Verify downloaded executables
-- **Log Security**: Secure log files containing sensitive information
+#### Current Security Model
 
-## Future Enhancements
+- **HTTP Only**: Repository uses plain HTTP
+- **No Authentication**: No authentication for downloads
+- **No Signing**: Plugins not digitally signed
+- **Public Access**: Repository publicly accessible
 
-### Planned Improvements
+#### Security Risks
+
+- **Man-in-the-Middle**: Potential for interception
+- **DNS Spoofing**: Potential for DNS-based attacks
+- **Code Injection**: Potential for malicious code
+- **Data Tampering**: Potential for data modification
+
+#### Mitigation Strategies
+
+```properties
+# Security configuration
+HABITV_VERIFY_DOWNLOADS=true               # Verify download integrity
+HABITV_CHECK_PLUGIN_SIGNATURES=false       # Check plugin signatures (future)
+HABITV_TRUSTED_REPOSITORIES=http://dabiboo.free.fr/repository
+HABITV_DOWNLOAD_TIMEOUT=30000              # Download timeout
+```
+
+### Future Security Enhancements
+
+#### Planned Improvements
+
 1. **HTTPS Repository**: Secure repository access
-2. **Digital Signatures**: Verify plugin authenticity
-3. **Rollback Support**: Ability to revert to previous versions
-4. **Update Scheduling**: Configurable update schedules
-5. **Delta Updates**: Download only changed files
+2. **Plugin Signing**: Digital signatures for plugins
+3. **Certificate Pinning**: Certificate verification
+4. **Checksum Verification**: File integrity checking
 
-### Configuration Enhancements
-1. **Update Channels**: Stable/beta/development channels
-2. **Update Notifications**: Configurable notification levels
-3. **Update History**: Track update history and changes
-4. **Update Policies**: Granular update policies per plugin type 
+This document provides comprehensive information about the habiTv startup update system. Understanding this system is crucial for both users and developers working with habiTv plugins. 

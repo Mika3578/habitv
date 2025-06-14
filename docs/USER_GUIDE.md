@@ -1,406 +1,783 @@
 # habiTv User Guide
 
-This guide covers how to use habiTv effectively for both GUI and command-line interfaces.
+This guide provides comprehensive instructions for using habiTv to discover and download TV content.
 
+**Version**: 4.1.0-SNAPSHOT  
 **Last Updated**: June 14, 2025
 
 ## Getting Started
 
-### First Launch
+### Prerequisites
 
-When you first launch habiTv, you'll see a splash screen and then be prompted to choose your interface mode:
+- **Java 8 or higher** (OpenJDK or Oracle JDK)
+- **Internet connection** for downloading content
+- **Sufficient disk space** for video downloads
 
-1. **GUI Mode**: System tray application with graphical interface
-2. **CLI Mode**: Command-line interface for advanced users
+#### Prerequisites
 
-### Initial Configuration
+- **Java 8 or higher** (OpenJDK or Oracle JDK)
+- **Internet connection** for downloading content
+- **Sufficient disk space** for video downloads
 
-After choosing your interface, habiTv will:
-1. Create configuration files in your user directory
-2. Download required external tools (if not already present)
-3. Check for updates
-4. Present the main interface
+#### Download and Install
 
-## GUI Mode
+1. **Download habiTv**:
+   ```bash
+   git clone https://github.com/Mika3578/habitv.git
+   cd habitv
+   ```
 
-### System Tray Interface
+2. **Build the application**:
+   ```bash
+   mvn clean package
+   ```
 
-When running in GUI mode, habiTv appears as an icon in your system tray:
+3. **Run habiTv**:
+   ```bash
+   java -jar target/habiTv.jar
+   ```
 
-- **Right-click** the tray icon for the main menu
-- **Left-click** to open the main window
-- **Double-click** to open manual download dialog
+#### Windows Installation
 
-### Main Window
+```cmd
+# Clone repository
+git clone https://github.com/Mika3578/habitv.git
+cd habitv
 
-The main window has several tabs:
+# Build application
+mvn clean package
 
-#### 1. Download Monitoring Tab
-
-This tab shows all current and completed downloads:
-
-**Features:**
-- **Active Downloads**: Shows progress, speed, and estimated time
-- **Completed Downloads**: History of finished downloads
-- **Failed Downloads**: List of failed attempts with error details
-
-**Actions:**
-- **Pause/Resume**: Control individual downloads
-- **Cancel**: Stop a download and mark as failed
-- **Retry**: Restart a failed download
-- **Open File**: Open the downloaded file location
-- **View Log**: Open the detailed log for troubleshooting
-
-#### 2. Show Selection Tab
-
-Browse and select shows to monitor:
-
-**Categories:**
-- **TV Channels**: Organized by content provider (Canal+, Arte, etc.)
-- **Genres**: Drama, Comedy, News, Sports, etc.
-- **Custom**: RSS feeds and file-based sources
-
-**Actions:**
-- **Browse Categories**: Navigate through available content
-- **Search**: Find specific shows or episodes
-- **Add to Monitoring**: Select shows for automatic download
-- **Remove from Monitoring**: Stop monitoring a show
-- **Manual Download**: Download a specific episode immediately
-
-#### 3. Configuration Tab
-
-Manage application settings:
-
-**General Settings:**
-- **Download Directory**: Where files are saved
-- **Log Level**: Detail level for logging (DEBUG, INFO, WARN, ERROR)
-- **Update Settings**: Automatic update preferences
-- **Proxy Configuration**: Network proxy settings
-
-**Download Settings:**
-- **Maximum Concurrent Downloads**: Number of simultaneous downloads
-- **Retry Attempts**: How many times to retry failed downloads
-- **Download Speed Limits**: Bandwidth restrictions
-- **File Naming**: Customize downloaded file names
-
-**Export Settings:**
-- **Post-Processing**: Automatic video conversion or processing
-- **Export Commands**: Custom commands to run after download
-- **File Organization**: Automatic file sorting and renaming
-
-### Manual Download Dialog
-
-Access via system tray icon or main menu:
-
-1. **Paste URL**: Enter a video URL to download
-2. **Auto-Detect**: habiTv automatically finds the best download method
-3. **Manual Selection**: Choose specific downloader if needed
-4. **Start Download**: Begin the download process
-
-## Command Line Interface (CLI)
-
-### Basic Commands
-
-```bash
-# Show help
-java -jar habiTv.jar --help
-
-# List available categories
-java -jar habiTv.jar --list-categories
-
-# Search for shows
-java -jar habiTv.jar --search "show name"
-
-# Download specific episode
-java -jar habiTv.jar --download "episode_id"
-
-# Run in daemon mode
-java -jar habiTv.jar --daemon
+# Run application
+java -jar target\habiTv.jar
 ```
 
-### Advanced CLI Options
+#### Initial Setup
 
-```bash
-# Specify configuration file
-java -jar habiTv.jar --config /path/to/config.xml
+1. **Launch Application**: Run the JAR file
+2. **Check System Tray**: Look for habiTv icon in system tray
+3. **Verify Plugins**: Check that plugins are loaded
+4. **Test Connection**: Try searching for content
 
-# Set log level
-java -jar habiTv.jar --log-level DEBUG
+#### Default Configuration
 
-# Download with specific options
-java -jar habiTv.jar --download "episode_id" --output /custom/path
+The application uses default settings that work for most users:
 
-# Run scheduled check
-java -jar habiTv.jar --check-updates
-
-# Export configuration
-java -jar habiTv.jar --export-config /path/to/export.xml
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <download>
+        <directory>./downloads</directory>
+        <timeout>300000</timeout>
+        <retry-count>3</retry-count>
+        <threads>4</threads>
+    </download>
+    
+    <gui>
+        <enabled>true</enabled>
+        <system-tray>true</system-tray>
+        <minimize-to-tray>true</minimize-to-tray>
+    </gui>
+    
+    <logging>
+        <level>INFO</level>
+        <file-enabled>true</file-enabled>
+        <file-path>./logs/habiTv.log</file-path>
+    </logging>
+    
+    <plugins>
+        <auto-update>true</auto-update>
+        <directory>./plugins</directory>
+    </plugins>
+</config>
 ```
 
-### Daemon Mode
+## User Interface
 
-For continuous operation:
+### System Tray
+
+habiTv runs in the system tray for easy access.
+
+#### Tray Icon
+
+- **Right-click**: Open context menu
+- **Double-click**: Open main window
+- **Hover**: Show tooltip with status
+
+#### Context Menu Options
+
+```text
+habiTv
+├── Open
+├── Search...
+├── Downloads
+│   ├── Show Queue
+│   ├── Pause All
+│   └── Resume All
+├── Plugins
+│   ├── List Plugins
+│   └── Update Plugins
+├── Settings
+├── About
+└── Exit
+```
+
+#### Main Window
+
+The main window provides access to all features:
+
+- **Search Bar**: Search for content across all providers
+- **Provider List**: Browse content by provider
+- **Download Queue**: Monitor and manage downloads
+- **Settings**: Configure application behavior
+
+#### Basic Commands
+
+Use the command-line interface for basic operations:
 
 ```bash
-# Start daemon
-java -jar habiTv.jar --daemon
+# List available plugins
+java -jar consoleView.jar --listPlugin
 
-# Check daemon status
-java -jar habiTv.jar --status
+# List categories for a plugin
+java -jar consoleView.jar --listCategory --plugins arte
 
-# Stop daemon
-java -jar habiTv.jar --stop
+# Search for content
+java -jar consoleView.jar --search "documentary"
+
+# Download an episode
+java -jar consoleView.jar --download --plugins arte --category "Documentaries" --episode "Example Episode"
+
+# Show download queue
+java -jar consoleView.jar --listDownload
+
+# Pause all downloads
+java -jar consoleView.jar --pauseDownload
+
+# Resume all downloads
+java -jar consoleView.jar --resumeDownload
+```
+
+#### Advanced Commands
+
+```bash
+# Export video with specific format
+java -jar consoleView.jar --download --plugins arte --category "Documentaries" --episode "Example Episode" --exportFormat mp4
+
+# Set custom output directory
+java -jar consoleView.jar --download --plugins arte --category "Documentaries" --episode "Example Episode" --outputDir /custom/path
+
+# Use specific quality settings
+java -jar consoleView.jar --download --plugins arte --category "Documentaries" --episode "Example Episode" --quality high
+
+# Enable debug logging
+java -jar consoleView.jar --download --plugins arte --category "Documentaries" --episode "Example Episode" --debug
 ```
 
 ## Content Providers
 
-### Supported Platforms
+### Available Plugins
 
-#### Canal+
-- **Content**: Premium French TV shows and movies
-- **Features**: High-quality streams, exclusive content
-- **Requirements**: May require authentication for premium content
+habiTv supports multiple content providers through plugins:
 
-#### Pluzz (France TV)
-- **Channels**: France 2, France 3, France 4, France Ô
-- **Content**: News, documentaries, entertainment
-- **Features**: Free content, good quality
+- **Arte**: French-German cultural channel
+- **Canal+**: French premium television channel
+- **Pluzz**: French public television catch-up service
 
-#### Arte
-- **Content**: Cultural and educational programming
-- **Features**: High-quality documentaries, international content
-- **Languages**: French and German content
+#### Plugin Information
 
-#### Sports Channels
-- **L'Équipe**: Sports news and highlights
-- **beIN Sports**: Live sports and analysis
-- **Features**: Live streams and replays
+Check plugin status and information:
 
-#### RSS Feeds
-- **Generic Support**: Any RSS feed with video links
-- **Formats**: HTTP, FTP, BitTorrent, YouTube, Dailymotion
-- **Customization**: Full control over content sources
+```bash
+# List all plugins
+java -jar consoleView.jar --listPlugin
 
-### Adding Custom Sources
+# Get detailed plugin info
+java -jar consoleView.jar --pluginInfo --plugins arte
 
-#### RSS Feed Setup
+# Check plugin updates
+java -jar consoleView.jar --updatePlugin
+```
 
-1. **Find RSS Feed**: Locate the RSS feed URL for your content
-2. **Add to habiTv**: Use the RSS plugin to add the feed
-3. **Configure Filters**: Set up content matching rules
-4. **Test**: Verify the feed works correctly
+### Content Structure
 
-#### File-Based Sources
+#### Category Structure
 
-1. **Create Source File**: Text file with video URLs
-2. **Add to habiTv**: Use the file plugin
-3. **Set Update Schedule**: How often to check for new content
-4. **Configure Processing**: How to handle the URLs
+Content is organized in a hierarchical structure:
+
+```text
+Provider
+├── Category 1
+│   ├── Episode 1
+│   ├── Episode 2
+│   └── Episode 3
+├── Category 2
+│   ├── Episode 1
+│   └── Episode 2
+└── Category 3
+    ├── Episode 1
+    ├── Episode 2
+    └── Episode 3
+```
+
+#### Content Information
+
+Each episode contains:
+
+- **Title**: Episode title
+- **Description**: Episode description
+- **Duration**: Length in seconds
+- **URL**: Direct download URL
+- **Thumbnail**: Preview image URL
+
+#### Basic Search
+
+Search for content across all providers:
+
+```bash
+# Simple search
+java -jar consoleView.jar --search "documentary"
+
+# Search in specific plugin
+java -jar consoleView.jar --search "documentary" --plugins arte
+
+# Search with multiple terms
+java -jar consoleView.jar --search "nature wildlife"
+```
+
+#### Advanced Search
+
+```bash
+# Search with filters
+java -jar consoleView.jar --search "documentary" --plugins arte --category "Nature"
+
+# Search with date range
+java -jar consoleView.jar --search "news" --dateFrom 2024-01-01 --dateTo 2024-12-31
+
+# Search with duration filter
+java -jar consoleView.jar --search "movie" --minDuration 3600 --maxDuration 7200
+```
 
 ## Download Management
 
-### Download States
+### Starting Downloads
 
-- **Pending**: Queued for download
-- **Downloading**: Currently being downloaded
-- **Paused**: Temporarily stopped
-- **Completed**: Successfully downloaded
-- **Failed**: Download failed (with error details)
-- **Cancelled**: Manually cancelled
+#### Starting Downloads
 
-### Download Options
-
-#### Quality Selection
-- **Automatic**: Let habiTv choose the best quality
-- **Manual**: Select specific quality (HD, SD, etc.)
-- **Custom**: Specify exact resolution or bitrate
-
-#### Download Limits
-- **Speed Limits**: Restrict bandwidth usage
-- **Concurrent Downloads**: Control number of simultaneous downloads
-- **Time Restrictions**: Download only during specific hours
-
-#### Retry Logic
-- **Automatic Retry**: Failed downloads are retried automatically
-- **Retry Count**: Maximum number of retry attempts
-- **Retry Delay**: Time between retry attempts
-
-### File Management
-
-#### Naming Conventions
-- **Default**: `Show Name - Episode Title - Date.ext`
-- **Custom**: Configure your own naming pattern
-- **Variables**: Use placeholders for dynamic naming
-
-#### Organization
-- **By Show**: Separate folders for each show
-- **By Date**: Organize by download date
-- **By Quality**: Separate folders by video quality
-- **Custom**: Define your own organization rules
-
-## Export and Post-Processing
-
-### Built-in Export Options
-
-#### Video Conversion
-- **Format Conversion**: Convert to different video formats
-- **Quality Adjustment**: Resize or re-encode videos
-- **Audio Extraction**: Extract audio tracks
-- **Subtitle Handling**: Embed or extract subtitles
-
-#### File Operations
-- **Move Files**: Move to different locations
-- **Copy Files**: Create copies in multiple locations
-- **Delete Originals**: Remove original files after processing
-- **Archive**: Compress or archive old files
-
-### Custom Export Commands
-
-#### Command Templates
 ```bash
-# Basic FFmpeg conversion
-ffmpeg -i "{input}" -c:v libx264 -c:a aac "{output}"
+# Download single episode
+java -jar consoleView.jar --download --plugins arte --category "Documentaries" --episode "Example Episode"
 
-# Upload to FTP
-curl -T "{input}" ftp://server.com/path/
+# Download all episodes in category
+java -jar consoleView.jar --download --plugins arte --category "Documentaries"
 
-# Send notification
-notify-send "Download Complete" "{filename}"
+# Download with custom filename
+java -jar consoleView.jar --download --plugins arte --category "Documentaries" --episode "Example Episode" --filename "custom_name"
 ```
 
-#### Variables Available
-- `{input}`: Input file path
-- `{output}`: Output file path
-- `{filename}`: Just the filename
-- `{show}`: Show name
-- `{episode}`: Episode title
-- `{date}`: Download date
+#### Download Options
 
-### Export Triggers
+```bash
+# Set output directory
+java -jar consoleView.jar --download --plugins arte --category "Documentaries" --episode "Example Episode" --outputDir /path/to/downloads
 
-- **On Download Complete**: Run immediately after download
-- **On Batch Complete**: Run after multiple downloads finish
-- **Scheduled**: Run at specific times
-- **Manual**: Run export commands manually
+# Set quality
+java -jar consoleView.jar --download --plugins arte --category "Documentaries" --episode "Example Episode" --quality high
 
-## Monitoring and Notifications
+# Include subtitles
+java -jar consoleView.jar --download --plugins arte --category "Documentaries" --episode "Example Episode" --subtitles
 
-### System Notifications
+# Set format
+java -jar consoleView.jar --download --plugins arte --category "Documentaries" --episode "Example Episode" --format mp4
+```
 
-#### Notification Types
-- **Download Started**: When a new download begins
-- **Download Complete**: When a download finishes successfully
-- **Download Failed**: When a download fails
-- **New Episodes**: When new episodes are found
-- **Export Complete**: When post-processing finishes
+#### Queue Management
 
-#### Notification Settings
-- **Enable/Disable**: Turn notifications on or off
-- **Sound**: Play sounds for notifications
-- **Duration**: How long notifications are displayed
-- **Priority**: Which notifications to show
+Manage the download queue:
 
-### Logging
+```bash
+# Show current queue
+java -jar consoleView.jar --listDownload
 
-#### Log Levels
-- **DEBUG**: Detailed debugging information
-- **INFO**: General information about operations
-- **WARN**: Warning messages for potential issues
-- **ERROR**: Error messages for problems
+# Pause specific download
+java -jar consoleView.jar --pauseDownload --id 123
 
-#### Log Management
-- **Log Rotation**: Automatic log file rotation
-- **Log Size Limits**: Maximum log file sizes
-- **Log Retention**: How long to keep old logs
-- **Log Export**: Export logs for analysis
+# Resume specific download
+java -jar consoleView.jar --resumeDownload --id 123
 
-## Troubleshooting
+# Cancel specific download
+java -jar consoleView.jar --cancelDownload --id 123
 
-### Common Issues
+# Clear completed downloads
+java -jar consoleView.jar --clearCompleted
+```
 
-#### Download Failures
-1. **Check Internet Connection**: Ensure stable internet access
-2. **Verify Content Availability**: Content may have been removed
-3. **Check External Tools**: Ensure rtmpDump, curl, etc. are working
-4. **Review Logs**: Check log files for specific error messages
+#### Queue Status
 
-#### Performance Issues
-1. **Reduce Concurrent Downloads**: Lower the number of simultaneous downloads
-2. **Check Disk Space**: Ensure sufficient storage space
-3. **Monitor System Resources**: Check CPU and memory usage
-4. **Optimize Network**: Use wired connection if possible
+Monitor download progress:
 
-#### Configuration Problems
-1. **Validate XML Files**: Check config.xml and grabconfig.xml syntax
-2. **Reset Configuration**: Delete config files to start fresh
-3. **Check Permissions**: Ensure write permissions to config directory
-4. **Review Environment Variables**: Check for conflicting settings
+```text
+Download Queue Status:
+├── Active Downloads: 2
+├── Queued Downloads: 5
+├── Completed Downloads: 15
+├── Failed Downloads: 1
+└── Total Downloads: 23
 
-### Getting Help
+Current Downloads:
+├── ID: 123 | Arte - Documentaries - Episode 1 | 75% | 2.5 MB/s
+└── ID: 124 | Canal+ - News - Episode 2 | 45% | 1.8 MB/s
+```
 
-#### Self-Help Resources
-- **Log Files**: Check `%USERPROFILE%\habitv\habiTv.log` (Windows) or `~/.habitv/habiTv.log` (Linux)
-- **Configuration Files**: Review settings in config.xml
-- **Documentation**: Refer to this guide and other documentation
+## Configuration
 
-#### Community Support
-- **GitHub Issues**: Search existing issues or create new ones
-- **Wiki**: Check the project wiki for additional information
-- **Forums**: Community forums for user discussions
+### Configuration Options
 
-#### Reporting Issues
-When reporting problems, include:
-- **Operating System**: Windows/Linux version
-- **Java Version**: Output of `java -version`
-- **habiTv Version**: Version you're using
-- **Error Messages**: Exact error text from logs
-- **Steps to Reproduce**: How to recreate the issue
-- **Configuration**: Relevant parts of your config files
+#### Configuration Options
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <download>
+        <directory>./downloads</directory>
+        <timeout>300000</timeout>
+        <retry-count>3</retry-count>
+        <threads>4</threads>
+        <buffer-size>8192</buffer-size>
+    </download>
+    
+    <gui>
+        <enabled>true</enabled>
+        <system-tray>true</system-tray>
+        <minimize-to-tray>true</minimize-to-tray>
+        <start-minimized>false</start-minimized>
+        <update-interval>1000</update-interval>
+    </gui>
+    
+    <logging>
+        <level>INFO</level>
+        <file-enabled>true</file-enabled>
+        <file-path>./logs/habiTv.log</file-path>
+        <file-max-size>10485760</file-max-size>
+        <file-max-files>5</file-max-files>
+        <console-enabled>true</console-enabled>
+    </logging>
+    
+    <plugins>
+        <auto-update>true</auto-update>
+        <update-interval>3600000</update-interval>
+        <directory>./plugins</directory>
+        <cache-directory>./plugins/cache</cache-directory>
+        <debug-enabled>false</debug-enabled>
+    </plugins>
+</config>
+```
+
+#### Environment Variables
+
+Set environment variables for configuration:
+
+```properties
+# Download settings
+HABITV_DOWNLOAD_DIR=./downloads
+HABITV_DOWNLOAD_TIMEOUT=300000
+HABITV_DOWNLOAD_THREADS=4
+
+# GUI settings
+HABITV_GUI_ENABLED=true
+HABITV_GUI_SYSTEM_TRAY=true
+
+# Logging settings
+HABITV_LOG_LEVEL=INFO
+HABITV_LOG_FILE_ENABLED=true
+
+# Plugin settings
+HABITV_PLUGIN_AUTO_UPDATE=true
+HABITV_PLUGIN_DIRECTORY=./plugins
+```
+
+#### Basic Configuration
+
+Essential settings for most users:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <download>
+        <directory>/home/user/Videos/habiTv</directory>
+        <threads>4</threads>
+        <timeout>300000</timeout>
+    </download>
+    
+    <gui>
+        <enabled>true</enabled>
+        <system-tray>true</system-tray>
+        <minimize-to-tray>true</minimize-to-tray>
+    </gui>
+    
+    <logging>
+        <level>INFO</level>
+        <file-enabled>true</file-enabled>
+    </logging>
+    
+    <plugins>
+        <auto-update>true</auto-update>
+    </plugins>
+</config>
+```
+
+#### Advanced Configuration
+
+Advanced settings for power users:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <download>
+        <directory>/home/user/Videos/habiTv</directory>
+        <threads>8</threads>
+        <timeout>600000</timeout>
+        <retry-count>5</retry-count>
+        <buffer-size>16384</buffer-size>
+        <chunk-size>2097152</chunk-size>
+    </download>
+    
+    <gui>
+        <enabled>true</enabled>
+        <system-tray>true</system-tray>
+        <minimize-to-tray>true</minimize-to-tray>
+        <start-minimized>false</start-minimized>
+        <update-interval>500</update-interval>
+        <theme>dark</theme>
+    </gui>
+    
+    <logging>
+        <level>DEBUG</level>
+        <file-enabled>true</file-enabled>
+        <file-path>./logs/habiTv.log</file-path>
+        <file-max-size>52428800</file-max-size>
+        <file-max-files>10</file-max-files>
+        <console-enabled>true</console-enabled>
+    </logging>
+    
+    <plugins>
+        <auto-update>true</auto-update>
+        <update-interval>1800000</update-interval>
+        <directory>./plugins</directory>
+        <cache-directory>./plugins/cache</cache-directory>
+        <debug-enabled>true</debug-enabled>
+    </plugins>
+    
+    <performance>
+        <memory-limit>2g</memory-limit>
+        <thread-pool-size>16</thread-pool-size>
+        <cache-size>1000</cache-size>
+        <gc-optimization>true</gc-optimization>
+    </performance>
+</config>
+```
+
+#### Plugin Settings
+
+Configure individual plugins:
+
+```xml
+<plugins>
+    <plugin name="arte">
+        <enabled>true</enabled>
+        <timeout>30000</timeout>
+        <retry-count>3</retry-count>
+        <user-agent>habiTv/1.0</user-agent>
+    </plugin>
+    
+    <plugin name="canalplus">
+        <enabled>true</enabled>
+        <timeout>45000</timeout>
+        <retry-count>5</retry-count>
+        <user-agent>habiTv/1.0</user-agent>
+    </plugin>
+</plugins>
+```
+
+#### Export Settings
+
+Configure video export options:
+
+```xml
+<export>
+    <default-format>mp4</default-format>
+    <quality>high</quality>
+    <audio-bitrate>128</audio-bitrate>
+    <video-bitrate>2000</video-bitrate>
+    <fps>30</fps>
+    <resolution>1920x1080</resolution>
+    <include-subtitles>true</include-subtitles>
+    <include-metadata>true</include-metadata>
+</export>
+```
 
 ## Advanced Features
 
 ### Automation
 
-#### Scheduled Tasks
-- **Automatic Checks**: Schedule regular content checks
-- **Batch Downloads**: Download multiple episodes at once
-- **Maintenance Tasks**: Automatic cleanup and organization
+#### Scheduled Downloads
 
-#### Integration
-- **External Scripts**: Integrate with your own scripts
-- **API Access**: Programmatic access to habiTv features
-- **Web Interface**: Optional web-based management interface
+Set up automatic downloads:
 
-### Customization
+```bash
+# Create download script
+cat > download_script.sh << 'EOF'
+#!/bin/bash
+java -jar consoleView.jar --download --plugins arte --category "Documentaries"
+java -jar consoleView.jar --download --plugins canalplus --category "News"
+EOF
 
-#### Plugin Development
-- **Content Providers**: Add support for new video sources
-- **Downloaders**: Implement new download methods
-- **Exporters**: Create custom post-processing plugins
+# Make executable
+chmod +x download_script.sh
 
-#### Configuration Templates
-- **Preset Configurations**: Save and share configuration setups
-- **Environment-Specific**: Different configs for different environments
-- **Backup and Restore**: Export and import configurations
+# Add to crontab (daily at 2 AM)
+echo "0 2 * * * /path/to/download_script.sh" | crontab -
+```
+
+#### Daemon Mode
+
+Run habiTv as a background service:
+
+```bash
+# Create systemd service
+sudo tee /etc/systemd/system/habitv.service << EOF
+[Unit]
+Description=habiTv Download Service
+After=network.target
+
+[Service]
+Type=simple
+User=habitv
+WorkingDirectory=/home/habitv
+ExecStart=/usr/bin/java -jar /home/habitv/habiTv.jar --daemon
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Enable and start service
+sudo systemctl enable habitv
+sudo systemctl start habitv
+```
+
+### Content Management
+
+#### Favorites
+
+Manage favorite content:
+
+```bash
+# Add to favorites
+java -jar consoleView.jar --favorite --plugins arte --category "Documentaries" --episode "Example Episode"
+
+# List favorites
+java -jar consoleView.jar --listFavorites
+
+# Remove from favorites
+java -jar consoleView.jar --unfavorite --id 123
+
+# Download all favorites
+java -jar consoleView.jar --downloadFavorites
+```
+
+#### Playlists
+
+Create and manage playlists:
+
+```bash
+# Create playlist
+java -jar consoleView.jar --createPlaylist --name "My Documentaries"
+
+# Add to playlist
+java -jar consoleView.jar --addToPlaylist --playlist "My Documentaries" --plugins arte --category "Documentaries" --episode "Example Episode"
+
+# List playlists
+java -jar consoleView.jar --listPlaylists
+
+# Download playlist
+java -jar consoleView.jar --downloadPlaylist --name "My Documentaries"
+```
+
+### Post-Processing
+
+#### Video Processing
+
+Apply post-processing to downloaded videos:
+
+```bash
+# Convert to different format
+java -jar consoleView.jar --download --plugins arte --category "Documentaries" --episode "Example Episode" --postProcess "convert:mp4"
+
+# Extract audio
+java -jar consoleView.jar --download --plugins arte --category "Documentaries" --episode "Example Episode" --postProcess "extract-audio:mp3"
+
+# Add watermark
+java -jar consoleView.jar --download --plugins arte --category "Documentaries" --episode "Example Episode" --postProcess "watermark:/path/to/logo.png"
+```
+
+#### Metadata Management
+
+Manage video metadata:
+
+```bash
+# Add metadata
+java -jar consoleView.jar --download --plugins arte --category "Documentaries" --episode "Example Episode" --metadata "title=Custom Title,artist=Custom Artist"
+
+# Extract metadata
+java -jar consoleView.jar --extractMetadata --input /path/to/video.mp4
+
+# Update metadata
+java -jar consoleView.jar --updateMetadata --input /path/to/video.mp4 --metadata "title=New Title"
+```
+
+## Troubleshooting
+
+### Common Issues
+
+#### Application Won't Start
+
+Check Java installation and permissions:
+
+```bash
+# Check Java version
+java -version
+
+# Check file permissions
+ls -la habiTv.jar
+
+# Run with debug output
+java -jar habiTv.jar --debug
+```
+
+#### Downloads Fail
+
+Check network and configuration:
+
+```bash
+# Test network connectivity
+ping google.com
+
+# Check download directory permissions
+ls -la /path/to/downloads
+
+# Test with verbose output
+java -jar consoleView.jar --download --plugins arte --category "Documentaries" --episode "Example Episode" --verbose
+```
+
+#### Plugins Not Working
+
+Check plugin status and updates:
+
+```bash
+# List plugins
+java -jar consoleView.jar --listPlugin
+
+# Update plugins
+java -jar consoleView.jar --updatePlugin
+
+# Check plugin logs
+tail -f logs/habiTv.log | grep -i plugin
+```
+
+### Performance Optimization
+
+#### Memory Usage
+
+Optimize memory usage:
+
+```bash
+# Run with limited memory
+java -Xmx512m -jar habiTv.jar
+
+# Monitor memory usage
+jps -l
+jstat -gc <pid>
+```
+
+#### Network Optimization
+
+Optimize network performance:
+
+```bash
+# Set custom timeout
+java -jar consoleView.jar --download --plugins arte --category "Documentaries" --episode "Example Episode" --timeout 600000
+
+# Use proxy
+java -jar consoleView.jar --download --plugins arte --category "Documentaries" --episode "Example Episode" --proxy http://proxy:8080
+
+# Limit bandwidth
+java -jar consoleView.jar --download --plugins arte --category "Documentaries" --episode "Example Episode" --bandwidth 1024
+```
 
 ## Best Practices
 
-### Performance Optimization
-1. **Use SSD Storage**: Faster read/write speeds for downloads
-2. **Limit Concurrent Downloads**: Balance speed with system resources
-3. **Regular Cleanup**: Remove old downloads and logs
-4. **Monitor Resources**: Keep an eye on system usage
+### Content Discovery
 
-### Content Management
-1. **Organize Downloads**: Use consistent naming and folder structure
-2. **Regular Backups**: Backup your configuration files
-3. **Quality Selection**: Choose appropriate quality for your needs
-4. **Storage Planning**: Plan for sufficient storage space
+- **Use Search**: Search is faster than browsing categories
+- **Check Categories**: Browse categories to discover new content
+- **Monitor Updates**: Check for new episodes regularly
+- **Use Filters**: Use filters to narrow down results
 
-### Network Usage
-1. **Bandwidth Management**: Set appropriate speed limits
-2. **Scheduled Downloads**: Download during off-peak hours
-3. **Proxy Configuration**: Use proxies if needed
-4. **Connection Monitoring**: Monitor for connection issues
+#### Download Management
 
-This user guide covers the essential features of habiTv. For more advanced topics, refer to the [Developer Documentation](DEVELOPER_GUIDE.md) or [Plugin Development Guide](PLUGIN_DEVELOPMENT.md). 
+- **Batch Downloads**: Download multiple episodes at once
+- **Queue Management**: Monitor and manage download queue
+- **Storage Planning**: Plan storage space for downloads
+- **Backup Strategy**: Back up important downloads
+
+#### Performance
+
+- **Limit Concurrent Downloads**: Don't overload your connection
+- **Monitor Resources**: Watch CPU and memory usage
+- **Optimize Settings**: Adjust settings for your system
+- **Regular Maintenance**: Clean up old files and logs
+
+### File Organization
+
+Organize downloaded content:
+
+```text
+downloads/
+├── Arte/
+│   ├── Documentaries/
+│   │   ├── 2024/
+│   │   │   ├── January/
+│   │   │   └── February/
+│   │   └── 2023/
+│   └── News/
+├── Canal+/
+│   ├── Movies/
+│   └── Series/
+└── Pluzz/
+    ├── Programs/
+    └── Specials/
+```
+
+#### Backup Strategy
+
+Backup important content:
+
+```bash
+# Create backup script
+cat > backup_downloads.sh << 'EOF'
+#!/bin/bash
+BACKUP_DIR="/backup/habitv/$(date +%Y-%m-%d)"
+mkdir -p "$BACKUP_DIR"
+rsync -av /downloads/ "$BACKUP_DIR/"
+echo "Backup completed: $BACKUP_DIR"
+EOF
+
+# Make executable
+chmod +x backup_downloads.sh
+
+# Add to crontab (weekly backup)
+echo "0 3 * * 0 /path/to/backup_downloads.sh" | crontab -
+```
+
+This user guide provides comprehensive instructions for using habiTv effectively. Follow these guidelines to get the most out of the application and troubleshoot common issues. 

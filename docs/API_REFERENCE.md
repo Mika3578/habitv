@@ -2,6 +2,7 @@
 
 This document provides detailed API reference for the habiTv framework and plugin system.
 
+**Version**: 4.1.0-SNAPSHOT  
 **Last Updated**: June 14, 2025
 
 ## Plugin API
@@ -499,42 +500,42 @@ public class ExportFailedException extends TechnicalException {
 
 Supported environment variables:
 
-```java
-// Application configuration
+```properties
+# Application configuration
 HABITV_HOME              // Application home directory
 HABITV_VERSION           // Application version
 HABITV_LOG_LEVEL         // Logging level (DEBUG, INFO, WARN, ERROR)
 HABITV_DEBUG             // Enable debug mode (true/false)
 HABITV_DEV_MODE          // Enable development mode (true/false)
 
-// Download configuration
+# Download configuration
 HABITV_DOWNLOAD_OUTPUT   // Download output directory
 HABITV_MAX_ATTEMPTS      // Maximum download attempts
 HABITV_DAEMON_CHECK_TIME // Daemon check time in seconds
 HABITV_FILENAME_CUT_SIZE // Maximum filename length
 
-// Plugin directories
+# Plugin directories
 HABITV_PLUGIN_DIR        // Main plugin directory
 HABITV_PROVIDER_PLUGIN_DIR // Provider plugins directory
 HABITV_DOWNLOADER_PLUGIN_DIR // Downloader plugins directory
 HABITV_EXPORTER_PLUGIN_DIR // Exporter plugins directory
 
-// Update configuration
+# Update configuration
 HABITV_UPDATE_ON_STARTUP // Check for updates on startup (true/false)
 HABITV_AUTORISE_SNAPSHOT // Allow snapshot updates (true/false)
 
-// Proxy configuration
+# Proxy configuration
 HTTP_PROXY_HOST          // HTTP proxy host
 HTTP_PROXY_PORT          // HTTP proxy port
 HTTP_PROXY_USER          // HTTP proxy username
 HTTP_PROXY_PASSWORD      // HTTP proxy password
 
-// Logging configuration
+# Logging configuration
 HABITV_LOG_FILE          // Log file path
 HABITV_LOG_MAX_FILE_SIZE // Maximum log file size
 HABITV_LOG_MAX_BACKUP_INDEX // Maximum backup log files
 
-// Java configuration
+# Java configuration
 JAVA_HOME                // Java installation directory
 JAVA_OPTS                // Java VM options
 ```
