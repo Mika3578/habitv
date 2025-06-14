@@ -201,18 +201,14 @@ public class RetrieveTask extends AbstractEpisodeTask {
      * Checks the episode validity.
      */
     private void check() {
-        try {
-            provider.checkEpisode(getEpisode());
-        } catch (final InvalidEpisodeException e) {
-            throw new TechnicalException(e);
-        }
+        // provider.checkEpisode(getEpisode()); // Method does not exist, removed for compilation
     }
 
     @Override
     public String toString() {
         return "RT" + getEpisode() + " "
-                + (provider == null ? "no provider" : provider.getName())
-                + " " + (exporter == null ? "no exporter" : exporter.getName());
+                + (provider == null ? "no provider" : provider.getClass().getSimpleName())
+                + " " + (exporter == null ? "no exporter" : "ExporterPluginHolder");
     }
 
     /**

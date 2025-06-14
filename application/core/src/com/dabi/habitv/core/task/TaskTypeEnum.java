@@ -15,20 +15,23 @@ public enum TaskTypeEnum {
 	/** Download task type. */
 	DOWNLOAD,
 	/** Export task type. */
-	EXPORT;
+	EXPORT,
+	/** Category task type. */
+	CATEGORY;
 
 	/** Default pool size for task execution. */
 	private static final int DEFAULT_POOLSIZE = 1;
 
 	/** Map of task types to their pool sizes. */
-	private static final Map<TaskTypeEnum, Integer> type2PoolSize = 
+	private static final Map<TaskTypeEnum, Integer> TYPE_TO_POOL_SIZE = 
 			new HashMap<TaskTypeEnum, Integer>();
 
 	static {
-		type2PoolSize.put(SEARCH, 1);
-		type2PoolSize.put(RETRIEVE, 1);
-		type2PoolSize.put(DOWNLOAD, 3);
-		type2PoolSize.put(EXPORT, 1);
+		TYPE_TO_POOL_SIZE.put(SEARCH, 1);
+		TYPE_TO_POOL_SIZE.put(RETRIEVE, 1);
+		TYPE_TO_POOL_SIZE.put(DOWNLOAD, 3);
+		TYPE_TO_POOL_SIZE.put(EXPORT, 1);
+		TYPE_TO_POOL_SIZE.put(CATEGORY, 1);
 	}
 
 	/**
@@ -37,7 +40,7 @@ public enum TaskTypeEnum {
 	 * @return the pool size for this task type
 	 */
 	public int getPoolSize() {
-		Integer poolSize = type2PoolSize.get(this);
+		Integer poolSize = TYPE_TO_POOL_SIZE.get(this);
 		return poolSize != null ? poolSize : DEFAULT_POOLSIZE;
 	}
 }

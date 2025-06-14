@@ -37,7 +37,7 @@ public class CategoryManager extends AbstractManager {
 		super(providerPluginHolder);
 		// task mgrs
 		searchCategoryMgr = new TaskMgr<SearchCategoryTask, SearchCategoryResult>(
-				TaskTypeEnum.category.getPoolSize(taskName2PoolSize),
+				TaskTypeEnum.CATEGORY.getPoolSize(),
 				buildCategoryTaskMgrListener(), null);
 		// publisher
 		searchCategoryPublisher = new Publisher<>();

@@ -39,6 +39,8 @@ public final class SearchCategoryTask extends
     @Override
     protected void adding() {
         LOG.info("Waiting for search category of " + channel);
+        publisher.addNews(new SearchCategoryEvent(channel,
+                SearchCategoryStateEnum.CHANNEL_CATEGORIES_TO_BUILD));
     }
 
     @Override
@@ -59,7 +61,7 @@ public final class SearchCategoryTask extends
     protected void started() {
         LOG.info("Search category of " + channel + " is starting");
         publisher.addNews(new SearchCategoryEvent(channel,
-                SearchCategoryStateEnum.STARTING));
+                SearchCategoryStateEnum.BUILDING_CATEGORIES));
     }
 
     @Override

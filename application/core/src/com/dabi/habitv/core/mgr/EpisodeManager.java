@@ -67,13 +67,13 @@ public final class EpisodeManager extends AbstractManager implements TaskAdder {
 		super(providerPluginHolder);
 		exportDAO = new ExportDAO(appDir);
 		// task mgrs
-		retreiveMgr = new TaskMgr<RetrieveTask, Object>(TaskTypeEnum.retreive.getPoolSize(taskName2PoolSize),
+		retreiveMgr = new TaskMgr<RetrieveTask, Object>(TaskTypeEnum.RETRIEVE.getPoolSize(),
 				buildRetreiveTaskMgrListener(), taskName2PoolSize);
-		downloadMgr = new TaskMgr<DownloadTask, Object>(TaskTypeEnum.download.getPoolSize(taskName2PoolSize),
+		downloadMgr = new TaskMgr<DownloadTask, Object>(TaskTypeEnum.DOWNLOAD.getPoolSize(),
 				buildDownloadTaskMgrListener(), taskName2PoolSize);
-		exportMgr = new TaskMgr<ExportTask, Object>(TaskTypeEnum.export.getPoolSize(taskName2PoolSize), buildExportTaskMgrListener(),
+		exportMgr = new TaskMgr<ExportTask, Object>(TaskTypeEnum.EXPORT.getPoolSize(), buildExportTaskMgrListener(),
 				taskName2PoolSize);
-		searchMgr = new TaskMgr<SearchTask, Object>(TaskTypeEnum.search.getPoolSize(taskName2PoolSize), buildSearchTaskMgrListener(),
+		searchMgr = new TaskMgr<SearchTask, Object>(TaskTypeEnum.SEARCH.getPoolSize(), buildSearchTaskMgrListener(),
 				taskName2PoolSize);
 		// publisher
 		retreivePublisher = new Publisher<>();
