@@ -76,9 +76,11 @@ mvn package -DskipTests
 - ✅ Executable JARs with proper manifests
 
 ### 3. Testing
-- ✅ Main application JAR tested with `--help` command
-- ✅ Console view JAR tested with `--help` command
-- ✅ Both JARs respond correctly to command-line options
+```bash
+# Main application JAR tested with `--help` command
+# Console view JAR tested with `--help` command
+# Both JARs respond correctly to command-line options
+```
 
 ## Usage Instructions
 

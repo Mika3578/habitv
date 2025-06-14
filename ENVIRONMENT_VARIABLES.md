@@ -163,7 +163,7 @@ Environment variables are loaded in the following priority order:
 
 ### Development Configuration
 
-```bash
+```properties
 # .env file for development
 HABITV_VERSION=4.1.0-SNAPSHOT
 HABITV_HOME=/path/to/dev/habitv
@@ -177,9 +177,9 @@ HABITV_AUTORISE_SNAPSHOT=false
 
 ### Production Configuration
 
-```bash
+```properties
 # .env file for production
-HABITV_VERSION=4.1.0
+HABITV_VERSION=4.1.0-SNAPSHOT
 HABITV_HOME=/opt/habitv
 HABITV_LOG_LEVEL=WARN
 HABITV_DEBUG=false
@@ -192,7 +192,7 @@ JAVA_OPTS=-Xmx4g -Xms2g -Dfile.encoding=UTF-8
 
 ### Proxy Configuration
 
-```bash
+```properties
 # .env file with proxy settings
 HTTP_PROXY_HOST=proxy.company.com
 HTTP_PROXY_PORT=8080
