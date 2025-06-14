@@ -1,6 +1,8 @@
 # Contributing to habiTv
 
-Thank you for your interest in contributing to habiTv! This guide will help you get started with contributing to the project.
+Thank you for your interest in contributing to habiTv! This guide explains how to contribute to the project.
+
+**Last Updated**: June 14, 2025
 
 ## Getting Started
 

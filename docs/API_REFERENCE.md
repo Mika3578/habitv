@@ -2,6 +2,8 @@
 
 This document provides detailed API reference for the habiTv framework and plugin system.
 
+**Last Updated**: June 14, 2025
+
 ## Plugin API
 
 ### Core Interfaces

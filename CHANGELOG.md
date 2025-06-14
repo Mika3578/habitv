@@ -12,12 +12,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Environment variables support
 - Improved error handling and logging
 - Enhanced plugin development framework
+- Updated documentation with current project state
+- Added last updated timestamps to documentation
 
 ### Changed
 - Updated Java compatibility from 1.7 to 1.8
 - Removed hardcoded JavaFX dependencies
 - Fixed deprecated API usage
 - Improved build configuration
+- Enhanced documentation structure and clarity
+- Updated all documentation links and references
 
 ### Fixed
 - Java version compatibility issues
@@ -25,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Deprecated URL constructor usage
 - Unused import warnings
 - Markdown linting issues
+- Documentation inconsistencies and outdated information
 
 ## [4.1.0-SNAPSHOT] - Current Development Version
 
@@ -36,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Plugin System**: Extensible architecture for new content sources
 - **Automatic Monitoring**: Background checking for new episodes
 - **Multi-Platform**: Windows and Linux support
+- **Environment Configuration**: Flexible configuration via environment variables
 
 ### Technical Stack
 - **Java 8**: Core application runtime
@@ -70,13 +76,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Java Compatibility**: Java 8+
 - **Build System**: Maven 3.6+
 - **Status**: Active development
+- **Last Documentation Update**: June 14, 2025
 
 ### Recent Improvements
-- **Documentation**: Complete documentation suite added
+- **Documentation**: Complete documentation suite added and updated
 - **Java Compatibility**: Updated from Java 1.7 to Java 1.8
 - **Error Handling**: Improved exception handling and logging
 - **Build System**: Enhanced Maven configuration
 - **Code Quality**: Fixed deprecated API usage and warnings
+- **Configuration**: Enhanced environment variable support
 
 ### Known Issues
 - Some plugin modules have parent POM reference issues (non-critical)

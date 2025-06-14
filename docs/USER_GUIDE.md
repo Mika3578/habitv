@@ -2,6 +2,8 @@
 
 This guide covers how to use habiTv effectively for both GUI and command-line interfaces.
 
+**Last Updated**: June 14, 2025
+
 ## Getting Started
 
 ### First Launch

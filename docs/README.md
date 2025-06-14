@@ -2,6 +2,8 @@
 
 Welcome to the habiTv documentation! This directory contains comprehensive documentation for users, developers, and contributors.
 
+**Last Updated**: June 14, 2025
+
 ## Documentation Overview
 
 ### For Users

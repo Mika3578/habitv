@@ -2,6 +2,8 @@
 
 This document explains how to configure and use environment variables with the habiTv application.
 
+**Last Updated**: June 14, 2025
+
 ## Overview
 
 The habiTv application now supports environment variables for configuration, making it easier to:

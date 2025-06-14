@@ -1,5 +1,9 @@
 # habiTv Plugin Development Guide
 
+This guide explains how to create plugins for habiTv to extend its functionality.
+
+**Last Updated**: June 14, 2025
+
 This guide covers developing plugins for habiTv, including content providers, downloaders, and exporters.
 
 ## Plugin Architecture Overview

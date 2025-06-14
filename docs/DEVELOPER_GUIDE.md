@@ -1,6 +1,8 @@
 # habiTv Developer Guide
 
-This guide is for developers who want to understand, modify, or extend the habiTv codebase.
+This guide provides information for developers who want to understand, modify, or extend the habiTv application.
+
+**Last Updated**: June 14, 2025
 
 ## Architecture Overview
 

@@ -2,6 +2,8 @@
 
 This guide covers installing habiTv on different operating systems and configurations.
 
+**Last Updated**: June 14, 2025
+
 ## Prerequisites
 
 ### Java Requirements
@@ -310,4 +312,4 @@ Include in your support request:
 - Operating system and version
 - Java version
 - Error messages or log excerpts
-- Steps to reproduce the issue 
+- Steps to reproduce the issue

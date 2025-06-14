@@ -17,6 +17,7 @@ habiTv is a Java-based application that automatically downloads TV replay conten
 - **Plugin System**: Extensible architecture for new content providers and download methods
 - **Background Operation**: Runs as a system tray application with notifications
 - **Export Integration**: Automatic post-processing and export capabilities
+- **Environment Configuration**: Flexible configuration via environment variables
 
 ## Supported Content Providers
 
@@ -55,6 +56,9 @@ Download the latest release from the [Releases](https://github.com/your-repo/hab
 ```cmd
 # Extract and run
 java -jar habiTv-4.1.0-SNAPSHOT.jar
+
+# Or use the provided batch file
+run-habitv.bat
 ```
 
 **Linux:**
@@ -113,6 +117,8 @@ Key variables:
 - `HABITV_HOME`: Application home directory
 - `HABITV_DOWNLOAD_OUTPUT`: Download output directory
 - `HABITV_LOG_LEVEL`: Logging level (DEBUG, INFO, WARN, ERROR)
+- `HABITV_DEBUG`: Enable debug mode
+- `HABITV_DEV_MODE`: Enable development mode
 
 ### Configuration Files
 
@@ -176,6 +182,7 @@ habitv/
 │   ├── canalPlus/      # Canal+ plugin
 │   ├── ffmpeg/         # FFmpeg export plugin
 │   └── ...             # Other plugins
+├── docs/               # Documentation
 └── pom.xml             # Maven parent POM
 ```
 
@@ -191,6 +198,7 @@ See [PLUGIN_DEVELOPMENT.md](docs/PLUGIN_DEVELOPMENT.md) for detailed plugin deve
 2. **Download Failures**: Check internet connection and provider availability
 3. **Plugin Errors**: Verify external tools (ffmpeg, rtmpDump) are installed
 4. **Configuration**: Check `config.xml` and `grabconfig.xml` syntax
+5. **Environment Variables**: Verify environment variable configuration
 
 ### Logs
 
@@ -200,13 +208,13 @@ Logs are stored in:
 
 ### Getting Help
 
-- Check the [Wiki](https://github.com/your-repo/habitv/wiki)
+- Check the [Documentation](docs/README.md)
 - Search [Issues](https://github.com/your-repo/habitv/issues)
 - Create a new issue for bugs or feature requests
 
 ## Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+We welcome contributions! Please see [CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines.
 
 ### Development Setup
 
@@ -233,3 +241,5 @@ See [CHANGELOG.md](CHANGELOG.md) for version history and updates.
 ---
 
 **Note**: This software is for personal use only. Please respect content providers' terms of service and copyright laws.
+
+**Last Updated**: June 14, 2025
