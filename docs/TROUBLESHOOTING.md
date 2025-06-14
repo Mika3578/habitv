@@ -3,7 +3,7 @@
 This guide helps you resolve common issues and problems with habiTv.
 
 **Version**: 4.1.0-SNAPSHOT  
-**Last Updated**: June 14, 2025
+**Last Updated**: December 19, 2024
 
 ## Common Issues
 

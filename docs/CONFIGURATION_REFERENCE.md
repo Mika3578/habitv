@@ -3,7 +3,7 @@
 This document provides a comprehensive reference for all configuration options available in habiTv.
 
 **Version**: 4.1.0-SNAPSHOT  
-**Last Updated**: June 14, 2025
+**Last Updated**: December 19, 2024
 
 ## Configuration Files
 

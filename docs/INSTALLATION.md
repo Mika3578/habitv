@@ -3,7 +3,7 @@
 This guide covers installing habiTv on different operating systems and configurations.
 
 **Version**: 4.1.0-SNAPSHOT  
-**Last Updated**: June 14, 2025
+**Last Updated**: December 19, 2024
 
 ## Prerequisites
 
@@ -18,17 +18,20 @@ java -version
 If Java is not installed or you need to upgrade:
 
 **Windows:**
+
 1. Download from [Oracle Java](https://www.oracle.com/java/technologies/downloads/) or [OpenJDK](https://adoptium.net/)
 2. Install and add to PATH
 3. Restart your terminal/command prompt
 
 **Linux (Ubuntu/Debian):**
+
 ```bash
 sudo apt update
 sudo apt install openjdk-8-jdk
 ```
 
 **Linux (CentOS/RHEL/Fedora):**
+
 ```bash
 sudo yum install java-1.8.0-openjdk
 # or for newer versions
@@ -49,10 +52,11 @@ sudo dnf install java-1.8.0-openjdk
 #### Windows Installation
 
 1. **Download the Windows package:**
-   - Go to [Releases](https://github.com/your-repo/habitv/releases)
+   - Go to [Releases](https://github.com/mika3578/habitv/releases)
    - Download `habiTv-windows-4.1.0-SNAPSHOT.zip`
 
 2. **Extract and run:**
+
    ```cmd
    # Extract to a folder (e.g., C:\habitv)
    # Run the executable
@@ -60,6 +64,7 @@ sudo dnf install java-1.8.0-openjdk
    ```
 
 3. **Alternative - JAR file:**
+
    ```cmd
    java -jar habiTv-4.1.0-SNAPSHOT.jar
    ```
@@ -67,9 +72,10 @@ sudo dnf install java-1.8.0-openjdk
 #### Linux Installation
 
 **Debian/Ubuntu (.deb package):**
+
 ```bash
 # Download and install
-wget https://github.com/your-repo/habitv/releases/download/v4.1.0/habiTv-linux-4.1.0-SNAPSHOT.deb
+wget https://github.com/mika3578/habitv/releases/download/v4.1.0/habiTv-linux-4.1.0-SNAPSHOT.deb
 sudo dpkg -i habiTv-linux-4.1.0-SNAPSHOT.deb
 
 # If dependencies are missing
@@ -77,9 +83,10 @@ sudo apt-get install -f
 ```
 
 **Generic Linux (JAR file):**
+
 ```bash
 # Download the JAR
-wget https://github.com/your-repo/habitv/releases/download/v4.1.0/habiTv-4.1.0-SNAPSHOT.jar
+wget https://github.com/mika3578/habitv/releases/download/v4.1.0/habiTv-4.1.0-SNAPSHOT.jar
 
 # Make executable
 chmod +x habiTv-4.1.0-SNAPSHOT.jar
@@ -99,11 +106,13 @@ java -jar habiTv-4.1.0-SNAPSHOT.jar
 **Install Maven:**
 
 **Windows:**
+
 1. Download from [Maven website](https://maven.apache.org/download.cgi)
 2. Extract to a directory (e.g., `C:\Program Files\Apache\maven`)
 3. Add to PATH: `C:\Program Files\Apache\maven\bin`
 
 **Linux:**
+
 ```bash
 sudo apt install maven  # Ubuntu/Debian
 sudo yum install maven  # CentOS/RHEL
@@ -113,7 +122,7 @@ sudo yum install maven  # CentOS/RHEL
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-repo/habitv.git
+git clone https://github.com/mika3578/habitv.git
 cd habitv
 
 # Build the project
@@ -151,6 +160,7 @@ habiTv creates configuration files in the user directory:
 **Linux:** `~/.habitv/`
 
 Key files:
+
 - `config.xml`: Main application configuration
 - `grabconfig.xml`: Show selection and monitoring settings
 - `habiTv.log`: Application logs
@@ -195,11 +205,13 @@ habiTv uses external tools for downloading and processing videos. These are **au
 ### Repository Configuration
 
 The external tools are downloaded from a remote repository. The default repository URL is:
+
 ```
 http://dabiboo.free.fr/repository
 ```
 
 You can configure a custom repository in your configuration file:
+
 ```xml
 <updateConfig>
     <updateOnStartup>true</updateOnStartup>
@@ -217,6 +229,7 @@ You can configure a custom repository in your configuration file:
 - **Manual Process**: Someone must manually download and upload new versions
 
 **Solutions**:
+
 - **Automated Updates**: Repository maintainers can set up automated update scripts
 - **Hybrid Approach**: habiTv can use repository as primary source with direct download fallback
 - **Custom Repository**: Set up your own automated repository
@@ -228,6 +241,7 @@ For more details on automated solutions, see [STARTUP_UPDATE_SYSTEM.md](STARTUP_
 If you prefer manual control or have network restrictions, you can manually place binaries in the `bin/` directory:
 
 **Windows:**
+
 ```cmd
 # Create bin directory if it doesn't exist
 mkdir bin
@@ -239,6 +253,7 @@ curl -L -o bin/ffmpeg.exe https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-esse
 ```
 
 **Linux:**
+
 ```bash
 # Create bin directory if it doesn't exist
 mkdir -p bin
@@ -260,6 +275,7 @@ chmod +x bin/yt-dlp
    - Review logs for download errors
 
 2. **"Permission denied" (Linux):**
+
    ```bash
    chmod +x bin/*
    ```
@@ -276,10 +292,12 @@ chmod +x bin/yt-dlp
 #### Logs and Debugging
 
 External tool issues are logged in:
+
 - **Windows**: `%USERPROFILE%\habitv\habiTv.log`
 - **Linux**: `~/.habitv/habiTv.log`
 
 Look for entries like:
+
 ```
 INFO - Checking yt-dlp version
 INFO - Downloading yt-dlp from repository
@@ -298,6 +316,7 @@ ERROR - Failed to download yt-dlp: Connection timeout
 If you want to host your own tool repository:
 
 1. **Directory Structure:**
+
    ```
    your-repo/
    ├── bin/
@@ -323,6 +342,7 @@ If you want to host your own tool repository:
 ### Test Installation
 
 1. **Launch habiTv:**
+
    ```bash
    java -jar habiTv-4.1.0-SNAPSHOT.jar
    ```
@@ -330,6 +350,7 @@ If you want to host your own tool repository:
 2. **Check for errors** in the console output
 
 3. **Verify configuration files** are created:
+
    ```cmd
    # Windows
    dir %USERPROFILE%\habitv
@@ -352,6 +373,7 @@ If you want to host your own tool repository:
    - Ensure Java is in PATH
 
 2. **"Permission denied" (Linux):**
+
    ```bash
    chmod +x habiTv-4.1.0-SNAPSHOT.jar
    ```
@@ -373,6 +395,7 @@ Check the log file for detailed error information:
 **Linux:** `~/.habitv/habiTv.log`
 
 Common log entries:
+
 - `INFO`: Normal operation
 - `WARN`: Non-critical issues
 - `ERROR`: Problems that need attention
@@ -385,6 +408,7 @@ Common log entries:
 1. **Stop habiTv** if running
 2. **Delete installation directory**
 3. **Remove configuration files** (optional):
+
    ```cmd
    rmdir /s %USERPROFILE%\habitv
    ```
@@ -392,11 +416,13 @@ Common log entries:
 ### Linux
 
 **If installed via .deb:**
+
 ```bash
 sudo dpkg -r habitv
 ```
 
 **If using JAR file:**
+
 ```bash
 # Remove JAR file
 rm habiTv-4.1.0-SNAPSHOT.jar
@@ -424,6 +450,7 @@ If you encounter issues during installation:
 4. **Create a new issue** with detailed information
 
 Include in your support request:
+
 - Operating system and version
 - Java version
 - Error messages or log excerpts

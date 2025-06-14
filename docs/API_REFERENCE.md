@@ -1,9 +1,9 @@
 # habiTv API Reference
 
-This document provides detailed API reference for the habiTv framework and plugin system.
+This document provides a complete reference for the habiTv API.
 
 **Version**: 4.1.0-SNAPSHOT  
-**Last Updated**: June 14, 2025
+**Last Updated**: December 19, 2024
 
 ## Plugin API
 

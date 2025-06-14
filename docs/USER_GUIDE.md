@@ -3,7 +3,7 @@
 This guide provides comprehensive instructions for using habiTv to discover and download TV content.
 
 **Version**: 4.1.0-SNAPSHOT  
-**Last Updated**: June 14, 2025
+**Last Updated**: December 19, 2024
 
 ## Getting Started
 

@@ -3,7 +3,7 @@
 Thank you for your interest in contributing to habiTv! This guide explains how to contribute to the project.
 
 **Version**: 4.1.0-SNAPSHOT  
-**Last Updated**: June 14, 2025
+**Last Updated**: December 19, 2024
 
 ## Getting Started
 
@@ -27,7 +27,7 @@ Before contributing, ensure you have:
 
 3. **Add the upstream remote**:
    ```bash
-   git remote add upstream https://github.com/original-repo/habitv.git
+   git remote add upstream https://github.com/mika3578/habitv.git
    ```
 
 4. **Build the project**:

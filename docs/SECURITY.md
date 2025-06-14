@@ -3,7 +3,7 @@
 This document outlines security policies, practices, and considerations for the habiTv application.
 
 **Version**: 4.1.0-SNAPSHOT  
-**Last Updated**: June 14, 2025
+**Last Updated**: December 19, 2024
 
 ## Security Overview
 

@@ -42,13 +42,19 @@ habiTv currently supports the following French TV platforms:
 
 ## Quick Start
 
-### 1. Download and Install
-
-Download the latest release from the [Releases](https://github.com/your-repo/habitv/releases) page:
+### Download
+Download the latest release from the [Releases](https://github.com/mika3578/habitv/releases) page:
 
 - **Windows**: `habiTv-windows-4.1.0-SNAPSHOT.zip`
 - **Linux**: `habiTv-linux-4.1.0-SNAPSHOT.deb`
 - **JAR**: `habiTv-4.1.0-SNAPSHOT.jar` (requires Java 8+)
+
+### From Source
+```bash
+git clone https://github.com/mika3578/habitv.git
+cd habitv
+mvn clean install
+```
 
 ### 2. Launch the Application
 
@@ -209,7 +215,7 @@ Logs are stored in:
 ### Getting Help
 
 - Check the [Documentation](docs/README.md)
-- Search [Issues](https://github.com/your-repo/habitv/issues)
+- Search [Issues](https://github.com/mika3578/habitv/issues)
 - Create a new issue for bugs or feature requests
 
 ## Contributing
@@ -242,7 +248,8 @@ See [CHANGELOG.md](CHANGELOG.md) for version history and updates.
 
 **Note**: This software is for personal use only. Please respect content providers' terms of service and copyright laws.
 
-**Last Updated**: June 14, 2025
+**Version**: 4.1.0-SNAPSHOT  
+**Last Updated**: December 19, 2024
 
 ## External Tools
 
@@ -268,3 +275,9 @@ You can configure a custom repository in your configuration file if needed.
 
 ### Manual Installation (Advanced)
 If you prefer manual control, you can place binaries in the `bin/` directory. See [INSTALLATION.md](docs/INSTALLATION.md) for detailed instructions.
+
+## Support
+
+- Search [Issues](https://github.com/mika3578/habitv/issues)
+- Check the [Documentation](docs/README.md)
+- Review [Troubleshooting Guide](docs/TROUBLESHOOTING.md)

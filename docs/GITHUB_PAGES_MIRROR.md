@@ -1,7 +1,7 @@
 # habiTv GitHub Pages HTTPS Mirror
 
 **Version**: 4.1.0-SNAPSHOT  
-**Last Updated**: June 15, 2025
+**Last Updated**: December 19, 2024
 
 ## Overview
 
@@ -15,9 +15,11 @@ This document describes the GitHub Pages HTTPS mirror of the habiTv external too
 - **Status**: Original repository
 
 ### GitHub Pages Mirror (New)
-- **URL**: `https://[username].github.io/[repository-name]/`
+- **URL**: `https://mika3578.github.io/habitv/repository/`
 - **Protocol**: HTTPS (encrypted)
 - **Status**: Secure mirror with automatic updates
+- **Type**: Maven repository mirror
+- **Structure**: Standard Maven repository layout with `com/dabi/habitv` group ID
 
 ## Benefits of GitHub Pages Mirror
 
@@ -40,6 +42,39 @@ This document describes the GitHub Pages HTTPS mirror of the habiTv external too
 - **Backup**: Automatic backup and version history
 
 ## Repository Structure
+
+### Maven Artifacts
+The repository contains Maven artifacts organized by group ID and artifact ID:
+
+```
+https://mika3578.github.io/habitv/repository/
+├── com/dabi/habitv/        # Group ID: com.dabi.habitv
+│   ├── arte/               # Arte plugin
+│   │   └── 4.1.0-SNAPSHOT/ # Version directory
+│   ├── youtube/            # YouTube plugin
+│   │   └── 4.1.0-SNAPSHOT/ # Version directory
+│   └── ...                 # Other plugins
+├── bin/                    # External tool binaries
+├── metadata/               # Version metadata
+└── plugins.txt             # Tool list
+```
+
+### External Tools
+External tools are stored in the `bin/` directory:
+
+```
+bin/
+├── yt-dlp.exe.zip         # Windows yt-dlp
+├── yt-dlp.zip             # Linux yt-dlp
+├── ffmpeg.exe.zip         # Windows ffmpeg
+├── ffmpeg.zip             # Linux ffmpeg
+├── aria2c.exe.zip         # Windows aria2c
+├── aria2c.zip             # Linux aria2c
+├── curl.exe.zip           # Windows curl
+├── curl.zip               # Linux curl
+├── rtmpdump.exe.zip       # Windows rtmpdump
+└── rtmpdump.zip           # Linux rtmpdump
+```
 
 ### Required Directory Structure
 ```
@@ -92,7 +127,7 @@ Users can now configure habiTv to use the HTTPS mirror:
 <updateConfig>
     <updateOnStartup>true</updateOnStartup>
     <autoriseSnapshot>true</autoriseSnapshot>
-    <repositoryUrl>https://[username].github.io/[repository-name]/</repositoryUrl>
+    <repositoryUrl>https://mika3578.github.io/habitv/repository/</repositoryUrl>
 </updateConfig>
 ```
 
@@ -100,7 +135,7 @@ Users can now configure habiTv to use the HTTPS mirror:
 
 ```bash
 # Set environment variable for repository URL
-export HABITV_REPOSITORY_URL="https://[username].github.io/[repository-name]/"
+export HABITV_REPOSITORY_URL="https://mika3578.github.io/habitv/repository/"
 ```
 
 ### Configuration File Example
@@ -111,7 +146,7 @@ export HABITV_REPOSITORY_URL="https://[username].github.io/[repository-name]/"
     <updateConfig>
         <updateOnStartup>true</updateOnStartup>
         <autoriseSnapshot>true</autoriseSnapshot>
-        <repositoryUrl>https://[username].github.io/[repository-name]/</repositoryUrl>
+        <repositoryUrl>https://mika3578.github.io/habitv/repository/</repositoryUrl>
         <timeout>30000</timeout>
         <retryAttempts>3</retryAttempts>
     </updateConfig>
@@ -221,13 +256,13 @@ echo "Repository mirror updated successfully!"
 
 #### Option 2: Environment Variable
 ```bash
-export HABITV_REPOSITORY_URL="https://[username].github.io/[repository-name]/"
+export HABITV_REPOSITORY_URL="https://mika3578.github.io/habitv/repository/"
 java -jar habiTv-4.1.0-SNAPSHOT.jar
 ```
 
 #### Option 3: Command Line
 ```bash
-java -jar habiTv-4.1.0-SNAPSHOT.jar --repository-url="https://[username].github.io/[repository-name]/"
+java -jar habiTv-4.1.0-SNAPSHOT.jar --repository-url="https://mika3578.github.io/habitv/repository/"
 ```
 
 ### For Developers
@@ -237,7 +272,7 @@ Update the default repository URL in the codebase:
 
 ```java
 // In FrameworkConf.java
-String UPDATE_URL = "https://[username].github.io/[repository-name]/";
+String UPDATE_URL = "https://mika3578.github.io/habitv/repository/";
 ```
 
 #### Update Documentation
@@ -270,20 +305,20 @@ Update all documentation references to use the new HTTPS URL.
 #### Repository Availability
 ```bash
 # Check if repository is accessible
-curl -I https://[username].github.io/[repository-name]/plugins.txt
+curl -I https://mika3578.github.io/habitv/repository/plugins.txt
 
 # Check specific tool availability
-curl -I https://[username].github.io/[repository-name]/bin/yt-dlp.exe.zip
+curl -I https://mika3578.github.io/habitv/repository/bin/yt-dlp.exe.zip
 ```
 
 #### Version Monitoring
 ```bash
 # Check current versions
-curl -s https://[username].github.io/[repository-name]/metadata/yt-dlp.version
+curl -s https://mika3578.github.io/habitv/repository/metadata/yt-dlp.version
 
 # Compare with latest
 LATEST=$(curl -s https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest | jq -r '.tag_name')
-CURRENT=$(curl -s https://[username].github.io/[repository-name]/metadata/yt-dlp.version)
+CURRENT=$(curl -s https://mika3578.github.io/habitv/repository/metadata/yt-dlp.version)
 echo "Latest: $LATEST, Current: $CURRENT"
 ```
 
@@ -303,7 +338,7 @@ jobs:
     steps:
       - name: Check repository availability
         run: |
-          if ! curl -f -I https://[username].github.io/[repository-name]/plugins.txt; then
+          if ! curl -f -I https://mika3578.github.io/habitv/repository/plugins.txt; then
             echo "Repository is not accessible"
             exit 1
           fi
@@ -311,7 +346,7 @@ jobs:
       - name: Check tool versions
         run: |
           for tool in yt-dlp ffmpeg aria2c curl rtmpdump; do
-            if ! curl -f -s https://[username].github.io/[repository-name]/metadata/${tool}.version; then
+            if ! curl -f -s https://mika3578.github.io/habitv/repository/metadata/${tool}.version; then
               echo "Missing version file for $tool"
               exit 1
             fi
@@ -325,7 +360,7 @@ jobs:
 #### Repository Not Accessible
 ```bash
 # Check if GitHub Pages is enabled
-curl -I https://[username].github.io/[repository-name]/
+curl -I https://mika3578.github.io/habitv/repository/
 
 # Check repository settings
 # Go to Settings > Pages in GitHub repository
@@ -334,16 +369,16 @@ curl -I https://[username].github.io/[repository-name]/
 #### SSL Certificate Issues
 ```bash
 # Verify SSL certificate
-openssl s_client -connect [username].github.io:443 -servername [username].github.io
+openssl s_client -connect mika3578.github.io:443 -servername mika3578.github.io
 
 # Check certificate validity
-echo | openssl s_client -connect [username].github.io:443 -servername [username].github.io 2>/dev/null | openssl x509 -noout -dates
+echo | openssl s_client -connect mika3578.github.io:443 -servername mika3578.github.io 2>/dev/null | openssl x509 -noout -dates
 ```
 
 #### Download Failures
 ```bash
 # Test specific file downloads
-curl -L -o test.zip https://[username].github.io/[repository-name]/bin/yt-dlp.exe.zip
+curl -L -o test.zip https://mika3578.github.io/habitv/repository/bin/yt-dlp.exe.zip
 
 # Check file integrity
 unzip -t test.zip
@@ -354,22 +389,22 @@ unzip -t test.zip
 #### Network Diagnostics
 ```bash
 # Check DNS resolution
-nslookup [username].github.io
+nslookup mika3578.github.io
 
 # Check connectivity
-ping [username].github.io
+ping mika3578.github.io
 
 # Check HTTP response
-curl -v https://[username].github.io/[repository-name]/
+curl -v https://mika3578.github.io/habitv/repository/
 ```
 
 #### Repository Diagnostics
 ```bash
 # List available files
-curl -s https://[username].github.io/[repository-name]/ | grep -o 'href="[^"]*"' | cut -d'"' -f2
+curl -s https://mika3578.github.io/habitv/repository/ | grep -o 'href="[^"]*"' | cut -d'"' -f2
 
 # Check file sizes
-curl -I https://[username].github.io/[repository-name]/bin/yt-dlp.exe.zip | grep Content-Length
+curl -I https://mika3578.github.io/habitv/repository/bin/yt-dlp.exe.zip | grep Content-Length
 ```
 
 ## Performance Considerations

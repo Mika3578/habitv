@@ -3,7 +3,7 @@
 This document describes the automatic update system that runs when habiTv starts up.
 
 **Version**: 4.1.0-SNAPSHOT  
-**Last Updated**: June 14, 2025
+**Last Updated**: December 19, 2024
 
 ## Overview
 

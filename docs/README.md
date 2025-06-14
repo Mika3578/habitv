@@ -3,7 +3,7 @@
 This directory contains comprehensive documentation for the habiTv project.
 
 **Version**: 4.1.0-SNAPSHOT  
-**Last Updated**: June 15, 2025
+**Last Updated**: December 19, 2024
 
 ## Overview
 
@@ -78,7 +78,7 @@ habiTv is a comprehensive video downloader and manager that supports multiple pl
 habiTv requires external tools for video processing and downloading. These are managed through a repository system:
 
 - **Primary Repository**: `http://dabiboo.free.fr/repository` (HTTP)
-- **GitHub Pages Mirror**: `https://[username].github.io/[repository-name]/` (HTTPS - Recommended)
+- **GitHub Pages Mirror**: `https://mika3578.github.io/habitv/repository/` (HTTPS - Recommended)
 
 ### Repository Benefits
 - **Security**: HTTPS encryption for all downloads
@@ -92,18 +92,18 @@ To use the secure GitHub Pages mirror:
 1. **Update Configuration**:
    ```xml
    <updateConfig>
-       <repositoryUrl>https://[username].github.io/[repository-name]/</repositoryUrl>
+       <repositoryUrl>https://mika3578.github.io/habitv/repository/</repositoryUrl>
    </updateConfig>
    ```
 
 2. **Environment Variable**:
    ```bash
-   export HABITV_REPOSITORY_URL="https://[username].github.io/[repository-name]/"
+   export HABITV_REPOSITORY_URL="https://mika3578.github.io/habitv/repository/"
    ```
 
 3. **Command Line**:
    ```bash
-   java -jar habiTv.jar --repository-url="https://[username].github.io/[repository-name]/"
+   java -jar habiTv.jar --repository-url="https://mika3578.github.io/habitv/repository/"
    ```
 
 For detailed setup instructions, see [GitHub Pages Mirror Guide](GITHUB_PAGES_MIRROR.md).
@@ -184,7 +184,7 @@ For detailed setup instructions, see [GitHub Pages Mirror Guide](GITHUB_PAGES_MI
 
 ### Current Version
 - **Version**: 4.1.0-SNAPSHOT
-- **Release Date**: June 15, 2025
+- **Release Date**: December 19, 2024
 - **Java Version**: Java 8 or higher
 - **License**: GPL v3
 

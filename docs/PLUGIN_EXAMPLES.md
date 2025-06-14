@@ -3,7 +3,7 @@
 This document provides practical examples of habiTv plugins to help developers understand the plugin system and create their own plugins.
 
 **Version**: 4.1.0-SNAPSHOT  
-**Last Updated**: June 14, 2025
+**Last Updated**: December 19, 2024
 
 ## Basic Plugin Structure
 

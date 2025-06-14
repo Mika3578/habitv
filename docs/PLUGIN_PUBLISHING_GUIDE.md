@@ -3,7 +3,7 @@
 This guide explains how to publish your habiTv plugin to the official repository so users can automatically download and use it.
 
 **Version**: 4.1.0-SNAPSHOT  
-**Last Updated**: June 14, 2025
+**Last Updated**: December 19, 2024
 
 ## Overview
 
