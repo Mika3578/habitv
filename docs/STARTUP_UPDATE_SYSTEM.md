@@ -734,4 +734,461 @@ HABITV_DOWNLOAD_TIMEOUT=30000              # Download timeout
 3. **Certificate Pinning**: Certificate verification
 4. **Checksum Verification**: File integrity checking
 
-This document provides comprehensive information about the habiTv startup update system. Understanding this system is crucial for both users and developers working with habiTv plugins. 
+## External Tool Management
+
+### Overview
+
+The startup update system also manages external tools (binaries) required by habiTv plugins. These tools are automatically downloaded, updated, and maintained by the system.
+
+### Supported External Tools
+
+| Tool | Purpose | Windows Binary | Linux Binary | Update Method |
+|------|---------|----------------|--------------|---------------|
+| yt-dlp | YouTube and video platform downloads | yt-dlp.exe | yt-dlp | Version check + download |
+| ffmpeg | Video processing and conversion | ffmpeg.exe | ffmpeg | Version check + download |
+| aria2c | High-speed downloads | aria2c.exe | aria2c | Version check + download |
+| rtmpdump | RTMP stream downloads | rtmpdump.exe | rtmpdump | Version check + download |
+| curl | HTTP downloads | curl.exe | curl | Version check + download |
+
+### Update Process for External Tools
+
+#### 1. **Startup Check**
+```java
+// Each updatable plugin checks its binary at startup
+public void update(Publisher<UpdatablePluginEvent> updatePublisher, DownloaderPluginHolder downloaders) {
+    new ZipExeUpdater(this, downloaders.getBinDir(), FrameworkConf.GROUP_ID, false, updatePublisher, downloaders)
+        .update(getFilesToUpdate());
+}
+```
+
+#### 2. **Version Detection**
+```java
+// Version is detected by running the binary with --version or -v
+public String getCurrentVersion(DownloaderPluginHolder downloaders) {
+    String versionOutput = callGetVersionCmd(downloaders);
+    Pattern versionPattern = getVersionPattern();
+    Matcher matcher = versionPattern.matcher(versionOutput);
+    return matcher.find() ? matcher.group(matcher.groupCount()) : null;
+}
+```
+
+#### 3. **Repository Comparison**
+- System checks repository for newer versions
+- Compares local version with repository version
+- Downloads if newer version is available
+
+#### 4. **Download and Installation**
+- Downloads ZIP file from repository
+- Extracts binary to bin/ directory
+- Sets appropriate permissions (Linux)
+- Verifies installation
+
+### Repository Structure for External Tools
+
+```
+repository/
+├── bin/
+│   ├── yt-dlp.exe.zip          # Windows yt-dlp binary
+│   ├── yt-dlp.zip              # Linux yt-dlp binary
+│   ├── ffmpeg.exe.zip          # Windows ffmpeg binary
+│   ├── ffmpeg.zip              # Linux ffmpeg binary
+│   ├── aria2c.exe.zip          # Windows aria2c binary
+│   ├── aria2c.zip              # Linux aria2c binary
+│   ├── rtmpdump.exe.zip        # Windows rtmpdump binary
+│   ├── rtmpdump.zip            # Linux rtmpdump binary
+│   ├── curl.exe.zip            # Windows curl binary
+│   └── curl.zip                # Linux curl binary
+├── plugins.txt                 # Plugin list
+└── metadata/                   # Version metadata
+    ├── yt-dlp.version
+    ├── ffmpeg.version
+    └── ...
+```
+
+### Tool Packaging Guidelines
+
+#### Windows Binaries
+- Package as ZIP files with `.exe.zip` extension
+- Include the main executable and any dependencies
+- Ensure the executable is in the root of the ZIP
+- Example: `yt-dlp.exe.zip` contains `yt-dlp.exe`
+
+#### Linux Binaries
+- Package as ZIP files with `.zip` extension
+- Include the main executable and any dependencies
+- Ensure the executable is in the root of the ZIP
+- Example: `yt-dlp.zip` contains `yt-dlp`
+
+#### Version Files
+Create version files in the metadata directory:
+```
+metadata/yt-dlp.version
+2025.06.09
+
+metadata/ffmpeg.version
+6.1.1
+```
+
+### Configuration Options
+
+#### Repository URL
+```xml
+<updateConfig>
+    <updateOnStartup>true</updateOnStartup>
+    <autoriseSnapshot>true</autoriseSnapshot>
+    <repositoryUrl>https://your-repo.com/habitv-tools</repositoryUrl>
+</updateConfig>
+```
+
+#### Disable Auto-Updates
+```xml
+<updateConfig>
+    <updateOnStartup>false</updateOnStartup>
+    <autoriseSnapshot>false</autoriseSnapshot>
+</updateConfig>
+```
+
+### Event Notifications
+
+External tool updates generate events:
+
+```java
+// Update started
+new UpdatablePluginEvent("yt-dlp", "2025.06.09", UpdatablePluginStateEnum.DOWNLOADING)
+
+// Update completed
+new UpdatablePluginEvent("yt-dlp", "2025.06.09", UpdatablePluginStateEnum.DONE)
+
+// Update failed
+new UpdatablePluginEvent("yt-dlp", "2025.06.09", UpdatablePluginStateEnum.ERROR)
+```
+
+### Troubleshooting External Tools
+
+#### Common Issues
+
+1. **Binary Not Found**
+   ```
+   ERROR - Tool yt-dlp not found in bin/ directory
+   ```
+   - Check if binary exists in bin/
+   - Verify download permissions
+   - Check repository availability
+
+2. **Version Check Failed**
+   ```
+   ERROR - Failed to get version for yt-dlp
+   ```
+   - Binary may be corrupted
+   - Permission issues (Linux)
+   - Binary not executable
+
+3. **Download Failed**
+   ```
+   ERROR - Failed to download yt-dlp from repository
+   ```
+   - Network connectivity issues
+   - Repository unavailable
+   - Firewall blocking downloads
+
+4. **Extraction Failed**
+   ```
+   ERROR - Failed to extract yt-dlp.zip
+   ```
+   - Corrupted download
+   - Insufficient disk space
+   - Permission issues
+
+#### Debug Commands
+
+```bash
+# Check if binary exists and is executable
+ls -la bin/yt-dlp*
+
+# Test binary manually
+bin/yt-dlp --version
+
+# Check download directory permissions
+ls -la bin/
+
+# Verify ZIP file integrity
+unzip -t bin/yt-dlp.zip
+```
+
+### Security Considerations
+
+#### Repository Security
+- Use HTTPS repositories when possible
+- Verify repository authenticity
+- Monitor for suspicious updates
+
+#### Binary Verification
+- Check file checksums when available
+- Verify binary signatures
+- Monitor for unexpected behavior
+
+#### Network Security
+- Use corporate proxies if required
+- Configure firewall rules appropriately
+- Monitor network traffic
+
+### Best Practices
+
+#### Repository Management
+1. **Regular Updates**: Keep tool versions current
+2. **Testing**: Test new versions before deployment
+3. **Backup**: Maintain previous versions for rollback
+4. **Monitoring**: Monitor download statistics and errors
+
+#### Binary Management
+1. **Source Verification**: Download from official sources
+2. **Version Tracking**: Maintain version history
+3. **Dependency Management**: Include all required dependencies
+4. **Cross-Platform**: Provide both Windows and Linux versions
+
+#### User Experience
+1. **Transparent Updates**: Inform users of updates
+2. **Fallback Options**: Provide manual installation instructions
+3. **Error Handling**: Clear error messages and solutions
+4. **Progress Indication**: Show download and update progress
+
+This document provides comprehensive information about the habiTv startup update system. Understanding this system is crucial for both users and developers working with habiTv plugins.
+
+## Repository Management Challenges
+
+### Manual Update Problem
+
+The current repository-based approach has a significant limitation: **manual update requirements**.
+
+#### Current Process Issues
+
+```
+Repository Update Process:
+1. New tool version released (e.g., yt-dlp 2025.06.10)
+2. Repository maintainer must manually download new version
+3. Repository maintainer must manually upload to repository
+4. Repository maintainer must manually update version metadata
+5. Users receive the update (delayed by manual steps)
+```
+
+#### Problems with Manual Updates
+
+- **Delayed Updates**: Users don't get latest versions immediately
+- **Maintenance Burden**: Someone must manually maintain the repository
+- **Human Error**: Risk of uploading wrong versions or corrupted files
+- **Dependency**: Repository availability depends on manual intervention
+- **Inconsistency**: Updates may be missed or delayed
+
+#### Impact on Users
+
+- Tools may be outdated for days or weeks
+- Security updates are delayed
+- New features and bug fixes are not immediately available
+- Dependency on repository maintainer availability
+
+### Automated Solutions
+
+#### 1. GitHub Actions Workflow
+
+Automate repository updates using GitHub Actions:
+
+```yaml
+# .github/workflows/update-tools.yml
+name: Update External Tools
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM
+  workflow_dispatch:     # Manual trigger
+
+jobs:
+  update-tools:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Check yt-dlp updates
+        run: |
+          LATEST_VERSION=$(curl -s https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest | jq -r '.tag_name')
+          CURRENT_VERSION=$(cat metadata/yt-dlp.version)
+          
+          if [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
+            echo "NEW_VERSION=$LATEST_VERSION" >> $GITHUB_ENV
+            echo "UPDATE_NEEDED=true" >> $GITHUB_ENV
+          fi
+      
+      - name: Download new versions
+        if: env.UPDATE_NEEDED == 'true'
+        run: |
+          curl -L -o "bin/yt-dlp.exe.zip" "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe"
+          curl -L -o "bin/yt-dlp.zip" "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp"
+          echo "$NEW_VERSION" > "metadata/yt-dlp.version"
+      
+      - name: Commit and push
+        if: env.UPDATE_NEEDED == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "Auto-update yt-dlp to $NEW_VERSION"
+          git push
+```
+
+#### 2. Automated Script
+
+Create a script that runs periodically:
+
+```bash
+#!/bin/bash
+# auto-update-repository.sh
+
+# Check for new versions daily
+while true; do
+    echo "Checking for tool updates..."
+    
+    # Check yt-dlp
+    LATEST_VERSION=$(curl -s https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
+    CURRENT_VERSION=$(cat metadata/yt-dlp.version)
+    
+    if [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
+        echo "New yt-dlp version: $LATEST_VERSION"
+        
+        # Download new version
+        curl -L -o "bin/yt-dlp.exe.zip" "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe"
+        curl -L -o "bin/yt-dlp.zip" "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp"
+        
+        # Update metadata
+        echo "$LATEST_VERSION" > "metadata/yt-dlp.version"
+        
+        # Commit and push to repository
+        git add .
+        git commit -m "Update yt-dlp to $LATEST_VERSION"
+        git push
+    fi
+    
+    # Wait 24 hours
+    sleep 86400
+done
+```
+
+#### 3. Hybrid Approach
+
+Combine repository reliability with direct download freshness:
+
+```java
+public class HybridToolManager {
+    
+    public DownloadResult downloadTool(String toolName, String binDir) {
+        // Try repository first (reliable)
+        try {
+            DownloadResult result = downloadFromRepository(toolName, binDir);
+            if (result.isSuccess()) {
+                return result;
+            }
+        } catch (Exception e) {
+            log.warn("Repository download failed for " + toolName + ": " + e.getMessage());
+        }
+        
+        // Fallback to direct download (latest)
+        try {
+            log.info("Attempting direct download for " + toolName);
+            return downloadFromOfficialSource(toolName, binDir);
+        } catch (Exception e) {
+            log.error("Direct download also failed for " + toolName + ": " + e.getMessage());
+            return new DownloadResult(false, null, null, e.getMessage(), 0);
+        }
+    }
+}
+```
+
+#### 4. Smart Version Checking
+
+Implement intelligent version comparison:
+
+```java
+public class SmartToolUpdater {
+    
+    public boolean shouldUpdate(String toolName, String currentVersion) {
+        // Check repository version
+        String repoVersion = getRepositoryVersion(toolName);
+        
+        // Check official source version
+        String officialVersion = getOfficialVersion(toolName);
+        
+        // Use the newer version
+        String latestVersion = compareVersions(repoVersion, officialVersion);
+        
+        return isNewer(latestVersion, currentVersion);
+    }
+    
+    private String getOfficialVersion(String toolName) {
+        // Use GitHub API or other methods to get latest version
+        switch (toolName) {
+            case "yt-dlp":
+                return getGitHubLatestVersion("yt-dlp/yt-dlp");
+            case "ffmpeg":
+                return getFFmpegLatestVersion();
+            // ... other tools
+        }
+    }
+}
+```
+
+### Recommended Solutions
+
+#### For Repository Maintainers
+
+1. **Automated Updates (Recommended)**
+   - Set up GitHub Actions for automatic daily checks
+   - No manual intervention required
+   - Consistent and reliable updates
+
+2. **Scheduled Scripts**
+   - Run update scripts on a schedule (cron jobs)
+   - Monitor and alert on failures
+   - Maintain update logs
+
+#### For Users
+
+1. **Hybrid System**
+   - Repository as primary source (reliable)
+   - Direct download as fallback (latest)
+   - Best of both worlds
+
+2. **Smart Updating**
+   - habiTv checks both sources
+   - Downloads newest available version
+   - Maintains reliability
+
+### Implementation Priority
+
+1. **Immediate**: Set up automated repository updates
+2. **Short-term**: Implement hybrid fallback system
+3. **Long-term**: Smart version checking and auto-selection
+
+### Benefits of Automation
+
+- ✅ **No Manual Work**: Updates happen automatically
+- ✅ **Faster Updates**: Users get latest versions quickly
+- ✅ **Consistency**: Regular, predictable updates
+- ✅ **Reliability**: Reduced human error
+- ✅ **Scalability**: Works for multiple tools and platforms
+
+### Monitoring and Alerts
+
+Set up monitoring for automated updates:
+
+```bash
+# Check update status
+curl -s https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest | jq '.tag_name'
+
+# Monitor repository health
+curl -I http://dabiboo.free.fr/repository/bin/yt-dlp.exe.zip
+
+# Alert on failures
+if [ $? -ne 0 ]; then
+    echo "Repository update failed" | mail -s "habiTv Update Alert" admin@example.com
+fi
+```
+
+This automated approach ensures that habiTv users always have access to the latest tool versions without requiring manual repository maintenance. 

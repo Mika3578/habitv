@@ -162,4 +162,31 @@ Each document includes:
 - **Wiki Pages** - Community-maintained documentation
 - **Code Examples** - Community-contributed examples
 
+## Documentation Index
+
+### Core Documentation
+- **[README.md](../README.md)** - Project overview and quick start
+- **[INSTALLATION.md](INSTALLATION.md)** - Installation and setup guide
+- **[USER_GUIDE.md](USER_GUIDE.md)** - User manual and features
+- **[DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md)** - Development setup and guidelines
+
+### System Documentation
+- **[STARTUP_UPDATE_SYSTEM.md](STARTUP_UPDATE_SYSTEM.md)** - Automatic update system
+- **[REPOSITORY_MANAGEMENT.md](REPOSITORY_MANAGEMENT.md)** - Repository management challenges and solutions
+- **[API_REFERENCE.md](API_REFERENCE.md)** - API documentation
+- **[CONFIGURATION_REFERENCE.md](CONFIGURATION_REFERENCE.md)** - Configuration options
+
+### Plugin Development
+- **[PLUGIN_DEVELOPMENT.md](PLUGIN_DEVELOPMENT.md)** - Plugin development guide
+- **[PLUGIN_EXAMPLES.md](PLUGIN_EXAMPLES.md)** - Plugin code examples
+- **[PLUGIN_PUBLISHING_GUIDE.md](PLUGIN_PUBLISHING_GUIDE.md)** - Publishing plugins
+
+### Security and Troubleshooting
+- **[SECURITY.md](SECURITY.md)** - Security policies and best practices
+- **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Problem solving guide
+
+### Project Management
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contributing guidelines
+- **[TODO.md](TODO.md)** - Development roadmap and tasks
+
 This documentation provides comprehensive information for users, developers, and contributors to the habiTv project. 

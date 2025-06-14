@@ -133,7 +133,7 @@ The application will automatically download required external tools on first run
 - **rtmpDump**: For RTMP stream downloads
 - **curl**: For HTTP downloads
 - **aria2c**: For high-speed downloads
-- **youtube-dl**: For YouTube and other platforms
+- **yt-dlp**: For YouTube and other platforms (replaces youtube-dl)
 - **ffmpeg**: For video processing and conversion
 
 ## Next Steps

@@ -31,7 +31,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Markdown linting issues
 - Documentation inconsistencies and outdated information
 
-## [4.1.0-SNAPSHOT] - Current Development Version
+## [4.1.0-SNAPSHOT] - 2025-06-15
+
+### Added
+- **yt-dlp Integration**: Replaced youtube-dl with yt-dlp for better YouTube support
+- **Enhanced Download Commands**: Improved format selection and subtitle handling
+- **Binary Distribution**: Added yt-dlp binaries for Windows and Linux in bin/ directory
+
+### Changed
+- **YouTube Plugin**: Updated to use yt-dlp instead of youtube-dl
+- **Configuration**: Updated default downloader configuration to use yt-dlp
+- **Documentation**: Updated all references from youtube-dl to yt-dlp
+
+### Fixed
+- **Arte Plugin**: Fixed to work with current website structure using JSON parsing
+- **Plugin Compilation**: All 22 plugins now compile successfully
+- **Build System**: Optimized Maven build process
+
+### Technical
+- **External Tools**: rtmpDump, curl, aria2c, yt-dlp, ffmpeg
+- **Java Version**: Requires Java 8 or higher
+- **Build Tool**: Maven 3.6+
 
 ### Current Features
 - **Content Providers**: Support for major French TV channels (Canal+, Arte, Pluzz, etc.)
@@ -42,13 +62,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Automatic Monitoring**: Background checking for new episodes
 - **Multi-Platform**: Windows and Linux support
 - **Environment Configuration**: Flexible configuration via environment variables
-
-### Technical Stack
-- **Java 8**: Core application runtime
-- **Maven**: Build and dependency management
-- **External Tools**: rtmpDump, curl, aria2c, youtube-dl, ffmpeg
-- **Logging**: Log4j for application logging
-- **UI Framework**: JavaFX for graphical interface
 
 ### Supported Platforms
 - **Canal+**: Premium French TV content

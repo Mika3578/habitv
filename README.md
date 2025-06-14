@@ -135,7 +135,7 @@ habiTv uses a modular plugin architecture:
 - Manage download URLs and authentication
 
 ### Downloader Plugins
-- Encapsulate external download tools (rtmpDump, curl, aria2c, youtube-dl)
+- Encapsulate external download tools (rtmpDump, curl, aria2c, yt-dlp)
 - Provide consistent interface for different protocols
 - Handle download progress and error recovery
 
@@ -230,7 +230,7 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 
 ## Acknowledgments
 
-- External tools: rtmpDump, curl, aria2c, youtube-dl, ffmpeg
+- External tools: rtmpDump, curl, aria2c, yt-dlp, ffmpeg
 - Java libraries: Apache Commons, Guava, JSoup, Jackson
 - Community contributors and testers
 
@@ -243,3 +243,28 @@ See [CHANGELOG.md](CHANGELOG.md) for version history and updates.
 **Note**: This software is for personal use only. Please respect content providers' terms of service and copyright laws.
 
 **Last Updated**: June 14, 2025
+
+## External Tools
+
+habiTv requires several external tools for downloading and processing videos. These are **automatically managed** by the application:
+
+### Automatic Management
+- **Startup Check**: Tools are automatically checked and downloaded at startup
+- **Version Control**: Outdated tools are automatically updated
+- **Repository-Based**: Tools are downloaded from a configured remote repository
+- **No Manual Installation**: The system handles everything automatically
+
+### Required Tools
+- **rtmpDump**: For RTMP stream downloads
+- **curl**: For HTTP downloads
+- **aria2c**: For high-speed downloads
+- **yt-dlp**: For YouTube and other platforms (replaces youtube-dl)
+- **ffmpeg**: For video processing and format conversion
+
+### Configuration
+The default repository for external tools is: `http://dabiboo.free.fr/repository`
+
+You can configure a custom repository in your configuration file if needed.
+
+### Manual Installation (Advanced)
+If you prefer manual control, you can place binaries in the `bin/` directory. See [INSTALLATION.md](docs/INSTALLATION.md) for detailed instructions.

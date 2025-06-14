@@ -34,11 +34,9 @@ public class YoutubePluginDownloader extends BaseUpdatablePlugin implements Plug
 		cmd = cmd.replaceFirst(FrameworkConf.DOWNLOAD_INPUT, Matcher.quoteReplacement(downloadParam.getDownloadInput()));
 		cmd = cmd.replaceFirst(FrameworkConf.DOWNLOAD_DESTINATION, Matcher.quoteReplacement(downloadParam.getDownloadOutput()));
 
-		// if (proxyDTO!=null){
-		// youtube-dl supports downloading videos through a proxy, by
+		// yt-dlp supports downloading videos through a proxy, by
 		// setting the http_proxy environment variable to the proxy URL, as in
 		// http://proxy_machine_name:port/.
-		// }
 
 		try {
 			return (new YoutubeDLCmdExecutor(downloaders.getCmdProcessor(), cmd));
@@ -69,7 +67,7 @@ public class YoutubePluginDownloader extends BaseUpdatablePlugin implements Plug
 
 	@Override
 	protected String[] getFilesToUpdate() {
-		return new String[] { "youtube-dl" };
+		return new String[] { "yt-dlp" };
 	}
 
 	@Override

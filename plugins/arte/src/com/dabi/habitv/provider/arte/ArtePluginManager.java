@@ -85,7 +85,7 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 	@Override
 	public ProcessHolder download(DownloadParamDTO downloadParam, DownloaderPluginHolder downloaders) throws DownloadFailedException {
 		// This would need to be implemented to actually download the video
-		// For now, we'll use youtube-dl as a fallback
+		// For now, we'll use yt-dlp as a fallback
 		return DownloadUtils.download(downloadParam, downloaders, "youtube");
 	}
 

@@ -175,36 +175,148 @@ See [ENVIRONMENT_VARIABLES.md](../ENVIRONMENT_VARIABLES.md) for complete list.
 
 ## External Dependencies
 
-habiTv uses external tools for downloading and processing videos. These are automatically downloaded on first run, but you can install them manually:
+habiTv uses external tools for downloading and processing videos. These are **automatically managed** by the application's update system.
+
+### Automatic Tool Management
+
+- **Startup Check**: habiTv automatically checks for required external tools at startup
+- **Auto-Download**: Missing or outdated tools are downloaded from the configured repository
+- **Version Control**: Tools are automatically updated when newer versions are available
+- **No Manual Installation Required**: The system handles everything automatically
 
 ### Required Tools
 
 - **rtmpDump**: For RTMP stream downloads
 - **curl**: For HTTP downloads
 - **aria2c**: For high-speed downloads
-- **youtube-dl**: For YouTube and other platforms
+- **yt-dlp**: For YouTube and other platforms (replaces youtube-dl)
 - **ffmpeg**: For video processing and conversion
 
-### Manual Installation
+### Repository Configuration
+
+The external tools are downloaded from a remote repository. The default repository URL is:
+```
+http://dabiboo.free.fr/repository
+```
+
+You can configure a custom repository in your configuration file:
+```xml
+<updateConfig>
+    <updateOnStartup>true</updateOnStartup>
+    <autoriseSnapshot>true</autoriseSnapshot>
+    <repositoryUrl>https://your-custom-repo.com/habitv-tools</repositoryUrl>
+</updateConfig>
+```
+
+#### Repository Update Limitations
+
+**Important**: The current repository system requires manual updates by the repository maintainer. This means:
+
+- **Delayed Updates**: New tool versions may not be immediately available
+- **Dependency**: Updates depend on repository maintainer availability
+- **Manual Process**: Someone must manually download and upload new versions
+
+**Solutions**:
+- **Automated Updates**: Repository maintainers can set up automated update scripts
+- **Hybrid Approach**: habiTv can use repository as primary source with direct download fallback
+- **Custom Repository**: Set up your own automated repository
+
+For more details on automated solutions, see [STARTUP_UPDATE_SYSTEM.md](STARTUP_UPDATE_SYSTEM.md#repository-management-challenges).
+
+### Manual Installation (Advanced Users Only)
+
+If you prefer manual control or have network restrictions, you can manually place binaries in the `bin/` directory:
 
 **Windows:**
 ```cmd
-# Download tools manually or use Chocolatey
-choco install ffmpeg curl
+# Create bin directory if it doesn't exist
+mkdir bin
 
-# Or download from official websites
-# https://ffmpeg.org/download.html
-# https://curl.se/windows/
+# Download tools manually
+curl -L -o bin/yt-dlp.exe https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe
+curl -L -o bin/ffmpeg.exe https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip
+# ... other tools as needed
 ```
 
 **Linux:**
 ```bash
-# Ubuntu/Debian
-sudo apt install ffmpeg curl aria2
+# Create bin directory if it doesn't exist
+mkdir -p bin
 
-# CentOS/RHEL
-sudo yum install ffmpeg curl aria2
+# Download tools manually
+curl -L -o bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp
+chmod +x bin/yt-dlp
+# ... other tools as needed
 ```
+
+### Troubleshooting External Tools
+
+#### Common Issues
+
+1. **"Tool not found" error:**
+   - Check internet connection
+   - Verify repository URL is accessible
+   - Check firewall/proxy settings
+   - Review logs for download errors
+
+2. **"Permission denied" (Linux):**
+   ```bash
+   chmod +x bin/*
+   ```
+
+3. **"Version mismatch" error:**
+   - The tool will be automatically updated on next startup
+   - Or manually delete the old binary to force re-download
+
+4. **"Download failed" error:**
+   - Check repository availability
+   - Verify network connectivity
+   - Check disk space in bin directory
+
+#### Logs and Debugging
+
+External tool issues are logged in:
+- **Windows**: `%USERPROFILE%\habitv\habiTv.log`
+- **Linux**: `~/.habitv/habiTv.log`
+
+Look for entries like:
+```
+INFO - Checking yt-dlp version
+INFO - Downloading yt-dlp from repository
+ERROR - Failed to download yt-dlp: Connection timeout
+```
+
+### Security Considerations
+
+- **Repository Trust**: Ensure you trust the repository providing the tools
+- **HTTPS**: Use HTTPS repositories when possible
+- **Checksums**: The system verifies downloaded files when possible
+- **Updates**: Keep tools updated for security patches
+
+### Custom Repository Setup
+
+If you want to host your own tool repository:
+
+1. **Directory Structure:**
+   ```
+   your-repo/
+   ├── bin/
+   │   ├── yt-dlp.exe.zip
+   │   ├── ffmpeg.exe.zip
+   │   ├── aria2c.exe.zip
+   │   ├── rtmpdump.exe.zip
+   │   └── curl.exe.zip
+   └── plugins.txt
+   ```
+
+2. **Tool Packaging:**
+   - Package each tool as a ZIP file
+   - Include the executable and any dependencies
+   - Use consistent naming: `{toolname}.exe.zip` for Windows
+
+3. **Version Management:**
+   - Update the ZIP files when new versions are released
+   - The system will detect version changes automatically
 
 ## Verification
 

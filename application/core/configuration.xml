@@ -13,7 +13,7 @@
             <aria2>bin\aria2c.exe</aria2>
             <curl>bin\curl.exe</curl>
             <ffmpeg>bin\ffmpeg.exe</ffmpeg>
-            <youtube>bin\youtube-dl.exe</youtube>
+            <youtube>bin\yt-dlp.exe</youtube>
         </downloaders>
     </downloadConfig>
     <updateConfig>
