@@ -5,21 +5,35 @@ import com.dabi.habitv.api.plugin.pub.Publisher;
 import com.dabi.habitv.core.event.SearchCategoryEvent;
 import com.dabi.habitv.core.event.SearchCategoryStateEnum;
 
+/**
+ * Task for searching categories in a channel.
+ * Handles the category search process for a specific channel.
+ */
 public final class SearchCategoryTask extends
 		AbstractTask<SearchCategoryResult> {
 
+	/** The channel to search categories for. */
 	private final String channel;
 
+	/** The plugin provider interface. */
 	private final PluginProviderInterface provider;
 
+	/** Publisher for search category events. */
 	private final Publisher<SearchCategoryEvent> searchCategoryPublisher;
 
-	public SearchCategoryTask(final String channel,
-			final PluginProviderInterface provider,
-			final Publisher<SearchCategoryEvent> searchCategoryPublisher) {
-		this.channel = channel;
-		this.provider = provider;
-		this.searchCategoryPublisher = searchCategoryPublisher;
+	/**
+	 * Constructs a new SearchCategoryTask.
+	 * 
+	 * @param channelName the channel to search
+	 * @param providerInstance the plugin provider
+	 * @param publisher the publisher for events
+	 */
+	public SearchCategoryTask(final String channelName,
+			final PluginProviderInterface providerInstance,
+			final Publisher<SearchCategoryEvent> publisher) {
+		this.channel = channelName;
+		this.provider = providerInstance;
+		this.searchCategoryPublisher = publisher;
 	}
 
 	@Override

@@ -19,39 +19,63 @@ import com.dabi.habitv.core.event.EpisodeStateEnum;
 import com.dabi.habitv.core.event.RetreiveEvent;
 import com.dabi.habitv.core.token.TokenReplacer;
 
+/**
+ * Task for retrieving episodes.
+ * Handles the complete retrieval process including download and export.
+ */
 public class RetrieveTask extends AbstractEpisodeTask {
 
+	/** Publisher for retrieve events. */
 	private final Publisher<RetreiveEvent> retreivePublisher;
 
+	/** Task adder for managing sub-tasks. */
 	private final TaskAdder taskAdder;
 
+	/** Exporter plugin holder. */
 	private final ExporterPluginHolder exporter;
 
+	/** Plugin provider interface. */
 	private final PluginProviderInterface provider;
 
+	/** Downloader plugin holder. */
 	private final DownloaderPluginHolder downloaders;
 
+	/** Data access object for downloaded episodes. */
 	private final DownloadedDAO downloadDAO;
 
+	/** Export state for episode resumption. */
 	private EpisodeExportState episodeExportState;
 
+	/** Whether this is a manual retrieval. */
 	private final boolean manual;
 
+	/**
+	 * Constructs a new RetrieveTask.
+	 * 
+	 * @param episode the episode to retrieve
+	 * @param publisher the publisher for events
+	 * @param taskAdderInstance the task adder
+	 * @param exporterHolder the exporter plugin holder
+	 * @param providerInstance the plugin provider
+	 * @param downloaderHolder the downloader plugin holder
+	 * @param downloadDAOInstance the download DAO
+	 * @param isManual whether this is a manual retrieval
+	 */
 	public RetrieveTask(final EpisodeDTO episode,
 			final Publisher<RetreiveEvent> publisher,
-			final TaskAdder taskAdder, final ExporterPluginHolder exporter,
-			final PluginProviderInterface provider,
-			final DownloaderPluginHolder downloaders,
-			final DownloadedDAO downloadDAO, boolean manual) {
+			final TaskAdder taskAdderInstance, final ExporterPluginHolder exporterHolder,
+			final PluginProviderInterface providerInstance,
+			final DownloaderPluginHolder downloaderHolder,
+			final DownloadedDAO downloadDAOInstance, final boolean isManual) {
 		super(episode);
 		this.retreivePublisher = publisher;
-		this.taskAdder = taskAdder;
-		this.exporter = exporter;
-		this.provider = provider;
-		this.downloadDAO = downloadDAO;
-		this.downloaders = downloaders;
+		this.taskAdder = taskAdderInstance;
+		this.exporter = exporterHolder;
+		this.provider = providerInstance;
+		this.downloadDAO = downloadDAOInstance;
+		this.downloaders = downloaderHolder;
 		this.episodeExportState = null;
-		this.manual = manual;
+		this.manual = isManual;
 	}
 
 	@Override
@@ -75,7 +99,7 @@ public class RetrieveTask extends AbstractEpisodeTask {
 
 	@Override
 	protected void started() {
-
+		// No specific action needed on start
 	}
 
 	@Override
@@ -88,10 +112,22 @@ public class RetrieveTask extends AbstractEpisodeTask {
 		return null;
 	}
 
+	/**
+	 * Checks if this is an export-only task.
+	 * 
+	 * @return true if this is an export-only task
+	 */
 	private boolean exportOnly() {
 		return episodeExportState != null;
 	}
 
+	/**
+	 * Exports the episode using the provided exporter list.
+	 * 
+	 * @param exporterList the list of exporters to use
+	 * @throws InterruptedException if interrupted during execution
+	 * @throws ExecutionException if execution fails
+	 */
 	private void export(final List<ExportDTO> exporterList)
 			throws InterruptedException, ExecutionException {
 		int i = 0;
@@ -115,12 +151,25 @@ public class RetrieveTask extends AbstractEpisodeTask {
 		}
 	}
 
+	/**
+	 * Checks if episode export should resume at the given step.
+	 * 
+	 * @param i the export step index
+	 * @return true if export should resume at this step
+	 */
 	private boolean episodeExportResume(final int i) {
 		// soit il n'y a pas à reprendre soit il faut reprendre et c'est l'étape
 		// à reprendre
 		return episodeExportState == null || i >= episodeExportState.getState();
 	}
 
+	/**
+	 * Validates the condition for an export.
+	 * 
+	 * @param export the export configuration
+	 * @param episode the episode to validate
+	 * @return true if the condition is valid
+	 */
 	private boolean validCondition(final ExportDTO export,
 			final EpisodeDTO episode) {
 		boolean ret = true;
@@ -133,6 +182,9 @@ public class RetrieveTask extends AbstractEpisodeTask {
 		return ret;
 	}
 
+	/**
+	 * Downloads the episode.
+	 */
 	private void download() {
 		final DownloadTask downloadTask = new DownloadTask(getEpisode(),
 				provider, downloaders, retreivePublisher, downloadDAO, manual);
@@ -141,6 +193,9 @@ public class RetrieveTask extends AbstractEpisodeTask {
 		downloadTask.waitEndOfTreatment();
 	}
 
+	/**
+	 * Checks the episode validity.
+	 */
 	private void check() {
 		try {
 			getEpisode().check();
@@ -154,9 +209,14 @@ public class RetrieveTask extends AbstractEpisodeTask {
 		return "Retreiving" + getEpisode().toString();
 	}
 
+	/**
+	 * Sets the episode export state for resumption.
+	 * 
+	 * @param exportState the export state to set
+	 */
 	public void setEpisodeExportState(
-			final EpisodeExportState episodeExportState) {
-		this.episodeExportState = episodeExportState;
+			final EpisodeExportState exportState) {
+		this.episodeExportState = exportState;
 	}
 
 	@Override
