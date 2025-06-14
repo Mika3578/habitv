@@ -13,7 +13,8 @@ public interface HabitTvConf {
 
 	String CONF_FILE = "configuration.xml";	
 
-	String STAT_URL = "http://dabiboo.free.fr/cpt.php";
+	// String STAT_URL = "http://dabiboo.free.fr/cpt.php";
+	String STAT_URL = "https://mika3578.github.io/habitv/stat.php";
 	
 	String LOG_FILE = "habiTv.log"; 
 

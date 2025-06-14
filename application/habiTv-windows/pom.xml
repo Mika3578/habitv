@@ -25,7 +25,7 @@
     <repository>
       <id>dabi-repo</id>
       <name>dabi-repo</name>
-      <url>http://dabiboo.free.fr/repository</url>
+      <url>https://mika3578.github.io/habitv/repository/</url>
     </repository>
   </repositories>  
 	<dependencies>
