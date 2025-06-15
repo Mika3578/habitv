@@ -5,22 +5,30 @@
 		<artifactId>parent</artifactId>
 		<version>5.0.0-SNAPSHOT</version>
 	</parent>
-	
+
 	<artifactId>application</artifactId>
 	<packaging>pom</packaging>
 
 	<name>habiTv application part</name>
 	<version>5.0.0-SNAPSHOT</version>	
-	
+
 	<modules>
 		<module>core</module>
 		<module>consoleView</module>
 		<module>trayView</module>		
 		<module>habiTv</module>
 	</modules>
-	
+
 	<dependencyManagement>
 	<dependencies>
+		<!-- Import dependency management from parent -->
+		<dependency>
+			<groupId>com.dabi.habitv</groupId>
+			<artifactId>parent</artifactId>
+			<version>${project.version}</version>
+			<type>pom</type>
+			<scope>import</scope>
+		</dependency>
 		<dependency>
 			<groupId>com.dabi.habitv</groupId>
 			<artifactId>core</artifactId>

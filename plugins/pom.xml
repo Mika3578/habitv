@@ -34,4 +34,17 @@
 		<module>wat</module>
 		<module>youtube</module>
 	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- Import dependency management from parent -->
+			<dependency>
+				<groupId>com.dabi.habitv</groupId>
+				<artifactId>parent</artifactId>
+				<version>${project.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>
