@@ -36,7 +36,21 @@
 			<resource>
 				<directory>conf</directory>
 			</resource>
+			<resource>
+				<directory>src</directory>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
 		</resources>
+		<testResources>
+			<testResource>
+				<directory>src</directory>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</testResource>
+		</testResources>
 		<plugins>
 			<plugin>
 				<groupId>com.sun.tools.xjc.maven2</groupId>

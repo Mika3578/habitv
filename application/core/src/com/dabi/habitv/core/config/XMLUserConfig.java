@@ -79,16 +79,28 @@ public class XMLUserConfig implements UserConfig {
 		try {
 			final File oldConfFile = new File(DirUtils.getOldConfFile());
 			final File confFile = new File(DirUtils.getConfFile());
+			
+			// Debug logging for configuration file paths
+			System.out.println("[Habitv] Debug: Checking configuration files...");
+			System.out.println("[Habitv] Debug: Old config file path: " + oldConfFile.getAbsolutePath());
+			System.out.println("[Habitv] Debug: New config file path: " + confFile.getAbsolutePath());
+			System.out.println("[Habitv] Debug: Old config file exists: " + oldConfFile.exists());
+			System.out.println("[Habitv] Debug: New config file exists: " + confFile.exists());
+			
 			if (oldConfFile.exists()) {
+				System.out.println("[Habitv] Debug: Loading old configuration from: " + oldConfFile.getAbsolutePath());
 				Config oldConfig = readOldConfig(oldConfFile);
 				oldConfFile.delete();
 				config = convertOldConfig(oldConfig);
+				System.out.println("[Habitv] Debug: Saving converted configuration to: " + confFile.getAbsolutePath());
 				saveConfig(confFile, config);
 			} else {
 				if (!confFile.exists()) {
+					System.out.println("[Habitv] Debug: No configuration file found, creating default configuration at: " + confFile.getAbsolutePath());
 					config = buildConfigFile(confFile);
 					saveConfig(confFile, config);
 				} else {
+					System.out.println("[Habitv] Debug: Loading configuration from: " + confFile.getAbsolutePath());
 					config = readConfig(confFile);
 				}
 			}
@@ -226,6 +238,7 @@ public class XMLUserConfig implements UserConfig {
 	private static Config readOldConfig(final File confFile)
 			throws JAXBException, UnsupportedEncodingException,
 			FileNotFoundException {
+		System.out.println("[Habitv] Debug: Starting XML parsing of old configuration file: " + confFile.getAbsolutePath());
 		Config config;
 		final JAXBContext jaxbContext;
 		jaxbContext = JAXBContext.newInstance(Config.class.getPackage()
@@ -235,12 +248,14 @@ public class XMLUserConfig implements UserConfig {
 		config = ((JAXBElement<Config>) unmarshaller
 				.unmarshal(new InputStreamReader(new FileInputStream(confFile),
 					HabitTvConf.ENCODING))).getValue();
+		System.out.println("[Habitv] Debug: Successfully parsed old configuration file: " + confFile.getAbsolutePath());
 		return config;
 	}
 
 	private static Configuration readConfig(final File confFile)
 			throws JAXBException, UnsupportedEncodingException,
 			FileNotFoundException {
+		System.out.println("[Habitv] Debug: Starting XML parsing of configuration file: " + confFile.getAbsolutePath());
 		Configuration config;
 		final JAXBContext jaxbContext;
 		jaxbContext = JAXBContext.newInstance(Configuration.class.getPackage()
@@ -249,6 +264,7 @@ public class XMLUserConfig implements UserConfig {
 		FileUtils.setValidation(unmarshaller, CONF_XSD);
 		config = (Configuration) unmarshaller.unmarshal(new InputStreamReader(
 				new FileInputStream(confFile), HabitTvConf.ENCODING));
+		System.out.println("[Habitv] Debug: Successfully parsed configuration file: " + confFile.getAbsolutePath());
 		return config;
 	}
 

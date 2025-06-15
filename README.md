@@ -18,6 +18,7 @@ habiTv is a Java-based application that automatically downloads TV replay conten
 - **Background Operation**: Runs as a system tray application with notifications
 - **Export Integration**: Automatic post-processing and export capabilities
 - **Environment Configuration**: Flexible configuration via environment variables
+- **Unified Logging**: Centralized logging system with configurable levels and outputs
 
 ## Supported Content Providers
 
@@ -130,6 +131,123 @@ Key variables:
 
 - `config.xml`: Main application configuration
 - `grabconfig.xml`: Show selection and monitoring configuration
+
+## Logging System
+
+habiTv uses a unified logging system based on log4j 1.2.15 with centralized configuration and thread-safe operation.
+
+### Log Format
+
+All log entries follow this format:
+```
+[2025-06-15 13:42:01.123] [INFO] [CoreManager] Download started for: https://...
+```
+
+Components:
+- **Timestamp**: `yyyy-MM-dd HH:mm:ss.SSS`
+- **Log Level**: `DEBUG`, `INFO`, `WARN`, `ERROR`
+- **Logger Name**: Class name (e.g., `CoreManager`, `PluginManager`)
+- **Message**: Log content with optional exception stack traces
+
+### Log Outputs
+
+1. **Console Output**: Real-time logging to console (INFO level and above)
+2. **File Output**: Persistent logging to `log/habitv.log` (DEBUG level and above)
+   - Automatic rotation: 10MB max file size, 10 backup files
+   - Thread-safe file writing
+
+### Configuration
+
+#### Default Configuration
+The application uses `habitv-log.properties` for logging configuration. Key settings:
+
+```properties
+# Root logger level
+log4j.rootLogger=INFO, console, file
+
+# Console appender
+log4j.appender.console=org.apache.log4j.ConsoleAppender
+log4j.appender.console.layout.ConversionPattern=[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5p] [%c{1}] %m%n
+
+# File appender
+log4j.appender.file=org.apache.log4j.RollingFileAppender
+log4j.appender.file.File=log/habitv.log
+log4j.appender.file.MaxFileSize=10MB
+log4j.appender.file.MaxBackupIndex=10
+```
+
+#### Custom Configuration
+
+Create a custom `habitv-log.properties` file in the application directory:
+
+```properties
+# Set root logger level
+log4j.rootLogger=DEBUG, console, file
+
+# Configure specific logger levels
+log4j.logger.com.dabi.habitv.core=DEBUG
+log4j.logger.com.dabi.habitv.provider=INFO
+log4j.logger.org.apache.http=WARN
+
+# Customize file location
+log4j.appender.file.File=/custom/path/habitv.log
+```
+
+#### Environment Variable Override
+
+Set `HABITV_LOG_LEVEL` environment variable to override the root logger level:
+
+```bash
+# Linux/macOS
+export HABITV_LOG_LEVEL=DEBUG
+
+# Windows
+set HABITV_LOG_LEVEL=DEBUG
+```
+
+### Log Levels
+
+- **DEBUG**: Detailed diagnostic information (development/troubleshooting)
+- **INFO**: General application flow and status information
+- **WARN**: Warning conditions that don't stop operation
+- **ERROR**: Error conditions that may affect functionality
+
+### Fallback Logging
+
+If the configuration file is missing or invalid, the system automatically falls back to:
+- Console-only logging
+- INFO level
+- Basic timestamp format
+
+### Performance Considerations
+
+- **Thread-Safe**: All logging operations are thread-safe
+- **Minimal Impact**: Logging has minimal performance impact
+- **Async Operations**: File writing is buffered for better performance
+- **Level Filtering**: Log levels are checked before expensive operations
+
+### Troubleshooting Logs
+
+Common log locations:
+- **Application Directory**: `log/habitv.log`
+- **User Home**: `~/.habitv/log/habitv.log` (Linux)
+- **User Profile**: `%USERPROFILE%\habitv\log\habitv.log` (Windows)
+
+To enable debug logging for troubleshooting:
+1. Set `log4j.rootLogger=DEBUG, console, file` in `habitv-log.properties`
+2. Or set environment variable: `HABITV_LOG_LEVEL=DEBUG`
+3. Restart the application
+
+### Configuration File Debugging
+
+The application automatically logs the configuration file paths at startup to help with troubleshooting:
+
+```
+[Habitv] Debug: Resolved configuration file path: C:/Users/Mika/habitv/configuration.xml
+[Habitv] Debug: Loading configuration from: C:\Users\Mika\habitv\configuration.xml
+```
+
+This helps identify which configuration file is being loaded and whether the application is running in local mode or user mode.
 
 ## Plugin System
 
@@ -269,7 +387,7 @@ habiTv requires several external tools for downloading and processing videos. Th
 - **ffmpeg**: For video processing and format conversion
 
 ### Configuration
-The default repository for external tools is: `http://dabiboo.free.fr/repository`
+The default repository for external tools is: `https://mika3578.github.io/habitv/repository/`
 
 You can configure a custom repository in your configuration file if needed.
 

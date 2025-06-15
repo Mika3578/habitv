@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Unified Logging System**: Centralized log4j 1.2.15 configuration with thread-safe operation
+- **HabitvLogger Class**: New centralized logging manager with automatic initialization
+- **Custom Log Configuration**: Support for `habitv-log.properties` with fallback mechanisms
+- **Enhanced Log Format**: Standardized format with timestamp, level, logger name, and message
+- **Automatic Log Directory**: Creates `log/` directory and manages log file rotation
+- **Environment Variable Support**: `HABITV_LOG_LEVEL` for runtime log level configuration
+- **Comprehensive Logging Documentation**: Detailed logging configuration guide in README.md
 - Comprehensive documentation suite
 - Environment variables support
 - Improved error handling and logging
@@ -16,6 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added last updated timestamps to documentation
 
 ### Changed
+- **Logging Infrastructure**: Replaced scattered System.out/System.err usage with proper logging
+- **Main Application Classes**: Updated HabitvLauncher, ConsoleLauncher, CoreManager to use unified logging
+- **Framework Classes**: Updated ZipUtils and other utility classes with proper logging
+- **Plugin Classes**: Standardized logging across plugin modules
+- **LogUtils Class**: Enhanced with backward compatibility and deprecated methods
 - Updated Java compatibility from 1.7 to 1.8
 - Removed hardcoded JavaFX dependencies
 - Fixed deprecated API usage
@@ -24,12 +36,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated all documentation links and references
 
 ### Fixed
+- **System.out/System.err Usage**: Replaced all direct console output with proper logging
+- **Logging Configuration**: Fixed missing configuration file handling with fallback support
+- **Thread Safety**: Ensured all logging operations are thread-safe
+- **Performance**: Optimized logging for minimal performance impact
 - Java version compatibility issues
 - Missing plugin version specifications
 - Deprecated URL constructor usage
 - Unused import warnings
 - Markdown linting issues
 - Documentation inconsistencies and outdated information
+
+### Debug Improvements
+- **Configuration File Path Logging**: Added debug output to show which configuration.xml file is being loaded at startup
+- **Path Resolution Debugging**: Enhanced logging to display all attempted configuration file paths and resolution logic
+- **XML Parsing Debugging**: Added logging before and after XML parsing operations to help troubleshoot configuration issues
+
+### Technical
+- **Log Format**: `[yyyy-MM-dd HH:mm:ss.SSS] [LEVEL] [LOGGER] Message`
+- **Log Outputs**: Console (INFO+) and File (DEBUG+) with automatic rotation
+- **Configuration**: `habitv-log.properties` with environment variable override support
+- **Fallback**: Automatic fallback to console-only logging if configuration fails
+- **Performance**: Thread-safe, buffered file writing, level filtering
 
 ## [4.1.0-SNAPSHOT] - 2025-06-15
 

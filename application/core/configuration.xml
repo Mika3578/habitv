@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:configuration xmlns:ns2="http://www.dabi.com/habitv/configuration/entities">
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration xmlns="http://www.dabi.com/habitv/configuration/entities" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.dabi.com/habitv/configuration/entities configuration.xsd ">
     <proxies/>
     <osConfig/>
     <downloadConfig>
@@ -20,6 +20,22 @@
         <updateOnStartup>true</updateOnStartup>
         <autoriseSnapshot>true</autoriseSnapshot>
     </updateConfig>
+    <credentialsConfig>
+        <credential>
+            <service>m6plus</service>
+            <username>your_email@example.com</username>
+            <password>your_password</password>
+            <enabled>true</enabled>
+            <description>M6+ account for accessing premium content</description>
+        </credential>
+        <credential>
+            <service>arte</service>
+            <username>your_arte_username</username>
+            <password>your_arte_password</password>
+            <enabled>false</enabled>
+            <description>Arte account (disabled)</description>
+        </credential>
+    </credentialsConfig>
     <exportConfig>
         <exporters>
             <exporter>
@@ -53,4 +69,4 @@
         <curl>2</curl>
         <ffmpeg>1</ffmpeg>
     </taskDefinition>
-</ns2:configuration>
+</configuration>

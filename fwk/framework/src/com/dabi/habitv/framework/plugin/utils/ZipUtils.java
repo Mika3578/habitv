@@ -7,13 +7,18 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.apache.log4j.Logger;
+
 public class ZipUtils {
+
+    private static final Logger LOG = Logger.getLogger(ZipUtils.class);
 
     public static void unZipIt(File zipFile, String outputFolder){
     	 
         byte[] buffer = new byte[1024];
     
         try{
+            LOG.info("Starting to unzip file: " + zipFile.getAbsolutePath() + " to: " + outputFolder);
     
        	//create output directory is not exists
        	File folder = new File(outputFolder);
@@ -32,7 +37,7 @@ public class ZipUtils {
        	   String fileName = ze.getName();
               File newFile = new File(outputFolder + File.separator + fileName);
     
-              //System.out.println("file unzip : "+ newFile.getAbsoluteFile());
+              LOG.debug("Extracting file: " + newFile.getAbsoluteFile());
     
                //create all non exists folders
                //else you will hit FileNotFoundException for compressed folder
@@ -52,10 +57,10 @@ public class ZipUtils {
            zis.closeEntry();
        	zis.close();
     
-       	System.out.println("Done");
+       	LOG.info("Unzip operation completed successfully");
     
        }catch(IOException ex){
-          ex.printStackTrace(); 
+          LOG.error("Failed to unzip file: " + zipFile.getAbsolutePath(), ex);
        }
       } 
 	

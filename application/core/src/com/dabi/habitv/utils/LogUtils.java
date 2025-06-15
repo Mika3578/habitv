@@ -13,7 +13,10 @@ import com.dabi.habitv.api.plugin.exception.TechnicalException;
 /**
  * Utility class for logging operations.
  * This class provides static methods for common logging operations.
+ * 
+ * @deprecated Use {@link HabitvLogger} for new code. This class is maintained for backward compatibility.
  */
+@Deprecated
 public final class LogUtils {
 
 	/**
@@ -30,7 +33,7 @@ public final class LogUtils {
 	 * @return the logger instance
 	 */
 	public static Logger getLogger(final Class<?> clazz) {
-		return Logger.getLogger(clazz);
+		return HabitvLogger.getLogger(clazz);
 	}
 
 	/**
@@ -40,7 +43,7 @@ public final class LogUtils {
 	 * @return the logger instance
 	 */
 	public static Logger getLogger(final String name) {
-		return Logger.getLogger(name);
+		return HabitvLogger.getLogger(name);
 	}
 
 	/**
@@ -49,16 +52,24 @@ public final class LogUtils {
 	 * @return the root logger instance
 	 */
 	public static Logger getRootLogger() {
-		return Logger.getRootLogger();
+		return HabitvLogger.getRootLogger();
 	}
 
+	/**
+	 * Updates the log4j configuration with the log file path.
+	 * 
+	 * @deprecated Use {@link HabitvLogger#updateConfiguration(Properties)} instead.
+	 */
+	@Deprecated
 	public static void updateLog4jConfiguration() {
 		Properties props = new Properties();
 		try {
 			InputStream configStream = ClassLoader.getSystemClassLoader()
 					.getResourceAsStream("log4j.properties");
-			props.load(configStream);
-			configStream.close();
+			if (configStream != null) {
+				props.load(configStream);
+				configStream.close();
+			}
 		} catch (IOException e) {
 			throw new TechnicalException(e);
 		}

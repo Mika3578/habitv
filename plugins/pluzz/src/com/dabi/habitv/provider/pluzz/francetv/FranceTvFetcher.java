@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
 import com.dabi.habitv.api.plugin.exception.TechnicalException;
@@ -23,6 +25,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Modern fetcher for France.tv data using their current API endpoints
  */
 public class FranceTvFetcher {
+    
+    private static final Logger LOG = Logger.getLogger(FranceTvFetcher.class);
     
     private final ObjectMapper mapper = new ObjectMapper();
     private final Map<String, CategoryDTO> catName2RootCat;
@@ -48,6 +52,7 @@ public class FranceTvFetcher {
      */
     public FranceTvArchive load() {
         try {
+            LOG.info("Loading France.tv categories and episodes");
             // Load main categories
             loadCategories();
             
@@ -55,9 +60,12 @@ public class FranceTvFetcher {
             loadEpisodes();
             
         } catch (IOException e) {
+            LOG.error("Failed to load France.tv data", e);
             throw new TechnicalException(e);
         }
         
+        LOG.info("Successfully loaded " + catName2RootCat.size() + " categories and " + 
+                catName2Episode.size() + " episode collections");
         return new FranceTvArchive(catName2RootCat.values(), catName2Episode);
     }
     
@@ -66,9 +74,11 @@ public class FranceTvFetcher {
         String categoriesUrl = CATALOG_API_URL + "/categories";
         
         try {
+            LOG.debug("Fetching categories from: " + categoriesUrl);
             String response = getUrlContent(categoriesUrl);
             parseCategoriesFromResponse(response);
         } catch (Exception e) {
+            LOG.warn("Failed to fetch categories from API, using default categories", e);
             // Fallback: create default categories based on France.tv structure
             createDefaultCategories();
         }
@@ -79,11 +89,12 @@ public class FranceTvFetcher {
         for (CategoryDTO category : catName2RootCat.values()) {
             try {
                 String episodesUrl = CATALOG_API_URL + "/category/" + category.getId() + "/episodes";
+                LOG.debug("Fetching episodes for category: " + category.getName() + " from: " + episodesUrl);
                 String response = getUrlContent(episodesUrl);
                 parseEpisodesFromResponse(response, category);
             } catch (Exception e) {
                 // Skip this category if we can't load episodes
-                System.err.println("Failed to load episodes for category: " + category.getName());
+                LOG.warn("Failed to load episodes for category: " + category.getName(), e);
             }
         }
     }

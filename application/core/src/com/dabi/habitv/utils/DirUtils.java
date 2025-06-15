@@ -186,7 +186,11 @@ public final class DirUtils {
 	 * @return the configuration file path
 	 */
 	public static String getConfFile() {
-		return getAppDir() + "/" + HabitTvConf.CONF_FILE;
+		String confPath = getAppDir() + "/" + HabitTvConf.CONF_FILE;
+		System.out.println("[Habitv] Debug: Resolved configuration file path: " + confPath);
+		System.out.println("[Habitv] Debug: App directory: " + getAppDir());
+		System.out.println("[Habitv] Debug: Is local mode: " + IS_LOCAL_MODE);
+		return confPath;
 	}
 
 	/**
@@ -195,7 +199,9 @@ public final class DirUtils {
 	 * @return the old configuration file path
 	 */
 	public static String getOldConfFile() {
-		return getAppDir() + "/" + HabitTvConf.OLD_CONF_FILE;
+		String oldConfPath = getAppDir() + "/" + HabitTvConf.OLD_CONF_FILE;
+		System.out.println("[Habitv] Debug: Resolved old configuration file path: " + oldConfPath);
+		return oldConfPath;
 	}
 
 	/**

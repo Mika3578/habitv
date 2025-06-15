@@ -27,6 +27,8 @@ import com.dabi.habitv.framework.plugin.utils.DownloadUtils;
 import com.dabi.habitv.framework.plugin.utils.ProcessingThreads;
 import com.dabi.habitv.framework.plugin.utils.RetrieverUtils;
 import com.dabi.habitv.utils.DirUtils;
+import com.dabi.habitv.utils.HabitvLogger;
+import org.apache.log4j.Logger;
 
 public final class ConsoleLauncher {
 	private static final String OPTION_RUN_EXPORT = "x";
@@ -58,6 +60,8 @@ public final class ConsoleLauncher {
 	private static GrabConfigDAO grabConfigDAO;
 
 	private static CoreManager coreManager;
+
+	private static final Logger LOG = HabitvLogger.getLogger(ConsoleLauncher.class);
 
 	private ConsoleLauncher() {
 
@@ -343,7 +347,7 @@ public final class ConsoleLauncher {
 	}
 
 	private static void info(String string) {
-		System.out.println(string);
+		LOG.info(string);
 	}
 
 	private static void usage(Options options) {

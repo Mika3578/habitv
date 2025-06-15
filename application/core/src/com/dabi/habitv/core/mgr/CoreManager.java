@@ -17,6 +17,7 @@ import com.dabi.habitv.core.token.TokenReplacer;
 import com.dabi.habitv.framework.FWKProperties;
 import com.dabi.habitv.framework.plugin.utils.RetrieverUtils;
 import com.dabi.habitv.utils.DirUtils;
+import com.dabi.habitv.utils.HabitvLogger;
 
 public final class CoreManager {
 
@@ -26,13 +27,14 @@ public final class CoreManager {
 
 	private final Map<String, Integer> taskName2PoolSizeMap;
 
-	private static final Logger LOG = Logger.getLogger(CoreManager.class);
+	private static final Logger LOG = HabitvLogger.getLogger(CoreManager.class);
 
 	private final PluginManager pluginManager;
 
 	public CoreManager(final UserConfig config) {
 		stat();
-		LOG.info("habitv version " + FWKProperties.getVersion());
+		LOG.info("habiTv version " + FWKProperties.getVersion());
+		LOG.info("Initializing CoreManager with configuration");
 		taskName2PoolSizeMap = config.getTaskDefinition();
 		TokenReplacer.setCutSize(config.getFileNameCutSize());
 		pluginManager = new PluginManager(config);
@@ -41,6 +43,7 @@ public final class CoreManager {
 		categoryManager = new CategoryManager(pluginManager.getProvidersHolder(), taskName2PoolSizeMap);
 
 		setProxy(config);
+		LOG.info("CoreManager initialization completed");
 	}
 
 	private void stat() {
