@@ -1,0 +1,4 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Sun Jun 15 11:29:08 CEST 2025
+parent-4.1.0-SNAPSHOT.pom>=
+parent-4.1.0-20170605.150239-5.pom>habitv-mirror=

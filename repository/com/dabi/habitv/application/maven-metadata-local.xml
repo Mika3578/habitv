@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.dabi.habitv</groupId>
+  <artifactId>application</artifactId>
+  <versioning>
+    <versions>
+      <version>4.1.0-SNAPSHOT</version>
+      <version>5.0.0-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20250615124037</lastUpdated>
+  </versioning>
+</metadata>

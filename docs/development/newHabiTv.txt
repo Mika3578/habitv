@@ -1,0 +1,49 @@
+IHM :
+Principale nouveauté bien que pas indispensable : l'IHM de paramétrage et de suivi des téléchargement. Elle est synchronisé avec les fichiers de configuration XML grabconfig.xml et config.xml.
+
+	- onglet de suivi des téléchargements
+		- interrompre un téléchargement (et marquer comme téléchargé)
+		- relancer un téléchargement
+		- relancer les exports
+		- ouvrir le fichier de log, le dossier des index, le fichier des erreurs
+		- bouton de recherche des épisodes à télécharger (des catégories sélectionnées dans l'onglet à télécharger)
+	- onglet de sélection des téléchargements
+		- possibilité de lister les épisodes d'une catégorie dans l'IHM
+		- bouton pour mettre à jour les catégories
+		- bouton pour supprimer les catégories qui ne sont plus disponiblés (visibles en grisées)
+		- téléchargement manuel d'un épisode
+		- ouvrir le lien de l'épisode dans le navigateur
+		- ouvrir directement l'index d'une catégorie
+		- filtre pour rechercher une émission parmis toutes les chaines
+		- filtre pour rechercher un épisode + possibilité de sauvegarder le filtre pour la recherche automatique
+		- possibilité de supprimer une catégorie (elle sera toujours dans le fichier grabconfig au statut supprimé mais ne sera plus visible dans l'IHM)
+		- sur les plugins "générique" file et RSS : simplification de l'ajout d'une catégorie par un menu contextuel. Par ex pour ajouter un catégorie youtube : 
+	- onglet configuration
+		- simplifie la configuration des paramètres les plus courants
+	- module de téléchargement manuel (accessible par l'icon tray)
+		- recherche automatiquement le meilleur plugin pour télécharger une vidéo à partir d'une url à copier/coller.
+
+packaging
+	- 3 packagings :
+		- 1 jar exécutable disponible pour ceux qui ont la bonne version de Java d'installée ( >= 1.7)
+		- 1 zip avec les .exe windows (qui embarque une jre 1.7)
+		- 1 .dev pour simplifier l'installation sous linux
+	- 1 lien de téléchargement pour chaque packaging qui pointe toujours sur la dernière archive générée
+	
+màj auto
+	- les plugins et exécutables ne sont plus packagés, ils sont téléchargés et mis à jour automatiquement par l'application au démarrage
+
+ligne de commande
+	- habiTv est maintenant complètement utilisable en ligne de commande avec plusieurs paramètres possibles cf : TODO LIEN
+
+dev plugin
+	- 
+	- le système de plugin est simplifié
+
+fichier de configuration
+	- les 2 fichiers de configuration grabconfig.xml et config.xml ont été retravaillés pour simplifier leur édition, à la configuration "maven" :
+			- l'ordre des éléments n'est plus obligatoire
+			- aucun élément de configuration n'est obligatoire : il y a une valeur par défaut pour chacun d'entre eux
+			- la rétro-compatibilité est assuré les fichiers seront automatiquement converti au démarrage de l'applcation
+
+Les fichiers générés par habiTv sont placés dans %USER_DIR%/habitv sauf si un des fichiers de configuration.xml ou grabconfig.xml est présent dans le répertoire contenant l'exécutable.
