@@ -44,8 +44,15 @@ public class UpdateManager {
 	public void process() {
 		try {
 			LOG.info("Checking plugin updates...");
-			String[] toUpdate = RetrieverUtils.getUrlContent(
-					site + "/plugins.txt", null).split("\\r\\n");
+			String[] rawLines = RetrieverUtils.getUrlContent(site + "/plugins.txt", null).split("\\r\\n");
+			java.util.List<String> toUpdateList = new java.util.ArrayList<>();
+			for (String line : rawLines) {
+				String trimmed = line.trim();
+				if (!trimmed.isEmpty() && !trimmed.startsWith("#")) {
+					toUpdateList.add(trimmed);
+				}
+			}
+			String[] toUpdate = toUpdateList.toArray(new String[0]);
 			updatePublisher.addNews(new UpdatePluginEvent(
 					UpdatePluginStateEnum.STARTING_ALL, toUpdate.length));
 			final Updater updater = new JarUpdater(pluginFolder, groupId,
