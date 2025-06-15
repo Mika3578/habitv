@@ -20,6 +20,35 @@
 		<log.level>INFO</log.level>
 		<debug>false</debug>
 		<env>dev</env>
+
+		<!-- Project Version Properties -->
+		<habitv.version>5.0.0-SNAPSHOT</habitv.version>
+
+		<!-- Dependency Version Properties -->
+		<jakarta.mail.version>2.1.2</jakarta.mail.version>
+		<angus.mail.version>2.0.2</angus.mail.version>
+		<guava.version>32.1.2-jre</guava.version>
+		<commons-cli.version>1.5.0</commons-cli.version>
+		<rome.version>2.1.0</rome.version>
+		<jsoup.version>1.16.1</jsoup.version>
+		<jackson.version>2.15.2</jackson.version>
+		<jakarta.xml.bind.version>4.0.0</jakarta.xml.bind.version>
+		<jaxb.runtime.version>4.0.3</jaxb.runtime.version>
+		<jakarta.activation.version>2.1.2</jakarta.activation.version>
+		<commons-codec.version>1.16.0</commons-codec.version>
+		<commons-lang3.version>3.13.0</commons-lang3.version>
+		<log4j.version>2.20.0</log4j.version>
+		<junit.version>5.10.0</junit.version>
+
+		<!-- Plugin Version Properties -->
+		<maven.compiler.version>3.11.0</maven.compiler.version>
+		<maven.jar.version>3.0.2</maven.jar.version>
+		<maven.deploy.version>3.0.0</maven.deploy.version>
+		<maven.site.version>3.12.1</maven.site.version>
+		<maven.surefire.version>3.1.2</maven.surefire.version>
+		<maven.enforcer.version>3.4.1</maven.enforcer.version>
+		<dependency.check.version>8.4.0</dependency.check.version>
+		<wagon.ftp.version>3.5.3</wagon.ftp.version>
 	</properties>
 
 	<profiles>
@@ -96,122 +125,135 @@
 
 	<dependencyManagement>
 	<dependencies>
+		<!-- habiTv Modules -->
 		<dependency>
 			<groupId>com.dabi.habitv</groupId>
 			<artifactId>api</artifactId>
-			<version>5.0.0-SNAPSHOT</version>
+			<version>${habitv.version}</version>
 		</dependency>	
 		<dependency>
 			<groupId>com.dabi.habitv</groupId>
 			<artifactId>framework</artifactId>
-			<version>5.0.0-SNAPSHOT</version>
-		</dependency>			
+			<version>${habitv.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.dabi.habitv</groupId>
+			<artifactId>plugin-tester</artifactId>
+			<version>${habitv.version}</version>
+			<scope>test</scope>
+		</dependency>
 
+		<!-- Email Dependencies -->
 		<dependency>
 			<groupId>jakarta.mail</groupId>
 			<artifactId>jakarta.mail-api</artifactId>
-			<version>2.1.2</version>
+			<version>${jakarta.mail.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.angus</groupId>
 			<artifactId>jakarta.mail</artifactId>
-			<version>2.0.2</version>
+			<version>${angus.mail.version}</version>
 		</dependency>
 
+		<!-- Utility Libraries -->
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>32.1.2-jre</version>
+			<version>${guava.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>commons-cli</groupId>
 			<artifactId>commons-cli</artifactId>
-			<version>1.5.0</version>
+			<version>${commons-cli.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>com.rometools</groupId>
 			<artifactId>rome</artifactId>
-			<version>2.1.0</version>
+			<version>${rome.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
-			<version>1.16.1</version>
+			<version>${jsoup.version}</version>
 		</dependency>
 
+		<!-- JSON Processing -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
-			<version>2.15.2</version>
+			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.15.2</version>
+			<version>${jackson.version}</version>
 		</dependency>
 
+		<!-- XML Processing -->
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
 			<artifactId>jakarta.xml.bind-api</artifactId>
-			<version>4.0.0</version>
+			<version>${jakarta.xml.bind.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jaxb</groupId>
 			<artifactId>jaxb-runtime</artifactId>
-			<version>4.0.3</version>
+			<version>${jaxb.runtime.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.activation</groupId>
 			<artifactId>jakarta.activation-api</artifactId>
-			<version>2.1.2</version>
+			<version>${jakarta.activation.version}</version>
 		</dependency>
+
+		<!-- Apache Commons -->
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
-			<version>1.16.0</version>
+			<version>${commons-codec.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.13.0</version>
+			<version>${commons-lang3.version}</version>
 		</dependency>
+
+		<!-- Logging -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
-			<version>2.20.0</version>
+			<version>${log4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
-			<version>2.20.0</version>
+			<version>${log4j.version}</version>
 		</dependency>
 		<!-- Bridge from log4j 1.x to log4j2 for backward compatibility -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-1.2-api</artifactId>
-			<version>2.20.0</version>
+			<version>${log4j.version}</version>
 		</dependency>
-		<!-- JUnit 5 dependencies -->
+
+		<!-- Testing -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>5.10.0</version>
+			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<version>5.10.0</version>
+			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- For backward compatibility with JUnit 4 tests -->
 		<dependency>
 			<groupId>org.junit.vintage</groupId>
 			<artifactId>junit-vintage-engine</artifactId>
-			<version>5.10.0</version>
+			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>	
@@ -237,14 +279,14 @@
 			<extension>
 				<groupId>org.apache.maven.wagon</groupId>
 				<artifactId>wagon-ftp</artifactId>
-				<version>3.5.3</version>
+				<version>${wagon.ftp.version}</version>
 			</extension>
 		</extensions>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.11.0</version>
+				<version>${maven.compiler.version}</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
@@ -253,7 +295,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.0.2</version>
+        <version>${maven.jar.version}</version>
         <configuration>
           <archive>
             <index>true</index>
@@ -270,7 +312,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>${maven.deploy.version}</version>
         <configuration>
           <deployAtEnd>true</deployAtEnd>
         </configuration>
@@ -278,7 +320,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.12.1</version>
+        <version>${maven.site.version}</version>
         <configuration>
           <siteDirectory>${project.build.directory}/site</siteDirectory>
         </configuration>
@@ -286,7 +328,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.1.2</version>
+        <version>${maven.surefire.version}</version>
         <configuration>
           <includes>
             <include>**/*Test.java</include>
@@ -297,7 +339,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.4.1</version>
+        <version>${maven.enforcer.version}</version>
         <executions>
           <execution>
             <id>enforce-environment</id>
@@ -325,7 +367,7 @@
       <plugin>
         <groupId>org.owasp</groupId>
         <artifactId>dependency-check-maven</artifactId>
-        <version>8.4.0</version>
+        <version>${dependency.check.version}</version>
         <configuration>
           <failBuildOnCVSS>8</failBuildOnCVSS>
           <formats>
