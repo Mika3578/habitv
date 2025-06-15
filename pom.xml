@@ -16,7 +16,49 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<skip.tests>false</skip.tests>
+		<log.level>INFO</log.level>
+		<debug>false</debug>
+		<env>dev</env>
 	</properties>
+
+	<profiles>
+		<!-- Development environment profile -->
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<env>dev</env>
+				<debug>true</debug>
+				<log.level>DEBUG</log.level>
+				<skip.tests>false</skip.tests>
+			</properties>
+		</profile>
+
+		<!-- Test environment profile -->
+		<profile>
+			<id>test</id>
+			<properties>
+				<env>test</env>
+				<debug>false</debug>
+				<log.level>INFO</log.level>
+				<skip.tests>false</skip.tests>
+			</properties>
+		</profile>
+
+		<!-- Production environment profile -->
+		<profile>
+			<id>prod</id>
+			<properties>
+				<env>prod</env>
+				<debug>false</debug>
+				<log.level>WARN</log.level>
+				<skip.tests>true</skip.tests>
+			</properties>
+		</profile>
+	</profiles>
 
 	 <scm>
         <connection>scm:svn:http://subversion.assembla.com/svn/habitv/trunk</connection>
@@ -37,7 +79,20 @@
 			<name>dabi-repo</name>
 			<url>https://mika3578.github.io/habitv/repository/</url>
 		</repository>
-	</repositories>	
+		<repository>
+			<id>central</id>
+			<name>Central Repository</name>
+			<url>https://repo.maven.apache.org/maven2</url>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>central</id>
+			<name>Central Repository</name>
+			<url>https://repo.maven.apache.org/maven2</url>
+		</pluginRepository>
+	</pluginRepositories>
 
 	<dependencyManagement>
 	<dependencies>
@@ -236,6 +291,7 @@
           <includes>
             <include>**/*Test.java</include>
           </includes>
+          <skipTests>${skip.tests}</skipTests>
         </configuration>
       </plugin>
       <plugin>
@@ -262,6 +318,30 @@
                 <banDuplicatePomDependencyVersions />
               </rules>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- OWASP Dependency Check for vulnerability scanning -->
+      <plugin>
+        <groupId>org.owasp</groupId>
+        <artifactId>dependency-check-maven</artifactId>
+        <version>8.4.0</version>
+        <configuration>
+          <failBuildOnCVSS>8</failBuildOnCVSS>
+          <formats>
+            <format>HTML</format>
+            <format>XML</format>
+          </formats>
+          <suppressionFiles>
+            <suppressionFile>${project.basedir}/dependency-check-suppressions.xml</suppressionFile>
+          </suppressionFiles>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>verify</phase>
           </execution>
         </executions>
       </plugin>
