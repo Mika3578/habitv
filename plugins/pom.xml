@@ -23,14 +23,15 @@
 		<module>ffmpeg</module>
 		<module>file</module>
 		<module>footyroom</module>
+		<module>francetv</module>
 		<module>globalnews</module>
 		<module>lequipe</module>
 		<module>mlssoccer</module>
-		<module>pluzz</module>
+		<module>plugin-tester</module>
 		<module>RSS</module>
 		<module>rtmpDump</module>
 		<module>sfr</module>
-		<module>youtube</module>
 		<module>wat</module>
+		<module>youtube</module>
 	</modules>
 </project>
