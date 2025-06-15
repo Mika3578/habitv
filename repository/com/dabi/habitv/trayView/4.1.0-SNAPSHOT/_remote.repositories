@@ -1,0 +1,6 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Sun Jun 15 14:40:46 CEST 2025
+trayView-4.1.0-SNAPSHOT.jar>=
+trayView-4.1.0-20170625.094237-3.pom>habitv-mirror=
+trayView-4.1.0-20170625.094237-3.jar>habitv-mirror=
+trayView-4.1.0-SNAPSHOT.pom>=

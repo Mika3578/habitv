@@ -1,0 +1,6 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Sun Jun 15 14:40:43 CEST 2025
+core-4.1.0-SNAPSHOT.pom>=
+core-4.1.0-20170625.093923-4.pom>habitv-mirror=
+core-4.1.0-SNAPSHOT.jar>=
+core-4.1.0-20170625.093923-4.jar>habitv-mirror=

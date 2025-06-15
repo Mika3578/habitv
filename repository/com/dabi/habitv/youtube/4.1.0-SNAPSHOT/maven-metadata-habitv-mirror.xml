@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>com.dabi.habitv</groupId>
+  <artifactId>youtube</artifactId>
+  <version>4.1.0-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <timestamp>20170625.093926</timestamp>
+      <buildNumber>10</buildNumber>
+    </snapshot>
+    <lastUpdated>20170625093926</lastUpdated>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>jar</extension>
+        <value>4.1.0-20170625.093926-10</value>
+        <updated>20170625093926</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>4.1.0-20170625.093926-10</value>
+        <updated>20170625093926</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+</metadata>

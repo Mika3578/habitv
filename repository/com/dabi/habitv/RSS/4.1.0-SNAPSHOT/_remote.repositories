@@ -1,0 +1,6 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Sun Jun 15 14:40:57 CEST 2025
+RSS-4.1.0-20170605.143418-2.jar>habitv-mirror=
+RSS-4.1.0-SNAPSHOT.jar>=
+RSS-4.1.0-SNAPSHOT.pom>=
+RSS-4.1.0-20170605.143418-2.pom>habitv-mirror=

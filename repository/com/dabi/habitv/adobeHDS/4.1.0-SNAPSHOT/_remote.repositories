@@ -1,0 +1,6 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Sun Jun 15 14:40:49 CEST 2025
+adobeHDS-4.1.0-SNAPSHOT.jar>=
+adobeHDS-4.1.0-SNAPSHOT.pom>=
+adobeHDS-4.1.0-20170605.143254-2.pom>habitv-mirror=
+adobeHDS-4.1.0-20170605.143254-2.jar>habitv-mirror=
