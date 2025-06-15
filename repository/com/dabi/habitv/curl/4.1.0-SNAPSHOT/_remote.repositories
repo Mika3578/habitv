@@ -1,6 +1,0 @@
-#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Sun Jun 15 14:40:52 CEST 2025
-curl-4.1.0-SNAPSHOT.pom>=
-curl-4.1.0-20170605.143339-2.pom>habitv-mirror=
-curl-4.1.0-SNAPSHOT.jar>=
-curl-4.1.0-20170605.143339-2.jar>habitv-mirror=
