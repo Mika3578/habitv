@@ -3,7 +3,7 @@
 This guide covers installing habiTv on different operating systems and configurations.
 
 **Version**: 4.1.0-SNAPSHOT  
-**Last Updated**: December 19, 2024
+**Last Updated**: June 15, 2025
 
 ## Prerequisites
 
@@ -199,6 +199,219 @@ If you want to enable automatic plugin updates, add the following to your `confi
 4. Restart habiTv
 
 **Note**: External tools (ffmpeg, rtmpDump, curl, etc.) are still automatically managed regardless of this setting.
+
+## Security Configuration
+
+### Security Overview
+
+habiTv implements a security-first approach with several layers of protection:
+
+1. **Plugin Security**: Disabled by default to prevent unauthorized code execution
+2. **Network Security**: HTTPS enforcement and certificate validation
+3. **Configuration Security**: Secure defaults and input validation
+4. **Repository Security**: Configurable and verifiable sources
+
+### Security Levels
+
+#### Level 1: Maximum Security (Recommended for Production)
+
+**Configuration:**
+```xml
+<updateConfig>
+    <updateOnStartup>false</updateOnStartup>
+    <autoriseSnapshot>false</autoriseSnapshot>
+</updateConfig>
+```
+
+**Features:**
+- ✅ Plugin auto-updates disabled
+- ✅ External tool updates enabled (trusted sources only)
+- ✅ HTTPS enforcement for all downloads
+- ✅ Certificate validation enabled
+- ✅ Input sanitization active
+
+**Use Cases:**
+- Production environments
+- Corporate networks
+- High-security requirements
+- Unattended operation
+
+#### Level 2: Standard Security (Default)
+
+**Configuration:**
+```xml
+<updateConfig>
+    <updateOnStartup>false</updateOnStartup>
+    <autoriseSnapshot>false</autoriseSnapshot>
+</updateConfig>
+```
+
+**Features:**
+- ✅ Plugin auto-updates disabled (default)
+- ✅ External tool updates enabled
+- ✅ Standard security measures
+- ✅ User consent required for plugins
+
+**Use Cases:**
+- Home users
+- Standard deployments
+- General purpose usage
+
+#### Level 3: Development/Testing
+
+**Configuration:**
+```xml
+<updateConfig>
+    <updateOnStartup>true</updateOnStartup>
+    <autoriseSnapshot>true</autoriseSnapshot>
+</updateConfig>
+```
+
+**Features:**
+- ⚠️ Plugin auto-updates enabled
+- ⚠️ Snapshot versions allowed
+- ✅ All security measures still active
+- ✅ Enhanced logging for debugging
+
+**Use Cases:**
+- Development environments
+- Testing scenarios
+- Plugin development
+- Debugging sessions
+
+### Security Best Practices
+
+#### For End Users
+
+1. **Start with Maximum Security:**
+   - Use Level 1 configuration initially
+   - Only enable features you understand and trust
+
+2. **Regular Security Reviews:**
+   - Review configuration files periodically
+   - Check logs for unusual activity
+   - Update the application regularly
+
+3. **Network Security:**
+   - Use HTTPS repositories when possible
+   - Configure firewalls to restrict access
+   - Monitor network traffic
+
+4. **File System Security:**
+   - Restrict access to habiTv directories
+   - Use dedicated user accounts
+   - Regular backups of configuration
+
+#### For System Administrators
+
+1. **Deployment Security:**
+   - Deploy with maximum security settings
+   - Use dedicated service accounts
+   - Implement proper file permissions
+
+2. **Network Configuration:**
+   - Configure proxy settings if needed
+   - Use internal repositories when possible
+   - Implement network monitoring
+
+3. **Monitoring and Logging:**
+   - Set up log monitoring
+   - Configure alerts for security events
+   - Regular security audits
+
+4. **Update Management:**
+   - Test updates in staging environment
+   - Implement change control procedures
+   - Document configuration changes
+
+### Security Configuration Examples
+
+#### Corporate Environment
+
+```xml
+<updateConfig>
+    <updateOnStartup>false</updateOnStartup>
+    <autoriseSnapshot>false</autoriseSnapshot>
+    <repositoryUrl>https://internal-repo.company.com/habitv</repositoryUrl>
+    <proxyHost>proxy.company.com</proxyHost>
+    <proxyPort>8080</proxyPort>
+</updateConfig>
+```
+
+#### Home User with Trusted Sources
+
+```xml
+<updateConfig>
+    <updateOnStartup>false</updateOnStartup>
+    <autoriseSnapshot>false</autoriseSnapshot>
+    <repositoryUrl>https://mika3578.github.io/habitv/repository</repositoryUrl>
+</updateConfig>
+```
+
+#### Development Environment
+
+```xml
+<updateConfig>
+    <updateOnStartup>true</updateOnStartup>
+    <autoriseSnapshot>true</autoriseSnapshot>
+    <repositoryUrl>https://dev-repo.company.com/habitv</repositoryUrl>
+    <logLevel>DEBUG</logLevel>
+</updateConfig>
+```
+
+### Security Troubleshooting
+
+#### Common Security Issues
+
+1. **Certificate Errors:**
+   ```
+   ERROR - SSL certificate validation failed
+   ```
+   **Solution:** Verify repository certificate or use trusted sources
+
+2. **Permission Denied:**
+   ```
+   ERROR - Access denied to configuration file
+   ```
+   **Solution:** Check file permissions and user access rights
+
+3. **Repository Access:**
+   ```
+   ERROR - Cannot access repository
+   ```
+   **Solution:** Check network connectivity and repository availability
+
+4. **Plugin Security Warnings:**
+   ```
+   WARN - Plugin auto-update is enabled
+   ```
+   **Solution:** Review security implications and disable if not needed
+
+#### Security Log Analysis
+
+Look for these security-related log entries:
+
+```
+INFO - Security: Plugin auto-update disabled
+INFO - Security: Using HTTPS repository
+INFO - Security: Certificate validation successful
+WARN - Security: Plugin auto-update enabled (user choice)
+ERROR - Security: Certificate validation failed
+ERROR - Security: Repository access denied
+```
+
+### Reporting Security Issues
+
+If you discover a security vulnerability:
+
+1. **Do not create public issues** for security problems
+2. **Email security details** to the maintainers
+3. **Include:**
+   - Detailed reproduction steps
+   - Affected versions
+   - Configuration details
+   - Log files (sanitized)
+4. **Follow responsible disclosure** practices
 
 ### Environment Variables
 

@@ -160,6 +160,98 @@ By default, habiTv **disables automatic plugin updates** for security and stabil
 - External tools (ffmpeg, rtmpDump, etc.) are still automatically managed
 - Only plugin JAR files require explicit enablement
 
+## Security
+
+habiTv implements several security measures to protect users and ensure safe operation:
+
+### Plugin Security
+
+**Default Security Model:**
+- **Plugin Auto-Updates Disabled**: By default, no automatic plugin downloads occur
+- **Explicit Consent Required**: Users must explicitly enable plugin updates via configuration
+- **Code Execution Prevention**: Prevents unauthorized code execution from external repositories
+- **Reduced Attack Surface**: Minimizes potential security risks from automatic downloads
+
+**Security Benefits:**
+- **No Unauthorized Code**: Prevents automatic execution of code from external sources
+- **User Control**: Users have full control over when and what code is downloaded
+- **Stability**: Reduces potential issues from unexpected plugin changes
+- **Transparency**: Clear indication of what code is being executed
+
+### Configuration Security
+
+**Secure Defaults:**
+- All potentially risky features are disabled by default
+- Users must explicitly opt-in to enable advanced features
+- Clear documentation of security implications for each feature
+
+**Configuration Validation:**
+- XML schema validation for configuration files
+- Input sanitization for user-provided data
+- Fallback mechanisms for corrupted configurations
+
+### Network Security
+
+**Download Security:**
+- HTTPS enforcement for all external downloads
+- Certificate validation for secure connections
+- Checksum verification for downloaded files
+- Timeout mechanisms to prevent hanging connections
+
+**Repository Security:**
+- Configurable repository URLs for external tools
+- Support for local repositories to avoid external dependencies
+- Clear documentation of repository sources and verification methods
+
+### Best Practices
+
+**For Users:**
+1. **Review Configuration**: Understand what each setting does before enabling
+2. **Trust Sources**: Only enable plugin updates from trusted repositories
+3. **Regular Updates**: Keep the application and external tools updated
+4. **Monitor Logs**: Check logs for any suspicious activity
+5. **Use Local Mode**: Consider using local repositories for maximum security
+
+**For Administrators:**
+1. **Network Isolation**: Run in isolated network environments if needed
+2. **Access Control**: Restrict file system access to necessary directories
+3. **Monitoring**: Set up monitoring for unusual download patterns
+4. **Backup**: Regularly backup configuration and downloaded content
+
+### Security Configuration Examples
+
+**Maximum Security (Recommended):**
+```xml
+<updateConfig>
+    <updateOnStartup>false</updateOnStartup>
+    <autoriseSnapshot>false</autoriseSnapshot>
+</updateConfig>
+```
+
+**Trusted Environment:**
+```xml
+<updateConfig>
+    <updateOnStartup>true</updateOnStartup>
+    <autoriseSnapshot>false</autoriseSnapshot>
+</updateConfig>
+```
+
+**Development/Testing:**
+```xml
+<updateConfig>
+    <updateOnStartup>true</updateOnStartup>
+    <autoriseSnapshot>true</autoriseSnapshot>
+</updateConfig>
+```
+
+### Reporting Security Issues
+
+If you discover a security vulnerability:
+1. **Do not** create a public issue
+2. **Email** security details to the maintainers
+3. **Include** detailed reproduction steps
+4. **Provide** affected versions and configurations
+
 ## Logging System
 
 habiTv uses a unified logging system based on log4j 1.2.15 with centralized configuration and thread-safe operation.
@@ -395,7 +487,7 @@ See [CHANGELOG.md](CHANGELOG.md) for version history and updates.
 **Note**: This software is for personal use only. Please respect content providers' terms of service and copyright laws.
 
 **Version**: 4.1.0-SNAPSHOT  
-**Last Updated**: December 19, 2024
+**Last Updated**: June 15, 2025
 
 ## External Tools
 

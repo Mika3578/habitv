@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Plugin Auto-Update Security**: Disabled automatic plugin updates by default for enhanced security
+- **Security-First Configuration**: Plugin updates now require explicit user consent via configuration
+- **Enhanced Security Documentation**: Comprehensive security considerations and configuration guides
 - **Unified Logging System**: Centralized log4j 1.2.15 configuration with thread-safe operation
 - **HabitvLogger Class**: New centralized logging manager with automatic initialization
 - **Custom Log Configuration**: Support for `habitv-log.properties` with fallback mechanisms
@@ -23,6 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added last updated timestamps to documentation
 
 ### Changed
+- **Plugin Update Behavior**: Changed default plugin auto-update from enabled to disabled
+- **Configuration Logic**: Modified updateOnStartup() to return false by default, requiring explicit true setting
+- **Security Model**: Implemented opt-in approach for plugin updates to prevent unauthorized code execution
 - **Logging Infrastructure**: Replaced scattered System.out/System.err usage with proper logging
 - **Main Application Classes**: Updated HabitvLauncher, ConsoleLauncher, CoreManager to use unified logging
 - **Framework Classes**: Updated ZipUtils and other utility classes with proper logging
@@ -46,6 +52,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unused import warnings
 - Markdown linting issues
 - Documentation inconsistencies and outdated information
+
+### Security
+- **Plugin Auto-Update Security**: Disabled automatic plugin updates by default to prevent unauthorized code execution
+- **Reduced Attack Surface**: Eliminated potential security risks from automatic plugin downloads
+- **User Consent Model**: Implemented explicit opt-in requirement for plugin updates
+- **Security Documentation**: Added comprehensive security considerations and best practices
 
 ### Debug Improvements
 - **Configuration File Path Logging**: Added debug output to show which configuration.xml file is being loaded at startup
