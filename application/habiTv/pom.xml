@@ -32,6 +32,13 @@
 			<scope>compile</scope>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<!-- Only include the YouTube plugin that we've been working on -->
+		<dependency>
+			<groupId>com.dabi.habitv</groupId>
+			<artifactId>youtube</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 	<build>
 <plugins>

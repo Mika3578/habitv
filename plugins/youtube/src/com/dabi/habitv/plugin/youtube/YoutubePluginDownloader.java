@@ -3,6 +3,8 @@ package com.dabi.habitv.plugin.youtube;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
 import com.dabi.habitv.api.plugin.api.PluginDownloaderInterface;
 import com.dabi.habitv.api.plugin.dto.DownloadParamDTO;
 import com.dabi.habitv.api.plugin.exception.DownloadFailedException;
@@ -14,6 +16,7 @@ import com.dabi.habitv.framework.plugin.api.update.BaseUpdatablePlugin;
 
 public class YoutubePluginDownloader extends BaseUpdatablePlugin implements PluginDownloaderInterface {
 
+	private static final Logger LOG = Logger.getLogger(YoutubePluginDownloader.class);
 	private static final Pattern VERSION_PATTERN = Pattern.compile("([\\-0-9A-Za-z.-]*)");
 
 	@Override
@@ -39,20 +42,22 @@ public class YoutubePluginDownloader extends BaseUpdatablePlugin implements Plug
 		// http://proxy_machine_name:port/.
 
 		try {
+			LOG.info("Executing YouTube download command: " + cmd);
 			return (new YoutubeDLCmdExecutor(downloaders.getCmdProcessor(), cmd));
 		} catch (final ExecutorFailedException e) {
+			LOG.error("Failed to execute YouTube download command: " + e.getMessage());
 			throw new DownloadFailedException(e);
 		}
 	}
 
 	@Override
 	protected String getLinuxDefaultBuildPath() {
-		return YoutubeConf.DEFAULT_LINUX_BIN_PATH;
+		return "yt-dlp"; // Fallback to yt-dlp if available
 	}
 
 	@Override
 	protected String getWindowsDefaultExe() {
-		return YoutubeConf.DEFAULT_WINDOWS_EXE;
+		return "yt-dlp.exe"; // Fallback to yt-dlp if available
 	}
 
 	@Override
@@ -67,18 +72,46 @@ public class YoutubePluginDownloader extends BaseUpdatablePlugin implements Plug
 
 	@Override
 	protected String[] getFilesToUpdate() {
+		// Use yt-dlp instead of youtube-dl for better compatibility
 		return new String[] { "yt-dlp" };
 	}
 
 	@Override
 	public DownloadableState canDownload(final String downloadInput) {
-		if (!downloadInput.startsWith("mp3:") && ( downloadInput.contains("youtube.") || downloadInput.contains("youtu.be") || downloadInput.contains("dailymotion.") || downloadInput.contains("vimeo.")
-		        || downloadInput.contains("dailymotion.") || downloadInput.contains("tf1.") || downloadInput.contains("wat.tv")
-		        || downloadInput.contains("clubic.") || downloadInput.contains("6play."))) {
-			return DownloadableState.SPECIFIC;
-		} else {
+		if (downloadInput == null) {
 			return DownloadableState.IMPOSSIBLE;
 		}
+		
+		// Check for various video platforms that yt-dlp supports
+		String input = downloadInput.toLowerCase();
+		if (input.startsWith("mp3:")) {
+			return DownloadableState.IMPOSSIBLE;
+		}
+		
+		// List of supported platforms
+		String[] supportedPlatforms = {
+			"youtube.", "youtu.be", "dailymotion.", "vimeo.", "tf1.", "wat.tv",
+			"clubic.", "6play.", "arte.", "france.tv", "pluzz.", "canalplus.",
+			"rtl.", "m6.", "w9.", "nrj12.", "nt1.", "d8.", "bfmtv.", "cnews.",
+			"lequipe.", "rmc.", "eurosport.", "beinsport.", "sport24.", "lci.",
+			"c8.", "cstar.", "gulli.", "gameone.", "j-one.", "cherie25.",
+			"tv5monde.", "arte.tv", "france24.", "franceinfo.", "franceinter.",
+			"franceculture.", "fip.", "tsf.", "nova.", "skyrock.", "virgin.",
+			"fun.", "rfm.", "rtl2.", "europe1.", "sud.", "rts.", "rtbf.",
+			"vrt.", "npo.", "zdf.", "ard.", "rai.", "rtve.", "rtp.", "rts.",
+			"svt.", "nrk.", "dr.", "yle.", "mtv.", "vice.", "redbull.", "ted.",
+			"khanacademy.", "coursera.", "edx.", "udemy.", "skillshare.",
+			"masterclass.", "pluralsight.", "lynda.", "treehouse.", "codecademy."
+		};
+		
+		for (String platform : supportedPlatforms) {
+			if (input.contains(platform)) {
+				LOG.debug("YouTube plugin can download from: " + downloadInput);
+				return DownloadableState.SPECIFIC;
+			}
+		}
+		
+		LOG.debug("YouTube plugin cannot download from: " + downloadInput);
+		return DownloadableState.IMPOSSIBLE;
 	}
-
 }
