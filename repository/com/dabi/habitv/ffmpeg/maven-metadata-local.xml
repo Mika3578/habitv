@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.dabi.habitv</groupId>
+  <artifactId>ffmpeg</artifactId>
+  <versioning>
+    <versions>
+      <version>4.1.2-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20250615130644</lastUpdated>
+  </versioning>
+</metadata>

@@ -3,7 +3,7 @@
   <groupId>com.dabi.habitv</groupId>
   <artifactId>application</artifactId>
   <versioning>
-    <lastUpdated>20250615124037</lastUpdated>
+    <lastUpdated>20250615130644</lastUpdated>
     <snapshot>
       <localCopy>true</localCopy>
     </snapshot>
@@ -11,7 +11,7 @@
       <snapshotVersion>
         <extension>pom</extension>
         <value>5.0.0-SNAPSHOT</value>
-        <updated>20250615124037</updated>
+        <updated>20250615130644</updated>
       </snapshotVersion>
     </snapshotVersions>
   </versioning>
