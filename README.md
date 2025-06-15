@@ -132,6 +132,34 @@ Key variables:
 - `config.xml`: Main application configuration
 - `grabconfig.xml`: Show selection and monitoring configuration
 
+### Plugin Auto-Update Configuration
+
+By default, habiTv **disables automatic plugin updates** for security and stability reasons. Plugin auto-update can be enabled by adding the following to your `config.xml`:
+
+```xml
+<updateConfig>
+    <updateOnStartup>true</updateOnStartup>
+    <autoriseSnapshot>false</autoriseSnapshot>
+</updateConfig>
+```
+
+**Security Considerations:**
+- Plugin auto-update downloads code from external repositories
+- Disabled by default to prevent unauthorized code execution
+- Only enable if you trust the configured repository
+- Consider the security implications before enabling
+
+**To Enable Plugin Auto-Update:**
+1. Open your `config.xml` file (usually in `%USERPROFILE%\habitv\` on Windows or `~/.habitv/` on Linux)
+2. Add or modify the `<updateConfig>` section
+3. Set `<updateOnStartup>true</updateOnStartup>`
+4. Restart habiTv
+
+**Default Behavior:**
+- Plugin auto-update is **disabled** by default
+- External tools (ffmpeg, rtmpDump, etc.) are still automatically managed
+- Only plugin JAR files require explicit enablement
+
 ## Logging System
 
 habiTv uses a unified logging system based on log4j 1.2.15 with centralized configuration and thread-safe operation.

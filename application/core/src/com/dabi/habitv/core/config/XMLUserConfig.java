@@ -65,7 +65,7 @@ public class XMLUserConfig implements UserConfig {
 
 	public static final String CONF_XSD = "configuration.xsd";
 
-	private static final boolean DEFAULT_UPDATE_ON_STARTUP = true;
+	private static final boolean DEFAULT_UPDATE_ON_STARTUP = false;
 
 	private static final Boolean DEFAULT_AUTORISE_SNAPSHOT = false;
 
@@ -483,9 +483,11 @@ public class XMLUserConfig implements UserConfig {
 
 	@Override
 	public boolean updateOnStartup() {
-		return config.getUpdateConfig() == null
-				|| config.getUpdateConfig().getUpdateOnStartup() == null ? true
-				: config.getUpdateConfig().getUpdateOnStartup();
+		// Plugin auto-update is disabled by default for security and stability
+		// Only enable if explicitly set to true in configuration
+		return config.getUpdateConfig() != null
+				&& config.getUpdateConfig().getUpdateOnStartup() != null 
+				&& config.getUpdateConfig().getUpdateOnStartup();
 	}
 
 	@Override

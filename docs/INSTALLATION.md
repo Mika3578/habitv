@@ -165,6 +165,41 @@ Key files:
 - `grabconfig.xml`: Show selection and monitoring settings
 - `habiTv.log`: Application logs
 
+### Plugin Auto-Update Configuration
+
+**Important**: By default, habiTv **disables automatic plugin updates** for security and stability reasons. This is different from external tool management, which remains enabled by default.
+
+#### Default Behavior
+
+- **Plugin Auto-Update**: **Disabled** by default
+- **External Tool Management**: **Enabled** by default (ffmpeg, rtmpDump, etc.)
+- **Security**: Prevents unauthorized code execution from external repositories
+
+#### Enabling Plugin Auto-Update
+
+If you want to enable automatic plugin updates, add the following to your `config.xml`:
+
+```xml
+<updateConfig>
+    <updateOnStartup>true</updateOnStartup>
+    <autoriseSnapshot>false</autoriseSnapshot>
+</updateConfig>
+```
+
+**Security Considerations:**
+- Plugin auto-update downloads executable JAR files from external repositories
+- Only enable if you trust the configured repository
+- Consider the security implications before enabling
+- The repository should be under your control or from a trusted source
+
+**Configuration Steps:**
+1. Open your `config.xml` file (usually in `%USERPROFILE%\habitv\` on Windows or `~/.habitv/` on Linux)
+2. Add or modify the `<updateConfig>` section
+3. Set `<updateOnStartup>true</updateOnStartup>`
+4. Restart habiTv
+
+**Note**: External tools (ffmpeg, rtmpDump, curl, etc.) are still automatically managed regardless of this setting.
+
 ### Environment Variables
 
 You can override default settings using environment variables:

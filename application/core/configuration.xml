@@ -17,7 +17,7 @@
         </downloaders>
     </downloadConfig>
     <updateConfig>
-        <updateOnStartup>true</updateOnStartup>
+        <updateOnStartup>false</updateOnStartup>
         <autoriseSnapshot>true</autoriseSnapshot>
     </updateConfig>
     <credentialsConfig>
