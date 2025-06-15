@@ -1,0 +1,6 @@
+# Ignore everything except the repository directory
+*
+!repository/
+!repository/**
+!.gitignore
+!index.html 
