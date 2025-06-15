@@ -22,7 +22,8 @@ interface ArteConf {
 		"SCI",    // Science
 		"CON",    // Concerts
 		"JEU",    // Youth
-		"SPO"     // Sports
+		"SPO",    // Sports
+		"REPLAY"  // Replay videos
 	};
 
 	String EXTENSION = FrameworkConf.MP4;
