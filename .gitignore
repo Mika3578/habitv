@@ -55,8 +55,8 @@ build/
 # Log files
 *.log
 **/*.log
-application/core/habiTv.log
-application/core/habiTv.lock
+data/habiTv.log
+data/habiTv.lock
 plugins/plugin-tester/habiTv.log
 
 # Package files
@@ -88,11 +88,26 @@ Thumbs.db
 application/core/grabconfig.xml
 application/core/testGrabConfig.xml
 application/core/testOldGrabconfig.xml
-application/core/export.index
-application/core/generated/
-application/core/index/
-application/core/plugins/
-application/core/bin/
+
+# Runtime and generated data (moved to data/ directory)
+data/
+data/*
+data/log/
+data/generated/
+data/plugins/
+data/export.index
+data/channel_tvshow.index
+data/episode*
+
+# External tool binaries (should be downloaded at runtime)
+bin/
+bin/*
+*.exe
+yt-dlp*
+ffmpeg*
+rtmpdump*
+aria2c*
+curl*
 
 # Temporary files
 *.tmp
