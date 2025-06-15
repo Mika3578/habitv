@@ -1,0 +1,28 @@
+# habiTv Plugin Repository
+# This file lists all available plugins for habiTv
+# Format: plugin_name
+# Each plugin will be downloaded from: https://mika3578.github.io/habitv/repository/com/dabi/habitv/plugin_name/5.0.0-SNAPSHOT/plugin_name-5.0.0-SNAPSHOT.jar
+
+# Core plugins
+6play
+adobeHDS
+aria2
+arte
+beinsport
+canalPlus
+clubic
+cmd
+curl
+email
+ffmpeg
+file
+footyroom
+globalnews
+lequipe
+mlssoccer
+pluzz
+RSS
+rtmpDump
+sfr
+wat
+youtube 
