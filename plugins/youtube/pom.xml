@@ -4,9 +4,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.dabi.habitv</groupId>
-		<artifactId>parent</artifactId>
-		<version>4.1.0-SNAPSHOT</version>
-		<relativePath>../../pom.xml</relativePath>
+		<artifactId>plugins</artifactId>
+		<version>5.0.0-SNAPSHOT</version>
 	</parent>
 
 	<scm>
@@ -16,7 +15,8 @@
 
 	<artifactId>youtube</artifactId>
 	<name>youtube</name>
-	<version>4.1.0-SNAPSHOT</version>
+	<version>5.0.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<dependencies>
 		<dependency>
 			<groupId>com.dabi.habitv</groupId>
@@ -37,6 +37,7 @@
 		<dependency>
 			<groupId>com.dabi.habitv</groupId>
 			<artifactId>framework</artifactId>
+			<version>5.0.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>
