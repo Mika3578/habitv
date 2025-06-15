@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Plugin Update Behavior**: Changed default plugin auto-update from enabled to disabled
 - **Configuration Logic**: Modified updateOnStartup() to return false by default, requiring explicit true setting
 - **Security Model**: Implemented opt-in approach for plugin updates to prevent unauthorized code execution
+- **YouTube Plugin**: Migrated from youtube-dl to yt-dlp for better YouTube support and maintenance
 - **Logging Infrastructure**: Replaced scattered System.out/System.err usage with proper logging
 - **Main Application Classes**: Updated HabitvLauncher, ConsoleLauncher, CoreManager to use unified logging
 - **Framework Classes**: Updated ZipUtils and other utility classes with proper logging

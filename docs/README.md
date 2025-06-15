@@ -3,7 +3,7 @@
 This directory contains comprehensive documentation for the habiTv project.
 
 **Version**: 4.1.0-SNAPSHOT  
-**Last Updated**: December 19, 2024
+**Last Updated**: June 15, 2025
 
 ## Overview
 
@@ -18,7 +18,7 @@ habiTv is a comprehensive video downloader and manager that supports multiple pl
 
 ### Configuration
 - [Configuration Reference](CONFIGURATION_REFERENCE.md) - Complete configuration options
-- [Plugin Configuration](PLUGIN_CONFIGURATION.md) - Plugin-specific settings
+- [Environment Variables](ENVIRONMENT_VARIABLES.md) - Environment variable configuration
 - [Security Settings](SECURITY.md) - Security and privacy configuration
 
 ## Core Features
@@ -33,52 +33,58 @@ habiTv is a comprehensive video downloader and manager that supports multiple pl
 - **Extensible Architecture**: Easy to add new platforms
 - [Plugin Development Guide](PLUGIN_DEVELOPMENT.md) - Create custom plugins
 - [Plugin Examples](PLUGIN_EXAMPLES.md) - Working plugin examples
-- [Plugin API Reference](PLUGIN_API.md) - Complete API documentation
+- [Plugin Publishing Guide](PLUGIN_PUBLISHING_GUIDE.md) - Publish plugins to repository
 
-### Update System
+### Update & Repository Management
 - **Automatic Updates**: Keep habiTv and plugins up to date
-- [Startup Update System](STARTUP_UPDATE_SYSTEM.md) - How updates work
-- **Repository Management**: Manage external tool repositories
-- [GitHub Pages HTTPS Mirror](GITHUB_PAGES_MIRROR.md) - Secure repository mirror
+- [Update & Repository Management](UPDATE_AND_REPO_MANAGEMENT.md) - Complete guide to updates and repositories
+- **Security-First**: HTTPS repositories with integrity verification
+- **Automated Maintenance**: GitHub Actions for repository updates
 
 ## Advanced Topics
 
 ### Development
-- [Plugin Development](PLUGIN_DEVELOPMENT.md) - Create and extend plugins
+- [Developer Guide](DEVELOPER_GUIDE.md) - Development setup and guidelines
 - [API Reference](API_REFERENCE.md) - Complete API documentation
-- [Architecture Overview](ARCHITECTURE.md) - System design and components
 - [Contributing Guidelines](CONTRIBUTING.md) - How to contribute
 
-### Deployment
-- [Plugin Deployment](PLUGIN_DEPLOYMENT.md) - Deploy custom plugins
-- [Plugin Publishing](PLUGIN_PUBLISHING.md) - Publish plugins to repository
-- [Repository Management](REPOSITORY_MANAGEMENT.md) - Manage tool repositories
+### User Guides
+- [User Guide](USER_GUIDE.md) - Complete user manual
+- [Troubleshooting Guide](TROUBLESHOOTING.md) - Common problems and solutions
 
 ### Security
 - [Security Guide](SECURITY.md) - Security best practices
-- [Privacy Configuration](PRIVACY.md) - Privacy settings and data handling
-- [Authentication](AUTHENTICATION.md) - User authentication and authorization
+- **Plugin Auto-Update**: Disabled by default for enhanced security
+- **HTTPS Enforcement**: All downloads use encrypted connections
+- **Certificate Validation**: Automatic SSL certificate verification
 
-## Troubleshooting
+## Documentation Structure
 
-### Common Issues
-- [Troubleshooting Guide](TROUBLESHOOTING.md) - Common problems and solutions
-- [Error Codes](ERROR_CODES.md) - Error code reference
-- [Log Analysis](LOG_ANALYSIS.md) - Understanding log files
-- [Performance Tuning](PERFORMANCE.md) - Optimize performance
+### User Documentation
+- **Installation**: Setup and installation guides
+- **Configuration**: Configuration options and examples
+- **Usage**: User interface and command-line usage
+- **Troubleshooting**: Common issues and solutions
 
-### Support
-- [FAQ](FAQ.md) - Frequently asked questions
-- [Known Issues](KNOWN_ISSUES.md) - Current known problems
-- [Community Support](COMMUNITY.md) - Get help from the community
+### Developer Documentation
+- **API Reference**: Complete API documentation
+- **Plugin Development**: Plugin creation and development
+- **Contributing**: Guidelines for contributors
+- **Architecture**: System design and components
+
+### Reference Documentation
+- **Configuration Reference**: All configuration options
+- **Environment Variables**: Environment variable reference
+- **Update & Repository Management**: Repository setup and maintenance
+- **Security**: Security configuration and best practices
 
 ## Repository Management
 
 ### External Tools
 habiTv requires external tools for video processing and downloading. These are managed through a repository system:
 
-- **Primary Repository**: `http://dabiboo.free.fr/repository` (HTTP)
-- **GitHub Pages Mirror**: `https://mika3578.github.io/habitv/repository/` (HTTPS - Recommended)
+- **Primary Repository**: `http://dabiboo.free.fr/repository` (HTTP - legacy)
+- **GitHub Pages Mirror**: `https://mika3578.github.io/habitv/repository/` (HTTPS - recommended)
 
 ### Repository Benefits
 - **Security**: HTTPS encryption for all downloads
@@ -106,14 +112,14 @@ To use the secure GitHub Pages mirror:
    java -jar habiTv.jar --repository-url="https://mika3578.github.io/habitv/repository/"
    ```
 
-For detailed setup instructions, see [GitHub Pages Mirror Guide](GITHUB_PAGES_MIRROR.md).
+For detailed setup instructions, see [Update & Repository Management](UPDATE_AND_REPO_MANAGEMENT.md).
 
 ## Plugin Development
 
 ### Getting Started
 - [Plugin Development Guide](PLUGIN_DEVELOPMENT.md) - Complete development tutorial
 - [Plugin Examples](PLUGIN_EXAMPLES.md) - Working examples to learn from
-- [Plugin API Reference](PLUGIN_API.md) - Complete API documentation
+- [Plugin Publishing Guide](PLUGIN_PUBLISHING_GUIDE.md) - Publish plugins to repository
 
 ### Plugin Types
 - **Download Plugins**: Download videos from specific platforms
@@ -122,21 +128,23 @@ For detailed setup instructions, see [GitHub Pages Mirror Guide](GITHUB_PAGES_MI
 - **Integration Plugins**: Integrate with external services
 
 ### Best Practices
-- [Plugin Best Practices](PLUGIN_BEST_PRACTICES.md) - Development guidelines
-- [Testing Plugins](PLUGIN_TESTING.md) - How to test your plugins
-- [Performance Optimization](PLUGIN_PERFORMANCE.md) - Optimize plugin performance
+- **Security**: Follow security best practices for plugin development
+- **Testing**: Comprehensive testing before publishing
+- **Documentation**: Clear documentation for users
+- **Performance**: Optimize for performance and resource usage
 
 ## Configuration Reference
 
 ### Core Configuration
 - [Configuration Reference](CONFIGURATION_REFERENCE.md) - Complete configuration options
-- [Plugin Configuration](PLUGIN_CONFIGURATION.md) - Plugin-specific settings
-- [Security Configuration](SECURITY_CONFIGURATION.md) - Security settings
+- [Environment Variables](ENVIRONMENT_VARIABLES.md) - Environment variable reference
+- [Security Configuration](SECURITY.md) - Security settings
 
 ### Advanced Configuration
-- [Network Configuration](NETWORK_CONFIGURATION.md) - Network and proxy settings
-- [Storage Configuration](STORAGE_CONFIGURATION.md) - File storage settings
-- [Performance Configuration](PERFORMANCE_CONFIGURATION.md) - Performance tuning
+- **Network Configuration**: Proxy settings and network options
+- **Storage Configuration**: File storage and organization
+- **Performance Configuration**: Performance tuning options
+- **Update Configuration**: Repository and update settings
 
 ## Security and Privacy
 
@@ -144,7 +152,7 @@ For detailed setup instructions, see [GitHub Pages Mirror Guide](GITHUB_PAGES_MI
 - **HTTPS Downloads**: Encrypted downloads from repositories
 - **Certificate Validation**: Automatic SSL certificate verification
 - **Integrity Checks**: File integrity verification
-- **Access Control**: User authentication and authorization
+- **Plugin Auto-Update**: Disabled by default for security
 
 ### Privacy Protection
 - **Data Minimization**: Only collect necessary data
@@ -155,57 +163,54 @@ For detailed setup instructions, see [GitHub Pages Mirror Guide](GITHUB_PAGES_MI
 ## Performance Optimization
 
 ### System Tuning
-- [Performance Guide](PERFORMANCE.md) - Complete performance optimization
 - **Concurrent Downloads**: Optimize download concurrency
 - **Memory Management**: Efficient memory usage
 - **Disk I/O**: Optimize file operations
+- **Network Optimization**: Configure network settings
 
 ### Plugin Performance
-- [Plugin Performance](PLUGIN_PERFORMANCE.md) - Optimize plugin performance
 - **Caching**: Implement effective caching strategies
 - **Resource Management**: Efficient resource usage
 - **Async Processing**: Use asynchronous operations
+- **Error Handling**: Robust error handling and recovery
 
 ## Community and Support
 
 ### Getting Help
-- [Community Support](COMMUNITY.md) - Community resources
-- [Bug Reports](BUG_REPORTS.md) - How to report bugs
-- [Feature Requests](FEATURE_REQUESTS.md) - Request new features
-- [Contributing](CONTRIBUTING.md) - How to contribute
+- **Documentation**: Check this documentation first
+- **Troubleshooting**: Review [Troubleshooting Guide](TROUBLESHOOTING.md)
+- **Issues**: Report bugs on GitHub
+- **Community**: Join the habiTv community
 
 ### Resources
-- [API Documentation](API_REFERENCE.md) - Complete API reference
-- [Code Examples](CODE_EXAMPLES.md) - Working code examples
-- [Video Tutorials](VIDEO_TUTORIALS.md) - Video tutorials and guides
-- [Blog Posts](BLOG_POSTS.md) - Latest news and updates
+- **API Documentation**: Complete API reference
+- **Code Examples**: Working code examples
+- **Security Guide**: Security best practices
+- **Performance Guide**: Performance optimization
 
 ## Version Information
 
 ### Current Version
 - **Version**: 4.1.0-SNAPSHOT
-- **Release Date**: December 19, 2024
+- **Release Date**: June 15, 2025
 - **Java Version**: Java 8 or higher
 - **License**: GPL v3
 
 ### Changelog
 - [Changelog](../CHANGELOG.md) - Complete version history
-- [Migration Guide](MIGRATION_GUIDE.md) - Upgrade instructions
-- [Deprecation Notices](DEPRECATION_NOTICES.md) - Deprecated features
+- **Migration Notes**: See individual documentation for migration guides
+- **Deprecation Notices**: Check documentation for deprecated features
 
 ## Legal and Licensing
 
 ### License Information
 - **License**: GNU General Public License v3.0
 - **Copyright**: habiTv Development Team
-- **Contributors**: See [Contributors](../CONTRIBUTORS.md)
-
-### Third-Party Licenses
-- [Third-Party Licenses](THIRD_PARTY_LICENSES.md) - Licenses of included libraries
-- [Attributions](ATTRIBUTIONS.md) - Third-party attributions
-- [Dependencies](DEPENDENCIES.md) - Dependency information
+- **Contributors**: See [Contributing Guidelines](CONTRIBUTING.md)
 
 ---
+
+**Note**: This documentation is continuously updated. For the latest information, check the [GitHub repository](https://github.com/mika3578/habitv).
 
 ## Quick Navigation
 

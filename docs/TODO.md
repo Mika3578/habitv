@@ -3,7 +3,19 @@
 This document outlines planned features, improvements, and tasks for the habiTv project.
 
 **Version**: 4.1.0-SNAPSHOT  
-**Last Updated**: December 19, 2024
+**Last Updated**: June 15, 2025
+
+## Immediate Development Tasks
+
+### Current Development Priorities
+- [ ] **Plugin Release Process**: Implement proper plugin release workflow
+- [ ] **Torrent Support**: Add torrent download capabilities
+- [ ] **RSS Content Matcher**: Enhance RSS feed content matching
+- [ ] **France TV Info Plugin**: Add support for francetvinfo
+- [ ] **Additional TV Plugins**: Add plugins for TMC, NT1, Eurosport
+- [ ] **Download Automation Testing**: Test and improve download automation
+- [ ] **UI Tree Expansion**: Improve tree view expansion with window resizing
+- [ ] **Internationalization**: Add French/English language support
 
 ## High Priority Tasks
 
