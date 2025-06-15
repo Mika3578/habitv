@@ -1,4 +1,4 @@
 @echo off
 echo Starting habiTv Console Application...
-java -jar "application\consoleView\target\consoleView-4.1.0-SNAPSHOT-shaded.jar" %*
+java -jar "application\consoleView\target\consoleView-5.0.0-SNAPSHOT-shaded.jar" %*
 pause 

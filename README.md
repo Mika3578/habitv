@@ -46,9 +46,9 @@ habiTv currently supports the following French TV platforms:
 ### Download
 Download the latest release from the [Releases](https://github.com/mika3578/habitv/releases) page:
 
-- **Windows**: `habiTv-windows-4.1.0-SNAPSHOT.zip`
-- **Linux**: `habiTv-linux-4.1.0-SNAPSHOT.deb`
-- **JAR**: `habiTv-4.1.0-SNAPSHOT.jar` (requires Java 8+)
+- **Windows**: `habiTv-windows-5.0.0-SNAPSHOT.zip`
+- **Linux**: `habiTv-linux-5.0.0-SNAPSHOT.deb`
+- **JAR**: `habiTv-5.0.0-SNAPSHOT.jar` (requires Java 8+)
 
 ### From Source
 ```bash
@@ -62,7 +62,7 @@ mvn clean install
 **Windows:**
 ```cmd
 # Extract and run
-java -jar habiTv-4.1.0-SNAPSHOT.jar
+java -jar habiTv-5.0.0-SNAPSHOT.jar
 
 # Or use the provided batch file
 run-habitv.bat
@@ -71,10 +71,10 @@ run-habitv.bat
 **Linux:**
 ```bash
 # Install the .deb package
-sudo dpkg -i habiTv-linux-4.1.0-SNAPSHOT.deb
+sudo dpkg -i habiTv-linux-5.0.0-SNAPSHOT.deb
 
 # Or run the JAR directly
-java -jar habiTv-4.1.0-SNAPSHOT.jar
+java -jar habiTv-5.0.0-SNAPSHOT.jar
 ```
 
 ### 3. Configure Your Shows
@@ -350,8 +350,8 @@ If the configuration file is missing or invalid, the system automatically falls 
 
 Common log locations:
 - **Application Directory**: `log/habitv.log`
-- **User Home**: `~/.habitv/log/habitv.log` (Linux)
-- **User Profile**: `%USERPROFILE%\habitv\log\habitv.log` (Windows)
+- **User Home**: `~/.habitv/habiTv.log`
+- **User Profile**: `%USERPROFILE%\habitv\log\habiTv.log` (Windows)
 
 To enable debug logging for troubleshooting:
 1. Set `log4j.rootLogger=DEBUG, console, file` in `habitv-log.properties`
@@ -486,7 +486,7 @@ See [CHANGELOG.md](CHANGELOG.md) for version history and updates.
 
 **Note**: This software is for personal use only. Please respect content providers' terms of service and copyright laws.
 
-**Version**: 4.1.0-SNAPSHOT  
+**Version**: 5.0.0-SNAPSHOT  
 **Last Updated**: June 15, 2025
 
 ## External Tools

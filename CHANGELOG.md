@@ -72,7 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Fallback**: Automatic fallback to console-only logging if configuration fails
 - **Performance**: Thread-safe, buffered file writing, level filtering
 
-## [4.1.0-SNAPSHOT] - 2025-06-15
+## [5.0.0-SNAPSHOT] - 2025-06-15
 
 ### Added
 - **yt-dlp Integration**: Replaced youtube-dl with yt-dlp for better YouTube support
@@ -126,7 +126,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Version History Notes
 
 ### Current Status
-- **Version**: 4.1.0-SNAPSHOT (development version)
+- **Version**: 5.0.0-SNAPSHOT (development version)
 - **Java Compatibility**: Java 8+
 - **Build System**: Maven 3.6+
 - **Status**: Active development

@@ -2,7 +2,7 @@
 
 This guide provides comprehensive information for developers working on the habiTv project.
 
-**Version**: 4.1.0-SNAPSHOT  
+**Version**: 5.0.0-SNAPSHOT  
 **Last Updated**: December 19, 2024
 
 ## Table of Contents

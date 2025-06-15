@@ -31,7 +31,7 @@ import com.dabi.habitv.framework.plugin.utils.OSUtils;
  * - Error handling and recovery
  * 
  * @author habiTv Team
- * @version 4.1.0-SNAPSHOT
+ * @version 5.0.0-SNAPSHOT
  */
 public class ExternalToolManager {
     
@@ -250,7 +250,7 @@ public class ExternalToolManager {
             connection = (HttpURLConnection) url.openConnection();
             connection.setConnectTimeout(timeout);
             connection.setReadTimeout(timeout);
-            connection.setRequestProperty("User-Agent", "habiTv/4.1.0");
+            connection.setRequestProperty("User-Agent", "habiTv/5.0.0");
             
             int responseCode = connection.getResponseCode();
             if (responseCode != HttpURLConnection.HTTP_OK) {
