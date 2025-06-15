@@ -491,7 +491,7 @@ See [CHANGELOG.md](CHANGELOG.md) for version history and updates.
 
 ## External Tools
 
-habiTv requires several external tools for downloading and processing videos. These are **automatically managed** by the application:
+habiTv requires several external tools for downloading and processing videos. These are **automatically managed** by the application, but you can also install them manually if needed.
 
 ### Automatic Management
 - **Startup Check**: Tools are automatically checked and downloaded at startup
@@ -513,6 +513,23 @@ You can configure a custom repository in your configuration file if needed.
 
 ### Manual Installation (Advanced)
 If you prefer manual control, you can place binaries in the `bin/` directory. See [INSTALLATION.md](docs/INSTALLATION.md) for detailed instructions.
+
+### yt-dlp Location Requirement
+
+The YouTube plugin requires `yt-dlp` to be present in a specific directory:
+
+- **Windows:**
+  - Place `yt-dlp.exe` in `C:\Users\<username>\habitv\bin\yt-dlp.exe`
+  - Example: `C:\Users\Alice\habitv\bin\yt-dlp.exe`
+- **Linux/macOS:**
+  - Place `yt-dlp` in `/home/<username>/.habitv/bin/yt-dlp` or `/Users/<username>/.habitv/bin/yt-dlp`
+
+If `yt-dlp` is not found in this location, the plugin will log a warning and provide a download link.
+
+**Download yt-dlp:**
+- [https://github.com/yt-dlp/yt-dlp/releases/latest](https://github.com/yt-dlp/yt-dlp/releases/latest)
+
+Other tools (ffmpeg, rtmpDump, etc.) may also be required for some plugins. See below for more details.
 
 ## Support
 
