@@ -315,7 +315,7 @@
 										</children>
 									</HBox>
 									<ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
-										<FlowPane fx:id="logFlow" orientation="VERTICAL" prefWrapLength="800.0" />
+										<TextArea fx:id="logView" wrapText="true" style="-fx-font-family: monospace;" />
 									</ScrollPane>
 								</children>
 							</VBox>

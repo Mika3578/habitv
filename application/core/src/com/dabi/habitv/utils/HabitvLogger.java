@@ -17,8 +17,7 @@ import org.apache.log4j.PropertyConfigurator;
  */
 public final class HabitvLogger {
 
-    private static final String DEFAULT_CONFIG_FILE = "habitv-log.properties";
-    private static final String FALLBACK_CONFIG_FILE = "log4j.properties";
+    private static final String CONFIG_FILE = "log4j.properties";
 
     private static volatile boolean initialized = false;
     private static final Object initLock = new Object();
@@ -50,18 +49,19 @@ public final class HabitvLogger {
      */
     private static void doInitialize() {
         try {
-            // Chargement de la configuration
+            // Load configuration
             Properties config = loadConfiguration();
 
-            // Configuration de log4j
+            // Configure log4j
             LogManager.resetConfiguration();
             PropertyConfigurator.configure(config);
 
-            // Log d'initialisation
+            // Log initialization and actual path
             Logger rootLogger = Logger.getRootLogger();
             String logFilePath = config.getProperty("log4j.appender.file.File");
             rootLogger.info("habiTv logging system initialized successfully");
             rootLogger.info("Log file path = " + logFilePath);
+            System.out.println("Log path = " + logFilePath);
 
         } catch (Exception e) {
             // Fallback console logging
@@ -79,21 +79,15 @@ public final class HabitvLogger {
     private static Properties loadConfiguration() throws IOException {
         Properties config = new Properties();
 
-        // Essayer de charger la configuration unifiée
+        // Load log4j.properties configuration
         InputStream configStream = HabitvLogger.class.getClassLoader()
-                .getResourceAsStream(DEFAULT_CONFIG_FILE);
-
-        if (configStream == null) {
-            // Fallback sur log4j.properties
-            configStream = HabitvLogger.class.getClassLoader()
-                    .getResourceAsStream(FALLBACK_CONFIG_FILE);
-        }
+                .getResourceAsStream(CONFIG_FILE);
 
         if (configStream != null) {
             config.load(configStream);
             configStream.close();
         } else {
-            // Créer une configuration par défaut si aucun fichier trouvé
+            // Create default configuration if no file found
             config = createDefaultConfiguration();
         }
 

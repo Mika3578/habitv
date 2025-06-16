@@ -2,12 +2,14 @@ package com.dabi.habitv.provider.sixplay;
 
 import com.dabi.habitv.framework.FrameworkConf;
 
-interface SixPlayConf {
+public final class SixPlayConf {
 
-	String NAME = "6play";
+	private SixPlayConf() {
+	}
 
-	String EXTENSION = FrameworkConf.MP4;
+	public static final String NAME = "6play";
 
-	String HOME_URL = "https://www.6play.fr/";
+	public static final String EXTENSION = FrameworkConf.MP4;
 
+	public static final String HOME_URL = "https://www.6play.fr";
 }

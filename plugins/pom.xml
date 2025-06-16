@@ -26,6 +26,7 @@
 		<module>globalnews</module>
 		<module>lequipe</module>
 		<module>mlssoccer</module>
+		<module>plugin-tester</module>
 		<module>pluzz</module>
 		<module>RSS</module>
 		<module>rtmpDump</module>

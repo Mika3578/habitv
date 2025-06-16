@@ -273,13 +273,12 @@ Components:
 
 1. **Console Output**: Real-time logging to console (INFO level and above)
 2. **File Output**: Persistent logging to `${user.home}/habitv/habiTv.log` (DEBUG level and above)
-   - Automatic rotation: 10MB max file size, 10 backup files
+   - Automatic rotation: 10MB max file size, 30 backup files
    - Thread-safe file writing
 
 ### Configuration
 
-#### Default Configuration
-The application uses `habitv-log.properties` for logging configuration. The log file location is fully controlled by this configuration file and is set to `${user.home}/habitv/habiTv.log` by default.
+The application uses `log4j.properties` for logging configuration. The log file location is fully controlled by this configuration file and is set to `${user.home}/habitv/habiTv.log` by default.
 
 Key settings:
 
@@ -295,12 +294,12 @@ log4j.appender.console.layout.ConversionPattern=[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%
 log4j.appender.file=org.apache.log4j.RollingFileAppender
 log4j.appender.file.File=${user.home}/habitv/habiTv.log
 log4j.appender.file.MaxFileSize=10MB
-log4j.appender.file.MaxBackupIndex=10
+log4j.appender.file.MaxBackupIndex=30
 ```
 
 #### Custom Configuration
 
-Create a custom `habitv-log.properties` file in the application directory:
+Create a custom `log4j.properties` file in the application directory to override default settings:
 
 ```properties
 # Set root logger level
@@ -356,20 +355,14 @@ Log location is fully controlled by log4j.properties:
 - **Windows**: `C:\Users\username\habitv\habiTv.log`
 
 To enable debug logging for troubleshooting:
-1. Set `log4j.rootLogger=DEBUG, console, file` in `habitv-log.properties`
+1. Set `log4j.rootLogger=DEBUG, console, file` in `log4j.properties`
 2. Or set environment variable: `HABITV_LOG_LEVEL=DEBUG`
 3. Restart the application
 
-### Configuration File Debugging
-
-The application automatically logs the configuration file paths at startup to help with troubleshooting:
-
+The application will print the actual log path at startup to help with troubleshooting:
 ```
-[Habitv] Debug: Resolved configuration file path: C:/Users/Mika/habitv/configuration.xml
-[Habitv] Debug: Loading configuration from: C:\Users\Mika\habitv\configuration.xml
+Log path = C:\Users\username\habitv\habiTv.log
 ```
-
-This helps identify which configuration file is being loaded and whether the application is running in local mode or user mode.
 
 ## Plugin System
 

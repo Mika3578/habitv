@@ -283,20 +283,13 @@ public class WindowController {
 	}
 
 	private void refreshLogDisplay(java.util.List<String> lines) {
-		logFlow.getChildren().clear();
+		StringBuilder logContent = new StringBuilder();
 		String filter = logFilter;
 		for (String line : lines) {
 			if (!filter.isEmpty() && !line.toLowerCase().contains(filter.toLowerCase())) continue;
-			javafx.scene.text.Text txt = new javafx.scene.text.Text(line + "\n");
-			if (line.contains("ERROR")) {
-				txt.setStyle("-fx-fill: red; -fx-font-weight: bold;");
-			} else if (line.contains("WARN")) {
-				txt.setStyle("-fx-fill: orange; -fx-font-weight: bold;");
-			} else if (line.contains("INFO")) {
-				txt.setStyle("-fx-fill: #888;");
-			}
-			logFlow.getChildren().add(txt);
+			logContent.append(line).append("\n");
 		}
+		logView.setText(logContent.toString());
 	}
 
 	private void toggleLogPause() {

@@ -15,6 +15,8 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 import com.dabi.habitv.api.plugin.api.PluginBaseInterface;
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
@@ -28,7 +30,6 @@ import com.dabi.habitv.framework.plugin.utils.ProcessingThreads;
 import com.dabi.habitv.framework.plugin.utils.RetrieverUtils;
 import com.dabi.habitv.utils.DirUtils;
 import com.dabi.habitv.utils.HabitvLogger;
-import org.apache.log4j.Logger;
 
 public final class ConsoleLauncher {
 	private static final String OPTION_RUN_EXPORT = "x";
@@ -61,7 +62,7 @@ public final class ConsoleLauncher {
 
 	private static CoreManager coreManager;
 
-	private static final Logger LOG = HabitvLogger.getLogger(ConsoleLauncher.class);
+	private static Logger LOG;
 
 	private ConsoleLauncher() {
 
@@ -69,6 +70,13 @@ public final class ConsoleLauncher {
 
 	@SuppressWarnings("static-access")
 	public static void main(final String[] args) {
+		// Initialize unified logging system early
+		// This will load log4j.properties from the classpath
+		HabitvLogger.initialize();
+
+		// Initialize logger after logging system is configured
+		LOG = HabitvLogger.getLogger(ConsoleLauncher.class);
+
 		if (args.length > 0 && DownloadUtils.isHttpUrl(args[0])) {
 			init();
 			downloadEpisodes(args);
