@@ -3,6 +3,9 @@ target/
 */target/
 **/target/
 
+# Miroir Maven (réservé à gh-pages uniquement)
+repository/
+
 # IDE files
 .idea/
 .vscode/
