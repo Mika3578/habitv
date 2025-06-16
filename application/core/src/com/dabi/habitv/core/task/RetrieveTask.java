@@ -90,11 +90,13 @@ public class RetrieveTask extends AbstractEpisodeTask {
     @Override
     protected void failed(final Throwable e) {
         LOG.error("Episode failed to retreive " + getEpisode(), e);
+        retreivePublisher.addNews(new RetreiveEvent(getEpisode(),
+                EpisodeStateEnum.FAILED));
     }
 
     @Override
     protected void ended() {
-        LOG.error("Episode is ready " + getEpisode());
+        LOG.info("Episode is ready " + getEpisode());
         retreivePublisher.addNews(new RetreiveEvent(getEpisode(),
                 EpisodeStateEnum.READY));
     }
@@ -105,9 +107,13 @@ public class RetrieveTask extends AbstractEpisodeTask {
     }
 
     @Override
-    protected Object doCall() throws InterruptedException, ExecutionException {
+    protected Object doCall() throws InterruptedException, ExecutionException, InvalidEpisodeException {
         if (!exportOnly()) {
             check();
+            // Check if the episode ID (URL) is empty
+            if (getEpisode().getId() == null || getEpisode().getId().isEmpty()) {
+                throw new InvalidEpisodeException(getEpisode().getId(), InvalidEpisodeException.CauseField.URL);
+            }
             download();
         }
         export(exporter.getExporterList());

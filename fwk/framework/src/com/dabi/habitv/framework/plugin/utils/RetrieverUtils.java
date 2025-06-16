@@ -42,7 +42,7 @@ public final class RetrieverUtils {
 	 * @param url
 	 *            the URL
 	 * @param proxy
-	 * @param timeOut
+	 *            the proxy to use for connection
 	 * @return the input stream
 	 */
 	public static InputStream getInputStreamFromUrl(final String url, final Proxy proxy) {
@@ -53,7 +53,7 @@ public final class RetrieverUtils {
 		try {
 			HttpURLConnection hc = (HttpURLConnection) openConnection(url, proxy);
 			prepareConnection(timeOut, hc);
-			
+
 			boolean redirect = false;
 
 			// normally, 3xx is redirect
@@ -72,7 +72,7 @@ public final class RetrieverUtils {
 				hc = (HttpURLConnection) new URL(newUrl).openConnection();
 				prepareConnection(timeOut, hc);
 			}
-			
+
 			return hc.getInputStream();
 		} catch (final IOException e) {
 			throw new TechnicalException(e);
@@ -194,7 +194,13 @@ public final class RetrieverUtils {
 
 	public static String getTitleByUrl(String url) {
 		try {
-			return Jsoup.connect(url).get().title();
+			// Configure Jsoup to follow redirects and use a proper user agent
+			return Jsoup.connect(url)
+					.userAgent(USER_AGENT)
+					.followRedirects(true)
+					.timeout(FrameworkConf.TIME_OUT_MS)
+					.get()
+					.title();
 		} catch (IOException e) {
 			final SyndFeedInput input = new SyndFeedInput();
 			try {
@@ -203,7 +209,6 @@ public final class RetrieverUtils {
 			} catch (IllegalArgumentException | FeedException | IOException e1) {
 				throw new TechnicalException(e);
 			}
-
 		}
 	}
 }

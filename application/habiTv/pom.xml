@@ -5,7 +5,7 @@
 		<artifactId>application</artifactId>
 		<version>4.1.0-SNAPSHOT</version>
 	</parent>
-	
+
 	<artifactId>habiTv</artifactId>
 	<packaging>jar</packaging>
 	<name>habiTv</name>
@@ -19,7 +19,12 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
-		</dependency>		
+		</dependency>
+		<dependency>
+			<groupId>com.dabi.habitv</groupId>
+			<artifactId>core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>com.dabi.habitv</groupId>
 			<artifactId>trayView</artifactId>
@@ -32,7 +37,7 @@
 			<scope>compile</scope>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Only include the YouTube plugin that we've been working on -->
 		<dependency>
 			<groupId>com.dabi.habitv</groupId>
@@ -45,7 +50,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>2.2</version>
+        <version>3.5.1</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -57,7 +62,9 @@
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                   <mainClass>com.dabi.habitv.HabitvLauncher</mainClass>
                 </transformer>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
               </transformers>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
             </configuration>
           </execution>
         </executions>

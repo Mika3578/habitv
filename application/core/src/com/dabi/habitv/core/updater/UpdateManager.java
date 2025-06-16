@@ -44,13 +44,21 @@ public class UpdateManager {
 	public void process() {
 		try {
 			LOG.info("Checking plugin updates...");
-			String[] toUpdate = RetrieverUtils.getUrlContent(
-					site + "/plugins.txt", null).split("\\r\\n");
-			updatePublisher.addNews(new UpdatePluginEvent(
-					UpdatePluginStateEnum.STARTING_ALL, toUpdate.length));
-			final Updater updater = new JarUpdater(pluginFolder, groupId,
-					coreVersion, autoriseSnapshot, updatePublisher);
-			updater.update(toUpdate);
+			try {
+				String content = RetrieverUtils.getUrlContent(site + "/plugins.txt", null);
+				if (content != null && !content.trim().isEmpty()) {
+					String[] toUpdate = content.split("\\r\\n");
+					updatePublisher.addNews(new UpdatePluginEvent(
+							UpdatePluginStateEnum.STARTING_ALL, toUpdate.length));
+					final Updater updater = new JarUpdater(pluginFolder, groupId,
+							coreVersion, autoriseSnapshot, updatePublisher);
+					updater.update(toUpdate);
+				} else {
+					LOG.info("No plugins to update (empty plugins.txt)");
+				}
+			} catch (com.dabi.habitv.api.plugin.exception.TechnicalException e) {
+				LOG.info("Repository not accessible, skipping update");
+			}
 
 			updatePublisher.addNews(new UpdatePluginEvent(
 					UpdatePluginStateEnum.ALL_DONE));

@@ -405,6 +405,18 @@ mvn test
 
 # Create executable JAR
 mvn package
+
+# Build only the executable JAR
+cd application\habiTv
+mvn clean package
+```
+
+The executable JAR will be created at:
+`application\habiTv\target\habiTv-4.1.0-SNAPSHOT.jar`
+
+This JAR includes all necessary dependencies and can be run with:
+```bash
+java -jar application\habiTv\target\habiTv-4.1.0-SNAPSHOT.jar
 ```
 
 ### Project Structure

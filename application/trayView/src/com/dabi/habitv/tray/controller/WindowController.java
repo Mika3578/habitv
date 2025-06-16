@@ -265,7 +265,7 @@ public class WindowController {
 		final java.util.concurrent.ScheduledExecutorService logScheduler = java.util.concurrent.Executors.newSingleThreadScheduledExecutor();
 		logScheduler.scheduleAtFixedRate(() -> {
 			if (logPaused) return;
-			final java.util.List<String> lines;
+			java.util.List<String> lines;
 			try {
 				java.nio.file.Path logFile = java.nio.file.Paths.get(LOG_PATH);
 				if (java.nio.file.Files.exists(logFile)) {
@@ -277,7 +277,8 @@ public class WindowController {
 				lines = java.util.Collections.singletonList("Erreur lecture log: " + e.getMessage());
 			}
 			lastLogLines = lines;
-			Platform.runLater(() -> refreshLogDisplay(lines));
+			final java.util.List<String> finalLines = lines;
+			Platform.runLater(() -> refreshLogDisplay(finalLines));
 		}, 0, 2, java.util.concurrent.TimeUnit.SECONDS);
 	}
 
