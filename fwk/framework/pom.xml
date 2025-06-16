@@ -49,8 +49,9 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>rome</groupId>
+			<groupId>com.rometools</groupId>
 			<artifactId>rome</artifactId>
+			<version>1.19.0</version>
 			<scope>provided</scope>
 		</dependency>
 

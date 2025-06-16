@@ -387,6 +387,32 @@ habiTv uses a modular plugin architecture:
 
 ### Building from Source
 
+#### Using Build Scripts (Recommended)
+
+The easiest way to build the executable JAR is to use the provided build scripts:
+
+**Windows:**
+```cmd
+build_jar.bat
+```
+
+**Linux/Unix:**
+```bash
+chmod +x build_jar.sh
+./build_jar.sh
+```
+
+These scripts will:
+1. Build the executable JAR
+2. Copy it to the target directory for convenience
+3. Display instructions on how to run it
+
+For more detailed information, see [README_EXECUTABLE_JAR.md](README_EXECUTABLE_JAR.md).
+
+#### Manual Build
+
+Alternatively, you can manually build the project:
+
 ```bash
 # Clone the repository
 git clone https://github.com/your-repo/habitv.git
