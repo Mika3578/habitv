@@ -189,14 +189,4 @@ public final class HabitvLogger {
         PropertyConfigurator.configure(properties);
         getRootLogger().info("Logging configuration updated");
     }
-    
-    /**
-     * Reloads the logging configuration from the configuration file.
-     */
-    public static void reloadConfiguration() {
-        synchronized (initLock) {
-            initialized = false;
-            initialize();
-        }
-    }
 }

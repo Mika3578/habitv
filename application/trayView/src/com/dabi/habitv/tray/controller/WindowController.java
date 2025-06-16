@@ -208,15 +208,9 @@ public class WindowController {
 				}
 			}
 
+			// Remplacement par lambda
 			if (!trayMode) {
-				primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-
-					@Override
-					public void handle(WindowEvent t) {
-						Platform.exit();
-					}
-
-				});
+				primaryStage.setOnCloseRequest(t -> Platform.exit());
 			}
 
 			DownloadController downloadController = new DownloadController(
@@ -268,10 +262,10 @@ public class WindowController {
 	private volatile String logFilter = "";
 	private java.util.List<String> lastLogLines = java.util.Collections.emptyList();
 	private void startLogAutoRefresh() {
-		logScheduler = java.util.concurrent.Executors.newSingleThreadScheduledExecutor();
+		final java.util.concurrent.ScheduledExecutorService logScheduler = java.util.concurrent.Executors.newSingleThreadScheduledExecutor();
 		logScheduler.scheduleAtFixedRate(() -> {
 			if (logPaused) return;
-			java.util.List<String> lines;
+			final java.util.List<String> lines;
 			try {
 				java.nio.file.Path logFile = java.nio.file.Paths.get(LOG_PATH);
 				if (java.nio.file.Files.exists(logFile)) {
@@ -314,7 +308,7 @@ public class WindowController {
 			javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
 			fileChooser.setTitle("Exporter le log");
 			fileChooser.setInitialFileName("habitv-" + java.time.LocalDateTime.now().toString().replace(':','-') + ".log");
-			java.io.File dest = fileChooser.showSaveDialog(null);
+			final java.io.File dest = fileChooser.showSaveDialog(null);
 			if (dest != null) {
 				try {
 					java.nio.file.Files.write(dest.toPath(), lastLogLines);
@@ -343,7 +337,8 @@ public class WindowController {
 		confirm.setHeaderText(null);
 		java.util.Optional<javafx.scene.control.ButtonType> result = confirm.showAndWait();
 		if (result.isPresent() && result.get() == javafx.scene.control.ButtonType.YES) {
-			try (java.io.BufferedWriter writer = java.nio.file.Files.newBufferedWriter(java.nio.file.Paths.get(LOG_PATH), java.nio.file.StandardOpenOption.TRUNCATE_EXISTING)) {
+			try {
+				java.nio.file.Files.newBufferedWriter(java.nio.file.Paths.get(LOG_PATH), java.nio.file.StandardOpenOption.TRUNCATE_EXISTING).close();
 				// Log vidé
 			} catch (Exception ex) {
 				showAlert(javafx.scene.control.Alert.AlertType.ERROR, "Impossible de vider le log : " + ex.getMessage());

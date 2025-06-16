@@ -13,9 +13,12 @@ public class HabitvLauncher {
 
 	private static final Logger LOG = HabitvLogger.getLogger(HabitvLauncher.class);
 
-	public static void main(final String[] args) throws Exception {
+	public static void main(final String[] args) {
 		// Crée le dossier de logs utilisateur si besoin
-		new File(System.getProperty("user.home") + "/habitv").mkdirs();
+		File userDir = new File(System.getProperty("user.home") + "/habitv");
+		if (!userDir.exists() && !userDir.mkdirs()) {
+			System.err.println("Impossible de créer le dossier utilisateur: " + userDir.getAbsolutePath());
+		}
 		// Initialize unified logging system early
 		HabitvLogger.initialize();
 		
