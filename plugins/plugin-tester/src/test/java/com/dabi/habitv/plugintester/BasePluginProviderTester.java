@@ -1,6 +1,5 @@
 package com.dabi.habitv.plugintester;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 
 import java.util.ArrayList;

@@ -19,11 +19,11 @@ public class BasePluginUpdateTester implements Subscriber<UpdatablePluginEvent> 
 	private Publisher<UpdatablePluginEvent> publisher;
 
 	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
+	public static void setUpBeforeClass() {
 	}
 
 	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
+	public static void tearDownAfterClass() {
 	}
 
 	public BasePluginUpdateTester() {
@@ -31,18 +31,18 @@ public class BasePluginUpdateTester implements Subscriber<UpdatablePluginEvent> 
 	}
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		downloaders = new DownloaderPluginHolder("", null, null, "downloads", "index", "bin", "plugins");
 		publisher = new Publisher<>();
 		publisher.attach(this);
 	}
 
 	@After
-	public void tearDown() throws Exception {
-	
+	public void tearDown() {
+
 	}
 
-	protected void testUpdatablePlugin(final Class<? extends UpdatablePluginInterface> class1) throws InstantiationException, IllegalAccessException, ReflectiveOperationException {
+	protected void testUpdatablePlugin(final Class<? extends UpdatablePluginInterface> class1) throws ReflectiveOperationException {
 		final UpdatablePluginInterface updatablePlugin = class1.getDeclaredConstructor().newInstance();
 		updatablePlugin.update(publisher, downloaders);
 	}

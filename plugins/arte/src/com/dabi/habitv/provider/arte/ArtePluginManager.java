@@ -95,9 +95,8 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 						if (!foundEpisodes.isEmpty()) {
 							getLog().info("Found " + foundEpisodes.size() + " episodes from " + url);
 							break; // Found episodes, no need to try other URLs
-						} else {
-							// No episodes found, but no error either
 						}
+						// No episodes found, but no error either
 
 					} catch (Exception e) {
 						if (retryCount == maxRetries - 1) {
@@ -204,13 +203,15 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 			int maxRetries = 3;
 			int retryCount = 0;
 			String jsonResponse = null;
+			boolean success = false;
 
-			while (retryCount < maxRetries) {
+			while (retryCount < maxRetries && !success) {
 				try {
 					jsonResponse = getUrlContent(apiUrl);
 					if (jsonResponse == null || jsonResponse.trim().isEmpty()) {
 						throw new Exception("Empty response from API");
 					}
+					success = true; // Successfully got response
 				} catch (Exception e) {
 					retryCount++;
 					if (retryCount < maxRetries) {
