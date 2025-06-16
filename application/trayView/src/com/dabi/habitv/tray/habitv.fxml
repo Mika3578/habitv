@@ -309,6 +309,33 @@
 						</AnchorPane>
 					</content>
 				</Tab>
+				<Tab fx:id="logsTab" text="Logs">
+					<content>
+						<AnchorPane>
+							<children>
+								<VBox AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+									<children>
+										<HBox spacing="10.0" alignment="CENTER_LEFT">
+											<children>
+												<Button fx:id="openLogFileButton" mnemonicParsing="false" text="📂 Ouvrir le log" />
+												<Button fx:id="clearLogFileButton" mnemonicParsing="false" text="🧹 Vider le log" />
+												<ToggleButton fx:id="pauseLogRefreshButton" mnemonicParsing="false" text="⏸️ Pause" />
+												<Button fx:id="exportLogFileButton" mnemonicParsing="false" text="💾 Exporter" />
+												<Label text="Filtrer :" />
+												<TextField fx:id="logFilterField" promptText="mot-clé ou niveau (ex: ERROR)" />
+											</children>
+										</HBox>
+										<ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
+											<content>
+												<FlowPane fx:id="logFlow" orientation="VERTICAL" prefWrapLength="800.0" />
+											</content>
+										</ScrollPane>
+									</children>
+								</VBox>
+							</children>
+						</AnchorPane>
+					</content>
+				</Tab>
 			</tabs>
 		</TabPane>
 	</children>

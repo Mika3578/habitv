@@ -158,6 +158,23 @@ public class WindowController {
 	@FXML
 	private Button refreshCredentialsButton;
 
+	@FXML
+	private Tab logsTab;
+	@FXML
+	private javafx.scene.control.TextArea logView;
+	@FXML
+	private Button openLogFileButton;
+	@FXML
+	private Button clearLogFileButton;
+	@FXML
+	private javafx.scene.control.ToggleButton pauseLogRefreshButton;
+	@FXML
+	private Button exportLogFileButton;
+	@FXML
+	private TextField logFilterField;
+	@FXML
+	private javafx.scene.layout.FlowPane logFlow;
+
 	private boolean trayMode = false;
 
 	public WindowController() {
@@ -226,9 +243,131 @@ public class WindowController {
 
 			controller.startDownloadCheckDemon();
 
+			// Après les autres initialisations, démarrer l'auto-refresh du log
+			startLogAutoRefresh();
+			// Actions des boutons log
+			openLogFileButton.setOnAction(e -> openLogFile());
+			clearLogFileButton.setOnAction(e -> clearLogFile());
+			pauseLogRefreshButton.setOnAction(e -> toggleLogPause());
+			exportLogFileButton.setOnAction(e -> exportLogFile());
+			logFilterField.textProperty().addListener((obs, oldVal, newVal) -> {
+				logFilter = newVal == null ? "" : newVal.trim();
+				refreshLogDisplay(lastLogLines);
+			});
+
 		} catch (Throwable e) {
 			LOG.error("", e);
 			Popin.fatalError();
 		}
 	}
+
+	// --- Ajout de la méthode d'auto-refresh du log ---
+	private java.util.concurrent.ScheduledExecutorService logScheduler;
+	private static final String LOG_PATH = System.getProperty("user.home") + "/habitv/habiTv.log";
+	private volatile boolean logPaused = false;
+	private volatile String logFilter = "";
+	private java.util.List<String> lastLogLines = java.util.Collections.emptyList();
+	private void startLogAutoRefresh() {
+		logScheduler = java.util.concurrent.Executors.newSingleThreadScheduledExecutor();
+		logScheduler.scheduleAtFixedRate(() -> {
+			if (logPaused) return;
+			java.util.List<String> lines;
+			try {
+				java.nio.file.Path logFile = java.nio.file.Paths.get(LOG_PATH);
+				if (java.nio.file.Files.exists(logFile)) {
+					lines = java.nio.file.Files.readAllLines(logFile);
+				} else {
+					lines = java.util.Collections.singletonList("Aucun log disponible.");
+				}
+			} catch (Exception e) {
+				lines = java.util.Collections.singletonList("Erreur lecture log: " + e.getMessage());
+			}
+			lastLogLines = lines;
+			Platform.runLater(() -> refreshLogDisplay(lines));
+		}, 0, 2, java.util.concurrent.TimeUnit.SECONDS);
+	}
+
+	private void refreshLogDisplay(java.util.List<String> lines) {
+		logFlow.getChildren().clear();
+		String filter = logFilter;
+		for (String line : lines) {
+			if (!filter.isEmpty() && !line.toLowerCase().contains(filter.toLowerCase())) continue;
+			javafx.scene.text.Text txt = new javafx.scene.text.Text(line + "\n");
+			if (line.contains("ERROR")) {
+				txt.setStyle("-fx-fill: red; -fx-font-weight: bold;");
+			} else if (line.contains("WARN")) {
+				txt.setStyle("-fx-fill: orange; -fx-font-weight: bold;");
+			} else if (line.contains("INFO")) {
+				txt.setStyle("-fx-fill: #888;");
+			}
+			logFlow.getChildren().add(txt);
+		}
+	}
+
+	private void toggleLogPause() {
+		logPaused = pauseLogRefreshButton.isSelected();
+		pauseLogRefreshButton.setText(logPaused ? "▶️ Reprendre" : "⏸️ Pause");
+	}
+
+	private void exportLogFile() {
+		Platform.runLater(() -> {
+			javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+			fileChooser.setTitle("Exporter le log");
+			fileChooser.setInitialFileName("habitv-" + java.time.LocalDateTime.now().toString().replace(':','-') + ".log");
+			java.io.File dest = fileChooser.showSaveDialog(null);
+			if (dest != null) {
+				try {
+					java.nio.file.Files.write(dest.toPath(), lastLogLines);
+				} catch (Exception ex) {
+					showAlert(javafx.scene.control.Alert.AlertType.ERROR, "Erreur export log : " + ex.getMessage());
+				}
+			}
+		});
+	}
+
+	private void openLogFile() {
+		try {
+			java.io.File logFile = new java.io.File(LOG_PATH);
+			if (logFile.exists()) {
+				java.awt.Desktop.getDesktop().open(logFile);
+			} else {
+				showAlert(javafx.scene.control.Alert.AlertType.WARNING, "Fichier de log introuvable.");
+			}
+		} catch (Exception ex) {
+			showAlert(javafx.scene.control.Alert.AlertType.ERROR, "Erreur à l'ouverture du log : " + ex.getMessage());
+		}
+	}
+
+	private void clearLogFile() {
+		javafx.scene.control.Alert confirm = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.CONFIRMATION, "Vider le fichier de log ?", javafx.scene.control.ButtonType.YES, javafx.scene.control.ButtonType.NO);
+		confirm.setHeaderText(null);
+		java.util.Optional<javafx.scene.control.ButtonType> result = confirm.showAndWait();
+		if (result.isPresent() && result.get() == javafx.scene.control.ButtonType.YES) {
+			try (java.io.BufferedWriter writer = java.nio.file.Files.newBufferedWriter(java.nio.file.Paths.get(LOG_PATH), java.nio.file.StandardOpenOption.TRUNCATE_EXISTING)) {
+				// Log vidé
+			} catch (Exception ex) {
+				showAlert(javafx.scene.control.Alert.AlertType.ERROR, "Impossible de vider le log : " + ex.getMessage());
+			}
+		}
+	}
+
+	private void showAlert(javafx.scene.control.Alert.AlertType type, String message) {
+		Platform.runLater(() -> {
+			javafx.scene.control.Alert alert = new javafx.scene.control.Alert(type, message, javafx.scene.control.ButtonType.OK);
+			alert.setHeaderText(null);
+			alert.showAndWait();
+		});
+	}
+
+	// Documentation :
+	// - L'onglet "Logs" permet d'afficher, filtrer, colorer, exporter, ouvrir et vider le fichier de log habitv/habiTv.log.
+	// - Les boutons permettent :
+	//   * 📂 Ouvrir le log dans l'éditeur système
+	//   * 🧹 Vider le log (après confirmation)
+	//   * ⏸️/▶️ Pause/Reprendre l'auto-refresh
+	//   * 💾 Exporter le log affiché
+	//   * Filtrer les lignes par mot-clé ou niveau (champ de recherche)
+	// - Les lignes ERROR sont rouges, WARN orange, INFO grises.
+	// - Le log est relu toutes les 2s sauf en pause.
+	// - Voir README.md et INSTALL.md pour plus d'infos.
 }

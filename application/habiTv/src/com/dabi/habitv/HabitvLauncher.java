@@ -14,6 +14,8 @@ public class HabitvLauncher {
 	private static final Logger LOG = HabitvLogger.getLogger(HabitvLauncher.class);
 
 	public static void main(final String[] args) throws Exception {
+		// Crée le dossier de logs utilisateur si besoin
+		new File(System.getProperty("user.home") + "/habitv").mkdirs();
 		// Initialize unified logging system early
 		HabitvLogger.initialize();
 		
