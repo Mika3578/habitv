@@ -251,25 +251,29 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 
 				// Try multiple JSON patterns
 				String[] patterns = {
-					"window\\.__INITIAL_STATE__\\s*=\\s*({.*?});",
-					"window\\.__APOLLO_STATE__\\s*=\\s*({.*?});",
-					"window\\.__NEXT_DATA__\\s*=\\s*({.*?});",
-					"\"data\":\\s*({.*?})\\s*};"
+					"window\\.__INITIAL_STATE__\\s*=\\s*\\{.*?\\};",
+					"window\\.__APOLLO_STATE__\\s*=\\s*\\{.*?\\};",
+					"window\\.__NEXT_DATA__\\s*=\\s*\\{.*?\\};",
+					"\"data\":\\s*\\{.*?\\}\\s*};"
 				};
 
 				for (String patternStr : patterns) {
 					Pattern pattern = Pattern.compile(patternStr, Pattern.DOTALL);
 					Matcher matcher = pattern.matcher(scriptContent);
 					if (matcher.find()) {
-						String jsonData = matcher.group(1);
-						try {
-							JSONObject json = new JSONObject(jsonData);
-							episodes.addAll(parseEpisodesFromJson(json, language));
-							if (!episodes.isEmpty()) {
-								break; // Found episodes, no need to try other patterns
+						String matchedText = matcher.group(0);
+						// Extract JSON data from the matched text
+						String jsonData = extractJsonFromMatchedText(matchedText, patternStr);
+						if (jsonData != null) {
+							try {
+								JSONObject json = new JSONObject(jsonData);
+								episodes.addAll(parseEpisodesFromJson(json, language));
+								if (!episodes.isEmpty()) {
+									break; // Found episodes, no need to try other patterns
+								}
+							} catch (Exception e) {
+								getLog().debug("Failed to parse JSON pattern: " + patternStr);
 							}
-						} catch (Exception e) {
-							getLog().debug("Failed to parse JSON pattern: " + patternStr);
 						}
 					}
 				}
@@ -594,6 +598,43 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 		}
 
 		return content;
+	}
+
+	private String extractJsonFromMatchedText(String matchedText, String patternStr) {
+		try {
+			if (patternStr.contains("__INITIAL_STATE__")) {
+				// Extract JSON from: window.__INITIAL_STATE__ = {...};
+				int start = matchedText.indexOf('{');
+				int end = matchedText.lastIndexOf('}');
+				if (start >= 0 && end >= 0 && end > start) {
+					return matchedText.substring(start, end + 1);
+				}
+			} else if (patternStr.contains("__APOLLO_STATE__")) {
+				// Extract JSON from: window.__APOLLO_STATE__ = {...};
+				int start = matchedText.indexOf('{');
+				int end = matchedText.lastIndexOf('}');
+				if (start >= 0 && end >= 0 && end > start) {
+					return matchedText.substring(start, end + 1);
+				}
+			} else if (patternStr.contains("__NEXT_DATA__")) {
+				// Extract JSON from: window.__NEXT_DATA__ = {...};
+				int start = matchedText.indexOf('{');
+				int end = matchedText.lastIndexOf('}');
+				if (start >= 0 && end >= 0 && end > start) {
+					return matchedText.substring(start, end + 1);
+				}
+			} else if (patternStr.contains("\"data\":")) {
+				// Extract JSON from: "data": {...};
+				int start = matchedText.indexOf('{');
+				int end = matchedText.lastIndexOf('}');
+				if (start >= 0 && end >= 0 && end > start) {
+					return matchedText.substring(start, end + 1);
+				}
+			}
+		} catch (Exception e) {
+			getLog().debug("Error extracting JSON from matched text: " + e.getMessage());
+		}
+		return null;
 	}
 
 }

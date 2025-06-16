@@ -106,11 +106,7 @@ data/episode*
 bin/
 bin/*
 *.exe
-yt-dlp*
-ffmpeg*
-rtmpdump*
-aria2c*
-curl*
+
 
 # Temporary files
 *.tmp
