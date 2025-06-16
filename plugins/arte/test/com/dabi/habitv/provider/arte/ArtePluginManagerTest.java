@@ -12,12 +12,12 @@ import java.util.Set;
 public class ArtePluginManagerTest extends BasePluginProviderTester {
 
 	@Test
-	public final void testArtePluginManager() throws InstantiationException, IllegalAccessException, DownloadFailedException, ReflectiveOperationException {
+	public final void testArtePluginManager() throws DownloadFailedException, ReflectiveOperationException {
 		testPluginProvider(ArtePluginManager.class, true);
 	}
 
 	@Test
-	public final void testArteReplayCategory() throws InstantiationException, IllegalAccessException, DownloadFailedException, ReflectiveOperationException {
+	public final void testArteReplayCategory() throws DownloadFailedException {
 		ArtePluginManager manager = new ArtePluginManager();
 
 		// Test that replay categories are created
@@ -34,7 +34,7 @@ public class ArtePluginManagerTest extends BasePluginProviderTester {
 	}
 
 	@Test
-	public final void testArteReplayEpisodes() throws InstantiationException, IllegalAccessException, DownloadFailedException, ReflectiveOperationException {
+	public final void testArteReplayEpisodes() throws DownloadFailedException {
 		ArtePluginManager manager = new ArtePluginManager();
 
 		// Find the Replay category
@@ -72,7 +72,7 @@ public class ArtePluginManagerTest extends BasePluginProviderTester {
 	}
 
 	@Test
-	public final void testAllCategories() throws InstantiationException, IllegalAccessException, DownloadFailedException, ReflectiveOperationException {
+	public final void testAllCategories() throws DownloadFailedException {
 		ArtePluginManager manager = new ArtePluginManager();
 
 		// Get all categories
@@ -125,7 +125,7 @@ public class ArtePluginManagerTest extends BasePluginProviderTester {
 	}
 
 	@Test
-	public final void testExtractLanguageFromUrl() throws Exception {
+	public final void testExtractLanguageFromUrl() throws ReflectiveOperationException {
 		ArtePluginManager manager = new ArtePluginManager();
 
 		// Use reflection to access private method
@@ -148,7 +148,7 @@ public class ArtePluginManagerTest extends BasePluginProviderTester {
 	}
 
 	@Test
-	public final void testExtractCategoryFromUrl() throws Exception {
+	public final void testExtractCategoryFromUrl() throws ReflectiveOperationException {
 		ArtePluginManager manager = new ArtePluginManager();
 
 		// Use reflection to access private method

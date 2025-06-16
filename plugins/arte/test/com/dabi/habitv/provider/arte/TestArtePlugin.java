@@ -57,7 +57,10 @@ public class TestArtePlugin {
 
         } catch (Exception e) {
             System.err.println("Error testing arte plugin: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Stack trace: ");
+            for (StackTraceElement element : e.getStackTrace()) {
+                System.err.println("    " + element.toString());
+            }
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.dabi.habitv.provider.arte;
 
-import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -83,7 +82,7 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 
 						// Fallback: try to extract from HTML structure
 						if (foundEpisodes.isEmpty()) {
-							foundEpisodes = extractEpisodesFromHtml(doc, language);
+							foundEpisodes = extractEpisodesFromHtml(doc);
 						}
 
 						// Fallback: try to extract from API endpoints
@@ -95,11 +94,9 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 
 						if (!foundEpisodes.isEmpty()) {
 							getLog().info("Found " + foundEpisodes.size() + " episodes from " + url);
-							success = true;
 							break; // Found episodes, no need to try other URLs
 						} else {
 							// No episodes found, but no error either
-							success = true;
 						}
 
 					} catch (Exception e) {
@@ -135,7 +132,7 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 			// Add main categories
 			for (String categoryCode : ArteConf.CATEGORIES) {
 				try {
-					String categoryName = getCategoryName(categoryCode, language);
+					String categoryName = getCategoryName(categoryCode);
 					String categoryId = String.format("%s/%s", language, categoryCode);
 
 					CategoryDTO category = new CategoryDTO(ArteConf.NAME, categoryName, categoryId, ArteConf.EXTENSION);
@@ -208,7 +205,7 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 			int retryCount = 0;
 			String jsonResponse = null;
 
-			while (retryCount < maxRetries && jsonResponse == null) {
+			while (retryCount < maxRetries) {
 				try {
 					jsonResponse = getUrlContent(apiUrl);
 					if (jsonResponse == null || jsonResponse.trim().isEmpty()) {
@@ -220,7 +217,7 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 						getLog().warn("Retry " + retryCount + "/" + maxRetries + " after error: " + e.getMessage());
 						// Exponential backoff
 						try {
-							Thread.sleep(1000 * retryCount);
+							Thread.sleep(1000L * retryCount);
 						} catch (InterruptedException ie) {
 							Thread.currentThread().interrupt();
 						}
@@ -230,7 +227,7 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 				}
 			}
 
-			if (jsonResponse != null && !jsonResponse.trim().isEmpty()) {
+			if (!jsonResponse.trim().isEmpty()) {
 				JSONObject json = new JSONObject(jsonResponse);
 				episodes.addAll(parseEpisodesFromApiJson(json, language));
 			}
@@ -283,7 +280,7 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 		return episodes;
 	}
 
-	private Set<EpisodeDTO> extractEpisodesFromHtml(Document doc, String language) {
+	private Set<EpisodeDTO> extractEpisodesFromHtml(Document doc) {
 		Set<EpisodeDTO> episodes = new LinkedHashSet<>();
 
 		try {
@@ -537,7 +534,7 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 		}
 	}
 
-	private String getCategoryName(String categoryCode, String language) {
+	private String getCategoryName(String categoryCode) {
 		switch (categoryCode) {
 			case "CIN": return "Cinema";
 			case "DOR": return "Documentaries and Reportage";

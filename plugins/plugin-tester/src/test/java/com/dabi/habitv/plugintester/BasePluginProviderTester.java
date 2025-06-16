@@ -1,6 +1,7 @@
 package com.dabi.habitv.plugintester;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,17 +30,16 @@ import com.dabi.habitv.framework.FrameworkConf;
 
 public class BasePluginProviderTester {
 
-	protected static final String TEST_FILE = "testFile.txt";
 	protected static final Logger LOG = Logger.getLogger(BasePluginProviderTester.class);
 	private static final int MAX_ATTEMPTS = 10;
 	private DownloaderPluginHolder downloaders;
 
 	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
+	public static void setUpBeforeClass() {
 	}
 
 	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
+	public static void tearDownAfterClass() {
 	}
 
 	public BasePluginProviderTester() {
@@ -47,7 +47,7 @@ public class BasePluginProviderTester {
 	}
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		final Map<String, PluginDownloaderInterface> downloaderName2downloader = new HashMap<>();
 		final MockDownloader mockDownloader = new MockDownloader();
 
@@ -64,7 +64,7 @@ public class BasePluginProviderTester {
 	}
 
 	@After
-	public void tearDown() throws Exception {
+	public void tearDown() {
 	}
 
 	protected void testPluginProvider(final PluginProviderInterface plugin, final boolean episodeOnlyOnLeaf) throws DownloadFailedException {
@@ -107,14 +107,14 @@ public class BasePluginProviderTester {
 		LOG.error("episode found " + episode);
 		LOG.error("episode id " + episode.getId());
 
-		if (PluginDownloaderInterface.class.isInstance(plugin)) {
+		if (plugin instanceof PluginDownloaderInterface) {
 			final PluginDownloaderInterface pluginDownloader = (PluginDownloaderInterface) plugin;
 			pluginDownloader.download(buildDownloadersHolder(episode), downloaders);
 		}
 	}
 
 	protected void checkCategories(final Set<CategoryDTO> categories) {
-		assertTrue("categorie liste vide ", !categories.isEmpty());
+		assertFalse("categorie liste vide ", categories.isEmpty());
 		for (final CategoryDTO categoryDTO : categories) {
 			if (categoryDTO.getName().isEmpty() || categoryDTO.getId().isEmpty()) {
 				LOG.error(categoryDTO);
@@ -152,7 +152,7 @@ public class BasePluginProviderTester {
 	}
 
 	public void testPluginProvider(final Class<? extends PluginProviderInterface> prDlPluginClass, final boolean episodeOnlyOnLeaf)
-	        throws InstantiationException, IllegalAccessException, DownloadFailedException, ReflectiveOperationException {
+	        throws DownloadFailedException, ReflectiveOperationException {
 		final PluginProviderInterface plugin = prDlPluginClass.getDeclaredConstructor().newInstance();
 		testPluginProvider(plugin, episodeOnlyOnLeaf);
 	}

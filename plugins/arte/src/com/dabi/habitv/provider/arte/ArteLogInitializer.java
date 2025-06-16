@@ -7,7 +7,7 @@ import org.apache.log4j.PropertyConfigurator;
  */
 public class ArteLogInitializer {
 
-    private static boolean initialized = false;
+    private static volatile boolean initialized = false;
     private static final Object initLock = new Object();
 
     /**
