@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>com.dabi.habitv</groupId>
+  <artifactId>beinsport</artifactId>
+  <version>4.0.11-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <timestamp>20170108.101612</timestamp>
+      <buildNumber>3</buildNumber>
+    </snapshot>
+    <lastUpdated>20170108101612</lastUpdated>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>jar</extension>
+        <value>4.0.11-20170108.101612-3</value>
+        <updated>20170108101612</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>4.0.11-20170108.101612-3</value>
+        <updated>20170108101612</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+</metadata>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>com.dabi.habitv</groupId>
+  <artifactId>parent</artifactId>
+  <version>4.0.2-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <timestamp>20140920.165441</timestamp>
+      <buildNumber>1</buildNumber>
+    </snapshot>
+    <lastUpdated>20140920165441</lastUpdated>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>4.0.2-20140920.165441-1</value>
+        <updated>20140920165441</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+</metadata>

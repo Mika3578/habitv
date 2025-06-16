@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>com.dabi.habitv</groupId>
+  <artifactId>file</artifactId>
+  <version>4.0.0-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <timestamp>20140628.182827</timestamp>
+      <buildNumber>45</buildNumber>
+    </snapshot>
+    <lastUpdated>20140628182827</lastUpdated>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>jar</extension>
+        <value>4.0.0-20140628.182827-45</value>
+        <updated>20140628182827</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>4.0.0-20140628.182827-45</value>
+        <updated>20140628182827</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+</metadata>
