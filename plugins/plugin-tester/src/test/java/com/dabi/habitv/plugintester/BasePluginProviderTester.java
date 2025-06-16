@@ -78,7 +78,7 @@ public class BasePluginProviderTester {
 		Set<EpisodeDTO> episodeList = Collections.emptySet();
 		int i = 0;
 		while (episodeList.isEmpty() && i < MAX_ATTEMPTS) {
-			LOG.error("no ep found, searching againg categories for " + plugin.getName());
+			LOG.error("no ep found, searching again categories for " + plugin.getName());
 			final CategoryDTO category = findCategory(episodeOnlyOnLeaf, categories);
 			if (category.isDownloadable()) {
 				LOG.error("search episodes for " + plugin.getName() + "/" + category);
