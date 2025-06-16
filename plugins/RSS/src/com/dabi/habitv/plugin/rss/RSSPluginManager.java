@@ -64,7 +64,7 @@ public class RSSPluginManager extends BasePluginWithProxy implements PluginProvi
 	}
 
 	private static Set<EpisodeDTO> convertFeedToEpisodeList(final SyndFeed feed, final CategoryDTO category) {
-		final Set<EpisodeDTO> episodeList = new LinkedHashSet<EpisodeDTO>();
+		final Set<EpisodeDTO> episodeList = new LinkedHashSet<>();
 		final List<?> entries = feed.getEntries();
 		if (!entries.isEmpty()) {
 			for (final Object object : entries) {

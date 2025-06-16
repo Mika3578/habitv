@@ -10,6 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -51,7 +52,7 @@ public final class RetrieverUtils {
 
 	public static InputStream getInputStreamFromUrl(final String url, final Integer timeOut, final Proxy proxy) {
 		try {
-			HttpURLConnection hc = (HttpURLConnection) openConnection(url, proxy);
+			HttpURLConnection hc = openConnection(url, proxy);
 			prepareConnection(timeOut, hc);
 
 			boolean redirect = false;
@@ -60,9 +61,10 @@ public final class RetrieverUtils {
 			int status = hc.getResponseCode();
 			if (status != HttpURLConnection.HTTP_OK) {	
 				if (status == HttpURLConnection.HTTP_MOVED_TEMP
-					|| status == HttpURLConnection.HTTP_MOVED_PERM
-						|| status == HttpURLConnection.HTTP_SEE_OTHER)
-				redirect = true;
+						|| status == HttpURLConnection.HTTP_MOVED_PERM
+						|| status == HttpURLConnection.HTTP_SEE_OTHER) {
+					redirect = true;
+				}
 			}
 
 			if (redirect) {
@@ -87,7 +89,7 @@ public final class RetrieverUtils {
 		hc.setRequestProperty("User-Agent", USER_AGENT);
 	}
 
-	private static HttpURLConnection openConnection(final String url, final Proxy proxy) throws IOException, MalformedURLException {
+	private static HttpURLConnection openConnection(final String url, final Proxy proxy) throws IOException {
 		if (useProxy(proxy)) {
 			return (HttpURLConnection) (new URL(url)).openConnection(proxy);
 		} else {
@@ -149,17 +151,17 @@ public final class RetrieverUtils {
 			if (encoding != null) {
 				reader = new BufferedReader(new InputStreamReader(in, encoding));
 			} else {
-				reader = new BufferedReader(new InputStreamReader(in, FrameworkConf.UTF8));
+				reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 			}
 		} catch (final UnsupportedEncodingException e) {
 			throw new TechnicalException(e);
 		}
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 
 		String readLine;
 		try {
 			while ((readLine = reader.readLine()) != null) {
-				sb.append(readLine + "\r\n");
+				sb.append(readLine).append("\r\n");
 			}
 		} catch (final IOException e) {
 			throw new TechnicalException(e);
