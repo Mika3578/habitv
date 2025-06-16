@@ -272,14 +272,16 @@ Components:
 ### Log Outputs
 
 1. **Console Output**: Real-time logging to console (INFO level and above)
-2. **File Output**: Persistent logging to `log/habitv.log` (DEBUG level and above)
+2. **File Output**: Persistent logging to `${user.home}/habitv/habiTv.log` (DEBUG level and above)
    - Automatic rotation: 10MB max file size, 10 backup files
    - Thread-safe file writing
 
 ### Configuration
 
 #### Default Configuration
-The application uses `habitv-log.properties` for logging configuration. Key settings:
+The application uses `habitv-log.properties` for logging configuration. The log file location is fully controlled by this configuration file and is set to `${user.home}/habitv/habiTv.log` by default.
+
+Key settings:
 
 ```properties
 # Root logger level
@@ -291,7 +293,7 @@ log4j.appender.console.layout.ConversionPattern=[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%
 
 # File appender
 log4j.appender.file=org.apache.log4j.RollingFileAppender
-log4j.appender.file.File=log/habitv.log
+log4j.appender.file.File=${user.home}/habitv/habiTv.log
 log4j.appender.file.MaxFileSize=10MB
 log4j.appender.file.MaxBackupIndex=10
 ```
@@ -348,10 +350,10 @@ If the configuration file is missing or invalid, the system automatically falls 
 
 ### Troubleshooting Logs
 
-Common log locations:
-- **Application Directory**: `log/habitv.log`
-- **User Home**: `~/.habitv/log/habitv.log` (Linux)
-- **User Profile**: `%USERPROFILE%\habitv\log\habitv.log` (Windows)
+Log location is fully controlled by log4j.properties:
+- **Default Location**: `${user.home}/habitv/habiTv.log`
+- **Linux/macOS**: `/home/username/habitv/habiTv.log`
+- **Windows**: `C:\Users\username\habitv\habiTv.log`
 
 To enable debug logging for troubleshooting:
 1. Set `log4j.rootLogger=DEBUG, console, file` in `habitv-log.properties`

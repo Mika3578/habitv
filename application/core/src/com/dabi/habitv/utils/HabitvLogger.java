@@ -16,20 +16,20 @@ import org.apache.log4j.PropertyConfigurator;
  * @version 4.1.0
  */
 public final class HabitvLogger {
-    
+
     private static final String DEFAULT_CONFIG_FILE = "habitv-log.properties";
     private static final String FALLBACK_CONFIG_FILE = "log4j.properties";
 
     private static volatile boolean initialized = false;
     private static final Object initLock = new Object();
-    
+
     /**
      * Private constructor to prevent instantiation of utility class.
      */
     private HabitvLogger() {
         // Utility class - prevent instantiation
     }
-    
+
     /**
      * Initializes the logging system with the unified configuration.
      * This method is thread-safe and idempotent.
@@ -44,7 +44,7 @@ public final class HabitvLogger {
             }
         }
     }
-    
+
     /**
      * Performs the actual initialization of the logging system.
      */
@@ -52,22 +52,24 @@ public final class HabitvLogger {
         try {
             // Chargement de la configuration
             Properties config = loadConfiguration();
-            
+
             // Configuration de log4j
             LogManager.resetConfiguration();
             PropertyConfigurator.configure(config);
-            
+
             // Log d'initialisation
             Logger rootLogger = Logger.getRootLogger();
+            String logFilePath = config.getProperty("log4j.appender.file.File");
             rootLogger.info("habiTv logging system initialized successfully");
-            
+            rootLogger.info("Log file path = " + logFilePath);
+
         } catch (Exception e) {
             // Fallback console logging
             System.err.println("Failed to initialize logging system: " + e.getMessage());
             setupFallbackLogging();
         }
     }
-    
+
     /**
      * Loads the logging configuration from properties file.
      * 
@@ -76,17 +78,17 @@ public final class HabitvLogger {
      */
     private static Properties loadConfiguration() throws IOException {
         Properties config = new Properties();
-        
+
         // Essayer de charger la configuration unifiée
         InputStream configStream = HabitvLogger.class.getClassLoader()
                 .getResourceAsStream(DEFAULT_CONFIG_FILE);
-        
+
         if (configStream == null) {
             // Fallback sur log4j.properties
             configStream = HabitvLogger.class.getClassLoader()
                     .getResourceAsStream(FALLBACK_CONFIG_FILE);
         }
-        
+
         if (configStream != null) {
             config.load(configStream);
             configStream.close();
@@ -94,10 +96,10 @@ public final class HabitvLogger {
             // Créer une configuration par défaut si aucun fichier trouvé
             config = createDefaultConfiguration();
         }
-        
+
         return config;
     }
-    
+
     /**
      * Creates a default logging configuration.
      * 
@@ -105,10 +107,10 @@ public final class HabitvLogger {
      */
     private static Properties createDefaultConfiguration() {
         Properties config = new Properties();
-        
+
         // Root logger
         config.setProperty("log4j.rootLogger", "INFO, console, file");
-        
+
         // Console appender
         config.setProperty("log4j.appender.console", "org.apache.log4j.ConsoleAppender");
         config.setProperty("log4j.appender.console.ImmediateFlush", "true");
@@ -125,7 +127,7 @@ public final class HabitvLogger {
 
         return config;
     }
-    
+
     /**
      * Sets up fallback logging when configuration fails.
      */
@@ -136,13 +138,13 @@ public final class HabitvLogger {
         fallback.setProperty("log4j.appender.console.layout", "org.apache.log4j.PatternLayout");
         fallback.setProperty("log4j.appender.console.layout.ConversionPattern", 
                 "[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5p] [%c{1}] %m%n");
-        
+
         LogManager.resetConfiguration();
         PropertyConfigurator.configure(fallback);
-        
+
         Logger.getRootLogger().warn("Using fallback logging configuration");
     }
-    
+
     /**
      * Gets a logger for the specified class.
      * Ensures logging system is initialized before returning logger.
@@ -154,7 +156,7 @@ public final class HabitvLogger {
         initialize();
         return Logger.getLogger(clazz);
     }
-    
+
     /**
      * Gets a logger for the specified name.
      * Ensures logging system is initialized before returning logger.
@@ -166,7 +168,7 @@ public final class HabitvLogger {
         initialize();
         return Logger.getLogger(name);
     }
-    
+
     /**
      * Gets the root logger.
      * Ensures logging system is initialized before returning logger.
@@ -177,7 +179,7 @@ public final class HabitvLogger {
         initialize();
         return Logger.getRootLogger();
     }
-    
+
     /**
      * Updates the logging configuration at runtime.
      * 
