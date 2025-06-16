@@ -98,6 +98,31 @@ module-name/
 
 ## Build System
 
+### Version Management
+
+#### Module Versioning
+The project uses a multi-module structure where each module can have its own version number. This is normal and acceptable for the following reasons:
+
+- **Independent Versioning**: Each module can have its own version number, especially if they are developed or updated independently
+- **Backward Compatibility**: Version differences (e.g., 4.1.0 vs 4.1.1) indicate minor updates to specific modules. Since they share the same major version (4.1), they maintain compatibility
+- **Parent Version**: The parent project version (4.1.0-SNAPSHOT) serves as a reference point, while child modules can have their own versions
+- **Dependency Management**: As long as dependencies between modules are properly managed (using exact versions), version differences won't cause issues
+
+Current version examples:
+- Most modules: 4.1.0-SNAPSHOT
+- Some modules with updates:
+  - beinsport: 4.1.1-SNAPSHOT
+  - ffmpeg: 4.1.2-SNAPSHOT
+  - footyroom: 4.1.1-SNAPSHOT
+  - pluzz: 4.1.1-SNAPSHOT
+
+#### Version Guidelines
+- All modules should share the same major version (4.1.x)
+- Minor version differences (4.1.0 vs 4.1.1) are acceptable for module-specific updates
+- Use exact versions in dependencies rather than version ranges
+- Keep the parent version as a reference point
+- Document version changes in module-specific README files
+
 ### Maven Configuration
 
 The project uses Maven for build management with a multi-module structure.

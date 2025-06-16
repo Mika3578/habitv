@@ -59,6 +59,14 @@ All plugins were successfully compiled and are available in their respective `ta
 
 ## Build Process
 
+### Version Management
+The project uses a multi-module structure with independent versioning:
+- Parent version: 4.1.0-SNAPSHOT
+- Module versions vary between 4.1.0-SNAPSHOT and 4.1.2-SNAPSHOT
+- Version differences are normal and indicate module-specific updates
+- All modules maintain compatibility through shared major version (4.1.x)
+- Dependencies use exact versions for stability
+
 ### 1. Compilation
 ```bash
 mvn clean compile

@@ -182,6 +182,13 @@ java -jar habiTv-4.1.0-SNAPSHOT.jar
 
 ## Version Management
 
+### Project Versioning
+The habiTv project uses a multi-module structure with independent versioning:
+- Parent version serves as a reference point (currently 4.1.0-SNAPSHOT)
+- Individual modules can have their own versions (e.g., 4.1.0-SNAPSHOT, 4.1.1-SNAPSHOT)
+- All modules share the same major version for compatibility
+- Version differences indicate module-specific updates and improvements
+
 ### Semantic Versioning
 Use semantic versioning for your plugin:
 - **Major.Minor.Patch** (e.g., 1.0.0, 1.1.0, 1.1.1)

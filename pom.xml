@@ -9,6 +9,8 @@
 	<name>Parent habiTv</name>
 
 	<modules>
+		<module>fwk/api</module>
+		<module>fwk/framework</module>
 		<module>fwk</module>
 		<module>application</module>
 		<module>plugins</module>
@@ -43,12 +45,12 @@
 		<dependency>
 			<groupId>com.dabi.habitv</groupId>
 			<artifactId>api</artifactId>
-			<version>[4.1,4.2)</version>
+			<version>4.1.0-SNAPSHOT</version>
 		</dependency>	
 		<dependency>
 			<groupId>com.dabi.habitv</groupId>
 			<artifactId>framework</artifactId>
-			<version>[4.1,4.2)</version>
+			<version>4.1.0-SNAPSHOT</version>
 		</dependency>			
 
 		<dependency>
@@ -191,7 +193,29 @@
             </manifestEntries>
           </archive>
         </configuration>
-      </plugin>			
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.5.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>com.dabi.habitv.Main</mainClass>
+                </transformer>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+              </transformers>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
 		</plugins>
 	</build>
 </project>
