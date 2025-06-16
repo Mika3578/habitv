@@ -156,5 +156,4 @@ public class BasePluginProviderTester {
 		final PluginProviderInterface plugin = prDlPluginClass.getDeclaredConstructor().newInstance();
 		testPluginProvider(plugin, episodeOnlyOnLeaf);
 	}
-
-}
+} 

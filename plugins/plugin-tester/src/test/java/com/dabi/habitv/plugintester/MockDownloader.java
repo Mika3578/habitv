@@ -29,5 +29,4 @@ public class MockDownloader implements PluginDownloaderInterface {
 		LOG.info("download of " + downloadParam + " ");
 		return ProcessHolder.EMPTY_PROCESS_HOLDER;
 	}
-
-}
+} 

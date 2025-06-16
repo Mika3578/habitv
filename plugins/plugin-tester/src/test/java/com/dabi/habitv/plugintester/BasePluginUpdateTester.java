@@ -51,5 +51,4 @@ public class BasePluginUpdateTester implements Subscriber<UpdatablePluginEvent> 
 	public void update(final UpdatablePluginEvent event) {
 		LOG.info(event);
 	}
-
-}
+} 
