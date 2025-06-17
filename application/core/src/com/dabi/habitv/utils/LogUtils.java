@@ -75,7 +75,7 @@ public final class LogUtils {
 			throw new TechnicalException(e);
 		}
 		props.setProperty("log4j.appender.file.File", DirUtils.getLogFileSlash());
-		LogManager.resetConfiguration();
+		Logger.getRootLogger().getLoggerRepository().resetConfiguration();
 		PropertyConfigurator.configure(props);
 	}
 }

@@ -4,11 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.ConfigurationSource;
-import org.apache.logging.log4j.core.config.Configurator;
-import org.apache.logging.log4j.core.config.properties.PropertiesConfigurationBuilder;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 /**
  * Centralized logging manager for habiTv application.
@@ -55,7 +52,7 @@ public final class HabitvLogger {
             Properties config = loadConfiguration();
 
             // Configure log4j
-            LogManager.resetConfiguration();
+            Logger.getRootLogger().getLoggerRepository().resetConfiguration();
             PropertyConfigurator.configure(config);
 
             // Log initialization and actual path
@@ -135,7 +132,7 @@ public final class HabitvLogger {
         fallback.setProperty("log4j.appender.console.layout.ConversionPattern", 
                 "[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5p] [%c{1}] %m%n");
 
-        LogManager.resetConfiguration();
+        Logger.getRootLogger().getLoggerRepository().resetConfiguration();
         PropertyConfigurator.configure(fallback);
 
         Logger.getRootLogger().warn("Using fallback logging configuration");
@@ -183,7 +180,7 @@ public final class HabitvLogger {
      */
     public static void updateConfiguration(Properties properties) {
         initialize();
-        LogManager.resetConfiguration();
+        Logger.getRootLogger().getLoggerRepository().resetConfiguration();
         PropertyConfigurator.configure(properties);
         getRootLogger().info("Logging configuration updated");
     }

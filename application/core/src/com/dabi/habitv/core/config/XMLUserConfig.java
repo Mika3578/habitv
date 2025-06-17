@@ -13,8 +13,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import org.apache.log4j.Logger;
-
 import com.dabi.habitv.utils.HabitvLogger;
 
 import javax.xml.bind.JAXBContext;
