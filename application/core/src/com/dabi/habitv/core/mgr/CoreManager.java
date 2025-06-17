@@ -51,7 +51,12 @@ public final class CoreManager {
 
 			@Override
 			public void run() {
-				RetrieverUtils.getUrlContent(HabitTvConf.STAT_URL, null);
+				try {
+					RetrieverUtils.getUrlContent(HabitTvConf.STAT_URL, null);
+				} catch (Exception e) {
+					// Non-critical operation, log and continue
+					LOG.warn("Failed to send statistics: " + e.getMessage());
+				}
 			}
 
 		}.start();

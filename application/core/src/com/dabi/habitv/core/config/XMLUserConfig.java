@@ -11,6 +11,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
+import org.apache.log4j.Logger;
+
+import com.dabi.habitv.utils.HabitvLogger;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -74,19 +80,41 @@ public class XMLUserConfig implements UserConfig {
 		this.config = config;
 	}
 
+	/**
+	 * Logs a debug message.
+	 * This method is used to replace direct System.out.println calls.
+	 * 
+	 * @param message the message to log
+	 */
+	private static void logDebug(String message) {
+		// Use the root logger to avoid adding dependencies
+		org.apache.log4j.Logger.getRootLogger().debug(message);
+	}
+
+	/**
+	 * Logs an error message.
+	 * This method is used to replace direct System.err.println calls.
+	 * 
+	 * @param message the message to log
+	 */
+	private static void logError(String message) {
+		// Use the root logger to avoid adding dependencies
+		org.apache.log4j.Logger.getRootLogger().error(message);
+	}
+
 	public static UserConfig initConfig() {
 		Configuration config;
 		try {
 			final File oldConfFile = new File(DirUtils.getOldConfFile());
 			final File confFile = new File(DirUtils.getConfFile());
-			
+
 			// Debug logging for configuration file paths
 			System.out.println("[Habitv] Debug: Checking configuration files...");
 			System.out.println("[Habitv] Debug: Old config file path: " + oldConfFile.getAbsolutePath());
 			System.out.println("[Habitv] Debug: New config file path: " + confFile.getAbsolutePath());
 			System.out.println("[Habitv] Debug: Old config file exists: " + oldConfFile.exists());
 			System.out.println("[Habitv] Debug: New config file exists: " + confFile.exists());
-			
+
 			if (oldConfFile.exists()) {
 				System.out.println("[Habitv] Debug: Loading old configuration from: " + oldConfFile.getAbsolutePath());
 				Config oldConfig = readOldConfig(oldConfFile);
@@ -549,7 +577,7 @@ public class XMLUserConfig implements UserConfig {
 		if (config.getCredentialsConfig() == null || config.getCredentialsConfig().getCredential() == null) {
 			return new ArrayList<>();
 		}
-		
+
 		List<CredentialConfig> credentials = new ArrayList<>();
 		for (com.dabi.habitv.configuration.entities.Credential xmlCredential : config.getCredentialsConfig().getCredential()) {
 			CredentialConfig credential = new CredentialConfig(
@@ -572,7 +600,7 @@ public class XMLUserConfig implements UserConfig {
 			credentialsConfig = new com.dabi.habitv.configuration.entities.Configuration.CredentialsConfig();
 			config.setCredentialsConfig(credentialsConfig);
 		}
-		
+
 		credentialsConfig.getCredential().clear();
 		for (CredentialConfig credential : credentials) {
 			com.dabi.habitv.configuration.entities.Credential xmlCredential = 
@@ -594,11 +622,11 @@ public class XMLUserConfig implements UserConfig {
 			credentialsConfig = new com.dabi.habitv.configuration.entities.Configuration.CredentialsConfig();
 			config.setCredentialsConfig(credentialsConfig);
 		}
-		
+
 		// Remove existing credential for the same service
 		credentialsConfig.getCredential().removeIf(c -> 
 			credential.getService().equalsIgnoreCase(c.getService()));
-		
+
 		// Add new credential
 		com.dabi.habitv.configuration.entities.Credential xmlCredential = 
 			new com.dabi.habitv.configuration.entities.Credential();
@@ -625,7 +653,7 @@ public class XMLUserConfig implements UserConfig {
 		if (config.getCredentialsConfig() == null || config.getCredentialsConfig().getCredential() == null) {
 			return null;
 		}
-		
+
 		for (com.dabi.habitv.configuration.entities.Credential xmlCredential : config.getCredentialsConfig().getCredential()) {
 			if (service.equalsIgnoreCase(xmlCredential.getService())) {
 				CredentialConfig credential = new CredentialConfig(

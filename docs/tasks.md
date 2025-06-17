@@ -4,18 +4,18 @@ This document contains a prioritized list of actionable tasks for improving the 
 
 ## 1. Code Quality and Maintenance
 
-- [ ] **Update outdated dependencies**
-  - Update Java Mail API from 1.4.3 to latest version
-  - Update Apache Commons CLI from 1.2 to latest version
-  - Update JAXB API from 2.0 to latest version
-  - Update Apache Commons Lang from 2.6 to latest version
+- [x] **Update outdated dependencies**
+  - Update Java Mail API from 1.4.3 to latest version (com.sun.mail:jakarta.mail:2.0.1)
+  - Update Apache Commons CLI from 1.2 to latest version (1.5.0)
+  - Update JAXB API from 2.0 to latest version (2.3.1)
+  - Update Apache Commons Lang from 2.6 to latest version (org.apache.commons:commons-lang3:3.12.0)
   - Rationale: Outdated dependencies may have security vulnerabilities and lack modern features
 
-- [ ] **Fix SCM configuration in pom.xml**
+- [x] **Fix SCM configuration in pom.xml**
   - Update SVN references to GitHub in the pom.xml
   - Rationale: Current SCM configuration points to SVN but the project is on GitHub
 
-- [ ] **Standardize logging implementation**
+- [x] **Standardize logging implementation**
   - Ensure consistent use of Log4j 2 throughout the codebase
   - Replace direct System.out/err calls with proper logging
   - Rationale: Consistent logging improves maintainability and debugging
