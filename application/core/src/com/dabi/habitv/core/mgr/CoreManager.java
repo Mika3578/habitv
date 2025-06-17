@@ -17,7 +17,7 @@ import com.dabi.habitv.core.token.TokenReplacer;
 import com.dabi.habitv.core.utils.FWKProperties;
 import com.dabi.habitv.core.utils.RetrieverUtils;
 import com.dabi.habitv.utils.DirUtils;
-import com.dabi.habitv.utils.HabitvLogger;
+import com.dabi.habitv.api.logging.HabitvLogger;
 
 public final class CoreManager {
 

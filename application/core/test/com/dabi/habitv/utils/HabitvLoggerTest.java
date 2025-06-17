@@ -3,6 +3,8 @@ package com.dabi.habitv.utils;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
+import com.dabi.habitv.api.logging.HabitvLogger;
+
 /**
  * Test class for HabitvLogger functionality.
  */
@@ -38,7 +40,7 @@ public class HabitvLoggerTest {
         HabitvLogger.initialize();
         HabitvLogger.initialize();
         HabitvLogger.initialize();
-        
+
         Logger logger = HabitvLogger.getLogger(HabitvLoggerTest.class);
         logger.info("Multiple initialization test passed");
     }

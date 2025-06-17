@@ -1,4 +1,4 @@
-package com.dabi.habitv.utils;
+package com.dabi.habitv.api.logging;
 
 import java.io.IOException;
 import java.io.InputStream;

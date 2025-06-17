@@ -2,7 +2,7 @@ package com.dabi.habitv.tray;
 
 import org.apache.log4j.PropertyConfigurator;
 
-import com.dabi.habitv.utils.HabitvLogger;
+import com.dabi.habitv.api.logging.HabitvLogger;
 
 import javafx.application.Application;
 import javafx.stage.Stage;

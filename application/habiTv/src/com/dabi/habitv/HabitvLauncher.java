@@ -8,7 +8,7 @@ import org.apache.log4j.PropertyConfigurator;
 
 import com.dabi.habitv.console.ConsoleLauncher;
 import com.dabi.habitv.tray.HabiTvViewRunner;
-import com.dabi.habitv.utils.HabitvLogger;
+import com.dabi.habitv.api.logging.HabitvLogger;
 
 public class HabitvLauncher {
 

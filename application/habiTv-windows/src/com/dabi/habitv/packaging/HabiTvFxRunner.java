@@ -7,12 +7,12 @@ import javafx.stage.Stage;
 
 import com.dabi.habitv.console.ConsoleLauncher;
 import com.dabi.habitv.tray.HabiTvSplashScreen;
-import com.dabi.habitv.utils.LogUtils;
+import com.dabi.habitv.api.logging.LogUtils;
 
 public class HabiTvFxRunner extends Application {
 
 	private HabiTvSplashScreen habiTvSplashScreen;
-	
+
 	public HabiTvFxRunner() {
 		this.habiTvSplashScreen = new HabiTvSplashScreen();
 	}
@@ -24,9 +24,9 @@ public class HabiTvFxRunner extends Application {
 		} else {
 			ConsoleLauncher.main(getParameters().getRaw().toArray(new String[getParameters().getRaw().size()]));
 		}
-		
+
 	}
-	
+
 	public static void main(String[] args) {
 		LogUtils.updateLog4jConfiguration();
 		launch(args);

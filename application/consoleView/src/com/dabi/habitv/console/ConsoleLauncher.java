@@ -29,7 +29,7 @@ import com.dabi.habitv.framework.plugin.utils.DownloadUtils;
 import com.dabi.habitv.framework.plugin.utils.ProcessingThreads;
 import com.dabi.habitv.framework.plugin.utils.RetrieverUtils;
 import com.dabi.habitv.utils.DirUtils;
-import com.dabi.habitv.utils.HabitvLogger;
+import com.dabi.habitv.api.logging.HabitvLogger;
 
 public final class ConsoleLauncher {
 	private static final String OPTION_RUN_EXPORT = "x";

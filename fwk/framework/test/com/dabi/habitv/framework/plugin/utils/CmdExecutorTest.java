@@ -13,6 +13,7 @@ import org.junit.Test;
 import com.dabi.habitv.api.plugin.exception.ExecutorFailedException;
 import com.dabi.habitv.api.plugin.exception.TechnicalException;
 import com.dabi.habitv.framework.plugin.exception.HungProcessException;
+import com.dabi.habitv.framework.plugin.utils.CmdExecutor;
 
 public class CmdExecutorTest {
 
