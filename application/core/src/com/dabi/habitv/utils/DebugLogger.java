@@ -23,7 +23,9 @@ public final class DebugLogger {
      * Replaces System.out.println calls for debug information.
      * 
      * @param message the message to log
+     * @deprecated This method is not currently used in the codebase
      */
+    @Deprecated
     public static void debug(String message) {
         LOG.debug(message);
     }
@@ -41,7 +43,9 @@ public final class DebugLogger {
      * Logs a warning message.
      * 
      * @param message the message to log
+     * @deprecated This method is not currently used in the codebase
      */
+    @Deprecated
     public static void warn(String message) {
         LOG.warn(message);
     }
@@ -73,7 +77,9 @@ public final class DebugLogger {
      * 
      * @param logger the logger to use
      * @param message the message to log
+     * @deprecated This method is not currently used in the codebase
      */
+    @Deprecated
     public static void debug(Logger logger, String message) {
         logger.debug(message);
     }
@@ -93,7 +99,9 @@ public final class DebugLogger {
      * 
      * @param logger the logger to use
      * @param message the message to log
+     * @deprecated This method is not currently used in the codebase
      */
+    @Deprecated
     public static void warn(Logger logger, String message) {
         logger.warn(message);
     }

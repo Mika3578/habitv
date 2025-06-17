@@ -14,8 +14,8 @@ import com.dabi.habitv.api.plugin.dto.ProxyDTO.ProtocolEnum;
 import com.dabi.habitv.core.config.HabitTvConf;
 import com.dabi.habitv.core.config.UserConfig;
 import com.dabi.habitv.core.token.TokenReplacer;
-import com.dabi.habitv.framework.FWKProperties;
-import com.dabi.habitv.framework.plugin.utils.RetrieverUtils;
+import com.dabi.habitv.core.utils.FWKProperties;
+import com.dabi.habitv.core.utils.RetrieverUtils;
 import com.dabi.habitv.utils.DirUtils;
 import com.dabi.habitv.utils.HabitvLogger;
 

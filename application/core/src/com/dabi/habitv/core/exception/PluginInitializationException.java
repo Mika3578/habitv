@@ -9,7 +9,7 @@ import com.dabi.habitv.api.plugin.exception.TechnicalException;
 public class PluginInitializationException extends TechnicalException {
 
     private static final long serialVersionUID = 1L;
-    
+
     private final String pluginName;
 
     /**
@@ -31,7 +31,8 @@ public class PluginInitializationException extends TechnicalException {
      * @param cause the cause
      */
     public PluginInitializationException(String pluginName, String message, Throwable cause) {
-        super(message, cause);
+        super(message);
+        initCause(cause);
         this.pluginName = pluginName;
     }
 
