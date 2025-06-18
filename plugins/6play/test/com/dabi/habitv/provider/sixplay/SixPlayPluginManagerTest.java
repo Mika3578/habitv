@@ -8,11 +8,15 @@ import com.dabi.habitv.plugintester.BasePluginProviderTester;
 
 public class SixPlayPluginManagerTest extends BasePluginProviderTester {
 
-	private static final Logger LOG = Logger.getLogger(SixPlayPluginManagerTest.class);
+	private static final Logger LOG = Logger.getLogger(SixPlayPluginManagerTest.class);	@Test
+	public final void testProviderSixPlay() throws DownloadFailedException, ReflectiveOperationException {
+		setUp();
+		testPluginProvider(SixPlayPluginManager.class, false);
+	}
 
-	@Test
-	public final void testProviderSixPlay() throws InstantiationException, IllegalAccessException, DownloadFailedException, ReflectiveOperationException {
-		LOG.info("Starting testProviderSixPlay test...");
+	@Test  
+	public final void testProviderSixPlayDetailed() throws DownloadFailedException {
+		LOG.info("Starting testProviderSixPlayDetailed test...");
 		try {
 			// Create a direct instance of the plugin for more control
 			SixPlayPluginManager plugin = new SixPlayPluginManager();
@@ -92,9 +96,8 @@ public class SixPlayPluginManagerTest extends BasePluginProviderTester {
 
 		return null;
 	}
-
 	@Test
-	public final void testDebugWebsite() throws Exception {
+	public final void testDebugWebsite() {
 		SixPlayPluginManager plugin = new SixPlayPluginManager();
 
 		// Test the findCategory method directly
@@ -105,8 +108,10 @@ public class SixPlayPluginManagerTest extends BasePluginProviderTester {
 			for (com.dabi.habitv.api.plugin.dto.CategoryDTO cat : categories) {
 				LOG.info("Category: " + cat.getName() + " -> " + cat.getId());
 			}
+			org.junit.Assert.assertTrue("Categories should not be empty", !categories.isEmpty());
 		} catch (Exception e) {
 			LOG.error("Exception during findCategory: " + e.getMessage(), e);
+			org.junit.Assert.fail("Exception during findCategory: " + e.getMessage());
 		}
 	}
 

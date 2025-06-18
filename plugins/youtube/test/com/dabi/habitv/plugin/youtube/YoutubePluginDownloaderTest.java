@@ -67,10 +67,10 @@ public class YoutubePluginDownloaderTest extends BasePluginUpdateTester {
 		Assert.assertEquals(DownloadableState.IMPOSSIBLE, downloader.canDownload("https://example.com/video.mp4"));
 		Assert.assertEquals(DownloadableState.IMPOSSIBLE, downloader.canDownload(null));
 	}
-
 	@Test
 	@Ignore("Requires external tools and network - skip during build")
-	public final void testYoutube() throws InstantiationException, IllegalAccessException {
+	public final void testYoutube() throws ReflectiveOperationException {
+		setUp();
 		try {
 			testUpdatablePlugin(YoutubePluginDownloader.class);
 		} catch (NoClassDefFoundError e) {

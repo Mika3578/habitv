@@ -11,10 +11,10 @@ import com.dabi.habitv.plugintester.BasePluginProviderTester;
 import java.util.Set;
 
 public class ArtePluginManagerTest extends BasePluginProviderTester {
-
 	@Test
 	@Ignore("Network test - skip during build")
 	public final void testArtePluginManager() throws DownloadFailedException, ReflectiveOperationException {
+		setUp();
 		testPluginProvider(ArtePluginManager.class, true);
 	}
 

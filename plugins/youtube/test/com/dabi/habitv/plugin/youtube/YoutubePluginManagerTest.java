@@ -11,10 +11,10 @@ import com.dabi.habitv.plugintester.BasePluginProviderTester;
 public class YoutubePluginManagerTest extends BasePluginProviderTester {
 
 	private static final Logger LOG = Logger.getLogger(YoutubePluginManagerTest.class);
-
 	@Test
 	@Ignore("Requires yt-dlp external tool - skip during build")
-	public final void test() throws InstantiationException, IllegalAccessException, DownloadFailedException, ReflectiveOperationException {
+	public final void test() throws DownloadFailedException, ReflectiveOperationException {
+		setUp();
 		try {
 			testPluginProvider(YoutubePluginManager.class, true);
 		} catch (TechnicalException e) {
