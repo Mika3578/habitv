@@ -1,4 +1,156 @@
 {
     "java.configuration.updateBuildConfiguration": "automatic",
-    "java.compile.nullAnalysis.mode": "automatic"
+    "java.compile.nullAnalysis.mode": "automatic",
+    
+    // Configuration des raccourcis et boutons
+    "workbench.action.toggleSidebarVisibility": "Ctrl+B",
+    "workbench.action.togglePanel": "Ctrl+J",
+    
+    // Configuration Maven
+    "maven.executable.path": "mvn",
+    "maven.terminal.useJavaHome": true,
+    "maven.terminal.customEnv": [
+        {
+            "environmentVariable": "JAVA_HOME",
+            "value": "${env:JAVA_HOME}"
+        }
+    ],
+    
+    // Configuration Git
+    "git.autofetch": true,
+    "git.autofetchPeriod": 180,
+    "git.confirmSync": false,
+    
+    // Configuration des fichiers
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 1000,
+    "files.exclude": {
+        "**/target": true,
+        "**/.mvn": false,
+        "**/node_modules": true,
+        "**/.git": true
+    },
+    
+    // Configuration de l'explorateur
+    "explorer.confirmDelete": false,
+    "explorer.confirmDragAndDrop": false,
+    
+    // Configuration du terminal
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "terminal.integrated.profiles.windows": {
+        "PowerShell": {
+            "source": "PowerShell",
+            "icon": "terminal-powershell"
+        }
+    },
+    
+    // Configuration des tâches
+    "task.autoDetect": "on",
+    "task.slowProviderWarning": false,
+    
+    // Configuration des extensions
+    "extensions.autoUpdate": true,
+    "extensions.autoCheckUpdates": true,
+    
+    // Configuration du workspace
+    "workbench.startupEditor": "none",
+    "workbench.editor.enablePreview": false,
+    
+    // Configuration des notifications
+    "notifications.enable": true,
+    "notifications.keepNotifications": false,
+    
+    // === ACTION BUTTONS CONFIGURATION ===
+    "actionButtons": {
+        "buttons": [
+            {
+                "name": "🧹 Clean",
+                "command": "workbench.action.tasks.runTask",
+                "args": "habitv-clean",
+                "color": "#ff6b6b",
+                "position": "left"
+            },
+            {
+                "name": "🔨 Build",
+                "command": "workbench.action.tasks.runTask",
+                "args": "habitv-build",
+                "color": "#4ecdc4",
+                "position": "left"
+            },
+            {
+                "name": "🧪 Test",
+                "command": "workbench.action.tasks.runTask",
+                "args": "habitv-test",
+                "color": "#45b7d1",
+                "position": "left"
+            },
+            {
+                "name": "📦 Install",
+                "command": "workbench.action.tasks.runTask",
+                "args": "habitv-install",
+                "color": "#96ceb4",
+                "position": "left"
+            },
+            {
+                "name": "🚀 Deploy",
+                "command": "workbench.action.tasks.runTask",
+                "args": "habitv-deploy",
+                "color": "#5f27cd",
+                "position": "left"
+            },
+            {
+                "name": "♻️ Refresh Git",
+                "command": "workbench.action.tasks.runTask",
+                "args": "habitv-refresh",
+                "color": "#00d2d3",
+                "position": "right"
+            },
+            {
+                "name": "🔄 Reload",
+                "command": "workbench.action.reloadWindow",
+                "color": "#ee5a24",
+                "position": "right"
+            }
+        ]
+    },
+    
+    // === CUSTOM BUTTONS CONFIGURATION ===
+    "customButtons.buttons": [
+        {
+            "id": "habitv.maven.clean",
+            "text": "🧹",
+            "tooltip": "Clean habitv project",
+            "color": "#ff6b6b"
+        },
+        {
+            "id": "habitv.maven.build",
+            "text": "🔨",
+            "tooltip": "Build habitv (clean + package)",
+            "color": "#4ecdc4"
+        },
+        {
+            "id": "habitv.maven.test",
+            "text": "🧪",
+            "tooltip": "Run tests",
+            "color": "#45b7d1"
+        },
+        {
+            "id": "habitv.maven.install",
+            "text": "📦",
+            "tooltip": "Install to local repo",
+            "color": "#96ceb4"
+        },
+        {
+            "id": "habitv.git.refresh",
+            "text": "🔄",
+            "tooltip": "Refresh Git branch",
+            "color": "#00d2d3"
+        },
+        {
+            "id": "habitv.ide.reload",
+            "text": "🔄",
+            "tooltip": "Reload IDE",
+            "color": "#ee5a24"
+        }
+    ]
 }

@@ -1,0 +1,87 @@
+[
+  // Raccourcis Maven
+  {
+    "key": "ctrl+shift+m c",
+    "command": "workbench.action.tasks.runTask",
+    "args": "habitv-clean",
+    "when": "workspaceFolderCount > 0"
+  },
+  {
+    "key": "ctrl+shift+m b",
+    "command": "workbench.action.tasks.runTask",
+    "args": "habitv-build",
+    "when": "workspaceFolderCount > 0"
+  },
+  {
+    "key": "ctrl+shift+m t",
+    "command": "workbench.action.tasks.runTask",
+    "args": "habitv-test",
+    "when": "workspaceFolderCount > 0"
+  },
+  {
+    "key": "ctrl+shift+m i",
+    "command": "workbench.action.tasks.runTask",
+    "args": "habitv-install",
+    "when": "workspaceFolderCount > 0"
+  },
+  {
+    "key": "ctrl+shift+m d",
+    "command": "workbench.action.tasks.runTask",
+    "args": "habitv-deps",
+    "when": "workspaceFolderCount > 0"
+  },
+  {
+    "key": "ctrl+shift+m p",
+    "command": "workbench.action.tasks.runTask",
+    "args": "habitv-profiles",
+    "when": "workspaceFolderCount > 0"
+  },
+  {
+    "key": "ctrl+shift+m v",
+    "command": "workbench.action.tasks.runTask",
+    "args": "habitv-verify",
+    "when": "workspaceFolderCount > 0"
+  },
+  
+  // Raccourcis Git
+  {
+    "key": "ctrl+shift+g r",
+    "command": "workbench.action.tasks.runTask",
+    "args": "habitv-refresh",
+    "when": "workspaceFolderCount > 0"
+  },
+  
+  // Raccourcis IDE
+  {
+    "key": "ctrl+shift+r",
+    "command": "workbench.action.reloadWindow",
+    "when": "workspaceFolderCount > 0"
+  },
+  {
+    "key": "ctrl+shift+`",
+    "command": "workbench.action.terminal.new",
+    "when": "workspaceFolderCount > 0"
+  },
+  
+  // Raccourcis de navigation
+  {
+    "key": "ctrl+shift+e",
+    "command": "workbench.view.explorer",
+    "when": "workspaceFolderCount > 0"
+  },
+  {
+    "key": "ctrl+shift+g",
+    "command": "workbench.view.scm",
+    "when": "workspaceFolderCount > 0"
+  },
+  {
+    "key": "ctrl+shift+d",
+    "command": "workbench.view.debug",
+    "when": "workspaceFolderCount > 0"
+  },
+  {
+    "key": "ctrl+shift+x",
+    "command": "workbench.view.extensions",
+    "when": "workspaceFolderCount > 0"
+  }
+] 

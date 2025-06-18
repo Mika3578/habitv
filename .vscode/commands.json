@@ -1,0 +1,130 @@
+[
+  // === MAVEN COMMANDS ===
+  {
+    "id": "habitv.maven.clean",
+    "command": "workbench.action.tasks.runTask",
+    "args": "habitv-clean",
+    "description": "🧹 Clean habitv project",
+    "icon": "🗑️",
+    "color": "#ff6b6b"
+  },
+  {
+    "id": "habitv.maven.build",
+    "command": "workbench.action.tasks.runTask",
+    "args": "habitv-build",
+    "description": "🔨 Build habitv (clean + package)",
+    "icon": "⚙️",
+    "color": "#4ecdc4"
+  },
+  {
+    "id": "habitv.maven.test",
+    "command": "workbench.action.tasks.runTask",
+    "args": "habitv-test",
+    "description": "🧪 Run tests",
+    "icon": "🧪",
+    "color": "#45b7d1"
+  },
+  {
+    "id": "habitv.maven.install",
+    "command": "workbench.action.tasks.runTask",
+    "args": "habitv-install",
+    "description": "📦 Install to local repo",
+    "icon": "📦",
+    "color": "#96ceb4"
+  },
+  {
+    "id": "habitv.maven.verify",
+    "command": "workbench.action.tasks.runTask",
+    "args": "habitv-verify",
+    "description": "✅ Verify project",
+    "icon": "✅",
+    "color": "#feca57"
+  },
+  {
+    "id": "habitv.maven.deps",
+    "command": "workbench.action.tasks.runTask",
+    "args": "habitv-deps",
+    "description": "🌳 Dependency tree",
+    "icon": "🌳",
+    "color": "#ff9ff3"
+  },
+  {
+    "id": "habitv.maven.profiles",
+    "command": "workbench.action.tasks.runTask",
+    "args": "habitv-profiles",
+    "description": "📄 Active profiles",
+    "icon": "📄",
+    "color": "#54a0ff"
+  },
+  {
+    "id": "habitv.maven.deploy",
+    "command": "workbench.action.tasks.runTask",
+    "args": "habitv-deploy",
+    "description": "🚀 Deploy to repo",
+    "icon": "🚀",
+    "color": "#5f27cd"
+  },
+  
+  // === GIT COMMANDS ===
+  {
+    "id": "habitv.git.refresh",
+    "command": "workbench.action.tasks.runTask",
+    "args": "habitv-refresh",
+    "description": "♻️ Refresh Git branch",
+    "icon": "🔄",
+    "color": "#00d2d3"
+  },
+  {
+    "id": "habitv.git.status",
+    "command": "git.status",
+    "description": "📝 Git status",
+    "icon": "📝",
+    "color": "#ff9f43"
+  },
+  
+  // === IDE COMMANDS ===
+  {
+    "id": "habitv.ide.reload",
+    "command": "workbench.action.reloadWindow",
+    "description": "🔄 Reload IDE",
+    "icon": "🔄",
+    "color": "#ee5a24"
+  },
+  {
+    "id": "habitv.ide.terminal",
+    "command": "workbench.action.terminal.new",
+    "description": "💻 New terminal",
+    "icon": "💻",
+    "color": "#2f3542"
+  },
+  
+  // === NAVIGATION ===
+  {
+    "id": "habitv.nav.explorer",
+    "command": "workbench.view.explorer",
+    "description": "📁 Explorer",
+    "icon": "📁",
+    "color": "#747d8c"
+  },
+  {
+    "id": "habitv.nav.sourceControl",
+    "command": "workbench.view.scm",
+    "description": "📝 Source Control",
+    "icon": "📝",
+    "color": "#3742fa"
+  },
+  {
+    "id": "habitv.nav.debug",
+    "command": "workbench.view.debug",
+    "description": "🐛 Debug",
+    "icon": "🐛",
+    "color": "#ff6348"
+  },
+  {
+    "id": "habitv.nav.extensions",
+    "command": "workbench.view.extensions",
+    "description": "🔌 Extensions",
+    "icon": "🔌",
+    "color": "#2ed573"
+  }
+]
