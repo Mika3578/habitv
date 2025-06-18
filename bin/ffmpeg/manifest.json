@@ -1,0 +1,31 @@
+{
+  "latest": "6.1",
+  "versions": [
+    "6.1",
+    "N-81964-gc44eae1",
+    "N-62728-g6956b04"
+  ],
+  "url_latest": "https://mika3578.github.io/habitv/bin/ffmpeg/latest/ffmpeg.exe",
+  "url_versioned": "https://mika3578.github.io/habitv/bin/ffmpeg/6.1/ffmpeg.exe",
+  "description": "FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video",
+  "homepage": "https://ffmpeg.org/",
+  "license": "LGPL/GPL",
+  "last_updated": "2025-06-18",
+  "changelog": [
+    {
+      "version": "6.1",
+      "date": "2025-06-18",
+      "changes": "Auto-updated from official source"
+    },
+    {
+      "version": "N-81964-gc44eae1",
+      "date": "2017-06-06",
+      "changes": "Latest development build included in habiTv repository"
+    },
+    {
+      "version": "N-62728-g6956b04",
+      "date": "2017-06-06",
+      "changes": "Development build included in habiTv repository"
+    }
+  ]
+}

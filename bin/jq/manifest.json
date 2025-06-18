@@ -1,0 +1,25 @@
+{
+  "latest": "1.7.2",
+  "versions": [
+    "1.7.2",
+    "1.7.1"
+  ],
+  "url_latest": "https://mika3578.github.io/habitv/bin/jq/latest/jq.exe",
+  "url_versioned": "https://mika3578.github.io/habitv/bin/jq/1.7.2/jq.exe",
+  "description": "jq is a lightweight and flexible command-line JSON processor",
+  "homepage": "https://jqlang.github.io/jq/",
+  "license": "MIT",
+  "last_updated": "2025-06-18",
+  "changelog": [
+    {
+      "version": "1.7.2",
+      "date": "2025-06-18",
+      "changes": "Auto-updated from official source"
+    },
+    {
+      "version": "1.7.1",
+      "date": "2024-01-01",
+      "changes": "Initial version included in habiTv repository"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "latest": "6.1.1",
+  "versions": [
+    "6.1.1",
+    "6.1"
+  ],
+  "url_latest": "https://mika3578.github.io/habitv/bin/ffprobe/latest/ffprobe.exe",
+  "url_versioned": "https://mika3578.github.io/habitv/bin/ffprobe/6.1.1/ffprobe.exe",
+  "description": "ffprobe is a multimedia streams analyzer from the FFmpeg project",
+  "homepage": "https://ffmpeg.org/",
+  "license": "LGPL/GPL",
+  "last_updated": "2025-06-18",
+  "changelog": [
+    {
+      "version": "6.1.1",
+      "date": "2025-06-18",
+      "changes": "Auto-updated from official source"
+    },
+    {
+      "version": "6.1",
+      "date": "2024-01-01",
+      "changes": "Initial version included in habiTv repository"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "latest": "3.12.2",
+  "versions": [
+    "3.12.2",
+    "3.12.1"
+  ],
+  "url_latest": "https://mika3578.github.io/habitv/bin/python/latest/python.exe",
+  "url_versioned": "https://mika3578.github.io/habitv/bin/python/3.12.2/python.exe",
+  "description": "Portable Python interpreter for Windows",
+  "homepage": "https://www.python.org/",
+  "license": "PSF-2.0",
+  "last_updated": "2025-06-18",
+  "files": [
+    "python.exe",
+    "pythonw.exe",
+    "python312.dll"
+  ],
+  "changelog": [
+    {
+      "version": "3.12.2",
+      "date": "2025-06-18",
+      "changes": "Auto-updated from official source"
+    },
+    {
+      "version": "3.12.1",
+      "date": "2024-01-01",
+      "changes": "Initial version included in habiTv repository"
+    }
+  ]
+}

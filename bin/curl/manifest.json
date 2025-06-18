@@ -1,0 +1,25 @@
+{
+  "latest": "8.0.0",
+  "versions": [
+    "8.0.0",
+    "7.25.0"
+  ],
+  "url_latest": "https://mika3578.github.io/habitv/bin/curl/latest/curl.exe",
+  "url_versioned": "https://mika3578.github.io/habitv/bin/curl/8.0.0/curl.exe",
+  "description": "cURL is a command line tool for transferring data with URLs",
+  "homepage": "https://curl.se/",
+  "license": "MIT/X derivate license",
+  "last_updated": "2025-06-18",
+  "changelog": [
+    {
+      "version": "8.0.0",
+      "date": "2025-06-18",
+      "changes": "Auto-updated from official source"
+    },
+    {
+      "version": "7.25.0",
+      "date": "2013-12-04",
+      "changes": "Initial version included in habiTv repository"
+    }
+  ]
+}

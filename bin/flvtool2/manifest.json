@@ -1,0 +1,25 @@
+{
+  "latest": "1.0.7",
+  "versions": [
+    "1.0.7",
+    "1.0.6"
+  ],
+  "url_latest": "https://mika3578.github.io/habitv/bin/flvtool2/latest/flvtool2.exe",
+  "url_versioned": "https://mika3578.github.io/habitv/bin/flvtool2/1.0.7/flvtool2.exe",
+  "description": "FLVTool2 is a command line tool for manipulating Macromedia Flash Video files",
+  "homepage": "https://github.com/unnu/flvtool2",
+  "license": "GPL-2.0",
+  "last_updated": "2025-06-18",
+  "changelog": [
+    {
+      "version": "1.0.7",
+      "date": "2025-06-18",
+      "changes": "Auto-updated from official source"
+    },
+    {
+      "version": "1.0.6",
+      "date": "2024-01-01",
+      "changes": "Initial version included in habiTv repository"
+    }
+  ]
+}

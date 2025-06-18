@@ -1,0 +1,25 @@
+{
+  "latest": "2.1.2",
+  "versions": [
+    "2.1.2",
+    "2.1.1"
+  ],
+  "url_latest": "https://mika3578.github.io/habitv/bin/phantomjs/latest/phantomjs.exe",
+  "url_versioned": "https://mika3578.github.io/habitv/bin/phantomjs/2.1.2/phantomjs.exe",
+  "description": "PhantomJS is a headless WebKit scriptable with a JavaScript API",
+  "homepage": "https://phantomjs.org/",
+  "license": "BSD-3-Clause",
+  "last_updated": "2025-06-18",
+  "changelog": [
+    {
+      "version": "2.1.2",
+      "date": "2025-06-18",
+      "changes": "Auto-updated from official source"
+    },
+    {
+      "version": "2.1.1",
+      "date": "2024-01-01",
+      "changes": "Initial version included in habiTv repository"
+    }
+  ]
+}

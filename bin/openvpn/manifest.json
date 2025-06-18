@@ -1,0 +1,25 @@
+{
+  "latest": "2.6.9",
+  "versions": [
+    "2.6.9",
+    "2.6.8"
+  ],
+  "url_latest": "https://mika3578.github.io/habitv/bin/openvpn/latest/openvpn.exe",
+  "url_versioned": "https://mika3578.github.io/habitv/bin/openvpn/2.6.9/openvpn.exe",
+  "description": "OpenVPN is an open-source VPN daemon",
+  "homepage": "https://openvpn.net/",
+  "license": "GPL-2.0",
+  "last_updated": "2025-06-18",
+  "changelog": [
+    {
+      "version": "2.6.9",
+      "date": "2025-06-18",
+      "changes": "Auto-updated from official source"
+    },
+    {
+      "version": "2.6.8",
+      "date": "2024-01-01",
+      "changes": "Initial version included in habiTv repository"
+    }
+  ]
+}

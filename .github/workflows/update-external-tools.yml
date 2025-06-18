@@ -1,0 +1,81 @@
+name: Update External Tools
+
+on:
+  schedule:
+    # Run every Sunday at 03:00 UTC
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+    # Allow manual triggering
+    inputs:
+      tool:
+        description: 'Specific tool to update (leave empty for all)'
+        required: false
+        default: ''
+      force_update:
+        description: 'Force update even if version is the same'
+        required: false
+        default: 'false'
+
+env:
+  PYTHONUNBUFFERED: 1
+
+jobs:
+  update-tools:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        pip install requests beautifulsoup4 lxml
+        
+    - name: Setup Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+    - name: Update all tools
+      run: |
+        python scripts/update_all_tools.py
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Check for changes
+      id: check_changes
+      run: |
+        if git diff --quiet; then
+          echo "no_changes=true" >> $GITHUB_OUTPUT
+          echo "No updates found"
+        else
+          echo "no_changes=false" >> $GITHUB_OUTPUT
+          echo "Updates found"
+        fi
+        
+    - name: Commit and push changes
+      if: steps.check_changes.outputs.no_changes == 'false'
+      run: |
+        git add bin/
+        git commit -m "Update external tool binaries [skip ci]"
+        git push
+        
+    - name: Create summary
+      run: |
+        echo "## External Tools Update Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Updated Tools:**" >> $GITHUB_STEP_SUMMARY
+        if [ -f "update_summary.txt" ]; then
+          cat update_summary.txt >> $GITHUB_STEP_SUMMARY
+        else
+          echo "- No updates were necessary" >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Next scheduled update:** Sunday at 03:00 UTC" >> $GITHUB_STEP_SUMMARY 

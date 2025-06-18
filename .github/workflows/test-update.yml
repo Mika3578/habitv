@@ -1,0 +1,57 @@
+name: Test Manual Update
+
+on:
+  workflow_dispatch:
+    inputs:
+      tool:
+        description: 'Specific tool to update (leave empty for all)'
+        required: false
+        default: ''
+      force_update:
+        description: 'Force update even if version is the same'
+        required: false
+        default: 'false'
+
+env:
+  PYTHONUNBUFFERED: 1
+
+jobs:
+  test-update:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        pip install requests
+        
+    - name: Setup Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+    - name: Test update script
+      run: |
+        python scripts/update_all_tools.py
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Show summary
+      run: |
+        if [ -f "update_summary.txt" ]; then
+          echo "## Update Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          cat update_summary.txt >> $GITHUB_STEP_SUMMARY
+        else
+          echo "## No Updates Found" >> $GITHUB_STEP_SUMMARY
+          echo "All tools are up to date." >> $GITHUB_STEP_SUMMARY
+        fi 

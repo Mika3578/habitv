@@ -1,0 +1,25 @@
+{
+  "latest": "23.02",
+  "versions": [
+    "23.02",
+    "23.01"
+  ],
+  "url_latest": "https://mika3578.github.io/habitv/bin/7z/latest/7z.exe",
+  "url_versioned": "https://mika3578.github.io/habitv/bin/7z/23.02/7z.exe",
+  "description": "7-Zip is a file archiver with a high compression ratio",
+  "homepage": "https://7-zip.org/",
+  "license": "LGPL-2.1",
+  "last_updated": "2025-06-18",
+  "changelog": [
+    {
+      "version": "23.02",
+      "date": "2025-06-18",
+      "changes": "Auto-updated from official source"
+    },
+    {
+      "version": "23.01",
+      "date": "2024-01-01",
+      "changes": "Initial version included in habiTv repository"
+    }
+  ]
+}
