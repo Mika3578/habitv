@@ -8,7 +8,7 @@ repository/
 
 # IDE files
 .idea/
-.vscode/
+# .vscode/
 *.iml
 *.ipr
 *.iws
@@ -50,7 +50,7 @@ build/
 !**/src/test/**/build/
 
 # VS Code
-.vscode/
+# .vscode/
 
 # Compiled class files
 *.class
