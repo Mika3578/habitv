@@ -71,6 +71,9 @@ plugins/plugin-tester/habiTv.log
 *.tar.gz
 *.rar
 
+# Maven wrapper exception
+!/.mvn/wrapper/maven-wrapper.jar
+
 # Virtual machine crash logs
 hs_err_pid*
 replay_pid*

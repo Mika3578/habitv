@@ -1,183 +1,238 @@
 # habiTv Improvement Tasks
 
-This document contains a prioritized list of actionable tasks for improving the habiTv project. Each task includes a description and rationale. Tasks are organized into categories and should be completed in the order presented for maximum effectiveness.
+This document contains a prioritized list of actionable improvement tasks for the habiTv project. Each item starts with a checkbox [ ] that can be checked off when completed. Tasks are logically ordered and cover both architectural and code-level improvements.
 
-## 1. Code Quality and Maintenance
+## 1. Code Quality and Architecture
 
-- [x] **Update outdated dependencies**
-  - Update Java Mail API from 1.4.3 to latest version (com.sun.mail:jakarta.mail:2.0.1)
-  - Update Apache Commons CLI from 1.2 to latest version (1.5.0)
-  - Update JAXB API from 2.0 to latest version (2.3.1)
-  - Update Apache Commons Lang from 2.6 to latest version (org.apache.commons:commons-lang3:3.12.0)
-  - Rationale: Outdated dependencies may have security vulnerabilities and lack modern features
-
-- [x] **Fix SCM configuration in pom.xml**
-  - Update SVN references to GitHub in the pom.xml
-  - Rationale: Current SCM configuration points to SVN but the project is on GitHub
-
-- [x] **Standardize logging implementation**
-  - Ensure consistent use of Log4j 2 throughout the codebase
-  - Replace direct System.out/err calls with proper logging
-  - Rationale: Consistent logging improves maintainability and debugging
-
-- [ ] **Implement proper error handling**
-  - Add comprehensive error handling in CoreManager and PluginManager
-  - Create custom exceptions for different error scenarios
-  - Implement graceful degradation for non-critical failures
-  - Rationale: Robust error handling improves reliability and user experience
-
-- [ ] **Address code duplication**
-  - Identify and refactor duplicated code in manager classes
-  - Create utility methods for common operations
-  - Rationale: Reduces maintenance burden and potential for bugs
-
-## 2. Architecture Improvements
-
-- [ ] **Improve plugin system security**
-  - Implement plugin signature verification
-  - Add sandboxing for plugin execution
-  - Create a plugin whitelist/blacklist mechanism
-  - Rationale: Enhances security when loading external plugins
-
-- [ ] **Refactor the "stat" method in CoreManager**
-  - Make statistics collection opt-in with user consent
-  - Ensure privacy by anonymizing collected data
-  - Add documentation about what data is collected and why
-  - Rationale: Improves transparency and respects user privacy
-
-- [ ] **Implement proper thread management**
-  - Replace raw Thread creation with ExecutorService
-  - Add proper thread naming for debugging
-  - Implement thread pooling for better resource management
-  - Rationale: Improves performance and stability for concurrent operations
-
-- [ ] **Separate synchronous and asynchronous operations**
-  - Clearly define which operations are blocking vs non-blocking
-  - Implement CompletableFuture for async operations
-  - Add progress reporting for long-running tasks
-  - Rationale: Improves responsiveness and user experience
-
-- [ ] **Implement dependency injection**
-  - Replace direct instantiation with a DI framework (e.g., Spring, Guice)
+### Core Architecture
+- [ ] **Implement proper dependency injection**
+  - Replace direct instantiation with a DI framework (Spring, Guice)
   - Create interfaces for all major components
-  - Rationale: Improves testability and flexibility
+  - Improve testability and modularity
 
-## 3. Testing Improvements
+- [ ] **Refactor thread management**
+  - Replace raw Thread creation with ExecutorService
+  - Implement proper thread pooling and lifecycle management
+  - Add thread naming for better debugging
+  - Fix the `stat()` method in CoreManager to use proper async patterns
 
-- [ ] **Increase unit test coverage**
-  - Add tests for CoreManager class
-  - Add tests for PluginManager class
-  - Add tests for EpisodeManager class
-  - Add tests for CategoryManager class
-  - Rationale: Ensures functionality works as expected and prevents regressions
+- [ ] **Improve error handling**
+  - Create a comprehensive exception hierarchy
+  - Implement proper error recovery mechanisms
+  - Add graceful degradation for non-critical failures
+  - Standardize error reporting across the application
 
+- [ ] **Enhance logging system**
+  - Upgrade from Log4j 1.x to Log4j 2.x
+  - Implement structured logging
+  - Add correlation IDs for request tracing
+  - Create configurable log rotation policies
+
+### Code Organization
+- [ ] **Reduce code duplication**
+  - Extract common functionality into utility classes
+  - Create shared base classes for similar components
+  - Implement the DRY (Don't Repeat Yourself) principle
+
+- [ ] **Improve code readability**
+  - Add comprehensive JavaDoc comments
+  - Standardize naming conventions
+  - Break down complex methods into smaller, focused ones
+  - Remove unused code and dependencies
+
+- [ ] **Standardize API design**
+  - Create consistent patterns for method signatures
+  - Implement builder patterns for complex objects
+  - Use consistent return types and error handling
+
+## 2. Testing and Quality Assurance
+
+### Unit Testing
+- [ ] **Add tests for manager classes**
+  - Create tests for CoreManager
+  - Create tests for CategoryManager
+  - Create tests for EpisodeManager
+  - Create tests for PluginManager
+
+- [ ] **Improve test coverage**
+  - Aim for at least 80% code coverage
+  - Focus on critical business logic
+  - Test edge cases and error conditions
+  - Add parameterized tests for complex logic
+
+- [ ] **Implement test fixtures**
+  - Create reusable test data
+  - Implement test helpers and utilities
+  - Use mocking frameworks for external dependencies
+
+### Integration Testing
 - [ ] **Add integration tests**
-  - Create tests that verify interactions between components
-  - Test the full download and export workflow
-  - Rationale: Verifies that components work together correctly
+  - Test interactions between components
+  - Verify end-to-end workflows
+  - Test plugin loading and execution
+  - Test configuration loading and validation
 
 - [ ] **Implement automated UI tests**
-  - Add tests for GUI components
+  - Test GUI components and interactions
+  - Verify system tray functionality
   - Test common user workflows
-  - Rationale: Ensures the user interface works correctly
+  - Ensure accessibility compliance
 
-- [ ] **Add performance tests**
-  - Create benchmarks for critical operations
-  - Test with large numbers of episodes and categories
-  - Rationale: Identifies performance bottlenecks
+### Performance Testing
+- [ ] **Create performance benchmarks**
+  - Measure download performance
+  - Test with large numbers of episodes
+  - Identify and fix bottlenecks
+  - Implement performance regression tests
 
-- [ ] **Implement test fixtures and mocks**
-  - Create reusable test fixtures for common test scenarios
-  - Use mocking frameworks for external dependencies
-  - Rationale: Makes tests more maintainable and focused
+## 3. Security Enhancements
 
-## 4. Documentation Improvements
+### Plugin Security
+- [ ] **Implement plugin signature verification**
+  - Create a signing mechanism for plugins
+  - Verify signatures during plugin loading
+  - Reject unsigned or tampered plugins
+  - Document the signing process for plugin developers
 
-- [ ] **Create comprehensive JavaDoc**
-  - Add JavaDoc to all public classes and methods
-  - Include examples in documentation
-  - Rationale: Improves developer understanding and onboarding
+- [ ] **Add plugin sandboxing**
+  - Restrict plugin access to system resources
+  - Implement permission system for plugins
+  - Monitor plugin resource usage
+  - Create isolation between plugins
 
-- [ ] **Improve plugin development documentation**
-  - Create step-by-step guide for creating new plugins
-  - Add examples for each plugin type
-  - Document plugin lifecycle and API
-  - Rationale: Facilitates third-party plugin development
+### Data Security
+- [ ] **Secure sensitive data**
+  - Encrypt stored credentials
+  - Implement secure configuration storage
+  - Add proper handling of API keys
+  - Follow security best practices for data at rest
 
-- [ ] **Create architecture documentation**
-  - Document the overall system architecture
-  - Create component diagrams
-  - Explain design decisions and patterns
-  - Rationale: Helps new developers understand the system
+- [ ] **Enhance network security**
+  - Enforce HTTPS for all external communications
+  - Implement certificate pinning
+  - Add proper TLS configuration
+  - Validate all network responses
 
-- [ ] **Add code style guidelines**
-  - Define coding standards and best practices
-  - Create a style guide document
-  - Add IDE configuration files
-  - Rationale: Ensures consistent code quality
+## 4. User Experience Improvements
 
-- [ ] **Improve user documentation**
-  - Create user guides for common tasks
-  - Add troubleshooting section
-  - Include screenshots and examples
-  - Rationale: Improves user experience and reduces support burden
-
-## 5. Feature Enhancements
-
-- [ ] **Implement plugin versioning system**
-  - Add semantic versioning for plugins
-  - Create compatibility checking between core and plugins
-  - Rationale: Prevents compatibility issues with plugins
-
-- [ ] **Add plugin marketplace**
-  - Create a central repository for plugins
-  - Implement plugin discovery and installation
-  - Add ratings and reviews for plugins
-  - Rationale: Makes it easier to find and install plugins
-
-- [ ] **Improve download resilience**
-  - Implement automatic retry with exponential backoff
-  - Add support for resuming interrupted downloads
-  - Create download queue management
-  - Rationale: Improves reliability for unstable connections
-
-- [ ] **Enhance user interface**
-  - Modernize the UI with a responsive design
+### GUI Enhancements
+- [ ] **Modernize the user interface**
+  - Update to a modern UI framework
+  - Implement responsive design
   - Add dark mode support
-  - Implement accessibility features
-  - Rationale: Improves user experience and accessibility
+  - Improve accessibility features
 
-- [ ] **Add support for more content providers**
-  - Implement plugins for additional streaming platforms
-  - Create a generic plugin for custom sites
-  - Rationale: Increases the utility of the application
+- [ ] **Enhance notification system**
+  - Create more informative notifications
+  - Add customizable notification settings
+  - Implement priority levels for notifications
+  - Improve notification interaction
+
+### CLI Improvements
+- [ ] **Enhance command-line interface**
+  - Add more command options
+  - Implement tab completion
+  - Improve help documentation
+  - Add interactive mode
+
+### Configuration
+- [ ] **Simplify configuration process**
+  - Create a configuration wizard
+  - Add validation for configuration values
+  - Implement sensible defaults
+  - Provide better error messages for misconfiguration
+
+## 5. Documentation Improvements
+
+### Developer Documentation
+- [ ] **Create comprehensive API documentation**
+  - Document all public APIs
+  - Add examples and use cases
+  - Create diagrams for complex interactions
+  - Document design patterns and architectural decisions
+
+- [ ] **Improve plugin development guide**
+  - Create step-by-step tutorials
+  - Add more examples for different plugin types
+  - Document best practices
+  - Create templates for new plugins
+
+### User Documentation
+- [ ] **Enhance user guides**
+  - Create guides for common tasks
+  - Add troubleshooting information
+  - Include screenshots and examples
+  - Create video tutorials
+
+- [ ] **Improve in-application help**
+  - Add context-sensitive help
+  - Create tooltips for complex features
+  - Implement a searchable help system
+  - Add guided tours for new users
 
 ## 6. Build and Deployment
 
-- [ ] **Implement continuous integration**
-  - Set up GitHub Actions for automated builds
-  - Add automated testing in CI pipeline
-  - Implement code quality checks
-  - Rationale: Ensures code quality and prevents regressions
+### Build System
+- [ ] **Modernize build process**
+  - Update Maven configuration
+  - Implement reproducible builds
+  - Add build profiles for different environments
+  - Optimize build performance
 
+- [ ] **Implement continuous integration**
+  - Set up GitHub Actions workflows
+  - Add automated testing in CI
+  - Implement code quality checks
+  - Create deployment pipelines
+
+### Deployment
 - [ ] **Improve release process**
   - Create automated release scripts
   - Implement semantic versioning
   - Add changelog generation
-  - Rationale: Streamlines the release process
+  - Create release notes templates
 
-- [ ] **Containerize the application**
-  - Create Docker configuration
-  - Add container orchestration support
-  - Rationale: Simplifies deployment and environment consistency
-
-- [ ] **Implement automated dependency updates**
-  - Set up Dependabot or similar tool
-  - Create policy for dependency updates
-  - Rationale: Keeps dependencies current with minimal effort
-
-- [ ] **Add installation packages for more platforms**
+- [ ] **Enhance platform support**
+  - Improve Windows installer
   - Create macOS package
-  - Improve Linux package
-  - Add Windows installer
-  - Rationale: Makes installation easier for users
+  - Enhance Linux packages
+  - Add container support (Docker)
+
+## 7. Feature Enhancements
+
+### Content Providers
+- [ ] **Add support for more streaming platforms**
+  - Implement plugins for popular streaming services
+  - Create a generic plugin for custom sites
+  - Add support for subscription-based services
+  - Implement content discovery features
+
+### Download Engine
+- [ ] **Improve download resilience**
+  - Add automatic retry with exponential backoff
+  - Implement download resumption
+  - Add bandwidth management
+  - Create download prioritization
+
+### Export Features
+- [ ] **Enhance export capabilities**
+  - Add support for more output formats
+  - Implement metadata embedding
+  - Add subtitle support
+  - Create custom export profiles
+
+## 8. Community and Ecosystem
+
+### Community Building
+- [ ] **Create community resources**
+  - Set up user forums
+  - Create a knowledge base
+  - Implement a plugin marketplace
+  - Establish contribution guidelines
+
+### Ecosystem Development
+- [ ] **Develop integration ecosystem**
+  - Create public APIs for integration
+  - Implement webhooks for events
+  - Add support for external tools
+  - Create SDK for developers

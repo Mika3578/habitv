@@ -172,9 +172,108 @@ mvn install
 mvn install -DskipTests
 ```
 
-### Plugin Development
+## Deployment Workflow
 
-#### Plugin Structure
+### Overview
+
+The habiTv project uses a local Maven deployment workflow that publishes artifacts to GitHub Pages for distribution. This approach eliminates the need for external FTP/HTTP repositories and provides a secure, reliable distribution mechanism.
+
+### Workflow Steps
+
+1. **Local Maven Deploy**: Run `mvn deploy` to generate all Maven artifacts locally
+2. **Artifact Copying**: Copy updated artifacts from `~/.m2/repository` to `docs/repository`
+3. **Git Commit**: Commit the updated artifacts to the repository
+4. **GitHub Pages**: Push to GitHub Pages for public distribution
+
+### Automated Scripts
+
+The project includes automated scripts to streamline the deployment process:
+
+#### PowerShell Scripts (Windows)
+
+```powershell
+# Combined deploy and publish
+.\scripts\deploy-and-publish.ps1
+
+# Post-deploy only (after manual mvn deploy)
+.\scripts\post-deploy.ps1
+
+# With custom commit message
+.\scripts\deploy-and-publish.ps1 -CommitMessage "Release version 4.1.0"
+```
+
+#### Bash Scripts (Linux/macOS)
+
+```bash
+# Combined deploy and publish
+./scripts/deploy-and-publish.sh
+
+# Post-deploy only (after manual mvn deploy)
+./scripts/post-deploy.sh
+
+# With custom commit message
+./scripts/deploy-and-publish.sh --commit-message "Release version 4.1.0"
+```
+
+### Manual Workflow
+
+If you prefer to run the steps manually:
+
+```bash
+# Step 1: Deploy to local repository
+mvn clean deploy
+
+# Step 2: Copy artifacts to docs/repository
+cp -r ~/.m2/repository/com/dabi/habitv/* docs/repository/com/dabi/habitv/
+
+# Step 3: Commit and push
+git add docs/repository/com/dabi/habitv/
+git commit -m "Deploy Maven artifacts to GitHub Pages"
+git push
+```
+
+### Configuration
+
+#### Repository Structure
+
+The artifacts are published to:
+- **Local Repository**: `~/.m2/repository/com/dabi/habitv/`
+- **GitHub Pages**: `https://mika3578.github.io/habitv/repository/com/dabi/habitv/`
+
+#### Maven Configuration
+
+The project has been configured to:
+- Remove FTP/HTTP deployment repositories from `pom.xml`
+- Remove FTP wagon extensions
+- Use local deployment only
+- Maintain GitHub Pages repository as the distribution point
+
+### Benefits
+
+- **Security**: HTTPS-only distribution through GitHub Pages
+- **Reliability**: GitHub's high-availability infrastructure
+- **Version Control**: Git-based artifact management
+- **Automation**: Scripted deployment process
+- **No External Dependencies**: No need for FTP servers or external repositories
+
+### Troubleshooting
+
+#### Common Issues
+
+1. **Artifacts Not Found**: Ensure `mvn deploy` completed successfully
+2. **Git Push Fails**: Check repository permissions and network connectivity
+3. **Script Permissions**: On Linux/macOS, ensure scripts are executable (`chmod +x scripts/*.sh`)
+
+#### Verification
+
+After deployment, verify artifacts are available at:
+```
+https://mika3578.github.io/habitv/repository/com/dabi/habitv/
+```
+
+## Plugin Development
+
+### Plugin Structure
 
 ```java
 package fr.mika3578.habitv.plugin;

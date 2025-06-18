@@ -1,10 +1,6 @@
 package com.dabi.habitv.plugintester;
 
 import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 
 import com.dabi.habitv.api.plugin.api.UpdatablePluginInterface;
 import com.dabi.habitv.api.plugin.holder.DownloaderPluginHolder;
@@ -18,11 +14,9 @@ public class BasePluginUpdateTester implements Subscriber<UpdatablePluginEvent> 
 	private DownloaderPluginHolder downloaders;
 	private Publisher<UpdatablePluginEvent> publisher;
 
-	@BeforeClass
 	public static void setUpBeforeClass() {
 	}
 
-	@AfterClass
 	public static void tearDownAfterClass() {
 	}
 
@@ -30,14 +24,12 @@ public class BasePluginUpdateTester implements Subscriber<UpdatablePluginEvent> 
 		super();
 	}
 
-	@Before
 	public void setUp() {
 		downloaders = new DownloaderPluginHolder("", null, null, "downloads", "index", "bin", "plugins");
 		publisher = new Publisher<>();
 		publisher.attach(this);
 	}
 
-	@After
 	public void tearDown() {
 
 	}

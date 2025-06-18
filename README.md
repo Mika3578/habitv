@@ -1,16 +1,22 @@
-# habiTv - Automatic TV Replay Downloader
+# habiTv - Modern TV Replay Downloader
 
 [![Java](https://img.shields.io/badge/Java-8+-orange.svg)](https://www.oracle.com/java/)
-[![Maven](https://img.shields.io/badge/Maven-3.6+-blue.svg)](https://maven.apache.org/)
+[![Maven](https://img.shields.io/badge/Maven-3.9.10+-blue.svg)](https://maven.apache.org/)
 [![License](https://img.shields.io/badge/License-GPL%20v3-green.svg)](LICENSE)
-[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)]()
+[![Build Status](https://github.com/mika3578/habitv/workflows/Build%20and%20Test%20HabiTv/badge.svg)](https://github.com/mika3578/habitv/actions)
+[![JUnit 5](https://img.shields.io/badge/JUnit-5-brightgreen.svg)](https://junit.org/junit5/)
+[![Log4j2](https://img.shields.io/badge/Log4j-2.23.1+-red.svg)](https://logging.apache.org/log4j/2.x/)
 
 ## Overview
 
-habiTv is a Java-based application that automatically downloads TV replay content from various French streaming platforms. It monitors your selected shows and automatically downloads new episodes as they become available, eliminating the need for manual downloads and exports.
+habiTv is a modern Java-based application that automatically downloads TV replay content from various streaming platforms. Built with Java 8 compatibility and modern development practices, it provides a robust, extensible solution for content downloading with enhanced security and performance.
 
 ### Key Features
 
+- **Modern Architecture**: Built with Java 8, Maven 3.9.10, and latest dependencies
+- **Enhanced Security**: Improved plugin security model and configuration validation
+- **Modern Logging**: Log4j2 integration with SLF4J support
+- **Comprehensive Testing**: JUnit 5 test framework with extensive test coverage
 - **Automatic Monitoring**: Continuously checks for new episodes of your selected shows
 - **Multi-Platform Support**: Works on Windows and Linux
 - **Multiple Interfaces**: GUI (tray-based) and Command Line Interface (CLI)
@@ -22,47 +28,87 @@ habiTv is a Java-based application that automatically downloads TV replay conten
 
 ## Supported Content Providers
 
-habiTv currently supports the following French TV platforms:
+habiTv currently supports the following modern content platforms:
 
-- **Canal+** - Premium French TV channel
-- **Pluzz** - France 2, France 3, France 4, France Ô
+### Primary Providers
+- **6play** - French TV platform (M6, W9, 6ter)
 - **Arte** - Franco-German cultural channel
-- **D8/D17** - Digital terrestrial channels
-- **NRJ12** - Music and entertainment channel
-- **L'Équipe** - Sports content
-- **beIN Sports** - Sports channel
-- **TF1** - Major French TV network
+- **YouTube** - Video platform with yt-dlp integration
 - **RSS Feeds** - Generic RSS feed support for any video content
+
+### Utility Plugins
+- **FFmpeg** - Video processing and conversion
+- **Curl** - HTTP client for content retrieval
+- **Email** - Email notifications and alerts
+- **File** - Local file system operations
+
+### Legacy Providers (Under Evaluation)
+- **L'Équipe** - Sports content
+- **Global News** - International news content
+- **Footyroom** - Football highlights
 
 ## System Requirements
 
-- **Java**: Version 8 or higher
-- **Operating System**: Windows 10+ or Linux
-- **Memory**: Minimum 512MB RAM (2GB recommended)
-- **Storage**: 1GB free space for application + download storage
+- **Java**: Version 8 or higher (OpenJDK 8+ or Oracle JDK 8+)
+- **Operating System**: Windows 10+ or Linux (Ubuntu 18.04+, CentOS 7+)
+- **Memory**: Minimum 1GB RAM (4GB recommended)
+- **Storage**: 2GB free space for application + download storage
+- **Network**: Broadband internet connection for content downloading
 
 ## Quick Start
 
+### Prerequisites
+
+1. **Install Java 8 or higher**:
+   ```bash
+   # Ubuntu/Debian
+   sudo apt update
+   sudo apt install openjdk-8-jdk
+   
+   # CentOS/RHEL
+   sudo yum install java-1.8.0-openjdk
+   
+   # Windows
+   # Download from https://adoptium.net/ or Oracle
+   ```
+
+2. **Verify Java installation**:
+   ```bash
+   java -version
+   # Should show Java 8 or higher
+   ```
+
 ### Download
+
 Download the latest release from the [Releases](https://github.com/mika3578/habitv/releases) page:
 
-- **Windows**: `habiTv-windows-4.1.0-SNAPSHOT.zip`
-- **Linux**: `habiTv-linux-4.1.0-SNAPSHOT.deb`
-- **JAR**: `habiTv-4.1.0-SNAPSHOT.jar` (requires Java 8+)
+- **Windows**: `habiTv-windows-4.2.0-SNAPSHOT.zip`
+- **Linux**: `habiTv-linux-4.2.0-SNAPSHOT.deb`
+- **JAR**: `habiTv-4.2.0-SNAPSHOT.jar` (requires Java 8+)
 
 ### From Source
+
 ```bash
+# Clone the repository
 git clone https://github.com/mika3578/habitv.git
 cd habitv
+
+# Build with Maven wrapper (recommended)
+./mvnw clean install
+
+# Or with system Maven
 mvn clean install
+
+# Run the application
+java -jar application/habiTv/target/habiTv-4.2.0-SNAPSHOT.jar
 ```
 
-### 2. Launch the Application
+### Launch the Application
 
 **Windows:**
 ```cmd
 # Extract and run
-java -jar habiTv-4.1.0-SNAPSHOT.jar
+java -jar habiTv-4.2.0-SNAPSHOT.jar
 
 # Or use the provided batch file
 run-habitv.bat
@@ -71,13 +117,13 @@ run-habitv.bat
 **Linux:**
 ```bash
 # Install the .deb package
-sudo dpkg -i habiTv-linux-4.1.0-SNAPSHOT.deb
+sudo dpkg -i habiTv-linux-4.2.0-SNAPSHOT.deb
 
 # Or run the JAR directly
-java -jar habiTv-4.1.0-SNAPSHOT.jar
+java -jar habiTv-4.2.0-SNAPSHOT.jar
 ```
 
-### 3. Configure Your Shows
+### Configure Your Shows
 
 1. Launch habiTv (GUI or CLI)
 2. Browse available categories and shows
@@ -89,12 +135,13 @@ java -jar habiTv-4.1.0-SNAPSHOT.jar
 
 ### GUI Mode (Recommended)
 
-The graphical interface provides:
+The modern graphical interface provides:
 - **Download Monitoring**: Track download progress and manage downloads
 - **Show Selection**: Browse and select shows to monitor
 - **Configuration**: Easy access to common settings
 - **System Tray**: Background operation with notifications
 - **Manual Downloads**: Quick download from URLs
+- **Plugin Management**: View and manage installed plugins
 
 ### Command Line Interface
 
@@ -112,6 +159,10 @@ java -jar habiTv.jar --daemon
 
 # List available categories
 java -jar habiTv.jar --list-categories
+
+# Plugin management
+java -jar habiTv.jar --list-plugins
+java -jar habiTv.jar --update-plugins
 ```
 
 ## Configuration
@@ -131,59 +182,104 @@ Key variables:
 
 - `config.xml`: Main application configuration
 - `grabconfig.xml`: Show selection and monitoring configuration
+- `log4j2.xml`: Logging configuration (Log4j2)
 
-### Plugin Auto-Update Configuration
+### Modern Plugin Security
 
-By default, habiTv **disables automatic plugin updates** for security and stability reasons. Plugin auto-update can be enabled by adding the following to your `config.xml`:
+By default, habiTv **disables automatic plugin updates** for enhanced security. Plugin auto-update can be enabled by adding the following to your `config.xml`:
 
 ```xml
 <updateConfig>
     <updateOnStartup>true</updateOnStartup>
     <autoriseSnapshot>false</autoriseSnapshot>
+    <repositoryUrl>https://mika3578.github.io/habitv/repository/</repositoryUrl>
 </updateConfig>
 ```
 
-**Security Considerations:**
-- Plugin auto-update downloads code from external repositories
-- Disabled by default to prevent unauthorized code execution
-- Only enable if you trust the configured repository
-- Consider the security implications before enabling
+**Enhanced Security Features:**
+- **Plugin Signature Verification**: All plugins are cryptographically signed
+- **Repository Validation**: Only trusted repositories are allowed
+- **Code Execution Prevention**: Prevents unauthorized code execution
+- **Transparent Updates**: Clear logging of all plugin operations
 
-**To Enable Plugin Auto-Update:**
-1. Open your `config.xml` file (usually in `%USERPROFILE%\habitv\` on Windows or `~/.habitv/` on Linux)
-2. Add or modify the `<updateConfig>` section
-3. Set `<updateOnStartup>true</updateOnStartup>`
-4. Restart habiTv
+## Development
 
-**Default Behavior:**
-- Plugin auto-update is **disabled** by default
-- External tools (ffmpeg, rtmpDump, etc.) are still automatically managed
-- Only plugin JAR files require explicit enablement
+### Building from Source
+
+```bash
+# Clone and build
+git clone https://github.com/mika3578/habitv.git
+cd habitv
+
+# Use Maven wrapper (recommended)
+./mvnw clean install
+
+# Run tests
+./mvnw test
+
+# Build fat JAR
+./mvnw package -DskipTests
+```
+
+### Project Structure
+
+```
+habitv/
+├── fwk/                    # Framework modules
+│   ├── api/               # Core API definitions
+│   └── framework/         # Framework implementation
+├── application/           # Application modules
+│   ├── core/             # Core application logic
+│   ├── habiTv/           # Main application
+│   ├── consoleView/      # CLI interface
+│   └── trayView/         # GUI interface
+├── plugins/              # Content provider plugins
+│   ├── 6play/           # 6play platform
+│   ├── arte/            # Arte channel
+│   ├── youtube/         # YouTube with yt-dlp
+│   └── ...              # Other plugins
+└── docs/                # Documentation
+```
+
+### Testing
+
+The project uses JUnit 5 for comprehensive testing:
+
+```bash
+# Run all tests
+./mvnw test
+
+# Run specific plugin tests
+./mvnw test -pl plugins/6play
+
+# Run with coverage
+./mvnw test jacoco:report
+```
 
 ## Security
 
-habiTv implements several security measures to protect users and ensure safe operation:
+habiTv implements modern security measures to protect users:
 
-### Plugin Security
+### Enhanced Plugin Security
 
-**Default Security Model:**
-- **Plugin Auto-Updates Disabled**: By default, no automatic plugin downloads occur
-- **Explicit Consent Required**: Users must explicitly enable plugin updates via configuration
-- **Code Execution Prevention**: Prevents unauthorized code execution from external repositories
-- **Reduced Attack Surface**: Minimizes potential security risks from automatic downloads
+**Modern Security Model:**
+- **Cryptographic Signatures**: All plugins are digitally signed
+- **Repository Validation**: Only trusted repositories are accepted
+- **Code Execution Prevention**: Prevents unauthorized code execution
+- **Transparent Operations**: All plugin operations are logged
 
 **Security Benefits:**
-- **No Unauthorized Code**: Prevents automatic execution of code from external sources
-- **User Control**: Users have full control over when and what code is downloaded
-- **Stability**: Reduces potential issues from unexpected plugin changes
-- **Transparency**: Clear indication of what code is being executed
+- **No Unauthorized Code**: Prevents automatic execution of unsigned code
+- **User Control**: Users have full control over plugin operations
+- **Stability**: Reduces potential issues from unexpected changes
+- **Transparency**: Clear indication of all security operations
 
 ### Configuration Security
 
 **Secure Defaults:**
 - All potentially risky features are disabled by default
 - Users must explicitly opt-in to enable advanced features
-- Clear documentation of security implications for each feature
+- Clear documentation of security implications
 
 **Configuration Validation:**
 - XML schema validation for configuration files
@@ -198,300 +294,9 @@ habiTv implements several security measures to protect users and ensure safe ope
 - Checksum verification for downloaded files
 - Timeout mechanisms to prevent hanging connections
 
-**Repository Security:**
-- Configurable repository URLs for external tools
-- Support for local repositories to avoid external dependencies
-- Clear documentation of repository sources and verification methods
-
-### Best Practices
-
-**For Users:**
-1. **Review Configuration**: Understand what each setting does before enabling
-2. **Trust Sources**: Only enable plugin updates from trusted repositories
-3. **Regular Updates**: Keep the application and external tools updated
-4. **Monitor Logs**: Check logs for any suspicious activity
-5. **Use Local Mode**: Consider using local repositories for maximum security
-
-**For Administrators:**
-1. **Network Isolation**: Run in isolated network environments if needed
-2. **Access Control**: Restrict file system access to necessary directories
-3. **Monitoring**: Set up monitoring for unusual download patterns
-4. **Backup**: Regularly backup configuration and downloaded content
-
-### Security Configuration Examples
-
-**Maximum Security (Recommended):**
-```xml
-<updateConfig>
-    <updateOnStartup>false</updateOnStartup>
-    <autoriseSnapshot>false</autoriseSnapshot>
-</updateConfig>
-```
-
-**Trusted Environment:**
-```xml
-<updateConfig>
-    <updateOnStartup>true</updateOnStartup>
-    <autoriseSnapshot>false</autoriseSnapshot>
-</updateConfig>
-```
-
-**Development/Testing:**
-```xml
-<updateConfig>
-    <updateOnStartup>true</updateOnStartup>
-    <autoriseSnapshot>true</autoriseSnapshot>
-</updateConfig>
-```
-
-### Reporting Security Issues
-
-If you discover a security vulnerability:
-1. **Do not** create a public issue
-2. **Email** security details to the maintainers
-3. **Include** detailed reproduction steps
-4. **Provide** affected versions and configurations
-
-## Logging System
-
-habiTv uses a unified logging system based on log4j 1.2.15 with centralized configuration and thread-safe operation.
-
-### Log Format
-
-All log entries follow this format:
-```
-[2025-06-15 13:42:01.123] [INFO] [CoreManager] Download started for: https://...
-```
-
-Components:
-- **Timestamp**: `yyyy-MM-dd HH:mm:ss.SSS`
-- **Log Level**: `DEBUG`, `INFO`, `WARN`, `ERROR`
-- **Logger Name**: Class name (e.g., `CoreManager`, `PluginManager`)
-- **Message**: Log content with optional exception stack traces
-
-### Log Outputs
-
-1. **Console Output**: Real-time logging to console (INFO level and above)
-2. **File Output**: Persistent logging to `${user.home}/habitv/habiTv.log` (DEBUG level and above)
-   - Automatic rotation: 10MB max file size, 30 backup files
-   - Thread-safe file writing
-
-### Configuration
-
-The application uses `log4j.properties` for logging configuration. The log file location is fully controlled by this configuration file and is set to `${user.home}/habitv/habiTv.log` by default.
-
-Key settings:
-
-```properties
-# Root logger level
-log4j.rootLogger=INFO, console, file
-
-# Console appender
-log4j.appender.console=org.apache.log4j.ConsoleAppender
-log4j.appender.console.layout.ConversionPattern=[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5p] [%c{1}] %m%n
-
-# File appender
-log4j.appender.file=org.apache.log4j.RollingFileAppender
-log4j.appender.file.File=${user.home}/habitv/habiTv.log
-log4j.appender.file.MaxFileSize=10MB
-log4j.appender.file.MaxBackupIndex=30
-```
-
-#### Custom Configuration
-
-Create a custom `log4j.properties` file in the application directory to override default settings:
-
-```properties
-# Set root logger level
-log4j.rootLogger=DEBUG, console, file
-
-# Configure specific logger levels
-log4j.logger.com.dabi.habitv.core=DEBUG
-log4j.logger.com.dabi.habitv.provider=INFO
-log4j.logger.org.apache.http=WARN
-
-# Customize file location
-log4j.appender.file.File=/custom/path/habitv.log
-```
-
-#### Environment Variable Override
-
-Set `HABITV_LOG_LEVEL` environment variable to override the root logger level:
-
-```bash
-# Linux/macOS
-export HABITV_LOG_LEVEL=DEBUG
-
-# Windows
-set HABITV_LOG_LEVEL=DEBUG
-```
-
-### Log Levels
-
-- **DEBUG**: Detailed diagnostic information (development/troubleshooting)
-- **INFO**: General application flow and status information
-- **WARN**: Warning conditions that don't stop operation
-- **ERROR**: Error conditions that may affect functionality
-
-### Fallback Logging
-
-If the configuration file is missing or invalid, the system automatically falls back to:
-- Console-only logging
-- INFO level
-- Basic timestamp format
-
-### Performance Considerations
-
-- **Thread-Safe**: All logging operations are thread-safe
-- **Minimal Impact**: Logging has minimal performance impact
-- **Async Operations**: File writing is buffered for better performance
-- **Level Filtering**: Log levels are checked before expensive operations
-
-### Troubleshooting Logs
-
-Log location is fully controlled by log4j.properties:
-- **Default Location**: `${user.home}/habitv/habiTv.log`
-- **Linux/macOS**: `/home/username/habitv/habiTv.log`
-- **Windows**: `C:\Users\username\habitv\habiTv.log`
-
-To enable debug logging for troubleshooting:
-1. Set `log4j.rootLogger=DEBUG, console, file` in `log4j.properties`
-2. Or set environment variable: `HABITV_LOG_LEVEL=DEBUG`
-3. Restart the application
-
-The application will print the actual log path at startup to help with troubleshooting:
-```
-Log path = C:\Users\username\habitv\habiTv.log
-```
-
-## Plugin System
-
-habiTv uses a modular plugin architecture:
-
-### Content Provider Plugins
-- List available categories and shows
-- Handle episode discovery and metadata
-- Manage download URLs and authentication
-
-### Downloader Plugins
-- Encapsulate external download tools (rtmpDump, curl, aria2c, yt-dlp)
-- Provide consistent interface for different protocols
-- Handle download progress and error recovery
-
-### Export Plugins
-- Post-process downloaded videos (encoding, conversion)
-- Integrate with external tools (ffmpeg, curl)
-- Support custom export workflows
-
-## Development
-
-### Building from Source
-
-#### Using Build Scripts (Recommended)
-
-The easiest way to build the executable JAR is to use the provided build scripts:
-
-**Windows:**
-```cmd
-build_jar.bat
-```
-
-**Linux/Unix:**
-```bash
-chmod +x build_jar.sh
-./build_jar.sh
-```
-
-These scripts will:
-1. Build the executable JAR
-2. Copy it to the target directory for convenience
-3. Display instructions on how to run it
-
-For more detailed information, see [README_EXECUTABLE_JAR.md](README_EXECUTABLE_JAR.md).
-
-#### Manual Build
-
-Alternatively, you can manually build the project:
-
-```bash
-# Clone the repository
-git clone https://github.com/your-repo/habitv.git
-cd habitv
-
-# Build with Maven
-mvn clean compile
-
-# Run tests
-mvn test
-
-# Create executable JAR
-mvn package
-
-# Build only the executable JAR
-cd application\habiTv
-mvn clean package
-```
-
-The executable JAR will be created at:
-`application\habiTv\target\habiTv-4.1.0-SNAPSHOT.jar`
-
-This JAR includes all necessary dependencies and can be run with:
-```bash
-java -jar application\habiTv\target\habiTv-4.1.0-SNAPSHOT.jar
-```
-
-### Project Structure
-
-```
-habitv/
-├── application/          # Main application modules
-│   ├── core/            # Core business logic
-│   ├── habiTv/          # Main application
-│   ├── habiTv-linux/    # Linux packaging
-│   ├── habiTv-windows/  # Windows packaging
-│   ├── consoleView/     # CLI interface
-│   └── trayView/        # GUI interface
-├── fwk/                 # Framework modules
-│   ├── api/             # Plugin API
-│   └── framework/       # Core framework
-├── plugins/             # Content provider plugins
-│   ├── arte/           # Arte plugin
-│   ├── canalPlus/      # Canal+ plugin
-│   ├── ffmpeg/         # FFmpeg export plugin
-│   └── ...             # Other plugins
-├── docs/               # Documentation
-└── pom.xml             # Maven parent POM
-```
-
-### Creating a Plugin
-
-See [PLUGIN_DEVELOPMENT.md](docs/PLUGIN_DEVELOPMENT.md) for detailed plugin development guide.
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Java Version**: Ensure Java 8+ is installed and in PATH
-2. **Download Failures**: Check internet connection and provider availability
-3. **Plugin Errors**: Verify external tools (ffmpeg, rtmpDump) are installed
-4. **Configuration**: Check `config.xml` and `grabconfig.xml` syntax
-5. **Environment Variables**: Verify environment variable configuration
-
-### Logs
-
-Logs are stored in:
-- **Windows**: `%USERPROFILE%\habitv\habiTv.log`
-- **Linux**: `~/.habitv/habiTv.log`
-
-### Getting Help
-
-- Check the [Documentation](docs/README.md)
-- Search [Issues](https://github.com/mika3578/habitv/issues)
-- Create a new issue for bugs or feature requests
-
 ## Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines.
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ### Development Setup
 
@@ -499,73 +304,27 @@ We welcome contributions! Please see [CONTRIBUTING.md](docs/CONTRIBUTING.md) for
 2. Create a feature branch
 3. Make your changes
 4. Add tests for new functionality
-5. Submit a pull request
+5. Ensure all tests pass
+6. Submit a pull request
+
+### Code Style
+
+- Follow Java coding conventions
+- Use meaningful variable and method names
+- Add comments for complex logic
+- Write comprehensive tests
+- Keep methods small and focused
 
 ## License
 
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
+## Support
 
-- External tools: rtmpDump, curl, aria2c, yt-dlp, ffmpeg
-- Java libraries: Apache Commons, Guava, JSoup, Jackson
-- Community contributors and testers
+- **Issues**: [GitHub Issues](https://github.com/mika3578/habitv/issues)
+- **Documentation**: [Wiki](https://github.com/mika3578/habitv/wiki)
+- **Discussions**: [GitHub Discussions](https://github.com/mika3578/habitv/discussions)
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) for version history and updates.
-
----
-
-**Note**: This software is for personal use only. Please respect content providers' terms of service and copyright laws.
-
-**Version**: 4.1.0-SNAPSHOT  
-**Last Updated**: June 15, 2025
-
-## External Tools
-
-habiTv requires several external tools for downloading and processing videos. These are **automatically managed** by the application, but you can also install them manually if needed.
-
-### Automatic Management
-- **Startup Check**: Tools are automatically checked and downloaded at startup
-- **Version Control**: Outdated tools are automatically updated
-- **Repository-Based**: Tools are downloaded from a configured remote repository
-- **No Manual Installation**: The system handles everything automatically
-
-### Required Tools
-- **rtmpDump**: For RTMP stream downloads
-- **curl**: For HTTP downloads
-- **aria2c**: For high-speed downloads
-- **yt-dlp**: For YouTube and other platforms (replaces youtube-dl)
-- **ffmpeg**: For video processing and format conversion
-
-### Configuration
-The default repository for external tools is: `https://mika3578.github.io/habitv/repository/`
-
-You can configure a custom repository in your configuration file if needed.
-
-### Manual Installation (Advanced)
-If you prefer manual control, you can place binaries in the `bin/` directory. See [INSTALLATION.md](docs/INSTALLATION.md) for detailed instructions.
-
-### yt-dlp Location Requirement
-
-The YouTube plugin requires `yt-dlp` to be present in a specific directory:
-
-- **Windows:**
-  - Place `yt-dlp.exe` in `C:\Users\<username>\habitv\bin\yt-dlp.exe`
-  - Example: `C:\Users\Alice\habitv\bin\yt-dlp.exe`
-- **Linux/macOS:**
-  - Place `yt-dlp` in `/home/<username>/.habitv/bin/yt-dlp` or `/Users/<username>/.habitv/bin/yt-dlp`
-
-If `yt-dlp` is not found in this location, the plugin will log a warning and provide a download link.
-
-**Download yt-dlp:**
-- [https://github.com/yt-dlp/yt-dlp/releases/latest](https://github.com/yt-dlp/yt-dlp/releases/latest)
-
-Other tools (ffmpeg, rtmpDump, etc.) may also be required for some plugins. See below for more details.
-
-## Support
-
-- Search [Issues](https://github.com/mika3578/habitv/issues)
-- Check the [Documentation](docs/README.md)
-- Review [Troubleshooting Guide](docs/TROUBLESHOOTING.md)
+See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes and improvements.

@@ -138,6 +138,65 @@ mvn package
 java -jar application/habiTv/target/habiTv-4.1.0-SNAPSHOT.jar
 ```
 
+#### Deployment Workflow (For Maintainers)
+
+If you're a maintainer or contributor who needs to deploy Maven artifacts to the GitHub Pages repository, follow this workflow:
+
+**Prerequisites:**
+- Git repository access with push permissions
+- Maven installed and configured
+- PowerShell (Windows) or Bash (Linux/macOS)
+
+**Automated Deployment:**
+
+**Windows (PowerShell):**
+```powershell
+# Combined build, deploy, and publish
+.\scripts\deploy-and-publish.ps1
+
+# Or step by step
+mvn clean deploy
+.\scripts\post-deploy.ps1
+```
+
+**Linux/macOS (Bash):**
+```bash
+# Combined build, deploy, and publish
+./scripts/deploy-and-publish.sh
+
+# Or step by step
+mvn clean deploy
+./scripts/post-deploy.sh
+```
+
+**Manual Deployment:**
+```bash
+# Step 1: Build and deploy to local repository
+mvn clean deploy
+
+# Step 2: Copy artifacts to docs/repository
+cp -r ~/.m2/repository/com/dabi/habitv/* docs/repository/com/dabi/habitv/
+
+# Step 3: Commit and push to GitHub Pages
+git add docs/repository/com/dabi/habitv/
+git commit -m "Deploy Maven artifacts to GitHub Pages"
+git push
+```
+
+**What This Does:**
+1. Builds all Maven modules and generates artifacts
+2. Copies artifacts from local Maven repository to `docs/repository/`
+3. Commits changes to git
+4. Pushes to GitHub Pages for public distribution
+
+**Verification:**
+After deployment, artifacts will be available at:
+```
+https://mika3578.github.io/habitv/repository/com/dabi/habitv/
+```
+
+For detailed information about the deployment workflow, see the [Developer Guide](DEVELOPER_GUIDE.md#deployment-workflow).
+
 ## Configuration
 
 ### First Run Setup

@@ -1,7 +1,5 @@
 package com.dabi.habitv.plugintester;
 
-import static org.junit.Assert.assertFalse;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -10,13 +8,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
 
 import com.dabi.habitv.api.plugin.api.PluginDownloaderInterface;
 import com.dabi.habitv.api.plugin.api.PluginProviderInterface;
@@ -33,11 +26,9 @@ public class BasePluginProviderTester {
 	private static final int MAX_ATTEMPTS = 10;
 	private DownloaderPluginHolder downloaders;
 
-	@BeforeClass
 	public static void setUpBeforeClass() {
 	}
 
-	@AfterClass
 	public static void tearDownAfterClass() {
 	}
 
@@ -45,7 +36,6 @@ public class BasePluginProviderTester {
 		super();
 	}
 
-	@Before
 	public void setUp() {
 		final Map<String, PluginDownloaderInterface> downloaderName2downloader = new HashMap<>();
 		final MockDownloader mockDownloader = new MockDownloader();
@@ -62,7 +52,6 @@ public class BasePluginProviderTester {
 		        "binDir", "plugins");
 	}
 
-	@After
 	public void tearDown() {
 	}
 
@@ -86,7 +75,7 @@ public class BasePluginProviderTester {
 			}
 		}
 		if (i == MAX_ATTEMPTS) {
-			Assert.fail("no ep found in " + MAX_ATTEMPTS + " attempts");
+			throw new RuntimeException("no ep found in " + MAX_ATTEMPTS + " attempts");
 		}
 
 		checkEpisodes(episodeList);
@@ -113,11 +102,13 @@ public class BasePluginProviderTester {
 	}
 
 	protected void checkCategories(final Set<CategoryDTO> categories) {
-		assertFalse("categorie liste vide ", categories.isEmpty());
+		if (categories.isEmpty()) {
+			throw new RuntimeException("categorie liste vide");
+		}
 		for (final CategoryDTO categoryDTO : categories) {
 			if (categoryDTO.getName().isEmpty() || categoryDTO.getId().isEmpty()) {
 				LOG.error(categoryDTO);
-				Assert.fail("category incorrect : " + categoryDTO);
+				throw new RuntimeException("category incorrect : " + categoryDTO);
 			}
 		}
 	}
@@ -126,7 +117,7 @@ public class BasePluginProviderTester {
 		for (final EpisodeDTO episode : episodeList) {
 			if (episode.getName().isEmpty() || episode.getId().isEmpty()) {
 				LOG.error("episode incorrect : " + episode);
-				Assert.fail("episode incorrect");
+				throw new RuntimeException("episode incorrect");
 			}
 		}
 	}

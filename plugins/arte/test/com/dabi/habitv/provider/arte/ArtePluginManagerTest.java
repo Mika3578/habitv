@@ -1,6 +1,7 @@
 package com.dabi.habitv.provider.arte;
 
 import org.junit.Test;
+import org.junit.Ignore;
 
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
@@ -12,11 +13,13 @@ import java.util.Set;
 public class ArtePluginManagerTest extends BasePluginProviderTester {
 
 	@Test
+	@Ignore("Network test - skip during build")
 	public final void testArtePluginManager() throws DownloadFailedException, ReflectiveOperationException {
 		testPluginProvider(ArtePluginManager.class, true);
 	}
 
 	@Test
+	@Ignore("Network test - skip during build")
 	public final void testArteReplayCategory() throws DownloadFailedException {
 		ArtePluginManager manager = new ArtePluginManager();
 
@@ -34,6 +37,7 @@ public class ArtePluginManagerTest extends BasePluginProviderTester {
 	}
 
 	@Test
+	@Ignore("Network test - skip during build")
 	public final void testArteReplayEpisodes() throws DownloadFailedException {
 		ArtePluginManager manager = new ArtePluginManager();
 
@@ -72,6 +76,7 @@ public class ArtePluginManagerTest extends BasePluginProviderTester {
 	}
 
 	@Test
+	@Ignore("Network test - skip during build")
 	public final void testAllCategories() throws DownloadFailedException {
 		// Check if arte.jar exists in the plugins folder
 		boolean arteJarExists = new java.io.File("plugins/arte.jar").exists();

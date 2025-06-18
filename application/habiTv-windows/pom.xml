@@ -9,8 +9,9 @@
 	<packaging>jar</packaging>
 	<name>habiTv-windows</name>	
 	 <scm>
-        <connection>scm:svn:http://subversion.assembla.com/svn/habitv/trunk/application/habiTv-windows</connection>
-        <developerConnection>scm:svn:http://subversion.assembla.com/svn/habitv/trunk/application/habiTv-windows</developerConnection>
+        <connection>scm:git:https://github.com/mika3578/habitv.git</connection>
+        <developerConnection>scm:git:https://github.com/mika3578/habitv.git</developerConnection>
+        <url>https://github.com/mika3578/habitv</url>
     </scm>
 	<properties>
 		<habitv.version>4.1.0</habitv.version>

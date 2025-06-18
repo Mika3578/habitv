@@ -1,19 +1,21 @@
+<?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.dabi.habitv</groupId>
 		<artifactId>parent</artifactId>
-		<version>4.1.0-SNAPSHOT</version>
+		<version>4.2.0-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<artifactId>api</artifactId>
-	<version>4.1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>api</name>
+	<description>HabiTv API - Core API definitions and interfaces</description>
 
-	 <scm>
-        <connection>scm:svn:http://subversion.assembla.com/svn/habitv/trunk/fwk/api</connection>
-        <developerConnection>scm:svn:http://subversion.assembla.com/svn/habitv/trunk/fwk/api</developerConnection>
+	<scm>
+        <connection>scm:git:https://github.com/mika3578/habitv.git</connection>
+        <developerConnection>scm:git:https://github.com/mika3578/habitv.git</developerConnection>
+        <url>https://github.com/mika3578/habitv</url>
     </scm>		
 	
 	<dependencies>
@@ -23,9 +25,18 @@
 			<scope>test</scope>
 		</dependency>		
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.17</version>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-1.2-api</artifactId>
+			<version>${log4j2.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${log4j2.version}</version>
 		</dependency>
 	</dependencies>
 </project>
