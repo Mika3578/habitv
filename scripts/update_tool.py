@@ -9,12 +9,9 @@ import sys
 import json
 import requests
 import zipfile
-import tempfile
-import shutil
 from datetime import datetime
-from pathlib import Path
 
-def download_file(url, filename):
+def download_file(url: str, filename: str) -> bool:
     """Download a file from URL."""
     try:
         response = requests.get(url, stream=True)
@@ -28,7 +25,7 @@ def download_file(url, filename):
         print(f"Error downloading {url}: {e}")
         return False
 
-def extract_zip(zip_path, extract_to):
+def extract_zip(zip_path: str, extract_to: str) -> bool:
     """Extract a zip file."""
     try:
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
@@ -38,7 +35,7 @@ def extract_zip(zip_path, extract_to):
         print(f"Error extracting {zip_path}: {e}")
         return False
 
-def update_manifest(tool_name, new_version, binary_name):
+def update_manifest(tool_name: str, new_version: str, binary_name: str) -> bool:
     """Update the manifest.json file for a tool."""
     manifest_path = f"bin/{tool_name}/manifest.json"
     
@@ -85,7 +82,7 @@ def update_manifest(tool_name, new_version, binary_name):
         print(f"Error updating manifest: {e}")
         return False
 
-def main():
+def main() -> None:
     if len(sys.argv) != 4:
         print("Usage: python update_tool.py <tool_name> <source_url> <binary_name>")
         sys.exit(1)

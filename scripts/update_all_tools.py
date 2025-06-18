@@ -5,20 +5,14 @@ This script handles downloading, versioning, and updating the BIN directory stru
 """
 
 import os
-import sys
 import json
-import requests
-import zipfile
-import tempfile
 import shutil
-import re
-import time
 from datetime import datetime
-from pathlib import Path
+from typing import Dict, List, Optional
 
 # Simplified tool configurations - for now, we'll use placeholder updates
 # In a real implementation, these would contain actual download URLs and patterns
-TOOL_CONFIGS = {
+TOOL_CONFIGS: Dict[str, Dict[str, str]] = {
     'curl': {'current_version': '7.25.0', 'new_version': '8.0.0'},
     'wget': {'current_version': '1.21.4', 'new_version': '1.21.5'},
     'aria2c': {'current_version': '1.16.4', 'new_version': '1.36.0'},
@@ -41,7 +35,7 @@ TOOL_CONFIGS = {
     'node': {'current_version': '20.10.0', 'new_version': '20.11.0'}
 }
 
-def update_manifest(tool_name, new_version, binary_name, additional_files=None):
+def update_manifest(tool_name: str, new_version: str, binary_name: str, additional_files: Optional[List[str]] = None) -> bool:
     """Update the manifest.json file for a tool."""
     manifest_path = f"bin/{tool_name}/manifest.json"
     
@@ -92,13 +86,13 @@ def update_manifest(tool_name, new_version, binary_name, additional_files=None):
         print(f"  Error updating manifest: {e}")
         return False
 
-def update_tool(tool_name, config):
+def update_tool(tool_name: str, config: Dict[str, str]) -> bool:
     """Update a single tool."""
     print(f"\nUpdating {tool_name}...")
     
     # Get current version from manifest
     manifest_path = f"bin/{tool_name}/manifest.json"
-    current_version = None
+    current_version: Optional[str] = None
     if os.path.exists(manifest_path):
         try:
             with open(manifest_path, 'r') as f:
@@ -108,7 +102,7 @@ def update_tool(tool_name, config):
             pass
     
     # Get new version from config
-    new_version = config['new_version']
+    new_version: str = config['new_version']
     
     print(f"  Current version: {current_version}")
     print(f"  New version: {new_version}")
@@ -127,8 +121,8 @@ def update_tool(tool_name, config):
     os.makedirs(latest_dir, exist_ok=True)
     
     # Determine binary name and additional files
-    binary_name = f"{tool_name}.exe"
-    additional_files = []
+    binary_name: str = f"{tool_name}.exe"
+    additional_files: List[str] = []
     
     if tool_name == 'python':
         binary_name = 'python.exe'
@@ -169,12 +163,12 @@ def update_tool(tool_name, config):
     print(f"  Successfully updated {tool_name} to version {new_version}")
     return True
 
-def main():
+def main() -> bool:
     """Main function to update all tools."""
     print("Starting external tools update...")
     print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
-    updated_tools = []
+    updated_tools: List[str] = []
     
     for tool_name, config in TOOL_CONFIGS.items():
         try:
