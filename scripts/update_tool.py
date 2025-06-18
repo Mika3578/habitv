@@ -1,4 +1,4 @@
-#!/usr/repository/com/dabi/habitv/bin/env python3
+#!/usr/bin/env python3
 """
 Script to update external tool binaries from their official sources.
 Usage: python update_tool.py <tool_name> <source_url> <binary_name>

@@ -1,4 +1,4 @@
-#!/usr/repository/com/dabi/habitv/bin/env python3
+#!/usr/bin/env python3
 """
 Comprehensive script to update all external tool binaries from their official sources.
 This script handles downloading, versioning, and updating the BIN directory structure.
