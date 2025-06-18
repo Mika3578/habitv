@@ -11,11 +11,9 @@ import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
 import com.dabi.habitv.api.plugin.dto.ProxyDTO;
 import com.dabi.habitv.api.plugin.dto.ProxyDTO.ProtocolEnum;
-import com.dabi.habitv.core.config.HabitTvConf;
 import com.dabi.habitv.core.config.UserConfig;
 import com.dabi.habitv.core.token.TokenReplacer;
 import com.dabi.habitv.core.utils.FWKProperties;
-import com.dabi.habitv.core.utils.RetrieverUtils;
 import com.dabi.habitv.utils.DirUtils;
 import com.dabi.habitv.api.logging.HabitvLogger;
 
@@ -45,21 +43,9 @@ public final class CoreManager {
 		setProxy(config);
 		LOG.info("CoreManager initialization completed");
 	}
-
 	private void stat() {
-		new Thread() {
-
-			@Override
-			public void run() {
-				try {
-					RetrieverUtils.getUrlContent(HabitTvConf.STAT_URL, null);
-				} catch (Exception e) {
-					// Non-critical operation, log and continue
-					LOG.warn("Failed to send statistics: " + e.getMessage());
-				}
-			}
-
-		}.start();
+		// Statistics disabled - GitHub Pages doesn't support PHP
+		LOG.debug("Statistics collection disabled");
 	}
 
 	private void setProxy(final UserConfig config) {

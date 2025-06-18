@@ -1,0 +1,172 @@
+{
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.compile.nullAnalysis.mode": "automatic",
+    
+    // Configuration des raccourcis et boutons
+    "workbench.action.toggleSidebarVisibility": "Ctrl+B",
+    "workbench.action.togglePanel": "Ctrl+J",
+    
+    // Configuration Maven
+    "maven.executable.path": "mvn",
+    "maven.terminal.useJavaHome": true,
+    "maven.terminal.customEnv": [
+        {
+            "environmentVariable": "JAVA_HOME",
+            "value": "${env:JAVA_HOME}"
+        }
+    ],
+    
+    // Configuration Git
+    "git.autofetch": true,
+    "git.autofetchPeriod": 180,
+    "git.confirmSync": false,
+    
+    // Configuration des fichiers
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 1000,
+    "files.exclude": {
+        "**/target": true,
+        "**/.mvn": false,
+        "**/node_modules": true,
+        "**/.git": true
+    },
+    
+    // Configuration de l'explorateur
+    "explorer.confirmDelete": false,
+    "explorer.confirmDragAndDrop": false,
+    
+    // Configuration du terminal
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "terminal.integrated.profiles.windows": {
+        "PowerShell": {
+            "source": "PowerShell",
+            "icon": "terminal-powershell"
+        }
+    },
+    
+    // Configuration des tâches
+    "task.autoDetect": "on",
+    "task.slowProviderWarning": false,
+    
+    // Configuration des extensions
+    "extensions.autoUpdate": true,
+    "extensions.autoCheckUpdates": true,
+    
+    // Configuration du workspace
+    "workbench.startupEditor": "none",
+    "workbench.editor.enablePreview": false,
+    
+    // Configuration des notifications
+    "notifications.enable": true,
+    "notifications.keepNotifications": false,
+    
+    // === ACTION BUTTONS CONFIGURATION (Status Bar) ===
+    "actionButtons": {
+        "reloadButton": "♻️",
+        "loadNpmCommands": false,
+        "commands": [
+            {
+                "cwd": "${workspaceFolder}",
+                "name": "🧹 Clean",
+                "color": "#ff6b6b",
+                "singleInstance": true,
+                "command": "mvn clean",
+                "tooltip": "Maven Clean - Nettoie le projet"
+            },
+            {
+                "cwd": "${workspaceFolder}",
+                "name": "🔨 Build",
+                "color": "#4ecdc4",
+                "singleInstance": true,
+                "command": "mvn clean package",
+                "tooltip": "Maven Build - Compile et package le projet"
+            },
+            {
+                "cwd": "${workspaceFolder}",
+                "name": "🧪 Test",
+                "color": "#45b7d1",
+                "singleInstance": true,
+                "command": "mvn test",
+                "tooltip": "Maven Test - Lance les tests unitaires"
+            },
+            {
+                "cwd": "${workspaceFolder}",
+                "name": "📦 Install",
+                "color": "#96ceb4",
+                "singleInstance": true,
+                "command": "mvn install",
+                "tooltip": "Maven Install - Installe dans le repository local"
+            },
+            {
+                "cwd": "${workspaceFolder}",
+                "name": "🌳 Deps",
+                "color": "#feca57",
+                "singleInstance": true,
+                "command": "mvn dependency:tree",
+                "tooltip": "Maven Dependencies - Affiche l'arbre des dépendances"
+            },
+            {
+                "cwd": "${workspaceFolder}",
+                "name": "✅ Verify",
+                "color": "#54a0ff",
+                "singleInstance": true,
+                "command": "mvn verify",
+                "tooltip": "Maven Verify - Vérifie la qualité du package"
+            },
+            {
+                "cwd": "${workspaceFolder}",
+                "name": "🔄 Refresh",
+                "color": "#5f27cd",
+                "singleInstance": true,
+                "command": "git fetch && git reset --hard && git clean -fd",
+                "tooltip": "Git Refresh - Synchronise avec le repository distant"
+            },
+            {
+                "name": "♻️ Reload IDE",
+                "color": "#ff6348",
+                "command": "workbench.action.reloadWindow",
+                "tooltip": "Recharge complètement VS Code"
+            }
+        ]
+    },
+    
+    // === TASK BUTTONS CONFIGURATION (Status Bar) ===
+    "taskButtons.showCounter": true,
+    "taskButtons.tasks": [
+        {
+            "label": "🧹 Clean",
+            "task": "habitv-clean",
+            "tooltip": "Maven Clean via Task"
+        },
+        {
+            "label": "🔨 Build", 
+            "task": "habitv-build",
+            "tooltip": "Maven Build via Task"
+        },
+        {
+            "label": "🧪 Test",
+            "task": "habitv-test", 
+            "tooltip": "Maven Test via Task"
+        },
+        {
+            "label": "📦 Install",
+            "task": "habitv-install",
+            "tooltip": "Maven Install via Task"
+        },
+        {
+            "label": "🚀 Deploy",
+            "task": "habitv-deploy",
+            "tooltip": "Maven Deploy via Task"
+        },
+        {
+            "label": "📦 Jar",
+            "task": "habitv-build-jar",
+            "tooltip": "Build JAR exécutable"
+        },
+        {
+            "label": "♻️ Refresh",
+            "task": "habitv-refresh",
+            "tooltip": "Git Refresh via Task"
+        }
+    ]
+}

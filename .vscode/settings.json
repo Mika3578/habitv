@@ -60,97 +60,279 @@
     "notifications.enable": true,
     "notifications.keepNotifications": false,
     
-    // === ACTION BUTTONS CONFIGURATION ===
+    // === ACTION BUTTONS CONFIGURATION (Status Bar) ===
     "actionButtons": {
-        "buttons": [
+        "reloadButton": "♻️",
+        "loadNpmCommands": false,
+        "commands": [
             {
+                "cwd": "${workspaceFolder}",
                 "name": "🧹 Clean",
-                "command": "workbench.action.tasks.runTask",
-                "args": "habitv-clean",
                 "color": "#ff6b6b",
-                "position": "left"
+                "singleInstance": true,
+                "command": "mvn clean",
+                "tooltip": "Maven Clean - Nettoie le projet"
             },
             {
+                "cwd": "${workspaceFolder}",
                 "name": "🔨 Build",
-                "command": "workbench.action.tasks.runTask",
-                "args": "habitv-build",
                 "color": "#4ecdc4",
-                "position": "left"
+                "singleInstance": true,
+                "command": "mvn clean package",
+                "tooltip": "Maven Build - Compile et package le projet"
             },
             {
+                "cwd": "${workspaceFolder}",
                 "name": "🧪 Test",
-                "command": "workbench.action.tasks.runTask",
-                "args": "habitv-test",
                 "color": "#45b7d1",
-                "position": "left"
+                "singleInstance": true,
+                "command": "mvn test",
+                "tooltip": "Maven Test - Lance les tests unitaires"
             },
             {
+                "cwd": "${workspaceFolder}",
                 "name": "📦 Install",
-                "command": "workbench.action.tasks.runTask",
-                "args": "habitv-install",
                 "color": "#96ceb4",
-                "position": "left"
+                "singleInstance": true,
+                "command": "mvn install",
+                "tooltip": "Maven Install - Installe dans le repository local"
             },
             {
-                "name": "🚀 Deploy",
-                "command": "workbench.action.tasks.runTask",
-                "args": "habitv-deploy",
+                "cwd": "${workspaceFolder}",
+                "name": "🌳 Deps",
+                "color": "#feca57",
+                "singleInstance": true,
+                "command": "mvn dependency:tree",
+                "tooltip": "Maven Dependencies - Affiche l'arbre des dépendances"
+            },
+            {
+                "cwd": "${workspaceFolder}",
+                "name": "✅ Verify",
+                "color": "#54a0ff",
+                "singleInstance": true,
+                "command": "mvn verify",
+                "tooltip": "Maven Verify - Vérifie la qualité du package"
+            },
+            {
+                "cwd": "${workspaceFolder}",
+                "name": "🔄 Refresh",
                 "color": "#5f27cd",
-                "position": "left"
+                "singleInstance": true,
+                "command": "git fetch && git reset --hard && git clean -fd",
+                "tooltip": "Git Refresh - Synchronise avec le repository distant"
             },
             {
-                "name": "♻️ Refresh Git",
-                "command": "workbench.action.tasks.runTask",
-                "args": "habitv-refresh",
-                "color": "#00d2d3",
-                "position": "right"
-            },
-            {
-                "name": "🔄 Reload",
+                "name": "♻️ Reload IDE",
+                "color": "#ff6348",
                 "command": "workbench.action.reloadWindow",
-                "color": "#ee5a24",
-                "position": "right"
+                "tooltip": "Recharge complètement VS Code"
             }
         ]
     },
     
-    // === CUSTOM BUTTONS CONFIGURATION ===
-    "customButtons.buttons": [
+    // === TASK BUTTONS CONFIGURATION (Status Bar) ===
+    "taskButtons.showCounter": true,
+    "taskButtons.tasks": [
         {
-            "id": "habitv.maven.clean",
-            "text": "🧹",
-            "tooltip": "Clean habitv project",
-            "color": "#ff6b6b"
+            "label": "🧹 Clean",
+            "task": "habitv-clean",
+            "tooltip": "Maven Clean via Task"
         },
         {
-            "id": "habitv.maven.build",
-            "text": "🔨",
-            "tooltip": "Build habitv (clean + package)",
-            "color": "#4ecdc4"
+            "label": "🔨 Build", 
+            "task": "habitv-build",
+            "tooltip": "Maven Build via Task"
         },
         {
-            "id": "habitv.maven.test",
-            "text": "🧪",
-            "tooltip": "Run tests",
-            "color": "#45b7d1"
+            "label": "🧪 Test",
+            "task": "habitv-test", 
+            "tooltip": "Maven Test via Task"
         },
         {
-            "id": "habitv.maven.install",
-            "text": "📦",
-            "tooltip": "Install to local repo",
-            "color": "#96ceb4"
+            "label": "📦 Install",
+            "task": "habitv-install",
+            "tooltip": "Maven Install via Task"
         },
         {
-            "id": "habitv.git.refresh",
-            "text": "🔄",
-            "tooltip": "Refresh Git branch",
-            "color": "#00d2d3"
+            "label": "🚀 Deploy",
+            "task": "habitv-deploy",
+            "tooltip": "Maven Deploy via Task"
         },
         {
-            "id": "habitv.ide.reload",
-            "text": "🔄",
-            "tooltip": "Reload IDE",
-            "color": "#ee5a24"
+            "label": "📦 Jar",
+            "task": "habitv-build-jar",
+            "tooltip": "Build JAR exécutable"
+        },
+        {
+            "label": "♻️ Refresh",
+            "task": "habitv-refresh",
+            "tooltip": "Git Refresh via Task"
         }
-    ]
+    ],
+    
+    // === ACTIVITUS BAR CONFIGURATION (Status Bar) ===
+    "activitusbar.searchViewInPanel": false,
+    "activitusbar.activeColour": "#4CAF50",
+    "activitusbar.inactiveColour": "#888888",
+    "activitusbar.views": [
+        {
+            "name": "explorer",
+            "codicon": "file-directory"
+        },
+        {
+            "name": "search",
+            "codicon": "search"
+        },
+        {
+            "name": "scm",
+            "codicon": "source-control"
+        },
+        {
+            "name": "debug",
+            "codicon": "debug"
+        },
+        {
+            "name": "extensions",
+            "codicon": "extensions"
+        }
+    ],
+    
+    // === TERMINAL COMMANDS CONFIGURATION ===
+    "terminalCommands.commands": [
+        {
+            "name": "🧹 Maven Clean",
+            "command": "mvn clean",
+            "showInExplorer": true,
+            "showInTerminal": true
+        },
+        {
+            "name": "🔨 Maven Build",
+            "command": "mvn clean package",
+            "showInExplorer": true,
+            "showInTerminal": true
+        },
+        {
+            "name": "🧪 Maven Test",
+            "command": "mvn test",
+            "showInExplorer": true,
+            "showInTerminal": true
+        },
+        {
+            "name": "📦 Maven Install",
+            "command": "mvn install",
+            "showInExplorer": true,
+            "showInTerminal": true
+        },
+        {
+            "name": "🌳 Maven Dependencies",
+            "command": "mvn dependency:tree",
+            "showInExplorer": true,
+            "showInTerminal": true
+        },
+        {
+            "name": "✅ Maven Verify",
+            "command": "mvn verify",
+            "showInExplorer": true,
+            "showInTerminal": true
+        },
+        {
+            "name": "🔄 Git Refresh",
+            "command": "git fetch && git reset --hard && git clean -fd",
+            "showInExplorer": true,
+            "showInTerminal": true        }
+    ],
+    
+    // === SHORTCUT MENU BAR CONFIGURATION (Menu Bar) ===
+    "shortcutMenuBar.navigateBack": true,
+    "shortcutMenuBar.navigateForward": true,
+    "shortcutMenuBar.showMenuBar": true,
+    "shortcutMenuBar.userButton01Command": "workbench.action.tasks.runTask",
+    "shortcutMenuBar.userButton01Text": "🔨 Build",
+    "shortcutMenuBar.userButton01Tooltip": "Exécuter une tâche de build",
+    "shortcutMenuBar.userButton02Command": "workbench.action.terminal.new",
+    "shortcutMenuBar.userButton02Text": "💻 Terminal",
+    "shortcutMenuBar.userButton02Tooltip": "Ouvrir un nouveau terminal",
+    "shortcutMenuBar.userButton03Command": "workbench.action.reloadWindow",
+    "shortcutMenuBar.userButton03Text": "♻️ Reload",
+    "shortcutMenuBar.userButton03Tooltip": "Recharger VS Code",
+    "shortcutMenuBar.userButton04Command": "git.fetch",
+    "shortcutMenuBar.userButton04Text": "⬇️ Fetch",
+    "shortcutMenuBar.userButton04Tooltip": "Git Fetch",
+    "shortcutMenuBar.userButton05Command": "workbench.action.showCommands",
+    "shortcutMenuBar.userButton05Text": "⌘ Commands",
+    "shortcutMenuBar.userButton05Tooltip": "Palette de commandes",
+    
+    // === STATUSBAR COMMANDS CONFIGURATION (Status Bar) ===
+    "statusbar-commands.commands": [
+        {
+            "text": "🧹 Clean",
+            "tooltip": "Maven Clean",
+            "command": "workbench.action.terminal.sendSequence",
+            "arguments": {
+                "text": "mvn clean\r"
+            },
+            "alignment": "left",
+            "priority": 100
+        },
+        {
+            "text": "🔨 Build",
+            "tooltip": "Maven Build",
+            "command": "workbench.action.terminal.sendSequence", 
+            "arguments": {
+                "text": "mvn clean package\r"
+            },
+            "alignment": "left",
+            "priority": 99
+        },
+        {
+            "text": "🧪 Test",
+            "tooltip": "Maven Test",
+            "command": "workbench.action.terminal.sendSequence",
+            "arguments": {
+                "text": "mvn test\r"
+            },
+            "alignment": "left",
+            "priority": 98
+        },
+        {
+            "text": "📦 Install",
+            "tooltip": "Maven Install",
+            "command": "workbench.action.terminal.sendSequence",
+            "arguments": {
+                "text": "mvn install\r"
+            },
+            "alignment": "left",
+            "priority": 97
+        },
+        {
+            "text": "🔄 Refresh",
+            "tooltip": "Git Refresh",
+            "command": "workbench.action.terminal.sendSequence",
+            "arguments": {
+                "text": "git fetch && git reset --hard && git clean -fd\r"
+            },
+            "alignment": "left",
+            "priority": 96
+        },
+        {
+            "text": "♻️ Reload",
+            "tooltip": "Reload VS Code",
+            "command": "workbench.action.reloadWindow",
+            "alignment": "right",
+            "priority": 95
+        }
+    ],
+    
+    // === TRUNK.IO CONFIGURATION (Code Quality) ===
+    "trunk.trunkPath": "",
+    "trunk.enableLsp": true,
+    "trunk.enableCodeActions": true,
+    "trunk.enableDiagnostics": true,
+    "trunk.enableFormatter": true,
+    
+    // === SOURCERY CONFIGURATION (AI Code Review) ===
+    "sourcery.metricsEnabled": true,
+    "sourcery.codeLensEnabled": true,
+    "sourcery.enableOnTypeFormatting": true,
+    "sourcery.pythonPath": "python"
 }

@@ -1,0 +1,32 @@
+[
+    {
+        "key": "ctrl+shift+h ctrl+shift+c",
+        "command": "workbench.action.tasks.runTask",
+        "args": "habitv-clean"
+    },
+    {
+        "key": "ctrl+shift+h ctrl+shift+b",
+        "command": "workbench.action.tasks.runTask", 
+        "args": "habitv-build"
+    },
+    {
+        "key": "ctrl+shift+h ctrl+shift+t",
+        "command": "workbench.action.tasks.runTask",
+        "args": "habitv-test"
+    },
+    {
+        "key": "ctrl+shift+h ctrl+shift+i",
+        "command": "workbench.action.tasks.runTask",
+        "args": "habitv-install"
+    },
+    {
+        "key": "ctrl+shift+h ctrl+shift+r",
+        "command": "workbench.action.tasks.runTask",
+        "args": "habitv-refresh"
+    },
+    {
+        "key": "ctrl+shift+h ctrl+shift+j",
+        "command": "workbench.action.tasks.runTask",
+        "args": "habitv-build-jar"
+    }
+]
