@@ -1,0 +1,25 @@
+{
+  "latest": "1.21.5",
+  "versions": [
+    "1.21.5",
+    "1.21.4"
+  ],
+  "url_latest": "https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/wget/latest/wget.exe",
+  "url_versioned": "https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/wget/1.21.5/wget.exe",
+  "description": "GNU Wget is a free software package for retrieving files using HTTP, HTTPS, FTP and FTPS",
+  "homepage": "https://www.gnu.org/software/wget/",
+  "license": "GPL-3.0",
+  "last_updated": "2025-06-18",
+  "changelog": [
+    {
+      "version": "1.21.5",
+      "date": "2025-06-18",
+      "changes": "Auto-updated from official source"
+    },
+    {
+      "version": "1.21.4",
+      "date": "2024-01-01",
+      "changes": "Initial version included in habiTv repository"
+    }
+  ]
+}

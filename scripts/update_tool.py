@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/repository/com/dabi/habitv/bin/env python3
 """
 Script to update external tool binaries from their official sources.
 Usage: python update_tool.py <tool_name> <source_url> <binary_name>
@@ -37,7 +37,7 @@ def extract_zip(zip_path: str, extract_to: str) -> bool:
 
 def update_manifest(tool_name: str, new_version: str, binary_name: str) -> bool:
     """Update the manifest.json file for a tool."""
-    manifest_path = f"bin/{tool_name}/manifest.json"
+    manifest_path = f"repository/com/dabi/habitv/bin/{tool_name}/manifest.json"
     
     if not os.path.exists(manifest_path):
         print(f"Manifest not found: {manifest_path}")
@@ -55,8 +55,8 @@ def update_manifest(tool_name: str, new_version: str, binary_name: str) -> bool:
             manifest['versions'].insert(0, new_version)
         
         # Update URLs
-        manifest['url_latest'] = f"https://mika3578.github.io/habitv/bin/{tool_name}/latest/{binary_name}"
-        manifest['url_versioned'] = f"https://mika3578.github.io/habitv/bin/{tool_name}/{new_version}/{binary_name}"
+        manifest['url_latest'] = f"https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/{tool_name}/latest/{binary_name}"
+        manifest['url_versioned'] = f"https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/{tool_name}/{new_version}/{binary_name}"
         
         # Update last_updated
         manifest['last_updated'] = datetime.now().strftime("%Y-%m-%d")
@@ -94,7 +94,7 @@ def main() -> None:
     print(f"Updating {tool_name} from {source_url}")
     
     # Create directories
-    bin_dir = f"bin/{tool_name}"
+    bin_dir = f"repository/com/dabi/habitv/bin/{tool_name}"
     latest_dir = f"{bin_dir}/latest"
     
     os.makedirs(bin_dir, exist_ok=True)

@@ -11,7 +11,7 @@ habiTv is a Java-based application for downloading TV replays from various strea
 
 ## External Tools
 
-habiTv uses several external tools for video processing and downloading. These are now centrally managed in the `bin/` directory and **automatically updated** by GitHub Actions.
+habiTv uses several external tools for video processing and downloading. These are now centrally managed in the `repository/com/dabi/habitv/bin/` directory and **automatically updated** by GitHub Actions.
 
 ### 🔄 **Automated Updates**
 - **Weekly Updates**: All tools are automatically updated every Sunday at 03:00 UTC
@@ -64,44 +64,44 @@ habiTv uses several external tools for video processing and downloading. These a
 All tools are available for direct download and are **automatically kept up to date**:
 
 #### Core Download Tools
-- curl: https://mika3578.github.io/habitv/bin/curl/latest/curl.exe
-- wget: https://mika3578.github.io/habitv/bin/wget/latest/wget.exe
-- aria2c: https://mika3578.github.io/habitv/bin/aria2c/latest/aria2c.exe
-- youtube-dl: https://mika3578.github.io/habitv/bin/youtube-dl/latest/youtube-dl.exe
+- curl: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/curl/latest/curl.exe
+- wget: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/wget/latest/wget.exe
+- aria2c: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/aria2c/latest/aria2c.exe
+- youtube-dl: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/youtube-dl/latest/youtube-dl.exe
 
 #### Video Processing Tools
-- ffmpeg: https://mika3578.github.io/habitv/bin/ffmpeg/latest/ffmpeg.exe
-- ffprobe: https://mika3578.github.io/habitv/bin/ffprobe/latest/ffprobe.exe
-- rtmpdump: https://mika3578.github.io/habitv/bin/rtmpdump/latest/rtmpdump.exe
-- mkvmerge: https://mika3578.github.io/habitv/bin/mkvmerge/latest/mkvmerge.exe
-- mp4box: https://mika3578.github.io/habitv/bin/mp4box/latest/mp4box.exe
-- flvtool2: https://mika3578.github.io/habitv/bin/flvtool2/latest/flvtool2.exe
+- ffmpeg: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/ffmpeg/latest/ffmpeg.exe
+- ffprobe: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/ffprobe/latest/ffprobe.exe
+- rtmpdump: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/rtmpdump/latest/rtmpdump.exe
+- mkvmerge: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/mkvmerge/latest/mkvmerge.exe
+- mp4box: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/mp4box/latest/mp4box.exe
+- flvtool2: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/flvtool2/latest/flvtool2.exe
 
 #### Media Analysis Tools
-- mediainfo: https://mika3578.github.io/habitv/bin/mediainfo/latest/mediainfo.exe
-- exiftool: https://mika3578.github.io/habitv/bin/exiftool/latest/exiftool.exe
+- mediainfo: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/mediainfo/latest/mediainfo.exe
+- exiftool: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/exiftool/latest/exiftool.exe
 
 #### Compression & Archive Tools
-- 7z: https://mika3578.github.io/habitv/bin/7z/latest/7z.exe
+- 7z: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/7z/latest/7z.exe
 
 #### Web Automation Tools
-- chromedriver: https://mika3578.github.io/habitv/bin/chromedriver/latest/chromedriver.exe
-- phantomjs: https://mika3578.github.io/habitv/bin/phantomjs/latest/phantomjs.exe
+- chromedriver: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/chromedriver/latest/chromedriver.exe
+- phantomjs: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/phantomjs/latest/phantomjs.exe
 
 #### Network Tools
-- openvpn: https://mika3578.github.io/habitv/bin/openvpn/latest/openvpn.exe
+- openvpn: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/openvpn/latest/openvpn.exe
 
 #### Audio Processing Tools
-- sox: https://mika3578.github.io/habitv/bin/sox/latest/sox.exe
+- sox: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/sox/latest/sox.exe
 
 #### Data Processing Tools
-- jq: https://mika3578.github.io/habitv/bin/jq/latest/jq.exe
+- jq: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/jq/latest/jq.exe
 
 #### Runtime Environments
-- python: https://mika3578.github.io/habitv/bin/python/latest/python.exe
-- node: https://mika3578.github.io/habitv/bin/node/latest/node.exe
+- python: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/python/latest/python.exe
+- node: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/node/latest/node.exe
 
-For more information about the external tools, see [bin/README.md](bin/README.md).
+For more information about the external tools, see [repository/com/dabi/habitv/bin/README.md](repository/com/dabi/habitv/bin/README.md).
 
 ## Building
 
@@ -139,7 +139,7 @@ habitv/
 ├── fwk/                    # Framework modules
 ├── application/            # Application modules
 ├── plugins/               # Plugin modules
-├── bin/        # External tool binaries
+├── repository/com/dabi/habitv/bin/        # External tool binaries
 └── scripts/               # Build and update scripts
 ```
 
@@ -170,4 +170,4 @@ This project is licensed under the terms specified in the individual module lice
 - rtmpdump: GPL-2.0
 - youtube-dl: Unlicense
 
-See individual `manifest.json` files in `bin/` for more details. 
+See individual `manifest.json` files in `repository/com/dabi/habitv/bin/` for more details. 

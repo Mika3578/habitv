@@ -1,0 +1,25 @@
+{
+  "latest": "1.36.0",
+  "versions": [
+    "1.36.0",
+    "1.16.4"
+  ],
+  "url_latest": "https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/aria2c/latest/aria2c.exe",
+  "url_versioned": "https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/aria2c/1.36.0/aria2c.exe",
+  "description": "aria2 is a lightweight multi-protocol & multi-source command-line download utility",
+  "homepage": "https://aria2.github.io/",
+  "license": "GPL-2.0",
+  "last_updated": "2025-06-18",
+  "changelog": [
+    {
+      "version": "1.36.0",
+      "date": "2025-06-18",
+      "changes": "Auto-updated from official source"
+    },
+    {
+      "version": "1.16.4",
+      "date": "2013-12-04",
+      "changes": "Initial version included in habiTv repository"
+    }
+  ]
+}

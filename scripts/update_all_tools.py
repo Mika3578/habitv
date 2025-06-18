@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/repository/com/dabi/habitv/bin/env python3
 """
 Comprehensive script to update all external tool binaries from their official sources.
 This script handles downloading, versioning, and updating the BIN directory structure.
@@ -37,7 +37,7 @@ TOOL_CONFIGS: Dict[str, Dict[str, str]] = {
 
 def update_manifest(tool_name: str, new_version: str, binary_name: str, additional_files: Optional[List[str]] = None) -> bool:
     """Update the manifest.json file for a tool."""
-    manifest_path = f"bin/{tool_name}/manifest.json"
+    manifest_path = f"repository/com/dabi/habitv/bin/{tool_name}/manifest.json"
     
     if not os.path.exists(manifest_path):
         print(f"  Manifest not found: {manifest_path}")
@@ -55,8 +55,8 @@ def update_manifest(tool_name: str, new_version: str, binary_name: str, addition
             manifest['versions'].insert(0, new_version)
         
         # Update URLs
-        manifest['url_latest'] = f"https://mika3578.github.io/habitv/bin/{tool_name}/latest/{binary_name}"
-        manifest['url_versioned'] = f"https://mika3578.github.io/habitv/bin/{tool_name}/{new_version}/{binary_name}"
+        manifest['url_latest'] = f"https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/{tool_name}/latest/{binary_name}"
+        manifest['url_versioned'] = f"https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/{tool_name}/{new_version}/{binary_name}"
         
         # Update last_updated
         manifest['last_updated'] = datetime.now().strftime("%Y-%m-%d")
@@ -91,7 +91,7 @@ def update_tool(tool_name: str, config: Dict[str, str]) -> bool:
     print(f"\nUpdating {tool_name}...")
     
     # Get current version from manifest
-    manifest_path = f"bin/{tool_name}/manifest.json"
+    manifest_path = f"repository/com/dabi/habitv/bin/{tool_name}/manifest.json"
     current_version: Optional[str] = None
     if os.path.exists(manifest_path):
         try:
@@ -113,7 +113,7 @@ def update_tool(tool_name: str, config: Dict[str, str]) -> bool:
         return False
     
     # Create directories
-    bin_dir = f"bin/{tool_name}"
+    bin_dir = f"repository/com/dabi/habitv/bin/{tool_name}"
     version_dir = f"{bin_dir}/{new_version}"
     latest_dir = f"{bin_dir}/latest"
     

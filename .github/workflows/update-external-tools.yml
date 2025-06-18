@@ -63,7 +63,7 @@ jobs:
     - name: Commit and push changes
       if: steps.check_changes.outputs.no_changes == 'false'
       run: |
-        git add bin/
+        git add repository/com/dabi/habitv/bin/
         git commit -m "Update external tool binaries [skip ci]"
         git push
         

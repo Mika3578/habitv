@@ -1,0 +1,25 @@
+{
+  "latest": "24.01",
+  "versions": [
+    "24.01",
+    "23.11"
+  ],
+  "url_latest": "https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/mediainfo/latest/mediainfo.exe",
+  "url_versioned": "https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/mediainfo/24.01/mediainfo.exe",
+  "description": "MediaInfo is a convenient unified display of the most relevant technical and tag data for video and audio files",
+  "homepage": "https://mediaarea.net/en/MediaInfo",
+  "license": "BSD-2-Clause",
+  "last_updated": "2025-06-18",
+  "changelog": [
+    {
+      "version": "24.01",
+      "date": "2025-06-18",
+      "changes": "Auto-updated from official source"
+    },
+    {
+      "version": "23.11",
+      "date": "2024-01-01",
+      "changes": "Initial version included in habiTv repository"
+    }
+  ]
+}

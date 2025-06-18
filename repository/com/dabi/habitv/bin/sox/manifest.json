@@ -1,0 +1,25 @@
+{
+  "latest": "14.4.3",
+  "versions": [
+    "14.4.3",
+    "14.4.2"
+  ],
+  "url_latest": "https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/sox/latest/sox.exe",
+  "url_versioned": "https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/sox/14.4.3/sox.exe",
+  "description": "SoX (Sound eXchange) is a command line utility that can convert various formats of computer audio files in to other formats",
+  "homepage": "https://sox.sourceforge.net/",
+  "license": "LGPL-2.1",
+  "last_updated": "2025-06-18",
+  "changelog": [
+    {
+      "version": "14.4.3",
+      "date": "2025-06-18",
+      "changes": "Auto-updated from official source"
+    },
+    {
+      "version": "14.4.2",
+      "date": "2024-01-01",
+      "changes": "Initial version included in habiTv repository"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "latest": "121.0.6167.85",
+  "versions": [
+    "121.0.6167.85",
+    "120.0.6099.109"
+  ],
+  "url_latest": "https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/chromedriver/latest/chromedriver.exe",
+  "url_versioned": "https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/chromedriver/121.0.6167.85/chromedriver.exe",
+  "description": "ChromeDriver is a standalone server that implements the W3C WebDriver wire protocol for Chromium",
+  "homepage": "https://chromedriver.chromium.org/",
+  "license": "BSD-3-Clause",
+  "last_updated": "2025-06-18",
+  "changelog": [
+    {
+      "version": "121.0.6167.85",
+      "date": "2025-06-18",
+      "changes": "Auto-updated from official source"
+    },
+    {
+      "version": "120.0.6099.109",
+      "date": "2024-01-01",
+      "changes": "Initial version included in habiTv repository"
+    }
+  ]
+}

@@ -62,7 +62,7 @@ The habiTv project now includes a comprehensive automated system for keeping all
 
 ### **Directory Structure**
 ```
-bin/
+repository/com/dabi/habitv/bin/
 ├── [tool]/
 │   ├── [version]/
 │   │   └── [tool].exe (and additional files)
@@ -99,13 +99,13 @@ bin/
 
 All tools are available for direct download at:
 ```
-https://mika3578.github.io/habitv/bin/[tool]/latest/[tool].exe
+https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/[tool]/latest/[tool].exe
 ```
 
 ### **Examples**
-- curl: https://mika3578.github.io/habitv/bin/curl/latest/curl.exe
-- ffmpeg: https://mika3578.github.io/habitv/bin/ffmpeg/latest/ffmpeg.exe
-- python: https://mika3578.github.io/habitv/bin/python/latest/python.exe
+- curl: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/curl/latest/curl.exe
+- ffmpeg: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/ffmpeg/latest/ffmpeg.exe
+- python: https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin/python/latest/python.exe
 
 ## 📋 **Usage Instructions**
 

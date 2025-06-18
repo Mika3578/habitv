@@ -9,7 +9,7 @@ import glob
 
 def verify_manifest_urls():
     """Verify all manifest.json files have correct URLs."""
-    bin_dir = "bin"
+    bin_dir = "repository/com/dabi/habitv/bin"
     
     if not os.path.exists(bin_dir):
         print(f"Error: {bin_dir} directory not found")
@@ -36,7 +36,7 @@ def verify_manifest_urls():
                     all_correct = False
             
             # Check URL format
-            base_url = "https://mika3578.github.io/habitv/bin"
+            base_url = "https://mika3578.github.io/habitv/repository/com/dabi/habitv/bin"
             
             if 'url_latest' in manifest:
                 expected_latest = f"{base_url}/{tool_name}/latest"
@@ -70,7 +70,7 @@ def verify_manifest_urls():
 
 def verify_file_structure():
     """Verify that all referenced files exist."""
-    bin_dir = "bin"
+    bin_dir = "repository/com/dabi/habitv/bin"
     all_correct = True
     
     print("\nVerifying file structure...")
