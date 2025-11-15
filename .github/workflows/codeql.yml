@@ -9,13 +9,13 @@
 # the `language` matrix defined below to confirm you have the correct set of
 # supported CodeQL languages.
 #
-name: "CodeQL Advanced"
+name: "CodeQL"
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "main" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master", "main" ]
   schedule:
     - cron: '32 20 * * 6'
 
@@ -60,12 +60,15 @@ jobs:
     # Add any setup steps before running the `github/codeql-action/init` action.
     # This includes steps like installing compilers or runtimes (`actions/setup-node`
     # or others). This is typically only required for manual builds.
-    # - name: Setup runtime (example)
-    #   uses: actions/setup-example@v1
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '11'
+        distribution: 'temurin'
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v4
+      uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
@@ -82,18 +85,12 @@ jobs:
     # to build your code.
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
-    - name: Run manual build steps
+    - name: Build with Maven
       if: matrix.build-mode == 'manual'
-      shell: bash
       run: |
-        echo 'If you are using a "manual" build mode for one or more of the' \
-          'languages you are analyzing, replace this with the commands to build' \
-          'your code, for example:'
-        echo '  make bootstrap'
-        echo '  make release'
-        exit 1
+        mvn clean compile -DskipTests
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v4
+      uses: github/codeql-action/analyze@v3
       with:
         category: "/language:${{matrix.language}}"

@@ -1,0 +1,39 @@
+name: Maven Build and Test
+
+on:
+  push:
+    branches: [ master, main, develop ]
+  pull_request:
+    branches: [ master, main, develop ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        java-version: [8, 11, 17]
+        exclude:
+          - os: windows-latest
+            java-version: 8
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK ${{ matrix.java-version }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ matrix.java-version }}
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Build with Maven
+      run: mvn clean install -DskipTests
+
+    - name: Run tests
+      run: mvn test
+
+    - name: Package application
+      run: mvn package -DskipTests
+

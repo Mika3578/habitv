@@ -1,11 +1,7 @@
+# Project-specific files
 application/core/grabconfig.xml
 application/core/testGrabConfig.xml
 application/core/testOldGrabconfig.xml
-plugins/plugin-tester/habiTv.log
-.metadata/
-*.project
-*.classpath
-.settings
 application/core/export.index
 application/core/generated/
 application/core/index/
@@ -13,3 +9,77 @@ application/core/plugins/
 application/core/habiTv.lock
 application/core/habiTv.log
 application/core/bin/
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+*.log.*
+*.log.1
+*.log.2
+plugins/**/habiTv.log*
+
+# Package files
+*.jar
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.rar
+
+# IDE - IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# IDE - Eclipse
+.metadata/
+*.project
+*.classpath
+.settings/
+bin/
+
+# IDE - NetBeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# IDE - VS Code
+.vscode/
+
+# OS-specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.*.sw?
