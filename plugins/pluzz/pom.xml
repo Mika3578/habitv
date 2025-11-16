@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.dabi.habitv</groupId>
 		<artifactId>parent</artifactId>
-		<version>4.1.0</version>
+		<version>4.2.0-beta</version>
 	</parent>
 	<artifactId>pluzz</artifactId>
 	<name>pluzz</name>
@@ -19,7 +19,7 @@
 		<dependency>
 			<groupId>com.dabi.habitv</groupId>
 			<artifactId>plugin-tester</artifactId>
-			<version>4.1.0</version>
+			<version>4.2.0-beta</version>
 			<scope>test</scope>
 		</dependency>	
 		<dependency>

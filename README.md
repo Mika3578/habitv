@@ -5,152 +5,158 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey.svg)]()
 
-habiTv est un logiciel permettant de télécharger automatiquement et régulièrement des vidéos sur les sites de Replay TV.
+habiTv automates the discovery and download of videos from TV replay/catch‑up and other sources. You define shows, series, or feeds to follow, and habiTv periodically checks for new episodes and downloads them automatically. Optional post‑processing commands (encode, copy/move, FTP, etc.) can run after a download completes.
 
-## 📋 Description
+Note on repository layout: this project uses a non‑standard Maven source layout. Production sources live under src/ and tests under test/ in each module. Commands below reflect this.
 
-Le but de habiTv est de ne pas avoir à télécharger puis exporter manuellement via une interface graphique des vidéos disponibles régulièrement sur le Replay, mais que tout soit géré automatiquement en tâche de fond.
+## Overview
 
-Avec habiTv, vous spécifiez les séries/documentaires/programmes que vous souhaitez récupérer et habiTv vérifie régulièrement si de nouveaux épisodes sont disponibles. Si c'est le cas, il les télécharge automatiquement.
+- GUI tray app to monitor and notify downloads
+- CLI to search, fetch, and run as a daemon with file logging
+- Modular plugin system for providers (content discovery), downloaders (wrappers for external tools), and exporters (post‑processing)
 
-Il est ensuite possible de spécifier une série de commandes à exécuter dès qu'un épisode est disponible pour par exemple l'exporter vers un support (encodage de la vidéo, transfert FTP, rangement, ...).
+## Tech stack
 
-## ✨ Fonctionnalités
+- Language: Java 7+ (built and tested commonly with JDK 8)
+- Build system / package manager: Maven (multi‑POM layout)
+- Tests: JUnit 4.x
+- Logging: log4j 1.x
+- Parsing/IO/libs: jsoup, Jackson, JAXB, Rome, Guava, Commons CLI
 
-### Modes d'utilisation
+Entry point
+- Main class: com.dabi.habitv.HabitvLauncher (packaged via maven‑shade‑plugin in application/habiTv)
 
-- **IHM (Interface Graphique)** : habiTv propose une interface visuelle pour sélectionner les programmes à télécharger et suivre les téléchargements. L'application se loge dans la barre des tâches et affiche des notifications pour prévenir qu'un nouvel épisode est téléchargé.
+## Requirements
 
-- **CLI (Ligne de Commande)** : habiTv propose plusieurs paramètres pour rechercher et télécharger des épisodes en ligne de commande. L'application peut se lancer en mode démon depuis la ligne de commande et logger dans un fichier.
-
-### Fournisseurs supportés
-
-habiTv supporte actuellement les fournisseurs suivants :
-
-- **CanalPlus** (Canal+, D8, D17)
-- **Pluzz** (France 2, 3, 4, ô)
-- **Arte**
-- **BeinSport**
-- **Lequipe.fr**
-- **6play**
-- **SFR**
-- **WAT**
-- **GlobalNews**
-- **MLSSoccer**
-- **Footyroom**
-- **Clubic**
-- **RSS** : n'importe quel flux RSS contenant des liens vers des vidéos à télécharger (HTTP, FTP, Bittorent, Youtube, Dailymotion ...)
-- **File** : téléchargement depuis des fichiers locaux
-- **Email** : téléchargement depuis des emails
-- **Youtube**
-
-### Système de plugins
-
-habiTv est personnalisable grâce à un système de plugin modulaire :
-
-- **Plugin Provider** : listent les catégories disponibles et gèrent le téléchargement des épisodes (ex: Arte, CanalPlus, Pluzz)
-- **Plugin Downloader** : encapsulent les utilitaires de téléchargement pour une meilleure interaction avec habiTv (youtube-dl, rtmpDump, curl, aria2c, ffmpeg, adobeHDS)
-- **Plugin Exporter** : améliorent l'interaction entre les utilitaires permettant d'exporter les vidéos et habiTv (ffmpeg, curl, cmd)
-
-## 🚀 Installation
-
-### Prérequis
-
-- Java 1.7 ou supérieur
-- Maven 3.0+ (pour la compilation)
-- Outils externes (selon les plugins utilisés) :
+- JDK 8 recommended (source/target 1.7 as per parent POM)
+- Maven 3.x
+- Optional external tools (needed depending on plugins you use):
   - youtube-dl
-  - rtmpDump
+  - rtmpdump
   - curl
   - aria2c
   - ffmpeg
 
-### Compilation
+Environment and configuration
+- Config directory: by default, a user‑level folder named habitv (the historical docs mention %USER_DIR%/habitv). TODO: Verify the exact path variable (%USER_HOME% or OS‑specific) and update here.
+- XML configs:
+  - config.xml: general application configuration
+  - grabconfig.xml: categories/shows to download
+- Example schemas: application/core/xsd/ (see XSDs for structure)
+
+## Getting started
+
+Clone and build
 
 ```bash
-# Cloner le repository
 git clone https://github.com/Mika3578/habitv.git
 cd habitv
 
-# Compiler le projet
-mvn clean install
+# Full build (parent is not an aggregator; build per aggregator/module)
+mvn -f fwk\pom.xml clean install
+mvn -f plugins\pom.xml clean install
+mvn -f application\pom.xml clean install
 ```
 
-### Exécution
+Build only the desktop launcher
 
 ```bash
-# Mode IHM (interface graphique)
-java -jar application/habiTv/target/habiTv-4.1.0-SNAPSHOT.jar
-
-# Mode CLI
-java -jar application/habiTv/target/habiTv-4.1.0-SNAPSHOT.jar [options]
+mvn -f application\habiTv\pom.xml clean package
 ```
 
-## 📖 Utilisation
+Run
 
-### Configuration
+```bash
+# GUI (tray) or CLI; shaded JAR produced by the habiTv module
+java -jar application\habiTv\target\habiTv-4.1.0-SNAPSHOT.jar
 
-habiTv utilise deux fichiers de configuration XML :
+# CLI options
+java -jar application\habiTv\target\habiTv-4.1.0-SNAPSHOT.jar --help
+```
 
-- `config.xml` : configuration générale de l'application
-- `grabconfig.xml` : configuration des catégories à télécharger
+Notes
+- Some plugins wrap native binaries. Ensure those tools are installed and available on PATH before using the related providers/downloaders/exporters.
+- On JDK 9+, you may need toolchain adjustments for legacy target 1.7. JDK 8 is the safest default.
 
-Les fichiers de configuration sont placés dans `%USER_DIR%/habitv` sauf si un des fichiers est présent dans le répertoire contenant l'exécutable.
+## Scripts and useful Maven commands
 
-### Exemple de configuration
+- Build and test a single module (example: fwk/api)
+  - mvn -f fwk\api\pom.xml clean test
+- Run tests for all plugins (aggregator):
+  - mvn -f plugins\pom.xml test
+- Build the main application launcher:
+  - mvn -f application\habiTv\pom.xml clean package
+- Run all application module tests via the aggregator:
+  - mvn -f application\pom.xml test
+- Run one test class via Surefire (-Dtest filter):
+  - mvn -f fwk\api\pom.xml -Dtest=SomeTestName test
 
-Voir les fichiers d'exemple dans `application/core/xsd/` pour la structure des fichiers de configuration.
+## Configuration and environment variables
 
-## 🏗️ Architecture
+- Primary configs: config.xml, grabconfig.xml
+- Location search order: TODO — confirm whether files next to the executable override the user config directory (historical behavior suggests so).
+- Logging: log4j configuration is classpath‑driven (log4j.properties). TODO — document default log location and how to enable file logging for daemon mode.
 
-Le projet est organisé en modules Maven :
+## Supported providers and plugins
+
+The repository contains provider, downloader, and exporter plugins under plugins/.
+
+Known modules (subject to availability/maintenance):
+- Providers: CanalPlus, Pluzz, Arte, BeinSport, L’Equipe, 6play, SFR, WAT, GlobalNews, MLSSoccer, Footyroom, Clubic, RSS, File, Email, YouTube
+- Downloaders: youtube-dl, rtmpDump, curl, aria2c, ffmpeg, adobeHDS
+- Exporters: ffmpeg, curl, cmd
+
+TODO: Verify the current operational status of each provider against the target sites’ latest changes.
+
+## Project structure
 
 ```
 habitv/
-├── application/          # Application principale
-│   ├── core/            # Cœur métier
-│   ├── consoleView/     # Interface ligne de commande
-│   ├── trayView/        # Interface graphique (systray)
-│   └── habiTv/          # Launcher principal
-├── fwk/                 # Framework
-│   ├── api/             # Interfaces et DTOs
-│   └── framework/       # Utilitaires et helpers
-└── plugins/              # Plugins (providers, downloaders, exporters)
+├── application/            # Desktop and CLI apps (non‑standard src/ and test/)
+│   ├── core/               # Domain/core logic and configuration schemas (XSD)
+│   ├── consoleView/        # Command‑line UI
+│   ├── trayView/           # Tray/GUI
+│   └── habiTv/             # Shaded launcher (main class: HabitvLauncher)
+├── fwk/                    # Framework libraries used by apps/plugins
+│   ├── api/                # Public API and DTOs
+│   └── framework/          # Utilities/helpers and command execution layer
+├── plugins/                # Providers, downloaders, exporters (many submodules)
+├── pom.xml                 # Root parent POM (packaging=pom; not an aggregator)
+└── README.md
 ```
 
-## 🛠️ Technologies
+## Testing
 
-- **Java 1.7+**
-- **Maven** (gestion des dépendances)
-- **Log4j** (logging)
-- **JavaFX** (interface graphique)
-- **Jsoup** (parsing HTML)
-- **Jackson** (JSON)
-- **JAXB** (XML)
-- **Rome** (RSS)
-- **Guava** (utilitaires)
-- **Commons CLI** (ligne de commande)
+- Framework
+  - mvn -f fwk\framework\pom.xml test
+- API
+  - mvn -f fwk\api\pom.xml test
+- Plugins (all)
+  - mvn -f plugins\pom.xml test
+- Application (all app modules)
+  - mvn -f application\pom.xml test
+- Single test class
+  - mvn -f <module\pom.xml> -Dtest=ClassName test
 
-## 🤝 Contribution
+Guidelines
+- Tests live under test/ (not src/test/java) and use JUnit 4 (org.junit.Test).
+- Avoid network and external tool dependencies in unit tests; mock execution layers where possible.
 
-Les contributions sont les bienvenues ! Veuillez consulter le fichier [CONTRIBUTING.md](CONTRIBUTING.md) pour plus d'informations.
+## Contribution
 
-## 📝 TODO
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) and follow the non‑standard src/ and test/ layout used by this repository.
 
-- Support torrent
-- RSS content matcher
-- Plugins TMC, NT1, Eurosport
-- Internationalisation (français/anglais)
-- Tests d'automatisation des téléchargements
+## License
 
-## 📄 Licence
+MIT — see [LICENSE](LICENSE).
 
-Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+## Credits
 
-## 👤 Auteur
+Originally developed by dabi. Thanks to all contributors who helped improve habiTv.
 
-Développé par dabi
+## TODOs
 
-## 🙏 Remerciements
-
-Merci à tous les contributeurs qui ont aidé à améliorer habiTv !
+- Confirm exact config directory and precedence (user folder vs. executable folder).
+- Document CLI arguments and examples.
+- Verify current provider support matrix and mark deprecated/broken ones.
+- Add guidance for logging configuration and daemon mode.

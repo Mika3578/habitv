@@ -4,12 +4,12 @@
 	<parent>
 		<groupId>com.dabi.habitv</groupId>
 		<artifactId>parent</artifactId>
-		<version>4.1.0</version>
+		<version>4.2.0-beta</version>
 	</parent>
 	<artifactId>plugin-tester</artifactId>
 	<packaging>jar</packaging>
 	<name>plugin-tester</name>
-	<version>4.1.0-SNAPSHOT</version>
+	<version>4.2.0-beta</version>
 	<dependencies>
 		<dependency>
 			<groupId>com.dabi.habitv</groupId>

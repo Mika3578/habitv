@@ -3,14 +3,14 @@
 	<parent>
 		<groupId>com.dabi.habitv</groupId>
 		<artifactId>parent</artifactId>
-		<version>4.1.0</version>
+		<version>4.2.0-beta</version>
 	</parent>
 	
 	<artifactId>application</artifactId>
 	<packaging>pom</packaging>
 
 	<name>habiTv application part</name>
-	<version>4.1.0-SNAPSHOT</version>	
+	<version>4.2.0-beta</version>	
 	
 	<modules>
 		<module>core</module>

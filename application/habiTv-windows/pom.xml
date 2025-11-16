@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.dabi.habitv</groupId>
 		<artifactId>parent</artifactId>
-		<version>4.1.0-SNAPSHOT</version>
+		<version>4.2.0-beta</version>
 	</parent>
 	<artifactId>habiTv-windows</artifactId>
 	<packaging>jar</packaging>
@@ -13,16 +13,16 @@
         <developerConnection>scm:svn:http://subversion.assembla.com/svn/habitv/trunk/application/habiTv-windows</developerConnection>
     </scm>
 	<properties>
-		<habitv.version>4.1.0</habitv.version>
-		<package.version>4.1.0</package.version>
+		<habitv.version>4.2.0-beta</habitv.version>
+		<package.version>4.2.0-beta</package.version>
 		<exec.mainClass>com.dabi.habitv.packaging.HabiTvFxRunner</exec.mainClass>
 		<javafx.min.version>2.2</javafx.min.version>
-<!--<jdk.home>C:/Program Files/Java/jdk1.7.0_11</jdk.home>-->
-		<jdk.home>D:/app/apps/dev/java/jdk1.7.0_55</jdk.home>
+<!--<jdk.home>C:/Program Files/Java/jdk1.8.0_202</jdk.home>-->
+		<jdk.home>${env.JAVA_HOME}</jdk.home>
 		<javafx.runtime.lib.jar>${jdk.home}/jre/lib/ext/jfxrt.jar</javafx.runtime.lib.jar>
 		<javafx.tools.ant.jar>${jdk.home}/lib/ant-javafx.jar</javafx.tools.ant.jar>
-		<maven.compiler.source>7</maven.compiler.source>
-		<maven.compiler.target>7</maven.compiler.target>
+		<maven.compiler.source>8</maven.compiler.source>
+		<maven.compiler.target>8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
   <repositories>

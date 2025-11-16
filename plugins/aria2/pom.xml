@@ -4,11 +4,11 @@
 	<parent>
 		<groupId>com.dabi.habitv</groupId>
 		<artifactId>parent</artifactId>
-		<version>4.1.0</version>
+		<version>4.2.0-beta</version>
 	</parent>
 	<artifactId>aria2</artifactId>
 	<name>aria2</name>
-	<version>4.1.0-SNAPSHOT</version>
+	<version>4.2.0-beta</version>
 	
 	<scm>
         <connection>scm:svn:http://subversion.assembla.com/svn/habitv/trunk/plugins/aria2</connection>
@@ -19,7 +19,7 @@
 		<dependency>
 			<groupId>com.dabi.habitv</groupId>
 			<artifactId>plugin-tester</artifactId>
-			<version>4.1.0</version>
+			<version>4.2.0-beta</version>
 			<scope>test</scope>
 		</dependency>	
 		<dependency>

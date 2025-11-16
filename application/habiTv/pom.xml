@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.dabi.habitv</groupId>
 		<artifactId>application</artifactId>
-		<version>4.1.0-SNAPSHOT</version>
+		<version>4.2.0-beta</version>
 	</parent>
 	
 	<artifactId>habiTv</artifactId>
