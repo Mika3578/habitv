@@ -18,7 +18,9 @@ public interface FrameworkConf {
 
 	Integer TIME_OUT_MS = 30000;
 
-	String UPDATE_URL = "http://dabiboo.free.fr/repository";
+	// GitHub Pages URL for plugin distribution (free, public, no authentication required)
+	// Base URL: https://mika3578.github.io/habitv/plugins
+	String UPDATE_URL = "https://mika3578.github.io/habitv/plugins";
 
 	String GROUP_ID = "com.dabi.habitv";
 

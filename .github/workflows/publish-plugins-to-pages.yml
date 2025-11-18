@@ -1,0 +1,143 @@
+name: Publish Plugins to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'plugins/**/target/*.jar'
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  publish-plugins:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: read
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '7'
+          distribution: 'temurin'
+      
+      - name: Setup Maven authentication for GitHub Packages
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<EOF
+          <settings>
+            <servers>
+              <server>
+                <id>dabi-repo</id>
+                <username>${{ github.actor }}</username>
+                <password>${{ secrets.GITHUB_TOKEN }}</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
+      
+      - name: Download plugins from Maven repository
+        run: |
+          mkdir -p plugins-download
+          cd plugins-download
+          
+          # List of plugins
+          PLUGINS="youtube canalPlus arte pluzz sfr wat 6play adobeHDS aria2 beinsport clubic cmd curl email ffmpeg file footyroom globalnews lequipe mlssoccer RSS rtmpDump"
+          
+          GROUP_ID="com.dabi.habitv"
+          REPO_URL="https://maven.pkg.github.com/Mika3578/habitv"
+          
+          for PLUGIN in $PLUGINS; do
+            echo "Downloading $PLUGIN..."
+            # Try to find the latest version from metadata
+            VERSION=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              "$REPO_URL/$(echo $GROUP_ID | tr '.' '/')/$PLUGIN/maven-metadata.xml" 2>/dev/null | \
+              grep -oP '<latest>\K[^<]+' || echo "")
+            
+            if [ -z "$VERSION" ]; then
+              # Try to get version from release metadata
+              VERSION=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                "$REPO_URL/$(echo $GROUP_ID | tr '.' '/')/$PLUGIN/maven-metadata.xml" 2>/dev/null | \
+                grep -oP '<version>\K[^<]+' | head -1 || echo "4.1.0-SNAPSHOT")
+            fi
+            
+            # Download the JAR file
+            JAR_URL="$REPO_URL/$(echo $GROUP_ID | tr '.' '/')/$PLUGIN/$VERSION/$PLUGIN-$VERSION.jar"
+            HTTP_CODE=$(curl -s -o "$PLUGIN-$VERSION.jar" -w "%{http_code}" \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "$JAR_URL")
+            
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "  ✓ Downloaded $PLUGIN-$VERSION.jar"
+            else
+              echo "  ✗ Failed to download $PLUGIN (HTTP $HTTP_CODE)"
+              rm -f "$PLUGIN-$VERSION.jar"
+            fi
+          done
+      
+      - name: Prepare GitHub Pages directory
+        run: |
+          git checkout gh-pages 2>/dev/null || git checkout -b gh-pages
+          mkdir -p plugins
+      
+      - name: Copy plugins and update manifest
+        run: |
+          # Copy downloaded plugins
+          cp plugins-download/*.jar plugins/ 2>/dev/null || true
+          
+          # Update plugins.txt
+          cd plugins
+          ls -1 *.jar 2>/dev/null | sed 's/-[0-9].*\.jar$//' | sort -u > plugins.txt || echo "" > plugins.txt
+          
+          # Generate manifest.json
+          python3 << 'PYTHON_SCRIPT'
+          import json
+          import os
+          import re
+          from collections import defaultdict
+          
+          plugins = defaultdict(list)
+          
+          for filename in os.listdir('.'):
+              if filename.endswith('.jar'):
+                  # Extract plugin name and version: plugin-name-version.jar
+                  match = re.match(r'^(.+?)-(\d+\.\d+\.\d+(?:-SNAPSHOT)?)\.jar$', filename)
+                  if match:
+                      plugin_name = match.group(1)
+                      version = match.group(2)
+                      plugins[plugin_name].append(version)
+          
+          # Sort versions for each plugin (newest first)
+          for plugin in plugins:
+              plugins[plugin].sort(reverse=True)
+          
+          manifest = {plugin: {"versions": versions} for plugin, versions in plugins.items()}
+          
+          with open('manifest.json', 'w') as f:
+              json.dump(manifest, f, indent=2)
+          
+          print(f"Generated manifest.json with {len(manifest)} plugins")
+          PYTHON_SCRIPT
+          
+          cd ..
+      
+      - name: Commit and push to gh-pages
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add plugins/
+          git commit -m "Auto-update plugins from Maven repository [skip ci]" || exit 0
+          git push origin gh-pages
+      
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -rf plugins-download
+
