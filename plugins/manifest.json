@@ -1,0 +1,22 @@
+{
+  "arte": {
+    "versions": [
+      "4.1.0-SNAPSHOT"
+    ]
+  },
+  "canalPlus": {
+    "versions": [
+      "4.1.0-SNAPSHOT"
+    ]
+  },
+  "youtube": {
+    "versions": [
+      "4.1.0-SNAPSHOT"
+    ]
+  },
+  "pluzz": {
+    "versions": [
+      "4.1.1-SNAPSHOT"
+    ]
+  }
+}
