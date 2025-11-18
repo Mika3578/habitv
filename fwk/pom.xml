@@ -11,4 +11,9 @@
 
 	<name>fwk habiTv</name>
 
+	<modules>
+		<module>api</module>
+		<module>framework</module>
+	</modules>
+
 </project>
