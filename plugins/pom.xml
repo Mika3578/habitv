@@ -4,8 +4,10 @@
 		<groupId>com.dabi.habitv</groupId>
 		<artifactId>parent</artifactId>
 		<version>4.1.0</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>plugins</artifactId>
+	<version>4.1.0</version>
 	<packaging>pom</packaging>
 	<name>plugins habiTv</name>
 

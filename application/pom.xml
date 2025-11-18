@@ -4,13 +4,14 @@
 		<groupId>com.dabi.habitv</groupId>
 		<artifactId>parent</artifactId>
 		<version>4.1.0</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 	
 	<artifactId>application</artifactId>
 	<packaging>pom</packaging>
 
 	<name>habiTv application part</name>
-	<version>4.1.0-SNAPSHOT</version>	
+	<version>4.1.0</version>	
 	
 	<modules>
 		<module>core</module>

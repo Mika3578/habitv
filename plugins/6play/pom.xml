@@ -8,7 +8,7 @@
 	</parent>
 	<artifactId>6play</artifactId>
 	<name>6play</name>
-	<version>4.1.0-SNAPSHOT</version>
+	<version>4.1.0</version>
 	
 	<dependencies>
 		<dependency>

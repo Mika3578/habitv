@@ -7,7 +7,7 @@
 		<version>4.1.0</version>
 	</parent>
 	<artifactId>mlssoccer</artifactId>
-	<version>4.1.0-SNAPSHOT</version>
+	<version>4.1.0</version>
 	<name>mlssoccer</name>
 	
 	<dependencies>

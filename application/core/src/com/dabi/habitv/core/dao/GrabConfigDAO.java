@@ -186,7 +186,7 @@ public class GrabConfigDAO {
 				subCategoriesDTO = Collections.emptySet();
 			}
 
-			if (category.getDownload() == null || category.getDownload()
+			if (category.isDownload() == null || category.isDownload()
 					|| !subCategoriesDTO.isEmpty()
 					|| loadMode.equals(LoadModeEnum.ALL)) {
 				categoryDTO = buildCategoryDTO(channelName, category,
@@ -204,17 +204,17 @@ public class GrabConfigDAO {
 				category.getId(), getInclude(category), getExclude(category),
 				category.getExtension());
 
-		categoryDTO.setSelected(category.getDownload() != null
-				&& category.getDownload());
+		categoryDTO.setSelected(category.isDownload() != null
+				&& category.isDownload());
 
-		categoryDTO.setTemplate(category.getTemplate() != null
-				&& category.getTemplate());
+		categoryDTO.setTemplate(category.isTemplate() != null
+				&& category.isTemplate());
 
-		categoryDTO.setDownloadable(category.getDownloadable() == null
-				|| category.getDownloadable());
+		categoryDTO.setDownloadable(category.isDownloadable() == null
+				|| category.isDownloadable());
 
-		categoryDTO.setDeleted(category.getDeleted() != null
-				&& category.getDeleted());
+		categoryDTO.setDeleted(category.isDeleted() != null
+				&& category.isDeleted());
 
 		categoryDTO.setState(category.getStatus() == null ? StatusEnum.EXIST
 				: StatusEnum.valueOf(category.getStatus()));
@@ -299,7 +299,7 @@ public class GrabConfigDAO {
 
 		buildCategoryConfiguration(oldCategory, categoryType);
 
-		categoryType.setDownload(oldCategory.getToDownload());
+		categoryType.setDownload(oldCategory.isToDownload());
 
 		Excludes excludes = new Excludes();
 		for (String oldExclude : oldCategory.getExclude()) {
@@ -358,8 +358,8 @@ public class GrabConfigDAO {
 							plugin.getName(), buildCategoryListDTO);
 					categoryPlugin.setDownloadable(false);
 					categoryPlugin
-							.setDeleted(plugin.getDeleted() == null ? false
-									: plugin.getDeleted());
+							.setDeleted(plugin.isDeleted() == null ? false
+									: plugin.isDeleted());
 					if (plugin.getStatus() != null) {
 						categoryPlugin.setState(StatusEnum.valueOf(plugin
 								.getStatus()));
