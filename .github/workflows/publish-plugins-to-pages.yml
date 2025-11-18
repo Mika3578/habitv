@@ -87,9 +87,114 @@ jobs:
           git checkout gh-pages 2>/dev/null || git checkout -b gh-pages
           mkdir -p plugins
       
-      - name: Copy plugins and update manifest
+      - name: Create Maven repository structure and update manifest
         run: |
-          # Copy downloaded plugins
+          GROUP_ID="com.dabi.habitv"
+          GROUP_PATH=$(echo $GROUP_ID | tr '.' '/')
+          
+          # Create Maven repository structure for each plugin
+          cd plugins-download
+          for JAR_FILE in *.jar; do
+            if [ -f "$JAR_FILE" ]; then
+              # Extract plugin name and version: plugin-name-version.jar
+              # Remove .jar extension
+              BASENAME="${JAR_FILE%.jar}"
+              # Extract version (last part matching version pattern)
+              VERSION=$(echo "$BASENAME" | sed -E 's/.*-([0-9]+\.[0-9]+\.[0-9]+(-SNAPSHOT)?)$/\1/')
+              
+              if [ -n "$VERSION" ] && [ "$VERSION" != "$BASENAME" ]; then
+                # Extract plugin name (everything before the version)
+                PLUGIN_NAME=$(echo "$BASENAME" | sed -E "s/-${VERSION}$//")
+                
+                # Create Maven directory structure
+                MAVEN_PATH="../$GROUP_PATH/$PLUGIN_NAME/$VERSION"
+                mkdir -p "$MAVEN_PATH"
+                
+                # Copy JAR to Maven structure
+                cp "$JAR_FILE" "$MAVEN_PATH/$JAR_FILE"
+                
+                # Generate POM file (minimal)
+                cat > "$MAVEN_PATH/$JAR_FILE.pom" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>$GROUP_ID</groupId>
+  <artifactId>$PLUGIN_NAME</artifactId>
+  <version>$VERSION</version>
+  <packaging>jar</packaging>
+</project>
+EOF
+                
+                echo "  ✓ Created Maven structure for $PLUGIN_NAME-$VERSION"
+              else
+                echo "  ⚠ Could not parse version from $JAR_FILE"
+              fi
+            fi
+          done
+          cd ..
+          
+          # Generate maven-metadata.xml for each plugin
+          python3 << 'PYTHON_SCRIPT'
+          import os
+          import re
+          import xml.etree.ElementTree as ET
+          from collections import defaultdict
+          from datetime import datetime
+          
+          GROUP_ID = "com.dabi.habitv"
+          GROUP_PATH = GROUP_ID.replace('.', '/')
+          
+          plugins = defaultdict(list)
+          
+          # Scan Maven structure to find all versions
+          if os.path.exists(GROUP_PATH):
+              for plugin_name in os.listdir(GROUP_PATH):
+                  plugin_path = os.path.join(GROUP_PATH, plugin_name)
+                  if os.path.isdir(plugin_path):
+                      for version_dir in os.listdir(plugin_path):
+                          version_path = os.path.join(plugin_path, version_dir)
+                          if os.path.isdir(version_path):
+                              # Check if JAR exists
+                              jar_files = [f for f in os.listdir(version_path) if f.endswith('.jar')]
+                              if jar_files:
+                                  plugins[plugin_name].append(version_dir)
+          
+          # Generate maven-metadata.xml for each plugin
+          for plugin_name, versions in plugins.items():
+              # Sort versions (newest first for latest)
+              versions_sorted = sorted(versions, reverse=True)
+              latest = versions_sorted[0] if versions_sorted else None
+              
+              # Create metadata XML
+              metadata = ET.Element("metadata")
+              ET.SubElement(metadata, "groupId").text = GROUP_ID
+              ET.SubElement(metadata, "artifactId").text = plugin_name
+              
+              versioning = ET.SubElement(metadata, "versioning")
+              if latest:
+                  ET.SubElement(versioning, "latest").text = latest
+                  ET.SubElement(versioning, "release").text = latest
+              
+              versions_elem = ET.SubElement(versioning, "versions")
+              for version in versions_sorted:
+                  ET.SubElement(versions_elem, "version").text = version
+              
+              ET.SubElement(versioning, "lastUpdated").text = datetime.now().strftime("%Y%m%d%H%M%S")
+              
+              # Write metadata file
+              metadata_path = os.path.join(GROUP_PATH, plugin_name, "maven-metadata.xml")
+              os.makedirs(os.path.dirname(metadata_path), exist_ok=True)
+              tree = ET.ElementTree(metadata)
+              ET.indent(tree, space="  ")
+              tree.write(metadata_path, encoding="utf-8", xml_declaration=True)
+              print(f"Generated maven-metadata.xml for {plugin_name}")
+          
+          print(f"Generated metadata for {len(plugins)} plugins")
+          PYTHON_SCRIPT
+          
+          # Also keep the old structure for backward compatibility
           cp plugins-download/*.jar plugins/ 2>/dev/null || true
           
           # Update plugins.txt
@@ -132,7 +237,7 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add plugins/
+          git add plugins/ com/
           git commit -m "Auto-update plugins from Maven repository [skip ci]" || exit 0
           git push origin gh-pages
       
