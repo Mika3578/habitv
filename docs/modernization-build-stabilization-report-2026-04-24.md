@@ -27,7 +27,7 @@ _Date: 2026-04-24 (UTC)_
 The build is currently not cleanly reproducible end-to-end due to POM topology/version mismatches, missing aggregation at the root, legacy repository/distribution assumptions, and outdated packaging/toolchain coupling.
 
 ### Top 5 blockers
-1. Parent POM resolution fails in nested modules due version mismatch (`4.1.0` vs `4.1.0-SNAPSHOT`) and wrong/default `relativePath`.
+1. Parent POM resolution fails in nested modules due to version mismatch (`4.1.0` vs `4.1.0-SNAPSHOT`) and wrong/default `relativePath`.
 2. Root/fwk aggregators do not declare child modules, producing false-green root builds.
 3. Legacy external artifact/update endpoint is HTTP and currently responds `403`.
 4. JavaFX packaging is tied to JDK7 internals via `systemPath` and absolute `jdk.home` paths.
