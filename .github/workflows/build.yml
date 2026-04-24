@@ -21,15 +21,19 @@ jobs:
           - os: ubuntu-latest
             java: '8'
             maven_profile: ''
+            maven_goal: 'validate'
           - os: windows-latest
             java: '8'
             maven_profile: ''
+            maven_goal: 'validate'
           - os: ubuntu-latest
             java: '17'
             maven_profile: '-Pjava17-compat'
+            maven_goal: 'test-compile'
           - os: windows-latest
             java: '17'
             maven_profile: '-Pjava17-compat'
+            maven_goal: 'test-compile'
 
     steps:
       - name: Checkout
@@ -43,4 +47,4 @@ jobs:
           cache: maven
 
       - name: Maven validate (reactor)
-        run: mvn -B -ntp -DskipTests ${{ matrix.maven_profile }} validate
+        run: mvn -B -ntp -DskipTests ${{ matrix.maven_profile }} ${{ matrix.maven_goal }}

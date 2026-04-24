@@ -188,15 +188,17 @@
 	<profiles>
 		<profile>
 			<id>java17-compat</id>
+			<properties>
+				<maven.compiler.release>8</maven.compiler.release>
+				<maven.compiler.source></maven.compiler.source>
+				<maven.compiler.target></maven.compiler.target>
+			</properties>
 			<build>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-compiler-plugin</artifactId>
 						<version>3.11.0</version>
-						<configuration>
-							<release>8</release>
-						</configuration>
 					</plugin>
 				</plugins>
 			</build>
