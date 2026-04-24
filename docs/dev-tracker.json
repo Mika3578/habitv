@@ -27,10 +27,10 @@
     ]
   },
   "backlog": [
-    {"id":"HBTV-001","title":"Align parent versions + relativePath","priority":"P0","status":"done","owner":"build_release_engineer","dependencies":[],"risk":"latent compile failures","due_date":"2026-04-30","progress_percent":100,"links":{"pr":"TBD","issue":"TBD"}},
-    {"id":"HBTV-002","title":"Add root/fwk module aggregation","priority":"P0","status":"done","owner":"build_release_engineer","dependencies":["HBTV-001"],"risk":"reactor exposes failures","due_date":"2026-05-02","progress_percent":100,"links":{"pr":"TBD","issue":"TBD"}},
-    {"id":"HBTV-003","title":"Fix SNASPHOT typo and version policy","priority":"P1","status":"todo","owner":"build_release_engineer","dependencies":["HBTV-001"],"risk":"version drift","due_date":"2026-05-02","progress_percent":0,"links":{"pr":"TBD","issue":"TBD"}},
-    {"id":"HBTV-004","title":"Add baseline GitHub build workflow","priority":"P0","status":"done","owner":"build_release_engineer","dependencies":["HBTV-001","HBTV-002"],"risk":"noisy CI gates","due_date":"2026-05-05","progress_percent":100,"links":{"pr":"TBD","issue":"TBD"}},
+    {"id":"HBTV-001","title":"Align parent versions + relativePath","priority":"P0","status":"done","owner":"build_release_engineer","dependencies":[],"risk":"latent compile failures","due_date":"2026-04-30","progress_percent":100,"links":{"pr":"3","issue":"TBD"}},
+    {"id":"HBTV-002","title":"Add root/fwk module aggregation","priority":"P0","status":"done","owner":"build_release_engineer","dependencies":["HBTV-001"],"risk":"reactor exposes failures","due_date":"2026-05-02","progress_percent":100,"links":{"pr":"3","issue":"TBD"}},
+    {"id":"HBTV-003","title":"Fix SNASPHOT typo and version policy","priority":"P1","status":"done","owner":"build_release_engineer","dependencies":["HBTV-001"],"risk":"version drift","due_date":"2026-05-02","progress_percent":100,"links":{"pr":"3","issue":"TBD"}},
+    {"id":"HBTV-004","title":"Add baseline GitHub build workflow","priority":"P0","status":"done","owner":"build_release_engineer","dependencies":["HBTV-001","HBTV-002"],"risk":"noisy CI gates","due_date":"2026-05-05","progress_percent":100,"links":{"pr":"3","issue":"TBD"}},
     {"id":"HBTV-005","title":"Add PR + issue templates","priority":"P1","status":"todo","owner":"tech_lead","dependencies":[],"risk":"adoption lag","due_date":"2026-05-06","progress_percent":0,"links":{"pr":"TBD","issue":"TBD"}},
     {"id":"HBTV-006","title":"Bootstrap security dependency scan","priority":"P1","status":"todo","owner":"security_engineer","dependencies":["HBTV-004"],"risk":"many legacy findings","due_date":"2026-05-10","progress_percent":0,"links":{"pr":"TBD","issue":"TBD"}},
     {"id":"HBTV-007","title":"Java 17 compatibility profile","priority":"P1","status":"todo","owner":"architect_build_engineer","dependencies":["HBTV-001","HBTV-002"],"risk":"legacy javafx blockers","due_date":"2026-05-20","progress_percent":0,"links":{"pr":"TBD","issue":"TBD"}},
@@ -39,7 +39,7 @@
     {"id":"HBTV-010","title":"Add CODEOWNERS and policy docs","priority":"P2","status":"todo","owner":"eng_manager_release_manager","dependencies":["HBTV-005"],"risk":"policy drift","due_date":"2026-06-20","progress_percent":0,"links":{"pr":"TBD","issue":"TBD"}}
   ],
   "blockers": [
-    {"id":"BLK-001","description":"Parent POM mismatch prevents module builds","impacted":["HBTV-001","HBTV-002","HBTV-004"],"owner":"build_release_engineer","escalate_by":"2026-04-25","status":"closed_2026-04-24"},
+    {"id":"BLK-001","description":"Parent POM mismatch prevents module builds","impacted":["HBTV-001","HBTV-002","HBTV-004"],"owner":"build_release_engineer","escalate_by":"2026-04-25","status":"closed","closed_at":"2026-04-24"},
     {"id":"BLK-002","description":"External HTTP repository returns 403","impacted":["HBTV-006","HBTV-007"],"owner":"build_release_engineer","escalate_by":"2026-04-28","status":"open"}
   ],
   "changelog": [

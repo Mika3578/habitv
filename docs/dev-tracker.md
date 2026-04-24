@@ -33,10 +33,10 @@ A task is Done when:
 
 | ID | Title | Priority | Status | Owner role | Dependencies | Risk | Due date | Progress | Links |
 |---|---|---|---|---|---|---|---|---|---|
-| HBTV-001 | Align parent versions + relativePath | P0 | Done | Build/Release Eng | None | Hidden module breakages after fix | 2026-04-30 | 100% | PR:pending / Issue:TBD |
-| HBTV-002 | Add root/fwk module aggregation | P0 | Done | Build/Release Eng | HBTV-001 | Reactor exposes compile failures | 2026-05-02 | 100% | PR:pending / Issue:TBD |
-| HBTV-003 | Fix `4.1.0-SNASPHOT` typo and version policy | P1 | Todo | Build/Release Eng | HBTV-001 | Transitive dependency drift | 2026-05-02 | 0% | PR:TBD / Issue:TBD |
-| HBTV-004 | Add baseline GitHub build workflow | P0 | Done | Build/Release Eng | HBTV-001,HBTV-002 | CI noise if gates too strict initially | 2026-05-05 | 100% | PR:pending / Issue:TBD |
+| HBTV-001 | Align parent versions + relativePath | P0 | Done | Build/Release Eng | None | Hidden module breakages after fix | 2026-04-30 | 100% | PR:3 / Issue:TBD |
+| HBTV-002 | Add root/fwk module aggregation | P0 | Done | Build/Release Eng | HBTV-001 | Reactor exposes compile failures | 2026-05-02 | 100% | PR:3 / Issue:TBD |
+| HBTV-003 | Fix `4.1.0-SNASPHOT` typo and version policy | P1 | Done | Build/Release Eng | HBTV-001 | Transitive dependency drift | 2026-05-02 | 100% | PR:3 / Issue:TBD |
+| HBTV-004 | Add baseline GitHub build workflow | P0 | Done | Build/Release Eng | HBTV-001,HBTV-002 | CI noise if gates too strict initially | 2026-05-05 | 100% | PR:3 / Issue:TBD |
 | HBTV-005 | Add PR template + modernization issue template | P1 | Todo | Tech Lead | None | Process adoption lag | 2026-05-06 | 0% | PR:TBD / Issue:TBD |
 | HBTV-006 | Bootstrap security/dependency scan | P1 | Todo | Security Eng | HBTV-004 | Legacy deps trigger many findings | 2026-05-10 | 0% | PR:TBD / Issue:TBD |
 | HBTV-007 | Establish Java 17 compatibility build profile | P1 | Todo | Architect + Build Eng | HBTV-001,HBTV-002 | JavaFX legacy blockers | 2026-05-20 | 0% | PR:TBD / Issue:TBD |
