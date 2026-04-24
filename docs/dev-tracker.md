@@ -1,6 +1,6 @@
 # Habitv Living Development Tracker
 
-_Last updated: 2026-04-24T20:05:00Z_
+_Last updated: 2026-04-24T20:40:00Z_
 
 ## Governance
 
@@ -49,7 +49,7 @@ A task is Done when:
 | Blocker ID | Description | Impacted items | Owner | Escalate by | Status |
 |---|---|---|---|---|---|
 | BLK-001 | Parent POM mismatch prevents module builds | HBTV-001,HBTV-002,HBTV-004 | Build/Release Eng | 2026-04-25 | Closed (2026-04-24) |
-| BLK-002 | External HTTP repo returns 403 | HBTV-007 | Build/Release Eng | 2026-04-28 | Closed (2026-04-24, switched `dabi-repo` to HTTPS + aligned module snapshots) |
+| BLK-002 | External HTTP repo returns 403 | HBTV-007 | Build/Release Eng | 2026-04-28 | Closed (2026-04-24, switched `dabi-repo` to GitHub Raw HTTPS mirror + aligned module snapshots) |
 | BLK-003 | Java 17 compile reveals JAXB-generated model/API mismatch in `core` | HBTV-007 | Architect + Build Eng | 2026-04-29 | Open |
 
 ## Decisions snapshot
@@ -64,6 +64,7 @@ A task is Done when:
 - 2026-04-24T18:05:00Z — Completed HBTV-006: added baseline dependency scan workflow and report artifact publication.
 - 2026-04-24T19:20:00Z — Started HBTV-007: added `java17-compat` profile and Java 17 CI lane; discovered `core` compile blocker (JAXB-generated API mismatch).
 - 2026-04-24T20:05:00Z — Mitigated CI dependency resolution failures by migrating `dabi-repo` URLs to HTTPS and aligning plugin versions to `4.1.0-SNAPSHOT`.
+- 2026-04-24T20:40:00Z — Repointed `dabi-repo` to `raw.githubusercontent.com/Mika3578/habitv-repo/main` to use a reachable HTTPS Maven mirror.
 
 ## Next update trigger
 Update this file after each of:

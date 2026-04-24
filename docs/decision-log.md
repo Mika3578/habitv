@@ -8,7 +8,7 @@
 | 2026-04-24 | ADR-004 | Complete P0 foundation as Maven topology + reactor + baseline CI | Finishing blocking infrastructure first unlocks measurable modernization flow | P0 build governance and CI baseline are now codified | Accepted |
 | 2026-04-24 | ADR-005 | Introduce non-blocking baseline dependency scanning in CI | Immediate visibility into dependency risk is needed, but legacy findings are expected | Security telemetry begins now without destabilizing PR velocity | Accepted |
 | 2026-04-24 | ADR-006 | Validate reactor on Java 17 via dedicated Maven compatibility profile | Runtime/toolchain modernization needs continuous signal before full packaging migration | Adds incremental Java 17 confidence while isolating JavaFX packaging blockers | Accepted |
-| 2026-04-24 | ADR-007 | Enforce secure repository transport and snapshot version alignment across plugins | Maven CI blocks HTTP repositories and version drift caused remote artifact resolution attempts | Restores deterministic reactor resolution in CI/security scan paths | Accepted |
+| 2026-04-24 | ADR-007 | Enforce secure repository transport via GitHub Raw mirror and align plugin snapshots | Maven CI blocks HTTP repositories and legacy host access is unreliable; version drift caused remote resolution attempts | Restores deterministic reactor resolution in CI/security scan paths | Accepted |
 
 ## Update rule
 Add one row whenever scope, sequencing, or standards change materially.

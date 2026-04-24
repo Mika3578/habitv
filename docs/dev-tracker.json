@@ -1,7 +1,7 @@
 {
   "program": {
     "name": "Habitv modernization",
-    "last_updated": "2026-04-24T20:05:00Z",
+    "last_updated": "2026-04-24T20:40:00Z",
     "phase": "Phase 1",
     "status": "in_progress",
     "progress_percent": 55
@@ -51,6 +51,7 @@
     {"timestamp":"2026-04-24T16:25:00Z","change":"Completed HBTV-005 (PR and issue templates)"},
     {"timestamp":"2026-04-24T18:05:00Z","change":"Completed HBTV-006 by adding dependency scan workflow and report artifact upload"},
     {"timestamp":"2026-04-24T19:20:00Z","change":"Started HBTV-007 with java17-compat profile and Java 17 CI lane; identified core JAXB API mismatch blocker"},
-    {"timestamp":"2026-04-24T20:05:00Z","change":"Migrated dabi-repo URLs to HTTPS and aligned plugin versions to 4.1.0-SNAPSHOT to prevent remote resolution drift"}
+    {"timestamp":"2026-04-24T20:05:00Z","change":"Migrated dabi-repo URLs to HTTPS and aligned plugin versions to 4.1.0-SNAPSHOT to prevent remote resolution drift"},
+    {"timestamp":"2026-04-24T20:40:00Z","change":"Repointed dabi-repo to raw.githubusercontent.com/Mika3578/habitv-repo/main for reachable HTTPS Maven artifacts"}
   ]
 }
