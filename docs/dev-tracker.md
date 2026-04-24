@@ -1,6 +1,6 @@
 # Habitv Living Development Tracker
 
-_Last updated: 2026-04-24T13:40:00Z_
+_Last updated: 2026-04-24T16:10:00Z_
 
 ## Governance
 
@@ -27,16 +27,16 @@ A task is Done when:
 ## Program status
 - Overall program: **In Progress**
 - Current phase: **Phase 0 (Build stabilization)**
-- Progress: **12%**
+- Progress: **40%**
 
 ## Backlog (live)
 
 | ID | Title | Priority | Status | Owner role | Dependencies | Risk | Due date | Progress | Links |
 |---|---|---|---|---|---|---|---|---|---|
-| HBTV-001 | Align parent versions + relativePath | P0 | Todo | Build/Release Eng | None | Hidden module breakages after fix | 2026-04-30 | 0% | PR:TBD / Issue:TBD |
-| HBTV-002 | Add root/fwk module aggregation | P0 | Todo | Build/Release Eng | HBTV-001 | Reactor exposes compile failures | 2026-05-02 | 0% | PR:TBD / Issue:TBD |
+| HBTV-001 | Align parent versions + relativePath | P0 | Done | Build/Release Eng | None | Hidden module breakages after fix | 2026-04-30 | 100% | PR:pending / Issue:TBD |
+| HBTV-002 | Add root/fwk module aggregation | P0 | Done | Build/Release Eng | HBTV-001 | Reactor exposes compile failures | 2026-05-02 | 100% | PR:pending / Issue:TBD |
 | HBTV-003 | Fix `4.1.0-SNASPHOT` typo and version policy | P1 | Todo | Build/Release Eng | HBTV-001 | Transitive dependency drift | 2026-05-02 | 0% | PR:TBD / Issue:TBD |
-| HBTV-004 | Add baseline GitHub build workflow | P0 | Todo | Build/Release Eng | HBTV-001,HBTV-002 | CI noise if gates too strict initially | 2026-05-05 | 0% | PR:TBD / Issue:TBD |
+| HBTV-004 | Add baseline GitHub build workflow | P0 | Done | Build/Release Eng | HBTV-001,HBTV-002 | CI noise if gates too strict initially | 2026-05-05 | 100% | PR:pending / Issue:TBD |
 | HBTV-005 | Add PR template + modernization issue template | P1 | Todo | Tech Lead | None | Process adoption lag | 2026-05-06 | 0% | PR:TBD / Issue:TBD |
 | HBTV-006 | Bootstrap security/dependency scan | P1 | Todo | Security Eng | HBTV-004 | Legacy deps trigger many findings | 2026-05-10 | 0% | PR:TBD / Issue:TBD |
 | HBTV-007 | Establish Java 17 compatibility build profile | P1 | Todo | Architect + Build Eng | HBTV-001,HBTV-002 | JavaFX legacy blockers | 2026-05-20 | 0% | PR:TBD / Issue:TBD |
@@ -48,7 +48,7 @@ A task is Done when:
 
 | Blocker ID | Description | Impacted items | Owner | Escalate by | Status |
 |---|---|---|---|---|---|
-| BLK-001 | Parent POM mismatch prevents module builds | HBTV-001,HBTV-002,HBTV-004 | Build/Release Eng | 2026-04-25 | Open |
+| BLK-001 | Parent POM mismatch prevents module builds | HBTV-001,HBTV-002,HBTV-004 | Build/Release Eng | 2026-04-25 | Closed (2026-04-24) |
 | BLK-002 | External HTTP repo returns 403 | HBTV-006,HBTV-007 | Build/Release Eng | 2026-04-28 | Open |
 
 ## Decisions snapshot
@@ -58,6 +58,7 @@ A task is Done when:
 - 2026-04-24T13:30:00Z — Initialized living tracker structure (DoR/DoD/escalation/backlog/blockers).
 - 2026-04-24T13:35:00Z — Added initial backlog IDs, priorities, dependencies, and due dates.
 - 2026-04-24T13:40:00Z — Synced tracker with modernization report v2 and marked Phase 0 active.
+- 2026-04-24T16:10:00Z — Completed P0 backlog items HBTV-001/HBTV-002/HBTV-004; closed BLK-001.
 
 ## Next update trigger
 Update this file after each of:

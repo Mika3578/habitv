@@ -1,0 +1,34 @@
+name: build
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+      - work
+  workflow_dispatch:
+
+jobs:
+  verify:
+    name: Verify (${{ matrix.os }}, Java ${{ matrix.java }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        java: ['8']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+          cache: maven
+
+      - name: Maven validate (reactor)
+        run: mvn -B -ntp -DskipTests validate
