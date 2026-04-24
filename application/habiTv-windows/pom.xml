@@ -23,13 +23,6 @@
 		<javafx.tools.ant.jar>${jdk.home}/lib/ant-javafx.jar</javafx.tools.ant.jar>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-  <repositories>
-    <repository>
-      <id>dabi-repo</id>
-      <name>dabi-repo</name>
-      <url>http://dabiboo.free.fr/repository</url>
-    </repository>
-  </repositories>  
 	<dependencies>
 		<dependency>
 			<groupId>javafx</groupId>

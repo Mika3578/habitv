@@ -7,6 +7,7 @@ on:
       - main
       - master
       - work
+      - develop
   workflow_dispatch:
 
 jobs:
@@ -16,8 +17,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        java: ['8']
+        include:
+          - os: ubuntu-latest
+            java: '8'
+            maven_profile: ''
+          - os: windows-latest
+            java: '8'
+            maven_profile: ''
+          - os: ubuntu-latest
+            java: '17'
+            maven_profile: '-Pjava17-compat'
+          - os: windows-latest
+            java: '17'
+            maven_profile: '-Pjava17-compat'
 
     steps:
       - name: Checkout
@@ -31,4 +43,4 @@ jobs:
           cache: maven
 
       - name: Maven validate (reactor)
-        run: mvn -B -ntp -DskipTests validate
+        run: mvn -B -ntp -DskipTests ${{ matrix.maven_profile }} validate
