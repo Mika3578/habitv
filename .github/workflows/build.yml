@@ -17,10 +17,14 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
+        java: ['8', '17']
+        maven_profile: ['']
         include:
-          - java: '8'
-            maven_profile: ''
-          - java: '17'
+          - os: ubuntu-latest
+            java: '17'
+            maven_profile: '-Pjava17-compat'
+          - os: windows-latest
+            java: '17'
             maven_profile: '-Pjava17-compat'
 
     steps:
