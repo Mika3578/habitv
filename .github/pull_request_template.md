@@ -18,7 +18,7 @@
 ### Definition of Done checklist
 - [ ] Code/docs merged with citations/evidence
 - [ ] Validation commands executed and recorded in PR
-- [ ] Tracker + risk register updated (if scope changed)
+- [ ] Tracker + risk register + decision log updated (if scope changed)
 - [ ] Follow-up items created for deferred work (if applicable)
 
 ### Blockers or risks

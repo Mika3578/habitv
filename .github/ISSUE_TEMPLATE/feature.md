@@ -24,4 +24,4 @@ labels: enhancement
 
 ---
 
-**Process note**: Large features may need a modernization task (see ISSUE_TEMPLATE/modernization.md) if they impact build/release.
+**Process note**: Large features that impact build/release may need a modernization task; please select the "Modernization Task" issue type.
