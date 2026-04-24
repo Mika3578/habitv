@@ -17,7 +17,11 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        java: ['8']
+        include:
+          - java: '8'
+            maven_profile: ''
+          - java: '17'
+            maven_profile: '-Pjava17-compat'
 
     steps:
       - name: Checkout
@@ -31,4 +35,4 @@ jobs:
           cache: maven
 
       - name: Maven validate (reactor)
-        run: mvn -B -ntp -DskipTests validate
+        run: mvn -B -ntp -DskipTests ${{ matrix.maven_profile }} validate
