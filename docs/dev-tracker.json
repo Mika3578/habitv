@@ -1,7 +1,7 @@
 {
   "program": {
     "name": "Habitv modernization",
-    "last_updated": "2026-04-24T21:00:00Z",
+    "last_updated": "2026-04-24T21:30:00Z",
     "phase": "Phase 0",
     "status": "in_progress",
     "progress_percent": 52
@@ -52,6 +52,7 @@
     {"timestamp":"2026-04-24T18:05:00Z","change":"Completed HBTV-006 by adding dependency scan workflow and report artifact upload"},
     {"timestamp":"2026-04-24T19:20:00Z","change":"Started HBTV-007 with java17-compat profile and Java 17 CI lane; identified core JAXB API mismatch blocker"},
     {"timestamp":"2026-04-24T20:05:00Z","change":"Removed custom dabi-repo declarations and aligned plugin versions to 4.1.0-SNAPSHOT to prevent remote resolution drift"},
-    {"timestamp":"2026-04-24T21:00:00Z","change":"Hardened dependency scan workflow and corrected PR #7 tracker/risk status (HBTV-006 done, HBTV-007 in progress, BLK-002 partially mitigated)"}
+    {"timestamp":"2026-04-24T21:00:00Z","change":"Hardened dependency scan workflow and corrected PR #7 tracker/risk status (HBTV-006 done, HBTV-007 in progress, BLK-002 partially mitigated)"},
+    {"timestamp":"2026-04-24T21:30:00Z","change":"Hardened dependency-check reliability by removing H2 DB cache reuse and adding DB reset + retry behavior"}
   ]
 }

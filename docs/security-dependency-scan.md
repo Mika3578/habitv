@@ -33,8 +33,10 @@ mvn -B -ntp org.owasp:dependency-check-maven:12.2.1:aggregate -Dformat=ALL -Dfai
 - Fail threshold: `-DfailBuildOnCVSS=11` (effectively non-blocking at scanner threshold)
 - Job mode: `continue-on-error: true` during bootstrap
 - Optional secret: `NVD_API_KEY`
+- Retry behavior: up to 3 attempts, clearing `~/.dependency-check` between retries
 
 If `NVD_API_KEY` is set in repository secrets, CI passes it to the scan. If not set, CI still runs the scan and logs that first updates may be slow.
+CI intentionally **does not cache `~/.dependency-check`** to avoid reusing a corrupted/stale H2 database. It only caches OWASP plugin artifacts from Maven local repository.
 
 ## Report artifacts
 Reports are uploaded from:

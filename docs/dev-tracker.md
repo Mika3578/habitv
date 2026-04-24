@@ -1,6 +1,6 @@
 # Habitv Living Development Tracker
 
-_Last updated: 2026-04-24T21:00:00Z_
+_Last updated: 2026-04-24T21:30:00Z_
 
 ## Governance
 
@@ -65,6 +65,7 @@ A task is Done when:
 - 2026-04-24T19:20:00Z — Started HBTV-007: added `java17-compat` profile and Java 17 CI lane; discovered `core` compile blocker (JAXB-generated API mismatch).
 - 2026-04-24T20:05:00Z — Mitigated CI dependency resolution failures by removing custom `dabi-repo` repository declarations and aligning plugin versions to `4.1.0-SNAPSHOT`.
 - 2026-04-24T21:00:00Z — Hardened security workflow (Java 17, pinned dependency-check aggregate, cache, timeout, optional `NVD_API_KEY`, explicit missing-report warnings) and corrected tracker status for PR #7.
+- 2026-04-24T21:30:00Z — Hardened dependency-check robustness by avoiding cached `~/.dependency-check` H2 DB reuse, clearing local DB before run/retries, and adding retry logic for transient feed/update failures.
 
 ## Next update trigger
 Update this file after each of:

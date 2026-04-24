@@ -35,29 +35,52 @@ jobs:
         with:
           path: |
             ~/.m2/repository/org/owasp
-            ~/.dependency-check
           key: ${{ runner.os }}-dependency-check-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-dependency-check-
 
-      - name: OWASP Dependency-Check (aggregate, with optional NVD API key)
+      - name: Clear dependency-check local DB (avoid stale/corrupted cache)
+        run: |
+          rm -rf ~/.dependency-check
+
+      - name: OWASP Dependency-Check (aggregate, with optional NVD API key + retry)
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: |
-          if [ -n "${NVD_API_KEY}" ]; then
-            echo "NVD_API_KEY detected: running dependency-check with NVD API key."
-            mvn -B -ntp \
-              org.owasp:dependency-check-maven:12.2.1:aggregate \
-              -Dformat=ALL \
-              -DfailBuildOnCVSS=11 \
-              -Dnvd.apiKey="${NVD_API_KEY}"
-          else
-            echo "NVD_API_KEY not set: first NVD update may be slow."
-            mvn -B -ntp \
-              org.owasp:dependency-check-maven:12.2.1:aggregate \
-              -Dformat=ALL \
-              -DfailBuildOnCVSS=11
-          fi
+          set -euo pipefail
+
+          for attempt in 1 2 3; do
+            echo "Dependency-Check attempt ${attempt}/3"
+            if [ -n "${NVD_API_KEY}" ]; then
+              echo "NVD_API_KEY detected: running dependency-check with NVD API key."
+              if mvn -B -ntp \
+                org.owasp:dependency-check-maven:12.2.1:aggregate \
+                -Dformat=ALL \
+                -DfailBuildOnCVSS=11 \
+                -Dnvd.apiKey="${NVD_API_KEY}"; then
+                echo "Dependency-Check succeeded on attempt ${attempt}."
+                break
+              fi
+            else
+              echo "NVD_API_KEY not set: first NVD update may be slow."
+              if mvn -B -ntp \
+                org.owasp:dependency-check-maven:12.2.1:aggregate \
+                -Dformat=ALL \
+                -DfailBuildOnCVSS=11; then
+                echo "Dependency-Check succeeded on attempt ${attempt}."
+                break
+              fi
+            fi
+
+            if [ "${attempt}" -eq 3 ]; then
+              echo "::warning::Dependency-Check failed after 3 attempts; leaving job non-blocking during bootstrap."
+              exit 1
+            fi
+
+            echo "Dependency-Check failed; clearing local DB and retrying in 30s."
+            rm -rf ~/.dependency-check
+            sleep 30
+          done
 
       - name: Check whether reports were generated
         if: always()
