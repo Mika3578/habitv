@@ -10,10 +10,10 @@ interface BeinSportConf {
 
 	String VIDEOS_CATEGORY = "video";
 
-	String VIDEOS_URL = "http://www.beinsports.com/us/videos";
+	String VIDEOS_URL = "https://www.beinsports.com/fr-fr/videos";
 
 	String REPLAY_CATEGORY = "replay";
 
-	String HOME_URL = "http://www.beinsports.com";
+	String HOME_URL = "https://www.beinsports.com";
 
 }

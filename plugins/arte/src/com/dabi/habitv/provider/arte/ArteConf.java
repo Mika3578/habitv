@@ -6,7 +6,7 @@ interface ArteConf {
 
 	String NAME = "arte";
 
-	String CAT_PAGE = "http://www.arte.tv/guide/fr/plus7";
+	String CAT_PAGE = "https://www.arte.tv/fr/";
 
 	String ID_EMISSION_TOKEN = "#ID_EMISSION#";
 
@@ -16,7 +16,7 @@ interface ArteConf {
 
 	String RTMPDUMP_CMD = "-r \"#VIDEO_URL#\" -c 1935 -m 10 -o \"#FILE_DEST#\"";
 
-	String HOME_URL = "http://www.arte.tv";
+	String HOME_URL = "https://www.arte.tv/fr/";
 
 	String EXTENSION = FrameworkConf.MP4;
 

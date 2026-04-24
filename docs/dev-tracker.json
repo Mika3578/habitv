@@ -1,7 +1,7 @@
 {
   "program": {
     "name": "Habitv modernization",
-    "last_updated": "2026-04-24T16:10:00Z",
+    "last_updated": "2026-04-24T18:05:00Z",
     "phase": "Phase 0",
     "status": "in_progress",
     "progress_percent": 40
@@ -35,6 +35,7 @@
     {"id":"HBTV-006","title":"Bootstrap security dependency scan","priority":"P1","status":"todo","owner":"security_engineer","dependencies":["HBTV-004"],"risk":"many legacy findings","due_date":"2026-05-10","progress_percent":0,"links":{"pr":"TBD","issue":"TBD"}},
     {"id":"HBTV-007","title":"Java 17 compatibility profile","priority":"P1","status":"todo","owner":"architect_build_engineer","dependencies":["HBTV-001","HBTV-002"],"risk":"legacy javafx blockers","due_date":"2026-05-20","progress_percent":0,"links":{"pr":"TBD","issue":"TBD"}},
     {"id":"HBTV-008","title":"Split unit vs integration tests","priority":"P1","status":"todo","owner":"qa_build_engineer","dependencies":["HBTV-002"],"risk":"ownership ambiguity","due_date":"2026-05-25","progress_percent":0,"links":{"pr":"TBD","issue":"TBD"}},
+    {"id":"HBTV-008a","title":"URL modernization support task for HBTV-008","priority":"P1","status":"in_progress","owner":"qa_build_engineer","dependencies":["HBTV-008"],"risk":"url updates alone do not restore provider plugins","due_date":"2026-05-25","progress_percent":25,"links":{"pr":"TBD","issue":"TBD"}},
     {"id":"HBTV-009","title":"Modernize packaging path","priority":"P2","status":"todo","owner":"desktop_lead","dependencies":["HBTV-007"],"risk":"packaging regressions","due_date":"2026-06-15","progress_percent":0,"links":{"pr":"TBD","issue":"TBD"}},
     {"id":"HBTV-010","title":"Add CODEOWNERS and policy docs","priority":"P2","status":"todo","owner":"eng_manager_release_manager","dependencies":["HBTV-005"],"risk":"policy drift","due_date":"2026-06-20","progress_percent":0,"links":{"pr":"TBD","issue":"TBD"}}
   ],
@@ -46,6 +47,7 @@
     {"timestamp":"2026-04-24T13:30:00Z","change":"Initialized tracker schema and governance"},
     {"timestamp":"2026-04-24T13:35:00Z","change":"Added initial backlog with dependencies/dates"},
     {"timestamp":"2026-04-24T13:40:00Z","change":"Synced tracker with modernization report v2"},
-    {"timestamp":"2026-04-24T16:10:00Z","change":"Completed P0 backlog (HBTV-001/002/004) and closed BLK-001"}
+    {"timestamp":"2026-04-24T16:10:00Z","change":"Completed P0 backlog (HBTV-001/002/004) and closed BLK-001"},
+    {"timestamp":"2026-04-24T18:05:00Z","change":"Started URL modernization by auditing obsolete HTTP/provider URLs and isolating network smoke tests (support task for HBTV-008)"}
   ]
 }
