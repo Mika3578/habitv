@@ -1,0 +1,46 @@
+name: security
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+      - work
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+jobs:
+  dependency-scan:
+    name: Dependency scan (OWASP)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
+          cache: maven
+
+      - name: OWASP Dependency-Check (aggregate)
+        run: >-
+          mvn -B -ntp
+          org.owasp:dependency-check-maven:check
+          -Dformat=HTML
+          -Dformat=JSON
+          -DfailBuildOnCVSS=11
+
+      - name: Upload dependency-check report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: |
+            **/target/dependency-check-report.html
+            **/target/dependency-check-report.json

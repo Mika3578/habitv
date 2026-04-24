@@ -30,7 +30,7 @@
 		<repository>
 			<id>dabi-repo</id>
 			<name>dabi-repo</name>
-			<url>http://dabiboo.free.fr/repository</url>
+			<url>https://dabiboo.free.fr/repository</url>
 		</repository>
 	</repositories>	
 
@@ -192,4 +192,27 @@
       </plugin>			
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>java17-compat</id>
+			<properties>
+				<maven.compiler.source>8</maven.compiler.source>
+				<maven.compiler.target>8</maven.compiler.target>
+				<maven.compiler.release>8</maven.compiler.release>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<version>3.11.0</version>
+						<configuration>
+							<release>${maven.compiler.release}</release>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

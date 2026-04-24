@@ -18,7 +18,7 @@
     <repository>
       <id>dabi-repo</id>
       <name>dabi-repo</name>
-      <url>http://dabiboo.free.fr/repository</url>
+      <url>https://dabiboo.free.fr/repository</url>
     </repository>
   </repositories>  	
 	
