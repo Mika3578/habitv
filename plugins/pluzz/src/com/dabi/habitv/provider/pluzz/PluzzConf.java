@@ -12,7 +12,7 @@ public interface PluzzConf {
 
 	long MAX_CACHE_ARCHIVE_TIME_MS = 60000L;
 
-	String BASE_URL = "https://www.france.tv/";
+	String BASE_URL = "https://www.france.tv";
 
 	String WS_JSON = "http://webservices.francetelevisions.fr/tools/getInfosOeuvre/v2/?idDiffusion=%s&catalogue=Pluzz&callback=webserviceCallback_%s";
 

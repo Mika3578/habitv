@@ -1,5 +1,8 @@
 package com.dabi.habitv.framework.plugin.utils;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.Test;
 
 /**
@@ -9,7 +12,9 @@ public class RetrieverUtilsNetworkIT {
 
 	@Test
 	public void shouldRetrieveBeinSportsTitleFromLiveWebsite() {
-		RetrieverUtils.getTitleByUrl("https://www.beinsports.com/fr-fr/videos");
+		String title = RetrieverUtils.getTitleByUrl("https://www.beinsports.com/fr-fr/videos");
+		assertNotNull("Page title must not be null", title);
+		assertFalse("Page title must not be empty", title.isEmpty());
 	}
 
 }

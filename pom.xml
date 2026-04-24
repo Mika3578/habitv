@@ -211,7 +211,6 @@
 								<configuration>
 									<includes>
 										<include>**/*IT.java</include>
-										<include>**/*NetworkIT.java</include>
 									</includes>
 								</configuration>
 							</execution>
