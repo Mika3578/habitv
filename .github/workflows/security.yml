@@ -31,9 +31,8 @@ jobs:
       - name: OWASP Dependency-Check (aggregate)
         run: >-
           mvn -B -ntp
-          org.owasp:dependency-check-maven:check
-          -Dformat=HTML
-          -Dformat=JSON
+          org.owasp:dependency-check-maven:aggregate
+          -Dformat=ALL
           -DfailBuildOnCVSS=11
 
       - name: Upload dependency-check report

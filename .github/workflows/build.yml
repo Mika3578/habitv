@@ -17,6 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
+        java: ['8', '17']
         include:
           - java: '8'
             maven_profile: ''
