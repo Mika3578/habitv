@@ -26,9 +26,9 @@ Generated sources are written to:
 This keeps generated artifacts out of source control and avoids stale, root-level generated files causing compile drift.
 
 ## Accessor naming expectations
-Boolean XSD elements are generated with `isXxx()` accessors by JAXB in this module (for example `isUpdateOnStartup`, `isDownload`, `isDeleted`).
+Current JAXB generation in this project exposes nullable Boolean accessors as `getXxx()`, not `isXxx()`.
 
-Production code in `application/core/src` must use the generated accessor contract and should not assume `getXxx()` for nullable booleans.
+Production code in `application/core/src` must follow the generated getter API for nullable booleans.
 
 ## Committed vs regenerated sources
 Generated JAXB classes are **not committed**.
@@ -49,3 +49,12 @@ mvn -B -ntp install
 - The current build lane remains Java 8-compatible and keeps `javax.xml.bind` usage intact.
 - This JAXB stabilization is intended to unblock `application/core` so Java 17 compatibility work can rebase cleanly afterward.
 - No `jakarta.xml.bind` migration is included in this scope.
+
+## Runtime provider notes
+- `javax.xml.bind:jaxb-api` provides JAXB interfaces but not the implementation provider class.
+- Runtime/test paths that call `JAXBContext.newInstance(...)` require a provider containing `com.sun.xml.bind.v2.ContextFactory`.
+- `application/core` and `fwk/framework` now declare:
+  - `javax.xml.bind:jaxb-api:2.3.1` (javax API line, Java 8-compatible)
+  - `com.sun.xml.bind:jaxb-impl:2.3.3` (runtime scope)
+  - `javax.activation:activation:1.1.1` (runtime scope)
+- This is the minimal Java 8-compatible `javax` JAXB RI wiring needed for deterministic local and CI test/runtime context creation.

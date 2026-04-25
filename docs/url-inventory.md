@@ -4,7 +4,7 @@ This inventory tracks hardcoded URLs found during the HTTPS modernization audit.
 
 | File path | Current URL (after this PR) | Replacement URL | Category | Status | Notes |
 |---|---|---|---|---|---|
-| `fwk/framework/test/com/dabi/habitv/framework/plugin/utils/RetrieverUtilsNetworkIT.java` | `https://www.beinsports.com/fr-fr/videos` | N/A | test-smoke-url | updated | Replaced obsolete `http://www.beinsports.fr` and moved test to network IT execution only. |
+| `fwk/framework/test/com/dabi/habitv/framework/plugin/utils/RetrieverUtilsNetworkIT.java` | `https://example.com/` | N/A | test-smoke-url | updated | Generic framework smoke test now uses a stable public test URL; provider-specific URLs are excluded from this test. |
 | `plugins/beinsport/src/com/dabi/habitv/provider/beinsport/BeinSportConf.java` | `https://www.beinsports.com/fr-fr/videos` | N/A | production-provider-url | updated | Updated public landing URL to HTTPS beIN Sports France videos page. |
 | `plugins/beinsport/src/com/dabi/habitv/provider/beinsport/BeinSportConf.java` | `https://www.beinsports.com` | N/A | production-provider-url | updated | HTTPS upgrade for provider home URL. |
 | `plugins/pluzz/src/com/dabi/habitv/provider/pluzz/PluzzConf.java` | `https://www.france.tv` | N/A | production-provider-url | updated | Public/base reference modernized; legacy webservice endpoints remain unchanged in this PR. |
@@ -30,4 +30,4 @@ This inventory tracks hardcoded URLs found during the HTTPS modernization audit.
 - Network/provider URLs are volatile; a successful HTTPS substitution does **not** guarantee provider plugin functionality.
 - Any provider that still relies on legacy service API URLs after this PR is marked `needs-dedicated-provider-rewrite`.
 
-- `mvn -B -ntp -Pnetwork-tests verify` currently fails in this environment with `java.net.SocketException: Network is unreachable` for the beIN smoke test, so this remains opt-in and non-deterministic.
+- Provider-specific URLs such as beIN Sports may return HTTP 403 for automated requests and are unsuitable for generic framework smoke tests.

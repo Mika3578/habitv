@@ -476,15 +476,15 @@ public class XMLUserConfig implements UserConfig {
 	@Override
 	public boolean updateOnStartup() {
 		return config.getUpdateConfig() == null
-				|| config.getUpdateConfig().isUpdateOnStartup() == null ? true
-				: config.getUpdateConfig().isUpdateOnStartup();
+				|| config.getUpdateConfig().getUpdateOnStartup() == null ? true
+				: config.getUpdateConfig().getUpdateOnStartup();
 	}
 
 	@Override
 	public boolean autoriseSnapshot() {
 		return config.getUpdateConfig() == null
-				|| config.getUpdateConfig().isAutoriseSnapshot() == null ? false
-				: config.getUpdateConfig().isAutoriseSnapshot();
+				|| config.getUpdateConfig().getAutoriseSnapshot() == null ? false
+				: config.getUpdateConfig().getAutoriseSnapshot();
 	}
 
 	@Override
