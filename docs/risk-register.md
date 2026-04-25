@@ -11,6 +11,7 @@
 | R-006 | Legacy provider URLs may be obsolete or moved to new platforms | High | Medium | High | Maintain `docs/url-inventory.md` and review URLs during each provider touchpoint | QA/Build Eng | URL-based smoke checks fail or redirect unexpectedly | Open |
 | R-007 | HTTPS URL replacement alone may not restore provider plugins due to API/page changes | High | High | High | Track as `needs-dedicated-provider-rewrite` and schedule provider-specific rewrite PRs | Provider Maintainer | Parsing/downloading fails after URL modernization | Open |
 | R-008 | Network-dependent tests make local/CI builds non-deterministic | Medium | High | High | Keep network tests opt-in under `-Pnetwork-tests`; do not run by default lifecycle | Build/Release Eng | Flaky failures in default build pipelines | Open |
+| R-009 | JAXB-generated model drift breaks `application/core` compilation when schema-derived boolean accessors diverge from hand-coded `getXxx()` calls | Medium | High | High | Pin `maven-jaxb-plugin` version and align core code with generated JAXB accessor contract (`isXxx()` for booleans) | Architect + Build Eng | `application/core` compile errors against generated entities | Open |
 
 ## Escalation
 - If any exposure remains **High** for >10 calendar days, escalate to Architect and Engineering Manager.
