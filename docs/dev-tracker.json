@@ -1,7 +1,7 @@
 {
   "program": {
     "name": "Habitv modernization",
-    "last_updated": "2026-04-25T13:05:00Z",
+    "last_updated": "2026-04-25T13:14:00Z",
     "phase": "Phase 0",
     "status": "in_progress",
     "progress_percent": 45
@@ -366,24 +366,28 @@
     {
       "timestamp": "2026-04-25T13:05:00Z",
       "change": "Re-ran Java 8 local validation on PR #13 branch and recorded exact outcomes: validate passes; compile/install stop at application/core accessor mismatch; network-tests verify fails in framework RetrieverUtilsNetworkIT with remote 403."
+    },
+    {
+      "timestamp": "2026-04-25T13:14:00Z",
+      "change": "Aligned JAXB accessor calls with generated getter API and replaced provider-specific network smoke URL with stable example.com test URL."
     }
   ],
   "validation_snapshot": {
     "github_actions": "success (java8 ubuntu/windows)",
     "validate": "success",
-    "compile": "failed at application/core due to JAXB-generated accessor mismatch (isUpdateOnStartup/isAutoriseSnapshot/isDownload/isDeleted methods not found)",
-    "install": "failed at application/core compile due to the same JAXB-generated accessor mismatch before reaching trayView",
-    "network_tests": "failed in fwk/framework on RetrieverUtilsNetworkIT with remote HTTP 403 for https://www.beinsports.com/fr-fr/videos under opt-in profile"
+    "compile": "no JAXB accessor failure in application/core; build proceeds and later fails at plugins/beinsport dependency resolution (blocked dabi-repo HTTP metadata for 4.1.1-SNAPSHOT)",
+    "install": "no JAXB accessor/runtime-provider or ListHttpNetworkIT default-lifecycle failure; build later fails at plugins/6play test SixPlayPluginManagerTest (categorie liste vide)",
+    "network_tests": "RetrieverUtilsNetworkIT passes with example.com and ListHttpNetworkIT runs under profile; build later fails at plugins/6play test SixPlayPluginManagerTest (categorie liste vide)"
   },
   "pr_13_validation_summary": {
     "core_statement": "PR #13 completes JAXB runtime provider wiring and isolates ListHttpNetworkIT from the default Surefire lifecycle.",
-    "install_statement": "On the current local tree, mvn install fails at application/core compile accessor mismatch before trayView, so this run does not exercise later JavaFX failure behavior.",
+    "install_statement": "On the current local tree, mvn install no longer fails for JAXB accessor/runtime-provider or TestListHttp isolation; it now fails later in plugin tests (6play provider test failure).",
     "results": [
       "GitHub Actions Java 8 Ubuntu/Windows: success",
-      "mvn -B -ntp -DskipTests validate: success",
-      "mvn -B -ntp -DskipTests compile: fails at application/core accessor mismatch (isUpdateOnStartup/isAutoriseSnapshot/isDownload/isDeleted methods not found)",
-      "mvn -B -ntp install: fails at application/core compile with the same accessor mismatch before trayView and before install-time JAXB/TestListHttp behavior can be re-verified locally",
-      "mvn -B -ntp -Pnetwork-tests verify: fails in fwk/framework on RetrieverUtilsNetworkIT with remote HTTP 403, confirming profile-gated network tests remain non-deterministic by environment"
+      "mvn -B -ntp clean -DskipTests validate: success",
+      "mvn -B -ntp clean -DskipTests compile: no application/core JAXB accessor failure; later fails at plugins/beinsport dependency resolution for blocked HTTP repo metadata",
+      "mvn -B -ntp clean install: no JAXB accessor/runtime-provider or ListHttpNetworkIT default-lifecycle failure; later fails at plugins/6play test SixPlayPluginManagerTest (categorie liste vide)",
+      "mvn -B -ntp clean -Pnetwork-tests verify: RetrieverUtilsNetworkIT passes with example.com and ListHttpNetworkIT runs under profile; later fails at plugins/6play test SixPlayPluginManagerTest (categorie liste vide)"
     ]
   }
 }

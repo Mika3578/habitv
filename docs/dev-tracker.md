@@ -1,6 +1,6 @@
 # Habitv Living Development Tracker
 
-_Last updated: 2026-04-25T13:05:00Z_
+_Last updated: 2026-04-25T13:14:00Z_
 
 ## Governance
 
@@ -73,13 +73,14 @@ A task is Done when:
 - 2026-04-25T12:10:00Z — Validation found an unrelated blocker at module `application/core`: compile fails on generated accessor mismatches (`isUpdateOnStartup`, `isAutoriseSnapshot`, `isDownload`/`isDeleted` family not found).
 - 2026-04-25T12:55:00Z — Completed HBTV-007b/HBTV-007c in PR #13 by pinning compatible JAXB API/RI versions and isolating `ListHttpNetworkIT` to profile-gated Failsafe execution.
 - 2026-04-25T13:05:00Z — Re-ran Java 8 local validation on PR #13 branch and recorded exact current outcomes (`validate` pass; `compile`/`install` stop at `application/core` accessor mismatch; `-Pnetwork-tests verify` fails in framework network IT with remote 403).
+- 2026-04-25T13:14:00Z — Aligned JAXB accessor calls with generated getter API and replaced provider-specific network smoke URL with stable example.com test URL.
 
 ## PR #13 validation snapshot (for PR body sync)
 - GitHub Actions (Java 8 Ubuntu + Windows): **Success**.
-- `mvn -B -ntp -DskipTests validate`: **Success**.
-- `mvn -B -ntp -DskipTests compile`: **Failure at `application/core` due to JAXB-generated accessor mismatch (`isUpdateOnStartup`/`isAutoriseSnapshot`/`isDownload`/`isDeleted` methods not found).**
-- `mvn -B -ntp install`: **Failure at `application/core` compile with the same accessor mismatch before reaching `application/trayView`.**
-- `mvn -B -ntp -Pnetwork-tests verify`: **Failure in `fwk/framework` on `RetrieverUtilsNetworkIT` with remote HTTP 403 (`https://www.beinsports.com/fr-fr/videos`) under opt-in profile.**
+- `mvn -B -ntp clean -DskipTests validate`: **Success**.
+- `mvn -B -ntp clean -DskipTests compile`: **No `application/core` JAXB accessor failure; build progresses beyond `core`/`trayView` and fails later at `plugins/beinsport` dependency resolution (`dabi-repo` HTTP blocked for `4.1.1-SNAPSHOT` metadata).**
+- `mvn -B -ntp clean install`: **No JAXB accessor/runtime-provider or `ListHttpNetworkIT` default-lifecycle failure; build fails later at `plugins/6play` test `SixPlayPluginManagerTest` (`categorie liste vide`).**
+- `mvn -B -ntp clean -Pnetwork-tests verify`: **`RetrieverUtilsNetworkIT` passes with `https://example.com/`; `ListHttpNetworkIT` runs under Failsafe profile; build later fails at `plugins/6play` test `SixPlayPluginManagerTest` (`categorie liste vide`).**
 ## Next update trigger
 Update this file after each of:
 - merged PR,
