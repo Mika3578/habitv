@@ -42,6 +42,7 @@
 			<plugin>
 				<groupId>com.sun.tools.xjc.maven2</groupId>
 				<artifactId>maven-jaxb-plugin</artifactId>
+				<version>1.1.1</version>
 				<executions>
 					<execution>
 						<id>config</id>
@@ -51,7 +52,7 @@
 						<configuration>
 							<generatePackage>com.dabi.habitv.config.entities</generatePackage>
 							<schemaDirectory>xsd</schemaDirectory>
-							<generateDirectory>generated</generateDirectory>
+							<generateDirectory>${project.build.directory}/generated-sources/jaxb</generateDirectory>
 							<includeSchemas>
 								<includeSchema>config.xsd</includeSchema>
 							</includeSchemas>
@@ -65,7 +66,7 @@
 						<configuration>
 							<generatePackage>com.dabi.habitv.configuration.entities</generatePackage>
 							<schemaDirectory>xsd</schemaDirectory>
-							<generateDirectory>generated</generateDirectory>
+							<generateDirectory>${project.build.directory}/generated-sources/jaxb</generateDirectory>
 							<includeSchemas>
 								<includeSchema>configuration.xsd</includeSchema>
 							</includeSchemas>
@@ -79,7 +80,7 @@
 						<configuration>
 							<generatePackage>com.dabi.habitv.grabconfig.entities</generatePackage>
 							<schemaDirectory>xsd</schemaDirectory>
-							<generateDirectory>generated</generateDirectory>
+							<generateDirectory>${project.build.directory}/generated-sources/jaxb</generateDirectory>
 							<includeSchemas>
 								<includeSchema>grab-config.xsd</includeSchema>
 							</includeSchemas>
