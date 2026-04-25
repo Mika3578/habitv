@@ -49,3 +49,11 @@ mvn -B -ntp install
 - The current build lane remains Java 8-compatible and keeps `javax.xml.bind` usage intact.
 - This JAXB stabilization is intended to unblock `application/core` so Java 17 compatibility work can rebase cleanly afterward.
 - No `jakarta.xml.bind` migration is included in this scope.
+
+## Runtime provider notes
+- `javax.xml.bind:jaxb-api` provides JAXB interfaces but not the implementation provider class.
+- Runtime/test paths that call `JAXBContext.newInstance(...)` require a provider containing `com.sun.xml.bind.v2.ContextFactory`.
+- `application/core` and `fwk/framework` now declare:
+  - `com.sun.xml.bind:jaxb-impl` (runtime scope)
+  - `javax.activation:activation` (runtime scope)
+- This is the minimal Java 8-compatible `javax` JAXB RI wiring needed for deterministic local and CI test/runtime context creation.

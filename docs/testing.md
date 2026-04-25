@@ -14,6 +14,7 @@ These tests must not depend on live websites or mutable external network respons
 Network-dependent smoke tests are isolated behind the Maven profile `network-tests`.
 
 - Naming convention: `*IT.java` or `*NetworkIT.java`
+- `application/core/test/com/dabi/habitv/core/updater/TestListHttpNetworkIT.java` is intentionally excluded from default Surefire lifecycle and runs only through Failsafe in this profile.
 - Execution command:
 
 ```bash
