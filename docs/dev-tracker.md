@@ -1,6 +1,6 @@
 # Habitv Living Development Tracker
 
-_Last updated: 2026-04-24T16:25:00Z_
+_Last updated: 2026-04-24T18:05:00Z_
 
 ## Governance
 
@@ -41,6 +41,7 @@ A task is Done when:
 | HBTV-006 | Bootstrap security/dependency scan | P1 | Todo | Security Eng | HBTV-004 | Legacy deps trigger many findings | 2026-05-10 | 0% | PR:TBD / Issue:TBD |
 | HBTV-007 | Establish Java 17 compatibility build profile | P1 | Todo | Architect + Build Eng | HBTV-001,HBTV-002 | JavaFX legacy blockers | 2026-05-20 | 0% | PR:TBD / Issue:TBD |
 | HBTV-008 | Split deterministic unit vs integration tests | P1 | Todo | QA/Build Eng | HBTV-002 | Test ownership ambiguity | 2026-05-25 | 0% | PR:TBD / Issue:TBD |
+| HBTV-008a | URL modernization support task (HTTP/provider audit + network smoke test isolation) | P1 | In Progress | QA/Build Eng | HBTV-008 | URL-only updates may not restore provider compatibility | 2026-05-25 | 25% | PR:TBD / Issue:TBD |
 | HBTV-009 | Migrate packaging away from JDK7 JavaFX paths | P2 | Todo | Desktop Lead | HBTV-007 | Packaging regression on Windows/Linux | 2026-06-15 | 0% | PR:TBD / Issue:TBD |
 | HBTV-010 | Add CODEOWNERS + release/build policy docs | P2 | Todo | Eng Manager + Release Mgr | HBTV-005 | Policy drift | 2026-06-20 | 0% | PR:TBD / Issue:TBD |
 
@@ -60,6 +61,8 @@ A task is Done when:
 - 2026-04-24T13:40:00Z — Synced tracker with modernization report v2 and marked Phase 0 active.
 - 2026-04-24T16:10:00Z — Completed P0 backlog items HBTV-001/HBTV-002/HBTV-004; closed BLK-001.
 - 2026-04-24T16:25:00Z — Completed HBTV-005: PR template + modernization/bug/feature issue templates added.
+
+- 2026-04-24T18:05:00Z — Started URL modernization by auditing obsolete HTTP/provider URLs and isolating network smoke tests (support task for HBTV-008).
 
 ## Next update trigger
 Update this file after each of:

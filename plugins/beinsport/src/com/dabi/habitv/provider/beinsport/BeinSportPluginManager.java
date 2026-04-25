@@ -46,7 +46,7 @@ public class BeinSportPluginManager extends BasePluginWithProxy implements Plugi
 	}
 
 	private String toUrl(String href) {
-		return href.startsWith("http://") ? href : (BeinSportConf.HOME_URL + href);
+		return (href.startsWith("http://") || href.startsWith("https://")) ? href : (BeinSportConf.HOME_URL + href);
 	}
 
 	@Override

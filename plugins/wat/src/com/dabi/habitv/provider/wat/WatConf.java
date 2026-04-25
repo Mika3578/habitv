@@ -8,8 +8,8 @@ interface WatConf {
 
 	String EXTENSION = FrameworkConf.MP4;
 
-	String HOME_URL = "http://www.tf1.fr";
+	String HOME_URL = "https://www.tf1.fr";
 
-	String PROGRAMME_URL = "http://www.tf1.fr/programmes-tv";
+	String PROGRAMME_URL = "https://www.tf1.fr/programmes-tv";
 
 }

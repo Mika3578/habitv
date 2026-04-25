@@ -8,9 +8,9 @@ interface ClubicConf {
 
 	String EXTENSION = FrameworkConf.MP4;
 
-	String HOME_URL = "http://www.clubic.com";
+	String HOME_URL = "https://www.clubic.com";
 	
-	String HOME_VIDEO_URL = "http://www.clubic.com/video";
+	String HOME_VIDEO_URL = "https://www.clubic.com/video";
 
 	String ENCODING = "ISO-8859-1";
 
