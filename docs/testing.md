@@ -24,6 +24,22 @@ mvn -B -ntp -Pnetwork-tests verify
 
 This ensures default builds remain deterministic while allowing explicit network checks when needed.
 
+## Plugin/provider test policy
+
+Provider tests that query live websites are not deterministic and must not run in the
+default Surefire lifecycle.
+
+- Going forward, live provider tests should use `*IT.java` naming and run only via
+  `mvn -B -ntp -Pnetwork-tests verify`.
+- Deterministic provider checks should rely on local fixtures or mocks and remain in
+  default test execution.
+- A provider parser update is out of scope for build stabilization unless fixture-backed
+  tests prove deterministic behavior.
+- Migration note: some legacy provider tests still use `*Test` naming (including older
+  tests built on `BasePluginProviderTester`) and have not yet been moved behind the
+  `network-tests` profile. Treat the `*IT.java`/Failsafe split as the target policy for
+  new tests and for incremental migration of existing live provider coverage.
+
 ## URL volatility policy
 
 Provider/public URLs are volatile and must be tracked in `docs/url-inventory.md`.

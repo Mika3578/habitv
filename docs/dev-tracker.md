@@ -1,6 +1,6 @@
 # Habitv Living Development Tracker
 
-_Last updated: 2026-04-25T13:14:00Z_
+_Last updated: 2026-04-25T13:30:00Z_
 
 ## Governance
 
@@ -45,6 +45,7 @@ A task is Done when:
 | HBTV-007b | Add JAXB runtime provider for tests/runtime (`com.sun.xml.bind.v2.ContextFactory`) | P1 | Done | Build/Release Eng | HBTV-007 | Runtime JAXB provider mismatch causes test failures | 2026-05-22 | 100% | PR:13 / Issue:TBD |
 | HBTV-007c | Isolate remaining network-dependent `TestListHttp` from default install lifecycle | P1 | Done | QA/Build Eng | HBTV-008a | Network-dependent test remains non-deterministic | 2026-05-25 | 100% | PR:13 / Issue:TBD |
 | HBTV-008a | URL modernization support task (HTTP/provider audit + network smoke test isolation) | P1 | In Progress | QA/Build Eng | HBTV-008 | URL-only updates may not restore provider compatibility | 2026-05-25 | 25% | PR:TBD / Issue:TBD |
+| HBTV-008b | Stabilize plugin snapshot dependency resolution and isolate live provider plugin tests | P1 | In Progress | Build/Release Eng + QA/Build Eng | HBTV-008,HBTV-008a | Plugin snapshot drift or live provider tests can break deterministic installs | 2026-05-03 | 60% | PR:13 / Issue:TBD |
 | HBTV-009 | Migrate packaging away from JDK7 JavaFX paths | P2 | Todo | Desktop Lead | HBTV-007 | Packaging regression on Windows/Linux | 2026-06-15 | 0% | PR:TBD / Issue:TBD |
 | HBTV-010 | Add CODEOWNERS + release/build policy docs | P2 | Todo | Eng Manager + Release Mgr | HBTV-005 | Policy drift | 2026-06-20 | 0% | PR:TBD / Issue:TBD |
 
@@ -57,6 +58,7 @@ A task is Done when:
 | BLK-003 | `application/trayView` compile requires JavaFX classes not present in modern/non-JDK8 toolchains | HBTV-007,HBTV-007a | Desktop Lead + Build Eng | 2026-04-29 | Open |
 | BLK-004 | JAXB runtime provider `com.sun.xml.bind.v2.ContextFactory` missing in test/runtime paths | HBTV-007,HBTV-007b | Build/Release Eng | 2026-04-29 | Closed (2026-04-25) |
 | BLK-005 | Remaining network-dependent `TestListHttp` keeps `install` non-deterministic | HBTV-008,HBTV-008a,HBTV-007c | QA/Build Eng | 2026-04-30 | Closed (2026-04-25) |
+| BLK-006 | Plugin modules resolve stale snapshot metadata due to version drift (`4.1.1/4.1.2-SNAPSHOT`) and live provider tests in Surefire | HBTV-008b | Build/Release Eng + QA/Build Eng | 2026-04-30 | Open |
 
 ## Decisions snapshot
 - See `docs/decision-log.md`.
@@ -74,6 +76,7 @@ A task is Done when:
 - 2026-04-25T12:55:00Z — Completed HBTV-007b/HBTV-007c in PR #13 by pinning compatible JAXB API/RI versions and isolating `ListHttpNetworkIT` to profile-gated Failsafe execution.
 - 2026-04-25T13:05:00Z — Re-ran Java 8 local validation on PR #13 branch and recorded exact current outcomes (`validate` pass; `compile`/`install` stop at `application/core` accessor mismatch; `-Pnetwork-tests verify` fails in framework network IT with remote 403).
 - 2026-04-25T13:14:00Z — Aligned JAXB accessor calls with generated getter API and replaced provider-specific network smoke URL with stable example.com test URL.
+- 2026-04-25T13:30:00Z — Added HBTV-008b to track plugin snapshot dependency stabilization and 6play live-test isolation from default lifecycle; HBTV-007 and HBTV-007a remain unchanged.
 
 ## PR #13 validation snapshot (for PR body sync)
 - GitHub Actions (Java 8 Ubuntu + Windows): **Success**.
