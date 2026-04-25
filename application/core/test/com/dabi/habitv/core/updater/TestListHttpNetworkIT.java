@@ -8,7 +8,10 @@ import org.junit.Test;
 
 import com.dabi.habitv.framework.plugin.utils.update.FindArtifactUtils;
 
-public class TestListHttp {
+/**
+ * This is a network-dependent smoke test and must not run as part of deterministic unit tests.
+ */
+public class TestListHttpNetworkIT {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
