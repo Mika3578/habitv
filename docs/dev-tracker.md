@@ -69,7 +69,7 @@ A task is Done when:
 - 2026-04-24T16:25:00Z — Completed HBTV-005: PR template + modernization/bug/feature issue templates added.
 - 2026-04-24T18:05:00Z — Started URL modernization by auditing obsolete HTTP/provider URLs and isolating network smoke tests (support task for HBTV-008).
 - 2026-04-25T12:00:00Z — Linked JAXB stabilization progress to PR:10, kept HBTV-007 In Progress, and added follow-up backlog items for JavaFX trayView, JAXB runtime provider, and TestListHttp isolation.
-- 2026-04-25T12:05:00Z — Added JAXB runtime provider wiring and isolated remaining network-dependent HTTP test from default install lifecycle.
+- 2026-04-25T12:05:00Z — Added JAXB runtime provider wiring and tracked the remaining network-dependent HTTP test for follow-up isolation from the default install lifecycle.
 - 2026-04-25T12:10:00Z — Validation found an unrelated blocker at module `application/core`: compile fails on generated accessor mismatches (`isUpdateOnStartup`, `isAutoriseSnapshot`, `isDownload`/`isDeleted` family not found).
 
 ## PR #10 final validation snapshot (for PR body sync)
