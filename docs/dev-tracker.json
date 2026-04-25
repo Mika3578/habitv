@@ -1,7 +1,7 @@
 {
   "program": {
     "name": "Habitv modernization",
-    "last_updated": "2026-04-25T12:55:00Z",
+    "last_updated": "2026-04-25T13:05:00Z",
     "phase": "Phase 0",
     "status": "in_progress",
     "progress_percent": 45
@@ -362,24 +362,28 @@
     {
       "timestamp": "2026-04-25T12:55:00Z",
       "change": "Completed HBTV-007b and HBTV-007c in PR:13; validated JAXB provider wiring and network test isolation while retaining JavaFX blocker HBTV-007a."
+    },
+    {
+      "timestamp": "2026-04-25T13:05:00Z",
+      "change": "Re-ran Java 8 local validation on PR #13 branch and recorded exact outcomes: validate passes; compile/install stop at application/core accessor mismatch; network-tests verify fails in framework RetrieverUtilsNetworkIT with remote 403."
     }
   ],
   "validation_snapshot": {
     "github_actions": "success (java8 ubuntu/windows)",
     "validate": "success",
-    "compile": "failed at application/trayView due to missing JavaFX packages on this toolchain (HBTV-007a)",
-    "install": "default install no longer fails from JAXB runtime provider or ListHttpNetworkIT; later fails at application/trayView JavaFX compile blocker",
-    "network_tests": "fails in this environment due to network unavailability (java.net.SocketException: Network is unreachable) under opt-in profile"
+    "compile": "failed at application/core due to JAXB-generated accessor mismatch (isUpdateOnStartup/isAutoriseSnapshot/isDownload/isDeleted methods not found)",
+    "install": "failed at application/core compile due to the same JAXB-generated accessor mismatch before reaching trayView",
+    "network_tests": "failed in fwk/framework on RetrieverUtilsNetworkIT with remote HTTP 403 for https://www.beinsports.com/fr-fr/videos under opt-in profile"
   },
   "pr_13_validation_summary": {
     "core_statement": "PR #13 completes JAXB runtime provider wiring and isolates ListHttpNetworkIT from the default Surefire lifecycle.",
-    "install_statement": "mvn install no longer fails due to JAXB provider/runtime mismatch or TestListHttp network access; it now fails later at application/trayView JavaFX compile blocker (HBTV-007a).",
+    "install_statement": "On the current local tree, mvn install fails at application/core compile accessor mismatch before trayView, so this run does not exercise later JavaFX failure behavior.",
     "results": [
       "GitHub Actions Java 8 Ubuntu/Windows: success",
       "mvn -B -ntp -DskipTests validate: success",
-      "mvn -B -ntp -DskipTests compile: fails at application/trayView JavaFX classes on this toolchain (HBTV-007a)",
-      "mvn -B -ntp install: core tests pass including GrabConfigDAO JAXB paths; ListHttpNetworkIT no longer runs in default surefire path; later fails at trayView JavaFX",
-      "mvn -B -ntp -Pnetwork-tests verify: fails in this environment due to network unavailability (SocketException), consistent with opt-in network tests"
+      "mvn -B -ntp -DskipTests compile: fails at application/core accessor mismatch (isUpdateOnStartup/isAutoriseSnapshot/isDownload/isDeleted methods not found)",
+      "mvn -B -ntp install: fails at application/core compile with the same accessor mismatch before trayView and before install-time JAXB/TestListHttp behavior can be re-verified locally",
+      "mvn -B -ntp -Pnetwork-tests verify: fails in fwk/framework on RetrieverUtilsNetworkIT with remote HTTP 403, confirming profile-gated network tests remain non-deterministic by environment"
     ]
   }
 }

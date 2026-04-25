@@ -1,6 +1,6 @@
 # Habitv Living Development Tracker
 
-_Last updated: 2026-04-25T12:55:00Z_
+_Last updated: 2026-04-25T13:05:00Z_
 
 ## Governance
 
@@ -72,13 +72,14 @@ A task is Done when:
 - 2026-04-25T12:05:00Z — Added JAXB runtime provider wiring and isolated remaining network-dependent HTTP test from default install lifecycle.
 - 2026-04-25T12:10:00Z — Validation found an unrelated blocker at module `application/core`: compile fails on generated accessor mismatches (`isUpdateOnStartup`, `isAutoriseSnapshot`, `isDownload`/`isDeleted` family not found).
 - 2026-04-25T12:55:00Z — Completed HBTV-007b/HBTV-007c in PR #13 by pinning compatible JAXB API/RI versions and isolating `ListHttpNetworkIT` to profile-gated Failsafe execution.
+- 2026-04-25T13:05:00Z — Re-ran Java 8 local validation on PR #13 branch and recorded exact current outcomes (`validate` pass; `compile`/`install` stop at `application/core` accessor mismatch; `-Pnetwork-tests verify` fails in framework network IT with remote 403).
 
 ## PR #13 validation snapshot (for PR body sync)
 - GitHub Actions (Java 8 Ubuntu + Windows): **Success**.
 - `mvn -B -ntp -DskipTests validate`: **Success**.
-- `mvn -B -ntp -DskipTests compile`: **Failure at `application/trayView` due to missing JavaFX packages on this toolchain (expected separate blocker HBTV-007a).**
-- `mvn -B -ntp install`: **No JAXB provider/runtime failures and no `ListHttpNetworkIT` execution in default Surefire path; build later fails at `application/trayView` JavaFX compile blocker (out of scope).**
-- `mvn -B -ntp -Pnetwork-tests verify`: **Fails in this environment due to live-network unavailability (`java.net.SocketException: Network is unreachable`) on opt-in integration tests.**
+- `mvn -B -ntp -DskipTests compile`: **Failure at `application/core` due to JAXB-generated accessor mismatch (`isUpdateOnStartup`/`isAutoriseSnapshot`/`isDownload`/`isDeleted` methods not found).**
+- `mvn -B -ntp install`: **Failure at `application/core` compile with the same accessor mismatch before reaching `application/trayView`.**
+- `mvn -B -ntp -Pnetwork-tests verify`: **Failure in `fwk/framework` on `RetrieverUtilsNetworkIT` with remote HTTP 403 (`https://www.beinsports.com/fr-fr/videos`) under opt-in profile.**
 ## Next update trigger
 Update this file after each of:
 - merged PR,
