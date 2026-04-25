@@ -1,10 +1,10 @@
 {
   "program": {
     "name": "Habitv modernization",
-    "last_updated": "2026-04-24T18:05:00Z",
+    "last_updated": "2026-04-25T11:40:00Z",
     "phase": "Phase 0",
     "status": "in_progress",
-    "progress_percent": 40
+    "progress_percent": 45
   },
   "governance": {
     "definition_of_ready": [
@@ -27,27 +27,331 @@
     ]
   },
   "backlog": [
-    {"id":"HBTV-001","title":"Align parent versions + relativePath","priority":"P0","status":"done","owner":"build_release_engineer","dependencies":[],"risk":"latent compile failures","due_date":"2026-04-30","progress_percent":100,"links":{"pr":"3","issue":"TBD"}},
-    {"id":"HBTV-002","title":"Add root/fwk module aggregation","priority":"P0","status":"done","owner":"build_release_engineer","dependencies":["HBTV-001"],"risk":"reactor exposes failures","due_date":"2026-05-02","progress_percent":100,"links":{"pr":"3","issue":"TBD"}},
-    {"id":"HBTV-003","title":"Fix SNASPHOT typo and version policy","priority":"P1","status":"done","owner":"build_release_engineer","dependencies":["HBTV-001"],"risk":"version drift","due_date":"2026-05-02","progress_percent":100,"links":{"pr":"3","issue":"TBD"}},
-    {"id":"HBTV-004","title":"Add baseline GitHub build workflow","priority":"P0","status":"done","owner":"build_release_engineer","dependencies":["HBTV-001","HBTV-002"],"risk":"noisy CI gates","due_date":"2026-05-05","progress_percent":100,"links":{"pr":"3","issue":"TBD"}},
-    {"id":"HBTV-005","title":"Add PR + issue templates","priority":"P1","status":"todo","owner":"tech_lead","dependencies":[],"risk":"adoption lag","due_date":"2026-05-06","progress_percent":0,"links":{"pr":"TBD","issue":"TBD"}},
-    {"id":"HBTV-006","title":"Bootstrap security dependency scan","priority":"P1","status":"todo","owner":"security_engineer","dependencies":["HBTV-004"],"risk":"many legacy findings","due_date":"2026-05-10","progress_percent":0,"links":{"pr":"TBD","issue":"TBD"}},
-    {"id":"HBTV-007","title":"Java 17 compatibility profile","priority":"P1","status":"todo","owner":"architect_build_engineer","dependencies":["HBTV-001","HBTV-002"],"risk":"legacy javafx blockers","due_date":"2026-05-20","progress_percent":0,"links":{"pr":"TBD","issue":"TBD"}},
-    {"id":"HBTV-008","title":"Split unit vs integration tests","priority":"P1","status":"todo","owner":"qa_build_engineer","dependencies":["HBTV-002"],"risk":"ownership ambiguity","due_date":"2026-05-25","progress_percent":0,"links":{"pr":"TBD","issue":"TBD"}},
-    {"id":"HBTV-008a","title":"URL modernization support task for HBTV-008","priority":"P1","status":"in_progress","owner":"qa_build_engineer","dependencies":["HBTV-008"],"risk":"url updates alone do not restore provider plugins","due_date":"2026-05-25","progress_percent":25,"links":{"pr":"TBD","issue":"TBD"}},
-    {"id":"HBTV-009","title":"Modernize packaging path","priority":"P2","status":"todo","owner":"desktop_lead","dependencies":["HBTV-007"],"risk":"packaging regressions","due_date":"2026-06-15","progress_percent":0,"links":{"pr":"TBD","issue":"TBD"}},
-    {"id":"HBTV-010","title":"Add CODEOWNERS and policy docs","priority":"P2","status":"todo","owner":"eng_manager_release_manager","dependencies":["HBTV-005"],"risk":"policy drift","due_date":"2026-06-20","progress_percent":0,"links":{"pr":"TBD","issue":"TBD"}}
+    {
+      "id": "HBTV-001",
+      "title": "Align parent versions + relativePath",
+      "priority": "P0",
+      "status": "done",
+      "owner": "build_release_engineer",
+      "dependencies": [],
+      "risk": "latent compile failures",
+      "due_date": "2026-04-30",
+      "progress_percent": 100,
+      "links": {
+        "pr": "3",
+        "issue": "TBD"
+      }
+    },
+    {
+      "id": "HBTV-002",
+      "title": "Add root/fwk module aggregation",
+      "priority": "P0",
+      "status": "done",
+      "owner": "build_release_engineer",
+      "dependencies": [
+        "HBTV-001"
+      ],
+      "risk": "reactor exposes failures",
+      "due_date": "2026-05-02",
+      "progress_percent": 100,
+      "links": {
+        "pr": "3",
+        "issue": "TBD"
+      }
+    },
+    {
+      "id": "HBTV-003",
+      "title": "Fix SNASPHOT typo and version policy",
+      "priority": "P1",
+      "status": "done",
+      "owner": "build_release_engineer",
+      "dependencies": [
+        "HBTV-001"
+      ],
+      "risk": "version drift",
+      "due_date": "2026-05-02",
+      "progress_percent": 100,
+      "links": {
+        "pr": "3",
+        "issue": "TBD"
+      }
+    },
+    {
+      "id": "HBTV-004",
+      "title": "Add baseline GitHub build workflow",
+      "priority": "P0",
+      "status": "done",
+      "owner": "build_release_engineer",
+      "dependencies": [
+        "HBTV-001",
+        "HBTV-002"
+      ],
+      "risk": "noisy CI gates",
+      "due_date": "2026-05-05",
+      "progress_percent": 100,
+      "links": {
+        "pr": "3",
+        "issue": "TBD"
+      }
+    },
+    {
+      "id": "HBTV-005",
+      "title": "Add PR + issue templates",
+      "priority": "P1",
+      "status": "todo",
+      "owner": "tech_lead",
+      "dependencies": [],
+      "risk": "adoption lag",
+      "due_date": "2026-05-06",
+      "progress_percent": 0,
+      "links": {
+        "pr": "TBD",
+        "issue": "TBD"
+      }
+    },
+    {
+      "id": "HBTV-006",
+      "title": "Bootstrap security dependency scan",
+      "priority": "P1",
+      "status": "todo",
+      "owner": "security_engineer",
+      "dependencies": [
+        "HBTV-004"
+      ],
+      "risk": "many legacy findings",
+      "due_date": "2026-05-10",
+      "progress_percent": 0,
+      "links": {
+        "pr": "TBD",
+        "issue": "TBD"
+      }
+    },
+    {
+      "id": "HBTV-007",
+      "title": "Java 17 compatibility profile",
+      "priority": "P1",
+      "status": "in_progress",
+      "owner": "architect_build_engineer",
+      "dependencies": [
+        "HBTV-001",
+        "HBTV-002"
+      ],
+      "risk": "legacy javafx blockers",
+      "due_date": "2026-05-20",
+      "progress_percent": 35,
+      "links": {
+        "pr": "10",
+        "issue": "TBD"
+      }
+    },
+    {
+      "id": "HBTV-008",
+      "title": "Split unit vs integration tests",
+      "priority": "P1",
+      "status": "todo",
+      "owner": "qa_build_engineer",
+      "dependencies": [
+        "HBTV-002"
+      ],
+      "risk": "ownership ambiguity",
+      "due_date": "2026-05-25",
+      "progress_percent": 0,
+      "links": {
+        "pr": "TBD",
+        "issue": "TBD"
+      }
+    },
+    {
+      "id": "HBTV-007a",
+      "title": "Resolve application/trayView JavaFX compile blocker on modern toolchains",
+      "priority": "P1",
+      "status": "todo",
+      "owner": "desktop_lead_build_engineer",
+      "dependencies": [
+        "HBTV-007"
+      ],
+      "risk": "javafx modules absent outside jdk8",
+      "due_date": "2026-05-22",
+      "progress_percent": 0,
+      "links": {
+        "pr": "TBD",
+        "issue": "TBD"
+      }
+    },
+    {
+      "id": "HBTV-007b",
+      "title": "Add JAXB runtime provider for tests/runtime (com.sun.xml.bind.v2.ContextFactory)",
+      "priority": "P1",
+      "status": "todo",
+      "owner": "build_release_engineer",
+      "dependencies": [
+        "HBTV-007"
+      ],
+      "risk": "runtime jaxb provider mismatch causes test failures",
+      "due_date": "2026-05-22",
+      "progress_percent": 0,
+      "links": {
+        "pr": "TBD",
+        "issue": "TBD"
+      }
+    },
+    {
+      "id": "HBTV-007c",
+      "title": "Isolate remaining network-dependent TestListHttp from default install lifecycle",
+      "priority": "P1",
+      "status": "todo",
+      "owner": "qa_build_engineer",
+      "dependencies": [
+        "HBTV-008a"
+      ],
+      "risk": "network-dependent test remains non-deterministic",
+      "due_date": "2026-05-25",
+      "progress_percent": 0,
+      "links": {
+        "pr": "TBD",
+        "issue": "TBD"
+      }
+    },
+    {
+      "id": "HBTV-008a",
+      "title": "URL modernization support task for HBTV-008",
+      "priority": "P1",
+      "status": "in_progress",
+      "owner": "qa_build_engineer",
+      "dependencies": [
+        "HBTV-008"
+      ],
+      "risk": "url updates alone do not restore provider plugins",
+      "due_date": "2026-05-25",
+      "progress_percent": 25,
+      "links": {
+        "pr": "TBD",
+        "issue": "TBD"
+      }
+    },
+    {
+      "id": "HBTV-009",
+      "title": "Modernize packaging path",
+      "priority": "P2",
+      "status": "todo",
+      "owner": "desktop_lead",
+      "dependencies": [
+        "HBTV-007"
+      ],
+      "risk": "packaging regressions",
+      "due_date": "2026-06-15",
+      "progress_percent": 0,
+      "links": {
+        "pr": "TBD",
+        "issue": "TBD"
+      }
+    },
+    {
+      "id": "HBTV-010",
+      "title": "Add CODEOWNERS and policy docs",
+      "priority": "P2",
+      "status": "todo",
+      "owner": "eng_manager_release_manager",
+      "dependencies": [
+        "HBTV-005"
+      ],
+      "risk": "policy drift",
+      "due_date": "2026-06-20",
+      "progress_percent": 0,
+      "links": {
+        "pr": "TBD",
+        "issue": "TBD"
+      }
+    }
   ],
   "blockers": [
-    {"id":"BLK-001","description":"Parent POM mismatch prevents module builds","impacted":["HBTV-001","HBTV-002","HBTV-004"],"owner":"build_release_engineer","escalate_by":"2026-04-25","status":"closed","closed_at":"2026-04-24"},
-    {"id":"BLK-002","description":"External HTTP repository returns 403","impacted":["HBTV-006","HBTV-007"],"owner":"build_release_engineer","escalate_by":"2026-04-28","status":"open"}
+    {
+      "id": "BLK-001",
+      "description": "Parent POM mismatch prevents module builds",
+      "impacted": [
+        "HBTV-001",
+        "HBTV-002",
+        "HBTV-004"
+      ],
+      "owner": "build_release_engineer",
+      "escalate_by": "2026-04-25",
+      "status": "closed",
+      "closed_at": "2026-04-24"
+    },
+    {
+      "id": "BLK-002",
+      "description": "External HTTP repository returns 403",
+      "impacted": [
+        "HBTV-006",
+        "HBTV-007"
+      ],
+      "owner": "build_release_engineer",
+      "escalate_by": "2026-04-28",
+      "status": "open"
+    },
+    {
+      "id": "BLK-003",
+      "description": "application/trayView compile requires JavaFX classes not present in modern/non-JDK8 toolchains",
+      "impacted": [
+        "HBTV-007",
+        "HBTV-007a"
+      ],
+      "owner": "desktop_lead_build_engineer",
+      "escalate_by": "2026-04-29",
+      "status": "open"
+    },
+    {
+      "id": "BLK-004",
+      "description": "JAXB runtime provider com.sun.xml.bind.v2.ContextFactory missing in test/runtime paths",
+      "impacted": [
+        "HBTV-007",
+        "HBTV-007b"
+      ],
+      "owner": "build_release_engineer",
+      "escalate_by": "2026-04-29",
+      "status": "open"
+    },
+    {
+      "id": "BLK-005",
+      "description": "Remaining network-dependent TestListHttp keeps install non-deterministic",
+      "impacted": [
+        "HBTV-008",
+        "HBTV-008a",
+        "HBTV-007c"
+      ],
+      "owner": "qa_build_engineer",
+      "escalate_by": "2026-04-30",
+      "status": "open"
+    }
   ],
   "changelog": [
-    {"timestamp":"2026-04-24T13:30:00Z","change":"Initialized tracker schema and governance"},
-    {"timestamp":"2026-04-24T13:35:00Z","change":"Added initial backlog with dependencies/dates"},
-    {"timestamp":"2026-04-24T13:40:00Z","change":"Synced tracker with modernization report v2"},
-    {"timestamp":"2026-04-24T16:10:00Z","change":"Completed P0 backlog (HBTV-001/002/004) and closed BLK-001"},
-    {"timestamp":"2026-04-24T18:05:00Z","change":"Started URL modernization by auditing obsolete HTTP/provider URLs and isolating network smoke tests (support task for HBTV-008)"}
+    {
+      "timestamp": "2026-04-24T13:30:00Z",
+      "change": "Initialized tracker schema and governance"
+    },
+    {
+      "timestamp": "2026-04-24T13:35:00Z",
+      "change": "Added initial backlog with dependencies/dates"
+    },
+    {
+      "timestamp": "2026-04-24T13:40:00Z",
+      "change": "Synced tracker with modernization report v2"
+    },
+    {
+      "timestamp": "2026-04-24T16:10:00Z",
+      "change": "Completed P0 backlog (HBTV-001/002/004) and closed BLK-001"
+    },
+    {
+      "timestamp": "2026-04-24T18:05:00Z",
+      "change": "Started URL modernization by auditing obsolete HTTP/provider URLs and isolating network smoke tests (support task for HBTV-008)"
+    },
+    {
+      "timestamp": "2026-04-25T11:40:00Z",
+      "change": "Linked JAXB stabilization progress to PR:10, kept HBTV-007 in progress, and added follow-up backlog items for JavaFX trayView, JAXB runtime provider, and TestListHttp isolation"
+    },
+    {
+      "timestamp": "2026-04-25T11:41:00Z",
+      "change": "Stabilized JAXB generation for core and identified JavaFX/runtime-test follow-up blockers."
+    }
   ]
 }

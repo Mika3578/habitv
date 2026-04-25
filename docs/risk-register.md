@@ -10,7 +10,11 @@
 
 | R-006 | Legacy provider URLs may be obsolete or moved to new platforms | High | Medium | High | Maintain `docs/url-inventory.md` and review URLs during each provider touchpoint | QA/Build Eng | URL-based smoke checks fail or redirect unexpectedly | Open |
 | R-007 | HTTPS URL replacement alone may not restore provider plugins due to API/page changes | High | High | High | Track as `needs-dedicated-provider-rewrite` and schedule provider-specific rewrite PRs | Provider Maintainer | Parsing/downloading fails after URL modernization | Open |
-| R-008 | Network-dependent tests make local/CI builds non-deterministic | Medium | High | High | Keep network tests opt-in under `-Pnetwork-tests`; do not run by default lifecycle | Build/Release Eng | Flaky failures in default build pipelines | Open |
+| R-008 | Network-dependent tests make local/CI builds non-deterministic (`TestListHttp` still in default install path) | Medium | High | High | Keep network tests opt-in under `-Pnetwork-tests`; isolate `TestListHttp` from default lifecycle | Build/Release Eng | Flaky failures in default build pipelines | Open |
+
+| R-009 | JAXB generated model/accessor drift may recur until full `compile` + `install` are green in target toolchains | Medium | High | High | Keep deterministic generation + generated-source path controls; run full compile/install gates before closing HBTV-007 | Architect + Build/Release Eng | JAXB accessor mismatch compile/runtime regression | Mitigated (not closed) |
+| R-010 | `application/trayView` depends on JavaFX classes unavailable on modern/non-JDK8 toolchains | High | Medium | High | Track dedicated JavaFX blocker task (HBTV-007a) and validate with explicit JavaFX-enabled profile/toolchain | Desktop Lead + Build Eng | Compile fails when toolchain lacks JavaFX | Open |
+| R-011 | JAXB runtime provider (`com.sun.xml.bind.v2.ContextFactory`) missing during tests/runtime on modern JDKs | High | Medium | High | Add explicit JAXB runtime dependencies/provider wiring in follow-up task HBTV-007b | Build/Release Eng | `install` test phase fails creating JAXB context | Open |
 
 ## Escalation
 - If any exposure remains **High** for >10 calendar days, escalate to Architect and Engineering Manager.

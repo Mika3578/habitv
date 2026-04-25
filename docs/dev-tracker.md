@@ -1,6 +1,6 @@
 # Habitv Living Development Tracker
 
-_Last updated: 2026-04-24T18:05:00Z_
+_Last updated: 2026-04-25T11:40:00Z_
 
 ## Governance
 
@@ -27,7 +27,7 @@ A task is Done when:
 ## Program status
 - Overall program: **In Progress**
 - Current phase: **Phase 0 (Build stabilization)**
-- Progress: **40%**
+- Progress: **45%**
 
 ## Backlog (live)
 
@@ -39,8 +39,11 @@ A task is Done when:
 | HBTV-004 | Add baseline GitHub build workflow | P0 | Done | Build/Release Eng | HBTV-001,HBTV-002 | CI noise if gates too strict initially | 2026-05-05 | 100% | PR:3 / Issue:TBD |
 | HBTV-005 | Add PR template + modernization/bug/feature issue templates | P1 | Done | Tech Lead | None | Process adoption lag | 2026-05-06 | 100% | PR:4 / Issue:TBD |
 | HBTV-006 | Bootstrap security/dependency scan | P1 | Todo | Security Eng | HBTV-004 | Legacy deps trigger many findings | 2026-05-10 | 0% | PR:TBD / Issue:TBD |
-| HBTV-007 | Establish Java 17 compatibility build profile | P1 | Todo | Architect + Build Eng | HBTV-001,HBTV-002 | JavaFX legacy blockers | 2026-05-20 | 0% | PR:TBD / Issue:TBD |
+| HBTV-007 | Establish Java 17 compatibility build profile | P1 | In Progress | Architect + Build Eng | HBTV-001,HBTV-002 | JavaFX legacy blockers | 2026-05-20 | 35% | PR:10 / Issue:TBD |
 | HBTV-008 | Split deterministic unit vs integration tests | P1 | Todo | QA/Build Eng | HBTV-002 | Test ownership ambiguity | 2026-05-25 | 0% | PR:TBD / Issue:TBD |
+| HBTV-007a | Resolve `application/trayView` JavaFX compile blocker on modern toolchains | P1 | Todo | Desktop Lead + Build Eng | HBTV-007 | JavaFX modules absent outside JDK8 | 2026-05-22 | 0% | PR:TBD / Issue:TBD |
+| HBTV-007b | Add JAXB runtime provider for tests/runtime (`com.sun.xml.bind.v2.ContextFactory`) | P1 | Todo | Build/Release Eng | HBTV-007 | Runtime JAXB provider mismatch causes test failures | 2026-05-22 | 0% | PR:TBD / Issue:TBD |
+| HBTV-007c | Isolate remaining network-dependent `TestListHttp` from default install lifecycle | P1 | Todo | QA/Build Eng | HBTV-008a | Network-dependent test remains non-deterministic | 2026-05-25 | 0% | PR:TBD / Issue:TBD |
 | HBTV-008a | URL modernization support task (HTTP/provider audit + network smoke test isolation) | P1 | In Progress | QA/Build Eng | HBTV-008 | URL-only updates may not restore provider compatibility | 2026-05-25 | 25% | PR:TBD / Issue:TBD |
 | HBTV-009 | Migrate packaging away from JDK7 JavaFX paths | P2 | Todo | Desktop Lead | HBTV-007 | Packaging regression on Windows/Linux | 2026-06-15 | 0% | PR:TBD / Issue:TBD |
 | HBTV-010 | Add CODEOWNERS + release/build policy docs | P2 | Todo | Eng Manager + Release Mgr | HBTV-005 | Policy drift | 2026-06-20 | 0% | PR:TBD / Issue:TBD |
@@ -51,6 +54,10 @@ A task is Done when:
 |---|---|---|---|---|---|
 | BLK-001 | Parent POM mismatch prevents module builds | HBTV-001,HBTV-002,HBTV-004 | Build/Release Eng | 2026-04-25 | Closed (2026-04-24) |
 | BLK-002 | External HTTP repo returns 403 | HBTV-006,HBTV-007 | Build/Release Eng | 2026-04-28 | Open |
+| BLK-003 | `application/trayView` compile requires JavaFX classes not present in modern/non-JDK8 toolchains | HBTV-007,HBTV-007a | Desktop Lead + Build Eng | 2026-04-29 | Open |
+| BLK-004 | JAXB runtime provider `com.sun.xml.bind.v2.ContextFactory` missing in test/runtime paths | HBTV-007,HBTV-007b | Build/Release Eng | 2026-04-29 | Open |
+| BLK-005 | Remaining network-dependent `TestListHttp` keeps `install` non-deterministic | HBTV-008,HBTV-008a,HBTV-007c | QA/Build Eng | 2026-04-30 | Open |
+
 
 ## Decisions snapshot
 - See `docs/decision-log.md`.
@@ -63,6 +70,16 @@ A task is Done when:
 - 2026-04-24T16:25:00Z — Completed HBTV-005: PR template + modernization/bug/feature issue templates added.
 
 - 2026-04-24T18:05:00Z — Started URL modernization by auditing obsolete HTTP/provider URLs and isolating network smoke tests (support task for HBTV-008).
+
+- 2026-04-25T11:40:00Z — Linked JAXB stabilization progress to PR:10, kept HBTV-007 In Progress, and added follow-up backlog items for JavaFX trayView, JAXB runtime provider, and TestListHttp isolation.
+- 2026-04-25T11:41:00Z — Stabilized JAXB generation for core and identified JavaFX/runtime-test follow-up blockers.
+
+## PR #10 final validation snapshot (for PR body sync)
+- GitHub Actions (Java 8 Ubuntu + Windows): **Success**.
+- `mvn -B -ntp -DskipTests validate`: **Success**.
+- `mvn -B -ntp -DskipTests compile`: **Core JAXB blocker fixed in PR context; any subsequent `application/trayView` JavaFX failure is tracked as follow-up (HBTV-007a)**.
+- `mvn -B -ntp install`: **Still blocked by JAXB runtime provider/test-runtime gap and remaining network-dependent tests (`TestListHttp`)**.
+- Follow-ups are intentionally tracked outside PR #10 scope (HBTV-007a/HBTV-007b/HBTV-007c).
 
 ## Next update trigger
 Update this file after each of:
