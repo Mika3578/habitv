@@ -10,7 +10,7 @@ import org.junit.Test;
  */
 public class RetrieverUtilsNetworkIT {
 
-	@Test
+	@Test(timeout = 10000)
 	public void shouldRetrieveBeinSportsTitleFromLiveWebsite() {
 		String title = RetrieverUtils.getTitleByUrl("https://www.beinsports.com/fr-fr/videos");
 		assertNotNull("Page title must not be null", title);

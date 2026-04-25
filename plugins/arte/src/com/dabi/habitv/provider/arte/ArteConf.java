@@ -16,7 +16,7 @@ interface ArteConf {
 
 	String RTMPDUMP_CMD = "-r \"#VIDEO_URL#\" -c 1935 -m 10 -o \"#FILE_DEST#\"";
 
-	String HOME_URL = "https://www.arte.tv/fr";
+	String HOME_URL = "https://www.arte.tv";
 
 	String EXTENSION = FrameworkConf.MP4;
 
