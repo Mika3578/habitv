@@ -273,11 +273,12 @@ public class XMLUserConfig implements UserConfig {
 				.newInstance(Configuration.class.getPackage().getName());
 		final Marshaller marshaller = jaxbContext.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+		marshaller.setProperty(Marshaller.JAXB_ENCODING, HabitTvConf.ENCODING);
 		FileUtils.setValidation(marshaller, CONF_XSD);
 		try (FileOutputStream outputFile = new FileOutputStream(file)) {
 			marshaller.marshal(config, outputFile);
 		} catch (IOException e) {
-			throw new TechnicalException(e);
+			throw new JAXBException("Unable to save configuration to " + file, e);
 		}
 	}
 

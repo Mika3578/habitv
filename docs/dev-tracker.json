@@ -98,14 +98,14 @@
       "id": "HBTV-005",
       "title": "Add PR + issue templates",
       "priority": "P1",
-      "status": "todo",
+      "status": "done",
       "owner": "tech_lead",
       "dependencies": [],
       "risk": "adoption lag",
       "due_date": "2026-05-06",
-      "progress_percent": 0,
+      "progress_percent": 100,
       "links": {
-        "pr": "TBD",
+        "pr": "4",
         "issue": "TBD"
       }
     },
