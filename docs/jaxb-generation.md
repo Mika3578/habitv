@@ -26,9 +26,9 @@ Generated sources are written to:
 This keeps generated artifacts out of source control and avoids stale, root-level generated files causing compile drift.
 
 ## Accessor naming expectations
-Boolean XSD elements are generated with `isXxx()` accessors by JAXB in this module (for example `isUpdateOnStartup`, `isDownload`, `isDeleted`).
+Current JAXB generation in this project exposes nullable Boolean accessors as `getXxx()`, not `isXxx()`.
 
-Production code in `application/core/src` must use the generated accessor contract and should not assume `getXxx()` for nullable booleans.
+Production code in `application/core/src` must follow the generated getter API for nullable booleans.
 
 ## Committed vs regenerated sources
 Generated JAXB classes are **not committed**.
