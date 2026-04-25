@@ -1,7 +1,7 @@
 {
   "program": {
     "name": "Habitv modernization",
-    "last_updated": "2026-04-25T13:14:00Z",
+    "last_updated": "2026-04-25T13:30:00Z",
     "phase": "Phase 0",
     "status": "in_progress",
     "progress_percent": 45
@@ -230,6 +230,24 @@
       }
     },
     {
+      "id": "HBTV-008b",
+      "title": "Stabilize plugin snapshot dependency resolution and isolate live provider plugin tests",
+      "priority": "P1",
+      "status": "in_progress",
+      "owner": "build_release_engineer_qa_build_engineer",
+      "dependencies": [
+        "HBTV-008",
+        "HBTV-008a"
+      ],
+      "risk": "plugin snapshot drift and live provider tests break deterministic installs",
+      "due_date": "2026-05-03",
+      "progress_percent": 60,
+      "links": {
+        "pr": "13",
+        "issue": "TBD"
+      }
+    },
+    {
       "id": "HBTV-009",
       "title": "Modernize packaging path",
       "priority": "P2",
@@ -324,6 +342,16 @@
       "escalate_by": "2026-04-30",
       "status": "closed",
       "closed_at": "2026-04-25"
+    },
+    {
+      "id": "BLK-006",
+      "description": "Plugin modules resolve stale snapshot metadata due to version drift and live provider tests in Surefire",
+      "impacted": [
+        "HBTV-008b"
+      ],
+      "owner": "build_release_engineer_qa_build_engineer",
+      "escalate_by": "2026-04-30",
+      "status": "open"
     }
   ],
   "changelog": [
@@ -370,6 +398,10 @@
     {
       "timestamp": "2026-04-25T13:14:00Z",
       "change": "Aligned JAXB accessor calls with generated getter API and replaced provider-specific network smoke URL with stable example.com test URL."
+    },
+    {
+      "timestamp": "2026-04-25T13:30:00Z",
+      "change": "Added HBTV-008b and BLK-006 for plugin snapshot/build stabilization; kept HBTV-007 in progress and HBTV-007a open."
     }
   ],
   "validation_snapshot": {

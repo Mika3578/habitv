@@ -12,6 +12,7 @@
 
 	<modules>
 		<module>6play</module>
+		<module>plugin-tester</module>
 		<module>adobeHDS</module>
 		<module>aria2</module>	
 		<module>arte</module>

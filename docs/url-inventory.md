@@ -14,6 +14,7 @@ This inventory tracks hardcoded URLs found during the HTTPS modernization audit.
 | `plugins/arte/src/com/dabi/habitv/provider/arte/ArteConf.java` | `http://videos.arte.tv/fr/do_delegate/videos/programmes/#ID_EMISSION#,view,rss.xml` | `https://www.arte.tv/fr/` (public reference only) | production-provider-url | needs-dedicated-provider-rewrite | Legacy feed endpoint remains; API behavior needs dedicated rewrite validation. |
 | `plugins/wat/src/com/dabi/habitv/provider/wat/WatConf.java` | `https://www.tf1.fr` | N/A | production-provider-url | updated | Updated TF1 public URLs to HTTPS. |
 | `plugins/6play/src/com/dabi/habitv/provider/sixplay/SixPlayConf.java` | `https://www.m6.fr` | N/A | production-provider-url | updated | Updated legacy 6play host reference to M6+ public URL. |
+| `plugins/6play/test/com/dabi/habitv/provider/sixplay/SixPlayPluginManagerIT.java` | N/A | N/A | test-provider-network | isolated-opt-in | 6play provider smoke test moved from Surefire `*Test` to Failsafe `*IT` so default `install` is deterministic. |
 | `plugins/clubic/src/com/dabi/habitv/provider/clubic/ClubicConf.java` | `https://www.clubic.com` | N/A | production-provider-url | updated | Updated Clubic public URLs to HTTPS. |
 | `plugins/lequipe/src/com/dabi/habitv/provider/lequipe/LEquipeConf.java` | `https://video.lequipe.fr` / `http://video.lequipe.fr/morevideos` | `https://www.tf1.fr/l-equipe/videos/replay` | production-provider-url | needs-dedicated-provider-rewrite | Kept unchanged in code to avoid accidental provider behavior changes without parser rewrite/tests. |
 | `plugins/canalPlus/src/com/dabi/habitv/provider/canalplus/*.java` | Legacy `http://service.canal-plus.com/...`, `http://service.mycanal.fr/...`, `http://www.d8.tv`, `http://www.d17.tv` | `https://www.canalplus.com/` or `https://www.canalplus.com/replay-gratuit/` (public references only) | production-provider-url | needs-dedicated-provider-rewrite | Endpoints are service/API-specific and channel-specific; HTTPS/public-site substitution alone is not safe. |
@@ -31,3 +32,4 @@ This inventory tracks hardcoded URLs found during the HTTPS modernization audit.
 - Any provider that still relies on legacy service API URLs after this PR is marked `needs-dedicated-provider-rewrite`.
 
 - Provider-specific URLs such as beIN Sports may return HTTP 403 for automated requests and are unsuitable for generic framework smoke tests.
+- 6play provider smoke coverage is now opt-in (`SixPlayPluginManagerIT`) and should be interpreted as live-site validation, not deterministic parser correctness.
