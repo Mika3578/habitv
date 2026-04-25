@@ -54,6 +54,7 @@ mvn -B -ntp install
 - `javax.xml.bind:jaxb-api` provides JAXB interfaces but not the implementation provider class.
 - Runtime/test paths that call `JAXBContext.newInstance(...)` require a provider containing `com.sun.xml.bind.v2.ContextFactory`.
 - `application/core` and `fwk/framework` now declare:
-  - `com.sun.xml.bind:jaxb-impl` (runtime scope)
-  - `javax.activation:activation` (runtime scope)
+  - `javax.xml.bind:jaxb-api:2.3.1` (javax API line, Java 8-compatible)
+  - `com.sun.xml.bind:jaxb-impl:2.3.3` (runtime scope)
+  - `javax.activation:activation:1.1.1` (runtime scope)
 - This is the minimal Java 8-compatible `javax` JAXB RI wiring needed for deterministic local and CI test/runtime context creation.
