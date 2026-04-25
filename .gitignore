@@ -18,3 +18,4 @@ application/core/bin/
 **/habiTv.log.*
 **/habitv.log.*
 .vscode/
+application/**/target/
