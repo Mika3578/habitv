@@ -310,7 +310,7 @@
       "owner": "build_release_engineer",
       "escalate_by": "2026-04-29",
       "status": "closed",
-      "closed_date": "2026-04-25"
+      "closed_at": "2026-04-25"
     },
     {
       "id": "BLK-005",
@@ -323,7 +323,7 @@
       "owner": "qa_build_engineer",
       "escalate_by": "2026-04-30",
       "status": "closed",
-      "closed_date": "2026-04-25"
+      "closed_at": "2026-04-25"
     }
   ],
   "changelog": [
