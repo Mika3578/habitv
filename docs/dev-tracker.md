@@ -1,6 +1,6 @@
 # Habitv Living Development Tracker
 
-_Last updated: 2026-04-24T18:05:00Z_
+_Last updated: 2026-04-25T12:00:00Z_
 
 ## Governance
 
@@ -27,7 +27,7 @@ A task is Done when:
 ## Program status
 - Overall program: **In Progress**
 - Current phase: **Phase 0 (Build stabilization)**
-- Progress: **40%**
+- Progress: **45%**
 
 ## Backlog (live)
 
@@ -39,9 +39,9 @@ A task is Done when:
 | HBTV-004 | Add baseline GitHub build workflow | P0 | Done | Build/Release Eng | HBTV-001,HBTV-002 | CI noise if gates too strict initially | 2026-05-05 | 100% | PR:3 / Issue:TBD |
 | HBTV-005 | Add PR template + modernization/bug/feature issue templates | P1 | Done | Tech Lead | None | Process adoption lag | 2026-05-06 | 100% | PR:4 / Issue:TBD |
 | HBTV-006 | Bootstrap security/dependency scan | P1 | Todo | Security Eng | HBTV-004 | Legacy deps trigger many findings | 2026-05-10 | 0% | PR:TBD / Issue:TBD |
-| HBTV-007 | Establish Java 17 compatibility build profile | P1 | Todo | Architect + Build Eng | HBTV-001,HBTV-002 | JavaFX legacy blockers | 2026-05-20 | 0% | PR:TBD / Issue:TBD |
+| HBTV-007 | Establish Java 17 compatibility build profile | P1 | In Progress | Architect + Build Eng | HBTV-001,HBTV-002 | JavaFX/JAXB modernization blockers | 2026-05-20 | 55% | PR:10 / Issue:TBD |
 | HBTV-008 | Split deterministic unit vs integration tests | P1 | Todo | QA/Build Eng | HBTV-002 | Test ownership ambiguity | 2026-05-25 | 0% | PR:TBD / Issue:TBD |
-| HBTV-008a | URL modernization support task (HTTP/provider audit + network smoke test isolation) | P1 | In Progress | QA/Build Eng | HBTV-008 | URL-only updates may not restore provider compatibility | 2026-05-25 | 25% | PR:TBD / Issue:TBD |
+| HBTV-008a | URL modernization support task (HTTP/provider audit + network smoke test isolation) | P1 | In Progress | QA/Build Eng | HBTV-008 | URL-only updates may not restore provider compatibility | 2026-05-25 | 25% | PR:9 / Issue:TBD |
 | HBTV-009 | Migrate packaging away from JDK7 JavaFX paths | P2 | Todo | Desktop Lead | HBTV-007 | Packaging regression on Windows/Linux | 2026-06-15 | 0% | PR:TBD / Issue:TBD |
 | HBTV-010 | Add CODEOWNERS + release/build policy docs | P2 | Todo | Eng Manager + Release Mgr | HBTV-005 | Policy drift | 2026-06-20 | 0% | PR:TBD / Issue:TBD |
 
@@ -51,6 +51,19 @@ A task is Done when:
 |---|---|---|---|---|---|
 | BLK-001 | Parent POM mismatch prevents module builds | HBTV-001,HBTV-002,HBTV-004 | Build/Release Eng | 2026-04-25 | Closed (2026-04-24) |
 | BLK-002 | External HTTP repo returns 403 | HBTV-006,HBTV-007 | Build/Release Eng | 2026-04-28 | Open |
+| BLK-003 | application/trayView fails compile on modern toolchains because JavaFX classes are missing from the classpath | HBTV-007,HBTV-009 | Desktop Lead | 2026-04-29 | Open |
+| BLK-004 | JAXB runtime provider missing for tests/runtime execution paths | HBTV-007 | Build/Release Eng | 2026-04-29 | Open |
+| BLK-005 | TestListHttp remains network-dependent and can fail in restricted/offline CI | HBTV-008,HBTV-008a | QA/Build Eng | 2026-04-30 | Open |
+
+application/core JAXB generation/accessor mismatch is fixed by PR #10. The next compile blocker is application/trayView because JavaFX classes are missing from the current toolchain.
+
+For `mvn install`, install is still blocked by JAXB runtime provider tests and remaining network-dependent TestListHttp.
+
+## PR #10 validation summary
+- GitHub Actions Java 8 Ubuntu/Windows: success.
+- `mvn -B -ntp -DskipTests validate`: success.
+- `mvn -B -ntp -DskipTests compile`: core JAXB blocker fixed; next unrelated blocker is application/trayView JavaFX.
+- `mvn -B -ntp install`: still blocked by JAXB runtime provider and TestListHttp network dependency.
 
 ## Decisions snapshot
 - See `docs/decision-log.md`.
@@ -61,8 +74,8 @@ A task is Done when:
 - 2026-04-24T13:40:00Z — Synced tracker with modernization report v2 and marked Phase 0 active.
 - 2026-04-24T16:10:00Z — Completed P0 backlog items HBTV-001/HBTV-002/HBTV-004; closed BLK-001.
 - 2026-04-24T16:25:00Z — Completed HBTV-005: PR template + modernization/bug/feature issue templates added.
-
 - 2026-04-24T18:05:00Z — Started URL modernization by auditing obsolete HTTP/provider URLs and isolating network smoke tests (support task for HBTV-008).
+- 2026-04-25T12:00:00Z — Folded PR #11 tracker updates into PR #10 context; kept HBTV-007 In Progress and added explicit post-JAXB follow-up blockers.
 
 ## Next update trigger
 Update this file after each of:
