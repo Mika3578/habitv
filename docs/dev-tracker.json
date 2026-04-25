@@ -1,7 +1,7 @@
 {
   "program": {
     "name": "Habitv modernization",
-    "last_updated": "2026-04-25T12:00:00Z",
+    "last_updated": "2026-04-25T12:10:00Z",
     "phase": "Phase 0",
     "status": "in_progress",
     "progress_percent": 45
@@ -165,14 +165,14 @@
       "id": "HBTV-007b",
       "title": "Add JAXB runtime provider for tests/runtime (com.sun.xml.bind.v2.ContextFactory)",
       "priority": "P1",
-      "status": "todo",
+      "status": "in_progress",
       "owner": "build_release_engineer",
       "dependencies": [
         "HBTV-007"
       ],
       "risk": "runtime jaxb provider mismatch causes test failures",
       "due_date": "2026-05-22",
-      "progress_percent": 0,
+      "progress_percent": 80,
       "links": {
         "pr": "TBD",
         "issue": "TBD"
@@ -182,14 +182,14 @@
       "id": "HBTV-007c",
       "title": "Isolate remaining network-dependent TestListHttp from default install lifecycle",
       "priority": "P1",
-      "status": "todo",
+      "status": "in_progress",
       "owner": "qa_build_engineer",
       "dependencies": [
         "HBTV-008a"
       ],
       "risk": "network-dependent test remains non-deterministic",
       "due_date": "2026-05-25",
-      "progress_percent": 0,
+      "progress_percent": 80,
       "links": {
         "pr": "TBD",
         "issue": "TBD"
@@ -309,7 +309,7 @@
       ],
       "owner": "build_release_engineer",
       "escalate_by": "2026-04-29",
-      "status": "open"
+      "status": "mitigating"
     },
     {
       "id": "BLK-005",
@@ -321,7 +321,7 @@
       ],
       "owner": "qa_build_engineer",
       "escalate_by": "2026-04-30",
-      "status": "open"
+      "status": "mitigating"
     }
   ],
   "pr_10_validation_summary": {
@@ -358,6 +358,14 @@
     {
       "timestamp": "2026-04-25T12:00:00Z",
       "change": "Folded PR #11/#12 documentation updates into PR #10 context, kept HBTV-007 in progress, and tracked JavaFX/JAXB-runtime/network follow-up blockers."
+    },
+    {
+      "timestamp": "2026-04-25T12:05:00Z",
+      "change": "Added JAXB runtime provider wiring and isolated remaining network-dependent HTTP test from default install lifecycle."
+    },
+    {
+      "timestamp": "2026-04-25T12:10:00Z",
+      "change": "Validation found an unrelated blocker at module application/core: compile fails on generated accessor mismatches (isUpdateOnStartup, isAutoriseSnapshot, isDownload/isDeleted family not found)."
     }
   ]
 }
