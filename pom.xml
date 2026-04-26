@@ -12,6 +12,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
+		<habitv.static.repo.dir>${project.build.directory}/habitv-repo</habitv.static.repo.dir>
 	</properties>
 
 	 <scm>
@@ -21,16 +22,23 @@
 	
 	<distributionManagement>
 		<repository>
-			<id>ftp-repository</id>
-			<url>ftp://ftpperso.free.fr/repository</url>
-		</repository>	
+			<id>habitv-static-repository</id>
+			<url>file:${habitv.static.repo.dir}</url>
+		</repository>
+		<snapshotRepository>
+			<id>habitv-static-snapshot-repository</id>
+			<url>file:${habitv.static.repo.dir}</url>
+		</snapshotRepository>
   </distributionManagement>	
 	
 	<repositories>
 		<repository>
-			<id>dabi-repo</id>
-			<name>dabi-repo</name>
-			<url>http://dabiboo.free.fr/repository</url>
+			<id>habitv-static-repository</id>
+			<name>habitv-static-repository</name>
+			<url>https://raw.githubusercontent.com/Mika3578/habitv-repo/main/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
 	</repositories>	
 
@@ -168,14 +176,6 @@
 				<filtering>true</filtering>
 			</resource>			
 		</resources>	
-		<extensions>
-		<!-- Enabling the use of FTP -->
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-ftp</artifactId>
-				<version>1.0-beta-6</version>
-			</extension>
-		</extensions>		
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
 			<plugin>
