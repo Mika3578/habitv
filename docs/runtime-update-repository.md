@@ -13,7 +13,7 @@ This document only describes the runtime updater repository.
 
 Runtime update checks now use:
 
-`https://raw.githubusercontent.com/Mika3578/habitv-repo/main`
+`https://cdn.jsdelivr.net/gh/Mika3578/habitv-repo@main`
 
 The runtime updater reads:
 
@@ -35,7 +35,7 @@ Expected repository layout example:
 
 Concrete URL shape:
 
-`https://raw.githubusercontent.com/Mika3578/habitv-repo/main/com/dabi/habitv/<artifactId>/<version>/<file>`
+`https://cdn.jsdelivr.net/gh/Mika3578/habitv-repo@main/com/dabi/habitv/<artifactId>/<version>/<file>`
 
 ## Updater URL resolution behavior
 
@@ -46,7 +46,7 @@ That means the runtime endpoint must allow readable directory responses for path
 - `<baseUrl>/com/dabi/habitv/<artifactId>/`
 - `<baseUrl>/com/dabi/habitv/<artifactId>/<version>/`
 
-When pointed at `raw.githubusercontent.com`, directory paths can return HTTP 400 because raw hosting is file-oriented, not a directory index service. In that case, URL migration is correct but startup updates still require repository publication/serving follow-up so the updater can enumerate versions/files.
+jsDelivr (`cdn.jsdelivr.net/gh/...`) serves browsable directory listings for GitHub-hosted repositories, satisfying this requirement. Startup updates will work once artifacts and `plugins.txt` are published to `habitv-repo`.
 
 ## Metadata expectations
 
@@ -65,7 +65,7 @@ Each artifactId in `plugins.txt` must have corresponding Maven-like directories/
 2. Start Habitv locally (any launcher path that initializes plugin update flow).
 3. Check logs for:
    - `Checking plugin updates...`
-   - URL requests to `raw.githubusercontent.com/Mika3578/habitv-repo/main`
+   - URL requests to `cdn.jsdelivr.net/gh/Mika3578/habitv-repo@main`
 4. Verify no runtime request still points to `dabiboo.free.fr`.
 
 If update retrieval fails because artifacts or `plugins.txt` are not yet published to `habitv-repo`, treat that as expected follow-up publication work, not as a runtime URL regression.
