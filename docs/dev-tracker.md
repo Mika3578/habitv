@@ -78,6 +78,8 @@ A task is Done when:
 - 2026-04-25T13:14:00Z — Aligned JAXB accessor calls with generated getter API and replaced provider-specific network smoke URL with stable example.com test URL.
 - 2026-04-25T13:30:00Z — Added HBTV-008b to track plugin snapshot dependency stabilization and 6play live-test isolation from default lifecycle; HBTV-007 and HBTV-007a remain unchanged.
 - 2026-04-27T10:25:00Z — Isolated live provider `BasePluginProviderTester` tests to `*IT` + Failsafe (`network-tests`); updated `docs/testing.md`, url inventory, risk register, and tracker.
+- 2026-04-27T08:00:00Z — Migrated runtime updater base URL from `dabiboo.free.fr` to `cdn.jsdelivr.net/gh/Mika3578/habitv-repo@main` (jsDelivr CDN backed by habitv-repo on GitHub); runtime startup no longer depends on the legacy repository host. jsDelivr supports browsable directory listings, satisfying the updater's HTML anchor discovery requirement.
+- 2026-04-27T08:00:00Z — Recorded follow-up to publish current plugin/tool artifacts and `plugins.txt` metadata to `habitv-repo` for full startup update success.
 
 ## Live provider test isolation — local validation (Java 8, 2026-04-27)
 - `mvn -B -ntp clean -DskipTests compile`: **Success** (full reactor).

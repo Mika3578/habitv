@@ -406,6 +406,14 @@
     {
       "timestamp": "2026-04-27T10:25:00Z",
       "change": "Isolated live provider BasePluginProviderTester tests to *IT + Failsafe (network-tests); documented in testing.md, url-inventory, risk register."
+    },
+    {
+      "timestamp": "2026-04-27T08:00:00Z",
+      "change": "Migrated runtime updater base URL from dabi legacy host to cdn.jsdelivr.net/gh/Mika3578/habitv-repo@main (jsDelivr CDN backed by habitv-repo on GitHub). jsDelivr supports directory listings, satisfying updater HTML anchor discovery. Runtime startup no longer depends on dabiboo.free.fr."
+    },
+    {
+      "timestamp": "2026-04-27T08:00:00Z",
+      "change": "Tracked remaining follow-up to publish plugin/tool artifacts and plugins.txt metadata to habitv-repo for successful startup updates."
     }
   ],
   "validation_snapshot": {
