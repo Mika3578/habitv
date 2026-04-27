@@ -27,6 +27,25 @@ This inventory tracks hardcoded URLs found during the HTTPS modernization audit.
 | `plugins/pluzz/pluzz.txt` | `http://www.pluzz.fr/...` | `https://www.france.tv/` (public reference only) | documentation-only-url | obsolete | Legacy notes/sample endpoints kept for historical context. |
 | `application/consoleView/grabconfig.xml` | Multiple `http://www.d8.tv/program/...` IDs | `https://www.canalplus.com/replay-gratuit/` (public reference only) | documentation-only-url | obsolete | Large static sample config references legacy channel URLs; requires provider-specific migration plan. |
 
+## Provider URL Matrix (plugin audit 2026-04-27)
+
+| Plugin module | Base URL(s) in code | Protocol | Redirect observation (audit run) | Renamed/dead indicator | Auth/access note |
+|---|---|---|---|---|---|
+| `6play` | `https://www.m6.fr` | HTTPS | `https://www.6play.fr` redirects to `https://www.m6.fr/` | yes (6play -> M6+) | public web, parser likely stale |
+| `arte` | `https://www.arte.tv`; `http://videos.arte.tv/...rss.xml` | mixed | legacy RSS endpoint not verified | likely legacy endpoint | public web |
+| `beinsport` | `https://www.beinsports.com/fr-fr/videos` | HTTPS | URL responds `403` to automated request | no rename confirmed | anti-bot/access restrictions likely |
+| `canalPlus` | `http://service.mycanal.fr/...`; `http://service.canal-plus.com/...`; `http://www.d8.tv`; `http://www.d17.tv` | HTTP | not fully validated in this audit | yes (legacy D8/D17 and old API hosts) | tokenized/private API behavior |
+| `clubic` | `https://www.clubic.com/video` | HTTPS | no redirect issue observed | unknown | public web |
+| `footyroom` | `http://footyroom.com` | HTTP in code | redirects to `https://footyroom.co/` | possible domain migration | public web |
+| `globalnews` | `https://globalnews.ca/national/videos/` | HTTPS | redirects to `https://globalnews.ca/videos/` | likely path migration | public web |
+| `lequipe` | `https://video.lequipe.fr`; `http://video.lequipe.fr/morevideos` | mixed | `http://video.lequipe.fr/morevideos` redirects to `https://www.lequipe.fr/tv/` | likely platform/path migration | public web |
+| `mlssoccer` | `https://www.mlssoccer.com` | HTTPS | no redirect issue observed | unknown | public web |
+| `pluzz` | `http://pluzz.webservices.francetelevisions.fr/...`; `http://webservices.francetelevisions.fr/...`; base `https://www.france.tv` | mixed | pluzz webservice host unresolved (unknown host) | yes (pluzz -> france.tv) | public web + obsolete legacy API |
+| `RSS` | external feed URLs (template includes Dailymotion RSS) | mostly HTTP in template | depends on feed endpoint | provider depends on external platforms | public feeds |
+| `sfr` | `https://sport.sfr.fr/...` | HTTPS | host resolution failed in audit environment | no rename confirmed | likely operator/customer access dependency |
+| `wat` | `https://www.tf1.fr`; historical WAT ecosystem | HTTPS | `https://www.wat.tv` redirects to `https://www.tf1.fr/` | yes (WAT closed/absorbed) | public web, legacy plugin |
+| `youtube` | downloader handles multiple hosts; binary `youtube-dl` | n/a | n/a | tooling legacy (not URL rename) | external extractor behavior |
+
 ## Validation notes
 
 - Network/provider URLs are volatile; a successful HTTPS substitution does **not** guarantee provider plugin functionality.

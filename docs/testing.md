@@ -45,6 +45,15 @@ default Surefire lifecycle.
   reserved for deterministic tests (e.g. local fixtures/mocks). **Remaining provider
   rewrites and parser fixes must be tracked in product backlog work items, not conflated
   with the default build.**
+- Migration note: some legacy provider tests still use `*Test` naming (including older
+  tests built on `BasePluginProviderTester`) and have not yet been moved behind the
+  `network-tests` profile. Treat the `*IT.java`/Failsafe split as the target policy for
+  new tests and for incremental migration of existing live provider coverage.
+- Audit note (2026-04-27): the following plugin tests are currently live-network
+  candidates and should be migrated to `*IT` naming under `-Pnetwork-tests`: `arte`,
+  `beinsport`, `canalPlus` (`CanalPlus`, `D8`, `D17`), `clubic`, `footyroom`,
+  `globalnews`, `lequipe`, `mlssoccer`, `pluzz`, `sfr`, `wat`, `youtube`, `RSS`, and
+  network-dependent `email` tests.
 
 ## URL volatility policy
 

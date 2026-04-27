@@ -27,7 +27,7 @@ A task is Done when:
 ## Program status
 - Overall program: **In Progress**
 - Current phase: **Phase 0 (Build stabilization)**
-- Progress: **45%**
+- Progress: **50%**
 
 ## Backlog (live)
 
@@ -45,7 +45,8 @@ A task is Done when:
 | HBTV-007b | Add JAXB runtime provider for tests/runtime (`com.sun.xml.bind.v2.ContextFactory`) | P1 | Done | Build/Release Eng | HBTV-007 | Runtime JAXB provider mismatch causes test failures | 2026-05-22 | 100% | PR:13 / Issue:TBD |
 | HBTV-007c | Isolate remaining network-dependent `TestListHttp` from default install lifecycle | P1 | Done | QA/Build Eng | HBTV-008a | Network-dependent test remains non-deterministic | 2026-05-25 | 100% | PR:13 / Issue:TBD |
 | HBTV-008a | URL modernization support task (HTTP/provider audit + network smoke test isolation) | P1 | In Progress | QA/Build Eng | HBTV-008 | URL-only updates may not restore provider compatibility | 2026-05-25 | 25% | PR:TBD / Issue:TBD |
-| HBTV-008b | Stabilize plugin snapshot dependency resolution and isolate live provider plugin tests | P1 | In Progress | Build/Release Eng + QA/Build Eng | HBTV-008,HBTV-008a | Plugin snapshot drift or live provider tests can break deterministic installs | 2026-05-03 | 90% | PR:TBD / Issue:TBD |
+| HBTV-008b | Stabilize plugin snapshot dependency resolution and isolate live provider plugin tests | P1 | In Progress | Build/Release Eng + QA/Build Eng | HBTV-008,HBTV-008a | Plugin snapshot drift or live provider tests can break deterministic installs | 2026-05-03 | 60% | PR:13 / Issue:TBD |
+| HBTV-011 | Audit plugin provider inventory and classify module status (docs only) | P1 | Done | QA/Build Eng | HBTV-008b | Misclassification could hide runtime/plugin maintenance debt | 2026-04-27 | 100% | PR:TBD / Issue:TBD |
 | HBTV-009 | Migrate packaging away from JDK7 JavaFX paths | P2 | Todo | Desktop Lead | HBTV-007 | Packaging regression on Windows/Linux | 2026-06-15 | 0% | PR:TBD / Issue:TBD |
 | HBTV-010 | Add CODEOWNERS + release/build policy docs | P2 | Todo | Eng Manager + Release Mgr | HBTV-005 | Policy drift | 2026-06-20 | 0% | PR:TBD / Issue:TBD |
 
@@ -80,6 +81,7 @@ A task is Done when:
 - 2026-04-27T10:25:00Z — Isolated live provider `BasePluginProviderTester` tests to `*IT` + Failsafe (`network-tests`); updated `docs/testing.md`, url inventory, risk register, and tracker.
 - 2026-04-27T08:00:00Z — Migrated runtime updater base URL from `dabiboo.free.fr` to `cdn.jsdelivr.net/gh/Mika3578/habitv-repo@main` (jsDelivr CDN backed by habitv-repo on GitHub); runtime startup no longer depends on the legacy repository host. jsDelivr supports browsable directory listings, satisfying the updater's HTML anchor discovery requirement.
 - 2026-04-27T08:00:00Z — Recorded follow-up to publish current plugin/tool artifacts and `plugins.txt` metadata to `habitv-repo` for full startup update success.
+- 2026-04-27T08:27:51Z — Completed provider/plugin audit documentation (`docs/plugin-provider-inventory.md`) and synchronized risk/testing/url inventories with provider status classifications, URL redirect observations, and test isolation recommendations.
 
 ## Live provider test isolation — local validation (Java 8, 2026-04-27)
 - `mvn -B -ntp clean -DskipTests compile`: **Success** (full reactor).
