@@ -1,10 +1,10 @@
 {
   "program": {
     "name": "Habitv modernization",
-    "last_updated": "2026-04-27T08:15:00Z",
+    "last_updated": "2026-04-27T08:27:51Z",
     "phase": "Phase 0",
     "status": "in_progress",
-    "progress_percent": 45
+    "progress_percent": 50
   },
   "governance": {
     "definition_of_ready": [
@@ -248,6 +248,23 @@
       }
     },
     {
+      "id": "HBTV-011",
+      "title": "Audit plugin provider inventory and classify module status (docs only)",
+      "priority": "P1",
+      "status": "done",
+      "owner": "qa_build_engineer",
+      "dependencies": [
+        "HBTV-008b"
+      ],
+      "risk": "misclassification could hide runtime/plugin maintenance debt",
+      "due_date": "2026-04-27",
+      "progress_percent": 100,
+      "links": {
+        "pr": "TBD",
+        "issue": "TBD"
+      }
+    },
+    {
       "id": "HBTV-009",
       "title": "Modernize packaging path",
       "priority": "P2",
@@ -410,6 +427,10 @@
     {
       "timestamp": "2026-04-27T08:00:00Z",
       "change": "Tracked remaining follow-up to publish plugin/tool artifacts and plugins.txt metadata to habitv-repo for successful startup updates."
+    },
+    {
+      "timestamp": "2026-04-27T08:27:51Z",
+      "change": "Completed provider/plugin audit documentation (docs/plugin-provider-inventory.md) and synchronized risk/testing/url inventories with provider status classifications, URL redirect observations, and test isolation recommendations."
     }
   ],
   "validation_snapshot": {
