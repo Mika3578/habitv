@@ -18,7 +18,7 @@ public interface FrameworkConf {
 
 	Integer TIME_OUT_MS = 30000;
 
-	String UPDATE_URL = "https://raw.githubusercontent.com/Mika3578/habitv-repo/main";
+	String UPDATE_URL = "https://cdn.jsdelivr.net/gh/Mika3578/habitv-repo@main";
 
 	String GROUP_ID = "com.dabi.habitv";
 
