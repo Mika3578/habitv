@@ -4,10 +4,13 @@
 
 Deterministic unit tests run by default with standard Maven lifecycle commands, including:
 
-- `mvn -B -ntp install`
+- `mvn -B -ntp clean install`
+- `mvn -B -ntp clean deploy` (when tests are not skipped, same rules apply)
 - `mvn -B -ntp test`
 
-These tests must not depend on live websites or mutable external network responses.
+**`mvn clean install` must stay deterministic:** it should not fail because a third-party streaming site returned no episodes, HTTP 403, or was unreachable.
+
+Passing **plugin compilation** (`mvn clean -DskipTests compile`) proves the code compiles; it does **not** prove that provider plugins still work against live sites. Runtime provider health requires separate validation.
 
 ## Opt-in network smoke tests
 
@@ -19,10 +22,12 @@ Network-dependent smoke tests are isolated behind the Maven profile `network-tes
 - Execution command:
 
 ```bash
-mvn -B -ntp -Pnetwork-tests verify
+mvn -B -ntp clean -Pnetwork-tests verify
 ```
 
-This ensures default builds remain deterministic while allowing explicit network checks when needed.
+**`mvn -Pnetwork-tests verify` is the place for live provider smoke tests** (plugin `*IT.java` classes under Failsafe). Failures there are expected when the network is restricted, sites block automated access, or parsers are outdated; treat them as opt-in signals, not as default build gates.
+
+This keeps default builds deterministic while allowing explicit, profile-gated checks when needed.
 
 ## Plugin/provider test policy
 
@@ -35,10 +40,11 @@ default Surefire lifecycle.
   default test execution.
 - A provider parser update is out of scope for build stabilization unless fixture-backed
   tests prove deterministic behavior.
-- Migration note: some legacy provider tests still use `*Test` naming (including older
-  tests built on `BasePluginProviderTester`) and have not yet been moved behind the
-  `network-tests` profile. Treat the `*IT.java`/Failsafe split as the target policy for
-  new tests and for incremental migration of existing live provider coverage.
+- Live provider smoke tests built on `BasePluginProviderTester` that hit real sites use
+  `*IT.java` and run only under `network-tests`. Remaining `*Test` classes in plugins are
+  reserved for deterministic tests (e.g. local fixtures/mocks). **Remaining provider
+  rewrites and parser fixes must be tracked in product backlog work items, not conflated
+  with the default build.**
 
 ## URL volatility policy
 

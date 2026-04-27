@@ -5,7 +5,10 @@ import org.junit.Test;
 import com.dabi.habitv.api.plugin.exception.DownloadFailedException;
 import com.dabi.habitv.plugintester.BasePluginProviderTester;
 
-public class BeinSportPluginManagerTest extends BasePluginProviderTester {
+/**
+ * This is a live provider smoke test and must not run as part of deterministic unit tests.
+ */
+public class BeinSportPluginManagerIT extends BasePluginProviderTester {
 
 	@Test
 	public final void testBeinSport() throws InstantiationException, IllegalAccessException, DownloadFailedException {

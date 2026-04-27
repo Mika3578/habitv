@@ -4,7 +4,10 @@ import org.junit.Test;
 
 import com.dabi.habitv.plugintester.BasePluginProviderTester;
 
-public class D8PluginManagerTest extends BasePluginProviderTester {
+/**
+ * This is a live provider smoke test and must not run as part of deterministic unit tests.
+ */
+public class D8PluginManagerIT extends BasePluginProviderTester {
 
 	@Test
 	public final void testProviderD8() throws InstantiationException, IllegalAccessException {
