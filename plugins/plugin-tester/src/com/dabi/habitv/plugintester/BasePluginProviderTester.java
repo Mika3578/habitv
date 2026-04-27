@@ -11,6 +11,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -36,6 +37,9 @@ public class BasePluginProviderTester {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
+		if (!Logger.getRootLogger().getAllAppenders().hasMoreElements()) {
+			BasicConfigurator.configure();
+		}
 	}
 
 	@AfterClass

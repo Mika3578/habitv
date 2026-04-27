@@ -6,6 +6,9 @@ package com.dabi.habitv.core.dao;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Set;
 
 import org.junit.After;
@@ -25,6 +28,7 @@ public class DownloadedDAOTest {
 
 	private DownloadedDAO dao;
 	private CategoryDTO category;
+	private File tempIndexDir;
 
 	/**
 	 * @throws java.lang.Exception
@@ -46,6 +50,7 @@ public class DownloadedDAOTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
+		tempIndexDir = Files.createTempDirectory("downloaded-dao-test-").toFile();
 		initDAO();
 	}
 
@@ -54,11 +59,29 @@ public class DownloadedDAOTest {
 	 */
 	@After
 	public void tearDown() throws Exception {
+		deleteRecursively(tempIndexDir);
 	}
 
 	private void initDAO() {
 		category = new CategoryDTO("channel", "tvshow", "channel", "mp4");
-		dao = new DownloadedDAO(category, ".");
+		dao = new DownloadedDAO(category, tempIndexDir.getAbsolutePath());
+	}
+
+	private static void deleteRecursively(final File file) throws IOException {
+		if (file == null || !file.exists()) {
+			return;
+		}
+		if (file.isDirectory()) {
+			final File[] children = file.listFiles();
+			if (children != null) {
+				for (final File child : children) {
+					deleteRecursively(child);
+				}
+			}
+		}
+		if (!file.delete()) {
+			throw new IOException("Failed to delete test file: " + file.getAbsolutePath());
+		}
 	}
 
 	@Test
