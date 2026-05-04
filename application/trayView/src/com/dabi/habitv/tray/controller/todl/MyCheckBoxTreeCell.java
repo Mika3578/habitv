@@ -62,22 +62,27 @@ public abstract class MyCheckBoxTreeCell<T> extends TreeCell<T> {
 		}, strConverter);
 	}
 
-	private final static StringConverter defaultTreeItemStringConverter = new StringConverter<TreeItem>() {
+	private final static StringConverter<TreeItem<?>> defaultTreeItemStringConverter = new StringConverter<TreeItem<?>>() {
 		@Override
-		public String toString(TreeItem treeItem) {
+		public String toString(TreeItem<?> treeItem) {
 			return (treeItem == null || treeItem.getValue() == null) ? ""
 					: treeItem.getValue().toString();
 		}
 
 		@Override
-		public TreeItem fromString(String string) {
-			return new TreeItem(string);
+		public TreeItem<?> fromString(String string) {
+			return new TreeItem<>(string);
 		}
 	};
 
 	public MyCheckBoxTreeCell(
 			final Callback<TreeItem<T>, ObservableValue<Boolean>> getSelectedProperty) {
-		this(getSelectedProperty, defaultTreeItemStringConverter);
+		this(getSelectedProperty, getDefaultTreeItemStringConverter());
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> StringConverter<TreeItem<T>> getDefaultTreeItemStringConverter() {
+		return (StringConverter<TreeItem<T>>) (StringConverter<?>) defaultTreeItemStringConverter;
 	}
 
 	public MyCheckBoxTreeCell(
@@ -167,7 +172,7 @@ public abstract class MyCheckBoxTreeCell<T> extends TreeCell<T> {
 			setText(null);
 			setGraphic(null);
 		} else {
-			StringConverter c = getConverter();
+			StringConverter<TreeItem<T>> c = getConverter();
 			Callback<TreeItem<T>, ObservableValue<Boolean>> callback = getSelectedStateCallback();
 
 			// update the node content
@@ -216,7 +221,7 @@ public abstract class MyCheckBoxTreeCell<T> extends TreeCell<T> {
 
 			// install new bindings.
 			// We special case things when the TreeItem is a CheckBoxTreeItem
-			if (getTreeItem() instanceof CheckBoxTreeItem) {
+			if (getTreeItem() instanceof CheckBoxTreeItem<?>) {
 				CheckBoxTreeItem<T> cbti = (CheckBoxTreeItem<T>) getTreeItem();
 				booleanProperty = cbti.selectedProperty();
 				checkBox.selectedProperty().bindBidirectional(

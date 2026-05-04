@@ -33,19 +33,13 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 
 		Document doc = Jsoup.parse(getUrlContent(category.getId()));
 		for (Element aEp : doc.select("section#videos article a")) {
-			String url = ArteConf.HOME_URL + aEp.attr("href");
-			final String name = aEp.select("h3").first().text();
-			if (!StringUtils.isEmpty(name)) {
-				episodes.add(new EpisodeDTO(category, name, url));
+			addEpisodeIfValid(episodes, category, aEp);
+		}
+		if (episodes.isEmpty()) {
+			for (Element aEp : doc.select("a[href*=/videos/]")) {
+				addEpisodeIfValid(episodes, category, aEp);
 			}
 		}
-//		for (Element aEp : doc.select("div#playlistContainer li")) {
-//			String url = ArteConf.HOME_URL + aEp.attr("href");
-//			final String name = aEp.select("h3").first().text();
-//			if (!StringUtils.isEmpty(name)) {
-//				episodes.add(new EpisodeDTO(category, name, url));
-//			}
-//		}		
 		return episodes;
 	}
 
@@ -64,6 +58,11 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 			languageCat.setDownloadable(false);
 			languageCat.addSubCategories(findCategoryByLanguage(href));
 			categories.add(languageCat);
+		}
+		if (categories.isEmpty()) {
+			final CategoryDTO fallbackCat = new CategoryDTO(ArteConf.NAME, "home", ArteConf.CAT_PAGE, ArteConf.EXTENSION);
+			fallbackCat.setDownloadable(true);
+			categories.add(fallbackCat);
 		}
 
 		return categories;
@@ -108,6 +107,24 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 			CategoryDTO cat = new CategoryDTO(ArteConf.NAME, text, href, ArteConf.EXTENSION);
 			cat.setDownloadable(true);
 			categories.add(cat);
+		}
+	}
+
+	private void addEpisodeIfValid(final Set<EpisodeDTO> episodes, final CategoryDTO category, final Element episodeLink) {
+		if (episodeLink == null) {
+			return;
+		}
+		final String href = episodeLink.attr("href");
+		if (StringUtils.isEmpty(href) || !href.contains("/videos/")) {
+			return;
+		}
+		final String url = href.startsWith("http") ? href : ArteConf.HOME_URL + href;
+		String name = episodeLink.select("h3").text();
+		if (StringUtils.isEmpty(name)) {
+			name = episodeLink.text();
+		}
+		if (!StringUtils.isEmpty(name)) {
+			episodes.add(new EpisodeDTO(category, name, url));
 		}
 	}
 

@@ -3,6 +3,8 @@ package com.dabi.habitv.core.config;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -271,8 +273,13 @@ public class XMLUserConfig implements UserConfig {
 				.newInstance(Configuration.class.getPackage().getName());
 		final Marshaller marshaller = jaxbContext.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+		marshaller.setProperty(Marshaller.JAXB_ENCODING, HabitTvConf.ENCODING);
 		FileUtils.setValidation(marshaller, CONF_XSD);
-		marshaller.marshal(config, file);
+		try (FileOutputStream outputFile = new FileOutputStream(file)) {
+			marshaller.marshal(config, outputFile);
+		} catch (IOException e) {
+			throw new JAXBException("Unable to save configuration to " + file, e);
+		}
 	}
 
 	private static Configuration buildDefaultConfig() {

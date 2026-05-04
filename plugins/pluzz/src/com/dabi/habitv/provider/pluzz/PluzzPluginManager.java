@@ -161,7 +161,7 @@ public class PluzzPluginManager extends BasePluginWithProxy implements PluginPro
 	@Override
 	public DownloadableState canDownload(String downloadInput) {
 		if (downloadInput.contains("france2.") || downloadInput.contains("france3.") || downloadInput.contains("france4.")
-		        || downloadInput.contains("france5.") || downloadInput.contains("pluzz.")) {
+		        || downloadInput.contains("france5.") || downloadInput.contains("pluzz.") || downloadInput.contains("france.tv")) {
 			return DownloadableState.SPECIFIC;
 		} else {
 			return DownloadableState.IMPOSSIBLE;

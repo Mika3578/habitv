@@ -1,14 +1,18 @@
-package com.dabi.habitv.provider.footyroom;
+package com.dabi.habitv.provider.mlssoccer;
 
 import org.junit.Test;
 
 import com.dabi.habitv.api.plugin.exception.DownloadFailedException;
 import com.dabi.habitv.plugintester.BasePluginProviderTester;
 
-public class FootyroomPluginManagerTest extends BasePluginProviderTester {
+/**
+ * This is a live provider smoke test and must not run as part of deterministic unit tests.
+ */
+public class MLSSoccerPluginManagerIT extends BasePluginProviderTester {
 	
 	@Test
 	public final void test() throws InstantiationException, IllegalAccessException, DownloadFailedException {
-		testPluginProvider(FootyroomPluginManager.class, true);
+		testPluginProvider(MLSSoccerPluginManager.class, true);
 	}
+
 }
