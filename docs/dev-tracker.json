@@ -1,7 +1,7 @@
 {
   "program": {
     "name": "Habitv modernization",
-    "last_updated": "2026-04-27T08:27:51Z",
+    "last_updated": "2026-04-27T10:25:00Z",
     "phase": "Phase 0",
     "status": "in_progress",
     "progress_percent": 50
@@ -199,14 +199,14 @@
       "id": "HBTV-008",
       "title": "Split unit vs integration tests",
       "priority": "P1",
-      "status": "todo",
+      "status": "in_progress",
       "owner": "qa_build_engineer",
       "dependencies": [
         "HBTV-002"
       ],
       "risk": "ownership ambiguity",
       "due_date": "2026-05-25",
-      "progress_percent": 0,
+      "progress_percent": 40,
       "links": {
         "pr": "TBD",
         "issue": "TBD"
@@ -241,9 +241,9 @@
       ],
       "risk": "plugin snapshot drift and live provider tests break deterministic installs",
       "due_date": "2026-05-03",
-      "progress_percent": 60,
+      "progress_percent": 90,
       "links": {
-        "pr": "13",
+        "pr": "TBD",
         "issue": "TBD"
       }
     },
@@ -362,7 +362,7 @@
     },
     {
       "id": "BLK-006",
-      "description": "Plugin modules resolve stale snapshot metadata due to version drift and live provider tests in Surefire",
+      "description": "Plugin modules resolve stale snapshot metadata due to version drift; live provider BasePluginProviderTester tests no longer run in default Surefire",
       "impacted": [
         "HBTV-008b"
       ],
@@ -421,6 +421,10 @@
       "change": "Added HBTV-008b and BLK-006 for plugin snapshot/build stabilization; kept HBTV-007 in progress and HBTV-007a open."
     },
     {
+      "timestamp": "2026-04-27T10:25:00Z",
+      "change": "Isolated live provider BasePluginProviderTester tests to *IT + Failsafe (network-tests); documented in testing.md, url-inventory, risk register."
+    },
+    {
       "timestamp": "2026-04-27T08:00:00Z",
       "change": "Migrated runtime updater base URL from dabi legacy host to cdn.jsdelivr.net/gh/Mika3578/habitv-repo@main (jsDelivr CDN backed by habitv-repo on GitHub). jsDelivr supports directory listings, satisfying updater HTML anchor discovery. Runtime startup no longer depends on dabiboo.free.fr."
     },
@@ -434,11 +438,12 @@
     }
   ],
   "validation_snapshot": {
-    "github_actions": "success (java8 ubuntu/windows)",
-    "validate": "success",
-    "compile": "no JAXB accessor failure in application/core; build proceeds and later fails at plugins/beinsport dependency resolution (blocked dabi-repo HTTP metadata for 4.1.1-SNAPSHOT)",
-    "install": "no JAXB accessor/runtime-provider or ListHttpNetworkIT default-lifecycle failure; build later fails at plugins/6play test SixPlayPluginManagerTest (categorie liste vide)",
-    "network_tests": "RetrieverUtilsNetworkIT passes with example.com and ListHttpNetworkIT runs under profile; build later fails at plugins/6play test SixPlayPluginManagerTest (categorie liste vide)"
+    "github_actions": "not re-run in this session",
+    "validate": "not run in this session",
+    "compile": "success: mvn -B -ntp clean -DskipTests compile (full reactor, 2026-04-27)",
+    "install": "failure: plugins/email (EmailPluginManagerTest, MessageReceiverTest: JavaMail SSL/protocol and NPE). Provider live tests no longer in default Surefire through plugins/curl.",
+    "deploy_skip_tests": "success: mvn -B -ntp clean deploy -DskipTests with quoted habitv.static.repo.dir to local static repo path",
+    "network_tests": "failure: plugins/6play Failsafe SixPlayPluginManagerIT (categorie liste vide); expected opt-in volatility"
   },
   "pr_13_validation_summary": {
     "core_statement": "PR #13 completes JAXB runtime provider wiring and isolates ListHttpNetworkIT from the default Surefire lifecycle.",
