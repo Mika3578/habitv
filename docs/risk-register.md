@@ -16,6 +16,8 @@ or accepted.
 | R-007 | Auto-update pulls unexpected old artifacts     | Medium     | High   | P1       |
 | R-008 | yt-dlp migration changes download behavior     | Medium     | Medium | P2       |
 | R-009 | GitHub Pages layout mismatches updater         | Medium     | High   | P1       |
+| R-010 | Intra-reactor version range excludes SNAPSHOTs | High       | High   | P0       |
+| R-011 | maven-jaxb-plugin missing pinned version       | Medium     | Medium | P1       |
 
 ---
 
@@ -105,3 +107,26 @@ or accepted.
 - Mitigation: HBTV-005 defines the layout explicitly and validates
   it against `FindArtifactUtils.findLastVersionUrl` semantics
   before cutting over.
+
+## R-010 — Intra-reactor version range `[4.1,4.2)` excludes SNAPSHOTs
+
+- Description: Root `pom.xml` declares dependencyManagement entries
+  for `com.dabi.habitv:api` and `com.dabi.habitv:framework` with the
+  closed version range `[4.1,4.2)`. Maven does not by default
+  include `4.1.0-SNAPSHOT` in that range, and the legacy
+  `dabiboo.free.fr` HTTP repository (which would have served the
+  matching release) is blocked by Maven 3.9+ defaults and likely
+  unreachable. As a result, `mvn compile` fails at `framework`
+  during dependency collection.
+- Mitigation: Replace the range with `${project.version}` for
+  intra-reactor coordinates in HBTV-002. No code change; POM only.
+
+## R-011 — `maven-jaxb-plugin` missing pinned version
+
+- Description: `application/core/pom.xml` declares
+  `com.sun.tools.xjc.maven2:maven-jaxb-plugin` without a `<version>`.
+  Maven 3.9+ warns and may refuse to build in future versions. Build
+  behavior depends on which plugin version Maven happens to resolve.
+- Mitigation: Pin the plugin version (e.g. the last known-working
+  `1.1.1`) in HBTV-002 so JAXB generation stays deterministic. No
+  source change.

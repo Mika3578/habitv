@@ -8,6 +8,12 @@
 
 	<name>Parent habiTv</name>
 
+	<modules>
+		<module>fwk</module>
+		<module>application</module>
+		<module>plugins</module>
+	</modules>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>

@@ -32,36 +32,71 @@ Status legend: `proposed`, `in-progress`, `blocked`, `done`,
 
 ## HBTV-001 — Maven reactor audit
 
-- Status: proposed
+- Status: in-progress
 - Priority: P0
-- Scope: Investigate and document why the root `pom.xml`, `fwk/pom.xml`
-  do not list `<modules>`; propose a corrected reactor that includes
-  `fwk`, `application`, `plugins` (and decides on
-  `plugins/plugin-tester`, `application/habiTv-linux`,
-  `application/habiTv-windows`).
+- Scope: Wire the Maven multi-module reactor so `mvn validate` walks
+  the full project from the root and parent resolution is
+  deterministic across `fwk`, `application`, and `plugins`. Topology
+  only; no dependency or plugin upgrades, no source changes.
 - Acceptance criteria:
-  - Reactor wiring proposal documented with reasoning.
-  - Parent version mismatches identified
-    (`4.1.0` vs `4.1.0-SNAPSHOT`, the `4.1.0-SNASPHOT` typo).
-  - Pilot branch demonstrates `mvn -N validate` succeeds at root.
-- Validation: `mvn -B -ntp -N -DskipTests validate` plus a per-module
-  smoke walk.
-- PR: build: stabilize Maven reactor from master (planned).
-- Notes: Audit + minimal wiring only; no plugin/version upgrades.
+  - Root `pom.xml` aggregates `fwk`, `application`, `plugins`. (done)
+  - `fwk/pom.xml` aggregates `api`, `framework`. (done)
+  - `application/pom.xml` keeps `core`, `consoleView`, `trayView`,
+    `habiTv`. `habiTv-linux` and `habiTv-windows` intentionally
+    excluded (hardcoded `${jdk.home}`, JDK-bundled JavaFX, ZenJava
+    plugin). (done — see notes)
+  - `plugins/pom.xml` keeps the 22 plugin modules. `plugin-tester`
+    intentionally excluded (deferred to HBTV-002 test-compile
+    scope). (done — see notes)
+  - All child POMs parent at `4.1.0-SNAPSHOT` with explicit
+    `<relativePath>`. (done)
+  - `fwk/framework/pom.xml` own version typo `4.1.0-SNASPHOT`
+    fixed to `4.1.0-SNAPSHOT`. (done)
+- Validation:
+  - `mvn -B -ntp -DskipTests validate` walks all 32 reactor
+    modules and reports BUILD SUCCESS.
+  - `mvn -B -ntp -DskipTests compile` reaches the next real
+    blocker (intra-reactor dependency range `[4.1,4.2)` on
+    `api`/`framework` in the root POM excludes SNAPSHOT siblings;
+    compile FAILS at `framework`). Deferred to HBTV-002.
+- PR: build: stabilize Maven reactor from master.
+- Notes:
+  - `habiTv-linux` and `habiTv-windows` left on disk but out of
+    the reactor; status documented in
+    `docs/audit-master-baseline.md`. They remain untouched and
+    are tracked under HBTV-008 (JavaFX / runtime packaging audit).
+  - `plugin-tester` left on disk but out of the reactor; test
+    sources depend on it only when the lifecycle reaches
+    `test-compile`, which HBTV-002 will address.
+  - One latent inconsistency intentionally preserved:
+    `application/habiTv-windows` parents to root `parent` while
+    its sibling `habiTv-linux` parents to `application`. Not
+    fixed because both modules are excluded from the reactor.
 
 ## HBTV-002 — Java 8 baseline CI
 
 - Status: proposed
 - Priority: P0
 - Scope: Extend the baseline workflow from `validate` to `compile`
-  (and later `test`) once HBTV-001 lands.
+  (and later `test`) once HBTV-001 lands. Specifically:
+  - Replace intra-reactor version range `[4.1,4.2)` on
+    `com.dabi.habitv:api` / `com.dabi.habitv:framework` in root
+    `pom.xml` with `${project.version}` so reactor SNAPSHOTs
+    resolve without the blocked HTTP repository.
+  - Decide whether to wire `plugins/plugin-tester` into the
+    reactor so test sources can resolve the harness once the
+    workflow reaches `test-compile`.
+  - Pin `maven-jaxb-plugin` to an explicit version (current
+    warning: missing version) so `application/core` keeps
+    generating deterministically.
 - Acceptance criteria:
   - `mvn -B -ntp -DskipTests compile` passes on Ubuntu and Windows
     with Temurin 8.
   - Network/provider tests remain excluded by default.
 - Validation: CI matrix runs green on Ubuntu and Windows.
 - PR: TBD.
-- Notes: Depends on HBTV-001.
+- Notes: Depends on HBTV-001. Compile currently fails at
+  `framework` because of the intra-reactor range.
 
 ## HBTV-003 — Repository branch / rules setup
 

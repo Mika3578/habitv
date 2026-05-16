@@ -192,3 +192,110 @@ Captured at PR creation time. Update if the environment changes.
   `4.1.0-SNASPHOT` typo in `fwk/framework/pom.xml`.
 - Keep the change scope to POM topology only; do not upgrade
   plugins or dependencies in that PR.
+
+## Maven reactor stabilization findings (HBTV-001)
+
+Captured during the `build: stabilize Maven reactor from master`
+PR. Branch: `build/stabilize-maven-reactor-from-master` based on
+`develop` (which was created from `origin/master` at the bootstrap
+merge commit). Local environment: Windows 11, Apache Maven 3.9.11,
+Azul Zulu OpenJDK 1.8.0_492.
+
+### Modules wired
+
+Reactor build order observed via `mvn -B -ntp -DskipTests validate`
+walks 32 entries:
+
+- Root: `com.dabi.habitv:parent` (pom).
+- `fwk`: `api`, `framework`, plus the `fwk` aggregator itself.
+- `application`: `core`, `consoleView`, `trayView`, `habiTv`, plus
+  the `application` aggregator itself.
+- `plugins`: 22 plugin modules (`6play`, `adobeHDS`, `aria2`,
+  `arte`, `beinsport`, `canalPlus`, `clubic`, `cmd`, `curl`,
+  `email`, `ffmpeg`, `file`, `footyroom`, `globalnews`, `lequipe`,
+  `mlssoccer`, `pluzz`, `RSS`, `rtmpDump`, `sfr`, `youtube`,
+  `wat`) plus the `plugins` aggregator itself.
+
+### Modules intentionally not wired
+
+- `application/habiTv-linux` and `application/habiTv-windows`.
+  Both declare hardcoded `${jdk.home}` properties pointing at
+  Linux/Windows JDK 7 install paths, use `system`-scope
+  `javafx:jfxrt` referencing `jfxrt.jar` under those paths, depend
+  on `com.zenjava:javafx-maven-plugin:2.0` (unmaintained), and use
+  `com.sun.javafx.tools.ant` packaging tasks. They cannot build
+  on a clean machine. Tracked under HBTV-008 (JavaFX / runtime
+  packaging audit). Their POMs were not modified in this PR.
+- `plugins/plugin-tester`. It is the shared harness referenced by
+  most plugin tests at `<scope>test</scope>`. `validate` and
+  `compile` do not exercise test sources, so excluding it from
+  the reactor does not block the current CI baseline. Wiring it
+  in will be revisited when HBTV-002 extends the workflow to
+  `test-compile` (or `test`).
+
+### Cross-cutting POM changes applied
+
+- Root `pom.xml`: added `<modules>fwk, application, plugins</modules>`.
+- `fwk/pom.xml`: added `<modules>api, framework</modules>`.
+- All in-reactor child POMs now declare their `<parent>` at
+  version `4.1.0-SNAPSHOT` with an explicit `<relativePath>` to
+  the correct parent file. This eliminates the previous Maven
+  warning "`parent.relativePath` ... points at ... instead of ...".
+- `fwk/framework/pom.xml`: own `<version>` fixed from
+  `4.1.0-SNASPHOT` to `4.1.0-SNAPSHOT`.
+- `application/habiTv-windows` was deliberately not edited.
+  It still parents to root `parent` (its sibling `habiTv-linux`
+  parents to `application`); both are out of the reactor.
+
+### Cross-cutting non-changes (preserved as-is)
+
+- Dependency versions are unchanged. Plugin own versions
+  `4.1.1-SNAPSHOT` (`pluzz`, `footyroom`, `beinsport`) and
+  `4.1.2-SNAPSHOT` (`ffmpeg`) are intentional (not typos).
+- Test-scope `plugin-tester` references at version `4.1.0`
+  inside plugin POMs are unchanged. They fail to resolve when
+  `test-compile` runs, but `validate` and `compile` do not
+  trigger them. HBTV-002 will reconcile.
+- The intra-reactor version range `[4.1,4.2)` on `api` and
+  `framework` inside the root `pom.xml` dependencyManagement is
+  unchanged. It is the next real blocker (see below); fixing it
+  belongs to HBTV-002 per scope rules.
+- `maven-jaxb-plugin` (`application/core`) still has no pinned
+  `<version>`. Warning persists; no change in this PR.
+- Legacy SVN `<scm>`, HTTP `dabiboo.free.fr` `<repository>`, and
+  FTP `<distributionManagement>` are untouched (HBTV-004).
+
+### Validation results
+
+- `git status --short`: 32 modified POMs plus the four docs
+  updates listed in the PR body.
+- `git branch --show-current`:
+  `build/stabilize-maven-reactor-from-master`.
+- `mvn -B -ntp -DskipTests validate` from the repository root:
+  `BUILD SUCCESS`, 32 reactor entries built (`pom` aggregators
+  plus `jar` modules). Only remaining warning is
+  `maven-jaxb-plugin` missing version (R-011).
+- `mvn -B -ntp -DskipTests compile` from the repository root:
+  `BUILD FAILURE` at `com.dabi.habitv:framework`. Cause:
+  `No versions available for com.dabi.habitv:api:jar:[4.1,4.2)
+  within specified range`. Maven cannot satisfy the closed range
+  because the only available `api` artifact is the reactor's
+  `4.1.0-SNAPSHOT`, which is not within `[4.1,4.2)` by default,
+  and the legacy `http://dabiboo.free.fr/repository` is blocked
+  by Maven 3.9 default mirror policy. Tracked as R-010 and
+  scoped to HBTV-002.
+
+### Next recommended PR
+
+`build: stabilize Java 8 compile baseline` (HBTV-002):
+
+- In root `pom.xml`, replace the intra-reactor dependencyManagement
+  ranges `[4.1,4.2)` on `com.dabi.habitv:api` and
+  `com.dabi.habitv:framework` with `${project.version}`.
+- Pin `com.sun.tools.xjc.maven2:maven-jaxb-plugin` to its last
+  known-working version in `application/core/pom.xml`.
+- Decide on `plugins/plugin-tester` wiring (likely include it as
+  a module so test-scope reactor coordinates resolve).
+- Keep scope to POM topology / version pins. No source changes,
+  no plugin upgrades, no provider rewrites, no JavaFX work, no
+  FTP/HTTP repo migration.
