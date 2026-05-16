@@ -213,3 +213,37 @@ Status legend: `proposed`, `in-progress`, `blocked`, `done`,
 - Validation: Audit reviewed in PR; no code changes in this item.
 - PR: TBD.
 - Notes: Pairs with Phase 7 of `docs/dev-plan.md`.
+
+## HBTV-010 — Plugin tester reactor dependency alignment
+
+- Status: done
+- Priority: P1
+- Scope: Align plugin module test-harness dependencies so
+  `com.dabi.habitv:plugin-tester` resolves from the local reactor line
+  instead of the blocked legacy HTTP repository; aggregate
+  `plugins/plugin-tester` in `plugins/pom.xml`.
+- Acceptance criteria:
+  - Every plugin module that pinned
+    `com.dabi.habitv:plugin-tester:4.1.0` now uses the reactor version
+    expression (`${project.version}` or `${project.parent.version}` for
+    modules with independent own versions).
+  - `plugins/pom.xml` includes `<module>plugin-tester</module>`.
+  - `mvn -B -ntp -DskipTests compile` moves past the former
+    `plugin-tester:4.1.0` descriptor blocker.
+- Validation:
+  - Baseline:
+    - `mvn -B -ntp -DskipTests validate` -> `BUILD SUCCESS` (32 modules).
+    - `mvn -B -ntp -DskipTests compile` -> `BUILD FAILURE` at `6play` on
+      `com.dabi.habitv:plugin-tester:4.1.0` descriptor resolution from
+      blocked `http://dabiboo.free.fr/repository`.
+  - After alignment:
+    - `mvn -B -ntp -DskipTests validate` -> `BUILD SUCCESS` (33 modules;
+      includes `plugin-tester`).
+    - `mvn -B -ntp -DskipTests compile` -> moves past `6play` and fails
+      later at `beinsport` on `framework/api:4.1.1-SNAPSHOT` resolution
+      from blocked legacy repository (HBTV-004-class blocker).
+- PR: build: align plugin tester reactor dependency.
+- Notes: R-012 is mitigated by this item. Remaining compile blocker is
+  legacy repository resolution for non-reactor versions in selected
+  plugin modules (`beinsport`, with similar risk for `footyroom`,
+  `pluzz`, and `ffmpeg`).

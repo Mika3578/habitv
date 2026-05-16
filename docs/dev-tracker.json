@@ -167,6 +167,26 @@
       ],
       "pr": "TBD",
       "notes": "Pairs with Phase 7 of docs/dev-plan.md."
+    },
+    {
+      "id": "HBTV-010",
+      "title": "Plugin tester reactor dependency alignment",
+      "status": "done",
+      "priority": "P1",
+      "scope": "Align plugin module test-harness dependencies so com.dabi.habitv:plugin-tester resolves from reactor coordinates; aggregate plugins/plugin-tester in plugins/pom.xml.",
+      "acceptanceCriteria": [
+        "Plugin modules that pinned com.dabi.habitv:plugin-tester:4.1.0 use reactor-aligned expressions (${project.version} or ${project.parent.version} for modules with independent own versions).",
+        "plugins/pom.xml includes <module>plugin-tester</module>.",
+        "mvn -B -ntp -DskipTests compile moves past the previous plugin-tester descriptor blocker at 6play."
+      ],
+      "validation": [
+        "Baseline: mvn -B -ntp -DskipTests validate -> BUILD SUCCESS (32 modules)",
+        "Baseline: mvn -B -ntp -DskipTests compile -> BUILD FAILURE at 6play on com.dabi.habitv:plugin-tester:4.1.0 descriptor resolution via blocked legacy repository",
+        "After alignment: mvn -B -ntp -DskipTests validate -> BUILD SUCCESS (33 modules, plugin-tester included)",
+        "After alignment: mvn -B -ntp -DskipTests compile -> moves past 6play and fails later at beinsport on framework/api:4.1.1-SNAPSHOT resolution via blocked legacy repository (HBTV-004 class)"
+      ],
+      "pr": "build: align plugin tester reactor dependency",
+      "notes": "Mitigates R-012. Remaining compile blocker is legacy repository resolution for non-reactor versions in selected plugin modules."
     }
   ]
 }

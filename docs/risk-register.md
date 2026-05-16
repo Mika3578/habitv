@@ -18,7 +18,7 @@ or accepted.
 | R-009 | GitHub Pages layout mismatches updater                          | Medium     | High   | P1       |
 | R-010 | Intra-reactor version range excludes SNAPSHOTs (mitigated)      | Low        | Low    | P3       |
 | R-011 | maven-jaxb-plugin missing pinned version (mitigated)            | Low        | Low    | P3       |
-| R-012 | Plugin tester version mismatch blocks compile                   | High       | Medium | P1       |
+| R-012 | Plugin tester version mismatch blocks compile (mitigated)       | Low        | Low    | P3       |
 
 ---
 
@@ -150,3 +150,10 @@ or accepted.
   versions to reactor coordinates (for example `${project.version}`) and
   confirm whether `plugin-tester` should stay aggregated in
   `plugins/pom.xml`.
+- Status: Mitigated in HBTV-010 by aligning plugin test-harness
+  dependency versions to reactor expressions and including
+  `plugins/plugin-tester` in `plugins/pom.xml`; `mvn compile` now moves
+  past the former `6play`/`plugin-tester:4.1.0` descriptor blocker.
+- Residual risk: Compile still hits blocked legacy repository resolution
+  for `framework/api:4.1.1-SNAPSHOT` in `beinsport`, which is tracked
+  under the existing legacy repository migration risk (R-001 / HBTV-004).
