@@ -29,27 +29,30 @@
     {
       "id": "HBTV-001",
       "title": "Maven reactor audit",
-      "status": "proposed",
+      "status": "in-progress",
       "priority": "P0",
-      "scope": "Investigate why root pom.xml and fwk/pom.xml have no <modules>; propose corrected reactor wiring covering fwk, application, plugins (incl. plugin-tester, habiTv-linux, habiTv-windows).",
+      "scope": "Wire the Maven multi-module reactor so mvn validate walks the full project from root; align parent versions and relativePath across fwk, application, plugins. Topology only; no dependency or plugin upgrades, no source changes.",
       "acceptanceCriteria": [
-        "Reactor wiring proposal documented with reasoning.",
-        "Parent version mismatches identified (4.1.0 vs 4.1.0-SNAPSHOT, the 4.1.0-SNASPHOT typo in fwk/framework/pom.xml).",
-        "Pilot branch demonstrates mvn -N validate succeeds at root."
+        "Root pom.xml aggregates fwk, application, plugins.",
+        "fwk/pom.xml aggregates api, framework.",
+        "application/pom.xml keeps core, consoleView, trayView, habiTv; habiTv-linux and habiTv-windows intentionally excluded.",
+        "plugins/pom.xml keeps 22 plugin modules; plugin-tester intentionally excluded.",
+        "All child POMs parent at 4.1.0-SNAPSHOT with explicit <relativePath>.",
+        "fwk/framework own version typo 4.1.0-SNASPHOT fixed to 4.1.0-SNAPSHOT."
       ],
       "validation": [
-        "mvn -B -ntp -N -DskipTests validate",
-        "per-module smoke walk via mvn -B -ntp -pl <module> validate"
+        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS across 32 reactor modules",
+        "mvn -B -ntp -DskipTests compile -> FAILS at framework due to intra-reactor dependency range [4.1,4.2) excluding SNAPSHOT siblings; deferred to HBTV-002"
       ],
-      "pr": "build: stabilize Maven reactor from master (planned)",
-      "notes": "Audit + minimal wiring only; no plugin/version upgrades."
+      "pr": "build: stabilize Maven reactor from master",
+      "notes": "habiTv-linux/habiTv-windows out of reactor (hardcoded jdk.home, JDK-bundled JavaFX, ZenJava plugin); plugin-tester out of reactor (deferred to HBTV-002 test-compile scope); habiTv-windows still parents to root parent (sibling habiTv-linux parents to application); preserved because both modules are excluded."
     },
     {
       "id": "HBTV-002",
       "title": "Java 8 baseline CI",
       "status": "proposed",
       "priority": "P0",
-      "scope": "Extend baseline workflow from validate to compile (and later test) once HBTV-001 lands.",
+      "scope": "Extend baseline workflow from validate to compile (and later test) once HBTV-001 lands. Includes replacing intra-reactor version range [4.1,4.2) with ${project.version}, pinning maven-jaxb-plugin version, and deciding whether to wire plugin-tester into the reactor.",
       "acceptanceCriteria": [
         "mvn -B -ntp -DskipTests compile passes on Ubuntu and Windows with Temurin 8.",
         "Network/provider tests remain excluded by default."
@@ -58,7 +61,7 @@
         "CI matrix runs green on ubuntu-latest and windows-latest"
       ],
       "pr": "TBD",
-      "notes": "Depends on HBTV-001."
+      "notes": "Depends on HBTV-001. Compile currently fails at framework because of intra-reactor range [4.1,4.2) on api/framework."
     },
     {
       "id": "HBTV-003",
