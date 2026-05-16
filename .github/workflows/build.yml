@@ -1,0 +1,41 @@
+name: build
+
+# Conservative baseline CI for the restart from master.
+# Intentionally validate-only (no compile, no tests) to avoid masking the
+# legacy reactor/plugin issues documented in docs/audit-master-baseline.md.
+# Subsequent PRs (HBTV-001, HBTV-002) will widen this workflow.
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: validate (${{ matrix.os }}, java8)
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Temurin JDK 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
+          cache: maven
+
+      - name: Maven validate
+        run: mvn -B -ntp -DskipTests validate
