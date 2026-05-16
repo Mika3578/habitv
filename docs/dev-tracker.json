@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "version": 1,
+  "description": "Machine-readable mirror of docs/dev-tracker.md. Keep both files in sync.",
+  "statusValues": ["proposed", "in-progress", "blocked", "done", "deferred"],
+  "priorityValues": ["P0", "P1", "P2", "P3"],
+  "items": [
+    {
+      "id": "HBTV-000",
+      "title": "Restart from master governance bootstrap",
+      "status": "in-progress",
+      "priority": "P0",
+      "scope": "Add governance, CI validate baseline, AI agent guidance, tracker/risk/decision/audit docs.",
+      "acceptanceCriteria": [
+        ".github/pull_request_template.md, issue templates, and .github/workflows/build.yml present and valid.",
+        "AGENTS.md, .cursor/rules/habitv-master.mdc, and .github/copilot-instructions.md present.",
+        "docs/dev-plan.md, docs/dev-tracker.md, docs/dev-tracker.json, docs/risk-register.md, docs/decision-log.md, docs/github-repository-settings.md, docs/audit-master-baseline.md present.",
+        "PR opened against master and reviewable."
+      ],
+      "validation": [
+        "git status --short",
+        "git branch --show-current",
+        "git log --oneline -5",
+        "mvn -B -ntp -DskipTests validate"
+      ],
+      "pr": "chore: bootstrap restart workflow from master",
+      "notes": "Documentation/workflow only. No runtime or provider changes."
+    },
+    {
+      "id": "HBTV-001",
+      "title": "Maven reactor audit",
+      "status": "proposed",
+      "priority": "P0",
+      "scope": "Investigate why root pom.xml and fwk/pom.xml have no <modules>; propose corrected reactor wiring covering fwk, application, plugins (incl. plugin-tester, habiTv-linux, habiTv-windows).",
+      "acceptanceCriteria": [
+        "Reactor wiring proposal documented with reasoning.",
+        "Parent version mismatches identified (4.1.0 vs 4.1.0-SNAPSHOT, the 4.1.0-SNASPHOT typo in fwk/framework/pom.xml).",
+        "Pilot branch demonstrates mvn -N validate succeeds at root."
+      ],
+      "validation": [
+        "mvn -B -ntp -N -DskipTests validate",
+        "per-module smoke walk via mvn -B -ntp -pl <module> validate"
+      ],
+      "pr": "build: stabilize Maven reactor from master (planned)",
+      "notes": "Audit + minimal wiring only; no plugin/version upgrades."
+    },
+    {
+      "id": "HBTV-002",
+      "title": "Java 8 baseline CI",
+      "status": "proposed",
+      "priority": "P0",
+      "scope": "Extend baseline workflow from validate to compile (and later test) once HBTV-001 lands.",
+      "acceptanceCriteria": [
+        "mvn -B -ntp -DskipTests compile passes on Ubuntu and Windows with Temurin 8.",
+        "Network/provider tests remain excluded by default."
+      ],
+      "validation": [
+        "CI matrix runs green on ubuntu-latest and windows-latest"
+      ],
+      "pr": "TBD",
+      "notes": "Depends on HBTV-001."
+    },
+    {
+      "id": "HBTV-003",
+      "title": "Repository branch / rules setup",
+      "status": "proposed",
+      "priority": "P1",
+      "scope": "Apply GitHub settings documented in docs/github-repository-settings.md (branch model, protection, merge strategy, required checks).",
+      "acceptanceCriteria": [
+        "master protected, linear history required.",
+        "develop created from master after bootstrap merge.",
+        "Squash merge enabled, merge commits disabled."
+      ],
+      "validation": [
+        "Manual confirmation in GitHub UI"
+      ],
+      "pr": "N/A (settings change)",
+      "notes": "Done by repo owner; tracked here for visibility."
+    },
+    {
+      "id": "HBTV-004",
+      "title": "Legacy repository URL migration plan",
+      "status": "proposed",
+      "priority": "P1",
+      "scope": "Plan migration of <scm> (SVN/Assembla), Maven <repository> (http://dabiboo.free.fr/repository), <distributionManagement> (ftp://ftpperso.free.fr/repository), and runtime telemetry/update URLs.",
+      "acceptanceCriteria": [
+        "Document target URLs and transition steps.",
+        "Identify code call sites in FrameworkConf.java, HabitTvConf.java, UpdateManager.java, FindArtifactUtils.java, CoreManager.java."
+      ],
+      "validation": [
+        "Plan reviewed in PR; no code changes in this item"
+      ],
+      "pr": "TBD",
+      "notes": "Pairs with HBTV-005."
+    },
+    {
+      "id": "HBTV-005",
+      "title": "Runtime updater publication plan",
+      "status": "proposed",
+      "priority": "P1",
+      "scope": "Define the habitv-repo static publication layout compatible with existing updater expectations.",
+      "acceptanceCriteria": [
+        "Directory layout documented.",
+        "Migration path for UPDATE_URL documented.",
+        "Plan for signing / integrity (HTTPS, checksums) documented."
+      ],
+      "validation": [
+        "Plan reviewed in PR"
+      ],
+      "pr": "TBD",
+      "notes": "Pairs with HBTV-004 and Phase 4 of docs/dev-plan.md."
+    },
+    {
+      "id": "HBTV-006",
+      "title": "Provider / plugin inventory",
+      "status": "proposed",
+      "priority": "P2",
+      "scope": "Inventory every plugin in plugins/ (22 in aggregator + plugin-tester); record status without removing modules.",
+      "acceptanceCriteria": [
+        "Inventory table per plugin with last-known status.",
+        "For each obsolete/renamed plugin, a recommended dedicated PR is named."
+      ],
+      "validation": [
+        "Inventory reviewed in PR; no code removal"
+      ],
+      "pr": "TBD",
+      "notes": "Feeds Phase 6 of docs/dev-plan.md."
+    },
+    {
+      "id": "HBTV-007",
+      "title": "yt-dlp replacement plan",
+      "status": "proposed",
+      "priority": "P2",
+      "scope": "Plan migration of the youtube plugin from youtube-dl to yt-dlp (executable, flags, parsing, config defaults).",
+      "acceptanceCriteria": [
+        "Differences in CLI between youtube-dl and yt-dlp captured.",
+        "Migration steps for code and default config listed.",
+        "Backward-compatibility / deprecation note drafted."
+      ],
+      "validation": [
+        "Plan reviewed in PR; no behavior change in this item"
+      ],
+      "pr": "TBD",
+      "notes": "Implementation deferred to a follow-up PR after reactor is stable."
+    },
+    {
+      "id": "HBTV-008",
+      "title": "JavaFX / runtime packaging audit",
+      "status": "proposed",
+      "priority": "P2",
+      "scope": "Audit JavaFX 2.x usage (application/trayView, habiTv-linux, habiTv-windows), zenjava/javafx-maven-plugin 2.0, and jfxrt/jdk.home assumptions.",
+      "acceptanceCriteria": [
+        "Inventory of JavaFX surface area documented.",
+        "Migration options for OpenJFX + modern packaging captured (jpackage, jlink, jdeploy, or fat-jar fallback)."
+      ],
+      "validation": [
+        "Audit reviewed in PR; no code changes in this item"
+      ],
+      "pr": "TBD",
+      "notes": "Pairs with Phase 7 of docs/dev-plan.md."
+    }
+  ]
+}
