@@ -11,6 +11,7 @@
 	<name>plugins habiTv</name>
 
 	<modules>
+		<module>plugin-tester</module>
 		<module>6play</module>
 		<module>adobeHDS</module>
 		<module>aria2</module>	
