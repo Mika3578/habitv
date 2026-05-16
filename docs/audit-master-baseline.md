@@ -285,7 +285,7 @@ walks 32 entries:
   by Maven 3.9 default mirror policy. Tracked as R-010 and
   scoped to HBTV-002.
 
-### Next recommended PR
+### Next recommended PR after HBTV-002
 
 `build: stabilize Java 8 compile baseline` (HBTV-002):
 
@@ -299,3 +299,50 @@ walks 32 entries:
 - Keep scope to POM topology / version pins. No source changes,
   no plugin upgrades, no provider rewrites, no JavaFX work, no
   FTP/HTTP repo migration.
+
+## Java 8 compile baseline findings (HBTV-002)
+
+Captured during the `build: stabilize Java 8 compile baseline` PR on
+branch `build/stabilize-java8-compile-baseline` from `develop`.
+Environment: Windows 11, Apache Maven 3.9.11, Java 8.
+
+### Scope applied
+
+- Root `pom.xml`: replaced dependencyManagement ranges `[4.1,4.2)` for
+  intra-reactor `com.dabi.habitv:api` and `com.dabi.habitv:framework`
+  with `${project.version}`.
+- `application/core/pom.xml`: pinned
+  `com.sun.tools.xjc.maven2:maven-jaxb-plugin` to `1.1.1`.
+- `plugins/pom.xml`: temporary evaluation adding
+  `<module>plugin-tester</module>` was tested and reverted because it
+  did not resolve compile.
+
+### Validation progression
+
+- Baseline `mvn -B -ntp -DskipTests validate`: `BUILD SUCCESS` across
+  32 modules, with warning about missing `maven-jaxb-plugin` version.
+- Baseline `mvn -B -ntp -DskipTests compile`: `BUILD FAILURE` at
+  `framework` due to `api:jar:[4.1,4.2)` resolution.
+- After root version fix: `compile` moved past `framework` and reached
+  `plugins/6play`.
+- After JAXB plugin pin: warning removed from `validate`; `compile`
+  still failed at `plugins/6play` on
+  `com.dabi.habitv:plugin-tester:4.1.0` descriptor resolution via the
+  blocked legacy repository.
+- With temporary `plugin-tester` reactor inclusion: `compile` still
+  failed at the same place because module POMs request `4.1.0` while
+  reactor builds `4.1.0-SNAPSHOT`.
+
+### Risk status impact
+
+- R-010 mitigated by replacing intra-reactor ranges with
+  `${project.version}`.
+- R-011 mitigated by pinning JAXB plugin version to `1.1.1`.
+- New blocker logged as R-012 (plugin tester version mismatch).
+
+### Next recommended PR
+
+Follow up HBTV-002 with a POM-only change set to align plugin
+test-harness dependencies from `plugin-tester:4.1.0` to reactor-aligned
+coordinates (for example `${project.version}`), then re-run
+`mvn -B -ntp -DskipTests compile`.

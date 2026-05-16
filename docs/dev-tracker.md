@@ -75,7 +75,7 @@ Status legend: `proposed`, `in-progress`, `blocked`, `done`,
 
 ## HBTV-002 — Java 8 baseline CI
 
-- Status: proposed
+- Status: in-progress
 - Priority: P0
 - Scope: Extend the baseline workflow from `validate` to `compile`
   (and later `test`) once HBTV-001 lands. Specifically:
@@ -93,10 +93,29 @@ Status legend: `proposed`, `in-progress`, `blocked`, `done`,
   - `mvn -B -ntp -DskipTests compile` passes on Ubuntu and Windows
     with Temurin 8.
   - Network/provider tests remain excluded by default.
-- Validation: CI matrix runs green on Ubuntu and Windows.
-- PR: TBD.
-- Notes: Depends on HBTV-001. Compile currently fails at
-  `framework` because of the intra-reactor range.
+- Validation:
+  - Baseline (before fixes):
+    - `mvn -B -ntp -DskipTests validate` -> `BUILD SUCCESS` (32 modules)
+      with warning: `maven-jaxb-plugin` missing version.
+    - `mvn -B -ntp -DskipTests compile` -> `BUILD FAILURE` at
+      `framework`: `No versions available for ... api:jar:[4.1,4.2)`.
+  - After replacing root intra-reactor ranges with `${project.version}`:
+    - `mvn -B -ntp -DskipTests validate` -> `BUILD SUCCESS`.
+    - `mvn -B -ntp -DskipTests compile` moves past `framework` and fails
+      later at `6play` on `plugin-tester:4.1.0` descriptor resolution.
+  - After pinning `maven-jaxb-plugin` to `1.1.1` in `application/core`:
+    - `mvn -B -ntp -DskipTests validate` -> `BUILD SUCCESS` with no
+      missing-plugin-version warning.
+    - `mvn -B -ntp -DskipTests compile` still fails at `6play` due to
+      `plugin-tester:4.1.0` resolution via blocked legacy repository.
+  - Evaluation: adding `<module>plugin-tester</module>` to
+    `plugins/pom.xml` does not remove the compile blocker because plugin
+    modules still request `plugin-tester:4.1.0` while reactor builds
+    `4.1.0-SNAPSHOT`. Change was not kept in this PR.
+- PR: build: stabilize Java 8 compile baseline.
+- Notes: Depends on HBTV-001. R-010 and R-011 are mitigated; the next
+  blocker is plugin test-harness version alignment (`plugin-tester`
+  `4.1.0` vs reactor `4.1.0-SNAPSHOT`).
 
 ## HBTV-003 — Repository branch / rules setup
 
