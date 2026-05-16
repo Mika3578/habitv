@@ -346,3 +346,52 @@ Follow up HBTV-002 with a POM-only change set to align plugin
 test-harness dependencies from `plugin-tester:4.1.0` to reactor-aligned
 coordinates (for example `${project.version}`), then re-run
 `mvn -B -ntp -DskipTests compile`.
+
+## Plugin tester alignment findings (HBTV-010)
+
+Captured during the `build: align plugin tester reactor dependency` PR on
+branch `build/align-plugin-tester-reactor-dependency` from `develop`.
+Environment: Windows 11, Apache Maven 3.9.11, Java 8.
+
+### Scope applied
+
+- Plugin module POMs that pinned
+  `com.dabi.habitv:plugin-tester:4.1.0` now use reactor-aligned version
+  expressions:
+  - `${project.version}` for modules on the parent line.
+  - `${project.parent.version}` for modules with independent own
+    versions (`beinsport`, `footyroom`, `pluzz`, `ffmpeg`).
+- `plugins/pom.xml` now includes `<module>plugin-tester</module>` before
+  the provider plugin modules, so the test harness is built in-reactor.
+
+### Validation results
+
+- Baseline `mvn -B -ntp -DskipTests validate`: `BUILD SUCCESS`
+  (32 modules).
+- Baseline `mvn -B -ntp -DskipTests compile`: `BUILD FAILURE` at
+  `6play` due to `com.dabi.habitv:plugin-tester:4.1.0` descriptor
+  resolution via blocked `http://dabiboo.free.fr/repository`.
+- After alignment `mvn -B -ntp -DskipTests validate`: `BUILD SUCCESS`
+  (33 modules, including `plugin-tester`).
+- After alignment `mvn -B -ntp -DskipTests compile`: `BUILD FAILURE`
+  later at `beinsport` while resolving
+  `com.dabi.habitv:framework:4.1.1-SNAPSHOT` and
+  `com.dabi.habitv:api:4.1.1-SNAPSHOT` from the blocked legacy
+  repository.
+
+### Risk and tracker impact
+
+- R-012 is mitigated: compile now moves past the plugin-tester
+  descriptor blocker.
+- Remaining blocker class is legacy external repository resolution,
+  mapped to HBTV-004.
+
+### Next recommended PR
+
+`build: align plugin module framework/api reactor versions` (HBTV-004):
+
+- Replace non-reactor `4.1.1-SNAPSHOT` / `4.1.2-SNAPSHOT` intra-project
+  dependency coordinates in plugin POMs with parent-reactor-aligned
+  expressions where valid.
+- Keep scope POM-only; do not change Java source, provider behavior,
+  JavaFX modules, runtime updater, or repository publication settings.
