@@ -1,0 +1,58 @@
+---
+description: Habitv restart-from-master governance rules for AI agents
+alwaysApply: true
+---
+
+# Habitv master modernization rules
+
+These rules apply to all AI-assisted work on the Habitv repository.
+They exist to keep modernization safe, incremental, and reviewable.
+
+## Java baseline
+
+- Always keep Java 8 compatibility unless an explicit tracker item
+  (e.g. HBTV-002 successor) says otherwise and is referenced in the PR.
+- Do not introduce Java 9+ language features or JDK 11/17/21-only APIs.
+- Any Java baseline migration must happen in a dedicated migration PR
+  with an ADR in `docs/decision-log.md`.
+
+## Architecture and scope
+
+- Do not rewrite architecture without a tracker item AND an ADR.
+- Do not perform opportunistic refactors or formatting changes.
+- Do not remove legacy code unless there is a dedicated deprecation PR
+  with a tracker item and migration notes.
+- Never mix unrelated fixes in the same branch.
+
+## Build and tests
+
+- Prefer deterministic Maven commands. Default validation:
+  `mvn -B -ntp -DskipTests validate`.
+- Do not run live provider/network tests in the default lifecycle.
+  Network or provider live tests must be opt-in via an explicit
+  profile or tracker item.
+- Do not change Maven module topology, plugin versions, or dependency
+  versions outside a scoped tracker item.
+
+## Branching and PRs
+
+- Use small PRs scoped to a single tracker item.
+- Use English for branches, commits, comments, docs, and PR text.
+- Keep linear history (no merge commits in feature branches).
+- Branch naming: `chore/...`, `build/...`, `ci/...`, `docs/...`,
+  `test/...`, `runtime/...`, `provider/...`, `fix/...`, `feature/...`.
+
+## Documentation discipline
+
+- Update `docs/dev-tracker.md` AND `docs/dev-tracker.json` for every
+  meaningful change so machine and human views stay aligned.
+- Update `docs/risk-register.md` when a risk is added, mitigated, or
+  realized.
+- Record cross-cutting decisions in `docs/decision-log.md` (ADR format).
+
+## Forbidden in this restart phase
+
+- No provider rewrites, no JavaFX migration, no JAXB regeneration,
+  no Maven deploy or distribution changes, and no runtime updater
+  changes unless an explicit dedicated tracker item covers them.
+- Never commit secrets, tokens, local absolute paths, or build outputs.
