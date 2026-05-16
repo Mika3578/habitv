@@ -50,7 +50,7 @@
     {
       "id": "HBTV-002",
       "title": "Java 8 baseline CI",
-      "status": "proposed",
+      "status": "in-progress",
       "priority": "P0",
       "scope": "Extend baseline workflow from validate to compile (and later test) once HBTV-001 lands. Includes replacing intra-reactor version range [4.1,4.2) with ${project.version}, pinning maven-jaxb-plugin version, and deciding whether to wire plugin-tester into the reactor.",
       "acceptanceCriteria": [
@@ -58,10 +58,16 @@
         "Network/provider tests remain excluded by default."
       ],
       "validation": [
-        "CI matrix runs green on ubuntu-latest and windows-latest"
+        "Baseline: mvn -B -ntp -DskipTests validate -> BUILD SUCCESS (32 modules) with warning about missing maven-jaxb-plugin version",
+        "Baseline: mvn -B -ntp -DskipTests compile -> BUILD FAILURE at framework: No versions available for com.dabi.habitv:api:jar:[4.1,4.2)",
+        "After root dependencyManagement fix (${project.version} for api/framework): mvn -B -ntp -DskipTests validate -> BUILD SUCCESS",
+        "After root dependencyManagement fix (${project.version} for api/framework): mvn -B -ntp -DskipTests compile -> moves past framework, fails at 6play on plugin-tester:4.1.0 descriptor resolution",
+        "After pinning com.sun.tools.xjc.maven2:maven-jaxb-plugin to 1.1.1: mvn -B -ntp -DskipTests validate -> BUILD SUCCESS without missing plugin version warning",
+        "After pinning com.sun.tools.xjc.maven2:maven-jaxb-plugin to 1.1.1: mvn -B -ntp -DskipTests compile -> BUILD FAILURE at 6play due to plugin-tester:4.1.0 resolution via blocked legacy repository",
+        "Evaluation only: adding <module>plugin-tester</module> in plugins/pom.xml does not remove the compile blocker because plugin dependencies request 4.1.0 while reactor builds 4.1.0-SNAPSHOT; change not kept"
       ],
-      "pr": "TBD",
-      "notes": "Depends on HBTV-001. Compile currently fails at framework because of intra-reactor range [4.1,4.2) on api/framework."
+      "pr": "build: stabilize Java 8 compile baseline",
+      "notes": "Depends on HBTV-001. R-010 and R-011 are mitigated by this PR. Remaining blocker: plugin-tester test-harness version alignment (4.1.0 in plugin dependencies vs 4.1.0-SNAPSHOT in reactor)."
     },
     {
       "id": "HBTV-003",

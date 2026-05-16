@@ -5,19 +5,20 @@ Severity uses `Likelihood x Impact` (Low / Medium / High) and an
 overall priority. Update when a risk is added, mitigated, realized,
 or accepted.
 
-| ID    | Title                                          | Likelihood | Impact | Priority |
-|-------|------------------------------------------------|------------|--------|----------|
-| R-001 | Legacy Maven repository / free.fr dependency   | High       | High   | P0       |
-| R-002 | FTP deployment no longer viable                | High       | High   | P0       |
-| R-003 | JavaFX tied to JDK 8 assumptions               | High       | High   | P1       |
-| R-004 | JAXB generation / runtime mismatch             | Medium     | High   | P1       |
-| R-005 | Live provider tests are non-deterministic      | High       | Medium | P1       |
-| R-006 | Provider endpoints obsolete or renamed         | High       | Medium | P1       |
-| R-007 | Auto-update pulls unexpected old artifacts     | Medium     | High   | P1       |
-| R-008 | yt-dlp migration changes download behavior     | Medium     | Medium | P2       |
-| R-009 | GitHub Pages layout mismatches updater         | Medium     | High   | P1       |
-| R-010 | Intra-reactor version range excludes SNAPSHOTs | High       | High   | P0       |
-| R-011 | maven-jaxb-plugin missing pinned version       | Medium     | Medium | P1       |
+| ID    | Title                                                           | Likelihood | Impact | Priority |
+|-------|-----------------------------------------------------------------|------------|--------|----------|
+| R-001 | Legacy Maven repository / free.fr dependency                    | High       | High   | P0       |
+| R-002 | FTP deployment no longer viable                                 | High       | High   | P0       |
+| R-003 | JavaFX tied to JDK 8 assumptions                                | High       | High   | P1       |
+| R-004 | JAXB generation / runtime mismatch                              | Medium     | High   | P1       |
+| R-005 | Live provider tests are non-deterministic                       | High       | Medium | P1       |
+| R-006 | Provider endpoints obsolete or renamed                          | High       | Medium | P1       |
+| R-007 | Auto-update pulls unexpected old artifacts                      | Medium     | High   | P1       |
+| R-008 | yt-dlp migration changes download behavior                      | Medium     | Medium | P2       |
+| R-009 | GitHub Pages layout mismatches updater                          | Medium     | High   | P1       |
+| R-010 | Intra-reactor version range excludes SNAPSHOTs (mitigated)      | Low        | Low    | P3       |
+| R-011 | maven-jaxb-plugin missing pinned version (mitigated)            | Low        | Low    | P3       |
+| R-012 | Plugin tester version mismatch blocks compile                   | High       | Medium | P1       |
 
 ---
 
@@ -120,6 +121,8 @@ or accepted.
   during dependency collection.
 - Mitigation: Replace the range with `${project.version}` for
   intra-reactor coordinates in HBTV-002. No code change; POM only.
+- Status: Mitigated in HBTV-002 by replacing the `api` and `framework`
+  root dependencyManagement versions with `${project.version}`.
 
 ## R-011 — `maven-jaxb-plugin` missing pinned version
 
@@ -130,3 +133,20 @@ or accepted.
 - Mitigation: Pin the plugin version (e.g. the last known-working
   `1.1.1`) in HBTV-002 so JAXB generation stays deterministic. No
   source change.
+- Status: Mitigated in HBTV-002 by pinning
+  `com.sun.tools.xjc.maven2:maven-jaxb-plugin` to `1.1.1` in
+  `application/core/pom.xml`.
+
+## R-012 — Plugin tester version mismatch blocks compile
+
+- Description: Plugin modules declare test-scope dependencies on
+  `com.dabi.habitv:plugin-tester:4.1.0`, while the project version is
+  `4.1.0-SNAPSHOT` and the reactor artifact is
+  `com.dabi.habitv:plugin-tester:4.1.0-SNAPSHOT`. During
+  `mvn -B -ntp -DskipTests compile`, Maven fails at `plugins/6play`
+  while resolving the `plugin-tester:4.1.0` descriptor from the blocked
+  legacy HTTP repository.
+- Mitigation: Dedicated POM-only follow-up to align plugin test-harness
+  versions to reactor coordinates (for example `${project.version}`) and
+  confirm whether `plugin-tester` should stay aggregated in
+  `plugins/pom.xml`.
