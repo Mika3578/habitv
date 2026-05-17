@@ -134,23 +134,35 @@ Status legend: `proposed`, `in-progress`, `blocked`, `done`,
 
 ## HBTV-004 — Legacy repository URL migration plan
 
-- Status: proposed
+- Status: in-progress
 - Priority: P1
 - Scope: Plan migration of `<scm>` (SVN/Assembla), Maven
   `<repository>` (`http://dabiboo.free.fr/repository`),
   `<distributionManagement>` (`ftp://ftpperso.free.fr/repository`),
-  and runtime telemetry/update URLs.
+  and runtime telemetry/update URLs. Plan only; execution split
+  across the seven sequenced PRs documented in
+  `docs/hbtv-004-url-migration-plan.md` section 5.
 - Acceptance criteria:
-  - Document target URLs and transition steps.
+  - Document target URLs and transition steps. (done — see
+    `docs/hbtv-004-url-migration-plan.md`)
   - Identify code call sites in
-    `fwk/framework/.../FrameworkConf.java`,
-    `application/core/.../HabitTvConf.java`,
-    `application/core/.../UpdateManager.java`,
-    `fwk/framework/.../FindArtifactUtils.java`,
-    `application/core/.../CoreManager.java`.
+    `fwk/framework/.../FrameworkConf.java:21`,
+    `application/core/.../HabitTvConf.java:16`,
+    `application/core/.../UpdateManager.java:40,48`,
+    `fwk/framework/.../FindArtifactUtils.java:56`,
+    `application/core/.../CoreManager.java:46-55`. (done)
+  - Inventory all 23 `<scm>` SVN blocks, 3 HTTP `<repository>`
+    blocks, and 1 FTP `<distributionManagement>` block. (done)
+  - Surface new risks R-013, R-014, R-015 in the risk register.
+    (done)
+  - Propose feature-flag quarantine plan
+    (`habitv.stat.enabled`, `habitv.update.enabled`) before any
+    URL is changed. (done)
 - Validation: Plan reviewed in PR; no code changes in this item.
-- PR: TBD.
-- Notes: Pairs with HBTV-005.
+- PR: docs: plan legacy URL migration (HBTV-004).
+- Notes: Pairs with HBTV-005. Execution PRs 2-7 listed in the
+  plan document; each will reference HBTV-004 (PRs 2-5) or
+  HBTV-005 (PRs 6-7).
 
 ## HBTV-005 — Runtime updater publication plan
 
@@ -169,7 +181,11 @@ Status legend: `proposed`, `in-progress`, `blocked`, `done`,
 - PR: build/standard-cross-os-static-repo-layout (pending).
 - Notes: Pairs with HBTV-004 and Phase 4 of `docs/dev-plan.md`; adds
   cross-OS deploy scripts and standard side-by-side workspace layout
-  under `$HOME/dev`.
+  under `$HOME/dev`. Section 2 of
+  `docs/hbtv-004-url-migration-plan.md` captures the reverse-engineered
+  `FindArtifactUtils` contract that the published layout must satisfy.
+  Served HTTP shape is captured in ADR-0009 (GitHub Pages with
+  generated `index.html`).
 
 ## HBTV-006 — Provider / plugin inventory
 

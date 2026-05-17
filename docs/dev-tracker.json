@@ -89,18 +89,21 @@
     {
       "id": "HBTV-004",
       "title": "Legacy repository URL migration plan",
-      "status": "proposed",
+      "status": "in-progress",
       "priority": "P1",
-      "scope": "Plan migration of <scm> (SVN/Assembla), Maven <repository> (http://dabiboo.free.fr/repository), <distributionManagement> (ftp://ftpperso.free.fr/repository), and runtime telemetry/update URLs.",
+      "scope": "Plan migration of <scm> (SVN/Assembla), Maven <repository> (http://dabiboo.free.fr/repository), <distributionManagement> (ftp://ftpperso.free.fr/repository), and runtime telemetry/update URLs. Plan only; execution split across seven sequenced PRs documented in docs/hbtv-004-url-migration-plan.md section 5.",
       "acceptanceCriteria": [
-        "Document target URLs and transition steps.",
-        "Identify code call sites in FrameworkConf.java, HabitTvConf.java, UpdateManager.java, FindArtifactUtils.java, CoreManager.java."
+        "Document target URLs and transition steps (docs/hbtv-004-url-migration-plan.md).",
+        "Identify code call sites in FrameworkConf.java:21, HabitTvConf.java:16, UpdateManager.java:40,48, FindArtifactUtils.java:56, CoreManager.java:46-55.",
+        "Inventory all 23 <scm> SVN blocks, 3 HTTP <repository> blocks, and 1 FTP <distributionManagement> block.",
+        "Surface new risks R-013, R-014, R-015 in the risk register.",
+        "Propose feature-flag quarantine plan (habitv.stat.enabled, habitv.update.enabled) before any URL is changed."
       ],
       "validation": [
         "Plan reviewed in PR; no code changes in this item"
       ],
-      "pr": "TBD",
-      "notes": "Pairs with HBTV-005."
+      "pr": "docs: plan legacy URL migration (HBTV-004)",
+      "notes": "Pairs with HBTV-005. Execution PRs 2-7 listed in the plan document; each will reference HBTV-004 (PRs 2-5) or HBTV-005 (PRs 6-7)."
     },
     {
       "id": "HBTV-005",
@@ -118,7 +121,7 @@
         "mvn -B -ntp -DskipTests deploy with temporary file:// target"
       ],
       "pr": "build/standard-cross-os-static-repo-layout (pending)",
-      "notes": "Pairs with HBTV-004 and Phase 4 of docs/dev-plan.md; adds cross-OS deploy scripts and standard side-by-side workspace layout under $HOME/dev."
+      "notes": "Pairs with HBTV-004 and Phase 4 of docs/dev-plan.md; adds cross-OS deploy scripts and standard side-by-side workspace layout under $HOME/dev. Section 2 of docs/hbtv-004-url-migration-plan.md captures the reverse-engineered FindArtifactUtils contract that the published layout must satisfy. Served HTTP shape is captured in ADR-0009 (GitHub Pages with generated index.html)."
     },
     {
       "id": "HBTV-006",

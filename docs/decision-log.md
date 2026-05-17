@@ -108,3 +108,60 @@ supersede older ones rather than rewriting them in place.
   remain explicit. PR #25 and PR #26 must be retargeted/rebased to
   `develop` (or recreated as scoped follow-ups) after this baseline
   lands.
+
+## ADR-0008 — Quarantine network pings at startup in development builds
+
+- Status: Proposed
+- Date: 2026-05-18
+- Context: `CoreManager.stat()` and `UpdateManager.process()` both
+  resolve URLs from `HabitTvConf.STAT_URL` /
+  `FrameworkConf.UPDATE_URL` (`http://dabiboo.free.fr/...`) at
+  runtime. Today every dev or CI run that constructs `CoreManager`
+  or invokes the updater silently pings the legacy third-party host.
+  This leaks traffic, slows tests, and prevents the URL migration
+  in HBTV-004 / HBTV-005 from being verifiable on a clean machine.
+- Decision: Introduce two opt-in system properties (or environment
+  variables) gating the network calls without modifying the URL
+  constants themselves:
+  - `habitv.stat.enabled` gates `CoreManager.stat()`.
+  - `habitv.update.enabled` gates `UpdateManager.process()`.
+  Both default to `false`. Production packaging scripts and end-user
+  releases set them to `true`. This decouples "should we ping" from
+  "what URL do we ping" so HBTV-004 PRs 2-3 can land before HBTV-005
+  picks the new host.
+- Consequences: Slight increase in code surface (two property
+  lookups) in exchange for predictable, network-free dev/CI runs.
+  Telemetry data may decrease until packaging scripts are updated;
+  acceptable trade-off given the third-party host status.
+
+## ADR-0009 — Publish via GitHub Pages with generated `index.html`
+
+- Status: Proposed
+- Date: 2026-05-18
+- Context: `FindArtifactUtils.findLastVersionUrl` discovers
+  artifacts by parsing Apache `mod_autoindex` HTML at
+  `${UPDATE_URL}/${groupIdPath}/${artifactId}/[version/]`. GitHub
+  Pages does not serve directory listings, and other static-host
+  options either require authentication (GitHub Packages) or break
+  the URL shape (GitHub Releases). Rewriting the updater
+  contract is out of scope for the restart phase. The companion
+  `docs/static-repository-deploy.md` introduced on `develop`
+  already documents the side-by-side workspace layout for
+  publication scripts; this ADR adds the contract for the served
+  HTTP shape.
+- Decision: Adopt GitHub Pages on a dedicated `Mika3578/habitv-repo`
+  repository. The publication workflow (GitHub Action triggered
+  on release tags) generates a per-directory `index.html` whose
+  `<a href="...">` entries match the `mod_autoindex` shape that
+  `FindArtifactUtils` already parses (version directories end with
+  `/`, files do not, excluded headers match the existing filter
+  list). Sidecar `.sha256` files are emitted next to each artifact
+  for integrity verification. HTTPS is provided by GitHub Pages.
+  Signing (PGP) is deferred to a later ADR.
+- Consequences: Updater code stays untouched. Publication is
+  reproducible, version-controlled, and free of third-party
+  dependencies. Until the action and the `habitv-repo` repository
+  exist, no releases can be published; this is acceptable because
+  no automated publication runs today either. ADR-0004 becomes
+  `Accepted` once the workflow is validated end-to-end against a
+  test artifact.

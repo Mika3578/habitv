@@ -19,6 +19,9 @@ or accepted.
 | R-010 | Intra-reactor version range excludes SNAPSHOTs (mitigated)      | Low        | Low    | P3       |
 | R-011 | maven-jaxb-plugin missing pinned version (mitigated)            | Low        | Low    | P3       |
 | R-012 | Plugin tester version mismatch blocks compile (mitigated)       | Low        | Low    | P3       |
+| R-013 | Hardcoded Gmail and freebox credentials in tests / samples      | Medium     | High   | P1       |
+| R-014 | GitHub Pages does not serve autoindex (updater contract break)  | High       | Medium | P1       |
+| R-015 | CoreManager.stat() pings third-party host on every startup      | High       | Low    | P2       |
 
 ---
 
@@ -171,3 +174,42 @@ or accepted.
 - Residual risk: Compile still hits blocked legacy repository resolution
   for `framework/api:4.1.1-SNAPSHOT` in `beinsport`, which is tracked
   under the existing legacy repository migration risk (R-001 / HBTV-004).
+
+## R-013 — Hardcoded Gmail and freebox credentials in tests / samples
+
+- Description: Test sources and a sample config carry plaintext
+  credentials:
+  - `plugins/email/test/com/dabi/habitv/plugin/email/MessageReceiverTest.java:14,19`
+    and `EmailPluginManagerTest.java:29` use `testhabitv` / `HabiTV410`
+    against `pop.gmail.com` / `imap.gmail.com`.
+  - `application/consoleView/config.xml:57,84` carries
+    `ftp://freebox:4688@hd1.freebox.fr/...` upload examples.
+- Mitigation: Dedicated PR to scrub credentials (replace with
+  placeholders / environment variables, mark the affected tests
+  `@Ignore` until they are reworked as offline fixtures). Rotate the
+  Gmail account if still active. Out of scope for HBTV-004; tracked
+  here so it is not lost.
+
+## R-014 — GitHub Pages does not serve autoindex (updater contract break)
+
+- Description: `FindArtifactUtils.findLastVersionUrl` (lines 77-123)
+  parses Apache `mod_autoindex` HTML to discover versions and files
+  under `${UPDATE_URL}/${groupIdPath}/${artifactId}/`. GitHub Pages
+  does not serve directory listings by default. If `habitv-repo` is
+  hosted on GitHub Pages without per-directory `index.html`, the
+  updater silently stops finding new versions.
+- Mitigation: HBTV-005 must define a publication workflow that
+  emits an `index.html` per directory with `<a href="X/">` entries
+  matching the `mod_autoindex` shape. ADR-0009 captures the
+  recommended approach.
+
+## R-015 — CoreManager.stat() pings third-party host on every startup
+
+- Description: `application/core/src/com/dabi/habitv/core/mgr/CoreManager.java:46-55`
+  fires a background thread on construction that GETs
+  `http://dabiboo.free.fr/cpt.php`. There is no gate, no opt-out, and
+  no failure logging. Developers and CI silently send traffic to a
+  third-party host on every test run that instantiates `CoreManager`.
+- Mitigation: HBTV-004 PR 2 adds a `habitv.stat.enabled` system
+  property (default `false`). Production packaging sets it to `true`.
+  The URL itself is not changed in that step.
