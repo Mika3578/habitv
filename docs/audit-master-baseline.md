@@ -306,7 +306,7 @@ Captured during the `build: stabilize Java 8 compile baseline` PR on
 branch `build/stabilize-java8-compile-baseline` from `develop`.
 Environment: Windows 11, Apache Maven 3.9.11, Java 8.
 
-### Scope applied
+### HBTV-010 scope applied
 
 - Root `pom.xml`: replaced dependencyManagement ranges `[4.1,4.2)` for
   intra-reactor `com.dabi.habitv:api` and `com.dabi.habitv:framework`
@@ -364,7 +364,7 @@ Environment: Windows 11, Apache Maven 3.9.11, Java 8.
 - `plugins/pom.xml` now includes `<module>plugin-tester</module>` before
   the provider plugin modules, so the test harness is built in-reactor.
 
-### Validation results
+### HBTV-010 validation results
 
 - Baseline `mvn -B -ntp -DskipTests validate`: `BUILD SUCCESS`
   (32 modules).
@@ -386,7 +386,7 @@ Environment: Windows 11, Apache Maven 3.9.11, Java 8.
 - Remaining blocker class is legacy external repository resolution,
   mapped to HBTV-004.
 
-### Next recommended PR
+### HBTV-010 next recommended PR
 
 `build: align plugin module framework/api reactor versions` (HBTV-004):
 
@@ -395,3 +395,70 @@ Environment: Windows 11, Apache Maven 3.9.11, Java 8.
   expressions where valid.
 - Keep scope POM-only; do not change Java source, provider behavior,
   JavaFX modules, runtime updater, or repository publication settings.
+
+## Runnable console baseline findings on `develop` (HBTV-011)
+
+Captured during branch `dev/modernization-status-and-next-step` from
+`develop`. Environment: Windows 11, Apache Maven 3.9.11, Java 8.
+
+### Baseline before branch changes (`develop`)
+
+- `mvn -B -ntp -DskipTests validate` -> `BUILD SUCCESS`.
+- `mvn -B -ntp -DskipTests compile` -> `BUILD FAILURE` at `beinsport`
+  when resolving `com.dabi.habitv:framework:4.1.1-SNAPSHOT` and
+  `com.dabi.habitv:api:4.1.1-SNAPSHOT` via blocked
+  `http://dabiboo.free.fr/repository`.
+
+### PR #27 inspection outcome
+
+- Local review branch: `review/pr-27-yt-dlp-provider`.
+- GitHub mergeability metadata (Mika3578/habitv): `mergeable=MERGEABLE`,
+  `mergeStateStatus=CLEAN` at inspection time.
+- Scoped command results:
+  - `mvn -B -ntp -DskipTests -pl '!application/trayView,!application/habiTv' validate`
+    -> `BUILD SUCCESS`.
+  - `mvn -B -ntp -DskipTests -pl '!application/trayView,!application/habiTv' compile`
+    -> `BUILD FAILURE` at `application/core` with 17 compile errors
+    caused by boolean accessor changes in
+    `XMLUserConfig` / `GrabConfigDAO`.
+  - `mvn -B -ntp -DskipTests -pl '!application/trayView,!application/habiTv' package`
+    -> `BUILD FAILURE` at `application/core` (same errors).
+  - `mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubePluginDownloaderCmdTest -Dsurefire.failIfNoSpecifiedTests=false test`
+    -> `BUILD SUCCESS` (`Tests run: 2, Failures: 0, Errors: 0`).
+
+Conclusion: PR #27 was not merged as-is; it was superseded with a scoped
+subset.
+
+### Scoped changes kept in HBTV-011 branch
+
+- Build/POM subset from PR #27 kept (Java 8+ compiler/JAXB dependency
+  updates) without the failing `application/core` Java source edits.
+- `application/consoleView` now packages a runnable fat JAR path and has
+  sample runtime configuration.
+- `plugins/youtube` has offline yt-dlp command wiring coverage
+  (`YoutubePluginDownloaderCmdTest`).
+
+### Final scoped validation on HBTV-011 branch
+
+- `mvn -B -ntp -DskipTests -pl '!application/trayView,!application/habiTv' validate`
+  -> `BUILD SUCCESS`.
+- `mvn -B -ntp -DskipTests -pl '!application/trayView,!application/habiTv' compile`
+  -> `BUILD FAILURE` at `beinsport` on blocked legacy repository
+  resolution for `framework/api:4.1.1-SNAPSHOT`.
+- `mvn -B -ntp -DskipTests -pl '!application/trayView,!application/habiTv' package`
+  -> `BUILD FAILURE` at `beinsport` on the same blocked legacy
+  repository resolution.
+- `mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubePluginDownloaderCmdTest -Dsurefire.failIfNoSpecifiedTests=false test`
+  -> `BUILD SUCCESS` (`Tests run: 2, Failures: 0, Errors: 0`).
+
+### Explicit out-of-scope reminders
+
+- JavaFX modernization and GUI runtime packaging (HBTV-008) remain out
+  of scope for this baseline.
+- Provider scraper cleanup/rewrite and obsolete plugin removal (HBTV-006)
+  remain out of scope.
+- PR #25 and PR #26 currently target `master`; they must be
+  retargeted/rebased onto `develop` later and are not merged in this
+  branch.
+- HBTV-004/HBTV-005 legacy repository and update URL migration stay
+  separate from this runnable baseline.

@@ -87,3 +87,24 @@ supersede older ones rather than rewriting them in place.
 - Consequences: Plugins remain unchanged in this PR. Reviewers
   can focus on governance. Cleanup happens later in safe,
   named units.
+
+## ADR-0006 — Establish runnable console baseline on `develop` before broader modernization
+
+- Status: Accepted
+- Date: 2026-05-17
+- Context: `develop` is the active modernization line. PR #27 introduces
+  a useful runnable console/yt-dlp path but also includes
+  `application/core` source edits that fail scoped compile/package.
+  Concurrent PR #25 and PR #26 are currently targeted at `master`,
+  which would mix branch lines if merged directly.
+- Decision: Create a dedicated stabilization branch from `develop` and
+  supersede PR #27 with scoped linear commits that keep only the
+  buildable subset (consoleView fat JAR path, yt-dlp runtime/test
+  wiring, and required build POM updates). Exclude failing unrelated
+  source edits and keep HBTV-004/HBTV-005, JavaFX modernization, and
+  provider cleanup out of scope.
+- Consequences: `develop` gains a factual runnable console baseline with
+  offline yt-dlp command coverage while known legacy repository blockers
+  remain explicit. PR #25 and PR #26 must be retargeted/rebased to
+  `develop` (or recreated as scoped follow-ups) after this baseline
+  lands.
