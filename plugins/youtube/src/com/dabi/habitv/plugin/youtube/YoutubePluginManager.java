@@ -54,7 +54,7 @@ public class YoutubePluginManager extends BasePluginWithProxy implements PluginP
 
 	private Set<EpisodeDTO> findEpisodeTop(CategoryDTO category, Map<String, String> params) {
 		String url = "https://www.googleapis.com/youtube/v3/search?part=snippet&order=viewCount&type=video";
-		url = addParam(url, params, "key", YoutubeConf.API_KEY);
+		url = addParam(url, params, "key", YoutubeConf.getApiKey());
 		String days = params.get(DAYS);
 		if (days != null) {
 			String publishedAfter = dateFormat.format(DateUtils.addDays(new Date(), -Integer.valueOf(days)));
@@ -86,8 +86,8 @@ public class YoutubePluginManager extends BasePluginWithProxy implements PluginP
 	}
 
 	private Set<EpisodeDTO> findEpisodePlaylist(CategoryDTO category, Map<String, String> params) {
-		String url = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&order=viewCount&type=video";
-		url = addParam(url, params, "key", YoutubeConf.API_KEY);
+		String url = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet";
+		url = addParam(url, params, "key", YoutubeConf.getApiKey());
 		url = addParam(url, params, PLAYLIST_ID);
 		url = addParam(url, params, MAX_RESULTS, "50");
 		return findEpisodesFromUrl(category, url);

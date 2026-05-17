@@ -53,17 +53,11 @@ public final class RetrieverUtils {
 		try {
 			HttpURLConnection hc = (HttpURLConnection) openConnection(url, proxy);
 			prepareConnection(timeOut, hc);
-			
-			boolean redirect = false;
 
-			// normally, 3xx is redirect
 			int status = hc.getResponseCode();
-			if (status != HttpURLConnection.HTTP_OK) {	
-				if (status == HttpURLConnection.HTTP_MOVED_TEMP
+			boolean redirect = status == HttpURLConnection.HTTP_MOVED_TEMP
 					|| status == HttpURLConnection.HTTP_MOVED_PERM
-						|| status == HttpURLConnection.HTTP_SEE_OTHER)
-				redirect = true;
-			}
+					|| status == HttpURLConnection.HTTP_SEE_OTHER;
 
 			if (redirect) {
 				// get redirect url from "location" header field
@@ -71,11 +65,52 @@ public final class RetrieverUtils {
 				// open the new connnection again
 				hc = (HttpURLConnection) new URL(newUrl).openConnection();
 				prepareConnection(timeOut, hc);
+				status = hc.getResponseCode();
 			}
-			
+
+			if (status >= HTTP_ERROR_THRESHOLD) {
+				throw new TechnicalException(buildHttpErrorMessage(url, status, hc));
+			}
+
 			return hc.getInputStream();
 		} catch (final IOException e) {
 			throw new TechnicalException(e);
+		}
+	}
+
+	private static final int HTTP_ERROR_THRESHOLD = 400;
+	private static final int MAX_ERROR_BODY_LENGTH = 1024;
+
+	private static String buildHttpErrorMessage(final String url, final int status, final HttpURLConnection hc) {
+		final String body = readErrorBody(hc);
+		final String suffix = (body == null || body.isEmpty()) ? "" : " - response body: " + body;
+		return "HTTP " + status + " for URL: " + url + suffix;
+	}
+
+	private static String readErrorBody(final HttpURLConnection hc) {
+		final InputStream err = hc.getErrorStream();
+		if (err == null) {
+			return null;
+		}
+		try {
+			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			final byte[] buf = new byte[512];
+			int read;
+			int total = 0;
+			while (total < MAX_ERROR_BODY_LENGTH && (read = err.read(buf)) != -1) {
+				final int toWrite = Math.min(read, MAX_ERROR_BODY_LENGTH - total);
+				baos.write(buf, 0, toWrite);
+				total += toWrite;
+			}
+			return baos.toString(FrameworkConf.UTF8).replaceAll("\\s+", " ").trim();
+		} catch (final IOException ignored) {
+			return null;
+		} finally {
+			try {
+				err.close();
+			} catch (final IOException ignored) {
+				// best effort
+			}
 		}
 	}
 
