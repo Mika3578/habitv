@@ -306,3 +306,27 @@ Status legend: `proposed`, `in-progress`, `blocked`, `done`,
     after this baseline is merged.
   - HBTV-004/HBTV-005 legacy repository/update URL migration remains
     separate and must not be mixed into this runnable baseline PR.
+
+## HBTV-012 — YouTube Data API key externalization
+
+- Status: in-progress
+- Priority: P1
+- Scope: Remove the hardcoded YouTube Data API key from
+  `plugins/youtube` and use runtime-provided configuration so 403
+  failures from revoked/restricted keys are diagnosable without
+  shipping credentials.
+- Acceptance criteria:
+  - `YoutubeConf` no longer embeds a concrete API key value.
+  - `YoutubePluginManager` resolves the key from runtime configuration.
+  - Playlist API request URL only includes supported parameters.
+  - Error messages include API request context while masking key values.
+- Validation:
+  - `mvn -B -ntp -DskipTests -pl plugins/youtube -am validate`
+    -> `BUILD SUCCESS`.
+  - `mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeConfTest -Dsurefire.failIfNoSpecifiedTests=false test`
+    -> `BUILD SUCCESS`.
+- PR: TBD.
+- Notes:
+  - Runtime key lookup order: Java property
+    `habitv.youtube.apiKey`, then environment variable
+    `HABITV_YOUTUBE_API_KEY`.

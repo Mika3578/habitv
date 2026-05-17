@@ -214,6 +214,25 @@
       ],
       "pr": "feat(console): restore runnable baseline with yt-dlp provider",
       "notes": "PR #27 is superseded with scoped reuse (build/POM, console fat-jar/runtime docs, YouTube offline test) while excluding its failing application/core source edits. JavaFX modernization, provider cleanup, and scraper rewrites remain out of scope. PR #25 and #26 must be retargeted/rebased from master to develop later. HBTV-004/HBTV-005 repository/update URL migration remains separate."
+    },
+    {
+      "id": "HBTV-012",
+      "title": "YouTube Data API key externalization",
+      "status": "in-progress",
+      "priority": "P1",
+      "scope": "Remove the hardcoded YouTube Data API key from plugins/youtube and resolve it from runtime configuration so revoked/restricted keys do not require a code change.",
+      "acceptanceCriteria": [
+        "YoutubeConf no longer embeds a concrete API key value.",
+        "YoutubePluginManager resolves the key from runtime configuration.",
+        "Playlist API request URL only includes supported parameters.",
+        "Error messages include API request context while masking key values."
+      ],
+      "validation": [
+        "mvn -B -ntp -DskipTests -pl plugins/youtube -am validate -> BUILD SUCCESS",
+        "mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeConfTest -Dsurefire.failIfNoSpecifiedTests=false test -> BUILD SUCCESS"
+      ],
+      "pr": "TBD",
+      "notes": "Runtime key lookup order: Java property habitv.youtube.apiKey, then environment variable HABITV_YOUTUBE_API_KEY."
     }
   ]
 }

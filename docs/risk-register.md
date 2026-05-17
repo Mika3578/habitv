@@ -19,6 +19,7 @@ or accepted.
 | R-010 | Intra-reactor version range excludes SNAPSHOTs (mitigated)      | Low        | Low    | P3       |
 | R-011 | maven-jaxb-plugin missing pinned version (mitigated)            | Low        | Low    | P3       |
 | R-012 | Plugin tester version mismatch blocks compile (mitigated)       | Low        | Low    | P3       |
+| R-013 | Hardcoded YouTube Data API key can break provider search        | Medium     | Medium | P2       |
 
 ---
 
@@ -166,3 +167,16 @@ or accepted.
 - Residual risk: Compile still hits blocked legacy repository resolution
   for `framework/api:4.1.1-SNAPSHOT` in `beinsport`, which is tracked
   under the existing legacy repository migration risk (R-001 / HBTV-004).
+
+## R-013 — Hardcoded YouTube Data API key can break provider search
+
+- Description: `plugins/youtube` embedded a concrete YouTube Data API
+  key in source. If the key is revoked, quota-exhausted, or restricted
+  to another referrer/IP, the provider search fails with HTTP 403 and
+  requires a new build to change credentials.
+- Mitigation: Externalize key resolution to runtime configuration with
+  deterministic precedence (system property then environment variable),
+  and include sanitized request context in error messages.
+- Status: Mitigated in HBTV-012 by removing the hardcoded key constant
+  from `YoutubeConf`, resolving keys from runtime config, and masking
+  the `key` parameter in error messages.

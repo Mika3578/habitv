@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 
 public class YoutubePluginManager extends BasePluginWithProxy implements PluginProviderInterface {
+	private static final String KEY = "key";
 	private static final String PLAYLIST_ID = "playlistId";
 	private static final String PUBLISHED_AFTER = "publishedAfter";
 
@@ -54,7 +55,7 @@ public class YoutubePluginManager extends BasePluginWithProxy implements PluginP
 
 	private Set<EpisodeDTO> findEpisodeTop(CategoryDTO category, Map<String, String> params) {
 		String url = "https://www.googleapis.com/youtube/v3/search?part=snippet&order=viewCount&type=video";
-		url = addParam(url, params, "key", YoutubeConf.API_KEY);
+		url = addParam(url, params, KEY, YoutubeConf.resolveApiKey());
 		String days = params.get(DAYS);
 		if (days != null) {
 			String publishedAfter = dateFormat.format(DateUtils.addDays(new Date(), -Integer.valueOf(days)));
@@ -86,8 +87,8 @@ public class YoutubePluginManager extends BasePluginWithProxy implements PluginP
 	}
 
 	private Set<EpisodeDTO> findEpisodePlaylist(CategoryDTO category, Map<String, String> params) {
-		String url = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&order=viewCount&type=video";
-		url = addParam(url, params, "key", YoutubeConf.API_KEY);
+		String url = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet";
+		url = addParam(url, params, KEY, YoutubeConf.resolveApiKey());
 		url = addParam(url, params, PLAYLIST_ID);
 		url = addParam(url, params, MAX_RESULTS, "50");
 		return findEpisodesFromUrl(category, url);
@@ -113,9 +114,13 @@ public class YoutubePluginManager extends BasePluginWithProxy implements PluginP
 				episodeList.add(new EpisodeDTO(category, name, href));
 			}
 		} catch (IOException e) {
-			throw new TechnicalException(e);
+			throw new TechnicalException("youtube api request failed: " + sanitizeUrl(url), e);
 		}
 		return episodeList;
+	}
+
+	private String sanitizeUrl(String url) {
+		return url.replaceAll("([?&]key=)[^&]+", "$1***");
 	}
 
 	@Override
