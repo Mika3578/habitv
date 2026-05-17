@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:configuration xmlns:tns="http://www.dabi.com/habitv/configuration/entities">
+    <osConfig>
+        <cmdProcessor>/bin/sh -c #CMD#</cmdProcessor>
+    </osConfig>
+    <downloadConfig>
+        <downloadOuput>./downloads/#TVSHOW_NAME#-#EPISODE_NAME_CUT#.#EXTENSION#</downloadOuput>
+        <maxAttempts>1</maxAttempts>
+        <demonCheckTime>1800</demonCheckTime>
+        <fileNameCutSize>50</fileNameCutSize>
+        <downloaders>
+            <youtube>/usr/bin/yt-dlp</youtube>
+            <curl>/usr/bin/curl</curl>
+        </downloaders>
+    </downloadConfig>
+    <updateConfig>
+        <updateOnStartup>false</updateOnStartup>
+        <autoriseSnapshot>false</autoriseSnapshot>
+    </updateConfig>
+    <taskDefinition>
+        <category>5</category>
+        <export>1</export>
+        <retreive>10</retreive>
+        <search>5</search>
+        <download>1</download>
+    </taskDefinition>
+</tns:configuration>
