@@ -214,6 +214,25 @@
       ],
       "pr": "feat(console): restore runnable baseline with yt-dlp provider",
       "notes": "PR #27 is superseded with scoped reuse (build/POM, console fat-jar/runtime docs, YouTube offline test) while excluding its failing application/core source edits. JavaFX modernization, provider cleanup, and scraper rewrites remain out of scope. PR #25 and #26 must be retargeted/rebased from master to develop later. HBTV-004/HBTV-005 repository/update URL migration remains separate."
+    },
+    {
+      "id": "HBTV-012",
+      "title": "Own-version plugin internal dependency alignment",
+      "status": "done",
+      "priority": "P0",
+      "scope": "Fix own-version plugin module dependency resolution so shared internal reactor dependencies (com.dabi.habitv:api, com.dabi.habitv:framework) resolve to the parent/reactor version instead of plugin-local artifact versions.",
+      "acceptanceCriteria": [
+        "Root dependencyManagement does not force own-version plugins to request non-reactor internal coordinates such as framework/api:4.1.1-SNAPSHOT.",
+        "mvn -B -ntp -DskipTests validate succeeds from root.",
+        "mvn -B -ntp -DskipTests compile succeeds from root.",
+        "maven-default-http-blocker no longer appears for framework/api:4.1.1-SNAPSHOT descriptor resolution."
+      ],
+      "validation": [
+        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS (33 modules)",
+        "mvn -B -ntp -DskipTests compile -> BUILD SUCCESS (33 modules)"
+      ],
+      "pr": "build: align own-version plugin internal dependencies",
+      "notes": "Cause: own-version plugin modules (beinsport, footyroom, pluzz, ffmpeg) inherited ${project.version} for shared internal dependencies, which interpolated to plugin-local versions (4.1.1-SNAPSHOT/4.1.2-SNAPSHOT) instead of reactor 4.1.0-SNAPSHOT. Fix: use ${project.parent.version} for shared internal dependencyManagement coordinates. Local compilation no longer requires http://dabiboo.free.fr/repository for these internal artifacts. Scope is Maven dependency alignment only; obsolete provider endpoints and runtime plugin availability remain out of scope."
     }
   ]
 }
