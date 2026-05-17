@@ -163,9 +163,13 @@ Status legend: `proposed`, `in-progress`, `blocked`, `done`,
   - Directory layout documented.
   - Migration path for `UPDATE_URL` documented.
   - Plan for signing / integrity (HTTPS, checksums) documented.
-- Validation: Plan reviewed in PR.
-- PR: TBD.
-- Notes: Pairs with HBTV-004 and Phase 4 of `docs/dev-plan.md`.
+- Validation:
+  - `mvn -B -ntp -DskipTests validate`
+  - `mvn -B -ntp -DskipTests deploy` with temporary `file://` target
+- PR: build/standard-cross-os-static-repo-layout (pending).
+- Notes: Pairs with HBTV-004 and Phase 4 of `docs/dev-plan.md`; adds
+  cross-OS deploy scripts and standard side-by-side workspace layout
+  under `$HOME/dev`.
 
 ## HBTV-006 — Provider / plugin inventory
 
