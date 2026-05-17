@@ -114,10 +114,11 @@
         "Plan for signing / integrity (HTTPS, checksums) documented."
       ],
       "validation": [
-        "Plan reviewed in PR"
+        "mvn -B -ntp -DskipTests validate",
+        "mvn -B -ntp -DskipTests deploy with temporary file:// target"
       ],
-      "pr": "TBD",
-      "notes": "Pairs with HBTV-004 and Phase 4 of docs/dev-plan.md."
+      "pr": "build/standard-cross-os-static-repo-layout (pending)",
+      "notes": "Pairs with HBTV-004 and Phase 4 of docs/dev-plan.md; adds cross-OS deploy scripts and standard side-by-side workspace layout under $HOME/dev."
     },
     {
       "id": "HBTV-006",
