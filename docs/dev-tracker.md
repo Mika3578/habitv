@@ -9,6 +9,38 @@ Status legend: `proposed`, `in-progress`, `blocked`, `done`,
 
 ---
 
+## Modernization status - 2026-05-17
+
+- Java baseline: Java 8 (`1.8`) remains the supported baseline for now.
+- Current priority order:
+  1. Merge PR #30.
+  2. Review/merge PR #29.
+  3. Close or supersede PR #26 if #29 fully replaces it.
+  4. Retarget/rebase PR #25 onto `develop`.
+  5. Start HBTV-004 execution: quarantine legacy runtime calls.
+  6. Start HBTV-005 publication layout for GitHub Pages/habitv-repo.
+- PR readiness snapshot:
+  - PR #30 targets `develop` and only updates packaging-module Java compiler
+    level from `7` to `1.8`.
+  - PR #29 targets `develop` and carries the YouTube API-key externalization
+    work; it should be reviewed next against #26.
+  - PR #26 still targets `master` and appears superseded by #29 for YouTube
+    API-key handling; do not merge #26 as-is.
+  - PR #25 targets `master` and must be retargeted/rebased to `develop` before
+    merge consideration.
+- Validation on current `develop`:
+  - `mvn -B -ntp -DskipTests validate` -> `BUILD SUCCESS`.
+  - `mvn -B -ntp -DskipTests compile` -> `BUILD FAILURE`.
+  - First real blocker: `plugins/beinsport` cannot resolve
+    `com.dabi.habitv:framework/api:4.1.1-SNAPSHOT` because Maven blocks the
+    legacy HTTP repository `http://dabiboo.free.fr/repository`
+    (`maven-default-http-blocker`).
+- Known blockers:
+  - Legacy HTTP Maven/runtime repository references.
+  - Plugin runtime health degraded.
+  - JavaFX/trayView remains a fragile Java 8 area.
+  - Provider plugins need quarantine before rewrite.
+
 ## HBTV-000 — Restart from master governance bootstrap
 
 - Status: in-progress
