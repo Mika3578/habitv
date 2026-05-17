@@ -32,6 +32,10 @@ or accepted.
 - Mitigation: Plan migration to a controlled static repository
   (HBTV-004 / HBTV-005). Until then, document the dependency and
   do not rely on it in CI.
+- Status update (HBTV-011): Confirmed unchanged. Scoped `compile` and
+  `package` still fail at `plugins/beinsport` while resolving
+  `framework/api:4.1.1-SNAPSHOT` through blocked
+  `http://dabiboo.free.fr/repository`.
 
 ## R-002 — FTP deployment no longer viable
 
@@ -98,6 +102,11 @@ or accepted.
   swap risks regressing downloads silently.
 - Mitigation: HBTV-007 plans the migration with a behavior diff
   and a deprecation note before any code change.
+- Status update (HBTV-011): Partially mitigated for command wiring by
+  adding an offline unit test (`YoutubePluginDownloaderCmdTest`) and a
+  runnable `consoleView` runtime path. End-to-end live provider behavior
+  remains intentionally out of scope until provider inventory/cleanup
+  work (HBTV-006).
 
 ## R-009 — GitHub Pages / static repo layout may not match old updater expectations
 

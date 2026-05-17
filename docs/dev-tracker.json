@@ -187,6 +187,33 @@
       ],
       "pr": "build: align plugin tester reactor dependency",
       "notes": "Mitigates R-012. Remaining compile blocker is legacy repository resolution for non-reactor versions in selected plugin modules."
+    },
+    {
+      "id": "HBTV-011",
+      "title": "Runnable console baseline with yt-dlp path on develop",
+      "status": "in-progress",
+      "priority": "P0",
+      "scope": "Establish a factual runnable baseline on develop by superseding PR #27 with scoped linear commits: keep consoleView runnable fat-jar packaging and yt-dlp runtime path/testing while preserving HBTV-004/HBTV-005 as separate work items.",
+      "acceptanceCriteria": [
+        "application/consoleView packages a runnable fat JAR in scoped builds.",
+        "An offline YouTube downloader command wiring test exists and passes.",
+        "Tracker/audit/risk/decision docs reflect exact command outcomes and scope boundaries.",
+        "PR #25 and PR #26 are documented as master-targeted work to retarget/rebase later, not merged into this baseline PR."
+      ],
+      "validation": [
+        "develop baseline: mvn -B -ntp -DskipTests validate -> BUILD SUCCESS",
+        "develop baseline: mvn -B -ntp -DskipTests compile -> BUILD FAILURE at beinsport (framework/api:4.1.1-SNAPSHOT blocked by maven-default-http-blocker for http://dabiboo.free.fr/repository)",
+        "PR #27 branch: mvn -B -ntp -DskipTests -pl '!application/trayView,!application/habiTv' validate -> BUILD SUCCESS",
+        "PR #27 branch: mvn -B -ntp -DskipTests -pl '!application/trayView,!application/habiTv' compile -> BUILD FAILURE at application/core (17 boolean accessor compile errors in XMLUserConfig/GrabConfigDAO)",
+        "PR #27 branch: mvn -B -ntp -DskipTests -pl '!application/trayView,!application/habiTv' package -> BUILD FAILURE at application/core (same compile errors)",
+        "PR #27 branch: mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubePluginDownloaderCmdTest -Dsurefire.failIfNoSpecifiedTests=false test -> BUILD SUCCESS (Tests run: 2, Failures: 0, Errors: 0)",
+        "final branch: mvn -B -ntp -DskipTests -pl '!application/trayView,!application/habiTv' validate -> BUILD SUCCESS",
+        "final branch: mvn -B -ntp -DskipTests -pl '!application/trayView,!application/habiTv' compile -> BUILD FAILURE at beinsport on blocked framework/api:4.1.1-SNAPSHOT resolution",
+        "final branch: mvn -B -ntp -DskipTests -pl '!application/trayView,!application/habiTv' package -> BUILD FAILURE at beinsport on the same blocked framework/api:4.1.1-SNAPSHOT resolution",
+        "final branch: mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubePluginDownloaderCmdTest -Dsurefire.failIfNoSpecifiedTests=false test -> BUILD SUCCESS (Tests run: 2, Failures: 0, Errors: 0)"
+      ],
+      "pr": "feat(console): restore runnable baseline with yt-dlp provider",
+      "notes": "PR #27 is superseded with scoped reuse (build/POM, console fat-jar/runtime docs, YouTube offline test) while excluding its failing application/core source edits. JavaFX modernization, provider cleanup, and scraper rewrites remain out of scope. PR #25 and #26 must be retargeted/rebased from master to develop later. HBTV-004/HBTV-005 repository/update URL migration remains separate."
     }
   ]
 }
