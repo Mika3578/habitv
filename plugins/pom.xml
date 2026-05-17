@@ -14,13 +14,13 @@
 		<module>plugin-tester</module>
 		<module>6play</module>
 		<module>adobeHDS</module>
-		<module>aria2</module>	
+		<module>aria2</module>
 		<module>arte</module>
-		<module>beinsport</module>		
+		<module>beinsport</module>
 		<module>canalPlus</module>
 		<module>clubic</module>
 		<module>cmd</module>
-		<module>curl</module>		
+		<module>curl</module>
 		<module>email</module>
 		<module>ffmpeg</module>
 		<module>file</module>
