@@ -318,15 +318,21 @@ Status legend: `proposed`, `in-progress`, `blocked`, `done`,
 - Acceptance criteria:
   - `YoutubeConf` no longer embeds a concrete API key value.
   - `YoutubePluginManager` resolves the key from runtime configuration.
+  - `trayView` configuration exposes a user-editable YouTube API key field
+    persisted in local user configuration.
   - Playlist API request URL only includes supported parameters.
   - Error messages include API request context while masking key values.
 - Validation:
   - `mvn -B -ntp -DskipTests -pl plugins/youtube -am validate`
     -> `BUILD SUCCESS`.
+  - `mvn -B -ntp -DskipTests -pl application/trayView,plugins/youtube -am compile`
+    -> `BUILD SUCCESS`.
   - `mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeConfTest -Dsurefire.failIfNoSpecifiedTests=false test`
     -> `BUILD SUCCESS`.
 - PR: TBD.
 - Notes:
+  - End users can set the key from the tray configuration tab; no
+    environment variable is required for standard usage.
   - Runtime key lookup order: Java property
     `habitv.youtube.apiKey`, then environment variable
     `HABITV_YOUTUBE_API_KEY`.

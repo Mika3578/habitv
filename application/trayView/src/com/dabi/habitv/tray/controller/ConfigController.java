@@ -24,13 +24,17 @@ public class ConfigController extends BaseController {
 
 	private CheckBox autoUpdate;
 
+	private TextField youtubeApiKey;
+
 	public ConfigController(TextField downloadOuput, TextField nbrMaxAttempts,
-			TextField daemonCheckTimeSec, CheckBox autoUpdate) {
+			TextField daemonCheckTimeSec, CheckBox autoUpdate,
+			TextField youtubeApiKey) {
 		super();
 		this.downloadOuput = downloadOuput;
 		this.nbrMaxAttempts = nbrMaxAttempts;
 		this.daemonCheckTimeSec = daemonCheckTimeSec;
 		this.autoUpdate = autoUpdate;
+		this.youtubeApiKey = youtubeApiKey;
 	}
 
 	public void init() {
@@ -58,6 +62,8 @@ public class ConfigController extends BaseController {
 						"Période de temps entre 2 recherches automatiques de téléchargement."));
 		autoUpdate.setTooltip(new Tooltip(
 				"si coché habiTv se mettra à jour automatiquement."));
+		youtubeApiKey.setTooltip(new Tooltip(
+				"Clé API YouTube Data v3. Laissez vide pour utiliser la variable d'environnement ou l'option Java."));
 	}
 
 	private void loadConfig() {
@@ -67,6 +73,7 @@ public class ConfigController extends BaseController {
 		daemonCheckTimeSec.setText(String.valueOf(userConfig
 				.getDemonCheckTime()));
 		autoUpdate.setSelected(userConfig.updateOnStartup());
+		youtubeApiKey.setText(userConfig.getYoutubeApiKey());
 	}
 
 	private void addButtonActions() {
@@ -118,6 +125,22 @@ public class ConfigController extends BaseController {
 		};
 		triggersave(daemonCheckTimeSec, saveDaemonCheck);
 
+		Runnable saveYoutubeApiKey = new Runnable() {
+
+			@Override
+			public void run() {
+				UserConfig userConfig = getController().loadUserConfig();
+				String currentValue = userConfig.getYoutubeApiKey();
+				String newValue = normalize(youtubeApiKey.getText());
+				if (currentValue == null ? newValue != null
+						: !currentValue.equals(newValue)) {
+					userConfig.setYoutubeApiKey(newValue);
+					saveConfig(userConfig);
+				}
+			}
+		};
+		triggersave(youtubeApiKey, saveYoutubeApiKey);
+
 		autoUpdate.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
@@ -149,5 +172,13 @@ public class ConfigController extends BaseController {
 		new Popin()
 				.show("Configuration sauvegardée",
 						"La configuration a été sauvegardée \n mais ne sera active qu'après un redémarrage de l'application.");
+	}
+
+	private String normalize(String value) {
+		if (value == null) {
+			return null;
+		}
+		String trimmed = value.trim();
+		return trimmed.isEmpty() ? null : trimmed;
 	}
 }

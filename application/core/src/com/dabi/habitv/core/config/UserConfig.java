@@ -37,6 +37,8 @@ public interface UserConfig {
 
 	String getBinDir();
 
+	String getYoutubeApiKey();
+
 	void setMaxAttempts(int parseInt);
 
 	void setUpdateOnStartup(boolean updateOnStartup);
@@ -44,5 +46,7 @@ public interface UserConfig {
 	void setDownloadOuput(String downloadOuput);
 
 	void setDemonCheckTime(int demonCheckTime);
+
+	void setYoutubeApiKey(String youtubeApiKey);
 
 }

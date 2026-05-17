@@ -178,5 +178,6 @@ or accepted.
   deterministic precedence (system property then environment variable),
   and include sanitized request context in error messages.
 - Status: Mitigated in HBTV-012 by removing the hardcoded key constant
-  from `YoutubeConf`, resolving keys from runtime config, and masking
-  the `key` parameter in error messages.
+  from `YoutubeConf`, resolving keys from runtime config, adding a
+  user-facing tray configuration field, and masking the `key`
+  parameter in error messages.

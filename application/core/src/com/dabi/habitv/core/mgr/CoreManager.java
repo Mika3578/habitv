@@ -19,6 +19,7 @@ import com.dabi.habitv.framework.plugin.utils.RetrieverUtils;
 import com.dabi.habitv.utils.DirUtils;
 
 public final class CoreManager {
+	private static final String YOUTUBE_API_KEY_PROPERTY = "habitv.youtube.apiKey";
 
 	private final CategoryManager categoryManager;
 
@@ -35,6 +36,7 @@ public final class CoreManager {
 		LOG.info("habitv version " + FWKProperties.getVersion());
 		taskName2PoolSizeMap = config.getTaskDefinition();
 		TokenReplacer.setCutSize(config.getFileNameCutSize());
+		applyYoutubeApiKey(config.getYoutubeApiKey());
 		pluginManager = new PluginManager(config);
 		episodeManager = new EpisodeManager(pluginManager.getDownloadersHolder(), pluginManager.getExportersHolder(),
 		        pluginManager.getProvidersHolder(), taskName2PoolSizeMap, config.getMaxAttempts(), DirUtils.getAppDir());
@@ -72,6 +74,12 @@ public final class CoreManager {
 	private void setHttpProxy(final ProxyDTO httpProxy) {
 		System.setProperty("http.proxyHost", httpProxy.getHost());
 		System.setProperty("http.proxyPort", String.valueOf(httpProxy.getPort()));
+	}
+
+	private void applyYoutubeApiKey(String youtubeApiKey) {
+		if (youtubeApiKey != null && !youtubeApiKey.trim().isEmpty()) {
+			System.setProperty(YOUTUBE_API_KEY_PROPERTY, youtubeApiKey.trim());
+		}
 	}
 
 	public CategoryManager getCategoryManager() {

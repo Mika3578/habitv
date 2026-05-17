@@ -135,6 +135,9 @@ public class WindowController {
 	@FXML
 	private CheckBox autoUpdate;
 
+	@FXML
+	private TextField youtubeApiKey;
+
 	private boolean trayMode = false;
 
 	public WindowController() {
@@ -196,7 +199,7 @@ public class WindowController {
 			manager.attach(toDlController);
 
 			new ConfigController(downloadOuput, nbrMaxAttempts,
-					daemonCheckTimeSec, autoUpdate).init(controller, manager,
+					daemonCheckTimeSec, autoUpdate, youtubeApiKey).init(controller, manager,
 					primaryStage);
 
 			controller.startDownloadCheckDemon();
