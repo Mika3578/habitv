@@ -106,7 +106,9 @@ branch `develop` created.
   `https://mika3578.github.io/habitv-repo/repository/`,
   `.../plugins.txt`, and `.../com/dabi/habitv/`.
 
-**Tracker** — `static-repo-publish`.
+**Tracker** — `static-repo-publish`. Deploy profile `static-repo-deploy`,
+`deployAtEnd=true`, and opt-in live provider tests (`-Plive-provider-tests`)
+keep `habitv-repo` publication deterministic.
 
 ---
 
