@@ -60,6 +60,75 @@
 
 ---
 
+## Offline fixture policy baseline
+
+### What counts as an offline fixture
+
+- A **small static test asset** (JSON, XML, minimal HTML fragment, or
+  structured metadata text) committed under module test resources.
+- Fixture content must be **sanitized and deterministic**:
+  - no secrets/tokens/cookies,
+  - no generated logs,
+  - no large copyrighted full-page dumps.
+- Tests using fixtures must validate parser assumptions, URL extraction
+  rules, or category mapping **without any live HTTP calls**.
+
+### Fixture location convention
+
+- Use this path pattern for provider modules:
+  - `plugins/<provider>/test/resources/fixtures/<provider>/`
+- Keep fixtures short and purpose-specific (one behavior per fixture).
+- Add a small `fixture-baseline.txt` metadata file first when parser
+  fixtures are not yet stable.
+
+### Default test behavior (no live network)
+
+- New baseline tests must read only local fixture files under
+  `test/resources/...`.
+- Live integration tests should remain opt-in/quarantined and must not be
+  required by default validation (`mvn -DskipTests validate/compile`).
+- Any new test in this item must be Java 8 compatible and deterministic.
+
+### Priority providers for fixture capture
+
+| Provider | Baseline status in this PR | Why first |
+|---|---|---|
+| `6play` | Local fixture metadata + offline baseline test | Legacy scraper targets static markup while current site is SPA-driven |
+| `canalPlus` (`D8`/`D17` family) | Local fixture metadata + offline baseline test | Multiple legacy endpoint families, highest rewrite risk |
+| `pluzz` | Local fixture metadata + offline baseline test | Renamed/replaced direction (`FranceTV`) must be documented before rewrite |
+| `arte` | Local fixture metadata + offline baseline test | Legacy HTTP/RSS parsing assumptions need stable parser anchors |
+| `youtube` | Local fixture metadata + offline baseline test | Keep fixture boundaries explicit while yt-dlp migration remains separate |
+
+### Infrastructure-only modules not suitable for provider fixtures
+
+- `adobeHDS`, `aria2`, `rtmpDump` (downloaders)
+- `cmd`, `curl`, `ffmpeg` (exporter/downloader wrappers)
+- `plugin-tester` (test harness)
+- `plugins/pom.xml` (aggregator)
+
+These modules are validated via command wiring or tool-wrapper tests, not
+provider endpoint fixtures.
+
+---
+
+## Initial offline fixture baseline artifacts
+
+- `plugins/6play/test/resources/fixtures/6play/fixture-baseline.txt`
+- `plugins/canalPlus/test/resources/fixtures/canalplus/fixture-baseline.txt`
+- `plugins/pluzz/test/resources/fixtures/pluzz/fixture-baseline.txt`
+- `plugins/arte/test/resources/fixtures/arte/fixture-baseline.txt`
+- `plugins/youtube/test/resources/fixtures/youtube/fixture-baseline.txt`
+
+Baseline tests added (local fixture loading only):
+
+- `SixPlayOfflineFixtureBaselineTest`
+- `CanalPlusOfflineFixtureBaselineTest`
+- `PluzzOfflineFixtureBaselineTest`
+- `ArteOfflineFixtureBaselineTest`
+- `YoutubeOfflineFixtureBaselineTest`
+
+---
+
 ## Follow-up PR queue (safe order)
 
 1. **test(provider-inventory): add offline fixtures for unknown providers**
