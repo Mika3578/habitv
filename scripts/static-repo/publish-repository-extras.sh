@@ -40,6 +40,12 @@ if command -v powershell.exe >/dev/null 2>&1; then
   exit 0
 fi
 
-echo "Tool downloads require PowerShell. Generating metadata only with python3." >&2
-python3 "$repo_root/scripts/static-repo/generate_repository_metadata.py" "$repository_root"
-echo "Done. Repository root: $repository_root"
+if command -v python3 >/dev/null 2>&1; then
+  echo "Tool downloads require PowerShell. Generating metadata only with python3." >&2
+  python3 "$repo_root/scripts/static-repo/generate_repository_metadata.py" "$repository_root"
+  echo "Done. Repository root: $repository_root"
+  exit 0
+fi
+
+echo "Error: neither PowerShell nor python3 is available. Install PowerShell for tool downloads or python3 for metadata-only generation." >&2
+exit 1
