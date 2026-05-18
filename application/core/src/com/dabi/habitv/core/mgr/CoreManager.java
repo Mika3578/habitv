@@ -46,11 +46,20 @@ public final class CoreManager {
 	}
 
 	private void stat() {
+		if (!Boolean.getBoolean(HabitTvConf.STAT_ENABLED_PROPERTY)) {
+			LOG.debug("Startup telemetry ping is disabled.");
+			return;
+		}
+		final String statUrl = System.getProperty(HabitTvConf.STAT_URL_PROPERTY, HabitTvConf.STAT_URL_DISABLED);
+		if (statUrl == null || statUrl.trim().isEmpty()) {
+			LOG.warn("Startup telemetry ping is enabled but no URL is configured.");
+			return;
+		}
 		new Thread() {
 
 			@Override
 			public void run() {
-				RetrieverUtils.getUrlContent(HabitTvConf.STAT_URL, null);
+				RetrieverUtils.getUrlContent(statUrl, null);
 			}
 
 		}.start();
