@@ -19,17 +19,17 @@
 ## 📊 Overall progress
 
 ```
-████████████████░░░░░░░░  62%
+████████████████░░░░░░░░  64%
 ```
 
 | Category | Count |
 |---------|------:|
-| ✅ Delivered | **8** |
+| ✅ Delivered | **9** |
 | 🟡 In progress | **0** |
 | 🔵 Proposed | **5** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
-| **Total work items** | **13** |
+| **Total work items** | **14** |
 
 ---
 
@@ -50,6 +50,7 @@
 | ▶️ `console-runnable` — Runnable console baseline | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 🔗 `own-version-deps-align` — Own-version plugin dependency alignment | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 🔑 `youtube-apikey` — YouTube Data API key externalization | ✅ Done | 🟠 P1 | `████████████████████` 100% |
+| 🧩 `jaxb-launcher-recovery` — JAXB generated sources & launcher classpath recovery | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 
 ---
 
