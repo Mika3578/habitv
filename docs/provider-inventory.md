@@ -1,7 +1,7 @@
 # 🔌 Provider and plugin inventory (HBTV-006)
 
 **Tracker item**: `provider-inventory` (`HBTV-006`)  
-**Scope in this PR**: documentation and classification only (no module removal, no provider rewrite, no runtime behavior change)
+**Scope in this PR**: documentation, classification, and offline fixture baseline (no module removal, no provider rewrite, no runtime behavior change)
 
 ---
 
@@ -77,6 +77,8 @@
 
 - Use this path pattern for provider modules:
   - `plugins/<provider>/test/resources/fixtures/<provider>/`
+  - Fixture directory names are **normalized to lowercase** regardless of module casing
+    (e.g. the `canalPlus` module uses `fixtures/canalplus/`).
 - Keep fixtures short and purpose-specific (one behavior per fixture).
 - Add a small `fixture-baseline.txt` metadata file first when parser
   fixtures are not yet stable.
