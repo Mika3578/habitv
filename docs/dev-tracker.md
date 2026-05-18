@@ -388,3 +388,30 @@ Status legend: `proposed`, `in-progress`, `blocked`, `done`,
   - Runtime key lookup order: Java property
     `habitv.youtube.apiKey`, then environment variable
     `HABITV_YOUTUBE_API_KEY`.
+
+## HBTV-014 — JAXB generated sources and launcher classpath recovery
+
+- Status: done
+- Priority: P1
+- Scope: Restore Maven/IDE visibility for JAXB-generated packages in
+  `application/core` and fix `HabitvLauncher` classpath setup without
+  dependency security upgrades (Log4j, Jackson, jsoup, JUnit) or
+  provider/plugin modernization.
+- Acceptance criteria:
+  - JAXB outputs land under `target/generated-sources/jaxb` and are
+    registered as compile source roots for `config`, `configuration`,
+    and `grabconfig` executions.
+  - `HabitvLauncher` compiles on Java 8 without `Utils4J.addToClasspath`
+    (removed Java 17-only `utils4j` usage).
+  - `.gitignore` lines 15–16 have no trailing whitespace when reported.
+- Validation:
+  - `mvn -B -ntp -DskipTests generate-sources` -> `BUILD SUCCESS`.
+  - `mvn -B -ntp -DskipTests validate` -> `BUILD SUCCESS`.
+  - `mvn -B -ntp -DskipTests clean compile` -> `BUILD SUCCESS` (33 modules).
+  - `git diff --check` -> clean on committed files.
+- PR: Fix JAXB generated sources and Habitv launcher classpath setup.
+- Notes:
+  - `application/core/generated/` remains gitignored for legacy local
+    trees; fresh builds use `target/generated-sources/jaxb` only.
+  - Transitive dependency vulnerability cleanup is intentionally deferred
+    to a dedicated security PR.

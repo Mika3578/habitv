@@ -259,6 +259,26 @@
       ],
       "pr": "fix: externalize data api key and mask api errors (#29)",
       "notes": "End users can set the key from the tray configuration tab. Runtime key lookup order: Java property habitv.youtube.apiKey, then environment variable HABITV_YOUTUBE_API_KEY."
+    },
+    {
+      "id": "HBTV-014",
+      "title": "JAXB generated sources and launcher classpath recovery",
+      "status": "done",
+      "priority": "P1",
+      "scope": "Restore Maven/IDE visibility for JAXB-generated packages in application/core and fix HabitvLauncher classpath setup without dependency security upgrades or provider/plugin modernization.",
+      "acceptanceCriteria": [
+        "JAXB outputs under target/generated-sources/jaxb are compile source roots for config, configuration, and grabconfig.",
+        "HabitvLauncher compiles on Java 8 without Utils4J.addToClasspath.",
+        ".gitignore lines 15-16 have no trailing whitespace when reported."
+      ],
+      "validation": [
+        "mvn -B -ntp -DskipTests generate-sources -> BUILD SUCCESS",
+        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS",
+        "mvn -B -ntp -DskipTests clean compile -> BUILD SUCCESS",
+        "git diff --check -> clean on committed files"
+      ],
+      "pr": "Fix JAXB generated sources and Habitv launcher classpath setup",
+      "notes": "application/core/generated/ remains gitignored for legacy local trees. Transitive dependency vulnerability cleanup deferred to a dedicated security PR."
     }
   ]
 }
