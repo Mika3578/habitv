@@ -163,9 +163,13 @@ Status legend: `proposed`, `in-progress`, `blocked`, `done`,
   - Directory layout documented.
   - Migration path for `UPDATE_URL` documented.
   - Plan for signing / integrity (HTTPS, checksums) documented.
-- Validation: Plan reviewed in PR.
-- PR: TBD.
-- Notes: Pairs with HBTV-004 and Phase 4 of `docs/dev-plan.md`.
+- Validation:
+  - `mvn -B -ntp -DskipTests validate`
+  - `mvn -B -ntp -DskipTests deploy` with temporary `file://` target
+- PR: build/standard-cross-os-static-repo-layout (pending).
+- Notes: Pairs with HBTV-004 and Phase 4 of `docs/dev-plan.md`; adds
+  cross-OS deploy scripts and standard side-by-side workspace layout
+  under `$HOME/dev`.
 
 ## HBTV-006 — Provider / plugin inventory
 
@@ -307,7 +311,41 @@ Status legend: `proposed`, `in-progress`, `blocked`, `done`,
   - HBTV-004/HBTV-005 legacy repository/update URL migration remains
     separate and must not be mixed into this runnable baseline PR.
 
-## HBTV-012 — YouTube Data API key externalization
+## HBTV-012 — Own-version plugin internal dependency alignment
+
+- Status: done
+- Priority: P0
+- Scope: Fix own-version plugin module dependency resolution so shared
+  internal reactor dependencies (`com.dabi.habitv:api`,
+  `com.dabi.habitv:framework`) resolve to the parent/reactor version
+  instead of each plugin module's own artifact version.
+- Acceptance criteria:
+  - Root dependencyManagement does not force own-version plugins to
+    request non-reactor internal coordinates such as
+    `framework/api:4.1.1-SNAPSHOT`.
+  - `mvn -B -ntp -DskipTests validate` succeeds from the root.
+  - `mvn -B -ntp -DskipTests compile` succeeds from the root.
+  - `maven-default-http-blocker` no longer appears for
+    `framework/api:4.1.1-SNAPSHOT` descriptor resolution.
+- Validation:
+  - `mvn -B -ntp -DskipTests validate` -> `BUILD SUCCESS` (33 modules).
+  - `mvn -B -ntp -DskipTests compile` -> `BUILD SUCCESS` (33 modules).
+- PR: build: align own-version plugin internal dependencies.
+- Notes:
+  - Cause: own-version plugin modules (`beinsport`, `footyroom`,
+    `pluzz`, `ffmpeg`) inherited `${project.version}` for shared
+    internal dependencies, which interpolated to plugin-local versions
+    (`4.1.1-SNAPSHOT` / `4.1.2-SNAPSHOT`) instead of reactor version
+    `4.1.0-SNAPSHOT`.
+  - Fix: use `${project.parent.version}` for shared internal
+    dependencyManagement coordinates so reactor modules resolve
+    consistently.
+  - Local compilation no longer requires
+    `http://dabiboo.free.fr/repository` for these internal artifacts.
+  - Scope is Maven dependency alignment only; obsolete provider
+    endpoints and runtime plugin availability remain out of scope.
+
+## HBTV-013 — YouTube Data API key externalization
 
 - Status: in-progress
 - Priority: P1

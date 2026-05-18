@@ -33,10 +33,15 @@ or accepted.
 - Mitigation: Plan migration to a controlled static repository
   (HBTV-004 / HBTV-005). Until then, document the dependency and
   do not rely on it in CI.
-- Status update (HBTV-011): Confirmed unchanged. Scoped `compile` and
-  `package` still fail at `plugins/beinsport` while resolving
-  `framework/api:4.1.1-SNAPSHOT` through blocked
-  `http://dabiboo.free.fr/repository`.
+- Status update (HBTV-012): Mitigated for local reactor compilation of
+  internal shared dependencies. Root dependencyManagement now maps
+  `com.dabi.habitv:api` and `com.dabi.habitv:framework` to
+  `${project.parent.version}`, so own-version plugin modules no longer
+  request plugin-local coordinates (`4.1.1-SNAPSHOT` / `4.1.2-SNAPSHOT`)
+  from blocked `http://dabiboo.free.fr/repository`.
+- Residual risk: Legacy repository migration is still required for
+  external publication/runtime update concerns and remains tracked under
+  HBTV-004/HBTV-005; this fix is Maven dependency alignment only.
 
 ## R-002 — FTP deployment no longer viable
 
@@ -177,7 +182,7 @@ or accepted.
 - Mitigation: Externalize key resolution to runtime configuration with
   deterministic precedence (system property then environment variable),
   and include sanitized request context in error messages.
-- Status: Mitigated in HBTV-012 by removing the hardcoded key constant
+- Status: Mitigated in HBTV-013 by removing the hardcoded key constant
   from `YoutubeConf`, resolving keys from runtime config, adding a
   user-facing tray configuration field, and masking the `key`
   parameter in error messages.
