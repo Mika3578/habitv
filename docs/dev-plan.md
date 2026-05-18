@@ -22,7 +22,7 @@ work from a later phase.
 | 4 | 📦 Publish artifacts via `habitv-repo` | ✅ Done | `████████████████████` 100% | `static-repo-publish` |
 | 5 | 🎬 Replace `youtube-dl` with `yt-dlp` | 🟡 In progress | `███████████████░░░░░` 75% | `ytdlp-migration` |
 | 6 | 🔌 Audit / deprecate obsolete providers | 🟡 In progress | `███████████░░░░░░░░░` 55% | `provider-inventory` |
-| 7 | 🖼️ Modernize UI / runtime packaging | 🔵 Proposed | `█░░░░░░░░░░░░░░░░░░░` 5% | `javafx-modernization` |
+| 7 | 🖼️ Modernize UI / runtime packaging | 🔵 Proposed | `███░░░░░░░░░░░░░░░░░` 15% | `javafx-modernization` |
 
 ---
 
@@ -152,7 +152,8 @@ Remaining: live fixture validation, `habitv-repo` `yt-dlp` tool zip publication.
 - Modernize the runtime updater (HTTPS, signed metadata) once the
   static repo from Phase 4 is in place.
 
-**Tracker** — `javafx-modernization`.
+**Tracker** — `javafx-modernization`. Concrete blocker reproduction
+and phased plan: [`ihm-build-blocking-points.md`](ihm-build-blocking-points.md).
 
 ---
 

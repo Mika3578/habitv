@@ -25,8 +25,8 @@
 | Category | Count |
 |---------|------:|
 | ✅ Delivered | **10** |
-| 🟡 In progress | **1** |
-| 🔵 Proposed | **3** |
+| 🟡 In progress | **2** |
+| 🔵 Proposed | **2** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
 | **Total work items** | **14** |
@@ -45,7 +45,7 @@
 | 📦 `static-repo-publish` — Static artifact repository publication | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🟡 In progress | 🟡 P2 | `███████████░░░░░░░░░` 55% |
 | 🎬 `ytdlp-migration` — `youtube-dl` → `yt-dlp` migration | 🟡 In progress | 🟡 P2 | `███████████████░░░░░` 75% |
-| 🖼️ `javafx-modernization` — JavaFX & runtime packaging modernization | 🔵 Proposed | 🟡 P2 | `█░░░░░░░░░░░░░░░░░░░` 5% |
+| 🖼️ `javafx-modernization` — JavaFX & runtime packaging modernization | 🔵 Proposed | 🟡 P2 | `███░░░░░░░░░░░░░░░░░` 15% |
 | 🧪 `plugin-tester-align` — `plugin-tester` reactor alignment | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | ▶️ `console-runnable` — Runnable console baseline | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 🔗 `own-version-deps-align` — Own-version plugin dependency alignment | ✅ Done | 🔴 P0 | `████████████████████` 100% |
@@ -362,7 +362,7 @@ rewrite, no live-network tests in this item.
 |---|---|
 | **Status** | 🔵 Proposed |
 | **Priority** | 🟡 P2 |
-| **Progress** | `█░░░░░░░░░░░░░░░░░░░` 5% |
+| **Progress** | `███░░░░░░░░░░░░░░░░░` 15% |
 | **Legacy code** | HBTV-008 |
 
 **Scope** — Migrate JavaFX 2.x usage and `${jdk.home}` packaging
@@ -373,16 +373,20 @@ assumptions:
 - `system`-scope `javafx:jfxrt` referencing `${jdk.home}/jre/lib/ext/jfxrt.jar`
 
 **Acceptance criteria**
-- 🟡 Surface inventory captured in audit doc *(done in audit-master-baseline)*
-- ⬜ OpenJFX migration options compared (jpackage, jlink, fat-jar)
-- ⬜ Packaging blueprint accepted via dedicated ADR
+- ✅ Surface inventory captured in audit doc *(audit-master-baseline + `docs/ihm-build-blocking-points.md`)*
+- ✅ OpenJFX migration options compared (jpackage, jlink, fat-jar) — see `docs/ihm-build-blocking-points.md` §3–§4
+- ⬜ Packaging blueprint accepted via dedicated ADR (proposed in `docs/ihm-build-blocking-points.md` §3 PR3)
 - ⬜ `habiTv-linux` + `habiTv-windows` re-enterable to the reactor
 
-**Validation** — Audit reviewed in PR; no code changes in this item.
+**Validation**
+- Audit reviewed in PR; no code changes in this item.
+- Reproduction of blockers B1–B8 captured in
+  `docs/ihm-build-blocking-points.md` §1–§2.
 
-**Notes** — Risk `javafx-jdk8`. Largest single piece of remaining
-work once `legacy-url-migration` + `static-repo-publish` +
-`provider-inventory` are clear.
+**Notes** — Risk `javafx-jdk8`. Surface and phased plan documented
+in `docs/ihm-build-blocking-points.md`. Next step: open the ADR
+proposed in PR3 of that plan (weakens AGENTS.md §2 row
+"bump-java-baseline-beyond-8" for the four IHM modules only).
 
 ---
 

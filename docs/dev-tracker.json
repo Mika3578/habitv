@@ -23,7 +23,7 @@
     "deferred": 0,
     "blocked": 0,
     "total": 14,
-    "overallProgressPercent": 79
+    "overallProgressPercent": 80
   },
   "items": [
     {
@@ -219,19 +219,20 @@
       "icon": "🖼️",
       "status": "proposed",
       "priority": "P2",
-      "progressPercent": 5,
+      "progressPercent": 15,
       "scope": "Migrate JavaFX 2.x usage and ${jdk.home} packaging assumptions in application/trayView, application/habiTv-linux, application/habiTv-windows, zenjava/javafx-maven-plugin 2.0, and system-scope javafx:jfxrt.",
       "acceptanceCriteria": [
-        "Surface inventory captured in audit doc (done in audit-master-baseline).",
-        "OpenJFX migration options compared (jpackage, jlink, fat-jar).",
-        "Packaging blueprint accepted via dedicated ADR.",
+        "Surface inventory captured in audit doc (done in audit-master-baseline + docs/ihm-build-blocking-points.md).",
+        "OpenJFX migration options compared (jpackage, jlink, fat-jar) -> documented in docs/ihm-build-blocking-points.md sections 3-4.",
+        "Packaging blueprint accepted via dedicated ADR (proposed in docs/ihm-build-blocking-points.md PR3).",
         "habiTv-linux + habiTv-windows re-enterable to the reactor."
       ],
       "validation": [
-        "Audit reviewed in PR; no code changes in this item."
+        "Audit reviewed in PR; no code changes in this item.",
+        "Reproduction of B1-B8 captured in docs/ihm-build-blocking-points.md sections 1-2."
       ],
-      "pr": "TBD",
-      "notes": "Risk javafx-jdk8. Largest single piece of remaining work once legacy-url-migration + static-repo-publish + provider-inventory are clear."
+      "pr": "docs: capture IHM build blocking points and modernization plan (this branch)",
+      "notes": "Risk javafx-jdk8. Surface and phased plan documented in docs/ihm-build-blocking-points.md. Next step: open the ADR proposed in PR3 of that plan (weakens AGENTS.md §2 row 'bump-java-baseline-beyond-8' for IHM modules only)."
     },
     {
       "id": "plugin-tester-align",
