@@ -59,6 +59,7 @@ public class YoutubePluginManager extends BasePluginWithProxy implements PluginP
 			throw new TechnicalException(
 					"YouTube Data API v3 key is missing. Set the 'HABITV_YOUTUBE_API_KEY' environment variable"
 							+ " or the 'habitv.youtube.apiKey' system property before starting habitv."
+							+ " You can also set the YouTube API key in habitv configuration and restart the application."
 							+ " Create a key at https://console.cloud.google.com/ (enable YouTube Data API v3).");
 		}
 	}

@@ -4,15 +4,21 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.InputStream;
+
+import org.junit.Assume;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.exception.TechnicalException;
+import com.dabi.habitv.framework.FrameworkConf;
 
 public class YoutubeApiKeyRequiredTest {
 
 	private static final String API_KEY_PROPERTY = "habitv.youtube.apiKey";
+	private static final String API_KEY_ENV = "HABITV_YOUTUBE_API_KEY";
 	private String previousProperty;
 
 	@Before
@@ -32,9 +38,7 @@ public class YoutubeApiKeyRequiredTest {
 
 	@Test
 	public void requireApiKeyFailsFastWithGuidanceWhenMissing() {
-		if (YoutubeConf.resolveApiKey() != null) {
-			return;
-		}
+		Assume.assumeTrue(System.getenv(API_KEY_ENV) == null);
 		try {
 			YoutubePluginManager.requireApiKey();
 			fail("Expected TechnicalException when YouTube API key is missing");
@@ -43,6 +47,7 @@ public class YoutubeApiKeyRequiredTest {
 			assertNotNull(message);
 			assertTrue(message.contains("HABITV_YOUTUBE_API_KEY"));
 			assertTrue(message.contains("habitv.youtube.apiKey"));
+			assertTrue(message.contains("habitv configuration"));
 		}
 	}
 
@@ -50,5 +55,30 @@ public class YoutubeApiKeyRequiredTest {
 	public void requireApiKeyAcceptsConfiguredKey() {
 		System.setProperty(API_KEY_PROPERTY, "test-key");
 		YoutubePluginManager.requireApiKey();
+	}
+
+	@Test
+	public void findEpisodeFailsFastBeforeAnyHttpCallWhenApiKeyMissing() {
+		Assume.assumeTrue(System.getenv(API_KEY_ENV) == null);
+		try {
+			new YoutubePluginManagerNoHttpCall().findEpisode(buildPlaylistCategory());
+			fail("Expected TechnicalException when YouTube API key is missing");
+		} catch (TechnicalException e) {
+			assertTrue(e.getMessage().contains("HABITV_YOUTUBE_API_KEY"));
+		}
+	}
+
+	private CategoryDTO buildPlaylistCategory() {
+		CategoryDTO parent = new CategoryDTO(YoutubeConf.NAME, "Playlist", "playlist-parent", FrameworkConf.MP4);
+		CategoryDTO child = new CategoryDTO(YoutubeConf.NAME, "Any playlist", "playlistId=test-playlist", FrameworkConf.MP4);
+		parent.addSubCategory(child);
+		return child;
+	}
+
+	private static class YoutubePluginManagerNoHttpCall extends YoutubePluginManager {
+		@Override
+		public InputStream getInputStreamFromUrl(String url) {
+			throw new AssertionError("Unexpected HTTP call: " + url);
+		}
 	}
 }
