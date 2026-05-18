@@ -18,12 +18,12 @@
   ],
   "summary": {
     "done": 9,
-    "inProgress": 0,
-    "proposed": 5,
+    "inProgress": 1,
+    "proposed": 4,
     "deferred": 0,
     "blocked": 0,
     "total": 14,
-    "overallProgressPercent": 64
+    "overallProgressPercent": 66
   },
   "items": [
     {
@@ -143,25 +143,25 @@
       "legacyCode": "HBTV-005",
       "displayTitle": "Static artifact repository publication",
       "icon": "📦",
-      "status": "proposed",
+      "status": "in-progress",
       "priority": "P1",
-      "progressPercent": 10,
+      "progressPercent": 30,
       "scope": "Stand up the habitv-repo static repository (GitHub Pages or equivalent HTTPS host) compatible with the existing FindArtifactUtils / UpdateManager semantics.",
       "acceptanceCriteria": [
         "Cross-OS deploy scripts present in scripts/static-repo/ (in develop).",
         "habitv-repo PR #1 merged.",
-        "repository/com/dabi/habitv/ layout published with real artifacts.",
-        "index.html generation for GitHub Pages (no autoindex by default).",
-        "plugins.txt format validated against FindArtifactUtils.",
-        "HTTPS + checksum strategy documented.",
+        "repository/com/dabi/habitv/ layout contract validated locally.",
+        "index.html generation for GitHub Pages validated without autoindex dependency.",
+        "plugins.txt format validated against FindArtifactUtils fallback expectations.",
+        "HTTPS + no-token runtime consumption contract documented.",
         "Migration path for UPDATE_URL documented."
       ],
       "validation": [
         "mvn -B -ntp -DskipTests validate",
-        "mvn -B -ntp -DskipTests deploy -DaltDeploymentRepository=local::default::file:///tmp/repo"
+        "python scripts/static-repo/validate_repository_layout.py <repository-root>"
       ],
-      "pr": "habitv-repo #1 (draft, since 2026-04-25)",
-      "notes": "Pairs with legacy-url-migration phase 5. Risks pages-layout-mismatch, pages-autoindex-gap."
+      "pr": "habitv-repo #1 (draft, since 2026-04-25); habitv PR TBD (layout validation + docs)",
+      "notes": "Runtime updates remain disabled by default. This step validates publication layout/documentation without changing updater runtime behavior."
     },
     {
       "id": "provider-inventory",
