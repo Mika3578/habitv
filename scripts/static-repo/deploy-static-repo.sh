@@ -33,10 +33,10 @@ if [ -n "${1-}" ]; then
   normalized=$(printf '%s' "$1" | tr '\\' '/')
   mvn -Dhabitv.static.repo.path="$normalized" \
     -B -ntp -DskipTests clean deploy \
-    '-DaltDeploymentRepository=habitv-local::default::file://${habitv.static.repo.path}'
+    '-DaltDeploymentRepository=habitv-local::default::file:///${habitv.static.repo.path}'
 else
   mvn -B -ntp -DskipTests clean deploy \
-    '-DaltDeploymentRepository=habitv-local::default::file://${habitv.static.repo.path}'
+    '-DaltDeploymentRepository=habitv-local::default::file:///${habitv.static.repo.path}'
 fi
 
 cat <<EOF

@@ -24,12 +24,12 @@
 		<repository>
 			<id>habitv-local</id>
 			<name>Habitv local static repository</name>
-			<url>file://${habitv.static.repo.path}</url>
+			<url>file:///${habitv.static.repo.path}</url>
 		</repository>
 		<snapshotRepository>
 			<id>habitv-local</id>
 			<name>Habitv local static repository</name>
-			<url>file://${habitv.static.repo.path}</url>
+			<url>file:///${habitv.static.repo.path}</url>
 		</snapshotRepository>
 	</distributionManagement>
 

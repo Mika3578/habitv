@@ -56,7 +56,7 @@ Push-Location $repoRoot
 try {
     $deployArgs = @(
         "-B", "-ntp", "-DskipTests", "clean", "deploy",
-        '-DaltDeploymentRepository=habitv-local::default::file://${habitv.static.repo.path}'
+        '-DaltDeploymentRepository=habitv-local::default::file:///${habitv.static.repo.path}'
     )
     if (-not [string]::IsNullOrWhiteSpace($StaticRepoPath)) {
         $normalized = $StaticRepoPath.Trim() -replace '\\', '/'

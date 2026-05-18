@@ -36,7 +36,7 @@ def build_manifest_lines(repository_root, plugin_ids):
     group_root = os.path.join(repository_root, "com", "dabi", "habitv")
     for artifact_id in plugin_ids:
         artifact_dir = os.path.join(group_root, artifact_id)
-        if not os.isdir(artifact_dir):
+        if not os.path.isdir(artifact_dir):
             print("warn: missing deployed plugin {}".format(artifact_id), file=sys.stderr)
             continue
         version_dirs = sorted(
@@ -55,7 +55,7 @@ def build_manifest_lines(repository_root, plugin_ids):
             break
 
     tools_root = os.path.join(repository_root, "tools")
-    if os.isdir(tools_root):
+    if os.path.isdir(tools_root):
         for tool_name in sorted(os.listdir(tools_root)):
             tool_dir = os.path.join(tools_root, tool_name)
             if not os.path.isdir(tool_dir):

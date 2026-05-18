@@ -109,18 +109,29 @@ public class UpdateManager {
 		int index = 0;
 		for (final String line : lines) {
 			if (isPluginLine(line)) {
-				result[index++] = line.trim();
+				result[index++] = normalizePluginLine(line);
 			}
 		}
 		return result;
 	}
 
 	private static boolean isPluginLine(final String line) {
-		if (line == null) {
+		final String trimmed = normalizePluginLine(line);
+		if (trimmed == null) {
 			return false;
 		}
-		final String trimmed = line.trim();
 		return !trimmed.isEmpty() && !trimmed.startsWith("#");
+	}
+
+	private static String normalizePluginLine(final String line) {
+		if (line == null) {
+			return null;
+		}
+		String trimmed = line.trim();
+		if (trimmed.startsWith("\uFEFF")) {
+			trimmed = trimmed.substring(1).trim();
+		}
+		return trimmed;
 	}
 
 }

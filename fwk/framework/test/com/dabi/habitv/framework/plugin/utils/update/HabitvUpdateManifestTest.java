@@ -40,4 +40,10 @@ public class HabitvUpdateManifestTest {
 		final HabitvUpdateManifest manifest = HabitvUpdateManifest.parse("\n# comment\n\n");
 		assertTrue(manifest.isEmpty());
 	}
+
+	@Test
+	public void parseIgnoresBomPrefixedComments() {
+		final HabitvUpdateManifest manifest = HabitvUpdateManifest.parse("\uFEFF# comment\n");
+		assertTrue(manifest.isEmpty());
+	}
 }

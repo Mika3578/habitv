@@ -159,10 +159,10 @@ public final class HabitvUpdateManifest {
 	}
 
 	static Entry parseLine(final String line) {
-		if (line == null) {
+		final String trimmed = normalizeLine(line);
+		if (trimmed == null) {
 			return null;
 		}
-		final String trimmed = line.trim();
 		if (trimmed.isEmpty() || trimmed.startsWith("#")) {
 			return null;
 		}
@@ -174,6 +174,17 @@ public final class HabitvUpdateManifest {
 		final ArtifactKind kind = parseKind(parts[0]);
 		final String checksum = parts.length > 6 ? parts[6] : null;
 		return new Entry(kind, parts[1], parts[2], parts[3], parts[4], parts[5], checksum);
+	}
+
+	private static String normalizeLine(final String line) {
+		if (line == null) {
+			return null;
+		}
+		String trimmed = line.trim();
+		if (trimmed.startsWith("\uFEFF")) {
+			trimmed = trimmed.substring(1).trim();
+		}
+		return trimmed;
 	}
 
 	private static ArtifactKind parseKind(final String raw) {

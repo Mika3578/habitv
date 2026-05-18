@@ -19,10 +19,14 @@ public final class UpdateRepositoryUrls {
 	}
 
 	public static String normalizeBaseUrl(final String baseUrl) {
-		if (baseUrl.endsWith("/")) {
-			return baseUrl.substring(0, baseUrl.length() - 1);
+		if (baseUrl == null) {
+			return null;
 		}
-		return baseUrl;
+		final String trimmed = baseUrl.trim();
+		if (trimmed.endsWith("/")) {
+			return trimmed.substring(0, trimmed.length() - 1);
+		}
+		return trimmed;
 	}
 
 	public static String buildRepositoryUrl(final String relativePath) {

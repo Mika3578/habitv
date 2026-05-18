@@ -1,5 +1,9 @@
 package com.dabi.habitv.core.updater;
 
+import static org.junit.Assert.assertArrayEquals;
+
+import java.lang.reflect.Method;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -28,6 +32,17 @@ public class UpdateManagerTest {
 	public final void testProcess() {
 		final UpdateManager updateManager = new UpdateManager("plugins",true);
 		updateManager.process();
+	}
+
+	@Test
+	public void splitPluginLinesIgnoresBomPrefixedCommentHeader() throws Exception {
+		final Method splitPluginLines = UpdateManager.class.getDeclaredMethod("splitPluginLines", String.class);
+		splitPluginLines.setAccessible(true);
+
+		final String plugins = "\uFEFF# header\narte\n6play\n";
+		final String[] parsed = (String[]) splitPluginLines.invoke(null, plugins);
+
+		assertArrayEquals(new String[] { "arte", "6play" }, parsed);
 	}
 
 }

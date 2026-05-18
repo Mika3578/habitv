@@ -10,7 +10,7 @@ publicly via GitHub Pages.
 | Local Maven staging (build only) | `${habitv.static.repo.path}` (see below) |
 | Public runtime download URL | `https://mika3578.github.io/habitv-repo/repository/` |
 
-**Strict separation:** Maven uses `file://${habitv.static.repo.path}` only at
+**Strict separation:** Maven uses `file:///${habitv.static.repo.path}` only at
 build/deploy time. Habitv at runtime never reads that path; it downloads from the
 HTTPS URL in `FrameworkConf.UPDATE_URL`.
 
@@ -23,15 +23,15 @@ Windows PowerShell:
 
 ```powershell
 mvn -B -ntp -DskipTests clean deploy -Pstatic-repo-publish `
-  '-DaltDeploymentRepository=habitv-local::default::file://${habitv.static.repo.path}' `
+  '-DaltDeploymentRepository=habitv-local::default::file:///${habitv.static.repo.path}' `
   "-pl=!application/habiTv"
 ```
 
-Linux/macOS (metadata and `index.html` only; tool ZIP downloads require PowerShell):
+Linux/macOS (PowerShell when available; otherwise metadata and `index.html` only):
 
 ```bash
 mvn -B -ntp -DskipTests clean deploy -Pstatic-repo-publish \
-  '-DaltDeploymentRepository=habitv-local::default::file://${habitv.static.repo.path}' \
+  '-DaltDeploymentRepository=habitv-local::default::file:///${habitv.static.repo.path}' \
   '-pl=!application/habiTv'
 ```
 
@@ -60,7 +60,7 @@ Override the staging path:
 ```powershell
 mvn -B -ntp -DskipTests clean deploy -Pstatic-repo-publish `
   "-Dhabitv.static.repo.path=$env:USERPROFILE/dev/habitv-repo/repository" `
-  '-DaltDeploymentRepository=habitv-local::default::file://${habitv.static.repo.path}' `
+  '-DaltDeploymentRepository=habitv-local::default::file:///${habitv.static.repo.path}' `
   "-pl=!application/habiTv"
 ```
 
