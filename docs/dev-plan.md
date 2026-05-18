@@ -10,7 +10,7 @@ work from a later phase.
 ## 🎯 Phase progress
 
 ```
-████████████░░░░░░░░░░░░  50%   (3.5 / 7 phases)
+██████████████░░░░░░░░░░  57%   (4 / 7 phases)
 ```
 
 | Phase | Title | Status | Progress | Tracker items |
@@ -18,8 +18,8 @@ work from a later phase.
 | 0 | 🏗️ Governance bootstrap | ✅ Done | `████████████████████` 100% | `gov-bootstrap` |
 | 1 | ⚙️ Stabilize Maven reactor | ✅ Done | `████████████████████` 100% | `maven-reactor` |
 | 2 | ☕ Stabilize Java 8 baseline | ✅ Done | `████████████████████` 100% | `java8-baseline`, `plugin-tester-align`, `own-version-deps-align` |
-| 3 | 🔗 Remove legacy free.fr / SVN / FTP | 🟡 In progress | `███████░░░░░░░░░░░░░` 35% | `legacy-url-migration`, `youtube-apikey` |
-| 4 | 📦 Publish artifacts via `habitv-repo` | 🔵 Proposed | `██░░░░░░░░░░░░░░░░░░` 10% | `static-repo-publish` |
+| 3 | 🔗 Remove legacy free.fr / SVN / FTP | ✅ Done | `████████████████████` 100% | `legacy-url-migration`, `youtube-apikey` |
+| 4 | 📦 Publish artifacts via `habitv-repo` | 🟡 In progress | `██████░░░░░░░░░░░░░░` 30% | `static-repo-publish` |
 | 5 | 🎬 Replace `youtube-dl` with `yt-dlp` | 🔵 Proposed | `████░░░░░░░░░░░░░░░░` 20% | `ytdlp-migration` |
 | 6 | 🔌 Audit / deprecate obsolete providers | 🔵 Proposed | `░░░░░░░░░░░░░░░░░░░░` 0% | `provider-inventory` |
 | 7 | 🖼️ Modernize UI / runtime packaging | 🔵 Proposed | `█░░░░░░░░░░░░░░░░░░░` 5% | `javafx-modernization` |
@@ -76,7 +76,7 @@ branch `develop` created.
 
 ## 🔗 Phase 3 — Remove legacy free.fr / SVN / FTP references
 
-🟡 **In progress** · `███████░░░░░░░░░░░░░` 35%
+✅ **Done**
 
 - Replace SVN/Assembla `<scm>` blocks with the current GitHub URLs.
 - Remove FTP `<distributionManagement>` and the `wagon-ftp` extension.
@@ -92,7 +92,7 @@ branch `develop` created.
 
 ## 📦 Phase 4 — Publish artifacts to `habitv-repo`
 
-🔵 **Proposed** · `██░░░░░░░░░░░░░░░░░░` 10%
+🟡 **In progress** · `██████░░░░░░░░░░░░░░` 30%
 
 - Stand up the `habitv-repo` static repository (GitHub Pages or
   equivalent HTTPS host) for artifacts, plugin drops, and update
@@ -100,6 +100,8 @@ branch `develop` created.
 - Define a directory layout compatible with the existing runtime
   updater (`FindArtifactUtils`, `UpdateManager`).
 - Document the publication workflow and credential handling.
+- Validate the generated local repository tree (`plugins.txt`,
+  `com/dabi/habitv`, required `index.html` links) before publication.
 
 **Tracker** — `static-repo-publish`.
 
