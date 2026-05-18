@@ -46,6 +46,23 @@ What this single command does:
    - `index.html` directory listings
    - `tools/<tool>/<version>/<tool>.zip` (Windows/PowerShell only)
 
+## Static repository contract
+
+Runtime consumption must work from a public static host with no credentials and no
+host-provided autoindex. The generated tree must include:
+
+- `repository/plugins.txt`
+- `repository/com/dabi/habitv/...` (Maven path layout)
+- `index.html` files with anchor links in directories used by
+  `FindArtifactUtils` fallback discovery:
+  - `repository/`, `repository/com/`, `repository/com/dabi/`,
+    `repository/com/dabi/habitv/`
+  - each `repository/com/dabi/habitv/<artifactId>/`
+  - each `repository/com/dabi/habitv/<artifactId>/<version>/`
+
+No GitHub Packages endpoint is used, and runtime update checks must never require a
+token.
+
 `application/habiTv` remains excluded (`-pl=!application/habiTv`) because of the
 existing JDK/`utils4j` compile blocker, which is unrelated to static repository
 deployment.
@@ -139,6 +156,21 @@ When `-Dhabitv.update.enabled=true` (optional `-Dhabitv.update.url=...`):
 
 Updates are **disabled by default**. If GitHub Pages is unreachable, Habitv keeps
 local plugins and tools.
+
+## Layout validation command
+
+After publishing metadata/index files, validate the generated repository layout:
+
+```bash
+python scripts/static-repo/validate_repository_layout.py "<path-to-repository>"
+```
+
+Windows example:
+
+```powershell
+python .\scripts\static-repo\validate_repository_layout.py `
+  "$env:USERPROFILE/dev/habitv-repo/repository"
+```
 
 ## Validation URLs
 

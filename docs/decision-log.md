@@ -18,7 +18,7 @@ older ones rather than rewriting them in place.
 | `restart-from-master` | Restart modernization from `master` | ✅ Accepted |
 | `keep-java8-baseline` | Keep Java 8 as baseline until the build is stable | ✅ Accepted |
 | `small-prs-linear-history` | Small PRs with linear history | ✅ Accepted |
-| `habitv-repo-static-host` | `habitv-repo` as the future static artifact repository | 🟡 Proposed |
+| `habitv-repo-static-host` | `habitv-repo` as the public static artifact repository | ✅ Accepted |
 | `provider-cleanup-separate` | Provider cleanup is separate from build / governance bootstrap | ✅ Accepted |
 | `develop-runnable-baseline` | Runnable console baseline on `develop` before broader modernization | ✅ Accepted |
 | `doc-sync-and-rule-lifecycle` | Doc sync protocol & rule lifecycle (meta-rules) | ✅ Accepted |
@@ -122,12 +122,12 @@ commits, making review and rollback expensive.
 
 ---
 
-## 🟡 `habitv-repo-static-host` — `habitv-repo` as the future public static artifact repository
+## ✅ `habitv-repo-static-host` — `habitv-repo` as the public static artifact repository
 
 | | |
 |---|---|
-| **Status** | 🟡 Proposed |
-| **Date** | 2026-05-16 |
+| **Status** | ✅ Accepted |
+| **Date** | 2026-05-18 |
 | **Tracker** | `static-repo-publish` |
 | **Risks** | `legacy-maven-repo`, `ftp-deploy`, `legacy-update-pull`, `pages-layout-mismatch` |
 | **Legacy code** | ADR-0004 |
@@ -137,16 +137,26 @@ commits, making review and rollback expensive.
 resolution and runtime updates. The host is third-party, plain HTTP,
 and unmaintained.
 
-**Decision** — Stand up a `habitv-repo` static repository (target:
-GitHub Pages or equivalent HTTPS static host) to publish Maven
-artifacts, plugin drops, and update metadata. Layout is defined in
-`static-repo-publish` to remain compatible with `FindArtifactUtils`
-and `UpdateManager` semantics.
+**Decision** — Use `habitv-repo` as the public static repository
+served over HTTPS (GitHub Pages or an equivalent static host), with
+no GitHub Packages dependency and no runtime token requirement.
+Publication layout is fixed as:
+
+- `repository/com/dabi/habitv/...` for Maven artifact paths
+- `repository/plugins.txt` for plugin ID discovery
+- static `index.html` directory listings with anchor links for
+  `FindArtifactUtils` fallback discovery (no host autoindex required)
+
+Local publication must pass
+`python scripts/static-repo/validate_repository_layout.py <repository-root>`
+before cutover.
 
 **Consequences**
-- ✅ HTTPS, version-controlled publication.
-- 🟡 Confirmation pending: a future ADR will accept or supersede this
-  once layout and publication workflow are validated end-to-end.
+- ✅ HTTPS, version-controlled publication contract is now fixed.
+- ✅ Runtime update defaults remain unchanged (`habitv.update.enabled=false`
+  unless explicitly set by the operator).
+- 🟡 End-to-end cutover in `habitv-repo` is still tracked under
+  `static-repo-publish`.
 
 ---
 

@@ -308,6 +308,10 @@ listing by default. Runtime updates stay disabled
 files or manifests are published and verified under
 `static-repo-publish`. Keep this risk at P1 until cutover
 validation completes.
+Local pre-cutover validation now exists via
+`python scripts/static-repo/validate_repository_layout.py <repository-root>`,
+which checks `plugins.txt`, `com/dabi/habitv`, and required `index.html`
+anchor links. Risk remains open until `habitv-repo` publication is live.
 
 ---
 
@@ -348,6 +352,8 @@ artifact versions by parsing index pages, which assumes autoindex.
 **Mitigation** — `static-repo-publish` plans to generate static
 `index.html` files (or a manifest) so listing semantics are
 preserved without relying on the host.
+Validation now includes a repository-layout check script to assert
+required `index.html` anchor links before publication.
 
 ---
 
