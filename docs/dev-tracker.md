@@ -132,25 +132,39 @@ Status legend: `proposed`, `in-progress`, `blocked`, `done`,
 - PR: N/A (settings change, not code).
 - Notes: Done by repo owner; tracked here for visibility.
 
-## HBTV-004 — Legacy repository URL migration plan
+## HBTV-004 — Legacy repository URL migration (execution)
 
-- Status: proposed
-- Priority: P1
-- Scope: Plan migration of `<scm>` (SVN/Assembla), Maven
-  `<repository>` (`http://dabiboo.free.fr/repository`),
-  `<distributionManagement>` (`ftp://ftpperso.free.fr/repository`),
-  and runtime telemetry/update URLs.
+- Status: done
+- Priority: P0
+- Scope: Remove active legacy DabiBoo/free.fr/SVN/Assembla wiring from
+  Maven POMs and runtime paths; replace SCM metadata with GitHub;
+  disable startup telemetry and plugin update checks by default;
+  point Maven `<repository>` at the public `habitv-repo` GitHub Pages
+  base when publication is available.
 - Acceptance criteria:
-  - Document target URLs and transition steps.
-  - Identify code call sites in
-    `fwk/framework/.../FrameworkConf.java`,
-    `application/core/.../HabitTvConf.java`,
-    `application/core/.../UpdateManager.java`,
-    `fwk/framework/.../FindArtifactUtils.java`,
-    `application/core/.../CoreManager.java`.
-- Validation: Plan reviewed in PR; no code changes in this item.
-- PR: TBD.
-- Notes: Pairs with HBTV-005.
+  - Active POM/runtime references to `dabiboo.free.fr`,
+    `subversion.assembla.com`, `scm:svn`, and `cpt.php` are removed.
+  - Root and packaging POM repository wiring uses
+    `https://mika3578.github.io/habitv-repo/repository`.
+  - Runtime telemetry ping is opt-in only (`habitv.stat.enabled=true`)
+    and requires explicit URL configuration (`habitv.stat.url`).
+  - Runtime plugin updates are opt-in only
+    (`habitv.update.enabled=true`) with optional `habitv.update.url`.
+- Validation:
+  - `git grep -n -I -E "dabiboo|free\.fr|ftpperso|subversion\.assembla|scm:svn|cpt\.php" -- .`
+    -> matches only documentation/history, no active code/POM endpoints.
+  - `mvn -B -ntp -DskipTests validate` -> `BUILD SUCCESS` (33 modules).
+  - `mvn -B -ntp -DskipTests compile` -> `BUILD SUCCESS` (33 modules).
+- PR: chore: remove legacy DabiBoo repository wiring (#36).
+- Notes:
+  - Detailed call-site inventory and updater contract:
+    `docs/hbtv-004-url-migration-plan.md` (from PR #25, preserved here).
+  - Execution supersedes the documentation-only plan in PR #25.
+  - Functional publication cutover remains blocked under HBTV-005 until
+    `habitv-repo` serves `/repository` with Apache-style directory
+    listings (`FindArtifactUtils` parses HTML `<a>` indexes).
+  - Do not enable `habitv.update.enabled` until static `index.html`
+    files or an equivalent manifest layout are verified.
 
 ## HBTV-005 — Runtime updater publication plan
 
@@ -347,7 +361,7 @@ Status legend: `proposed`, `in-progress`, `blocked`, `done`,
 
 ## HBTV-013 — YouTube Data API key externalization
 
-- Status: in-progress
+- Status: done
 - Priority: P1
 - Scope: Remove the hardcoded YouTube Data API key from
   `plugins/youtube` and use runtime-provided configuration so 403
@@ -367,7 +381,7 @@ Status legend: `proposed`, `in-progress`, `blocked`, `done`,
     -> `BUILD SUCCESS`.
   - `mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeConfTest -Dsurefire.failIfNoSpecifiedTests=false test`
     -> `BUILD SUCCESS`.
-- PR: TBD.
+- PR: fix: externalize data api key and mask api errors (#29).
 - Notes:
   - End users can set the key from the tray configuration tab; no
     environment variable is required for standard usage.

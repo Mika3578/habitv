@@ -11,12 +11,7 @@
 	<packaging>jar</packaging>
 	<name>api</name>
 
-	 <scm>
-        <connection>scm:svn:http://subversion.assembla.com/svn/habitv/trunk/fwk/api</connection>
-        <developerConnection>scm:svn:http://subversion.assembla.com/svn/habitv/trunk/fwk/api</developerConnection>
-    </scm>		
-	
-	<dependencies>
+<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

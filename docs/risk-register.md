@@ -42,6 +42,11 @@ or accepted.
 - Residual risk: Legacy repository migration is still required for
   external publication/runtime update concerns and remains tracked under
   HBTV-004/HBTV-005; this fix is Maven dependency alignment only.
+- Status update (HBTV-004): Active Maven repository wiring no longer
+  references `http://dabiboo.free.fr/repository` in active POM paths.
+  Functional publication cutover remains blocked under HBTV-005 until
+  `https://mika3578.github.io/habitv-repo/repository` is published with
+  a layout compatible with local reactor builds.
 
 ## R-002 — FTP deployment no longer viable
 
@@ -51,6 +56,8 @@ or accepted.
   the password mechanism would expose credentials.
 - Mitigation: Remove FTP deploy in HBTV-004 / HBTV-005 and replace
   with a documented static publication workflow.
+- Status update (HBTV-004): Active packaging POMs no longer declare
+  `ftp://ftpperso.free.fr/repository` distributionManagement blocks.
 
 ## R-003 — JavaFX tied to JDK 8 assumptions
 
@@ -98,8 +105,13 @@ or accepted.
   `FrameworkConf.UPDATE_URL` (`http://dabiboo.free.fr/repository`)
   at runtime. Running a dev build can pull whatever happens to
   be on that host (or fail noisily if it is down).
-- Mitigation: Plan a feature flag / env override in HBTV-005 to
-  disable updates in development. Until then, document the risk.
+- Mitigation: Disable updates by default; require explicit opt-in before
+  any runtime fetch (`habitv.update.enabled`, optional `habitv.update.url`).
+- Status update (HBTV-004): `UpdateManager` returns immediately unless
+  `habitv.update.enabled=true`. The default target base URL constant is
+  `https://mika3578.github.io/habitv-repo/repository` (legacy DabiBoo
+  removed). Do not enable updates until HBTV-005 publishes Apache-style
+  directory indexes or an equivalent manifest layout.
 
 ## R-008 — yt-dlp migration can change download behavior
 
@@ -123,6 +135,12 @@ or accepted.
 - Mitigation: HBTV-005 defines the layout explicitly and validates
   it against `FindArtifactUtils.findLastVersionUrl` semantics
   before cutting over.
+- Status update (HBTV-004/HBTV-005): `FindArtifactUtils` parses HTML
+  directory listings via anchor tags (Apache `mod_autoindex` shape).
+  GitHub Pages does not provide that listing by default. Runtime updates
+  stay disabled (`habitv.update.enabled` defaults false) until static
+  `index.html` files or manifests are published and verified under
+  HBTV-005. Keep this risk at P1 until cutover validation completes.
 
 ## R-010 — Intra-reactor version range `[4.1,4.2)` excludes SNAPSHOTs
 

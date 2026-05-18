@@ -19,15 +19,22 @@
 	</properties>
 
 	 <scm>
-        <connection>scm:svn:http://subversion.assembla.com/svn/habitv/trunk</connection>
-        <developerConnection>scm:svn:http://subversion.assembla.com/svn/habitv/trunk</developerConnection>
+        <connection>scm:git:https://github.com/Mika3578/habitv.git</connection>
+        <developerConnection>scm:git:https://github.com/Mika3578/habitv.git</developerConnection>
+        <url>https://github.com/Mika3578/habitv</url>
     </scm>	
 	
 	<repositories>
 		<repository>
-			<id>dabi-repo</id>
-			<name>dabi-repo</name>
-			<url>http://dabiboo.free.fr/repository</url>
+			<id>habitv-static-repo</id>
+			<name>Habitv public static artifact repository</name>
+			<url>https://mika3578.github.io/habitv-repo/repository</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
 	</repositories>	
 
