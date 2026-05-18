@@ -1,0 +1,4 @@
+provider=arte
+parserBoundary=legacy-rss-html
+network=disabled
+note=Fixture placeholder for parser-shape stabilization before rewrite.

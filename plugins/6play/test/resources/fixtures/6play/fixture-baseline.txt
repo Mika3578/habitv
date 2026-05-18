@@ -1,0 +1,3 @@
+provider=6play
+network=disabled
+note=Fixture placeholder only. The current site behavior is SPA-driven.
