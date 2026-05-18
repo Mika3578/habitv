@@ -23,11 +23,15 @@ evaluate_repository_root() {
 repo_root=$(get_repo_root)
 repository_root=$(evaluate_repository_root "$repo_root" "${1-}")
 
-if command -v pwsh >/dev/null 2>&1; then
-  pwsh -File "$repo_root/scripts/static-repo/publish-repository-extras.ps1" \
-    -RepositoryPath "$repository_root"
-  exit 0
-fi
+case "$(uname -s)" in
+  CYGWIN*|MINGW*|MSYS*)
+    if command -v pwsh >/dev/null 2>&1; then
+      pwsh -File "$repo_root/scripts/static-repo/publish-repository-extras.ps1" \
+        -RepositoryPath "$repository_root"
+      exit 0
+    fi
+    ;;
+esac
 
 if command -v powershell.exe >/dev/null 2>&1; then
   powershell.exe -ExecutionPolicy Bypass -File \
