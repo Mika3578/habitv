@@ -19,14 +19,14 @@
 ## 📊 Overall progress
 
 ```
-██████████████████░░░░░░  73%
+███████████████████░░░░░  76%
 ```
 
 | Category | Count |
 |---------|------:|
 | ✅ Delivered | **10** |
-| 🟡 In progress | **0** |
-| 🔵 Proposed | **4** |
+| 🟡 In progress | **1** |
+| 🔵 Proposed | **3** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
 | **Total work items** | **14** |
@@ -43,7 +43,7 @@
 | 🛡️ `branch-protection` — GitHub branch protection rules | 🔵 Proposed | 🟠 P1 | `░░░░░░░░░░░░░░░░░░░░` 0% |
 | 🔗 `legacy-url-migration` — Legacy URL migration (free.fr / SVN / FTP) | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 📦 `static-repo-publish` — Static artifact repository publication | ✅ Done | 🟠 P1 | `████████████████████` 100% |
-| 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🔵 Proposed | 🟡 P2 | `░░░░░░░░░░░░░░░░░░░░` 0% |
+| 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🟡 In progress | 🟡 P2 | `████████░░░░░░░░░░░░` 40% |
 | 🎬 `ytdlp-migration` — `youtube-dl` → `yt-dlp` migration | 🔵 Proposed | 🟡 P2 | `████░░░░░░░░░░░░░░░░` 20% |
 | 🖼️ `javafx-modernization` — JavaFX & runtime packaging modernization | 🔵 Proposed | 🟡 P2 | `█░░░░░░░░░░░░░░░░░░░` 5% |
 | 🧪 `plugin-tester-align` — `plugin-tester` reactor alignment | ✅ Done | 🟠 P1 | `████████████████████` 100% |
@@ -176,9 +176,9 @@ mvn -B -ntp -DskipTests compile      # BUILD SUCCESS (after plugin-tester-align 
 
 | | |
 |---|---|
-| **Status** | 🔵 Proposed |
+| **Status** | 🟡 In progress |
 | **Priority** | 🟠 P1 |
-| **Progress** | `░░░░░░░░░░░░░░░░░░░░` 0% |
+| **Progress** | `████████░░░░░░░░░░░░` 40% |
 | **Legacy code** | HBTV-003 |
 
 **Scope** — Apply the GitHub settings documented in
@@ -292,17 +292,25 @@ run one dedicated opt-in runtime update smoke test with
 renamed, broken parser). No code removal in this item.
 
 **Acceptance criteria**
-- ⬜ Inventory table per plugin with last-known status
-- ⬜ For each obsolete/renamed plugin, a recommended dedicated
-  removal/rename PR is named
+- ✅ Inventory table per plugin with last-known status
+- ✅ For each obsolete/renamed plugin, a recommended dedicated
+  follow-up PR is named
 - ⬜ Offline fixtures captured where feasible
 
-**Validation** — Inventory reviewed in a doc-only PR; no behavior change.
+**Validation**
+```bash
+docs/provider-inventory.md reviewed in a doc-only PR
+# no provider code, runtime update behavior, or Maven publication behavior change
+```
 
-**Notes** — Visible candidates: `pluzz` (already renamed `francetv` on
-`habitv-repo`), `canalPlus`, `beinsport`, `D8`/`D17`/`nrj12` (README
-mentions but no module exists), `wat`, `sfr`, `clubic`, `kewego`-derived
-RSS samples. Risks `live-tests-flaky`, `provider-endpoints-dead`.
+**Related PR** · `docs: inventory provider plugin status` (this PR)
+
+**Notes** — Inventory baseline is now documented in
+[`provider-inventory.md`](provider-inventory.md) for every plugin module
+plus historical references (`D8`, `D17`, `nrj12`, FranceTV/Pluzz,
+Kewego). This item remains open until fixture-based validation and
+dedicated cleanup/rewrite PRs are completed. Risks `live-tests-flaky`,
+`provider-endpoints-dead`.
 
 ---
 
@@ -562,7 +570,7 @@ scope for a dedicated security PR.
 Recommended merge / start order (see `dev-plan.md` for phase reasoning):
 
 1. 🔵 **Apply branch protection** → close `branch-protection`
-2. 🔵 **Start `provider-inventory`** after HBTV-005 closure confirmation
+2. 🟡 **Complete `provider-inventory` follow-up fixture/rewrite PRs**
 3. 🔵 Then in any order: `ytdlp-migration`, `javafx-modernization`
 
 ---

@@ -18,12 +18,12 @@
   ],
   "summary": {
     "done": 10,
-    "inProgress": 0,
-    "proposed": 4,
+    "inProgress": 1,
+    "proposed": 3,
     "deferred": 0,
     "blocked": 0,
     "total": 14,
-    "overallProgressPercent": 73
+    "overallProgressPercent": 76
   },
   "items": [
     {
@@ -168,9 +168,9 @@
       "legacyCode": "HBTV-006",
       "displayTitle": "Provider plugin inventory & cleanup",
       "icon": "🔌",
-      "status": "proposed",
+      "status": "in-progress",
       "priority": "P2",
-      "progressPercent": 0,
+      "progressPercent": 40,
       "scope": "Inventory every plugin in plugins/ (22 in aggregator + plugin-tester); record current status (working, obsolete endpoint, renamed, broken parser). No code removal in this item.",
       "acceptanceCriteria": [
         "Inventory table per plugin with last-known status.",
@@ -180,8 +180,8 @@
       "validation": [
         "Inventory reviewed in a doc-only PR; no behavior change."
       ],
-      "pr": "TBD",
-      "notes": "Visible candidates: pluzz (already renamed francetv on habitv-repo), canalPlus, beinsport, D8/D17/nrj12 (README mentions but no module), wat, sfr, clubic. Risks live-tests-flaky, provider-endpoints-dead."
+      "pr": "docs/provider-plugin-inventory (this PR)",
+      "notes": "Inventory baseline added in docs/provider-inventory.md covering all plugin modules plus historical references (D8, D17, nrj12, FranceTV/Pluzz, Kewego). Follow-up PR queue documented without removing modules. Risks live-tests-flaky, provider-endpoints-dead."
     },
     {
       "id": "ytdlp-migration",
