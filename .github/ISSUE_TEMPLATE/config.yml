@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Development tracker
+    url: https://github.com/Mika3578/habitv/blob/develop/docs/dev-tracker.md
+    about: Review active modernization items (HBTV-XXX) before opening a feature request
+  - name: Security policy
+    url: https://github.com/Mika3578/habitv/blob/develop/SECURITY.md
+    about: Report vulnerabilities privately per SECURITY.md
