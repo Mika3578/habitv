@@ -1,120 +1,386 @@
-# AGENTS.md
+# 🤖 AGENTS.md — Rules for AI coding agents
 
-Instructions for AI coding agents (Codex, Cursor, Claude, Copilot, etc.)
-working on the Habitv repository. These instructions complement, but do
-not replace, the human review process.
+Instructions for **Codex, Cursor, Claude, Copilot** and any other AI
+coding agent working on the Habitv repository. These instructions
+complement, but do not replace, the human review process.
 
-## Repository context
+> 📚 **Companion files** (read them before acting):
+> - [`CONTRIBUTING.md`](CONTRIBUTING.md) — branch / commit / PR policy
+> - [`docs/dev-plan.md`](docs/dev-plan.md) — phased modernization plan
+> - [`docs/dev-tracker.md`](docs/dev-tracker.md) — active work items
+> - [`docs/risk-register.md`](docs/risk-register.md) — current risks
+> - [`docs/decision-log.md`](docs/decision-log.md) — accepted ADRs
 
-Habitv is a Java 8 Maven multi-module application that downloads
-French TV catch-up content via pluggable provider plugins. Top-level
-layout (see `docs/audit-master-baseline.md` for details):
+---
 
-- `pom.xml` — root parent POM (no reactor `<modules>` yet).
-- `fwk/` — `fwk/api`, `fwk/framework` (no aggregator `<modules>` yet).
-- `application/` — aggregator of `core`, `consoleView`, `trayView`,
-  `habiTv`.
-- `plugins/` — aggregator of 22 plugin modules
-  (`plugins/plugin-tester` is intentionally not in the aggregator).
+## 🧭 1. Repository context
 
-The repository is in a controlled restart phase: most cleanup work
-is staged via the tracker in `docs/dev-tracker.md`.
+Habitv is a **Java 8 Maven multi-module** application that downloads
+French TV catch-up content via pluggable provider plugins.
 
-## Branching model
-
-- `master` is the stable baseline and the protected default branch.
-- `develop` will become the integration branch after the bootstrap
-  PR is merged (see `docs/github-repository-settings.md`).
-- Short-lived feature branches: `chore/...`, `build/...`, `ci/...`,
-  `docs/...`, `test/...`, `runtime/...`, `provider/...`, `fix/...`,
-  `feature/...`.
-- Never base modernization branches on `develop` until the bootstrap
-  PR is merged. The restart PR itself targets `master`.
-
-## Commit policy
-
-- Conventional Commits: `<type>(<scope>): <subject>`.
-  Types: `feat`, `fix`, `refactor`, `perf`, `docs`, `test`, `chore`,
-  `build`, `ci`, `style`, `revert`.
-- Subject: imperative, lowercase, no trailing period, <= 72 chars.
-- Body (when needed): explain the motivation and contrast with prior
-  behavior. Wrap at ~72 chars.
-- One logical change per commit. Split commits that need "and" in
-  the subject.
-- Never commit secrets, tokens, local paths, build outputs, or
-  IDE files.
-
-## PR policy
-
-- One tracker item per PR. Reference it as `HBTV-XXX` in the body.
-- Use `.github/pull_request_template.md` and fill every section.
-- Keep diffs small and focused; no opportunistic refactors,
-  formatting passes, or unrelated dependency bumps.
-- Preserve linear history. No merge commits inside feature branches.
-- Update documentation (`docs/dev-tracker.md`,
-  `docs/dev-tracker.json`, `docs/risk-register.md`, and
-  `docs/decision-log.md`) when the change is meaningful.
-
-## Validation policy
-
-Default validation command for the current phase:
+### Layout
 
 ```
+.
+├── pom.xml                # root parent POM (aggregates fwk/, application/, plugins/)
+├── fwk/                   # api/, framework/
+├── application/           # core/, consoleView/, trayView/, habiTv/
+│   ├── habiTv-linux/      # ❌ out of reactor — JavaFX 2.x, hardcoded ${jdk.home}
+│   └── habiTv-windows/    # ❌ out of reactor — JavaFX 2.x, hardcoded ${jdk.home}
+├── plugins/               # 22 provider/downloader/export plugins + plugin-tester
+└── docs/                  # tracker, plan, risks, decisions, audit baseline
+```
+
+### Current state at a glance
+
+| Item | State |
+|------|:-----:|
+| Maven reactor walkable end-to-end | ✅ |
+| `mvn validate` on Ubuntu + Windows (CI) | ✅ |
+| `mvn compile` from root | ✅ |
+| `mvn test` (offline) | 🟡 partial |
+| `mvn package` (full app) | ⛔ blocked on JavaFX / `jdk.home` |
+| Legacy `dabiboo.free.fr` / SVN / FTP removed | ⬜ |
+| `youtube-dl` → `yt-dlp` complete migration | 🟡 wiring only |
+| Provider plugin endpoints audited | ⬜ |
+
+---
+
+## 🚦 2. Hard rules (never break)
+
+| 🔴 Forbidden without explicit tracker item + ADR | Why |
+|---|---|
+| Restructure Maven reactor topology | High blast radius; tracked under `maven-reactor` |
+| Bump Java baseline beyond **Java 8** | JavaFX 2.x and `javax.xml.bind` 2.0 assume JDK 8 |
+| Migrate JavaFX (`jfxrt`) to OpenJFX | Tracked under `javafx-modernization` |
+| Regenerate JAXB classes or move to `jakarta.*` | Risk `jaxb-mismatch` |
+| Replace `youtube-dl` plugin behavior with `yt-dlp` | Tracked under `ytdlp-migration` |
+| Change runtime updater URLs or layout | Tracked under `static-repo-publish` |
+| Migrate FTP/HTTP repositories | Tracked under `legacy-url-migration` |
+| Remove or rename provider/plugin modules | Tracked under `provider-inventory` |
+| Add OWASP / SBOM / static-analysis plugins | Out of restart phase |
+| Commit secrets, tokens, local paths, IDE files | 🚨 never, period |
+| Write non-English content (branches, code, docs) | English-only policy |
+
+---
+
+## 📝 3. Commit policy
+
+Conventional Commits, English, imperative, lowercase, ≤ 72 chars.
+
+```
+<type>(<scope>): <subject>
+
+<body wrapped at ~72 chars — motivation, not implementation detail>
+```
+
+**Types allowed**: `feat`, `fix`, `refactor`, `perf`, `docs`, `test`,
+`chore`, `build`, `ci`, `style`, `revert`.
+
+**One logical change per commit.** Split any subject containing "and".
+
+---
+
+## 🎯 4. PR policy
+
+| Rule | Detail |
+|------|--------|
+| Tracker reference | Reference one work-item slug (e.g. `legacy-url-migration`) in the PR body |
+| Template | Fill every section of `.github/pull_request_template.md` |
+| Diff size | Keep small and focused; reject opportunistic refactors |
+| History | Linear inside feature branches; no merge commits |
+| Doc sync | Update tracker, risk register, decision log on meaningful changes |
+
+---
+
+## 🧪 5. Validation policy
+
+Default validation command for this phase:
+
+```bash
 mvn -B -ntp -DskipTests validate
 ```
 
-Stronger commands (`compile`, `test`, `package`, `verify`) are
-NOT default-safe yet because the reactor is incomplete (see
-`docs/audit-master-baseline.md`). Use them only when a tracker
-item explicitly asks for them, and document the exact command
-in the PR body.
+Stronger commands are **not default-safe**. Use them only when a
+tracker item explicitly asks for them, and document the **exact
+command + output** in the PR body.
 
-## Forbidden broad changes (in this restart phase)
+| Command | Status |
+|---------|:------:|
+| `mvn validate` | 🟢 always run |
+| `mvn compile` | 🟢 safe from `develop` since `own-version-deps-align` |
+| `mvn package` | 🟡 use `-pl` to exclude broken modules |
+| `mvn test` | 🟠 many tests hit live network — quarantine |
+| `mvn verify` | ⛔ not safe yet |
 
-Do not, without an explicit tracker item and ADR:
+---
 
-- Restructure Maven reactor or aggregator topology.
-- Migrate Java baseline beyond Java 8.
-- Migrate JavaFX (JDK-bundled `jfxrt`) to OpenJFX.
-- Regenerate or replace JAXB-bound classes / move to `jakarta.*`.
-- Replace `youtube-dl` with `yt-dlp` (HBTV-007).
-- Change runtime updater URLs or layout (HBTV-005).
-- Migrate FTP/HTTP repositories (HBTV-004).
-- Remove or rename provider/plugin modules (HBTV-006).
-- Add OWASP dependency-check, SBOM, or static-analysis plugins.
+## 🛠️ 6. How to maintain trackers
 
-## How to update tracker / risk / decision docs
+`docs/dev-tracker.md` and `docs/dev-tracker.json` are **mirrors**.
+Always update both in the same commit. Fields per item:
 
-- `docs/dev-tracker.md` is the human-readable list of items. Each
-  item must keep its fields: Status, Priority, Scope, Acceptance
-  criteria, Validation, PR, Notes.
-- `docs/dev-tracker.json` is the machine-readable mirror. Always
-  update both in the same commit. Field names must match.
-- `docs/risk-register.md` tracks risks `R-00X`. Add new risks with
-  a description, likelihood/impact note, and mitigation plan.
-- `docs/decision-log.md` uses ADR entries `ADR-00XX` with Status,
-  Context, Decision, Consequences. Append-only; supersede rather
-  than rewrite past decisions.
+- `id` — descriptive kebab-case slug (e.g. `legacy-url-migration`)
+- `legacyCode` — old opaque code preserved for compat (`HBTV-XXX`)
+- `displayTitle` — human-readable label
+- `icon` — emoji prefix
+- `status` — `proposed` | `in-progress` | `done` | `blocked` | `deferred`
+- `priority` — `P0` (critical) | `P1` (high) | `P2` (normal) | `P3` (low)
+- `progressPercent` — integer 0–100
+- `scope`, `acceptanceCriteria`, `validation`, `pr`, `notes`
 
-## How to handle failing tests
+For risks in `docs/risk-register.md` and decisions in
+`docs/decision-log.md`, follow the same convention: a descriptive
+slug as the primary id, a `Legacy code` field for the old `R-0XX`
+or `ADR-00XX` reference. Append-only; supersede rather than rewrite.
 
-- Read the failing assertion AND the test before editing code.
-- Do not edit a test only to make it pass; understand the contract.
-- If the failure is environmental (network, missing tool, OS
-  binary), do not retry blindly; record the limitation in the PR
-  body and in `docs/risk-register.md` if novel.
-- Never disable, delete, or `@Ignore` a test to ship green without
-  documenting the reason in the PR and the tracker.
+---
 
-## How to report partial validation honestly
+## 🧯 7. How to handle failures
 
-If the agent cannot run a required validation command (missing
-Java, Maven, network, or external tool), it must:
+### Test failure
+1. Read the failing assertion **and** the test before editing code.
+2. Do not patch the test only to make it pass — understand the contract.
+3. If the failure is environmental (network, missing tool, OS binary),
+   document the limitation; never blindly retry.
 
-1. State exactly which command could not be run and why.
+### Build failure
+1. Capture the **exact** Maven output (module, plugin, error).
+2. If caused by blocked legacy `dabiboo.free.fr` / FTP, it is a known
+   class — link the relevant risk and tracker item.
+3. Never bypass with `--no-verify` or by skipping hooks.
+
+### Cannot run a required command
+You **must**:
+1. State exactly which command could not be run, and why.
 2. Not claim success for that command.
-3. Record the limitation in the PR body's "Validation results"
-   section AND in `docs/audit-master-baseline.md` if it changes
-   the picture of what is reproducible on a clean machine.
-4. Propose the minimal next step needed to make that command
-   runnable (e.g. install Temurin 8, restore network).
+3. Record the limitation in the PR body's "Validation results" section
+   and, if it changes the reproducibility picture, in
+   `docs/audit-master-baseline.md`.
+4. Propose the minimal next step to make the command runnable.
+
+---
+
+## 🔐 8. Security awareness
+
+- ❌ Never introduce hardcoded API keys, passwords, or tokens.
+- ❌ Never extend the existing hardcoded credentials (Gmail tests,
+  YouTube key, freebox FTP sample) — they are tracked for removal.
+- ❌ Never silently re-enable runtime calls to legacy hosts
+  (`dabiboo.free.fr`, `ftpperso.free.fr`).
+- ✅ Read [`SECURITY.md`](SECURITY.md) before touching any auth or
+  network code.
+
+---
+
+## 🗣️ 9. Communication conventions
+
+- Always reply in **English** in code, commits, comments, docs, and PR
+  text — regardless of the user's prompt language.
+- Be precise about what you ran vs. what you reasoned about. Cite
+  exact command outputs, file paths, and line numbers.
+- Disagree with the user when their suggestion would break a hard
+  rule above; surface the conflict instead of complying silently.
+
+---
+
+## 📅 10. Update cadence
+
+This file is reviewed:
+- On every phase transition in `docs/dev-plan.md`.
+- When a new hard rule is added (must come with an accepting ADR).
+- When the supported tooling baseline changes (Java version, Maven
+  version, OS targets).
+
+Last refresh: see the latest commit touching this file.
+
+---
+
+## 🔄 11. Doc sync protocol (after every step)
+
+**Rule** — every commit that changes meaningful state must keep the
+documentation set in lockstep. A "meaningful state change" is any
+commit that creates, advances, completes, mitigates, supersedes, or
+contradicts an item that is already documented.
+
+### 11.1 What to update, by commit type
+
+| Type | `CHANGELOG.md` | `dev-tracker.{md,json}` | `risk-register.md` | `decision-log.md` |
+|------|:---:|:---:|:---:|:---:|
+| `feat` | ✅ Features | ✅ status / progress | 🟡 if mitigates | 🟡 if architectural |
+| `fix` | ✅ Fixes | 🟡 progress | 🟡 if mitigates | ❌ |
+| `refactor` | ✅ | ❌ | ❌ | 🟡 if shape change |
+| `perf` | ✅ | ❌ | ❌ | ❌ |
+| `docs` | 🟡 if user-facing | ✅ if scope/status | ✅ if risk listed | ✅ if ADR proposed |
+| `test` | ✅ Tests | 🟡 progress | 🟡 `live-tests-flaky` quarantine | ❌ |
+| `chore` | 🟡 if user-facing | ❌ | ❌ | ❌ |
+| `build` | ✅ Build | 🟡 progress | 🟡 if removes blocker | 🟡 if topology |
+| `ci` | ✅ Build | 🟡 progress | ❌ | ❌ |
+| `style` | ❌ | ❌ | ❌ | ❌ |
+| `revert` | ✅ | ✅ reopen | ✅ reopen | 🔁 supersede |
+
+`✅` = required when the commit touches that area · `🟡` = required
+**if** the commit's content matches the condition next to the icon ·
+`❌` = leave alone.
+
+### 11.2 What to update, by milestone
+
+| Milestone | Required updates |
+|---|---|
+| **PR merged** | Bump `progressPercent` on each item the PR advanced. Recompute the `summary` block in `dev-tracker.json`. Refresh the dashboard tables in `dev-tracker.md`, `dev-plan.md`, `risk-register.md`. |
+| **All criteria met for an item** | Flip `status` to `done`, set `progressPercent: 100`, recompute summaries, add a CHANGELOG entry summarizing the item. |
+| **Phase completed** | Mark the phase done in `dev-plan.md`. Recompute the phase progress bar. Refresh AGENTS.md "Current state at a glance" table (Section 1). |
+| **New risk identified** | Add row to `risk-register.md` dashboard table AND a dedicated section below it. Link from the relevant tracker item. |
+| **Risk mitigated** | Move the risk to the 🟢 Mitigated bucket. Annotate the mitigating PR in its `Status update` line. |
+| **New decision** | Append an ADR in `decision-log.md` and update its dashboard table. Reference the ADR id from any item it constrains. |
+
+### 11.3 How to verify before a PR
+
+The agent MUST run this checklist before requesting review:
+
+```bash
+# 1. The two tracker files agree on slug ids
+python3 - <<'EOF'
+import json, re
+md = open('docs/dev-tracker.md').read()
+js = json.load(open('docs/dev-tracker.json'))
+md_slugs = set(re.findall(r'`([a-z][a-z0-9-]{4,})`', md))
+js_slugs = {i['id'] for i in js['items']}
+missing = js_slugs - md_slugs
+assert not missing, f"Missing slugs in dev-tracker.md: {missing}"
+assert len(js_slugs) == js['summary']['total']
+print('OK:', len(js_slugs), 'items, all slugs cross-referenced')
+EOF
+
+# 2. The progress summary matches the items
+python3 - <<'EOF'
+import json
+js = json.load(open('docs/dev-tracker.json'))
+s = js['summary']
+counts = {'done': 0, 'in-progress': 0, 'proposed': 0, 'blocked': 0, 'deferred': 0}
+for i in js['items']:
+    counts[i['status']] += 1
+assert s['done'] == counts['done'], (s, counts)
+assert s['inProgress'] == counts['in-progress'], (s, counts)
+assert s['proposed'] == counts['proposed'], (s, counts)
+print('OK: summary matches item statuses')
+EOF
+
+# 3. CHANGELOG has an Unreleased entry referencing this PR if user-facing
+grep -F "$(git rev-parse --short HEAD)" CHANGELOG.md || true
+```
+
+A PR that flunks 11.1, 11.2, or 11.3 must be amended before merge.
+
+---
+
+## 🧬 12. Rule lifecycle — meta-rules
+
+This section is the rulebook **about** the rulebook. It governs how
+rules in `AGENTS.md` can be created, modified, or deleted, including
+the rules in this very section.
+
+### 12.1 Rule identification
+
+Every rule is uniquely identified by its **section heading + index**:
+
+- `2.5` — "Replace `youtube-dl` plugin behavior with `yt-dlp`"
+  (a hard rule from Section 2's table)
+- `3` — "Conventional Commits …" (a process rule from Section 3)
+- `12.3` — "Modify a rule" (a meta-rule, this section)
+
+Rule classes and their breakage consequence:
+
+| Class | Found in | Breakage consequence |
+|------|---------|----------------------|
+| 🔴 **Hard rule** | Section 2 | PR reverted; incident logged |
+| 🟠 **Process rule** | Sections 3–11 | PR amended; warning logged |
+| 🟣 **Meta-rule** | Section 12 | PR blocked at review; cannot proceed without compliance |
+
+### 12.2 Create a rule
+
+To **add** a new rule:
+
+1. Open or update an ADR in `docs/decision-log.md` with status
+   `🟡 Proposed`. The ADR must carry:
+   - **Context** — why the rule is needed.
+   - **Decision** — the rule's exact wording.
+   - **Consequences** — what it constrains and how it interacts with
+     existing rules.
+2. Add the rule text to `AGENTS.md` in the same PR.
+3. If the rule is a 🔴 hard rule (Section 2), it must reference a
+   risk from `risk-register.md`. If no relevant risk exists, add one
+   in the same PR.
+4. On merge, the ADR transitions from `🟡 Proposed` to
+   `✅ Accepted`.
+
+### 12.3 Modify a rule
+
+To **change** an existing rule's wording, scope, or strictness:
+
+1. Open a new ADR (do not edit the old one) that **supersedes** the
+   prior ADR. Use the metadata line `Supersedes: <old-slug>`.
+2. Edit the rule text in `AGENTS.md` in the same PR.
+3. Update the ADR dashboard in `decision-log.md`: the older ADR
+   becomes `🔁 Superseded`; the new one is `✅ Accepted` on merge.
+4. If the change weakens a 🔴 hard rule, the ADR must explicitly
+   identify the residual risk and link the risk slug that now
+   carries it.
+
+### 12.4 Delete a rule
+
+To **remove** a rule entirely:
+
+1. Open an ADR with status `🟡 Proposed`. The decision must:
+   - Quote the removed rule verbatim.
+   - Explain why it is no longer needed (changed reality, replaced
+     by a different mechanism, etc.).
+   - Identify any residual risk that must be accepted, and link the
+     risk slug entry created for it.
+2. Remove the rule text from `AGENTS.md` in the same PR.
+3. If the deleted rule was a 🔴 hard rule, the PR requires explicit
+   owner approval and cannot be self-approved by an AI agent.
+
+### 12.5 Conflict-of-interest safeguards
+
+These hold for AI agents in particular:
+
+- 🚫 An agent **may not** delete or weaken a hard rule in the same
+  PR that benefits from doing so. Split into two PRs: first the
+  rulebook change, then the work it enables.
+- 🚫 An agent **may not** silently amend a rule. Every change goes
+  through 12.2 / 12.3 / 12.4 with an ADR.
+- 🚫 An agent **may not** create a rule that exempts itself, a
+  specific tool, a specific branch, or a specific user from the
+  meta-rules.
+- ✅ An agent **must** flag a conflict between two existing rules
+  the moment it observes one, even if it does not have authority
+  to resolve it.
+
+### 12.6 Self-modification of meta-rules
+
+The meta-rules in Section 12 themselves can be changed — but with
+extra care:
+
+- The ADR proposing a change to Section 12 must remain in
+  `🟡 Proposed` for **at least 7 days** before it can be merged.
+- The cooling-off period prevents an agent from instantly weakening
+  its own constraints inside a single working session.
+- This 7-day cooling-off **does not apply** to fixing typos,
+  formatting, or clarifications that demonstrably do not change the
+  rules' force.
+
+### 12.7 Audit trail
+
+Any change to `AGENTS.md` must leave traceable evidence:
+
+- The commit message references the ADR slug introducing or
+  superseding the change (e.g.
+  `docs(agents): ... (doc-sync-and-rule-lifecycle)`).
+- The ADR references the section/rule it touches (e.g.
+  `Touches: AGENTS.md §11, §12`).
+- The dashboard tables in `decision-log.md` and `dev-tracker.md`
+  are refreshed in the same PR.
+
+A change that breaks the audit trail is invalid and must be
+reverted.
