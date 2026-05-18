@@ -10,7 +10,7 @@ work from a later phase.
 ## 🎯 Phase progress
 
 ```
-█████████████████░░░░░░░  71%   (5 / 7 phases)
+██████████████████░░░░░░  76%   (5 / 7 phases done, 1 in progress)
 ```
 
 | Phase | Title | Status | Progress | Tracker items |
@@ -21,7 +21,7 @@ work from a later phase.
 | 3 | 🔗 Remove legacy free.fr / SVN / FTP | ✅ Done | `████████████████████` 100% | `legacy-url-migration`, `youtube-apikey` |
 | 4 | 📦 Publish artifacts via `habitv-repo` | ✅ Done | `████████████████████` 100% | `static-repo-publish` |
 | 5 | 🎬 Replace `youtube-dl` with `yt-dlp` | 🔵 Proposed | `████░░░░░░░░░░░░░░░░` 20% | `ytdlp-migration` |
-| 6 | 🔌 Audit / deprecate obsolete providers | 🔵 Proposed | `░░░░░░░░░░░░░░░░░░░░` 0% | `provider-inventory` |
+| 6 | 🔌 Audit / deprecate obsolete providers | 🟡 In progress | `████████░░░░░░░░░░░░` 40% | `provider-inventory` |
 | 7 | 🖼️ Modernize UI / runtime packaging | 🔵 Proposed | `█░░░░░░░░░░░░░░░░░░░` 5% | `javafx-modernization` |
 
 ---
@@ -126,12 +126,14 @@ branch `develop` created.
 
 ## 🔌 Phase 6 — Audit / deprecate obsolete providers
 
-🔵 **Proposed** · `░░░░░░░░░░░░░░░░░░░░` 0%
+🟡 **In progress** · `████████░░░░░░░░░░░░` 40%
 
 - Inventory all provider plugins and verify endpoints are reachable
   and parsable (offline against captured fixtures, not live).
 - Mark obsolete or renamed providers with a deprecation plan and
   dedicated removal PRs.
+- Baseline classification doc added at `docs/provider-inventory.md`;
+  follow-up fixture and rewrite PRs remain pending.
 
 **Tracker** — `provider-inventory`.
 
