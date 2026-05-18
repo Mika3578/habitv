@@ -477,9 +477,10 @@ public class XMLUserConfig implements UserConfig {
 
 	@Override
 	public boolean autoriseSnapshot() {
-		return config.getUpdateConfig() == null
+		final boolean fromConfiguration = config.getUpdateConfig() == null
 				|| config.getUpdateConfig().getAutoriseSnapshot() == null ? false
 				: config.getUpdateConfig().getAutoriseSnapshot();
+		return UpdateConfigResolver.resolveAutoriseSnapshot(fromConfiguration);
 	}
 
 	@Override

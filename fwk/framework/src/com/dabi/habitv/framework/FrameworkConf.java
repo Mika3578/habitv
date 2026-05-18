@@ -22,6 +22,9 @@ public interface FrameworkConf {
 
 	String UPDATE_URL_PROPERTY = "habitv.update.url";
 
+	/** Overrides configuration.xml updateConfig/autoriseSnapshot when set to true or false. */
+	String UPDATE_AUTORISE_SNAPSHOT_PROPERTY = "habitv.update.autoriseSnapshot";
+
 	/** Target static repository base when updates are explicitly enabled. */
 	String UPDATE_URL = "https://mika3578.github.io/habitv-repo/repository/";
 
