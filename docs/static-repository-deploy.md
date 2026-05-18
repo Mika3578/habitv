@@ -14,6 +14,60 @@ publicly via GitHub Pages.
 build/deploy time. Habitv at runtime never reads that path; it downloads from the
 HTTPS URL in `FrameworkConf.UPDATE_URL`.
 
+## One-command workflow (preferred)
+
+The `static-repo-publish` profile adds a final reactor module,
+`build/static-repo-publisher`, that runs **after** all other modules have deployed.
+
+Windows PowerShell:
+
+```powershell
+mvn -B -ntp -DskipTests clean deploy -Pstatic-repo-publish `
+  '-DaltDeploymentRepository=habitv-local::default::file://${habitv.static.repo.path}' `
+  "-pl=!application/habiTv"
+```
+
+Linux/macOS (metadata and `index.html` only; tool ZIP downloads require PowerShell):
+
+```bash
+mvn -B -ntp -DskipTests clean deploy -Pstatic-repo-publish \
+  '-DaltDeploymentRepository=habitv-local::default::file://${habitv.static.repo.path}' \
+  '-pl=!application/habiTv'
+```
+
+What this single command does:
+
+1. **Maven deploy** — publishes plugin and framework JARs under
+   `${habitv.static.repo.path}/com/dabi/habitv/`.
+2. **`static-repo-publisher`** (final module) — generates:
+   - `plugins.txt`
+   - `habitv-update-manifest.properties`
+   - `index.html` directory listings
+   - `tools/<tool>/<version>/<tool>.zip` (Windows/PowerShell only)
+
+`application/habiTv` remains excluded (`-pl=!application/habiTv`) because of the
+existing JDK/`utils4j` compile blocker, which is unrelated to static repository
+deployment.
+
+Inspect the resolved staging path:
+
+```powershell
+mvn help:evaluate "-Dexpression=habitv.static.repo.path" -q "-DforceStdout"
+```
+
+Override the staging path:
+
+```powershell
+mvn -B -ntp -DskipTests clean deploy -Pstatic-repo-publish `
+  "-Dhabitv.static.repo.path=$env:USERPROFILE/dev/habitv-repo/repository" `
+  '-DaltDeploymentRepository=habitv-local::default::file://${habitv.static.repo.path}' `
+  "-pl=!application/habiTv"
+```
+
+Nothing is written under the `habitv` source tree; output goes only to
+`${habitv.static.repo.path}` (default `${user.home}/dev/habitv-repo/repository`).
+The `repository/` directory is listed in `.gitignore` as a safety net.
+
 ## Default local staging path
 
 Root `pom.xml` defines:
@@ -22,26 +76,11 @@ Root `pom.xml` defines:
 <habitv.static.repo.path>${user.home}/dev/habitv-repo/repository</habitv.static.repo.path>
 ```
 
-This expands per OS (forward slashes, no hardcoded username):
-
 | OS | Example |
 |----|---------|
 | Windows | `C:/Users/<user>/dev/habitv-repo/repository` |
 | Linux | `/home/<user>/dev/habitv-repo/repository` |
 | macOS | `/Users/<user>/dev/habitv-repo/repository` |
-
-Inspect the resolved value:
-
-```bash
-mvn help:evaluate -Dexpression=habitv.static.repo.path -q -DforceStdout
-```
-
-Override for a non-default checkout:
-
-```bash
-mvn -Dhabitv.static.repo.path=/path/to/habitv-repo/repository help:evaluate \
-  -Dexpression=habitv.static.repo.path -q -DforceStdout
-```
 
 ## Workspace layout
 
@@ -50,77 +89,39 @@ ${user.home}/dev/
   habitv/                      # application (clone)
   habitv-repo/                 # static artifacts (clone)
     repository/
-      com/dabi/habitv/...      # Maven layout
-      tools/...                # external tools (zip/exe)
+      com/dabi/habitv/...      # Maven layout (from deploy)
+      tools/...                # external tools (from publisher)
       plugins.txt
       habitv-update-manifest.properties
-      index.html               # optional directory listings
+      index.html
 ```
 
-## Maven deploy (preferred: `altDeploymentRepository`)
+## Manual fallback scripts
 
-`distributionManagement` references `file://${habitv.static.repo.path}` for
-modules that deploy without overrides. For portable, explicit staging, prefer:
-
-```bash
-mvn -B -ntp -DskipTests clean deploy \
-  -DaltDeploymentRepository=habitv-local::default::file://${habitv.static.repo.path}
-```
-
-Use single quotes on Unix shells so `${habitv.static.repo.path}` is resolved by
-Maven, not the shell:
-
-```bash
-mvn -B -ntp -DskipTests clean deploy \
-  '-DaltDeploymentRepository=habitv-local::default::file://${habitv.static.repo.path}'
-```
-
-### Overrides
-
-Linux/macOS:
-
-```bash
-mvn -B -ntp -DskipTests clean deploy \
-  -Dhabitv.static.repo.path="$HOME/dev/habitv-repo/repository" \
-  -DaltDeploymentRepository=habitv-local::default::file://$HOME/dev/habitv-repo/repository
-```
-
-Windows PowerShell:
+If you deploy without the profile, run the publisher script after `mvn deploy`:
 
 ```powershell
-mvn -B -ntp -DskipTests clean deploy `
-  "-Dhabitv.static.repo.path=$env:USERPROFILE/dev/habitv-repo/repository" `
-  "-DaltDeploymentRepository=habitv-local::default::file:///$env:USERPROFILE/dev/habitv-repo/repository"
+.\scripts\static-repo\publish-repository-extras.ps1 -RepositoryPath (mvn help:evaluate "-Dexpression=habitv.static.repo.path" -q "-DforceStdout")
 ```
-
-Or property-only (Maven resolves the path; recommended when using the default):
-
-```powershell
-mvn -B -ntp -DskipTests clean deploy `
-  '-DaltDeploymentRepository=habitv-local::default::file://${habitv.static.repo.path}'
-```
-
-Helper scripts (deploy only, no `git push`):
 
 ```bash
-./scripts/static-repo/deploy-static-repo.sh
+./scripts/static-repo/publish-repository-extras.sh
 ```
+
+Tool sources: `scripts/static-repo/tool-sources.properties`.
+
+Skipped by default: `rtmpdump` (no reliable upstream Windows binary), `adobeHDS`
+(runtime expects `AdobeHDS.exe`; plugin ships `AdobeHDS.php` only).
+
+## Publish to GitHub Pages
+
+After the Maven command completes, commit the sibling `habitv-repo` checkout:
 
 ```powershell
-.\scripts\static-repo\deploy-static-repo.ps1
-```
-
-Optional script argument / `-StaticRepoPath` sets `-Dhabitv.static.repo.path=...`.
-
-## Manual publication to GitHub Pages
-
-After `mvn deploy`, from the `habitv-repo` checkout (parent of `repository/`):
-
-```bash
-cd "$(dirname "$(mvn help:evaluate -Dexpression=habitv.static.repo.path -q -DforceStdout)")"
+cd $env:USERPROFILE\dev\habitv-repo
 git status --short
 git add repository
-git commit -m "repo: publish habitv artifacts"
+git commit -m "repo: publish habitv artifacts and tools"
 git push
 ```
 
