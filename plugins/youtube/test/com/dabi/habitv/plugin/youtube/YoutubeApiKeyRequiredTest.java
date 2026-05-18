@@ -38,7 +38,7 @@ public class YoutubeApiKeyRequiredTest {
 
 	@Test
 	public void requireApiKeyFailsFastWithGuidanceWhenMissing() {
-		Assume.assumeTrue(System.getenv(API_KEY_ENV) == null);
+		Assume.assumeTrue(YoutubeConf.normalizeApiKey(System.getenv(API_KEY_ENV)) == null);
 		try {
 			YoutubePluginManager.requireApiKey();
 			fail("Expected TechnicalException when YouTube API key is missing");
@@ -59,7 +59,7 @@ public class YoutubeApiKeyRequiredTest {
 
 	@Test
 	public void findEpisodeFailsFastBeforeAnyHttpCallWhenApiKeyMissing() {
-		Assume.assumeTrue(System.getenv(API_KEY_ENV) == null);
+		Assume.assumeTrue(YoutubeConf.normalizeApiKey(System.getenv(API_KEY_ENV)) == null);
 		try {
 			new YoutubePluginManagerNoHttpCall().findEpisode(buildPlaylistCategory());
 			fail("Expected TechnicalException when YouTube API key is missing");
