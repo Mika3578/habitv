@@ -1,8 +1,11 @@
 package com.dabi.habitv.plugin.youtube;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -13,6 +16,7 @@ import com.dabi.habitv.api.plugin.api.PluginDownloaderInterface.DownloadableStat
 import com.dabi.habitv.api.plugin.dto.DownloadParamDTO;
 import com.dabi.habitv.api.plugin.holder.DownloaderPluginHolder;
 import com.dabi.habitv.api.plugin.holder.ProcessHolder;
+import com.dabi.habitv.framework.plugin.utils.CmdExecutor;
 
 public class YoutubePluginDownloaderCmdTest {
 
@@ -28,7 +32,13 @@ public class YoutubePluginDownloaderCmdTest {
 	}
 
 	@Test
-	public void downloadReturnsAProcessHolderWithConfiguredYtDlpBinary() {
+	public void getFilesToUpdateReturnsYtDlpArtifactId() {
+		final YoutubePluginDownloader downloader = new YoutubePluginDownloader();
+		assertArrayEquals(new String[] { "yt-dlp" }, downloader.getFilesToUpdate());
+	}
+
+	@Test
+	public void downloadReturnsAProcessHolderWithConfiguredYtDlpBinary() throws Exception {
 		final HashMap<String, String> downloaderName2Bin = new HashMap<>();
 		downloaderName2Bin.put(YoutubeConf.NAME, "/usr/bin/yt-dlp");
 		final DownloaderPluginHolder downloaders = new DownloaderPluginHolder(
@@ -44,5 +54,42 @@ public class YoutubePluginDownloaderCmdTest {
 		final ProcessHolder holder = new YoutubePluginDownloader()
 				.download(param, downloaders);
 		assertNotNull(holder);
+		assertTrue(holder instanceof YtDlpCmdExecutor);
+		final String cmd = readCmd(holder);
+		assertTrue(cmd.startsWith("/usr/bin/yt-dlp "));
+		assertTrue(cmd.contains("https://www.youtube.com/watch?v=jNQXAC9IVRw"));
+		assertTrue(cmd.contains("/tmp/out/test.mp4"));
+		assertTrue(cmd.contains("--write-sub"));
+		assertTrue(cmd.contains("--write-auto-sub"));
+		assertTrue(cmd.contains("--no-check-certificate"));
+	}
+
+	@Test
+	public void downloadWithMp3ArgsIncludesExtractAudioFlags() throws Exception {
+		final HashMap<String, String> downloaderName2Bin = new HashMap<>();
+		downloaderName2Bin.put(YoutubeConf.NAME, "/usr/bin/yt-dlp");
+		final DownloaderPluginHolder downloaders = new DownloaderPluginHolder(
+				"/bin/sh -c #CMD#",
+				Collections.<String, PluginDownloaderInterface>emptyMap(),
+				downloaderName2Bin, "/tmp/out", "/tmp/idx", "/tmp/bin",
+				"/tmp/plugins");
+
+		final DownloadParamDTO param = new DownloadParamDTO(
+				"https://www.youtube.com/watch?v=jNQXAC9IVRw",
+				"/tmp/out/test.mp3", "mp3");
+		param.addParam(com.dabi.habitv.framework.FrameworkConf.PARAMETER_ARGS,
+				YoutubeConf.DUMP_CMD_MP3);
+
+		final ProcessHolder holder = new YoutubePluginDownloader()
+				.download(param, downloaders);
+		final String cmd = readCmd(holder);
+		assertTrue(cmd.contains("--extract-audio"));
+		assertTrue(cmd.contains("--audio-format mp3"));
+	}
+
+	private static String readCmd(final ProcessHolder holder) throws Exception {
+		final Field field = CmdExecutor.class.getDeclaredField("cmd");
+		field.setAccessible(true);
+		return (String) field.get(holder);
 	}
 }
