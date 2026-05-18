@@ -80,7 +80,7 @@ public class UpdateManager {
 	}
 
 	private String[] resolvePluginsToUpdate(final String updateSite) {
-		final String baseUrl = UpdateRepositoryUrls.normalizeBaseUrl(updateSite);
+		final String baseUrl = UpdateRepositoryUrls.normalizeBaseUrl(updateSite.trim());
 		try {
 			final String pluginsList = RetrieverUtils.getUrlContent(
 					baseUrl + "/" + FrameworkConf.PLUGINS_LIST_FILE, null);
