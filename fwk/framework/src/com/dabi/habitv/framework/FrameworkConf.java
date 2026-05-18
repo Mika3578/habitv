@@ -18,6 +18,11 @@ public interface FrameworkConf {
 
 	Integer TIME_OUT_MS = 30000;
 
+	String UPDATE_ENABLED_PROPERTY = "habitv.update.enabled";
+
+	String UPDATE_URL_PROPERTY = "habitv.update.url";
+
+	/** Target static repository base when updates are explicitly enabled. */
 	String UPDATE_URL = "https://mika3578.github.io/habitv-repo/repository";
 
 	String GROUP_ID = "com.dabi.habitv";
