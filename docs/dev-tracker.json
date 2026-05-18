@@ -88,19 +88,23 @@
     },
     {
       "id": "HBTV-004",
-      "title": "Legacy repository URL migration plan",
-      "status": "proposed",
-      "priority": "P1",
-      "scope": "Plan migration of <scm> (SVN/Assembla), Maven <repository> (http://dabiboo.free.fr/repository), <distributionManagement> (ftp://ftpperso.free.fr/repository), and runtime telemetry/update URLs.",
+      "title": "Legacy repository URL migration (execution)",
+      "status": "in-progress",
+      "priority": "P0",
+      "scope": "Remove active DabiBoo/free.fr/SVN/Assembla Maven and runtime wiring; replace SCM with GitHub; disable stat/update network calls by default; point Maven repository at habitv-repo GitHub Pages base.",
       "acceptanceCriteria": [
-        "Document target URLs and transition steps.",
-        "Identify code call sites in FrameworkConf.java, HabitTvConf.java, UpdateManager.java, FindArtifactUtils.java, CoreManager.java."
+        "Active POM/runtime references to dabiboo.free.fr, subversion.assembla.com, scm:svn, and cpt.php are removed.",
+        "Root repository uses https://mika3578.github.io/habitv-repo/repository.",
+        "Telemetry is opt-in via habitv.stat.enabled and habitv.stat.url.",
+        "Plugin updates are opt-in via habitv.update.enabled and optional habitv.update.url."
       ],
       "validation": [
-        "Plan reviewed in PR; no code changes in this item"
+        "git grep legacy URL pattern -> documentation/history only",
+        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS (33 modules)",
+        "mvn -B -ntp -DskipTests compile -> BUILD SUCCESS (33 modules)"
       ],
-      "pr": "TBD",
-      "notes": "Pairs with HBTV-005."
+      "pr": "chore: remove legacy DabiBoo repository wiring (#36)",
+      "notes": "Execution supersedes PR #25 plan-only work. Publication cutover and updater HTML index contract remain HBTV-005; do not enable habitv.update.enabled until static index.html or manifest layout is verified."
     },
     {
       "id": "HBTV-005",
@@ -238,7 +242,7 @@
     {
       "id": "HBTV-013",
       "title": "YouTube Data API key externalization",
-      "status": "in-progress",
+      "status": "done",
       "priority": "P1",
       "scope": "Remove the hardcoded YouTube Data API key from plugins/youtube and resolve it from runtime configuration so revoked/restricted keys do not require a code change.",
       "acceptanceCriteria": [
@@ -253,8 +257,8 @@
         "mvn -B -ntp -DskipTests -pl application/trayView,plugins/youtube -am compile -> BUILD SUCCESS",
         "mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeConfTest -Dsurefire.failIfNoSpecifiedTests=false test -> BUILD SUCCESS"
       ],
-      "pr": "TBD",
-      "notes": "End users can set the key from the tray configuration tab; no environment variable is required for standard usage. Runtime key lookup order: Java property habitv.youtube.apiKey, then environment variable HABITV_YOUTUBE_API_KEY."
+      "pr": "fix: externalize data api key and mask api errors (#29)",
+      "notes": "End users can set the key from the tray configuration tab. Runtime key lookup order: Java property habitv.youtube.apiKey, then environment variable HABITV_YOUTUBE_API_KEY."
     }
   ]
 }
