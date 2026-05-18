@@ -497,4 +497,3 @@ current slugs. Source of truth is the per-entry `Legacy code` field.
 | ADR-0007 | `doc-sync-and-rule-lifecycle` |
 | ADR-0008 | `descriptive-slug-ids` |
 | ADR-0009 | `legacy-dabiboo-svn-removal` |
-| ADR-0009 | `legacy-dabiboo-svn-removal` |
