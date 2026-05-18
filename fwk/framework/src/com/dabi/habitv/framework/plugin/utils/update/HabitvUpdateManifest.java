@@ -119,7 +119,16 @@ public final class HabitvUpdateManifest {
 	}
 
 	public static HabitvUpdateManifest loadFromRepository() {
-		final String manifestUrl = UpdateRepositoryUrls.buildRepositoryUrl(FrameworkConf.UPDATE_MANIFEST_FILE);
+		return loadFromRepository(UpdateRepositoryUrls.getUpdateBaseUrl());
+	}
+
+	public static HabitvUpdateManifest loadFromRepository(final String baseUrl) {
+		final String normalizedBase = UpdateRepositoryUrls.normalizeBaseUrl(baseUrl);
+		if (normalizedBase == null || normalizedBase.isEmpty()) {
+			LOG.debug("Update manifest base URL is empty.");
+			return empty();
+		}
+		final String manifestUrl = normalizedBase + "/" + FrameworkConf.UPDATE_MANIFEST_FILE;
 		try {
 			final String content = RetrieverUtils.getUrlContent(manifestUrl, null);
 			return parse(content);
