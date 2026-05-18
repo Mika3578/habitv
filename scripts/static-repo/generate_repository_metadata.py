@@ -76,7 +76,7 @@ def build_manifest_lines(repository_root, plugin_ids):
 
 def write_plugins_txt(repository_root, plugin_ids):
     path = os.path.join(repository_root, "plugins.txt")
-    with open(path, "w") as handle:
+    with open(path, "w", encoding="utf-8") as handle:
         handle.write("# Habitv plugin artifact ids (one per line, matches Maven artifactId)\n")
         for plugin_id in plugin_ids:
             handle.write(plugin_id + "\n")
@@ -86,7 +86,7 @@ def write_plugins_txt(repository_root, plugin_ids):
 def write_manifest(repository_root, plugin_ids):
     path = os.path.join(repository_root, "habitv-update-manifest.properties")
     lines = build_manifest_lines(repository_root, plugin_ids)
-    with open(path, "w") as handle:
+    with open(path, "w", encoding="utf-8") as handle:
         handle.write("\n".join(lines) + "\n")
     print("Wrote {} ({} lines)".format(path, len(lines)))
 
@@ -108,7 +108,7 @@ def write_directory_index(directory_path):
     for href, label in entries:
         html_lines.append("<a href=\"{}\">{}</a>".format(href, label))
     html_lines.append("</pre></body></html>")
-    with open(os.path.join(directory_path, "index.html"), "w") as handle:
+    with open(os.path.join(directory_path, "index.html"), "w", encoding="utf-8") as handle:
         handle.write("\n".join(html_lines) + "\n")
 
 

@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNull;
 import java.io.File;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.dabi.habitv.framework.FrameworkConf;
@@ -13,6 +14,11 @@ import com.dabi.habitv.framework.FrameworkConf;
 public class UpdateRepositoryUrlsTest {
 
 	private String previousUpdateUrl;
+
+	@Before
+	public void setUp() {
+		previousUpdateUrl = System.getProperty(FrameworkConf.UPDATE_URL_PROPERTY);
+	}
 
 	@After
 	public void tearDown() {
