@@ -158,6 +158,26 @@ When `-Dhabitv.update.enabled=true` (optional `-Dhabitv.update.url=...`):
 Updates are **disabled by default**. If GitHub Pages is unreachable, Habitv keeps
 local plugins and tools.
 
+### Development snapshot updates
+
+Maven deploy publishes timestamped SNAPSHOT JARs (for example
+`arte-4.1.0-20260518.163022-1.jar`). Normal users must keep
+`updateConfig/autoriseSnapshot` set to `false` in `configuration.xml`.
+
+For local development against the published static repository, run Habitv with an
+explicit JVM override (configuration value is read first, then overridden only
+when the property is set):
+
+```bash
+java -Dhabitv.update.enabled=true \
+  -Dhabitv.update.autoriseSnapshot=true \
+  -jar habitv.jar
+```
+
+Supported values for `habitv.update.autoriseSnapshot` are `true` and `false`
+only. Invalid values are ignored and leave the XML setting in effect. The
+updater logs when the XML value is overridden.
+
 ## Layout validation command
 
 After publishing metadata/index files, validate the generated repository layout:
