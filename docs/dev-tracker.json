@@ -23,7 +23,7 @@
     "deferred": 0,
     "blocked": 0,
     "total": 14,
-    "overallProgressPercent": 79
+    "overallProgressPercent": 80
   },
   "items": [
     {
@@ -219,7 +219,7 @@
       "icon": "🖼️",
       "status": "proposed",
       "priority": "P2",
-      "progressPercent": 5,
+      "progressPercent": 10,
       "scope": "Migrate JavaFX 2.x usage and ${jdk.home} packaging assumptions in application/trayView, application/habiTv-linux, application/habiTv-windows, zenjava/javafx-maven-plugin 2.0, and system-scope javafx:jfxrt.",
       "acceptanceCriteria": [
         "Surface inventory captured in audit doc (done in audit-master-baseline).",
@@ -228,10 +228,11 @@
         "habiTv-linux + habiTv-windows re-enterable to the reactor."
       ],
       "validation": [
-        "Audit reviewed in PR; no code changes in this item."
+        "Audit reviewed in PR; no code changes in this item.",
+        "mvn -B -ntp -pl application/habiTv -am -Dtest=JavaFxRuntimeLocatorTest -Dsurefire.failIfNoSpecifiedTests=false test -> BUILD SUCCESS"
       ],
       "pr": "TBD",
-      "notes": "Risk javafx-jdk8. Largest single piece of remaining work once legacy-url-migration + static-repo-publish + provider-inventory are clear."
+      "notes": "Risk javafx-jdk8. HabitvLauncher now resolves jfxrt.jar from common JDK 8 layouts and supports -Dhabitv.jfxrt.path; GUI mode exits with diagnostics when JavaFX is missing. OpenJFX migration and platform packaging remain out of scope."
     },
     {
       "id": "plugin-tester-align",
