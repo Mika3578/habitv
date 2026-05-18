@@ -23,7 +23,7 @@
     "deferred": 0,
     "blocked": 0,
     "total": 14,
-    "overallProgressPercent": 76
+    "overallProgressPercent": 77
   },
   "items": [
     {
@@ -170,18 +170,23 @@
       "icon": "🔌",
       "status": "in-progress",
       "priority": "P2",
-      "progressPercent": 40,
+      "progressPercent": 55,
       "scope": "Inventory every plugin in plugins/ (22 in aggregator + plugin-tester); record current status (working, obsolete endpoint, renamed, broken parser). No code removal in this item.",
       "acceptanceCriteria": [
         "Inventory table per plugin with last-known status.",
         "For each obsolete/renamed plugin, a recommended dedicated removal/rename PR is named.",
-        "Offline fixtures captured where feasible."
+        "Offline fixture baseline captured for priority providers and expanded incrementally."
       ],
       "validation": [
-        "Inventory reviewed in a doc-only PR; no behavior change."
+        "docs/provider-inventory.md updated with an offline fixture policy and baseline.",
+        "mvn -B -ntp -pl plugins/6play -am -Dtest=SixPlayOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test",
+        "mvn -B -ntp -pl plugins/canalPlus -am -Dtest=CanalPlusOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test",
+        "mvn -B -ntp -pl plugins/pluzz -am -Dtest=PluzzOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test",
+        "mvn -B -ntp -pl plugins/arte -am -Dtest=ArteOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test",
+        "mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test"
       ],
-      "pr": "docs/provider-plugin-inventory (this PR)",
-      "notes": "Inventory baseline added in docs/provider-inventory.md covering all plugin modules plus historical references (D8, D17, nrj12, FranceTV/Pluzz, Kewego). Follow-up PR queue documented without removing modules. Risks live-tests-flaky, provider-endpoints-dead."
+      "pr": "test/provider-offline-fixture-baseline (this PR)",
+      "notes": "Inventory baseline from PR #50 is extended with an offline fixture policy and first local fixture metadata/tests for 6play, canalPlus, pluzz, arte, and youtube. No provider rewrite, plugin removal, runtime updater change, yt-dlp migration, JavaFX modernization, or Maven publication change."
     },
     {
       "id": "ytdlp-migration",
