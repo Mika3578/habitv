@@ -1,0 +1,45 @@
+name: Feature request
+description: Propose an improvement or modernization tracker item
+title: "feat: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Large architectural changes need a tracker item (HBTV-XXX) and often an ADR.
+        See `docs/dev-tracker.md`.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or opportunity
+      description: What pain does this solve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+
+  - type: input
+    id: tracker
+    attributes:
+      label: Tracker item (if any)
+      placeholder: HBTV-XXX
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope awareness
+      options:
+        - label: This stays within Java 8 and current Maven reactor constraints
+        - label: This may require a dedicated tracker item and small PR series

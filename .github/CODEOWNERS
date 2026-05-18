@@ -1,0 +1,6 @@
+# Default ownership for review routing (single-maintainer repository).
+* @Mika3578
+.github/ @Mika3578
+docs/ @Mika3578
+pom.xml @Mika3578
+**/pom.xml @Mika3578

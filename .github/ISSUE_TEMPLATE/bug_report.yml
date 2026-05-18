@@ -1,0 +1,66 @@
+name: Bug report
+description: Report a defect in Habitv runtime, build, or plugins
+title: "bug: "
+labels:
+  - bug
+  - triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use English. Do not paste secrets, tokens, or session cookies in logs.
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Java, Maven, OS, Habitv version or commit SHA, affected module(s)
+      placeholder: |
+        Java: ...
+        Maven: ...
+        OS: ...
+        Commit: ...
+        Module(s): ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include exact error messages when possible
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Redact secrets before pasting
+      render: shell
+
+  - type: checkboxes
+    id: network
+    attributes:
+      label: Network dependency
+      options:
+        - label: Requires network or provider access to reproduce
+        - label: Reproducible fully offline

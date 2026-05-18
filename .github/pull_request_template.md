@@ -14,35 +14,36 @@
 <!-- Bullet list of intentional non-changes to avoid scope creep. -->
 -
 
-## Linked tracker item
-
-<!-- HBTV-XXX from docs/dev-tracker.md (and matching docs/dev-tracker.json). -->
-- HBTV-
-
-## Validation commands
+## Validation
 
 <!-- Commands actually run locally and their honest outcome. -->
-- `git status --short`
-- `git branch --show-current`
-- `git log --oneline -5`
+- `git diff --check`
 - `mvn -B -ntp -DskipTests validate`
 
-## Risk assessment
+## Risk
 
 <!-- Reference docs/risk-register.md IDs (R-00X) impacted or introduced. -->
 - Affected risks:
 - New risks:
 - Mitigation:
 
-## Rollback plan
+## Rollback
 
-<!-- How to revert this PR safely if it breaks master. -->
+<!-- How to revert this PR safely if it breaks develop. -->
 - Revert commit(s) via `git revert <sha>` and re-run validation.
 
-## Checklists
+## Linked tracker item
 
-- [ ] Linear history preserved (no merge commits in this branch)
+<!-- HBTV-XXX from docs/dev-tracker.md when applicable. -->
+- HBTV-
+
+## Checklist
+
+- [ ] Branch was created from `develop`
+- [ ] No unrelated source changes
+- [ ] `git diff --check` passed
+- [ ] `mvn -B -ntp -DskipTests validate` passed or baseline failure documented
+- [ ] PR keeps linear history
 - [ ] English used for branches, commits, comments, docs, and PR text
 - [ ] Documentation updated (`docs/dev-tracker.md`, `docs/dev-tracker.json`, risk register, decision log as needed)
-- [ ] No unrelated refactors, formatting, or dependency bumps
 - [ ] No secrets, tokens, local paths, or build outputs committed
