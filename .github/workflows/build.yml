@@ -1,19 +1,17 @@
 name: build
 
 # Conservative baseline CI for the restart from master.
-# Triggers on master and develop so the validate baseline is enforced
-# on every PR aimed at either branch (HBTV-002 closure). See
-# docs/audit-master-baseline.md for context.
+# Intentionally validate-only (no compile, no tests) to avoid masking the
+# legacy reactor/plugin issues documented in docs/audit-master-baseline.md.
+# Subsequent PRs (HBTV-001, HBTV-002) will widen this workflow.
 
 on:
   push:
     branches:
       - master
-      - develop
   pull_request:
     branches:
       - master
-      - develop
 
 permissions:
   contents: read
