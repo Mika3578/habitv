@@ -131,5 +131,9 @@ limitation is purely network policy of the runtime environment.
 Startup telemetry and plugin update checks are disabled by default.
 Enable only when needed: `-Dhabitv.stat.enabled=true`
 `-Dhabitv.stat.url=...` and/or `-Dhabitv.update.enabled=true`
-(optional `-Dhabitv.update.url=...`). Do not enable updates until
-HBTV-005 publishes verified static directory indexes.
+(optional `-Dhabitv.update.url=...`).
+
+Development snapshot updates: keep `<autoriseSnapshot>false</autoriseSnapshot>`
+in `configuration.xml` and pass `-Dhabitv.update.autoriseSnapshot=true` when you
+need Maven timestamped SNAPSHOT plugin artifacts from the static repository.
+This override must not be enabled for normal end users.

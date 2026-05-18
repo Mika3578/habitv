@@ -272,7 +272,9 @@ python scripts/static-repo/validate_repository_layout.py "<repository-root>"
 
 **Notes** — Runtime updates stay disabled by default.
 Publication cutover is complete (`https://mika3578.github.io/habitv-repo/repository/`
-and `plugins.txt` live with no authentication). Remaining follow-up:
+and `plugins.txt` live with no authentication). SNAPSHOT consumption for
+developers is opt-in via `-Dhabitv.update.autoriseSnapshot=true` while
+`configuration.xml` keeps `autoriseSnapshot` false. Remaining follow-up:
 run one dedicated opt-in runtime update smoke test with
 `-Dhabitv.update.enabled=true` against the published Pages URL.
 
