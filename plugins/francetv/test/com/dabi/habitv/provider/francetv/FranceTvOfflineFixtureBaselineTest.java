@@ -1,4 +1,4 @@
-package com.dabi.habitv.provider.pluzz;
+package com.dabi.habitv.provider.francetv;
 
 import static org.junit.Assert.assertTrue;
 
@@ -10,18 +10,18 @@ import java.io.InputStream;
 
 import org.junit.Test;
 
-public class PluzzOfflineFixtureBaselineTest {
+public class FranceTvOfflineFixtureBaselineTest {
 
 	@Test
 	public void fixtureBaselineIsAvailableLocally() throws IOException {
-		String fixturePath = "test/resources/fixtures/pluzz/fixture-baseline.txt";
+		String fixturePath = "test/resources/fixtures/francetv/fixture-baseline.txt";
 		assertTrue("missing local fixture: " + fixturePath, new File(fixturePath).exists());
 		try (InputStream input = new FileInputStream(fixturePath)) {
 			String content = readUtf8(input);
-			assertTrue("fixture metadata must mention provider", content.contains("provider=pluzz"));
+			assertTrue("fixture metadata must mention provider", content.contains("provider=francetv"));
 			assertTrue("fixture metadata must disable network access", content.contains("network=disabled"));
-			assertTrue("fixture metadata must note france.tv direction",
-					content.contains("replacementHint=france.tv"));
+			assertTrue("fixture metadata must note france.tv",
+					content.contains("site=https://www.france.tv"));
 		}
 	}
 

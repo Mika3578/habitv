@@ -76,7 +76,8 @@ public class YoutubePluginDownloader extends BaseUpdatablePlugin implements Plug
 	public DownloadableState canDownload(final String downloadInput) {
 		if (!downloadInput.startsWith("mp3:") && ( downloadInput.contains("youtube.") || downloadInput.contains("youtu.be") || downloadInput.contains("dailymotion.") || downloadInput.contains("vimeo.")
 		        || downloadInput.contains("dailymotion.") || downloadInput.contains("tf1.") || downloadInput.contains("wat.tv")
-		        || downloadInput.contains("clubic.") || downloadInput.contains("6play."))) {
+		        || downloadInput.contains("clubic.") || downloadInput.contains("6play.")
+		        || downloadInput.contains("france.tv"))) {
 			return DownloadableState.SPECIFIC;
 		} else {
 			return DownloadableState.IMPOSSIBLE;

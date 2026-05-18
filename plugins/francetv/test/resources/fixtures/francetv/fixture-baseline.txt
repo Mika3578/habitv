@@ -1,0 +1,4 @@
+provider=francetv
+network=disabled
+site=https://www.france.tv
+downloader=youtube

@@ -25,7 +25,7 @@ habiTv est utilisable de 2 manières :
 Il supporte actuellement les fournisseurs suivant : 
 
     canalPlus
-    pluzz  (france 2,3,4,ô)
+    francetv  (france.tv — France 2, 3, 4, 5, O)
     arte
     D8
     D17
