@@ -12,11 +12,6 @@
 	<name>habiTv</name>
 	<dependencies>
 		<dependency>
-			<groupId>org.fuin</groupId>
-			<artifactId>utils4j</artifactId>
-			<version>0.16.0</version>
-		</dependency>	
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
