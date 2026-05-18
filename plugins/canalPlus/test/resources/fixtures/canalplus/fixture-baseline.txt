@@ -1,0 +1,3 @@
+providerFamily=canalPlus,d8,d17
+network=disabled
+note=Fixture placeholder for split Canal+/D8/D17 endpoint rewrite planning.

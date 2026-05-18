@@ -1,0 +1,4 @@
+provider=youtube
+ytdlpMigrationScope=out-of-scope
+network=disabled
+note=Fixture boundary marker for provider inventory phase only.
