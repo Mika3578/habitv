@@ -19,17 +19,17 @@
 ## 📊 Overall progress
 
 ```
-████████████████░░░░░░░░  62%
+████████████████░░░░░░░░  64%
 ```
 
 | Category | Count |
 |---------|------:|
-| ✅ Delivered | **8** |
+| ✅ Delivered | **9** |
 | 🟡 In progress | **0** |
 | 🔵 Proposed | **5** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
-| **Total work items** | **13** |
+| **Total work items** | **14** |
 
 ---
 
@@ -50,6 +50,7 @@
 | ▶️ `console-runnable` — Runnable console baseline | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 🔗 `own-version-deps-align` — Own-version plugin dependency alignment | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 🔑 `youtube-apikey` — YouTube Data API key externalization | ✅ Done | 🟠 P1 | `████████████████████` 100% |
+| 🧩 `jaxb-launcher-recovery` — JAXB generated sources & launcher classpath recovery | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 
 ---
 
@@ -512,6 +513,47 @@ Java property `habitv.youtube.apiKey`, then environment variable
 
 ---
 
+
+## 🧩 `jaxb-launcher-recovery` — JAXB generated sources & launcher classpath recovery
+
+| | |
+|---|---|
+| **Status** | ✅ Done |
+| **Priority** | 🟠 P1 |
+| **Progress** | `████████████████████` 100% |
+| **Legacy code** | HBTV-014 |
+
+**Scope** — Restore Maven/IDE visibility for JAXB-generated packages in
+`application/core` and fix `HabitvLauncher` classpath setup without
+broad dependency remediation or provider modernization.
+
+**Acceptance criteria**
+- ✅ JAXB outputs land under `target/generated-sources/jaxb` and are
+  registered as compile source roots for `config`, `configuration`, and
+  `grabconfig`
+- ✅ `HabitvLauncher` compiles on Java 8 without
+  `Utils4J.addToClasspath`
+- ✅ `application/core/generated` remains gitignored for legacy local
+  trees while fresh builds use `target/generated-sources/jaxb`
+
+**Validation**
+```bash
+mvn -B -ntp -DskipTests generate-sources   # BUILD SUCCESS
+mvn -B -ntp -DskipTests validate           # BUILD SUCCESS
+mvn -B -ntp -DskipTests clean compile      # BUILD SUCCESS (33 modules)
+git diff --check                           # clean on committed files
+```
+
+**Related PR** · `fix: restore generated sources and launcher classpath` (#44)
+
+**Notes** — `application/habiTv` now uses a small Java 8-compatible
+local `URLClassLoader` helper instead of the unavailable
+`Utils4J.addToClasspath` API. Incompatible `utils4j` Java 17 bytecode
+and broader transitive dependency vulnerability cleanup remain out of
+scope for a dedicated security PR.
+
+---
+
 # 📈 What ships next
 
 Recommended merge / start order (see `dev-plan.md` for phase reasoning):
@@ -542,3 +584,4 @@ issue trackers:
 | HBTV-011 | `console-runnable` |
 | HBTV-012 | `own-version-deps-align` |
 | HBTV-013 | `youtube-apikey` |
+| HBTV-014 | `jaxb-launcher-recovery` |
