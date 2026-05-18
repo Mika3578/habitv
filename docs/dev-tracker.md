@@ -307,7 +307,7 @@ mvn -B -ntp -pl plugins/arte -am -Dtest=ArteOfflineFixtureBaselineTest -Dsurefir
 mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test
 ```
 
-**Related PR** · `docs: inventory provider plugin status` (this PR)
+**Related PR** · `docs: capture provider offline fixture baseline` (this PR)
 
 **Notes** — Inventory baseline is now documented in
 [`provider-inventory.md`](provider-inventory.md) for every plugin module
