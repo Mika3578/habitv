@@ -16,10 +16,10 @@ added, mitigated, realized, or accepted.
 
 | Status | Count |
 |---|---:|
-| 🟢 **Mitigated** | 5 |
+| 🟢 **Mitigated** | 7 |
 | 🔴 **Open / Critical (P0)** | 1 |
-| 🟠 **Open / High (P1)** | 6 |
-| 🟡 **Open / Medium (P2)** | 3 |
+| 🟠 **Open / High (P1)** | 5 |
+| 🟡 **Open / Medium (P2)** | 2 |
 | 🟢 **Open / Low (P3)** | 0 |
 | **Total tracked** | **15** |
 
@@ -37,12 +37,12 @@ added, mitigated, realized, or accepted.
 | `provider-endpoints-dead` | High | Med | 🟠 P1 | 🟡 Open |
 | `legacy-update-pull` | Med | High | 🟠 P1 | 🟠 Open |
 | `ytdlp-behavior-diff` | Med | Med | 🟡 P2 | 🟡 Open |
-| `pages-layout-mismatch` | Med | High | 🟠 P1 | 🟡 Open |
+| `pages-layout-mismatch` | Med | High | 🟠 P1 | 🟢 Mitigated |
 | `reactor-version-range` | Low | Low | 🟢 P3 | 🟢 Mitigated |
 | `jaxb-plugin-unpinned` | Low | Low | 🟢 P3 | 🟢 Mitigated |
 | `plugin-tester-mismatch` | Low | Low | 🟢 P3 | 🟢 Mitigated |
 | `youtube-key-hardcoded` | Med | Med | 🟡 P2 | 🟢 Mitigated |
-| `pages-autoindex-gap` | Med | Med | 🟡 P2 | 🟡 Open |
+| `pages-autoindex-gap` | Med | Med | 🟡 P2 | 🟢 Mitigated |
 | `silent-stat-ping` | Med | Med | 🟡 P2 | 🟡 Open |
 
 ---
@@ -216,12 +216,14 @@ fail noisily if it is down).
 required before any runtime fetch (`habitv.update.enabled=true`,
 optional `habitv.update.url`).
 
-**Status update (`legacy-url-migration`)** — `UpdateManager` returns
-immediately unless `habitv.update.enabled=true`. The default target
-base URL constant is `https://mika3578.github.io/habitv-repo/repository`
-(legacy DabiBoo removed). Do not enable updates until
-`static-repo-publish` publishes Apache-style directory indexes or an
-equivalent manifest layout.
+**Status update (`legacy-url-migration` / `static-repo-publish`)** —
+`UpdateManager` returns immediately unless
+`habitv.update.enabled=true`. The default target base URL constant is
+`https://mika3578.github.io/habitv-repo/repository` (legacy DabiBoo
+removed). Publication cutover and live Pages layout validation are now
+complete (habitv-repo PR #2 merged), and updates remain disabled by
+default. Remaining follow-up: one dedicated opt-in runtime update
+smoke test against the live Pages URL.
 
 ---
 
@@ -300,18 +302,14 @@ explicitly and validates it against
 `FindArtifactUtils.findLastVersionUrl` semantics before cutting
 over.
 
-**Status update (`legacy-url-migration` / `static-repo-publish`)** —
-`FindArtifactUtils` parses HTML directory listings via anchor tags
-(Apache `mod_autoindex` shape). GitHub Pages does not provide that
-listing by default. Runtime updates stay disabled
-(`habitv.update.enabled` defaults false) until static `index.html`
-files or manifests are published and verified under
-`static-repo-publish`. Keep this risk at P1 until cutover
-validation completes.
-Local pre-cutover validation now exists via
-`python scripts/static-repo/validate_repository_layout.py <repository-root>`,
-which checks `plugins.txt`, `com/dabi/habitv`, and required `index.html`
-anchor links. Risk remains open until `habitv-repo` publication is live.
+**Status update (`static-repo-publish`)** — `habitv-repo` publication
+is live and validated:
+`https://mika3578.github.io/habitv-repo/repository/`,
+`.../plugins.txt`, and `.../com/dabi/habitv/` all return HTTP 200 with
+generated index pages and usable links. Local layout validation also
+passes via
+`python scripts/static-repo/validate_repository_layout.py <repository-root>`.
+Risk is mitigated for publication layout compatibility.
 
 ---
 
@@ -341,7 +339,7 @@ user-editable field; error messages mask the `key` parameter.
 
 | | |
 |---|---|
-| **Status** | 🟡 Open |
+| **Status** | 🟢 Mitigated |
 | **Likelihood** | Medium · **Impact** Medium · **Priority** 🟡 P2 |
 | **Legacy code** | R-014 |
 
@@ -349,11 +347,13 @@ user-editable field; error messages mask the `key` parameter.
 `mod_autoindex` directory listings. `FindArtifactUtils` discovers
 artifact versions by parsing index pages, which assumes autoindex.
 
-**Mitigation** — `static-repo-publish` plans to generate static
-`index.html` files (or a manifest) so listing semantics are
-preserved without relying on the host.
-Validation now includes a repository-layout check script to assert
-required `index.html` anchor links before publication.
+**Mitigation** — `static-repo-publish` generates static `index.html`
+files and validates required links with
+`validate_repository_layout.py` before publication.
+
+**Status update (`static-repo-publish`)** — GitHub Pages now serves the
+published generated index files at the live repository URLs (HTTP 200,
+no authentication). Autoindex from the host is no longer required.
 
 ---
 
