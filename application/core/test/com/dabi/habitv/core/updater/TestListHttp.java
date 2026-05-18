@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.dabi.habitv.framework.plugin.utils.update.FindArtifactUtils;
@@ -26,6 +27,7 @@ public class TestListHttp {
 	public void tearDown() throws Exception {
 	}
 
+	@Ignore("Live static repository integration test; requires network and habitv.update.url")
 	@Test
 	public final void test() {
 		final String groupId = "com.dabi.habitv";

@@ -22,9 +22,9 @@ public final class UpdateRepositoryUrls {
 		if (baseUrl == null) {
 			return null;
 		}
-		final String trimmed = baseUrl.trim();
-		if (trimmed.endsWith("/")) {
-			return trimmed.substring(0, trimmed.length() - 1);
+		String trimmed = baseUrl.trim();
+		while (trimmed.endsWith("/")) {
+			trimmed = trimmed.substring(0, trimmed.length() - 1);
 		}
 		return trimmed;
 	}

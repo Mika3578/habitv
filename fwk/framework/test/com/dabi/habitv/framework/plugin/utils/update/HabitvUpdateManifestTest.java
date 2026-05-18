@@ -46,4 +46,12 @@ public class HabitvUpdateManifestTest {
 		final HabitvUpdateManifest manifest = HabitvUpdateManifest.parse("\uFEFF# comment\n");
 		assertTrue(manifest.isEmpty());
 	}
+
+	@Test
+	public void parseLineAcceptsBomPrefixedPluginEntry() {
+		final Entry entry = HabitvUpdateManifest.parseLine(
+				"\uFEFFplugin|com.dabi.habitv|arte|4.1.0|jar|com/dabi/habitv/arte/4.1.0/arte-4.1.0.jar");
+		assertEquals(ArtifactKind.PLUGIN, entry.getKind());
+		assertEquals("arte", entry.getArtifactId());
+	}
 }
