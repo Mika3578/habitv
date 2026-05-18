@@ -43,14 +43,13 @@ governance-only PR.
 ## Required PR checks
 
 The **CI** workflow (`.github/workflows/ci.yml`) must pass on pull requests
-targeting `develop`. The currently observed required ruleset status check name
-from a green PR run is:
+targeting `develop`. Use the expected required ruleset status check context:
 
-- `validate (zulu-8)`
+- `CI / validate (zulu-8)`
 
 If GitHub displays a different check name in the ruleset UI (for example
-`CI / validate (zulu-8)`), align the ruleset with the exact name shown on a
-completed workflow run.
+`validate (zulu-8)` without the workflow prefix), align the ruleset with the
+exact name shown on a completed workflow run.
 
 ## Security policy summary
 

@@ -26,7 +26,7 @@
         "do_not_enforce_on_create": true,
         "required_status_checks": [
           {
-            "context": "validate (zulu-8)"
+            "context": "CI / validate (zulu-8)"
           }
         ]
       }
