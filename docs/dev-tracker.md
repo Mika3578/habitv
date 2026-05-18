@@ -142,7 +142,9 @@ mvn -B -ntp -DskipTests compile      # BUILD SUCCESS (after HBTV-010 + HBTV-012)
 
 **Notes** — Original blocker chain: `plugin-tester:4.1.0`
 (HBTV-010) → `framework/api:4.1.1-SNAPSHOT` (HBTV-012). Both cleared.
-Risks **R-010**, **R-011**, **R-012** are mitigated.
+CI workflow now triggers on `master` **and** `develop` so every
+modernization PR is validated. Risks **R-010**, **R-011**, **R-012**
+are mitigated.
 
 ---
 
