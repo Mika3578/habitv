@@ -33,19 +33,24 @@ The root `pom.xml` defines:
 - `habitv.deploy.repo.path` — default `${maven.multiModuleProjectDirectory}/../habitv-repo/repository`
 - `distributionManagement` — `file://${habitv.deploy.repo.path}` (`habitv-local`)
 
-From `habitv/` (Linux/macOS):
+From `habitv/` (Linux/macOS — use an absolute `file://` URL):
 
 ```bash
+REPO_FILE_URL="file://$(cd ../habitv-repo/repository && pwd)"
 mvn -B -ntp -DskipTests clean deploy \
-  -DaltDeploymentRepository=habitv-local::default::file://../habitv-repo/repository
+  "-DaltDeploymentRepository=habitv-local::${REPO_FILE_URL}"
 ```
 
 Windows PowerShell:
 
 ```powershell
+$repo = (Resolve-Path "..\habitv-repo\repository").Path -replace '\\','/'
 mvn -B -ntp -DskipTests clean deploy `
-  "-DaltDeploymentRepository=habitv-local::default::file://../habitv-repo/repository"
+  "-DaltDeploymentRepository=habitv-local::file:///$repo"
 ```
+
+Relative `file://../habitv-repo/repository` is not reliable on Windows; prefer the
+helper scripts or an absolute path.
 
 Override the local path:
 

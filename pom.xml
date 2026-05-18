@@ -17,7 +17,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- Resolved from the reactor root when building with mvn from habitv/ -->
-		<habitv.deploy.repo.path>${maven.multiModuleProjectDirectory}/../habitv-repo/repository</habitv.deploy.repo.path>
+		<habitv.deploy.repo.path>${session.executionRootDirectory}/../habitv-repo/repository</habitv.deploy.repo.path>
 	</properties>
 
 	<distributionManagement>

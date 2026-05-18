@@ -59,12 +59,13 @@ fi
 
 resolved_repository_path="$resolved_static_repo_path/repository"
 mkdir -p "$resolved_repository_path"
+repository_file_url="file://$(CDPATH= cd -- "$resolved_repository_path" && pwd)"
 
-echo "Deploying Maven artifacts to: file://$resolved_repository_path"
+echo "Deploying Maven artifacts to: habitv-local::$repository_file_url"
 (
   CDPATH= cd -- "$repo_root"
   mvn -B -ntp -DskipTests clean deploy \
-    -DaltDeploymentRepository=habitv-local::default::file://../habitv-repo/repository
+    "-DaltDeploymentRepository=habitv-local::$repository_file_url"
 )
 
 cat <<EOF

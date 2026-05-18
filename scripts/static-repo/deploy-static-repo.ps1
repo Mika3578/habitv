@@ -86,12 +86,13 @@ if (-not (Test-Path -Path $resolvedRepositoryPath -PathType Container)) {
     New-Item -Path $resolvedRepositoryPath -ItemType Directory | Out-Null
 }
 
-$relativeRepositoryPath = "../habitv-repo/repository"
-Write-Host ("Deploying Maven artifacts to: file://{0}" -f $resolvedRepositoryPath)
+$repositoryFileUrl = ((Resolve-Path $resolvedRepositoryPath).Path -replace '\\', '/')
+$deployRepository = "habitv-local::file:///$repositoryFileUrl"
+
+Write-Host ("Deploying Maven artifacts to: {0}" -f $deployRepository)
 Push-Location $repoRoot
 try {
-    & mvn -B -ntp -DskipTests clean deploy `
-        "-DaltDeploymentRepository=habitv-local::default::file://$relativeRepositoryPath"
+    & mvn -B -ntp -DskipTests clean deploy "-DaltDeploymentRepository=$deployRepository"
     if ($LASTEXITCODE -ne 0) {
         throw "Maven deploy failed."
     }
