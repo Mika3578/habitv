@@ -17,7 +17,8 @@ HTTPS URL in `FrameworkConf.UPDATE_URL`.
 ## One-command workflow (preferred)
 
 The `static-repo-publish` profile adds a final reactor module,
-`build/static-repo-publisher`, that runs **after** all other modules have deployed.
+`build/static-repo-publisher`, and activates the local file
+`distributionManagement` used for the static repository deploy.
 
 Windows PowerShell:
 

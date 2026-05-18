@@ -20,19 +20,6 @@
 		<habitv.static.repo.path>${user.home}/dev/habitv-repo/repository</habitv.static.repo.path>
 	</properties>
 
-	<distributionManagement>
-		<repository>
-			<id>habitv-local</id>
-			<name>Habitv local static repository</name>
-			<url>file:///${habitv.static.repo.path}</url>
-		</repository>
-		<snapshotRepository>
-			<id>habitv-local</id>
-			<name>Habitv local static repository</name>
-			<url>file:///${habitv.static.repo.path}</url>
-		</snapshotRepository>
-	</distributionManagement>
-
 	 <scm>
         <connection>scm:git:https://github.com/Mika3578/habitv.git</connection>
         <developerConnection>scm:git:https://github.com/Mika3578/habitv.git</developerConnection>
@@ -210,6 +197,18 @@
 	<profiles>
 		<profile>
 			<id>static-repo-publish</id>
+			<distributionManagement>
+				<repository>
+					<id>habitv-local</id>
+					<name>Habitv local static repository</name>
+					<url>file:///${habitv.static.repo.path}</url>
+				</repository>
+				<snapshotRepository>
+					<id>habitv-local</id>
+					<name>Habitv local static repository</name>
+					<url>file:///${habitv.static.repo.path}</url>
+				</snapshotRepository>
+			</distributionManagement>
 			<modules>
 				<module>build/static-repo-publisher</module>
 			</modules>

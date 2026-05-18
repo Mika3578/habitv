@@ -3,4 +3,4 @@
 #
 # plugin|com.dabi.habitv|6play|4.1.0-SNAPSHOT|jar|com/dabi/habitv/6play/4.1.0-SNAPSHOT/6play-4.1.0-SNAPSHOT.jar
 # tool|com.dabi.habitv|ffmpeg|3.0|zip|tools/ffmpeg/3.0/ffmpeg.zip
-# tool|com.dabi.habitv|yt-dlp|latest|zip|tools/yt-dlp/latest/yt-dlp.zip
+# tool|com.dabi.habitv|youtube-dl|latest|zip|tools/youtube-dl/latest/youtube-dl.zip
