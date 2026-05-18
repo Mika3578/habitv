@@ -19,6 +19,7 @@ public class ArteOfflineFixtureBaselineTest {
 			assertNotNull("missing local fixture: " + fixturePath, input);
 			String content = readUtf8(input);
 			assertTrue("fixture metadata must mention provider", content.contains("provider=arte"));
+			assertTrue("fixture metadata must disable network access", content.contains("network=disabled"));
 			assertTrue("fixture metadata must document parser boundary",
 					content.contains("parserBoundary=legacy-rss-html"));
 		}
