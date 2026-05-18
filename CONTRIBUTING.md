@@ -45,7 +45,7 @@ Allowed types: `feat`, `fix`, `refactor`, `perf`, `docs`, `test`, `chore`,
 ```
 feat(youtube): externalize data api key
 fix(arte): handle 404 on main archive
-docs(tracker): record HBTV-010 plugin tester alignment
+docs(tracker): record plugin-tester-align outcome
 ```
 
 ❌ **Avoid**
@@ -62,7 +62,7 @@ WIP                   ← do not commit WIP
 
 | Rule | Detail |
 |------|--------|
-| Tracker ID | Reference `HBTV-XXX` from `docs/dev-tracker.md` in the PR body |
+| Tracker ID | Reference one work-item slug (e.g. `legacy-url-migration`) from `docs/dev-tracker.md` in the PR body |
 | Scope discipline | One logical change. No opportunistic refactors or formatting passes |
 | Linear history | No merge commits inside feature branches; squash or rebase only |
 | Doc sync | Update `docs/dev-tracker.{md,json}`, `docs/risk-register.md`, `docs/decision-log.md` when behavior or scope changes |
@@ -81,10 +81,10 @@ Stronger goals are only safe for explicitly scoped modules.
 | Goal | Status in current phase | When to use |
 |------|------------------------|-------------|
 | `mvn -B -ntp -DskipTests validate` | 🟢 safe, default | Always |
-| `mvn -B -ntp -DskipTests compile` | 🟢 safe on `develop` since HBTV-012 | Always |
+| `mvn -B -ntp -DskipTests compile` | 🟢 safe on `develop` since `own-version-deps-align` | Always |
 | `mvn -B -ntp -DskipTests package` | 🟡 scoped only | `-pl '!application/trayView,!application/habiTv'` |
 | `mvn -B -ntp test` | 🟠 network-dependent tests flap | Scoped per-module; document results |
-| `mvn -B -ntp verify` | ⛔ not safe yet | Wait for HBTV-002 completion |
+| `mvn -B -ntp verify` | ⛔ not safe yet | Wait for `java8-baseline` test-lifecycle work |
 
 Always quote the **exact command output** in your PR body.
 
@@ -98,10 +98,10 @@ Do not, without a dedicated tracker item and an accepted ADR:
 - Migrate the Java baseline beyond Java 8.
 - Migrate JavaFX (JDK-bundled `jfxrt`) to OpenJFX.
 - Regenerate JAXB-bound classes or move to `jakarta.*`.
-- Replace `youtube-dl` with `yt-dlp` (see HBTV-007).
-- Change runtime updater URLs or layout (see HBTV-005).
-- Migrate FTP/HTTP repositories (see HBTV-004).
-- Remove or rename provider/plugin modules (see HBTV-006).
+- Replace `youtube-dl` with `yt-dlp` (see `ytdlp-migration`).
+- Change runtime updater URLs or layout (see `static-repo-publish`).
+- Migrate FTP/HTTP repositories (see `legacy-url-migration`).
+- Remove or rename provider/plugin modules (see `provider-inventory`).
 - Add OWASP, SBOM, or static-analysis plugins.
 
 ---
@@ -112,8 +112,9 @@ Do not, without a dedicated tracker item and an accepted ADR:
   files, or generated artifacts.
 - The repository historically contained hardcoded credentials
   (Gmail POP3/IMAP test, YouTube Data API key, freebox FTP sample).
-  These are tracked under `R-013` in `docs/risk-register.md` and are
-  being remediated; **do not add new ones**.
+  These are tracked under `youtube-key-hardcoded` in
+  `docs/risk-register.md` and are being remediated;
+  **do not add new ones**.
 - See [`SECURITY.md`](SECURITY.md) for the disclosure process.
 
 ---

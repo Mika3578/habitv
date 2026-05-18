@@ -39,15 +39,15 @@ and should not be relied on in production until remediated:
 
 | Risk ID | Area | Status |
 |---------|------|--------|
-| `R-013` | Hardcoded YouTube Data API key in `plugins/youtube` | 🟡 Being remediated (PR #29) |
-| `R-001` | Legacy plain-HTTP `dabiboo.free.fr` Maven repository | 🟠 Migration planned (HBTV-004) |
-| `R-002` | FTP deployment with embedded credentials | 🟠 Migration planned (HBTV-004) |
-| `R-007` | Auto-update can pull artifacts from unmaintained host | 🟠 Quarantine planned (HBTV-005) |
+| `youtube-key-hardcoded` | Hardcoded YouTube Data API key in `plugins/youtube` | 🟡 Being remediated (PR #29) |
+| `legacy-maven-repo` | Legacy plain-HTTP `dabiboo.free.fr` Maven repository | 🟠 Migration planned (`legacy-url-migration`) |
+| `ftp-deploy` | FTP deployment with embedded credentials | 🟠 Migration planned (`legacy-url-migration`) |
+| `legacy-update-pull` | Auto-update can pull artifacts from unmaintained host | 🟠 Quarantine planned (`static-repo-publish`) |
 | — | Hardcoded Gmail POP3/IMAP credentials in `plugins/email` tests | 🔴 Pending dedicated remediation PR |
 | — | Sample FTP credentials in `application/consoleView/config.xml` | 🔴 Sample is illustrative; do not reuse |
 
 If your security report concerns one of these already-tracked items,
-please reference the risk ID in your advisory.
+please reference the risk slug in your advisory.
 
 ---
 

@@ -4,19 +4,25 @@
 for the modernization restart. **Append-only**: new decisions supersede
 older ones rather than rewriting them in place.
 
+> 📝 **Identifier convention** — every entry uses a descriptive
+> kebab-case slug (e.g. `restart-from-master`) rather than an opaque
+> code. See the `descriptive-slug-ids` ADR below for the rationale and
+> the legacy mapping.
+
 ---
 
 ## 📊 ADR dashboard
 
-| ID | Title | Status |
+| ADR | Title | Status |
 |---|---|:--:|
-| `ADR-0001` | Restart modernization from `master` | ✅ Accepted |
-| `ADR-0002` | Keep Java 8 as baseline until the build is stable | ✅ Accepted |
-| `ADR-0003` | Small PRs with linear history | ✅ Accepted |
-| `ADR-0004` | `habitv-repo` as the future static artifact repository | 🟡 Proposed |
-| `ADR-0005` | Provider cleanup is separate from build / governance bootstrap | ✅ Accepted |
-| `ADR-0006` | Runnable console baseline on `develop` before broader modernization | ✅ Accepted |
-| `ADR-0007` | Doc sync protocol & rule lifecycle (meta-rules) | ✅ Accepted |
+| `restart-from-master` | Restart modernization from `master` | ✅ Accepted |
+| `keep-java8-baseline` | Keep Java 8 as baseline until the build is stable | ✅ Accepted |
+| `small-prs-linear-history` | Small PRs with linear history | ✅ Accepted |
+| `habitv-repo-static-host` | `habitv-repo` as the future static artifact repository | 🟡 Proposed |
+| `provider-cleanup-separate` | Provider cleanup is separate from build / governance bootstrap | ✅ Accepted |
+| `develop-runnable-baseline` | Runnable console baseline on `develop` before broader modernization | ✅ Accepted |
+| `doc-sync-and-rule-lifecycle` | Doc sync protocol & rule lifecycle (meta-rules) | ✅ Accepted |
+| `descriptive-slug-ids` | Switch tracker / risk / ADR identifiers to descriptive slugs | ✅ Accepted |
 
 ---
 
@@ -31,13 +37,14 @@ older ones rather than rewriting them in place.
 
 ---
 
-## ✅ ADR-0001 — Restart modernization from `master`
+## ✅ `restart-from-master` — Restart modernization from `master`
 
 | | |
 |---|---|
 | **Status** | ✅ Accepted |
 | **Date** | 2026-05-16 |
-| **Tracker** | HBTV-000 |
+| **Tracker** | `gov-bootstrap` |
+| **Legacy code** | ADR-0001 |
 
 **Context** — Earlier modernization attempts diverged from the stable
 `master` baseline and accumulated unrelated changes, making it hard
@@ -58,14 +65,15 @@ baseline (or `develop` once created).
 
 ---
 
-## ✅ ADR-0002 — Keep Java 8 as baseline until the build is stable
+## ✅ `keep-java8-baseline` — Keep Java 8 as baseline until the build is stable
 
 | | |
 |---|---|
 | **Status** | ✅ Accepted |
 | **Date** | 2026-05-16 |
-| **Trackers** | HBTV-001, HBTV-002 |
-| **Risks** | R-003, R-004 |
+| **Trackers** | `maven-reactor`, `java8-baseline` |
+| **Risks** | `javafx-jdk8`, `jaxb-mismatch` |
+| **Legacy code** | ADR-0002 |
 
 **Context** — The codebase declares Java 1.7 in the root
 `maven-compiler-plugin` and Java 7 in some packaging POMs. JavaFX 2.x
@@ -74,9 +82,9 @@ Java baselines while the reactor itself is broken would conflate
 multiple risks.
 
 **Decision** — Keep Java 8 (Temurin 8) as the baseline for all CI and
-agent guidance until HBTV-001 (reactor) and HBTV-002 (compile + test
-baseline) are stable. Any later baseline change requires a dedicated
-migration PR and a superseding ADR.
+agent guidance until the `maven-reactor` and `java8-baseline` items
+are stable. Any later baseline change requires a dedicated migration
+PR and a superseding ADR.
 
 **Consequences**
 - ✅ AI agents and contributors must reject Java 9+ language and API
@@ -87,12 +95,13 @@ migration PR and a superseding ADR.
 
 ---
 
-## ✅ ADR-0003 — Small PRs with linear history
+## ✅ `small-prs-linear-history` — Small PRs with linear history
 
 | | |
 |---|---|
 | **Status** | ✅ Accepted |
 | **Date** | 2026-05-16 |
+| **Legacy code** | ADR-0003 |
 
 **Context** — Recent history mixes unrelated changes in single
 commits, making review and rollback expensive.
@@ -107,18 +116,20 @@ commits, making review and rollback expensive.
 **Consequences**
 - ✅ Slightly more overhead per change, materially better
   reviewability and bisectability.
-- ✅ CI gates only on the `validate` workflow until HBTV-002 lands.
+- ✅ CI gates only on the `validate` workflow until the
+  `java8-baseline` item lands.
 
 ---
 
-## 🟡 ADR-0004 — `habitv-repo` as the future public static artifact repository
+## 🟡 `habitv-repo-static-host` — `habitv-repo` as the future public static artifact repository
 
 | | |
 |---|---|
 | **Status** | 🟡 Proposed |
 | **Date** | 2026-05-16 |
-| **Tracker** | HBTV-005 |
-| **Risks** | R-001, R-002, R-007, R-009 |
+| **Tracker** | `static-repo-publish` |
+| **Risks** | `legacy-maven-repo`, `ftp-deploy`, `legacy-update-pull`, `pages-layout-mismatch` |
+| **Legacy code** | ADR-0004 |
 
 **Context** — Today the project relies on
 `http://dabiboo.free.fr/repository` for both Maven artifact
@@ -128,8 +139,8 @@ and unmaintained.
 **Decision** — Stand up a `habitv-repo` static repository (target:
 GitHub Pages or equivalent HTTPS static host) to publish Maven
 artifacts, plugin drops, and update metadata. Layout is defined in
-HBTV-005 to remain compatible with `FindArtifactUtils` and
-`UpdateManager` semantics.
+`static-repo-publish` to remain compatible with `FindArtifactUtils`
+and `UpdateManager` semantics.
 
 **Consequences**
 - ✅ HTTPS, version-controlled publication.
@@ -138,23 +149,24 @@ HBTV-005 to remain compatible with `FindArtifactUtils` and
 
 ---
 
-## ✅ ADR-0005 — Provider cleanup is separate from build / governance bootstrap
+## ✅ `provider-cleanup-separate` — Provider cleanup is separate from build / governance bootstrap
 
 | | |
 |---|---|
 | **Status** | ✅ Accepted |
 | **Date** | 2026-05-16 |
-| **Tracker** | HBTV-006 |
+| **Tracker** | `provider-inventory` |
+| **Legacy code** | ADR-0005 |
 
 **Context** — Several provider plugins (Pluzz, legacy Canal+, beIN,
 others) are likely obsolete. Removing them in the bootstrap PR would
 blend documentation work with risky behavior changes and break the
 "small, scoped" rule.
 
-**Decision** — Inventory provider/plugin status in HBTV-006 without
-removing modules. Each obsolete/renamed plugin gets its own dedicated
-PR with a deprecation note. The bootstrap PR does not touch
-`plugins/*` or runtime code.
+**Decision** — Inventory provider/plugin status under
+`provider-inventory` without removing modules. Each obsolete/renamed
+plugin gets its own dedicated PR with a deprecation note. The
+bootstrap PR does not touch `plugins/*` or runtime code.
 
 **Consequences**
 - ✅ Plugins remain unchanged in this PR. Reviewers can focus on
@@ -163,13 +175,14 @@ PR with a deprecation note. The bootstrap PR does not touch
 
 ---
 
-## ✅ ADR-0006 — Runnable console baseline on `develop` before broader modernization
+## ✅ `develop-runnable-baseline` — Runnable console baseline on `develop` before broader modernization
 
 | | |
 |---|---|
 | **Status** | ✅ Accepted |
 | **Date** | 2026-05-17 |
-| **Tracker** | HBTV-011 |
+| **Tracker** | `console-runnable` |
+| **Legacy code** | ADR-0006 |
 
 **Context** — `develop` is the active modernization line. PR #27
 introduced a useful runnable console / yt-dlp path but also included
@@ -181,8 +194,8 @@ mix branch lines if merged directly.
 and supersede PR #27 with scoped linear commits that keep only the
 buildable subset (consoleView fat-jar path, yt-dlp runtime/test
 wiring, and required build POM updates). Exclude failing unrelated
-source edits and keep HBTV-004 / HBTV-005, JavaFX modernization, and
-provider cleanup out of scope.
+source edits and keep `legacy-url-migration` / `static-repo-publish`,
+JavaFX modernization, and provider cleanup out of scope.
 
 **Consequences**
 - ✅ `develop` gained a factual runnable console baseline with
@@ -194,7 +207,7 @@ provider cleanup out of scope.
 
 ---
 
-## ✅ ADR-0007 — Doc sync protocol & rule lifecycle (meta-rules)
+## ✅ `doc-sync-and-rule-lifecycle` — Doc sync protocol & rule lifecycle (meta-rules)
 
 | | |
 |---|---|
@@ -202,8 +215,9 @@ provider cleanup out of scope.
 | **Date** | 2026-05-18 |
 | **Touches** | `AGENTS.md` §11, §12 |
 | **Supersedes** | — (additive) |
+| **Legacy code** | ADR-0007 |
 
-**Context** — The repository now carries six tracked documents
+**Context** — The repository now carries seven tracked documents
 (`CHANGELOG.md`, `AGENTS.md`, `dev-tracker.md`, `dev-tracker.json`,
 `dev-plan.md`, `risk-register.md`, `decision-log.md`). They each
 encode a different facet of the modernization state and must agree
@@ -241,8 +255,8 @@ with reality at all times. Two gaps remained after the docs refresh:
 **Consequences**
 
 - ✅ Drift between the tracker, plan, risk register, decision log,
-  and changelog is now formally detectable: §11.3 ships a four-step
-  verification command set.
+  and changelog is now formally detectable: §11.3 ships a verification
+  command set.
 - ✅ The rulebook is self-protecting against silent weakening: every
   rule change requires an ADR and, for §12 itself, a cooling-off
   period.
@@ -254,33 +268,195 @@ with reality at all times. Two gaps remained after the docs refresh:
   example, to remove the cooling-off period) must itself go through
   the cooling-off period it tries to remove.
 
+---
+
+## ✅ `descriptive-slug-ids` — Switch tracker / risk / ADR identifiers to descriptive slugs
+
+| | |
+|---|---|
+| **Status** | ✅ Accepted |
+| **Date** | 2026-05-18 |
+| **Touches** | `dev-tracker.md`, `dev-tracker.json`, `dev-plan.md`, `risk-register.md`, `decision-log.md`, `AGENTS.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `SECURITY.md` |
+| **Supersedes** | — (refactor, no prior ADR contradicted) |
+
+**Context** — The previous identifier scheme used opaque numeric
+codes:
+
+- `HBTV-000` … `HBTV-013` for work items
+- `R-001` … `R-015` for risks
+- `ADR-0001` … `ADR-0007` for architecture decisions
+
+These codes carry no semantic meaning. Reading a PR description like
+"closes HBTV-004" or "mitigates R-013" forces the reader to look up
+the registry to know what is actually being changed. After the docs
+refresh, the dashboards already display human-readable titles, but
+the cross-references in commit messages, PR bodies, and code comments
+still used the codes.
+
+**Decision** — Use **descriptive kebab-case slugs** as the canonical
+identifier for every tracker item, risk, and ADR.
+
+Naming convention:
+- Lowercase ASCII.
+- 2–6 words joined by hyphens.
+- Stable for the lifetime of the item; renames go through an ADR.
+- No type prefix when the surrounding context is unambiguous (a slug
+  in `dev-tracker.md` is a work item; in `risk-register.md` is a
+  risk; in `decision-log.md` is an ADR).
+
+The old numeric codes are preserved as a `legacy code` field in each
+entry so PR descriptions, commits, and issue history that already
+reference the old codes remain traceable. New work must use the slug.
+
+**Slug mapping**
+
+| Old | New (work item) |
+|---|---|
+| HBTV-000 | `gov-bootstrap` |
+| HBTV-001 | `maven-reactor` |
+| HBTV-002 | `java8-baseline` |
+| HBTV-003 | `branch-protection` |
+| HBTV-004 | `legacy-url-migration` |
+| HBTV-005 | `static-repo-publish` |
+| HBTV-006 | `provider-inventory` |
+| HBTV-007 | `ytdlp-migration` |
+| HBTV-008 | `javafx-modernization` |
+| HBTV-010 | `plugin-tester-align` |
+| HBTV-011 | `console-runnable` |
+| HBTV-012 | `own-version-deps-align` |
+| HBTV-013 | `youtube-apikey` |
+
+| Old | New (risk) |
+|---|---|
+| R-001 | `legacy-maven-repo` |
+| R-002 | `ftp-deploy` |
+| R-003 | `javafx-jdk8` |
+| R-004 | `jaxb-mismatch` |
+| R-005 | `live-tests-flaky` |
+| R-006 | `provider-endpoints-dead` |
+| R-007 | `legacy-update-pull` |
+| R-008 | `ytdlp-behavior-diff` |
+| R-009 | `pages-layout-mismatch` |
+| R-010 | `reactor-version-range` |
+| R-011 | `jaxb-plugin-unpinned` |
+| R-012 | `plugin-tester-mismatch` |
+| R-013 | `youtube-key-hardcoded` |
+| R-014 | `pages-autoindex-gap` |
+| R-015 | `silent-stat-ping` |
+
+| Old | New (ADR) |
+|---|---|
+| ADR-0001 | `restart-from-master` |
+| ADR-0002 | `keep-java8-baseline` |
+| ADR-0003 | `small-prs-linear-history` |
+| ADR-0004 | `habitv-repo-static-host` |
+| ADR-0005 | `provider-cleanup-separate` |
+| ADR-0006 | `develop-runnable-baseline` |
+| ADR-0007 | `doc-sync-and-rule-lifecycle` |
+| ADR-0008 | `descriptive-slug-ids` |
+
+**Consequences**
+
+- ✅ A PR title like `feat(youtube): close youtube-apikey` is
+  immediately readable; `feat(youtube): close HBTV-013` was not.
+- ✅ Slugs survive renumbering and re-ordering; numeric codes had a
+  spurious linear-history vibe.
+- ✅ The §11.3 verification check is updated to compare slugs.
+- ⚠️ Existing PRs (#25, #29, #36) and commit messages still reference
+  the old codes. The `legacy code` field on each entry preserves the
+  link; no rewriting of history.
+- ⚠️ The renaming itself does **not** trigger the meta-rule
+  cooling-off period defined in the `doc-sync-and-rule-lifecycle`
+  ADR, because it does not change any rule **inside** `AGENTS.md` §12.
+  It only changes the identifiers used **across** the docs.
+
 **Validation**
 ```bash
-# §11.3 invariants on the current PR
-diff <(grep -oE 'HBTV-[0-9]+' docs/dev-tracker.md  | sort -u) \
-     <(grep -oE 'HBTV-[0-9]+' docs/dev-tracker.json | sort -u)   # empty diff
-python3 -c "import json; json.load(open('docs/dev-tracker.json'))"  # parses
+# Slug parity between tracker md and json
+python3 - <<'EOF'
+import json, re
+md = open('docs/dev-tracker.md').read()
+js = json.load(open('docs/dev-tracker.json'))
+md_slugs = set(re.findall(r'`([a-z][a-z0-9-]{4,})`', md))
+js_slugs = {i['id'] for i in js['items']}
+missing = js_slugs - md_slugs
+assert not missing, f"Missing slugs in dev-tracker.md: {missing}"
+print('OK:', len(js_slugs), 'items, all slugs cross-referenced')
+EOF
 ```
 
 ---
 
 ## 📝 How to add a new ADR
 
-1. Pick the next `ADR-00XX` id.
+1. Pick a descriptive kebab-case slug (e.g. `enable-spotbugs`).
 2. Use this template:
    ```markdown
-   ## 🟡 ADR-00XX — <Title>
+   ## 🟡 `your-slug` — <Title>
 
    | | |
    |---|---|
    | **Status** | 🟡 Proposed |
    | **Date** | YYYY-MM-DD |
-   | **Tracker** | HBTV-XXX |
-   | **Risks** | R-0XX |
+   | **Tracker** | `tracker-slug` |
+   | **Risks** | `risk-slug` |
 
    **Context** — …
    **Decision** — …
    **Consequences** — …
    ```
 3. Update the dashboard table at the top of this file.
-4. Reference the ADR id in any PR that depends on it.
+4. Reference the ADR slug in any PR that depends on it.
+
+---
+
+## 🗂️ Legacy code index
+
+For incoming references in PR descriptions, commit messages, and
+external issue trackers, this table maps the old codes to the
+current slugs. Source of truth is the per-entry `Legacy code` field.
+
+| Work item (old) | Slug |
+|---|---|
+| HBTV-000 | `gov-bootstrap` |
+| HBTV-001 | `maven-reactor` |
+| HBTV-002 | `java8-baseline` |
+| HBTV-003 | `branch-protection` |
+| HBTV-004 | `legacy-url-migration` |
+| HBTV-005 | `static-repo-publish` |
+| HBTV-006 | `provider-inventory` |
+| HBTV-007 | `ytdlp-migration` |
+| HBTV-008 | `javafx-modernization` |
+| HBTV-010 | `plugin-tester-align` |
+| HBTV-011 | `console-runnable` |
+| HBTV-012 | `own-version-deps-align` |
+| HBTV-013 | `youtube-apikey` |
+
+| Risk (old) | Slug |
+|---|---|
+| R-001 | `legacy-maven-repo` |
+| R-002 | `ftp-deploy` |
+| R-003 | `javafx-jdk8` |
+| R-004 | `jaxb-mismatch` |
+| R-005 | `live-tests-flaky` |
+| R-006 | `provider-endpoints-dead` |
+| R-007 | `legacy-update-pull` |
+| R-008 | `ytdlp-behavior-diff` |
+| R-009 | `pages-layout-mismatch` |
+| R-010 | `reactor-version-range` |
+| R-011 | `jaxb-plugin-unpinned` |
+| R-012 | `plugin-tester-mismatch` |
+| R-013 | `youtube-key-hardcoded` |
+| R-014 | `pages-autoindex-gap` |
+| R-015 | `silent-stat-ping` |
+
+| ADR (old) | Slug |
+|---|---|
+| ADR-0001 | `restart-from-master` |
+| ADR-0002 | `keep-java8-baseline` |
+| ADR-0003 | `small-prs-linear-history` |
+| ADR-0004 | `habitv-repo-static-host` |
+| ADR-0005 | `provider-cleanup-separate` |
+| ADR-0006 | `develop-runnable-baseline` |
+| ADR-0007 | `doc-sync-and-rule-lifecycle` |
+| ADR-0008 | `descriptive-slug-ids` |

@@ -3,6 +3,11 @@
 Active risks for the modernization restart. Update when a risk is
 added, mitigated, realized, or accepted.
 
+> 📝 **Identifier convention** — every risk uses a descriptive
+> kebab-case slug. The opaque legacy codes (`R-XXX`) are preserved on
+> each entry for compatibility with existing PRs and commits. See the
+> `descriptive-slug-ids` ADR for the full mapping.
+
 > **Severity** = `Likelihood × Impact`. Priority sets execution order.
 
 ---
@@ -22,31 +27,35 @@ added, mitigated, realized, or accepted.
 
 ## 🗂️ Summary table
 
-| ID | Title | Likelihood | Impact | Priority | Status |
-|---|---|:--:|:--:|:--:|:--:|
-| `R-001` | Legacy Maven repository / free.fr dependency | High | High | 🔴 P0 | 🟢 Mitigated (compile-time) |
-| `R-002` | FTP deployment no longer viable | High | High | 🔴 P0 | 🟠 Open |
-| `R-003` | JavaFX tied to JDK 8 assumptions | High | High | 🟠 P1 | 🟠 Open |
-| `R-004` | JAXB generation / runtime mismatch | Med | High | 🟠 P1 | 🟠 Open |
-| `R-005` | Live provider tests are non-deterministic | High | Med | 🟠 P1 | 🟡 Open |
-| `R-006` | Provider endpoints obsolete or renamed | High | Med | 🟠 P1 | 🟡 Open |
-| `R-007` | Auto-update pulls unexpected old artifacts | Med | High | 🟠 P1 | 🟠 Open |
-| `R-008` | yt-dlp migration changes download behavior | Med | Med | 🟡 P2 | 🟡 Open |
-| `R-009` | GitHub Pages layout mismatches updater | Med | High | 🟠 P1 | 🟡 Open |
-| `R-010` | Intra-reactor version range excludes SNAPSHOTs | Low | Low | 🟢 P3 | 🟢 Mitigated |
-| `R-011` | `maven-jaxb-plugin` missing pinned version | Low | Low | 🟢 P3 | 🟢 Mitigated |
-| `R-012` | Plugin tester version mismatch blocks compile | Low | Low | 🟢 P3 | 🟢 Mitigated |
-| `R-013` | Hardcoded YouTube Data API key | Med | Med | 🟡 P2 | 🟡 PR in flight |
-| `R-014` | GitHub Pages directory autoindex gap | Med | Med | 🟡 P2 | 🟡 Open |
-| `R-015` | Silent `stat()` ping at startup | Med | Med | 🟡 P2 | 🟡 Open |
+| Risk | Likelihood | Impact | Priority | Status |
+|---|:--:|:--:|:--:|:--:|
+| `legacy-maven-repo` | High | High | 🔴 P0 | 🟢 Mitigated (compile-time) |
+| `ftp-deploy` | High | High | 🔴 P0 | 🟠 Open |
+| `javafx-jdk8` | High | High | 🟠 P1 | 🟠 Open |
+| `jaxb-mismatch` | Med | High | 🟠 P1 | 🟠 Open |
+| `live-tests-flaky` | High | Med | 🟠 P1 | 🟡 Open |
+| `provider-endpoints-dead` | High | Med | 🟠 P1 | 🟡 Open |
+| `legacy-update-pull` | Med | High | 🟠 P1 | 🟠 Open |
+| `ytdlp-behavior-diff` | Med | Med | 🟡 P2 | 🟡 Open |
+| `pages-layout-mismatch` | Med | High | 🟠 P1 | 🟡 Open |
+| `reactor-version-range` | Low | Low | 🟢 P3 | 🟢 Mitigated |
+| `jaxb-plugin-unpinned` | Low | Low | 🟢 P3 | 🟢 Mitigated |
+| `plugin-tester-mismatch` | Low | Low | 🟢 P3 | 🟢 Mitigated |
+| `youtube-key-hardcoded` | Med | Med | 🟡 P2 | 🟡 PR in flight |
+| `pages-autoindex-gap` | Med | Med | 🟡 P2 | 🟡 Open |
+| `silent-stat-ping` | Med | Med | 🟡 P2 | 🟡 Open |
 
 ---
 
 ## 🟢 Mitigated risks
 
-### `R-010` — Intra-reactor version range excludes SNAPSHOTs
+### `reactor-version-range` — Intra-reactor version range excludes SNAPSHOTs
 
-> 🟢 **Mitigated** · Likelihood **Low** · Impact **Low**
+| | |
+|---|---|
+| **Status** | 🟢 Mitigated |
+| **Likelihood** | Low · **Impact** Low |
+| **Legacy code** | R-010 |
 
 **Description** — Root `pom.xml` declared `dependencyManagement`
 entries for `com.dabi.habitv:api` and `com.dabi.habitv:framework`
@@ -55,25 +64,34 @@ with the closed range `[4.1,4.2)`. Maven does not include
 `dabiboo.free.fr` HTTP host is blocked by Maven 3.9+ defaults.
 
 **Mitigation** — Replaced the range with `${project.version}` for
-intra-reactor coordinates in HBTV-002. No code change; POM only.
+intra-reactor coordinates in `java8-baseline`. No code change;
+POM only.
 
 ---
 
-### `R-011` — `maven-jaxb-plugin` missing pinned version
+### `jaxb-plugin-unpinned` — `maven-jaxb-plugin` missing pinned version
 
-> 🟢 **Mitigated** · Likelihood **Low** · Impact **Low**
+| | |
+|---|---|
+| **Status** | 🟢 Mitigated |
+| **Likelihood** | Low · **Impact** Low |
+| **Legacy code** | R-011 |
 
 **Description** — `application/core/pom.xml` declared
 `com.sun.tools.xjc.maven2:maven-jaxb-plugin` without a `<version>`.
 Maven 3.9+ warns and may refuse to build in future versions.
 
-**Mitigation** — Pinned to `1.1.1` in HBTV-002.
+**Mitigation** — Pinned to `1.1.1` in `java8-baseline`.
 
 ---
 
-### `R-012` — Plugin tester version mismatch blocks compile
+### `plugin-tester-mismatch` — Plugin tester version mismatch blocks compile
 
-> 🟢 **Mitigated** · Likelihood **Low** · Impact **Low**
+| | |
+|---|---|
+| **Status** | 🟢 Mitigated |
+| **Likelihood** | Low · **Impact** Low |
+| **Legacy code** | R-012 |
 
 **Description** — Plugin modules declared test-scope dependencies
 on `com.dabi.habitv:plugin-tester:4.1.0`, while the reactor builds
@@ -81,15 +99,19 @@ on `com.dabi.habitv:plugin-tester:4.1.0`, while the reactor builds
 trying to fetch the `4.1.0` descriptor from the blocked legacy
 HTTP repository.
 
-**Mitigation** — HBTV-010 aligned plugin test-harness versions to
-reactor expressions and added `plugins/plugin-tester` to the
-aggregator.
+**Mitigation** — `plugin-tester-align` aligned plugin test-harness
+versions to reactor expressions and added `plugins/plugin-tester`
+to the aggregator.
 
 ---
 
-### `R-001` — Legacy Maven repository / free.fr dependency
+### `legacy-maven-repo` — Legacy Maven repository / free.fr dependency
 
-> 🟢 **Compile-time mitigated** · Likelihood **High** · Impact **High** · 🔴 **P0**
+| | |
+|---|---|
+| **Status** | 🟢 Compile-time mitigated |
+| **Likelihood** | High · **Impact** High · **Priority** 🔴 P0 |
+| **Legacy code** | R-001 |
 
 **Description** — Root `pom.xml` and packaging POMs declared a
 `<repository>` pointing at `http://dabiboo.free.fr/repository`
@@ -97,36 +119,45 @@ aggregator.
 blocked by Maven defaults, project-specific artifacts cannot be
 resolved.
 
-**Mitigation status** — Compile-time mitigated by HBTV-012: root
-`dependencyManagement` maps `api` and `framework` to
-`${project.parent.version}`, so own-version plugin modules no
-longer fetch plugin-local coordinates from blocked hosts.
+**Mitigation status** — Compile-time mitigated by
+`own-version-deps-align`: root `dependencyManagement` maps `api` and
+`framework` to `${project.parent.version}`, so own-version plugin
+modules no longer fetch plugin-local coordinates from blocked hosts.
 
 **Residual risk** — Legacy repository migration is still required
 for external publication and runtime updates. Tracked under
-HBTV-004 / HBTV-005.
+`legacy-url-migration` / `static-repo-publish`.
 
 ---
 
 ## 🟠 Open — High priority
 
-### `R-002` — FTP deployment no longer viable
+### `ftp-deploy` — FTP deployment no longer viable
 
-> 🟠 **Open** · Likelihood **High** · Impact **High** · 🔴 **P0**
+| | |
+|---|---|
+| **Status** | 🟠 Open |
+| **Likelihood** | High · **Impact** High · **Priority** 🔴 P0 |
+| **Legacy code** | R-002 |
 
 **Description** — `<distributionManagement>` uses
 `ftp://ftpperso.free.fr/repository` with `wagon-ftp 1.0-beta-6`.
 FTP is unencrypted, the freebox personal pages target is
 deprecated, and the password mechanism would expose credentials.
 
-**Mitigation** — Remove FTP deploy in HBTV-004 / HBTV-005 and
-replace with a documented static publication workflow.
+**Mitigation** — Remove FTP deploy in `legacy-url-migration` /
+`static-repo-publish` and replace with a documented static
+publication workflow.
 
 ---
 
-### `R-003` — JavaFX tied to JDK 8 assumptions
+### `javafx-jdk8` — JavaFX tied to JDK 8 assumptions
 
-> 🟠 **Open** · Likelihood **High** · Impact **High** · 🟠 **P1**
+| | |
+|---|---|
+| **Status** | 🟠 Open |
+| **Likelihood** | High · **Impact** High · **Priority** 🟠 P1 |
+| **Legacy code** | R-003 |
 
 **Description** — `application/trayView` uses
 `zenjava/javafx-maven-plugin 2.0` and JavaFX 2.x APIs;
@@ -134,14 +165,18 @@ replace with a documented static publication workflow.
 `javafx:jfxrt` pointing at `${jdk.home}/jre/lib/ext/jfxrt.jar`
 with hardcoded `jdk.home`. JDK 11+ no longer bundles JavaFX.
 
-**Mitigation** — Tracked under HBTV-008. Do not migrate in this
-restart phase; keep Java 8 baseline first.
+**Mitigation** — Tracked under `javafx-modernization`. Do not
+migrate in this restart phase; keep Java 8 baseline first.
 
 ---
 
-### `R-004` — JAXB generation / runtime mismatch
+### `jaxb-mismatch` — JAXB generation / runtime mismatch
 
-> 🟠 **Open** · Likelihood **Medium** · Impact **High** · 🟠 **P1**
+| | |
+|---|---|
+| **Status** | 🟠 Open |
+| **Likelihood** | Medium · **Impact** High · **Priority** 🟠 P1 |
+| **Legacy code** | R-004 |
 
 **Description** — `application/core` generates JAXB classes via
 the unmaintained `com.sun.tools.xjc.maven2:maven-jaxb-plugin` and
@@ -149,30 +184,38 @@ depends on `javax.xml.bind:jaxb-api:2.0`. On JDK 9+,
 `javax.xml.bind` is not on the default classpath.
 
 **Mitigation** — Keep Java 8 baseline; revisit when migrating off
-Java 8. Document under HBTV-001 follow-up if reactor surfaces
-hidden generation failures.
+Java 8.
 
 ---
 
-### `R-007` — Auto-update pulls unexpected old artifacts during development
+### `legacy-update-pull` — Auto-update pulls unexpected old artifacts during development
 
-> 🟠 **Open** · Likelihood **Medium** · Impact **High** · 🟠 **P1**
+| | |
+|---|---|
+| **Status** | 🟠 Open |
+| **Likelihood** | Medium · **Impact** High · **Priority** 🟠 P1 |
+| **Legacy code** | R-007 |
 
 **Description** — `UpdateManager` and `FindArtifactUtils` resolve
 `FrameworkConf.UPDATE_URL` (`http://dabiboo.free.fr/repository`)
 at runtime. A dev build can pull whatever is on that host (or
 fail noisily if it is down).
 
-**Mitigation** — Plan a feature flag / env override in HBTV-005 to
-disable updates in development. Until then, document the risk.
+**Mitigation** — Plan a feature flag / env override in
+`static-repo-publish` to disable updates in development. Until
+then, document the risk.
 
 ---
 
 ## 🟡 Open — Medium / Low priority
 
-### `R-005` — Live provider tests are non-deterministic
+### `live-tests-flaky` — Live provider tests are non-deterministic
 
-> 🟡 **Open** · Likelihood **High** · Impact **Medium** · 🟠 **P1**
+| | |
+|---|---|
+| **Status** | 🟡 Open |
+| **Likelihood** | High · **Impact** Medium · **Priority** 🟠 P1 |
+| **Legacy code** | R-005 |
 
 **Description** — Many tests reach live endpoints (Canal+, beIN,
 RSS, Dailymotion, kewego, etc.) via `BasePluginProviderTester` /
@@ -180,85 +223,113 @@ RSS, Dailymotion, kewego, etc.) via `BasePluginProviderTester` /
 remote availability and HTML/JSON changes.
 
 **Mitigation** — Keep tests excluded from the default lifecycle
-in HBTV-002; quarantine network tests behind an opt-in profile.
+in `java8-baseline`; quarantine network tests behind an opt-in
+profile.
 
 ---
 
-### `R-006` — Provider endpoints obsolete or renamed
+### `provider-endpoints-dead` — Provider endpoints obsolete or renamed
 
-> 🟡 **Open** · Likelihood **High** · Impact **Medium** · 🟠 **P1**
+| | |
+|---|---|
+| **Status** | 🟡 Open |
+| **Likelihood** | High · **Impact** Medium · **Priority** 🟠 P1 |
+| **Legacy code** | R-006 |
 
 **Description** — Several providers (Pluzz, legacy Canal+, beIN)
 are likely dead or renamed. Provider plugins may compile but never
 produce results in production.
 
-**Mitigation** — Inventory in HBTV-006. Removal/rename happens in
-dedicated PRs, not in this restart bootstrap.
+**Mitigation** — Inventory in `provider-inventory`.
+Removal/rename happens in dedicated PRs, not in this restart
+bootstrap.
 
 ---
 
-### `R-008` — yt-dlp migration can change download behavior
+### `ytdlp-behavior-diff` — yt-dlp migration can change download behavior
 
-> 🟡 **Open** · Likelihood **Medium** · Impact **Medium** · 🟡 **P2**
+| | |
+|---|---|
+| **Status** | 🟡 Open |
+| **Likelihood** | Medium · **Impact** Medium · **Priority** 🟡 P2 |
+| **Legacy code** | R-008 |
 
 **Description** — `yt-dlp` is not a drop-in for `youtube-dl`:
 option parsing, output templates, and post-processors differ.
 
-**Mitigation** — HBTV-007 plans the migration with a behavior diff
-and deprecation note before any code change. Command wiring is
-already covered by an offline test (HBTV-011).
+**Mitigation** — `ytdlp-migration` plans the migration with a
+behavior diff and deprecation note before any code change. Command
+wiring is already covered by an offline test from
+`console-runnable`.
 
 ---
 
-### `R-009` — GitHub Pages / static repo layout may not match old updater expectations
+### `pages-layout-mismatch` — GitHub Pages / static repo layout may not match old updater expectations
 
-> 🟡 **Open** · Likelihood **Medium** · Impact **High** · 🟠 **P1**
+| | |
+|---|---|
+| **Status** | 🟡 Open |
+| **Likelihood** | Medium · **Impact** High · **Priority** 🟠 P1 |
+| **Legacy code** | R-009 |
 
 **Description** — The runtime updater expects a specific directory
 layout (groupId-as-path, artifactId folder, version list, latest
 marker). Hosting on GitHub Pages or another static host may diverge
 subtly and break update discovery.
 
-**Mitigation** — HBTV-005 defines the layout explicitly and
-validates it against `FindArtifactUtils.findLastVersionUrl`
-semantics before cutting over.
+**Mitigation** — `static-repo-publish` defines the layout
+explicitly and validates it against
+`FindArtifactUtils.findLastVersionUrl` semantics before cutting
+over.
 
 ---
 
-### `R-013` — Hardcoded YouTube Data API key
+### `youtube-key-hardcoded` — Hardcoded YouTube Data API key
 
-> 🟡 **PR in flight** · Likelihood **Medium** · Impact **Medium** · 🟡 **P2**
+| | |
+|---|---|
+| **Status** | 🟡 PR in flight |
+| **Likelihood** | Medium · **Impact** Medium · **Priority** 🟡 P2 |
+| **Legacy code** | R-013 |
 
 **Description** — `plugins/youtube` embedded a concrete YouTube
 Data API key in source. If the key is revoked, quota-exhausted, or
 restricted to another referrer/IP, the provider search fails with
 HTTP 403 and requires a new build to change credentials.
 
-**Mitigation** — HBTV-013: externalize key resolution to runtime
-configuration with deterministic precedence (system property then
-environment variable), add a tray configuration field, and include
-sanitized request context in error messages. PR #29 awaits a
-documentation merge conflict resolution.
+**Mitigation** — `youtube-apikey`: externalize key resolution to
+runtime configuration with deterministic precedence (system
+property then environment variable), add a tray configuration
+field, and include sanitized request context in error messages.
+PR #29 awaits a documentation merge conflict resolution.
 
 ---
 
-### `R-014` — GitHub Pages autoindex gap
+### `pages-autoindex-gap` — GitHub Pages autoindex gap
 
-> 🟡 **Open** · Likelihood **Medium** · Impact **Medium** · 🟡 **P2**
+| | |
+|---|---|
+| **Status** | 🟡 Open |
+| **Likelihood** | Medium · **Impact** Medium · **Priority** 🟡 P2 |
+| **Legacy code** | R-014 |
 
 **Description** — GitHub Pages does not provide Apache-style
 `mod_autoindex` directory listings. `FindArtifactUtils` discovers
 artifact versions by parsing index pages, which assumes autoindex.
 
-**Mitigation** — HBTV-005 plans to generate static `index.html`
-files (or a manifest) so listing semantics are preserved without
-relying on the host.
+**Mitigation** — `static-repo-publish` plans to generate static
+`index.html` files (or a manifest) so listing semantics are
+preserved without relying on the host.
 
 ---
 
-### `R-015` — Silent `stat()` ping at startup
+### `silent-stat-ping` — Silent `stat()` ping at startup
 
-> 🟡 **Open** · Likelihood **Medium** · Impact **Medium** · 🟡 **P2**
+| | |
+|---|---|
+| **Status** | 🟡 Open |
+| **Likelihood** | Medium · **Impact** Medium · **Priority** 🟡 P2 |
+| **Legacy code** | R-015 |
 
 **Description** — `application/core/.../CoreManager.java` pings
 `HabitTvConf.STAT_URL` (`http://dabiboo.free.fr/cpt.php`) at
@@ -266,8 +337,8 @@ startup for telemetry. Dev builds and CI silently contact the
 legacy host.
 
 **Mitigation** — Plan a quarantine flag (`habitv.stat.enabled`,
-default `false`) under HBTV-004; remove the legacy host once the
-flag ships.
+default `false`) under `legacy-url-migration`; remove the legacy
+host once the flag ships.
 
 ---
 
@@ -280,3 +351,25 @@ flag ships.
 | 🟡 Open / Medium | P2 — needs action but not blocking the baseline |
 | 🟢 Open / Low | P3 — known, accepted, monitored |
 | 🔴 Open / Critical | Realized incident or imminent breakage |
+
+---
+
+## 🗂️ Legacy code index
+
+| Legacy code | Slug |
+|---|---|
+| R-001 | `legacy-maven-repo` |
+| R-002 | `ftp-deploy` |
+| R-003 | `javafx-jdk8` |
+| R-004 | `jaxb-mismatch` |
+| R-005 | `live-tests-flaky` |
+| R-006 | `provider-endpoints-dead` |
+| R-007 | `legacy-update-pull` |
+| R-008 | `ytdlp-behavior-diff` |
+| R-009 | `pages-layout-mismatch` |
+| R-010 | `reactor-version-range` |
+| R-011 | `jaxb-plugin-unpinned` |
+| R-012 | `plugin-tester-mismatch` |
+| R-013 | `youtube-key-hardcoded` |
+| R-014 | `pages-autoindex-gap` |
+| R-015 | `silent-stat-ping` |

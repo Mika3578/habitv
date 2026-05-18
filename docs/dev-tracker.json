@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema",
-  "version": 2,
-  "description": "Machine-readable mirror of docs/dev-tracker.md. Keep both files in sync.",
+  "version": 3,
+  "description": "Machine-readable mirror of docs/dev-tracker.md. Keep both files in sync. Identifiers use descriptive kebab-case slugs (see descriptive-slug-ids ADR).",
   "lastRefresh": "2026-05-18",
   "statusValues": ["proposed", "in-progress", "blocked", "done", "deferred"],
   "priorityValues": ["P0", "P1", "P2", "P3"],
@@ -16,7 +16,8 @@
   },
   "items": [
     {
-      "id": "HBTV-000",
+      "id": "gov-bootstrap",
+      "legacyCode": "HBTV-000",
       "displayTitle": "Governance bootstrap from master",
       "icon": "🏗️",
       "status": "done",
@@ -34,10 +35,11 @@
         "git log --oneline -5 -> bootstrap commits present"
       ],
       "pr": "chore: bootstrap restart workflow from master (#21)",
-      "notes": "Documentation/workflow only. GitHub UI-level settings application moved to HBTV-003."
+      "notes": "Documentation/workflow only. GitHub UI-level settings application moved to branch-protection."
     },
     {
-      "id": "HBTV-001",
+      "id": "maven-reactor",
+      "legacyCode": "HBTV-001",
       "displayTitle": "Maven reactor stabilization",
       "icon": "⚙️",
       "status": "done",
@@ -48,7 +50,7 @@
         "Root pom.xml aggregates fwk, application, plugins.",
         "fwk/pom.xml aggregates api, framework.",
         "application/pom.xml keeps core, consoleView, trayView, habiTv.",
-        "plugins/pom.xml keeps 22 plugin modules + plugin-tester (added in HBTV-010).",
+        "plugins/pom.xml keeps 22 plugin modules + plugin-tester (added in plugin-tester-align).",
         "All child POMs parent at 4.1.0-SNAPSHOT with explicit relativePath.",
         "fwk/framework own-version typo 4.1.0-SNASPHOT fixed to 4.1.0-SNAPSHOT."
       ],
@@ -56,10 +58,11 @@
         "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS, 33 reactor entries"
       ],
       "pr": "build: stabilize Maven reactor from master (#22)",
-      "notes": "habiTv-linux / habiTv-windows stay out of reactor (JavaFX 2.x + hardcoded jdk.home), tracked under HBTV-008."
+      "notes": "habiTv-linux / habiTv-windows stay out of reactor (JavaFX 2.x + hardcoded jdk.home), tracked under javafx-modernization."
     },
     {
-      "id": "HBTV-002",
+      "id": "java8-baseline",
+      "legacyCode": "HBTV-002",
       "displayTitle": "Java 8 compile baseline",
       "icon": "☕",
       "status": "done",
@@ -70,17 +73,19 @@
         "Intra-reactor [4.1,4.2) ranges replaced with ${project.version}.",
         "maven-jaxb-plugin pinned to 1.1.1 in application/core.",
         "mvn compile BUILD SUCCESS on Ubuntu and Windows with Temurin 8.",
-        "Network/provider tests excluded from default lifecycle."
+        "Network/provider tests excluded from default lifecycle.",
+        "CI workflow triggers on both master and develop."
       ],
       "validation": [
         "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS",
-        "mvn -B -ntp -DskipTests compile -> BUILD SUCCESS (after HBTV-010 + HBTV-012)"
+        "mvn -B -ntp -DskipTests compile -> BUILD SUCCESS (after plugin-tester-align + own-version-deps-align)"
       ],
       "pr": "build: stabilize Java 8 compile baseline (#23)",
-      "notes": "Original blocker chain: plugin-tester:4.1.0 (HBTV-010) -> framework/api:4.1.1-SNAPSHOT (HBTV-012). Both cleared. CI workflow now triggers on master AND develop so every modernization PR is validated. Risks R-010, R-011, R-012 are mitigated."
+      "notes": "Original blocker chain: plugin-tester:4.1.0 (plugin-tester-align) -> framework/api:4.1.1-SNAPSHOT (own-version-deps-align). Both cleared. Risks reactor-version-range, jaxb-plugin-unpinned, plugin-tester-mismatch mitigated."
     },
     {
-      "id": "HBTV-003",
+      "id": "branch-protection",
+      "legacyCode": "HBTV-003",
       "displayTitle": "GitHub branch protection rules",
       "icon": "🛡️",
       "status": "proposed",
@@ -100,7 +105,8 @@
       "notes": "Owner-only task; no code change."
     },
     {
-      "id": "HBTV-004",
+      "id": "legacy-url-migration",
+      "legacyCode": "HBTV-004",
       "displayTitle": "Legacy URL migration (free.fr / SVN / FTP)",
       "icon": "🔗",
       "status": "in-progress",
@@ -121,10 +127,11 @@
         "mvn -B -ntp -DskipTests compile -> BUILD SUCCESS"
       ],
       "pr": "#25 (draft, plan), #36 (open, execution)",
-      "notes": "Sequenced: (1) merge plan, (2) ship quarantine flags, (3) flip POMs, (4) remove FTP, (5) point updater to HBTV-005 host. Risks R-001, R-002, R-007, R-013, R-014, R-015."
+      "notes": "Sequenced: (1) merge plan, (2) ship quarantine flags, (3) flip POMs, (4) remove FTP, (5) point updater to static-repo-publish host. Risks legacy-maven-repo, ftp-deploy, legacy-update-pull, youtube-key-hardcoded, pages-autoindex-gap, silent-stat-ping."
     },
     {
-      "id": "HBTV-005",
+      "id": "static-repo-publish",
+      "legacyCode": "HBTV-005",
       "displayTitle": "Static artifact repository publication",
       "icon": "📦",
       "status": "proposed",
@@ -145,10 +152,11 @@
         "mvn -B -ntp -DskipTests deploy -DaltDeploymentRepository=local::default::file:///tmp/repo"
       ],
       "pr": "habitv-repo #1 (draft, since 2026-04-25)",
-      "notes": "Pairs with HBTV-004 phase 5. Risks R-009, R-014."
+      "notes": "Pairs with legacy-url-migration phase 5. Risks pages-layout-mismatch, pages-autoindex-gap."
     },
     {
-      "id": "HBTV-006",
+      "id": "provider-inventory",
+      "legacyCode": "HBTV-006",
       "displayTitle": "Provider plugin inventory & cleanup",
       "icon": "🔌",
       "status": "proposed",
@@ -164,10 +172,11 @@
         "Inventory reviewed in a doc-only PR; no behavior change."
       ],
       "pr": "TBD",
-      "notes": "Visible candidates: pluzz (already renamed francetv on habitv-repo), canalPlus, beinsport, D8/D17/nrj12 (README mentions but no module), wat, sfr, clubic. Risks R-005, R-006."
+      "notes": "Visible candidates: pluzz (already renamed francetv on habitv-repo), canalPlus, beinsport, D8/D17/nrj12 (README mentions but no module), wat, sfr, clubic. Risks live-tests-flaky, provider-endpoints-dead."
     },
     {
-      "id": "HBTV-007",
+      "id": "ytdlp-migration",
+      "legacyCode": "HBTV-007",
       "displayTitle": "youtube-dl to yt-dlp migration",
       "icon": "🎬",
       "status": "proposed",
@@ -186,10 +195,11 @@
         "mvn -B -ntp -pl plugins/youtube -am test -> Tests run: 2, Failures: 0"
       ],
       "pr": "TBD",
-      "notes": "Risk R-008. End-to-end live behavior remains out of scope until HBTV-006 inventory cleanup."
+      "notes": "Risk ytdlp-behavior-diff. End-to-end live behavior remains out of scope until provider-inventory cleanup."
     },
     {
-      "id": "HBTV-008",
+      "id": "javafx-modernization",
+      "legacyCode": "HBTV-008",
       "displayTitle": "JavaFX & runtime packaging modernization",
       "icon": "🖼️",
       "status": "proposed",
@@ -206,10 +216,11 @@
         "Audit reviewed in PR; no code changes in this item."
       ],
       "pr": "TBD",
-      "notes": "Risk R-003. Largest single piece of remaining work once HBTV-004 + HBTV-005 + HBTV-006 are clear."
+      "notes": "Risk javafx-jdk8. Largest single piece of remaining work once legacy-url-migration + static-repo-publish + provider-inventory are clear."
     },
     {
-      "id": "HBTV-010",
+      "id": "plugin-tester-align",
+      "legacyCode": "HBTV-010",
       "displayTitle": "plugin-tester reactor alignment",
       "icon": "🧪",
       "status": "done",
@@ -226,10 +237,11 @@
         "mvn -B -ntp -DskipTests compile -> past the previous blocker"
       ],
       "pr": "build: align plugin tester reactor dependency (#24)",
-      "notes": "Risk R-012 mitigated. Residual framework/api blocker moved to HBTV-012 (and resolved there)."
+      "notes": "Risk plugin-tester-mismatch mitigated. Residual framework/api blocker moved to own-version-deps-align (and resolved there)."
     },
     {
-      "id": "HBTV-011",
+      "id": "console-runnable",
+      "legacyCode": "HBTV-011",
       "displayTitle": "Runnable console baseline",
       "icon": "▶️",
       "status": "done",
@@ -246,10 +258,11 @@
         "mvn -B -ntp -pl plugins/youtube -am test -> 2/2 pass"
       ],
       "pr": "feat(console): restore runnable baseline with yt-dlp provider (#28)",
-      "notes": "Superseded PR #27 with a scoped subset. JavaFX modernization (HBTV-008), tray/GUI packaging, and scraper rewrites remain out of scope."
+      "notes": "Superseded PR #27 with a scoped subset. javafx-modernization, tray/GUI packaging, and scraper rewrites remain out of scope."
     },
     {
-      "id": "HBTV-012",
+      "id": "own-version-deps-align",
+      "legacyCode": "HBTV-012",
       "displayTitle": "Own-version plugin dependency alignment",
       "icon": "🔗",
       "status": "done",
@@ -266,10 +279,11 @@
         "mvn -B -ntp -DskipTests compile -> BUILD SUCCESS (33 modules)"
       ],
       "pr": "build: align own-version plugin internal dependencies (#33)",
-      "notes": "Own-version plugin modules (beinsport, footyroom, pluzz, ffmpeg) now use ${project.parent.version} for shared internal dependencyManagement coordinates. Risk R-001 mitigated for local reactor compilation (external publication still pending HBTV-004)."
+      "notes": "Own-version plugin modules (beinsport, footyroom, pluzz, ffmpeg) now use ${project.parent.version} for shared internal dependencyManagement coordinates. Risk legacy-maven-repo mitigated for local reactor compilation (external publication still pending legacy-url-migration)."
     },
     {
-      "id": "HBTV-013",
+      "id": "youtube-apikey",
+      "legacyCode": "HBTV-013",
       "displayTitle": "YouTube Data API key externalization",
       "icon": "🔑",
       "status": "in-progress",
@@ -290,7 +304,7 @@
         "mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeConfTest test -> BUILD SUCCESS"
       ],
       "pr": "fix(youtube): externalize data api key and mask api errors (#29)",
-      "notes": "PR #29 is blocked on a documentation merge conflict only (collided with HBTV-012 id on develop); renumbered here to HBTV-013. Risk R-013 mitigated by this work."
+      "notes": "PR #29 is blocked on a documentation merge conflict only (an id collision under the legacy numbering scheme); the slug-based naming this refresh introduces makes such collisions impossible going forward. Risk youtube-key-hardcoded mitigated by this work."
     }
   ]
 }

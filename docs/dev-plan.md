@@ -13,16 +13,16 @@ work from a later phase.
 ████████████░░░░░░░░░░░░  50%   (3.5 / 7 phases)
 ```
 
-| Phase | Title | Status | Progress | Trackers |
+| Phase | Title | Status | Progress | Tracker items |
 |:----:|---|:--:|---|---|
-| 0 | 🏗️ Governance bootstrap | ✅ Done | `████████████████████` 100% | HBTV-000 |
-| 1 | ⚙️ Stabilize Maven reactor | ✅ Done | `████████████████████` 100% | HBTV-001 |
-| 2 | ☕ Stabilize Java 8 baseline | ✅ Done | `████████████████████` 100% | HBTV-002, HBTV-010, HBTV-012 |
-| 3 | 🔗 Remove legacy free.fr / SVN / FTP | 🟡 In progress | `███████░░░░░░░░░░░░░` 35% | HBTV-004, HBTV-013 |
-| 4 | 📦 Publish artifacts via `habitv-repo` | 🔵 Proposed | `██░░░░░░░░░░░░░░░░░░` 10% | HBTV-005 |
-| 5 | 🎬 Replace `youtube-dl` with `yt-dlp` | 🔵 Proposed | `████░░░░░░░░░░░░░░░░` 20% | HBTV-007 |
-| 6 | 🔌 Audit / deprecate obsolete providers | 🔵 Proposed | `░░░░░░░░░░░░░░░░░░░░` 0% | HBTV-006 |
-| 7 | 🖼️ Modernize UI / runtime packaging | 🔵 Proposed | `█░░░░░░░░░░░░░░░░░░░` 5% | HBTV-008 |
+| 0 | 🏗️ Governance bootstrap | ✅ Done | `████████████████████` 100% | `gov-bootstrap` |
+| 1 | ⚙️ Stabilize Maven reactor | ✅ Done | `████████████████████` 100% | `maven-reactor` |
+| 2 | ☕ Stabilize Java 8 baseline | ✅ Done | `████████████████████` 100% | `java8-baseline`, `plugin-tester-align`, `own-version-deps-align` |
+| 3 | 🔗 Remove legacy free.fr / SVN / FTP | 🟡 In progress | `███████░░░░░░░░░░░░░` 35% | `legacy-url-migration`, `youtube-apikey` |
+| 4 | 📦 Publish artifacts via `habitv-repo` | 🔵 Proposed | `██░░░░░░░░░░░░░░░░░░` 10% | `static-repo-publish` |
+| 5 | 🎬 Replace `youtube-dl` with `yt-dlp` | 🔵 Proposed | `████░░░░░░░░░░░░░░░░` 20% | `ytdlp-migration` |
+| 6 | 🔌 Audit / deprecate obsolete providers | 🔵 Proposed | `░░░░░░░░░░░░░░░░░░░░` 0% | `provider-inventory` |
+| 7 | 🖼️ Modernize UI / runtime packaging | 🔵 Proposed | `█░░░░░░░░░░░░░░░░░░░` 5% | `javafx-modernization` |
 
 ---
 
@@ -54,7 +54,7 @@ branch `develop` created.
 - Decide the status of `plugins/plugin-tester` and
   `application/habiTv-linux` / `habiTv-windows`.
 
-**Tracker** — `HBTV-001`.
+**Tracker** — `maven-reactor`.
 
 ---
 
@@ -69,7 +69,8 @@ branch `develop` created.
 - Quarantine network-dependent tests behind an opt-in profile (next
   phase or a dedicated follow-up).
 
-**Trackers** — `HBTV-002`, `HBTV-010`, `HBTV-012`.
+**Trackers** — `java8-baseline`, `plugin-tester-align`,
+`own-version-deps-align`.
 
 ---
 
@@ -85,7 +86,7 @@ branch `develop` created.
   development builds do not ping legacy hosts.
 - Externalize the hardcoded YouTube Data API key.
 
-**Trackers** — `HBTV-004`, `HBTV-013`.
+**Trackers** — `legacy-url-migration`, `youtube-apikey`.
 
 ---
 
@@ -100,7 +101,7 @@ branch `develop` created.
   updater (`FindArtifactUtils`, `UpdateManager`).
 - Document the publication workflow and credential handling.
 
-**Tracker** — `HBTV-005`.
+**Tracker** — `static-repo-publish`.
 
 ---
 
@@ -114,7 +115,7 @@ branch `develop` created.
 - Migrate the default config (`application/core/configuration.xml`).
 - Provide a deprecation note for users still on `youtube-dl`.
 
-**Tracker** — `HBTV-007`.
+**Tracker** — `ytdlp-migration`.
 
 ---
 
@@ -127,7 +128,7 @@ branch `develop` created.
 - Mark obsolete or renamed providers with a deprecation plan and
   dedicated removal PRs.
 
-**Tracker** — `HBTV-006`.
+**Tracker** — `provider-inventory`.
 
 ---
 
@@ -142,7 +143,7 @@ branch `develop` created.
 - Modernize the runtime updater (HTTPS, signed metadata) once the
   static repo from Phase 4 is in place.
 
-**Tracker** — `HBTV-008`.
+**Tracker** — `javafx-modernization`.
 
 ---
 

@@ -50,14 +50,14 @@ French TV catch-up content via pluggable provider plugins.
 
 | 🔴 Forbidden without explicit tracker item + ADR | Why |
 |---|---|
-| Restructure Maven reactor topology | High blast radius; tracked under HBTV-001 |
+| Restructure Maven reactor topology | High blast radius; tracked under `maven-reactor` |
 | Bump Java baseline beyond **Java 8** | JavaFX 2.x and `javax.xml.bind` 2.0 assume JDK 8 |
-| Migrate JavaFX (`jfxrt`) to OpenJFX | Tracked under HBTV-008 |
-| Regenerate JAXB classes or move to `jakarta.*` | Risk R-004 |
-| Replace `youtube-dl` plugin behavior with `yt-dlp` | Tracked under HBTV-007 |
-| Change runtime updater URLs or layout | Tracked under HBTV-005 |
-| Migrate FTP/HTTP repositories | Tracked under HBTV-004 |
-| Remove or rename provider/plugin modules | Tracked under HBTV-006 |
+| Migrate JavaFX (`jfxrt`) to OpenJFX | Tracked under `javafx-modernization` |
+| Regenerate JAXB classes or move to `jakarta.*` | Risk `jaxb-mismatch` |
+| Replace `youtube-dl` plugin behavior with `yt-dlp` | Tracked under `ytdlp-migration` |
+| Change runtime updater URLs or layout | Tracked under `static-repo-publish` |
+| Migrate FTP/HTTP repositories | Tracked under `legacy-url-migration` |
+| Remove or rename provider/plugin modules | Tracked under `provider-inventory` |
 | Add OWASP / SBOM / static-analysis plugins | Out of restart phase |
 | Commit secrets, tokens, local paths, IDE files | 🚨 never, period |
 | Write non-English content (branches, code, docs) | English-only policy |
@@ -85,7 +85,7 @@ Conventional Commits, English, imperative, lowercase, ≤ 72 chars.
 
 | Rule | Detail |
 |------|--------|
-| Tracker reference | Reference one `HBTV-XXX` in the PR body |
+| Tracker reference | Reference one work-item slug (e.g. `legacy-url-migration`) in the PR body |
 | Template | Fill every section of `.github/pull_request_template.md` |
 | Diff size | Keep small and focused; reject opportunistic refactors |
 | History | Linear inside feature branches; no merge commits |
@@ -108,7 +108,7 @@ command + output** in the PR body.
 | Command | Status |
 |---------|:------:|
 | `mvn validate` | 🟢 always run |
-| `mvn compile` | 🟢 safe from `develop` since HBTV-012 |
+| `mvn compile` | 🟢 safe from `develop` since `own-version-deps-align` |
 | `mvn package` | 🟡 use `-pl` to exclude broken modules |
 | `mvn test` | 🟠 many tests hit live network — quarantine |
 | `mvn verify` | ⛔ not safe yet |
@@ -120,17 +120,19 @@ command + output** in the PR body.
 `docs/dev-tracker.md` and `docs/dev-tracker.json` are **mirrors**.
 Always update both in the same commit. Fields per item:
 
+- `id` — descriptive kebab-case slug (e.g. `legacy-url-migration`)
+- `legacyCode` — old opaque code preserved for compat (`HBTV-XXX`)
 - `displayTitle` — human-readable label
 - `icon` — emoji prefix
-- `id` — `HBTV-XXX` identifier
 - `status` — `proposed` | `in-progress` | `done` | `blocked` | `deferred`
 - `priority` — `P0` (critical) | `P1` (high) | `P2` (normal) | `P3` (low)
-- `progress` — integer 0–100
+- `progressPercent` — integer 0–100
 - `scope`, `acceptanceCriteria`, `validation`, `pr`, `notes`
 
-For risks (`R-0XX`) in `docs/risk-register.md` and decisions
-(`ADR-00XX`) in `docs/decision-log.md`, follow the existing
-templates. Append-only; supersede rather than rewrite.
+For risks in `docs/risk-register.md` and decisions in
+`docs/decision-log.md`, follow the same convention: a descriptive
+slug as the primary id, a `Legacy code` field for the old `R-0XX`
+or `ADR-00XX` reference. Append-only; supersede rather than rewrite.
 
 ---
 
@@ -210,7 +212,7 @@ contradicts an item that is already documented.
 | `refactor` | ✅ | ❌ | ❌ | 🟡 if shape change |
 | `perf` | ✅ | ❌ | ❌ | ❌ |
 | `docs` | 🟡 if user-facing | ✅ if scope/status | ✅ if risk listed | ✅ if ADR proposed |
-| `test` | ✅ Tests | 🟡 progress | 🟡 R-005 quarantine | ❌ |
+| `test` | ✅ Tests | 🟡 progress | 🟡 `live-tests-flaky` quarantine | ❌ |
 | `chore` | 🟡 if user-facing | ❌ | ❌ | ❌ |
 | `build` | ✅ Build | 🟡 progress | 🟡 if removes blocker | 🟡 if topology |
 | `ci` | ✅ Build | 🟡 progress | ❌ | ❌ |
@@ -237,17 +239,34 @@ contradicts an item that is already documented.
 The agent MUST run this checklist before requesting review:
 
 ```bash
-# 1. The two tracker files agree on item ids
-diff <(grep -oE 'HBTV-[0-9]+' docs/dev-tracker.md  | sort -u) \
-     <(grep -oE 'HBTV-[0-9]+' docs/dev-tracker.json | sort -u)
+# 1. The two tracker files agree on slug ids
+python3 - <<'EOF'
+import json, re
+md = open('docs/dev-tracker.md').read()
+js = json.load(open('docs/dev-tracker.json'))
+md_slugs = set(re.findall(r'`([a-z][a-z0-9-]{4,})`', md))
+js_slugs = {i['id'] for i in js['items']}
+missing = js_slugs - md_slugs
+assert not missing, f"Missing slugs in dev-tracker.md: {missing}"
+assert len(js_slugs) == js['summary']['total']
+print('OK:', len(js_slugs), 'items, all slugs cross-referenced')
+EOF
 
-# 2. The JSON parses
-python3 -c "import json; json.load(open('docs/dev-tracker.json'))"
+# 2. The progress summary matches the items
+python3 - <<'EOF'
+import json
+js = json.load(open('docs/dev-tracker.json'))
+s = js['summary']
+counts = {'done': 0, 'in-progress': 0, 'proposed': 0, 'blocked': 0, 'deferred': 0}
+for i in js['items']:
+    counts[i['status']] += 1
+assert s['done'] == counts['done'], (s, counts)
+assert s['inProgress'] == counts['in-progress'], (s, counts)
+assert s['proposed'] == counts['proposed'], (s, counts)
+print('OK: summary matches item statuses')
+EOF
 
-# 3. The progress summary matches the items
-#    summary.done == count(items where status==done), etc.
-
-# 4. CHANGELOG has an Unreleased entry referencing this PR if user-facing
+# 3. CHANGELOG has an Unreleased entry referencing this PR if user-facing
 grep -F "$(git rev-parse --short HEAD)" CHANGELOG.md || true
 ```
 
@@ -300,12 +319,12 @@ To **add** a new rule:
 To **change** an existing rule's wording, scope, or strictness:
 
 1. Open a new ADR (do not edit the old one) that **supersedes** the
-   prior ADR. Use the metadata line `Supersedes: ADR-00XX`.
+   prior ADR. Use the metadata line `Supersedes: <old-slug>`.
 2. Edit the rule text in `AGENTS.md` in the same PR.
 3. Update the ADR dashboard in `decision-log.md`: the older ADR
    becomes `🔁 Superseded`; the new one is `✅ Accepted` on merge.
 4. If the change weakens a 🔴 hard rule, the ADR must explicitly
-   identify the residual risk and link the `R-0XX` entry that now
+   identify the residual risk and link the risk slug that now
    carries it.
 
 ### 12.4 Delete a rule
@@ -317,7 +336,7 @@ To **remove** a rule entirely:
    - Explain why it is no longer needed (changed reality, replaced
      by a different mechanism, etc.).
    - Identify any residual risk that must be accepted, and link the
-     `R-0XX` entry created for it.
+     risk slug entry created for it.
 2. Remove the rule text from `AGENTS.md` in the same PR.
 3. If the deleted rule was a 🔴 hard rule, the PR requires explicit
    owner approval and cannot be self-approved by an AI agent.
@@ -355,8 +374,9 @@ extra care:
 
 Any change to `AGENTS.md` must leave traceable evidence:
 
-- The commit message references the ADR id introducing or
-  superseding the change (e.g. `docs(agents): ... (ADR-0007)`).
+- The commit message references the ADR slug introducing or
+  superseding the change (e.g.
+  `docs(agents): ... (doc-sync-and-rule-lifecycle)`).
 - The ADR references the section/rule it touches (e.g.
   `Touches: AGENTS.md §11, §12`).
 - The dashboard tables in `decision-log.md` and `dev-tracker.md`
