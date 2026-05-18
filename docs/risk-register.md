@@ -288,7 +288,7 @@ wiring is already covered by an offline test from
 
 | | |
 |---|---|
-| **Status** | 🟡 Open |
+| **Status** | 🟢 Mitigated |
 | **Likelihood** | Medium · **Impact** High · **Priority** 🟠 P1 |
 | **Legacy code** | R-009 |
 

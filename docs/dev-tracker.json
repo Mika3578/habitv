@@ -160,7 +160,7 @@
         "mvn -B -ntp -DskipTests validate",
         "python scripts/static-repo/validate_repository_layout.py <repository-root>"
       ],
-      "pr": "habitv-repo #2 (merged); habitv PR TBD (publication status + tracker refresh)",
+      "pr": "habitv-repo #2 (merged); habitv PR #49 (publication status + tracker refresh)",
       "notes": "Runtime updates remain disabled by default. Publication cutover is live on GitHub Pages with token-free HTTPS access. Remaining follow-up: run one dedicated opt-in runtime update smoke test with habitv.update.enabled=true against the published URL."
     },
     {

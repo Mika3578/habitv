@@ -256,7 +256,7 @@ or equivalent HTTPS host) compatible with the existing
 **Acceptance criteria**
 - ✅ Cross-OS deploy scripts present in `scripts/static-repo/` *(in develop)*
 - ✅ `habitv-repo` PR [#2](https://github.com/Mika3578/habitv-repo/pull/2) merged
-- ✅ `repository/com/dabi/habitv/` layout contract validated locally
+- ✅ `repository/com/dabi/habitv/` layout contract validated locally and published
 - ✅ `index.html` generation for GitHub Pages (no autoindex dependency) validated locally and live
 - ✅ `plugins.txt` format validated against `FindArtifactUtils` fallback expectations and live
 - ✅ HTTPS + no-token runtime consumption contract documented
@@ -268,7 +268,7 @@ mvn -B -ntp -DskipTests validate
 python scripts/static-repo/validate_repository_layout.py "<repository-root>"
 ```
 
-**Related PRs** · habitv-repo #2 (merged) · this PR (publication status + tracker refresh)
+**Related PRs** · habitv-repo #2 (merged) · habitv PR #49 (publication status + tracker refresh)
 
 **Notes** — Runtime updates stay disabled by default.
 Publication cutover is complete (`https://mika3578.github.io/habitv-repo/repository/`
