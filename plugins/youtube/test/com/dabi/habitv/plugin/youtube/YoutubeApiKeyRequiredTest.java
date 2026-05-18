@@ -18,7 +18,6 @@ import com.dabi.habitv.framework.FrameworkConf;
 public class YoutubeApiKeyRequiredTest {
 
 	private static final String API_KEY_PROPERTY = "habitv.youtube.apiKey";
-	private static final String API_KEY_ENV = "HABITV_YOUTUBE_API_KEY";
 	private String previousProperty;
 
 	@Before
@@ -38,7 +37,7 @@ public class YoutubeApiKeyRequiredTest {
 
 	@Test
 	public void requireApiKeyFailsFastWithGuidanceWhenMissing() {
-		Assume.assumeTrue(YoutubeConf.normalizeApiKey(System.getenv(API_KEY_ENV)) == null);
+		Assume.assumeTrue(YoutubeConf.resolveApiKey() == null);
 		try {
 			YoutubePluginManager.requireApiKey();
 			fail("Expected TechnicalException when YouTube API key is missing");
@@ -59,7 +58,7 @@ public class YoutubeApiKeyRequiredTest {
 
 	@Test
 	public void findEpisodeFailsFastBeforeAnyHttpCallWhenApiKeyMissing() {
-		Assume.assumeTrue(YoutubeConf.normalizeApiKey(System.getenv(API_KEY_ENV)) == null);
+		Assume.assumeTrue(YoutubeConf.resolveApiKey() == null);
 		try {
 			new YoutubePluginManagerNoHttpCall().findEpisode(buildPlaylistCategory());
 			fail("Expected TechnicalException when YouTube API key is missing");
