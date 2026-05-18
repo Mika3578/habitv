@@ -89,7 +89,7 @@
     {
       "id": "HBTV-004",
       "title": "Legacy repository URL migration (execution)",
-      "status": "in-progress",
+      "status": "done",
       "priority": "P0",
       "scope": "Remove active DabiBoo/free.fr/SVN/Assembla Maven and runtime wiring; replace SCM with GitHub; disable stat/update network calls by default; point Maven repository at habitv-repo GitHub Pages base.",
       "acceptanceCriteria": [

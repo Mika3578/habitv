@@ -134,7 +134,7 @@ Status legend: `proposed`, `in-progress`, `blocked`, `done`,
 
 ## HBTV-004 — Legacy repository URL migration (execution)
 
-- Status: in-progress
+- Status: done
 - Priority: P0
 - Scope: Remove active legacy DabiBoo/free.fr/SVN/Assembla wiring from
   Maven POMs and runtime paths; replace SCM metadata with GitHub;
@@ -157,6 +157,8 @@ Status legend: `proposed`, `in-progress`, `blocked`, `done`,
   - `mvn -B -ntp -DskipTests compile` -> `BUILD SUCCESS` (33 modules).
 - PR: chore: remove legacy DabiBoo repository wiring (#36).
 - Notes:
+  - Detailed call-site inventory and updater contract:
+    `docs/hbtv-004-url-migration-plan.md` (from PR #25, preserved here).
   - Execution supersedes the documentation-only plan in PR #25.
   - Functional publication cutover remains blocked under HBTV-005 until
     `habitv-repo` serves `/repository` with Apache-style directory
