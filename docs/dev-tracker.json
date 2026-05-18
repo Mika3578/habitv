@@ -1,97 +1,129 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema",
-  "version": 1,
-  "description": "Machine-readable mirror of docs/dev-tracker.md. Keep both files in sync.",
-  "statusValues": ["proposed", "in-progress", "blocked", "done", "deferred"],
-  "priorityValues": ["P0", "P1", "P2", "P3"],
+  "version": 3,
+  "description": "Machine-readable mirror of docs/dev-tracker.md. Keep both files in sync. Identifiers use descriptive kebab-case slugs (see descriptive-slug-ids ADR).",
+  "lastRefresh": "2026-05-18",
+  "statusValues": [
+    "proposed",
+    "in-progress",
+    "blocked",
+    "done",
+    "deferred"
+  ],
+  "priorityValues": [
+    "P0",
+    "P1",
+    "P2",
+    "P3"
+  ],
+  "summary": {
+    "done": 8,
+    "inProgress": 0,
+    "proposed": 5,
+    "deferred": 0,
+    "blocked": 0,
+    "total": 13,
+    "overallProgressPercent": 62
+  },
   "items": [
     {
-      "id": "HBTV-000",
-      "title": "Restart from master governance bootstrap",
-      "status": "in-progress",
+      "id": "gov-bootstrap",
+      "legacyCode": "HBTV-000",
+      "displayTitle": "Governance bootstrap from master",
+      "icon": "🏗️",
+      "status": "done",
       "priority": "P0",
-      "scope": "Add governance, CI validate baseline, AI agent guidance, tracker/risk/decision/audit docs.",
+      "progressPercent": 100,
+      "scope": "Establish branching model, CI validate baseline, AI agent guidance, and the documentation skeleton.",
       "acceptanceCriteria": [
         ".github/pull_request_template.md, issue templates, and .github/workflows/build.yml present and valid.",
         "AGENTS.md, .cursor/rules/habitv-master.mdc, and .github/copilot-instructions.md present.",
-        "docs/dev-plan.md, docs/dev-tracker.md, docs/dev-tracker.json, docs/risk-register.md, docs/decision-log.md, docs/github-repository-settings.md, docs/audit-master-baseline.md present.",
-        "PR opened against master and reviewable."
+        "Tracker / risk / decision / plan / settings / audit docs present.",
+        "Restart PR merged to master, integration branch develop created."
       ],
       "validation": [
-        "git status --short",
-        "git branch --show-current",
-        "git log --oneline -5",
-        "mvn -B -ntp -DskipTests validate"
+        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS",
+        "git log --oneline -5 -> bootstrap commits present"
       ],
-      "pr": "chore: bootstrap restart workflow from master",
-      "notes": "Documentation/workflow only. No runtime or provider changes."
+      "pr": "chore: bootstrap restart workflow from master (#21)",
+      "notes": "Documentation/workflow only. GitHub UI-level settings application moved to branch-protection."
     },
     {
-      "id": "HBTV-001",
-      "title": "Maven reactor audit",
-      "status": "in-progress",
+      "id": "maven-reactor",
+      "legacyCode": "HBTV-001",
+      "displayTitle": "Maven reactor stabilization",
+      "icon": "⚙️",
+      "status": "done",
       "priority": "P0",
-      "scope": "Wire the Maven multi-module reactor so mvn validate walks the full project from root; align parent versions and relativePath across fwk, application, plugins. Topology only; no dependency or plugin upgrades, no source changes.",
+      "progressPercent": 100,
+      "scope": "Wire the multi-module reactor so mvn validate walks the full project from the root and parent resolution is deterministic across fwk, application, and plugins. Topology only.",
       "acceptanceCriteria": [
         "Root pom.xml aggregates fwk, application, plugins.",
         "fwk/pom.xml aggregates api, framework.",
-        "application/pom.xml keeps core, consoleView, trayView, habiTv; habiTv-linux and habiTv-windows intentionally excluded.",
-        "plugins/pom.xml keeps 22 plugin modules; plugin-tester intentionally excluded.",
-        "All child POMs parent at 4.1.0-SNAPSHOT with explicit <relativePath>.",
-        "fwk/framework own version typo 4.1.0-SNASPHOT fixed to 4.1.0-SNAPSHOT."
+        "application/pom.xml keeps core, consoleView, trayView, habiTv.",
+        "plugins/pom.xml keeps 22 plugin modules + plugin-tester (added in plugin-tester-align).",
+        "All child POMs parent at 4.1.0-SNAPSHOT with explicit relativePath.",
+        "fwk/framework own-version typo 4.1.0-SNASPHOT fixed to 4.1.0-SNAPSHOT."
       ],
       "validation": [
-        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS across 32 reactor modules",
-        "mvn -B -ntp -DskipTests compile -> FAILS at framework due to intra-reactor dependency range [4.1,4.2) excluding SNAPSHOT siblings; deferred to HBTV-002"
+        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS, 33 reactor entries"
       ],
-      "pr": "build: stabilize Maven reactor from master",
-      "notes": "habiTv-linux/habiTv-windows out of reactor (hardcoded jdk.home, JDK-bundled JavaFX, ZenJava plugin); plugin-tester out of reactor (deferred to HBTV-002 test-compile scope); habiTv-windows still parents to root parent (sibling habiTv-linux parents to application); preserved because both modules are excluded."
+      "pr": "build: stabilize Maven reactor from master (#22)",
+      "notes": "habiTv-linux / habiTv-windows stay out of reactor (JavaFX 2.x + hardcoded jdk.home), tracked under javafx-modernization."
     },
     {
-      "id": "HBTV-002",
-      "title": "Java 8 baseline CI",
-      "status": "in-progress",
-      "priority": "P0",
-      "scope": "Extend baseline workflow from validate to compile (and later test) once HBTV-001 lands. Includes replacing intra-reactor version range [4.1,4.2) with ${project.version}, pinning maven-jaxb-plugin version, and deciding whether to wire plugin-tester into the reactor.",
-      "acceptanceCriteria": [
-        "mvn -B -ntp -DskipTests compile passes on Ubuntu and Windows with Temurin 8.",
-        "Network/provider tests remain excluded by default."
-      ],
-      "validation": [
-        "Baseline: mvn -B -ntp -DskipTests validate -> BUILD SUCCESS (32 modules) with warning about missing maven-jaxb-plugin version",
-        "Baseline: mvn -B -ntp -DskipTests compile -> BUILD FAILURE at framework: No versions available for com.dabi.habitv:api:jar:[4.1,4.2)",
-        "After root dependencyManagement fix (${project.version} for api/framework): mvn -B -ntp -DskipTests validate -> BUILD SUCCESS",
-        "After root dependencyManagement fix (${project.version} for api/framework): mvn -B -ntp -DskipTests compile -> moves past framework, fails at 6play on plugin-tester:4.1.0 descriptor resolution",
-        "After pinning com.sun.tools.xjc.maven2:maven-jaxb-plugin to 1.1.1: mvn -B -ntp -DskipTests validate -> BUILD SUCCESS without missing plugin version warning",
-        "After pinning com.sun.tools.xjc.maven2:maven-jaxb-plugin to 1.1.1: mvn -B -ntp -DskipTests compile -> BUILD FAILURE at 6play due to plugin-tester:4.1.0 resolution via blocked legacy repository",
-        "Evaluation only: adding <module>plugin-tester</module> in plugins/pom.xml does not remove the compile blocker because plugin dependencies request 4.1.0 while reactor builds 4.1.0-SNAPSHOT; change not kept"
-      ],
-      "pr": "build: stabilize Java 8 compile baseline",
-      "notes": "Depends on HBTV-001. R-010 and R-011 are mitigated by this PR. Remaining blocker: plugin-tester test-harness version alignment (4.1.0 in plugin dependencies vs 4.1.0-SNAPSHOT in reactor)."
-    },
-    {
-      "id": "HBTV-003",
-      "title": "Repository branch / rules setup",
-      "status": "proposed",
-      "priority": "P1",
-      "scope": "Apply GitHub settings documented in docs/github-repository-settings.md (branch model, protection, merge strategy, required checks).",
-      "acceptanceCriteria": [
-        "master protected, linear history required.",
-        "develop created from master after bootstrap merge.",
-        "Squash merge enabled, merge commits disabled."
-      ],
-      "validation": [
-        "Manual confirmation in GitHub UI"
-      ],
-      "pr": "N/A (settings change)",
-      "notes": "Done by repo owner; tracked here for visibility."
-    },
-    {
-      "id": "HBTV-004",
-      "title": "Legacy repository URL migration (execution)",
+      "id": "java8-baseline",
+      "legacyCode": "HBTV-002",
+      "displayTitle": "Java 8 compile baseline",
+      "icon": "☕",
       "status": "done",
       "priority": "P0",
-      "scope": "Remove active DabiBoo/free.fr/SVN/Assembla Maven and runtime wiring; replace SCM with GitHub; disable stat/update network calls by default; point Maven repository at habitv-repo GitHub Pages base.",
+      "progressPercent": 100,
+      "scope": "Make mvn compile succeed on Temurin 8 from the root, without resolving artifacts from the blocked legacy HTTP repository.",
+      "acceptanceCriteria": [
+        "Intra-reactor [4.1,4.2) ranges replaced with ${project.version}.",
+        "maven-jaxb-plugin pinned to 1.1.1 in application/core.",
+        "mvn compile BUILD SUCCESS on Ubuntu and Windows with Temurin 8.",
+        "Network/provider tests excluded from default lifecycle.",
+        "CI workflow triggers on both master and develop."
+      ],
+      "validation": [
+        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS",
+        "mvn -B -ntp -DskipTests compile -> BUILD SUCCESS (after plugin-tester-align + own-version-deps-align)"
+      ],
+      "pr": "build: stabilize Java 8 compile baseline (#23)",
+      "notes": "Original blocker chain: plugin-tester:4.1.0 (plugin-tester-align) -> framework/api:4.1.1-SNAPSHOT (own-version-deps-align). Both cleared. Risks reactor-version-range, jaxb-plugin-unpinned, plugin-tester-mismatch mitigated."
+    },
+    {
+      "id": "branch-protection",
+      "legacyCode": "HBTV-003",
+      "displayTitle": "GitHub branch protection rules",
+      "icon": "🛡️",
+      "status": "proposed",
+      "priority": "P1",
+      "progressPercent": 0,
+      "scope": "Apply the GitHub settings documented in github-repository-settings.md: branch model, protection, merge strategy, required checks.",
+      "acceptanceCriteria": [
+        "master protected; linear history required.",
+        "develop protected; required CI: build workflow on Ubuntu + Windows.",
+        "Squash merge enabled, merge commits disabled.",
+        "Force-push disabled on protected branches."
+      ],
+      "validation": [
+        "Manual confirmation in the GitHub UI by the repo owner."
+      ],
+      "pr": "N/A (settings change, not code)",
+      "notes": "Owner-only task; no code change."
+    },
+    {
+      "id": "legacy-url-migration",
+      "legacyCode": "HBTV-004",
+      "displayTitle": "Legacy URL migration (free.fr / SVN / FTP)",
+      "icon": "🔗",
+      "status": "done",
+      "priority": "P0",
+      "progressPercent": 100,
+      "scope": "Remove or replace every active reference to <scm>scm:svn:..., <repository>http://dabiboo.free.fr/repository, <distributionManagement>ftp://ftpperso.free.fr/repository + wagon-ftp, and runtime constants UPDATE_URL and STAT_URL.",
       "acceptanceCriteria": [
         "Active POM/runtime references to dabiboo.free.fr, subversion.assembla.com, scm:svn, and cpt.php are removed.",
         "Root repository uses https://mika3578.github.io/habitv-repo/repository.",
@@ -99,7 +131,7 @@
         "Plugin updates are opt-in via habitv.update.enabled and optional habitv.update.url."
       ],
       "validation": [
-        "git grep legacy URL pattern -> documentation/history only",
+        "git grep -nIE \"dabiboo|free\\.fr|ftpperso|subversion\\.assembla|scm:svn\" -- . -> matches only documentation/history, no active code/POM endpoints.",
         "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS (33 modules)",
         "mvn -B -ntp -DskipTests compile -> BUILD SUCCESS (33 modules)"
       ],
@@ -107,143 +139,165 @@
       "notes": "Execution supersedes PR #25 plan-only work. Publication cutover and updater HTML index contract remain HBTV-005; do not enable habitv.update.enabled until static index.html or manifest layout is verified."
     },
     {
-      "id": "HBTV-005",
-      "title": "Runtime updater publication plan",
+      "id": "static-repo-publish",
+      "legacyCode": "HBTV-005",
+      "displayTitle": "Static artifact repository publication",
+      "icon": "📦",
       "status": "proposed",
       "priority": "P1",
-      "scope": "Define the habitv-repo static publication layout compatible with existing updater expectations.",
+      "progressPercent": 10,
+      "scope": "Stand up the habitv-repo static repository (GitHub Pages or equivalent HTTPS host) compatible with the existing FindArtifactUtils / UpdateManager semantics.",
       "acceptanceCriteria": [
-        "Directory layout documented.",
-        "Migration path for UPDATE_URL documented.",
-        "Plan for signing / integrity (HTTPS, checksums) documented."
+        "Cross-OS deploy scripts present in scripts/static-repo/ (in develop).",
+        "habitv-repo PR #1 merged.",
+        "repository/com/dabi/habitv/ layout published with real artifacts.",
+        "index.html generation for GitHub Pages (no autoindex by default).",
+        "plugins.txt format validated against FindArtifactUtils.",
+        "HTTPS + checksum strategy documented.",
+        "Migration path for UPDATE_URL documented."
       ],
       "validation": [
         "mvn -B -ntp -DskipTests validate",
-        "mvn -B -ntp -DskipTests deploy with temporary file:// target"
+        "mvn -B -ntp -DskipTests deploy -DaltDeploymentRepository=local::default::file:///tmp/repo"
       ],
-      "pr": "build/standard-cross-os-static-repo-layout (pending)",
-      "notes": "Pairs with HBTV-004 and Phase 4 of docs/dev-plan.md; adds cross-OS deploy scripts and standard side-by-side workspace layout under $HOME/dev."
+      "pr": "habitv-repo #1 (draft, since 2026-04-25)",
+      "notes": "Pairs with legacy-url-migration phase 5. Risks pages-layout-mismatch, pages-autoindex-gap."
     },
     {
-      "id": "HBTV-006",
-      "title": "Provider / plugin inventory",
+      "id": "provider-inventory",
+      "legacyCode": "HBTV-006",
+      "displayTitle": "Provider plugin inventory & cleanup",
+      "icon": "🔌",
       "status": "proposed",
       "priority": "P2",
-      "scope": "Inventory every plugin in plugins/ (22 in aggregator + plugin-tester); record status without removing modules.",
+      "progressPercent": 0,
+      "scope": "Inventory every plugin in plugins/ (22 in aggregator + plugin-tester); record current status (working, obsolete endpoint, renamed, broken parser). No code removal in this item.",
       "acceptanceCriteria": [
         "Inventory table per plugin with last-known status.",
-        "For each obsolete/renamed plugin, a recommended dedicated PR is named."
+        "For each obsolete/renamed plugin, a recommended dedicated removal/rename PR is named.",
+        "Offline fixtures captured where feasible."
       ],
       "validation": [
-        "Inventory reviewed in PR; no code removal"
+        "Inventory reviewed in a doc-only PR; no behavior change."
       ],
       "pr": "TBD",
-      "notes": "Feeds Phase 6 of docs/dev-plan.md."
+      "notes": "Visible candidates: pluzz (already renamed francetv on habitv-repo), canalPlus, beinsport, D8/D17/nrj12 (README mentions but no module), wat, sfr, clubic. Risks live-tests-flaky, provider-endpoints-dead."
     },
     {
-      "id": "HBTV-007",
-      "title": "yt-dlp replacement plan",
+      "id": "ytdlp-migration",
+      "legacyCode": "HBTV-007",
+      "displayTitle": "youtube-dl to yt-dlp migration",
+      "icon": "🎬",
       "status": "proposed",
       "priority": "P2",
-      "scope": "Plan migration of the youtube plugin from youtube-dl to yt-dlp (executable, flags, parsing, config defaults).",
+      "progressPercent": 20,
+      "scope": "Plan and execute migration of the youtube plugin's binary contract from youtube-dl to yt-dlp (executable name, command flags, output parsing, post-processors).",
       "acceptanceCriteria": [
-        "Differences in CLI between youtube-dl and yt-dlp captured.",
-        "Migration steps for code and default config listed.",
-        "Backward-compatibility / deprecation note drafted."
+        "Runtime path packaged in consoleView fat-jar (done).",
+        "Offline command-wiring test YoutubePluginDownloaderCmdTest passes (done).",
+        "CLI flag diff documented (--format, output template, post-processors).",
+        "application/core/configuration.xml sample updated to yt-dlp.",
+        "Backward-compatibility / deprecation note for users on youtube-dl.",
+        "Provider behavior validated against captured fixtures."
       ],
       "validation": [
-        "Plan reviewed in PR; no behavior change in this item"
+        "mvn -B -ntp -pl plugins/youtube -am test -> Tests run: 2, Failures: 0"
       ],
       "pr": "TBD",
-      "notes": "Implementation deferred to a follow-up PR after reactor is stable."
+      "notes": "Risk ytdlp-behavior-diff. End-to-end live behavior remains out of scope until provider-inventory cleanup."
     },
     {
-      "id": "HBTV-008",
-      "title": "JavaFX / runtime packaging audit",
+      "id": "javafx-modernization",
+      "legacyCode": "HBTV-008",
+      "displayTitle": "JavaFX & runtime packaging modernization",
+      "icon": "🖼️",
       "status": "proposed",
       "priority": "P2",
-      "scope": "Audit JavaFX 2.x usage (application/trayView, habiTv-linux, habiTv-windows), zenjava/javafx-maven-plugin 2.0, and jfxrt/jdk.home assumptions.",
+      "progressPercent": 5,
+      "scope": "Migrate JavaFX 2.x usage and ${jdk.home} packaging assumptions in application/trayView, application/habiTv-linux, application/habiTv-windows, zenjava/javafx-maven-plugin 2.0, and system-scope javafx:jfxrt.",
       "acceptanceCriteria": [
-        "Inventory of JavaFX surface area documented.",
-        "Migration options for OpenJFX + modern packaging captured (jpackage, jlink, jdeploy, or fat-jar fallback)."
+        "Surface inventory captured in audit doc (done in audit-master-baseline).",
+        "OpenJFX migration options compared (jpackage, jlink, fat-jar).",
+        "Packaging blueprint accepted via dedicated ADR.",
+        "habiTv-linux + habiTv-windows re-enterable to the reactor."
       ],
       "validation": [
-        "Audit reviewed in PR; no code changes in this item"
+        "Audit reviewed in PR; no code changes in this item."
       ],
       "pr": "TBD",
-      "notes": "Pairs with Phase 7 of docs/dev-plan.md."
+      "notes": "Risk javafx-jdk8. Largest single piece of remaining work once legacy-url-migration + static-repo-publish + provider-inventory are clear."
     },
     {
-      "id": "HBTV-010",
-      "title": "Plugin tester reactor dependency alignment",
+      "id": "plugin-tester-align",
+      "legacyCode": "HBTV-010",
+      "displayTitle": "plugin-tester reactor alignment",
+      "icon": "🧪",
       "status": "done",
       "priority": "P1",
-      "scope": "Align plugin module test-harness dependencies so com.dabi.habitv:plugin-tester resolves from reactor coordinates; aggregate plugins/plugin-tester in plugins/pom.xml.",
+      "progressPercent": 100,
+      "scope": "Align plugin module test-harness dependencies so com.dabi.habitv:plugin-tester resolves from the local reactor instead of the blocked legacy HTTP repository; include plugins/plugin-tester in the aggregator.",
       "acceptanceCriteria": [
-        "Plugin modules that pinned com.dabi.habitv:plugin-tester:4.1.0 use reactor-aligned expressions (${project.version} or ${project.parent.version} for modules with independent own versions).",
-        "plugins/pom.xml includes <module>plugin-tester</module>.",
-        "mvn -B -ntp -DskipTests compile moves past the previous plugin-tester descriptor blocker at 6play."
+        "Plugin modules using ${project.version} or ${project.parent.version}.",
+        "plugins/pom.xml aggregates plugin-tester.",
+        "Compile passes the former 6play / plugin-tester:4.1.0 blocker."
       ],
       "validation": [
-        "Baseline: mvn -B -ntp -DskipTests validate -> BUILD SUCCESS (32 modules)",
-        "Baseline: mvn -B -ntp -DskipTests compile -> BUILD FAILURE at 6play on com.dabi.habitv:plugin-tester:4.1.0 descriptor resolution via blocked legacy repository",
-        "After alignment: mvn -B -ntp -DskipTests validate -> BUILD SUCCESS (33 modules, plugin-tester included)",
-        "After alignment: mvn -B -ntp -DskipTests compile -> moves past 6play and fails later at beinsport on framework/api:4.1.1-SNAPSHOT resolution via blocked legacy repository (HBTV-004 class)"
+        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS (33 modules)",
+        "mvn -B -ntp -DskipTests compile -> past the previous blocker"
       ],
-      "pr": "build: align plugin tester reactor dependency",
-      "notes": "Mitigates R-012. Remaining compile blocker is legacy repository resolution for non-reactor versions in selected plugin modules."
+      "pr": "build: align plugin tester reactor dependency (#24)",
+      "notes": "Risk plugin-tester-mismatch mitigated. Residual framework/api blocker moved to own-version-deps-align (and resolved there)."
     },
     {
-      "id": "HBTV-011",
-      "title": "Runnable console baseline with yt-dlp path on develop",
-      "status": "in-progress",
-      "priority": "P0",
-      "scope": "Establish a factual runnable baseline on develop by superseding PR #27 with scoped linear commits: keep consoleView runnable fat-jar packaging and yt-dlp runtime path/testing while preserving HBTV-004/HBTV-005 as separate work items.",
-      "acceptanceCriteria": [
-        "application/consoleView packages a runnable fat JAR in scoped builds.",
-        "An offline YouTube downloader command wiring test exists and passes.",
-        "Tracker/audit/risk/decision docs reflect exact command outcomes and scope boundaries.",
-        "PR #25 and PR #26 are documented as master-targeted work to retarget/rebase later, not merged into this baseline PR."
-      ],
-      "validation": [
-        "develop baseline: mvn -B -ntp -DskipTests validate -> BUILD SUCCESS",
-        "develop baseline: mvn -B -ntp -DskipTests compile -> BUILD FAILURE at beinsport (framework/api:4.1.1-SNAPSHOT blocked by maven-default-http-blocker for http://dabiboo.free.fr/repository)",
-        "PR #27 branch: mvn -B -ntp -DskipTests -pl '!application/trayView,!application/habiTv' validate -> BUILD SUCCESS",
-        "PR #27 branch: mvn -B -ntp -DskipTests -pl '!application/trayView,!application/habiTv' compile -> BUILD FAILURE at application/core (17 boolean accessor compile errors in XMLUserConfig/GrabConfigDAO)",
-        "PR #27 branch: mvn -B -ntp -DskipTests -pl '!application/trayView,!application/habiTv' package -> BUILD FAILURE at application/core (same compile errors)",
-        "PR #27 branch: mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubePluginDownloaderCmdTest -Dsurefire.failIfNoSpecifiedTests=false test -> BUILD SUCCESS (Tests run: 2, Failures: 0, Errors: 0)",
-        "final branch: mvn -B -ntp -DskipTests -pl '!application/trayView,!application/habiTv' validate -> BUILD SUCCESS",
-        "final branch: mvn -B -ntp -DskipTests -pl '!application/trayView,!application/habiTv' compile -> BUILD FAILURE at beinsport on blocked framework/api:4.1.1-SNAPSHOT resolution",
-        "final branch: mvn -B -ntp -DskipTests -pl '!application/trayView,!application/habiTv' package -> BUILD FAILURE at beinsport on the same blocked framework/api:4.1.1-SNAPSHOT resolution",
-        "final branch: mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubePluginDownloaderCmdTest -Dsurefire.failIfNoSpecifiedTests=false test -> BUILD SUCCESS (Tests run: 2, Failures: 0, Errors: 0)"
-      ],
-      "pr": "feat(console): restore runnable baseline with yt-dlp provider",
-      "notes": "PR #27 is superseded with scoped reuse (build/POM, console fat-jar/runtime docs, YouTube offline test) while excluding its failing application/core source edits. JavaFX modernization, provider cleanup, and scraper rewrites remain out of scope. PR #25 and #26 must be retargeted/rebased from master to develop later. HBTV-004/HBTV-005 repository/update URL migration remains separate."
-    },
-    {
-      "id": "HBTV-012",
-      "title": "Own-version plugin internal dependency alignment",
+      "id": "console-runnable",
+      "legacyCode": "HBTV-011",
+      "displayTitle": "Runnable console baseline",
+      "icon": "▶️",
       "status": "done",
       "priority": "P0",
+      "progressPercent": 100,
+      "scope": "Establish a factual runnable baseline on develop: consoleView packages a runnable fat-jar, the YouTube command wiring is unit-tested offline, and tracker/audit docs reflect exact outcomes.",
+      "acceptanceCriteria": [
+        "application/consoleView packages a runnable fat JAR in scoped builds.",
+        "Offline YoutubePluginDownloaderCmdTest passes (2/2).",
+        "Tracker/audit reflect exact validation results."
+      ],
+      "validation": [
+        "mvn -B -ntp -DskipTests -pl '!application/trayView,!application/habiTv' validate -> BUILD SUCCESS",
+        "mvn -B -ntp -pl plugins/youtube -am test -> 2/2 pass"
+      ],
+      "pr": "feat(console): restore runnable baseline with yt-dlp provider (#28)",
+      "notes": "Superseded PR #27 with a scoped subset. javafx-modernization, tray/GUI packaging, and scraper rewrites remain out of scope."
+    },
+    {
+      "id": "own-version-deps-align",
+      "legacyCode": "HBTV-012",
+      "displayTitle": "Own-version plugin dependency alignment",
+      "icon": "🔗",
+      "status": "done",
+      "priority": "P0",
+      "progressPercent": 100,
       "scope": "Fix own-version plugin module dependency resolution so shared internal reactor dependencies (com.dabi.habitv:api, com.dabi.habitv:framework) resolve to the parent/reactor version instead of plugin-local artifact versions.",
       "acceptanceCriteria": [
-        "Root dependencyManagement does not force own-version plugins to request non-reactor internal coordinates such as framework/api:4.1.1-SNAPSHOT.",
-        "mvn -B -ntp -DskipTests validate succeeds from root.",
-        "mvn -B -ntp -DskipTests compile succeeds from root.",
-        "maven-default-http-blocker no longer appears for framework/api:4.1.1-SNAPSHOT descriptor resolution."
+        "Root dependencyManagement does not force non-reactor coordinates.",
+        "mvn validate and mvn compile succeed from the root.",
+        "maven-default-http-blocker no longer triggered for framework/api:4.1.1-SNAPSHOT."
       ],
       "validation": [
         "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS (33 modules)",
         "mvn -B -ntp -DskipTests compile -> BUILD SUCCESS (33 modules)"
       ],
-      "pr": "build: align own-version plugin internal dependencies",
-      "notes": "Cause: own-version plugin modules (beinsport, footyroom, pluzz, ffmpeg) inherited ${project.version} for shared internal dependencies, which interpolated to plugin-local versions (4.1.1-SNAPSHOT/4.1.2-SNAPSHOT) instead of reactor 4.1.0-SNAPSHOT. Fix: use ${project.parent.version} for shared internal dependencyManagement coordinates. Local compilation no longer requires http://dabiboo.free.fr/repository for these internal artifacts. Scope is Maven dependency alignment only; obsolete provider endpoints and runtime plugin availability remain out of scope."
+      "pr": "build: align own-version plugin internal dependencies (#33)",
+      "notes": "Own-version plugin modules (beinsport, footyroom, pluzz, ffmpeg) now use ${project.parent.version} for shared internal dependencyManagement coordinates. Risk legacy-maven-repo mitigated for local reactor compilation (external publication still pending legacy-url-migration)."
     },
     {
-      "id": "HBTV-013",
-      "title": "YouTube Data API key externalization",
+      "id": "youtube-apikey",
+      "legacyCode": "HBTV-013",
+      "displayTitle": "YouTube Data API key externalization",
+      "icon": "🔑",
       "status": "done",
       "priority": "P1",
+      "progressPercent": 100,
       "scope": "Remove the hardcoded YouTube Data API key from plugins/youtube and resolve it from runtime configuration so revoked/restricted keys do not require a code change.",
       "acceptanceCriteria": [
         "YoutubeConf no longer embeds a concrete API key value.",
@@ -257,8 +311,8 @@
         "mvn -B -ntp -DskipTests -pl application/trayView,plugins/youtube -am compile -> BUILD SUCCESS",
         "mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeConfTest -Dsurefire.failIfNoSpecifiedTests=false test -> BUILD SUCCESS"
       ],
-      "pr": "fix: externalize data api key and mask api errors (#29)",
-      "notes": "End users can set the key from the tray configuration tab. Runtime key lookup order: Java property habitv.youtube.apiKey, then environment variable HABITV_YOUTUBE_API_KEY."
+      "pr": "fix(youtube): externalize data api key and mask api errors (#29)",
+      "notes": "End users can set the key from the tray configuration tab. Runtime key lookup order: Java property habitv.youtube.apiKey, then environment variable HABITV_YOUTUBE_API_KEY. Risk youtube-key-hardcoded mitigated."
     }
   ]
 }
