@@ -17,10 +17,10 @@ added, mitigated, realized, or accepted.
 | Status | Count |
 |---|---:|
 | 🟢 **Mitigated** | 5 |
-| 🟠 **Open / High priority** | 4 |
-| 🟡 **Open / Medium priority** | 3 |
-| 🔴 **Open / Critical** | 0 |
-| 🟢 **Open / Low priority** | 3 |
+| 🔴 **Open / Critical (P0)** | 1 |
+| 🟠 **Open / High (P1)** | 6 |
+| 🟡 **Open / Medium (P2)** | 3 |
+| 🟢 **Open / Low (P3)** | 0 |
 | **Total tracked** | **15** |
 
 ---
