@@ -206,4 +206,13 @@
       </plugin>			
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>static-repo-publish</id>
+			<modules>
+				<module>build/static-repo-publisher</module>
+			</modules>
+		</profile>
+	</profiles>
 </project>
