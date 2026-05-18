@@ -155,8 +155,12 @@ before cutover.
 - ✅ HTTPS, version-controlled publication contract is now fixed.
 - ✅ Runtime update defaults remain unchanged (`habitv.update.enabled=false`
   unless explicitly set by the operator).
-- 🟡 End-to-end cutover in `habitv-repo` is still tracked under
-  `static-repo-publish`.
+- ✅ End-to-end publication cutover completed via
+  `https://github.com/Mika3578/habitv-repo/pull/2` with live Pages
+  validation for `/repository/`, `/repository/plugins.txt`, and
+  `/repository/com/dabi/habitv/`.
+- ⚠️ One dedicated opt-in runtime update smoke test remains recommended
+  (keep default runtime updates disabled).
 
 ---
 

@@ -19,13 +19,13 @@
 ## 📊 Overall progress
 
 ```
-████████████████░░░░░░░░  66%
+██████████████████░░░░░░  73%
 ```
 
 | Category | Count |
 |---------|------:|
-| ✅ Delivered | **9** |
-| 🟡 In progress | **1** |
+| ✅ Delivered | **10** |
+| 🟡 In progress | **0** |
 | 🔵 Proposed | **4** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
@@ -42,7 +42,7 @@
 | ☕ `java8-baseline` — Java 8 compile baseline | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 🛡️ `branch-protection` — GitHub branch protection rules | 🔵 Proposed | 🟠 P1 | `░░░░░░░░░░░░░░░░░░░░` 0% |
 | 🔗 `legacy-url-migration` — Legacy URL migration (free.fr / SVN / FTP) | ✅ Done | 🔴 P0 | `████████████████████` 100% |
-| 📦 `static-repo-publish` — Static artifact repository publication | 🟡 In progress | 🟠 P1 | `██████░░░░░░░░░░░░░░` 30% |
+| 📦 `static-repo-publish` — Static artifact repository publication | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🔵 Proposed | 🟡 P2 | `░░░░░░░░░░░░░░░░░░░░` 0% |
 | 🎬 `ytdlp-migration` — `youtube-dl` → `yt-dlp` migration | 🔵 Proposed | 🟡 P2 | `████░░░░░░░░░░░░░░░░` 20% |
 | 🖼️ `javafx-modernization` — JavaFX & runtime packaging modernization | 🔵 Proposed | 🟡 P2 | `█░░░░░░░░░░░░░░░░░░░` 5% |
@@ -244,9 +244,9 @@ files or an equivalent manifest layout are verified.
 
 | | |
 |---|---|
-| **Status** | 🟡 In progress |
+| **Status** | ✅ Done |
 | **Priority** | 🟠 P1 |
-| **Progress** | `██████░░░░░░░░░░░░░░` 30% |
+| **Progress** | `████████████████████` 100% |
 | **Legacy code** | HBTV-005 |
 
 **Scope** — Stand up the `habitv-repo` static repository (GitHub Pages
@@ -255,12 +255,12 @@ or equivalent HTTPS host) compatible with the existing
 
 **Acceptance criteria**
 - ✅ Cross-OS deploy scripts present in `scripts/static-repo/` *(in develop)*
-- ⬜ `habitv-repo` PR [#1](https://github.com/Mika3578/habitv-repo/pull/1) merged
-- 🟡 `repository/com/dabi/habitv/` layout contract validated locally
-- 🟡 `index.html` generation for GitHub Pages (no autoindex dependency) validated locally
-- 🟡 `plugins.txt` format validated against `FindArtifactUtils` fallback expectations
+- ✅ `habitv-repo` PR [#2](https://github.com/Mika3578/habitv-repo/pull/2) merged
+- ✅ `repository/com/dabi/habitv/` layout contract validated locally and published
+- ✅ `index.html` generation for GitHub Pages (no autoindex dependency) validated locally and live
+- ✅ `plugins.txt` format validated against `FindArtifactUtils` fallback expectations and live
 - ✅ HTTPS + no-token runtime consumption contract documented
-- ⬜ Migration path for `UPDATE_URL` documented
+- ✅ Migration path for `UPDATE_URL` documented
 
 **Validation**
 ```bash
@@ -268,11 +268,13 @@ mvn -B -ntp -DskipTests validate
 python scripts/static-repo/validate_repository_layout.py "<repository-root>"
 ```
 
-**Related PRs** · habitv-repo #1 (draft, since 2026-04-25) · this PR (layout validation + docs)
+**Related PRs** · habitv-repo #2 (merged) · habitv PR #49 (publication status + tracker refresh)
 
 **Notes** — Runtime updates stay disabled by default.
-This item validates publication layout and docs without changing
-runtime updater behavior.
+Publication cutover is complete (`https://mika3578.github.io/habitv-repo/repository/`
+and `plugins.txt` live with no authentication). Remaining follow-up:
+run one dedicated opt-in runtime update smoke test with
+`-Dhabitv.update.enabled=true` against the published Pages URL.
 
 ---
 
@@ -560,8 +562,8 @@ scope for a dedicated security PR.
 Recommended merge / start order (see `dev-plan.md` for phase reasoning):
 
 1. 🔵 **Apply branch protection** → close `branch-protection`
-2. 🟡 **Merge `habitv-repo` PR #1** → complete `static-repo-publish`
-3. 🔵 Then in any order: `provider-inventory`, `ytdlp-migration`, `javafx-modernization`
+2. 🔵 **Start `provider-inventory`** after HBTV-005 closure confirmation
+3. 🔵 Then in any order: `ytdlp-migration`, `javafx-modernization`
 
 ---
 

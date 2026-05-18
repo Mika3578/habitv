@@ -175,6 +175,7 @@ python .\scripts\static-repo\validate_repository_layout.py `
 ## Validation URLs
 
 - https://mika3578.github.io/habitv-repo/repository/
+- https://mika3578.github.io/habitv-repo/repository/plugins.txt
 - https://mika3578.github.io/habitv-repo/repository/com/dabi/habitv/
 - https://mika3578.github.io/habitv-repo/repository/tools/
 
