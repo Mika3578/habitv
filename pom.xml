@@ -16,20 +16,20 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<!-- Resolved from the reactor root when building with mvn from habitv/ -->
-		<habitv.deploy.repo.path>${session.executionRootDirectory}/../habitv-repo/repository</habitv.deploy.repo.path>
+		<!-- Local Maven staging only; runtime uses FrameworkConf.UPDATE_URL (GitHub Pages). -->
+		<habitv.static.repo.path>${user.home}/dev/habitv-repo/repository</habitv.static.repo.path>
 	</properties>
 
 	<distributionManagement>
 		<repository>
 			<id>habitv-local</id>
 			<name>Habitv local static repository</name>
-			<url>file://${habitv.deploy.repo.path}</url>
+			<url>file://${habitv.static.repo.path}</url>
 		</repository>
 		<snapshotRepository>
 			<id>habitv-local</id>
 			<name>Habitv local static repository</name>
-			<url>file://${habitv.deploy.repo.path}</url>
+			<url>file://${habitv.static.repo.path}</url>
 		</snapshotRepository>
 	</distributionManagement>
 

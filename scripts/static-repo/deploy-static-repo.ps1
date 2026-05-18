@@ -11,88 +11,59 @@ function Get-RepoRoot {
     return (Resolve-Path (Join-Path $scriptDirectory "..\..")).Path
 }
 
-function Resolve-StaticRepoPath {
+function Get-MavenStaticRepoPath {
     param(
-        [string]$ExplicitPath,
-        [string]$RepoRootPath
+        [string]$RepoRootPath,
+        [string]$OverridePath
     )
 
-    $candidates = @()
-
-    if (-not [string]::IsNullOrWhiteSpace($ExplicitPath)) {
-        $candidates += @{
-            Label = "argument -StaticRepoPath"
-            Path = $ExplicitPath
-        }
+    $mvnArgs = @(
+        "help:evaluate",
+        "-Dexpression=habitv.static.repo.path",
+        "-q",
+        "-DforceStdout"
+    )
+    if (-not [string]::IsNullOrWhiteSpace($OverridePath)) {
+        $normalized = $OverridePath.Trim() -replace '\\', '/'
+        $mvnArgs = @("-Dhabitv.static.repo.path=$normalized") + $mvnArgs
     }
 
-    if (-not [string]::IsNullOrWhiteSpace($env:HABITV_STATIC_REPO_LOCAL_PATH)) {
-        $candidates += @{
-            Label = "environment HABITV_STATIC_REPO_LOCAL_PATH"
-            Path = $env:HABITV_STATIC_REPO_LOCAL_PATH
+    Push-Location $RepoRootPath
+    try {
+        $evaluated = (& mvn @mvnArgs | Select-Object -Last 1).Trim()
+        if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($evaluated)) {
+            throw "Unable to evaluate habitv.static.repo.path."
         }
+        return ($evaluated -replace '\\', '/')
     }
-
-    if (-not [string]::IsNullOrWhiteSpace($HOME)) {
-        $candidates += @{
-            Label = "standard home workspace"
-            Path = (Join-Path $HOME "dev/habitv-repo")
-        }
+    finally {
+        Pop-Location
     }
-
-    $siblingDefault = Join-Path (Split-Path -Parent $RepoRootPath) "habitv-repo"
-    $candidates += @{
-        Label = "sibling fallback ../habitv-repo"
-        Path = $siblingDefault
-    }
-
-    foreach ($candidate in $candidates) {
-        try {
-            $resolved = (Resolve-Path -Path $candidate.Path -ErrorAction Stop).Path
-            if (Test-Path -Path $resolved -PathType Container) {
-                Write-Host ("Using static repository checkout from {0}: {1}" -f $candidate.Label, $resolved)
-                return $resolved
-            }
-        }
-        catch {
-            continue
-        }
-    }
-
-    $setupMessage = @(
-        "Unable to resolve habitv-repo checkout.",
-        "Resolution order:",
-        "  1. -StaticRepoPath",
-        "  2. HABITV_STATIC_REPO_LOCAL_PATH",
-        "  3. $HOME/dev/habitv-repo",
-        "  4. ../habitv-repo",
-        "Expected standard layout:",
-        "  $HOME/dev/habitv",
-        "  $HOME/dev/habitv-repo"
-    ) -join [Environment]::NewLine
-
-    throw $setupMessage
 }
 
 $repoRoot = Get-RepoRoot
-$resolvedStaticRepoPath = Resolve-StaticRepoPath -ExplicitPath $StaticRepoPath -RepoRootPath $repoRoot
+$staticRepoPath = Get-MavenStaticRepoPath -RepoRootPath $repoRoot -OverridePath $StaticRepoPath
 
-if (-not (Test-Path -Path $resolvedStaticRepoPath -PathType Container)) {
-    throw ("Static repository path does not exist: {0}" -f $resolvedStaticRepoPath)
+if (-not (Test-Path -Path $staticRepoPath -PathType Container)) {
+    New-Item -Path $staticRepoPath -ItemType Directory -Force | Out-Null
 }
 
-$resolvedRepositoryPath = Join-Path $resolvedStaticRepoPath "repository"
-if (-not (Test-Path -Path $resolvedRepositoryPath -PathType Container)) {
-    New-Item -Path $resolvedRepositoryPath -ItemType Directory | Out-Null
-}
+$habitvRepoRoot = Split-Path -Parent $staticRepoPath
+Write-Host ("habitv.static.repo.path = {0}" -f $staticRepoPath)
+Write-Host "Deploying with Maven property-based file repository (no hardcoded machine path)."
 
-$repositoryFileUrl = ((Resolve-Path $resolvedRepositoryPath).Path -replace '\\', '/')
-$deployRepository = "habitv-local::file:///$repositoryFileUrl"
-
-Write-Host ("Deploying Maven artifacts to: {0}" -f $deployRepository)
 Push-Location $repoRoot
 try {
-    & mvn -B -ntp -DskipTests clean deploy "-DaltDeploymentRepository=$deployRepository"
+    $deployArgs = @(
+        "-B", "-ntp", "-DskipTests", "clean", "deploy",
+        '-DaltDeploymentRepository=habitv-local::default::file://${habitv.static.repo.path}'
+    )
+    if (-not [string]::IsNullOrWhiteSpace($StaticRepoPath)) {
+        $normalized = $StaticRepoPath.Trim() -replace '\\', '/'
+        $deployArgs = @("-Dhabitv.static.repo.path=$normalized") + $deployArgs
+    }
+
+    & mvn @deployArgs
     if ($LASTEXITCODE -ne 0) {
         throw "Maven deploy failed."
     }
@@ -102,7 +73,7 @@ finally {
 }
 
 Write-Host "Deploy complete. Publish with:"
-Write-Host "  cd $resolvedStaticRepoPath"
+Write-Host "  cd $habitvRepoRoot"
 Write-Host "  git status --short"
 Write-Host "  git add repository"
 Write-Host '  git commit -m "repo: publish habitv artifacts"'
