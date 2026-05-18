@@ -98,6 +98,16 @@ function Get-PluginArtifactIds {
     return $ids | Sort-Object
 }
 
+function Write-Utf8NoBomLines {
+    param(
+        [string]$Path,
+        [string[]]$Lines
+    )
+
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllLines($Path, $Lines, $utf8NoBom)
+}
+
 function Write-PluginsTxt {
     param([string]$RepositoryRoot, [string[]]$PluginIds)
 
