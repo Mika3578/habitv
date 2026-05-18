@@ -17,13 +17,13 @@
     "P3"
   ],
   "summary": {
-    "done": 8,
+    "done": 9,
     "inProgress": 0,
     "proposed": 5,
     "deferred": 0,
     "blocked": 0,
-    "total": 13,
-    "overallProgressPercent": 62
+    "total": 14,
+    "overallProgressPercent": 64
   },
   "items": [
     {
@@ -313,6 +313,29 @@
       ],
       "pr": "fix(youtube): externalize data api key and mask api errors (#29)",
       "notes": "End users can set the key from the tray configuration tab. Runtime key lookup order: Java property habitv.youtube.apiKey, then environment variable HABITV_YOUTUBE_API_KEY. Risk youtube-key-hardcoded mitigated."
+    },
+    {
+      "id": "jaxb-launcher-recovery",
+      "legacyCode": "HBTV-014",
+      "displayTitle": "JAXB generated sources & launcher classpath recovery",
+      "icon": "🧩",
+      "status": "done",
+      "priority": "P1",
+      "progressPercent": 100,
+      "scope": "Restore Maven/IDE visibility for JAXB-generated packages in application/core and fix HabitvLauncher classpath setup without broad dependency remediation or provider modernization.",
+      "acceptanceCriteria": [
+        "JAXB outputs land under target/generated-sources/jaxb and are registered as compile source roots for config, configuration, and grabconfig.",
+        "HabitvLauncher compiles on Java 8 without Utils4J.addToClasspath.",
+        "application/core/generated remains gitignored for legacy local trees while fresh builds use target/generated-sources/jaxb."
+      ],
+      "validation": [
+        "mvn -B -ntp -DskipTests generate-sources -> BUILD SUCCESS",
+        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS",
+        "mvn -B -ntp -DskipTests clean compile -> BUILD SUCCESS (33 modules)",
+        "git diff --check -> clean on committed files"
+      ],
+      "pr": "fix: restore generated sources and launcher classpath (#44)",
+      "notes": "application/habiTv now uses a small Java 8-compatible local URLClassLoader helper instead of the unavailable Utils4J.addToClasspath API. Incompatible utils4j Java 17 bytecode and broader transitive dependency vulnerability cleanup remain out of scope for a dedicated security PR."
     }
   ]
 }
