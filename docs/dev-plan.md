@@ -10,7 +10,7 @@ work from a later phase.
 ## 🎯 Phase progress
 
 ```
-██████████████░░░░░░░░░░  57%   (4 / 7 phases)
+█████████████████░░░░░░░  71%   (5 / 7 phases)
 ```
 
 | Phase | Title | Status | Progress | Tracker items |
@@ -19,7 +19,7 @@ work from a later phase.
 | 1 | ⚙️ Stabilize Maven reactor | ✅ Done | `████████████████████` 100% | `maven-reactor` |
 | 2 | ☕ Stabilize Java 8 baseline | ✅ Done | `████████████████████` 100% | `java8-baseline`, `plugin-tester-align`, `own-version-deps-align` |
 | 3 | 🔗 Remove legacy free.fr / SVN / FTP | ✅ Done | `████████████████████` 100% | `legacy-url-migration`, `youtube-apikey` |
-| 4 | 📦 Publish artifacts via `habitv-repo` | 🟡 In progress | `██████░░░░░░░░░░░░░░` 30% | `static-repo-publish` |
+| 4 | 📦 Publish artifacts via `habitv-repo` | ✅ Done | `████████████████████` 100% | `static-repo-publish` |
 | 5 | 🎬 Replace `youtube-dl` with `yt-dlp` | 🔵 Proposed | `████░░░░░░░░░░░░░░░░` 20% | `ytdlp-migration` |
 | 6 | 🔌 Audit / deprecate obsolete providers | 🔵 Proposed | `░░░░░░░░░░░░░░░░░░░░` 0% | `provider-inventory` |
 | 7 | 🖼️ Modernize UI / runtime packaging | 🔵 Proposed | `█░░░░░░░░░░░░░░░░░░░` 5% | `javafx-modernization` |
@@ -92,7 +92,7 @@ branch `develop` created.
 
 ## 📦 Phase 4 — Publish artifacts to `habitv-repo`
 
-🟡 **In progress** · `██████░░░░░░░░░░░░░░` 30%
+✅ **Done** · `████████████████████` 100%
 
 - Stand up the `habitv-repo` static repository (GitHub Pages or
   equivalent HTTPS host) for artifacts, plugin drops, and update
@@ -102,6 +102,9 @@ branch `develop` created.
 - Document the publication workflow and credential handling.
 - Validate the generated local repository tree (`plugins.txt`,
   `com/dabi/habitv`, required `index.html` links) before publication.
+- Validate live GitHub Pages URLs:
+  `https://mika3578.github.io/habitv-repo/repository/`,
+  `.../plugins.txt`, and `.../com/dabi/habitv/`.
 
 **Tracker** — `static-repo-publish`.
 

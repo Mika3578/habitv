@@ -17,13 +17,13 @@
     "P3"
   ],
   "summary": {
-    "done": 9,
-    "inProgress": 1,
+    "done": 10,
+    "inProgress": 0,
     "proposed": 4,
     "deferred": 0,
     "blocked": 0,
     "total": 14,
-    "overallProgressPercent": 66
+    "overallProgressPercent": 73
   },
   "items": [
     {
@@ -143,16 +143,16 @@
       "legacyCode": "HBTV-005",
       "displayTitle": "Static artifact repository publication",
       "icon": "📦",
-      "status": "in-progress",
+      "status": "done",
       "priority": "P1",
-      "progressPercent": 30,
+      "progressPercent": 100,
       "scope": "Stand up the habitv-repo static repository (GitHub Pages or equivalent HTTPS host) compatible with the existing FindArtifactUtils / UpdateManager semantics.",
       "acceptanceCriteria": [
         "Cross-OS deploy scripts present in scripts/static-repo/ (in develop).",
-        "habitv-repo PR #1 merged.",
-        "repository/com/dabi/habitv/ layout contract validated locally.",
-        "index.html generation for GitHub Pages validated without autoindex dependency.",
-        "plugins.txt format validated against FindArtifactUtils fallback expectations.",
+        "habitv-repo PR #2 merged.",
+        "repository/com/dabi/habitv/ layout contract validated locally and published.",
+        "index.html generation for GitHub Pages validated without autoindex dependency (local + live).",
+        "plugins.txt format validated against FindArtifactUtils fallback expectations (local + live).",
         "HTTPS + no-token runtime consumption contract documented.",
         "Migration path for UPDATE_URL documented."
       ],
@@ -160,8 +160,8 @@
         "mvn -B -ntp -DskipTests validate",
         "python scripts/static-repo/validate_repository_layout.py <repository-root>"
       ],
-      "pr": "habitv-repo #1 (draft, since 2026-04-25); habitv PR TBD (layout validation + docs)",
-      "notes": "Runtime updates remain disabled by default. This step validates publication layout/documentation without changing updater runtime behavior."
+      "pr": "habitv-repo #2 (merged); habitv PR TBD (publication status + tracker refresh)",
+      "notes": "Runtime updates remain disabled by default. Publication cutover is live on GitHub Pages with token-free HTTPS access. Remaining follow-up: run one dedicated opt-in runtime update smoke test with habitv.update.enabled=true against the published URL."
     },
     {
       "id": "provider-inventory",
