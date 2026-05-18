@@ -23,7 +23,16 @@ public interface FrameworkConf {
 	String UPDATE_URL_PROPERTY = "habitv.update.url";
 
 	/** Target static repository base when updates are explicitly enabled. */
-	String UPDATE_URL = "https://mika3578.github.io/habitv-repo/repository";
+	String UPDATE_URL = "https://mika3578.github.io/habitv-repo/repository/";
+
+	/** Update manifest file at the repository root (pipe-delimited entries). */
+	String UPDATE_MANIFEST_FILE = "habitv-update-manifest.properties";
+
+	/** Plugin list file at the repository root (one artifact id per line). */
+	String PLUGINS_LIST_FILE = "plugins.txt";
+
+	/** External tools layout: repository/tools/{tool-name}/{version}/{file} */
+	String TOOLS_REPOSITORY_PREFIX = "tools";
 
 	String GROUP_ID = "com.dabi.habitv";
 

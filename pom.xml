@@ -16,6 +16,8 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- Local Maven staging only; runtime uses FrameworkConf.UPDATE_URL (GitHub Pages). -->
+		<habitv.static.repo.path>${user.home}/dev/habitv-repo/repository</habitv.static.repo.path>
 	</properties>
 
 	 <scm>
@@ -191,4 +193,25 @@
       </plugin>			
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>static-repo-publish</id>
+			<distributionManagement>
+				<repository>
+					<id>habitv-local</id>
+					<name>Habitv local static repository</name>
+					<url>file:///${habitv.static.repo.path}</url>
+				</repository>
+				<snapshotRepository>
+					<id>habitv-local</id>
+					<name>Habitv local static repository</name>
+					<url>file:///${habitv.static.repo.path}</url>
+				</snapshotRepository>
+			</distributionManagement>
+			<modules>
+				<module>build/static-repo-publisher</module>
+			</modules>
+		</profile>
+	</profiles>
 </project>

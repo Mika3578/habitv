@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.dabi.habitv</groupId>
+		<artifactId>parent</artifactId>
+		<version>4.1.0-SNAPSHOT</version>
+		<relativePath>../../pom.xml</relativePath>
+	</parent>
+
+	<artifactId>static-repo-publisher</artifactId>
+	<packaging>pom</packaging>
+	<name>static repository publisher</name>
+	<description>Final reactor step: publish plugins.txt, manifest, index.html, and tool zips.</description>
+
+	<properties>
+		<habitv.repo.root>${session.executionRootDirectory}</habitv.repo.root>
+		<static.repo.publish.script>${habitv.repo.root}/scripts/static-repo/publish-repository-extras.ps1</static.repo.publish.script>
+		<static.repo.metadata.script>${habitv.repo.root}/scripts/static-repo/generate_repository_metadata.py</static.repo.metadata.script>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>3.5.0</version>
+				<executions>
+					<execution>
+						<id>publish-static-repository-extras</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>static-repo-publish-windows</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<configuration>
+							<executable>powershell.exe</executable>
+							<arguments>
+								<argument>-ExecutionPolicy</argument>
+								<argument>Bypass</argument>
+								<argument>-File</argument>
+								<argument>${static.repo.publish.script}</argument>
+								<argument>-RepositoryPath</argument>
+								<argument>${habitv.static.repo.path}</argument>
+							</arguments>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>static-repo-publish-unix</id>
+			<activation>
+				<os>
+					<family>unix</family>
+				</os>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<configuration>
+							<executable>python3</executable>
+							<arguments>
+								<argument>${static.repo.metadata.script}</argument>
+								<argument>${habitv.static.repo.path}</argument>
+							</arguments>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+</project>

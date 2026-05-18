@@ -8,6 +8,8 @@ import com.dabi.habitv.core.event.UpdatePluginStateEnum;
 import com.dabi.habitv.framework.FWKProperties;
 import com.dabi.habitv.framework.FrameworkConf;
 import com.dabi.habitv.framework.plugin.utils.RetrieverUtils;
+import com.dabi.habitv.framework.plugin.utils.update.HabitvUpdateManifest;
+import com.dabi.habitv.framework.plugin.utils.update.UpdateRepositoryUrls;
 import com.dabi.habitv.framework.plugin.utils.update.Updater;
 
 public class UpdateManager {
@@ -54,8 +56,11 @@ public class UpdateManager {
 		}
 		try {
 			LOG.info("Checking plugin updates...");
-			String[] toUpdate = RetrieverUtils.getUrlContent(
-					updateSite + "/plugins.txt", null).split("\\r\\n");
+			final String[] toUpdate = resolvePluginsToUpdate(updateSite);
+			if (toUpdate.length == 0) {
+				LOG.warn("No plugins listed for update; keeping local plugins.");
+				return;
+			}
 			updatePublisher.addNews(new UpdatePluginEvent(
 					UpdatePluginStateEnum.STARTING_ALL, toUpdate.length));
 			final Updater updater = new JarUpdater(pluginFolder, groupId,
@@ -66,12 +71,67 @@ public class UpdateManager {
 					UpdatePluginStateEnum.ALL_DONE));
 			LOG.info("Update done");
 		} catch (Exception e) {
-			LOG.error("Erreur lors de la mise à jour : ", e);
+			LOG.error("Plugin update failed; keeping local plugins.", e);
 		}
 	}
 
 	public Publisher<UpdatePluginEvent> getUpdatePublisher() {
 		return updatePublisher;
+	}
+
+	private String[] resolvePluginsToUpdate(final String updateSite) {
+		final String baseUrl = UpdateRepositoryUrls.normalizeBaseUrl(updateSite.trim());
+		try {
+			final String pluginsList = RetrieverUtils.getUrlContent(
+					baseUrl + "/" + FrameworkConf.PLUGINS_LIST_FILE, null);
+			if (pluginsList != null && !pluginsList.trim().isEmpty()) {
+				return splitPluginLines(pluginsList);
+			}
+		} catch (final RuntimeException e) {
+			LOG.debug("plugins.txt not available at " + baseUrl + ": " + e.getMessage());
+		}
+		final HabitvUpdateManifest manifest = HabitvUpdateManifest.loadFromRepository();
+		if (!manifest.isEmpty()) {
+			return manifest.getPluginArtifactIds();
+		}
+		return new String[0];
+	}
+
+	private static String[] splitPluginLines(final String pluginsList) {
+		final String[] lines = pluginsList.split("\\r?\\n");
+		int count = 0;
+		for (final String line : lines) {
+			if (isPluginLine(line)) {
+				count++;
+			}
+		}
+		final String[] result = new String[count];
+		int index = 0;
+		for (final String line : lines) {
+			if (isPluginLine(line)) {
+				result[index++] = normalizePluginLine(line);
+			}
+		}
+		return result;
+	}
+
+	private static boolean isPluginLine(final String line) {
+		final String trimmed = normalizePluginLine(line);
+		if (trimmed == null) {
+			return false;
+		}
+		return !trimmed.isEmpty() && !trimmed.startsWith("#");
+	}
+
+	private static String normalizePluginLine(final String line) {
+		if (line == null) {
+			return null;
+		}
+		String trimmed = line.trim();
+		if (trimmed.startsWith("\uFEFF")) {
+			trimmed = trimmed.substring(1).trim();
+		}
+		return trimmed;
 	}
 
 }
