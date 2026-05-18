@@ -500,7 +500,8 @@ the key from the tray configuration tab. Runtime key lookup order:
 Java property `habitv.youtube.apiKey`, then environment variable
 `HABITV_YOUTUBE_API_KEY`.
 
-> **Audit trail note** — PR #29's body references `HBTV-012` under
+> **Audit trail note** — PR #29 (`fix(youtube): externalize data api key and mask api errors`,
+> <https://github.com/Mika3578/habitv/pull/29>) references `HBTV-012` under
 > the legacy numbering scheme because the tracker at the time of
 > authorship had not yet assigned HBTV-013 to this work. This refresh
 > assigns `HBTV-013` / slug `youtube-apikey` to the YouTube API key
