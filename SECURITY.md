@@ -39,15 +39,28 @@ and should not be relied on in production until remediated:
 
 | Risk ID | Area | Status |
 |---------|------|--------|
-| `youtube-key-hardcoded` | Hardcoded YouTube Data API key in `plugins/youtube` | 🟡 Being remediated (PR #29) |
-| `legacy-maven-repo` | Legacy plain-HTTP `dabiboo.free.fr` Maven repository | 🟠 Migration planned (`legacy-url-migration`) |
+| `youtube-key-hardcoded` | Hardcoded YouTube Data API key in `plugins/youtube` | ✅ Mitigated (PR #29 merged) |
+| `legacy-maven-repo` | Legacy plain-HTTP `dabiboo.free.fr` Maven repository | ✅ Active wiring removed (PR #36 merged) |
 | `ftp-deploy` | FTP deployment with embedded credentials | 🟠 Migration planned (`legacy-url-migration`) |
-| `legacy-update-pull` | Auto-update can pull artifacts from unmaintained host | 🟠 Quarantine planned (`static-repo-publish`) |
+| `legacy-update-pull` | Auto-update can pull artifacts from unmaintained host | 🟠 Opt-in guard added; cutover pending (`static-repo-publish`) |
 | — | Hardcoded Gmail POP3/IMAP credentials in `plugins/email` tests | 🔴 Pending dedicated remediation PR |
 | — | Sample FTP credentials in `application/consoleView/config.xml` | 🔴 Sample is illustrative; do not reuse |
 
 If your security report concerns one of these already-tracked items,
 please reference the risk slug in your advisory.
+
+---
+
+## 🔒 Sensitive data
+
+Never include in issues, pull requests, comments, logs, or attachments:
+
+- Passwords, API keys, tokens, or personal access tokens
+- Cookies or session identifiers
+- Private replay-service or provider credentials
+- Personal data unrelated to the defect
+
+Redact logs before posting. Use placeholders for secrets.
 
 ---
 

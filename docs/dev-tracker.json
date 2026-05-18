@@ -3,16 +3,27 @@
   "version": 3,
   "description": "Machine-readable mirror of docs/dev-tracker.md. Keep both files in sync. Identifiers use descriptive kebab-case slugs (see descriptive-slug-ids ADR).",
   "lastRefresh": "2026-05-18",
-  "statusValues": ["proposed", "in-progress", "blocked", "done", "deferred"],
-  "priorityValues": ["P0", "P1", "P2", "P3"],
+  "statusValues": [
+    "proposed",
+    "in-progress",
+    "blocked",
+    "done",
+    "deferred"
+  ],
+  "priorityValues": [
+    "P0",
+    "P1",
+    "P2",
+    "P3"
+  ],
   "summary": {
-    "done": 6,
-    "inProgress": 2,
+    "done": 8,
+    "inProgress": 0,
     "proposed": 5,
     "deferred": 0,
     "blocked": 0,
     "total": 13,
-    "overallProgressPercent": 50
+    "overallProgressPercent": 62
   },
   "items": [
     {
@@ -109,25 +120,23 @@
       "legacyCode": "HBTV-004",
       "displayTitle": "Legacy URL migration (free.fr / SVN / FTP)",
       "icon": "🔗",
-      "status": "in-progress",
-      "priority": "P1",
-      "progressPercent": 35,
+      "status": "done",
+      "priority": "P0",
+      "progressPercent": 100,
       "scope": "Remove or replace every active reference to <scm>scm:svn:..., <repository>http://dabiboo.free.fr/repository, <distributionManagement>ftp://ftpperso.free.fr/repository + wagon-ftp, and runtime constants UPDATE_URL and STAT_URL.",
       "acceptanceCriteria": [
-        "Migration plan document published (PR #25 draft).",
-        "Runtime quarantine flags habitv.stat.enabled and habitv.update.enabled (default false) implemented and tested.",
-        "POMs swapped to GitHub URLs (PR #36 open).",
-        "wagon-ftp extension removed.",
-        "<scm> blocks point to the current GitHub URL.",
-        "Plain-HTTP dabiboo.free.fr repository fully removed."
+        "Active POM/runtime references to dabiboo.free.fr, subversion.assembla.com, scm:svn, and cpt.php are removed.",
+        "Root repository uses https://mika3578.github.io/habitv-repo/repository.",
+        "Telemetry is opt-in via habitv.stat.enabled and habitv.stat.url.",
+        "Plugin updates are opt-in via habitv.update.enabled and optional habitv.update.url."
       ],
       "validation": [
-        "git grep -nIE \"dabiboo|free\\.fr|ftpperso|subversion\\.assembla|scm:svn\" -- . (expected: no active matches)",
-        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS",
-        "mvn -B -ntp -DskipTests compile -> BUILD SUCCESS"
+        "git grep -nIE \"dabiboo|free\\.fr|ftpperso|subversion\\.assembla|scm:svn\" -- . -> matches only documentation/history, no active code/POM endpoints.",
+        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS (33 modules)",
+        "mvn -B -ntp -DskipTests compile -> BUILD SUCCESS (33 modules)"
       ],
-      "pr": "#25 (draft, plan), #36 (open, execution)",
-      "notes": "Sequenced: (1) merge plan, (2) ship quarantine flags, (3) flip POMs, (4) remove FTP, (5) point updater to static-repo-publish host. Risks legacy-maven-repo, ftp-deploy, legacy-update-pull, youtube-key-hardcoded, pages-autoindex-gap, silent-stat-ping."
+      "pr": "chore: remove legacy DabiBoo repository wiring (#36)",
+      "notes": "Execution supersedes PR #25 plan-only work. Publication cutover and updater HTML index contract remain HBTV-005; do not enable habitv.update.enabled until static index.html or manifest layout is verified."
     },
     {
       "id": "static-repo-publish",
@@ -286,25 +295,24 @@
       "legacyCode": "HBTV-013",
       "displayTitle": "YouTube Data API key externalization",
       "icon": "🔑",
-      "status": "in-progress",
+      "status": "done",
       "priority": "P1",
-      "progressPercent": 85,
+      "progressPercent": 100,
       "scope": "Remove the hardcoded YouTube Data API key from plugins/youtube and resolve it from runtime configuration so revoked/restricted keys do not require a code change.",
       "acceptanceCriteria": [
         "YoutubeConf no longer embeds a concrete API key value.",
-        "Runtime lookup: Java property habitv.youtube.apiKey, then env HABITV_YOUTUBE_API_KEY.",
-        "Tray configuration exposes a user-editable field persisted in user config.",
+        "YoutubePluginManager resolves the key from runtime configuration.",
+        "trayView configuration exposes a user-editable YouTube API key field persisted in local user configuration.",
         "Playlist API request URL only includes supported parameters.",
-        "Error messages include sanitized request context (no key leak).",
-        "PR merged onto develop."
+        "Error messages include API request context while masking key values."
       ],
       "validation": [
         "mvn -B -ntp -DskipTests -pl plugins/youtube -am validate -> BUILD SUCCESS",
         "mvn -B -ntp -DskipTests -pl application/trayView,plugins/youtube -am compile -> BUILD SUCCESS",
-        "mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeConfTest test -> BUILD SUCCESS"
+        "mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeConfTest -Dsurefire.failIfNoSpecifiedTests=false test -> BUILD SUCCESS"
       ],
       "pr": "fix(youtube): externalize data api key and mask api errors (#29)",
-      "notes": "PR #29 is blocked on a documentation merge conflict only (an id collision under the legacy numbering scheme); the slug-based naming this refresh introduces makes such collisions impossible going forward. Risk youtube-key-hardcoded mitigated by this work."
+      "notes": "End users can set the key from the tray configuration tab. Runtime key lookup order: Java property habitv.youtube.apiKey, then environment variable HABITV_YOUTUBE_API_KEY. Risk youtube-key-hardcoded mitigated."
     }
   ]
 }

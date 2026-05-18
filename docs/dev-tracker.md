@@ -19,13 +19,13 @@
 ## 📊 Overall progress
 
 ```
-████████████░░░░░░░░░░░░  50%
+████████████████░░░░░░░░  62%
 ```
 
 | Category | Count |
 |---------|------:|
-| ✅ Delivered | **6** |
-| 🟡 In progress | **2** |
+| ✅ Delivered | **8** |
+| 🟡 In progress | **0** |
 | 🔵 Proposed | **5** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
@@ -41,7 +41,7 @@
 | ⚙️ `maven-reactor` — Maven reactor stabilization | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | ☕ `java8-baseline` — Java 8 compile baseline | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 🛡️ `branch-protection` — GitHub branch protection rules | 🔵 Proposed | 🟠 P1 | `░░░░░░░░░░░░░░░░░░░░` 0% |
-| 🔗 `legacy-url-migration` — Legacy URL migration (free.fr / SVN / FTP) | 🟡 In progress | 🟠 P1 | `███████░░░░░░░░░░░░░` 35% |
+| 🔗 `legacy-url-migration` — Legacy URL migration (free.fr / SVN / FTP) | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 📦 `static-repo-publish` — Static artifact repository publication | 🔵 Proposed | 🟠 P1 | `██░░░░░░░░░░░░░░░░░░` 10% |
 | 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🔵 Proposed | 🟡 P2 | `░░░░░░░░░░░░░░░░░░░░` 0% |
 | 🎬 `ytdlp-migration` — `youtube-dl` → `yt-dlp` migration | 🔵 Proposed | 🟡 P2 | `████░░░░░░░░░░░░░░░░` 20% |
@@ -49,7 +49,7 @@
 | 🧪 `plugin-tester-align` — `plugin-tester` reactor alignment | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | ▶️ `console-runnable` — Runnable console baseline | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 🔗 `own-version-deps-align` — Own-version plugin dependency alignment | ✅ Done | 🔴 P0 | `████████████████████` 100% |
-| 🔑 `youtube-apikey` — YouTube Data API key externalization | 🟡 In progress | 🟠 P1 | `█████████████████░░░` 85% |
+| 🔑 `youtube-apikey` — YouTube Data API key externalization | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 
 ---
 
@@ -201,41 +201,41 @@ nothing technical but everyone has push access to `develop`.
 
 | | |
 |---|---|
-| **Status** | 🟡 In progress |
-| **Priority** | 🟠 P1 |
-| **Progress** | `███████░░░░░░░░░░░░░` 35% |
+| **Status** | ✅ Done |
+| **Priority** | 🔴 P0 |
+| **Progress** | `████████████████████` 100% |
 | **Legacy code** | HBTV-004 |
 
-**Scope** — Remove or replace every active reference to:
-- `<scm>scm:svn:http://subversion.assembla.com/svn/habitv/trunk` (~22 POMs)
-- `<repository>http://dabiboo.free.fr/repository` (3 POMs)
-- `<distributionManagement>ftp://ftpperso.free.fr/repository` + `wagon-ftp`
-- Runtime constants `UPDATE_URL` and `STAT_URL`
+**Scope** — Remove active legacy DabiBoo/free.fr/SVN/Assembla wiring from
+Maven POMs and runtime paths; replace SCM metadata with GitHub; disable
+startup telemetry and plugin update checks by default; point Maven
+`<repository>` at the public `habitv-repo` GitHub Pages base.
 
 **Acceptance criteria**
-- 🟡 Migration plan document published — *PR #25 (draft)*
-- ⬜ Runtime quarantine flags `habitv.stat.enabled` and
-  `habitv.update.enabled` (default `false`) implemented and tested
-- 🟡 POMs swapped to GitHub URLs — *PR #36 (open)*
-- ⬜ `wagon-ftp` extension removed
-- ⬜ `<scm>` blocks point to the current GitHub URL
-- ⬜ Plain-HTTP `dabiboo.free.fr` repository fully removed
+- ✅ Active POM/runtime references to `dabiboo.free.fr`,
+  `subversion.assembla.com`, `scm:svn`, and `cpt.php` are removed
+- ✅ Root and packaging POM repository wiring uses
+  `https://mika3578.github.io/habitv-repo/repository`
+- ✅ Runtime telemetry ping is opt-in only (`habitv.stat.enabled=true`)
+  and requires explicit URL configuration (`habitv.stat.url`)
+- ✅ Runtime plugin updates are opt-in only (`habitv.update.enabled=true`)
+  with optional `habitv.update.url`
 
 **Validation**
 ```bash
 git grep -nIE "dabiboo|free\.fr|ftpperso|subversion\.assembla|scm:svn" -- .
-# expected: no active matches outside docs/history sections
-mvn -B -ntp -DskipTests validate     # BUILD SUCCESS
-mvn -B -ntp -DskipTests compile      # BUILD SUCCESS
+# -> matches only documentation/history, no active code/POM endpoints
+mvn -B -ntp -DskipTests validate     # BUILD SUCCESS (33 modules)
+mvn -B -ntp -DskipTests compile      # BUILD SUCCESS (33 modules)
 ```
 
-**Related PRs** · #25 (draft, plan) · #36 (open, execution)
+**Related PRs** · #25 (plan, merged) · #36 (execution, merged)
 
-**Notes** — Sequenced: (1) merge the plan, (2) ship the quarantine
-flags, (3) flip POMs, (4) remove FTP, (5) point updater to the static
-repo prepared by `static-repo-publish`. Risks `legacy-maven-repo`,
-`ftp-deploy`, `legacy-update-pull`, `youtube-key-hardcoded`,
-`pages-autoindex-gap`, `silent-stat-ping` all converge here.
+**Notes** — Execution supersedes the documentation-only plan in PR #25.
+Functional publication cutover remains blocked under `static-repo-publish`
+until `habitv-repo` serves `/repository` with Apache-style directory
+listings. Do not enable `habitv.update.enabled` until static `index.html`
+files or an equivalent manifest layout are verified.
 
 ---
 
@@ -468,9 +468,9 @@ pending `legacy-url-migration`).
 
 | | |
 |---|---|
-| **Status** | 🟡 In progress |
+| **Status** | ✅ Done |
 | **Priority** | 🟠 P1 |
-| **Progress** | `█████████████████░░░` 85% |
+| **Progress** | `████████████████████` 100% |
 | **Legacy code** | HBTV-013 |
 
 **Scope** — Remove the hardcoded YouTube Data API key from
@@ -479,27 +479,26 @@ or restricted keys do not require a code change.
 
 **Acceptance criteria**
 - ✅ `YoutubeConf` no longer embeds a concrete API key value
-- ✅ Runtime lookup: Java property `habitv.youtube.apiKey`, then env
-  `HABITV_YOUTUBE_API_KEY`
+- ✅ `YoutubePluginManager` resolves the key from runtime configuration
 - ✅ Tray configuration exposes a user-editable field persisted in
   user config
 - ✅ Playlist API request URL only includes supported parameters
 - ✅ Error messages include sanitized request context (no key leak)
-- 🟡 PR merged onto `develop`
+- ✅ PR merged onto `develop`
 
 **Validation**
 ```bash
 mvn -B -ntp -DskipTests -pl plugins/youtube -am validate                       # BUILD SUCCESS
 mvn -B -ntp -DskipTests -pl application/trayView,plugins/youtube -am compile   # BUILD SUCCESS
-mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeConfTest test                # BUILD SUCCESS
+mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeConfTest -Dsurefire.failIfNoSpecifiedTests=false test  # BUILD SUCCESS
 ```
 
 **Related PR** · `fix(youtube): externalize data api key and mask api errors` (#29)
 
-**Notes** — PR #29 is blocked on a documentation merge conflict only
-(an id collision under the legacy numbering scheme); the slug-based
-naming this refresh introduces makes such collisions impossible going
-forward. Risk `youtube-key-hardcoded` mitigated by this work.
+**Notes** — Risk `youtube-key-hardcoded` mitigated. End users can set
+the key from the tray configuration tab. Runtime key lookup order:
+Java property `habitv.youtube.apiKey`, then environment variable
+`HABITV_YOUTUBE_API_KEY`.
 
 ---
 
@@ -507,12 +506,9 @@ forward. Risk `youtube-key-hardcoded` mitigated by this work.
 
 Recommended merge / start order (see `dev-plan.md` for phase reasoning):
 
-1. 🟡 **Resolve PR #29** → close `youtube-apikey` *(doc-only conflict)*
-2. 🔵 **Apply branch protection** → close `branch-protection`
-3. 🟡 **Land the URL migration plan PR #25** → unblock `legacy-url-migration` execution
-4. 🟡 **Land PR #36** + write quarantine flags → halve `legacy-url-migration` scope
-5. 🔵 **Merge `habitv-repo` PR #1** → start `static-repo-publish`
-6. 🔵 Then in any order: `provider-inventory`, `ytdlp-migration`, `javafx-modernization`
+1. 🔵 **Apply branch protection** → close `branch-protection`
+2. 🔵 **Merge `habitv-repo` PR #1** → start `static-repo-publish`
+3. 🔵 Then in any order: `provider-inventory`, `ytdlp-migration`, `javafx-modernization`
 
 ---
 

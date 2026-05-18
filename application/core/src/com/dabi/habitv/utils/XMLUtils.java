@@ -33,4 +33,8 @@ public class XMLUtils {
 	public static String getTagName(Object node) {
 		return ((org.w3c.dom.Node) node).getLocalName();
 	}
+
+	public static void setTagValue(Object node, String value) {
+		((org.w3c.dom.Node) node).setTextContent(value);
+	}
 }

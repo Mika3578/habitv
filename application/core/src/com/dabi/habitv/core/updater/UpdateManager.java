@@ -42,10 +42,20 @@ public class UpdateManager {
 	}
 
 	public void process() {
+		if (!Boolean.getBoolean(FrameworkConf.UPDATE_ENABLED_PROPERTY)) {
+			LOG.debug("Plugin update check is disabled.");
+			return;
+		}
+		final String updateSite = System.getProperty(
+				FrameworkConf.UPDATE_URL_PROPERTY, site);
+		if (updateSite == null || updateSite.trim().isEmpty()) {
+			LOG.warn("Plugin update check is enabled but no update URL is configured.");
+			return;
+		}
 		try {
 			LOG.info("Checking plugin updates...");
 			String[] toUpdate = RetrieverUtils.getUrlContent(
-					site + "/plugins.txt", null).split("\\r\\n");
+					updateSite + "/plugins.txt", null).split("\\r\\n");
 			updatePublisher.addNews(new UpdatePluginEvent(
 					UpdatePluginStateEnum.STARTING_ALL, toUpdate.length));
 			final Updater updater = new JarUpdater(pluginFolder, groupId,

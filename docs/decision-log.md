@@ -23,6 +23,7 @@ older ones rather than rewriting them in place.
 | `develop-runnable-baseline` | Runnable console baseline on `develop` before broader modernization | ✅ Accepted |
 | `doc-sync-and-rule-lifecycle` | Doc sync protocol & rule lifecycle (meta-rules) | ✅ Accepted |
 | `descriptive-slug-ids` | Switch tracker / risk / ADR identifiers to descriptive slugs | ✅ Accepted |
+| `legacy-dabiboo-svn-removal` | Remove active legacy DabiBoo/SVN wiring from build and runtime paths | ✅ Accepted |
 
 ---
 
@@ -284,7 +285,7 @@ codes:
 
 - `HBTV-000` … `HBTV-013` for work items
 - `R-001` … `R-015` for risks
-- `ADR-0001` … `ADR-0007` for architecture decisions
+- `ADR-0001` … `ADR-0009` for architecture decisions
 
 These codes carry no semantic meaning. Reading a PR description like
 "closes HBTV-004" or "mitigates R-013" forces the reader to look up
@@ -354,6 +355,7 @@ reference the old codes remain traceable. New work must use the slug.
 | ADR-0006 | `develop-runnable-baseline` |
 | ADR-0007 | `doc-sync-and-rule-lifecycle` |
 | ADR-0008 | `descriptive-slug-ids` |
+| ADR-0009 | `legacy-dabiboo-svn-removal` |
 
 **Consequences**
 
@@ -384,6 +386,40 @@ assert not missing, f"Missing slugs in dev-tracker.md: {missing}"
 print('OK:', len(js_slugs), 'items, all slugs cross-referenced')
 EOF
 ```
+
+---
+
+## ✅ `legacy-dabiboo-svn-removal` — Remove active legacy DabiBoo/SVN wiring from build and runtime paths
+
+| | |
+|---|---|
+| **Status** | ✅ Accepted |
+| **Date** | 2026-05-17 |
+| **Trackers** | `legacy-url-migration` |
+| **Risks** | `legacy-maven-repo`, `ftp-deploy`, `legacy-update-pull` |
+| **Legacy code** | ADR-0009 |
+
+**Context** — Active code and Maven metadata still referenced legacy
+endpoints (`dabiboo.free.fr`, `scm:svn` on Assembla, and `cpt.php`
+telemetry). These endpoints are either unavailable or no longer
+acceptable for modern secure/reproducible builds.
+
+**Decision** — Replace active Maven repository base URL with
+`https://mika3578.github.io/habitv-repo/repository`, replace/remove
+active SVN/Assembla SCM metadata in POMs in favour of GitHub SCM
+metadata inheritance, disable startup telemetry by default behind
+`habitv.stat.enabled` / `habitv.stat.url`, and disable runtime plugin
+updates by default behind `habitv.update.enabled` with optional
+`habitv.update.url` (defaulting to the GitHub Pages base when enabled).
+
+**Consequences**
+- ✅ Build/runtime wiring no longer depends on legacy DabiBoo/free.fr/SVN
+  endpoints.
+- ⚠️ `FindArtifactUtils` still expects Apache-style HTML directory indexes;
+  do not enable updates until HBTV-005 publishes verified static
+  `index.html` or manifest files on GitHub Pages.
+- ✅ Functional Maven/publication cutover remains a separate
+  `static-repo-publish` item.
 
 ---
 
@@ -460,3 +496,5 @@ current slugs. Source of truth is the per-entry `Legacy code` field.
 | ADR-0006 | `develop-runnable-baseline` |
 | ADR-0007 | `doc-sync-and-rule-lifecycle` |
 | ADR-0008 | `descriptive-slug-ids` |
+| ADR-0009 | `legacy-dabiboo-svn-removal` |
+| ADR-0009 | `legacy-dabiboo-svn-removal` |

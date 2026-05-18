@@ -16,9 +16,9 @@ added, mitigated, realized, or accepted.
 
 | Status | Count |
 |---|---:|
-| 🟢 **Mitigated** | 4 |
+| 🟢 **Mitigated** | 5 |
 | 🟠 **Open / High priority** | 4 |
-| 🟡 **Open / Medium priority** | 4 |
+| 🟡 **Open / Medium priority** | 3 |
 | 🔴 **Open / Critical** | 0 |
 | 🟢 **Open / Low priority** | 3 |
 | **Total tracked** | **15** |
@@ -41,7 +41,7 @@ added, mitigated, realized, or accepted.
 | `reactor-version-range` | Low | Low | 🟢 P3 | 🟢 Mitigated |
 | `jaxb-plugin-unpinned` | Low | Low | 🟢 P3 | 🟢 Mitigated |
 | `plugin-tester-mismatch` | Low | Low | 🟢 P3 | 🟢 Mitigated |
-| `youtube-key-hardcoded` | Med | Med | 🟡 P2 | 🟡 PR in flight |
+| `youtube-key-hardcoded` | Med | Med | 🟡 P2 | 🟢 Mitigated |
 | `pages-autoindex-gap` | Med | Med | 🟡 P2 | 🟡 Open |
 | `silent-stat-ping` | Med | Med | 🟡 P2 | 🟡 Open |
 
@@ -128,6 +128,13 @@ modules no longer fetch plugin-local coordinates from blocked hosts.
 for external publication and runtime updates. Tracked under
 `legacy-url-migration` / `static-repo-publish`.
 
+**Status update (`legacy-url-migration`)** — Active Maven repository
+wiring no longer references `http://dabiboo.free.fr/repository` in
+active POM paths (PR #36 merged). Functional publication cutover
+remains blocked under `static-repo-publish` until
+`https://mika3578.github.io/habitv-repo/repository` is published with
+a layout compatible with local reactor builds.
+
 ---
 
 ## 🟠 Open — High priority
@@ -148,6 +155,10 @@ deprecated, and the password mechanism would expose credentials.
 **Mitigation** — Remove FTP deploy in `legacy-url-migration` /
 `static-repo-publish` and replace with a documented static
 publication workflow.
+
+**Status update (`legacy-url-migration`)** — Active packaging POMs
+no longer declare `ftp://ftpperso.free.fr/repository`
+distributionManagement blocks (PR #36 merged).
 
 ---
 
@@ -201,9 +212,16 @@ Java 8.
 at runtime. A dev build can pull whatever is on that host (or
 fail noisily if it is down).
 
-**Mitigation** — Plan a feature flag / env override in
-`static-repo-publish` to disable updates in development. Until
-then, document the risk.
+**Mitigation** — Updates are disabled by default; explicit opt-in
+required before any runtime fetch (`habitv.update.enabled=true`,
+optional `habitv.update.url`).
+
+**Status update (`legacy-url-migration`)** — `UpdateManager` returns
+immediately unless `habitv.update.enabled=true`. The default target
+base URL constant is `https://mika3578.github.io/habitv-repo/repository`
+(legacy DabiBoo removed). Do not enable updates until
+`static-repo-publish` publishes Apache-style directory indexes or an
+equivalent manifest layout.
 
 ---
 
@@ -282,13 +300,22 @@ explicitly and validates it against
 `FindArtifactUtils.findLastVersionUrl` semantics before cutting
 over.
 
+**Status update (`legacy-url-migration` / `static-repo-publish`)** —
+`FindArtifactUtils` parses HTML directory listings via anchor tags
+(Apache `mod_autoindex` shape). GitHub Pages does not provide that
+listing by default. Runtime updates stay disabled
+(`habitv.update.enabled` defaults false) until static `index.html`
+files or manifests are published and verified under
+`static-repo-publish`. Keep this risk at P1 until cutover
+validation completes.
+
 ---
 
 ### `youtube-key-hardcoded` — Hardcoded YouTube Data API key
 
 | | |
 |---|---|
-| **Status** | 🟡 PR in flight |
+| **Status** | 🟢 Mitigated |
 | **Likelihood** | Medium · **Impact** Medium · **Priority** 🟡 P2 |
 | **Legacy code** | R-013 |
 
@@ -297,11 +324,12 @@ Data API key in source. If the key is revoked, quota-exhausted, or
 restricted to another referrer/IP, the provider search fails with
 HTTP 403 and requires a new build to change credentials.
 
-**Mitigation** — `youtube-apikey`: externalize key resolution to
-runtime configuration with deterministic precedence (system
-property then environment variable), add a tray configuration
-field, and include sanitized request context in error messages.
-PR #29 awaits a documentation merge conflict resolution.
+**Mitigation** — Mitigated in `youtube-apikey` (PR #29 merged):
+`YoutubeConf` no longer embeds a concrete API key constant; keys
+are resolved from runtime configuration (Java property
+`habitv.youtube.apiKey`, then environment variable
+`HABITV_YOUTUBE_API_KEY`); tray configuration exposes a
+user-editable field; error messages mask the `key` parameter.
 
 ---
 
