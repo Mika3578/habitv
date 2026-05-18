@@ -44,7 +44,7 @@
 | 🔗 `legacy-url-migration` — Legacy URL migration (free.fr / SVN / FTP) | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 📦 `static-repo-publish` — Static artifact repository publication | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🟡 In progress | 🟡 P2 | `███████████░░░░░░░░░` 55% |
-| 🎬 `ytdlp-migration` — `youtube-dl` → `yt-dlp` migration | 🔵 Proposed | 🟡 P2 | `████░░░░░░░░░░░░░░░░` 20% |
+| 🎬 `ytdlp-migration` — `youtube-dl` → `yt-dlp` migration | 🟡 In progress | 🟡 P2 | `███████████████░░░░░` 75% |
 | 🖼️ `javafx-modernization` — JavaFX & runtime packaging modernization | 🔵 Proposed | 🟡 P2 | `█░░░░░░░░░░░░░░░░░░░` 5% |
 | 🧪 `plugin-tester-align` — `plugin-tester` reactor alignment | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | ▶️ `console-runnable` — Runnable console baseline | ✅ Done | 🔴 P0 | `████████████████████` 100% |
@@ -324,9 +324,9 @@ capture and dedicated cleanup/rewrite PRs. Risks `live-tests-flaky`,
 
 | | |
 |---|---|
-| **Status** | 🔵 Proposed |
+| **Status** | 🟡 In progress |
 | **Priority** | 🟡 P2 |
-| **Progress** | `████░░░░░░░░░░░░░░░░` 20% |
+| **Progress** | `███████████████░░░░░` 75% |
 | **Legacy code** | HBTV-007 |
 
 **Scope** — Plan and execute migration of the `youtube` plugin's binary
@@ -334,20 +334,23 @@ contract from `youtube-dl` to `yt-dlp` (executable name, command flags,
 output parsing, post-processors).
 
 **Acceptance criteria**
-- 🟡 Runtime path packaged in `consoleView` fat-jar *(done)*
-- 🟡 Offline command-wiring test `YoutubePluginDownloaderCmdTest` passes *(done)*
-- ⬜ CLI flag diff documented (`--format`, output template, post-processors)
-- ⬜ `application/core/configuration.xml` sample updated to `yt-dlp`
-- ⬜ Backward-compatibility / deprecation note for users on `youtube-dl`
-- ⬜ Provider behavior validated against captured fixtures
+- ✅ Runtime path packaged in `consoleView` fat-jar
+- ✅ Offline command-wiring tests (`YoutubePluginDownloaderCmdTest`, defaults)
+- ✅ CLI flag contract documented (`docs/ytdlp-cli-compatibility.md`)
+- ✅ `application/core/configuration.xml` sample updated to `yt-dlp`
+- ✅ Backward-compatibility / deprecation note for users on `youtube-dl`
+- ⬜ Provider behavior validated against captured fixtures (live endpoints; follow-up)
+- ⬜ `habitv-repo` publishes `tools/yt-dlp/...` artifact (follow-up PR)
 
 **Validation**
 ```bash
-mvn -B -ntp -pl plugins/youtube -am test     # Tests run: 2, Failures: 0
+mvn -B -ntp -pl plugins/youtube -am -Dsurefire.failIfNoSpecifiedTests=false test
 ```
 
-**Notes** — Risk `ytdlp-behavior-diff`. End-to-end live behavior
-remains out of scope until `provider-inventory` cleanup.
+**Notes** — Risk `ytdlp-behavior-diff`. Plugin module id remains `youtube`.
+Static-repo tool metadata in `scripts/static-repo/tool-sources.properties` uses
+`yt-dlp`; publishing the zip to `habitv-repo` is a separate PR. No provider
+rewrite, no live-network tests in this item.
 
 ---
 

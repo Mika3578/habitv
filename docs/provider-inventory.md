@@ -44,7 +44,7 @@
 | `plugins/rtmpDump` | `rtmpDump` | downloader | keep | `RtmpDumpPluginDownloader` is binary wrapper with updater version pattern; dedicated test exists | keep as-is |
 | `plugins/sfr` | `sfr` | provider | unknown / needs fixture | `SFRConf` uses `sport.sfr.fr` API path; provider tests are live-network style only | add fixture tests |
 | `plugins/wat` | `wat` | provider | obsolete endpoint | `WatConf` points to TF1/WAT-era URLs; plugin naming and endpoint model reflect legacy provider branding | rewrite provider |
-| `plugins/youtube` | `youtube` | provider | keep | `YoutubePluginManager` provider implementation; offline command-wiring tests exist; yt-dlp migration explicitly out of scope here | migrate to yt-dlp |
+| `plugins/youtube` | `youtube` | provider | keep | `YoutubePluginManager` provider; offline tests; binary contract migrated to yt-dlp (`YtDlpCmdExecutor`, defaults `yt-dlp` / `yt-dlp.exe`) | keep (yt-dlp binary) |
 
 ---
 
@@ -99,7 +99,7 @@
 | `canalPlus` (`D8`/`D17` family) | Local fixture metadata + offline baseline test | Multiple legacy endpoint families, highest rewrite risk |
 | `pluzz` | Local fixture metadata + offline baseline test | Renamed/replaced direction (`FranceTV`) must be documented before rewrite |
 | `arte` | Local fixture metadata + offline baseline test | Legacy HTTP/RSS parsing assumptions need stable parser anchors |
-| `youtube` | Local fixture metadata + offline baseline test | Keep fixture boundaries explicit while yt-dlp migration remains separate |
+| `youtube` | Local fixture metadata + offline baseline test | Binary contract migrated to yt-dlp; live provider validation still separate |
 
 ### Infrastructure-only modules not suitable for provider fixtures
 
@@ -151,6 +151,6 @@ Baseline tests added (local fixture loading only):
 - No plugin modules were removed.
 - No provider logic was rewritten.
 - No runtime updater behavior was changed.
-- No yt-dlp migration work started in this inventory PR.
+- yt-dlp binary migration is tracked under `ytdlp-migration` (separate PRs).
 - No JavaFX modernization work started in this inventory PR.
 - No Maven publication layout or `habitv-repo` contract was changed.

@@ -1,4 +1,4 @@
 provider=youtube
-ytdlpMigrationScope=out-of-scope
+ytdlpMigrationScope=binary-contract-migrated
 network=disabled
-note=Fixture boundary marker for provider inventory phase only.
+note=Offline fixture boundary; no live endpoint validation in yt-dlp migration PR.

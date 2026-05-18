@@ -20,8 +20,8 @@ public class YoutubeOfflineFixtureBaselineTest {
 			String content = readUtf8(input);
 			assertTrue("fixture metadata must mention provider", content.contains("provider=youtube"));
 			assertTrue("fixture metadata must disable network access", content.contains("network=disabled"));
-			assertTrue("fixture metadata must keep yt-dlp migration out of scope",
-					content.contains("ytdlpMigrationScope=out-of-scope"));
+			assertTrue("fixture metadata must record yt-dlp migration scope",
+					content.contains("ytdlpMigrationScope=binary-contract-migrated"));
 		}
 	}
 

@@ -18,12 +18,12 @@
   ],
   "summary": {
     "done": 10,
-    "inProgress": 1,
-    "proposed": 3,
+    "inProgress": 2,
+    "proposed": 2,
     "deferred": 0,
     "blocked": 0,
     "total": 14,
-    "overallProgressPercent": 77
+    "overallProgressPercent": 79
   },
   "items": [
     {
@@ -193,23 +193,24 @@
       "legacyCode": "HBTV-007",
       "displayTitle": "youtube-dl to yt-dlp migration",
       "icon": "🎬",
-      "status": "proposed",
+      "status": "in-progress",
       "priority": "P2",
-      "progressPercent": 20,
+      "progressPercent": 75,
       "scope": "Plan and execute migration of the youtube plugin's binary contract from youtube-dl to yt-dlp (executable name, command flags, output parsing, post-processors).",
       "acceptanceCriteria": [
         "Runtime path packaged in consoleView fat-jar (done).",
-        "Offline command-wiring test YoutubePluginDownloaderCmdTest passes (done).",
-        "CLI flag diff documented (--format, output template, post-processors).",
-        "application/core/configuration.xml sample updated to yt-dlp.",
-        "Backward-compatibility / deprecation note for users on youtube-dl.",
-        "Provider behavior validated against captured fixtures."
+        "Offline command-wiring tests pass (done).",
+        "CLI flag contract documented in docs/ytdlp-cli-compatibility.md (done).",
+        "application/core/configuration.xml sample updated to yt-dlp (done).",
+        "Backward-compatibility / deprecation note for users on youtube-dl (done).",
+        "Provider behavior validated against captured fixtures (follow-up).",
+        "habitv-repo publishes tools/yt-dlp artifact (follow-up PR)."
       ],
       "validation": [
-        "mvn -B -ntp -pl plugins/youtube -am test -> Tests run: 2, Failures: 0"
+        "mvn -B -ntp -pl plugins/youtube -am -Dsurefire.failIfNoSpecifiedTests=false test"
       ],
-      "pr": "TBD",
-      "notes": "Risk ytdlp-behavior-diff. End-to-end live behavior remains out of scope until provider-inventory cleanup."
+      "pr": "feat(youtube): migrate downloader binary to yt-dlp (TBD)",
+      "notes": "Plugin module id remains youtube. Static-repo tool metadata uses yt-dlp; habitv-repo publication is separate. No provider rewrite or live-network tests."
     },
     {
       "id": "javafx-modernization",

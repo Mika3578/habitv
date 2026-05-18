@@ -20,7 +20,7 @@ work from a later phase.
 | 2 | ☕ Stabilize Java 8 baseline | ✅ Done | `████████████████████` 100% | `java8-baseline`, `plugin-tester-align`, `own-version-deps-align` |
 | 3 | 🔗 Remove legacy free.fr / SVN / FTP | ✅ Done | `████████████████████` 100% | `legacy-url-migration`, `youtube-apikey` |
 | 4 | 📦 Publish artifacts via `habitv-repo` | ✅ Done | `████████████████████` 100% | `static-repo-publish` |
-| 5 | 🎬 Replace `youtube-dl` with `yt-dlp` | 🔵 Proposed | `████░░░░░░░░░░░░░░░░` 20% | `ytdlp-migration` |
+| 5 | 🎬 Replace `youtube-dl` with `yt-dlp` | 🟡 In progress | `███████████████░░░░░` 75% | `ytdlp-migration` |
 | 6 | 🔌 Audit / deprecate obsolete providers | 🟡 In progress | `███████████░░░░░░░░░` 55% | `provider-inventory` |
 | 7 | 🖼️ Modernize UI / runtime packaging | 🔵 Proposed | `█░░░░░░░░░░░░░░░░░░░` 5% | `javafx-modernization` |
 
@@ -112,7 +112,7 @@ branch `develop` created.
 
 ## 🎬 Phase 5 — Replace `youtube-dl` with `yt-dlp`
 
-🔵 **Proposed** · `████░░░░░░░░░░░░░░░░` 20%
+🟡 **In progress** · `███████████████░░░░░` 75%
 
 - Switch the `youtube` plugin's binary expectations from
   `youtube-dl` to `yt-dlp` (executable name, command flags,
@@ -120,7 +120,8 @@ branch `develop` created.
 - Migrate the default config (`application/core/configuration.xml`).
 - Provide a deprecation note for users still on `youtube-dl`.
 
-**Tracker** — `ytdlp-migration`.
+**Tracker** — `ytdlp-migration`. CLI contract: `docs/ytdlp-cli-compatibility.md`.
+Remaining: live fixture validation, `habitv-repo` `yt-dlp` tool zip publication.
 
 ---
 

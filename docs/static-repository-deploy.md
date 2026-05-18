@@ -126,7 +126,8 @@ If you deploy without the profile, run the publisher script after `mvn deploy`:
 ./scripts/static-repo/publish-repository-extras.sh
 ```
 
-Tool sources: `scripts/static-repo/tool-sources.properties`.
+Tool sources: `scripts/static-repo/tool-sources.properties` (includes `yt-dlp`;
+publish `tools/yt-dlp/latest/yt-dlp.zip` to `habitv-repo` in a follow-up PR).
 
 Skipped by default: `rtmpdump` (no reliable upstream Windows binary), `adobeHDS`
 (runtime expects `AdobeHDS.exe`; plugin ships `AdobeHDS.php` only).

@@ -41,7 +41,7 @@ public class YoutubePluginDownloader extends BaseUpdatablePlugin implements Plug
 		// }
 
 		try {
-			return (new YoutubeDLCmdExecutor(downloaders.getCmdProcessor(), cmd));
+			return (new YtDlpCmdExecutor(downloaders.getCmdProcessor(), cmd));
 		} catch (final ExecutorFailedException e) {
 			throw new DownloadFailedException(e);
 		}
@@ -69,7 +69,7 @@ public class YoutubePluginDownloader extends BaseUpdatablePlugin implements Plug
 
 	@Override
 	protected String[] getFilesToUpdate() {
-		return new String[] { "youtube-dl" };
+		return new String[] { "yt-dlp" };
 	}
 
 	@Override

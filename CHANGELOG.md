@@ -32,18 +32,21 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-05-18 | TBD | Migrate YouTube plugin downloader defaults to yt-dlp |
 | 2026-05-17 | `7a61dd6` | Add runnable yt-dlp runtime path for `consoleView` |
 
 ### 🧪 Tests
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-05-18 | TBD | Expand offline yt-dlp defaults and command wiring tests |
 | 2026-05-17 | `0163d9a` | Cover yt-dlp command wiring (offline test) |
 
 ### 📚 Documentation
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-05-18 | TBD | Document yt-dlp CLI compatibility and tracker progress |
 | 2026-05-17 | `750640d` | Update modernization status after console baseline |
 | 2026-05-16 | `be5b667` | Update plugin tester dependency tracker |
 | 2026-05-16 | `993f3d0` | Add AI agent repository instructions |
@@ -64,7 +67,7 @@ What it intentionally **does not yet change** (tracked separately):
 
 - ⬜ Legacy URLs (`dabiboo.free.fr`, Assembla SVN, FTP) — still present
 - ⬜ JavaFX 2.x / `${jdk.home}` packaging — `habiTv-linux` / `habiTv-windows` excluded from reactor
-- ⬜ `youtube-dl` → `yt-dlp` plugin command migration (wiring only, not flags)
+- 🟡 `youtube-dl` → `yt-dlp` plugin binary migration (in progress; see `ytdlp-migration`)
 - ⬜ Provider plugin inventory / dead-endpoint cleanup
 - ⬜ Hardcoded YouTube Data API key (PR [#29](https://github.com/Mika3578/habitv/pull/29) in flight)
 
