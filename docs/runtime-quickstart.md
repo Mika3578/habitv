@@ -128,8 +128,13 @@ plugin itself is fully wired (see
 `plugins/youtube/test/.../YoutubePluginDownloaderCmdTest.java`); the
 limitation is purely network policy of the runtime environment.
 
-Startup telemetry and plugin update checks are disabled by default.
-Enable only when needed: `-Dhabitv.stat.enabled=true`
-`-Dhabitv.stat.url=...` and/or `-Dhabitv.update.enabled=true`
-(optional `-Dhabitv.update.url=...`). Do not enable updates until
-HBTV-005 publishes verified static directory indexes.
+Startup telemetry is disabled by default. Enable only when needed:
+`-Dhabitv.stat.enabled=true` `-Dhabitv.stat.url=...`.
+
+Plugin update checks now follow the `<updateOnStartup>` setting in
+`configuration.xml` (defaults to `true` when the element is absent).
+The `habitv.update.enabled` system property is an explicit opt-out:
+set `-Dhabitv.update.enabled=false` to keep the kill-switch behavior
+needed while `static-repo-publish` has not yet published verified
+static directory indexes or the equivalent manifest. See the
+`update-default-enabled` ADR.

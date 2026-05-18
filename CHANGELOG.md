@@ -34,6 +34,12 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 |------|--------|--------|
 | 2026-05-17 | `7a61dd6` | Add runnable yt-dlp runtime path for `consoleView` |
 
+### 🐛 Fixes
+
+| Date | Commit | Change |
+|------|--------|--------|
+| 2026-05-18 | _pending_ | Honor `<updateOnStartup>true</updateOnStartup>` at double-click launch — `habitv.update.enabled` is now an opt-out (`=false` only) instead of an opt-in (`update-default-enabled` ADR) |
+
 ### 🧪 Tests
 
 | Date | Commit | Change |

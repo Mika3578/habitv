@@ -24,6 +24,7 @@ older ones rather than rewriting them in place.
 | `doc-sync-and-rule-lifecycle` | Doc sync protocol & rule lifecycle (meta-rules) | ✅ Accepted |
 | `descriptive-slug-ids` | Switch tracker / risk / ADR identifiers to descriptive slugs | ✅ Accepted |
 | `legacy-dabiboo-svn-removal` | Remove active legacy DabiBoo/SVN wiring from build and runtime paths | ✅ Accepted |
+| `update-default-enabled` | Honor `<updateOnStartup>` at launch; `habitv.update.enabled` becomes an explicit opt-out | 🟡 Proposed |
 
 ---
 
@@ -420,6 +421,68 @@ updates by default behind `habitv.update.enabled` with optional
   `index.html` or manifest files on GitHub Pages.
 - ✅ Functional Maven/publication cutover remains a separate
   `static-repo-publish` item.
+
+---
+
+## 🟡 `update-default-enabled` — Honor `<updateOnStartup>` at launch; `habitv.update.enabled` becomes an explicit opt-out
+
+| | |
+|---|---|
+| **Status** | 🟡 Proposed |
+| **Date** | 2026-05-18 |
+| **Tracker** | `legacy-url-migration` |
+| **Risks** | `legacy-update-pull`, `pages-layout-mismatch` |
+| **Supersedes** | partially `legacy-dabiboo-svn-removal` (the "disable runtime plugin updates by default behind `habitv.update.enabled`" clause only) |
+
+**Context** — `configuration.xml` ships with
+`<updateOnStartup>true</updateOnStartup>` and `XMLUserConfig` defaults
+to `true` even when the element is absent. The launchers
+(`ConsoleLauncher.init()`, `UpdateController.RunHabitvTask.call()`)
+correctly route the call to `CoreManager.update()` →
+`PluginManager.update()` → `UpdateManager.process()`. However,
+`UpdateManager.process()` opens with
+`if (!Boolean.getBoolean("habitv.update.enabled")) return;`, which
+short-circuits at every double-click launch because the JVM property
+is not set. The net effect is that JAR plugin updates are silently
+skipped while the XML config and UI splash say "updating".
+
+**Decision** — Invert the system-property gate. The property now acts
+as an explicit kill-switch (opt-out) rather than an opt-in:
+
+| `habitv.update.enabled` value | Behavior |
+|---|---|
+| unset (default) | run, gated upstream by `<updateOnStartup>` |
+| `true` | run (same as unset) |
+| `false` (case-insensitive) | skip with `INFO` log |
+| anything else | run (defensive: trust upstream gate) |
+
+The `<updateOnStartup>false</updateOnStartup>` XML setting remains the
+per-installation way to disable the feature. `-Dhabitv.update.enabled=false`
+remains the global JVM-level kill-switch for operators.
+
+**Consequences**
+- ✅ `<updateOnStartup>true</updateOnStartup>` is no longer a no-op at
+  double-click launch.
+- ⚠️ Repository layout work (`static-repo-publish`) is no longer the
+  hard gate. Safety now relies on the graceful fallback in
+  `UpdateManager.resolvePluginsToUpdate()` — if `plugins.txt` is
+  missing AND the manifest is empty or unreachable, `process()`
+  logs `"No plugins listed for update; keeping local plugins."`
+  and exits without touching local files (`UpdateManager.java:60-62`).
+- ⚠️ Operators who relied on "absent property = disabled" must now
+  set `-Dhabitv.update.enabled=false` explicitly to preserve the
+  prior behavior.
+- ✅ External tools (ZipExeUpdater path) were never gated by this
+  property; their behavior is unchanged (Windows-only, opt-in via
+  `<updateOnStartup>`).
+- ✅ `legacy-update-pull` mitigation is updated in
+  `risk-register.md` with a 2026-05-18 status note.
+
+**Validation** — `UpdateManagerTest.processSkipsWhenUpdatesExplicitlyDisabled`
+covers the explicit `=false` opt-out path. The unset/default path is
+not unit-tested because it would require the live repository or a
+fixture HTTP server; the existing graceful-fallback log
+(`"keeping local plugins"`) is the user-visible signal.
 
 ---
 

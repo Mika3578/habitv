@@ -223,6 +223,16 @@ base URL constant is `https://mika3578.github.io/habitv-repo/repository`
 `static-repo-publish` publishes Apache-style directory indexes or an
 equivalent manifest layout.
 
+**Status update (`update-default-enabled`, 2026-05-18)** —
+`habitv.update.enabled` flipped from opt-in to opt-out so the
+`<updateOnStartup>true</updateOnStartup>` XML setting is actually
+honored at double-click launch. The kill-switch is preserved as
+`-Dhabitv.update.enabled=false`. Repository layout work remains
+gated under `static-repo-publish`; the gating mechanism is now the
+absence of usable directory listings (404 / empty manifest), which
+keeps `keeping local plugins` as a safe fallback (UpdateManager.java
+line 61) rather than a hard property check.
+
 ---
 
 ## 🟡 Open — Medium / Low priority

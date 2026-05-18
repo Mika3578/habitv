@@ -42,8 +42,8 @@ public class UpdateManagerTest {
 	}
 
 	@Test
-	public void processSkipsWhenUpdatesDisabled() {
-		System.clearProperty(FrameworkConf.UPDATE_ENABLED_PROPERTY);
+	public void processSkipsWhenUpdatesExplicitlyDisabled() {
+		System.setProperty(FrameworkConf.UPDATE_ENABLED_PROPERTY, "false");
 		System.setProperty(FrameworkConf.UPDATE_URL_PROPERTY, "https://updates.must-not-be-used.example/repository/");
 
 		final AtomicInteger notifications = new AtomicInteger();

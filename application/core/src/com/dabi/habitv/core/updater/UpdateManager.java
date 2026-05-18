@@ -44,8 +44,11 @@ public class UpdateManager {
 	}
 
 	public void process() {
-		if (!Boolean.getBoolean(FrameworkConf.UPDATE_ENABLED_PROPERTY)) {
-			LOG.debug("Plugin update check is disabled.");
+		final String enabledOverride = System.getProperty(
+				FrameworkConf.UPDATE_ENABLED_PROPERTY);
+		if ("false".equalsIgnoreCase(enabledOverride)) {
+			LOG.info("Plugin update check is disabled by system property '"
+					+ FrameworkConf.UPDATE_ENABLED_PROPERTY + "=false'.");
 			return;
 		}
 		final String updateSite = System.getProperty(
