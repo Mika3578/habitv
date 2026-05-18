@@ -44,12 +44,22 @@ public class YoutubePluginManager extends BasePluginWithProxy implements PluginP
 
 	@Override
 	public Set<EpisodeDTO> findEpisode(CategoryDTO category) {
+		requireApiKey();
 		if (PLAYLIST.equals(category.getFatherCategory().getName())) {
 			return findEpisodePlaylist(category, TemplateUtils.getParamValues(category.getId()));
 		} else if (TOP.equals(category.getFatherCategory().getName())) {
 			return findEpisodeTop(category, TemplateUtils.getParamValues(category.getId()));
 		} else {
 			throw new TechnicalException(category.getFatherCategory().getId() + " unknow");
+		}
+	}
+
+	static void requireApiKey() {
+		if (YoutubeConf.resolveApiKey() == null) {
+			throw new TechnicalException(
+					"YouTube Data API v3 key is missing. Set the 'HABITV_YOUTUBE_API_KEY' environment variable"
+							+ " or the 'habitv.youtube.apiKey' system property before starting habitv."
+							+ " Create a key at https://console.cloud.google.com/ (enable YouTube Data API v3).");
 		}
 	}
 
