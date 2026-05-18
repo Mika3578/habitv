@@ -108,3 +108,24 @@ supersede older ones rather than rewriting them in place.
   remain explicit. PR #25 and PR #26 must be retargeted/rebased to
   `develop` (or recreated as scoped follow-ups) after this baseline
   lands.
+
+## ADR-0007 — Remove active legacy DabiBoo/SVN wiring from build and runtime paths
+
+- Status: Accepted
+- Date: 2026-05-17
+- Context: Active code and Maven metadata still referenced legacy
+  endpoints (`dabiboo.free.fr`, `scm:svn` on Assembla, and
+  `cpt.php` telemetry). These endpoints are either unavailable or no
+  longer acceptable for modern secure/reproducible builds.
+- Decision: Replace active Maven repository base URL with
+  `https://mika3578.github.io/habitv-repo/repository`, replace/remove
+  active SVN/Assembla SCM metadata in POMs in favor of GitHub SCM
+  metadata inheritance, disable startup telemetry by default behind
+  `habitv.stat.enabled` / `habitv.stat.url`, and disable runtime plugin
+  updates by default behind `habitv.update.enabled` with optional
+  `habitv.update.url` (defaulting to the GitHub Pages base when enabled).
+- Consequences: Build/runtime wiring no longer depends on legacy
+  DabiBoo/free.fr/SVN endpoints. `FindArtifactUtils` still expects
+  Apache-style HTML directory indexes; do not enable updates until HBTV-005
+  publishes verified static `index.html` or manifest files on GitHub Pages.
+  Functional Maven/publication cutover remains a separate HBTV-005 item.

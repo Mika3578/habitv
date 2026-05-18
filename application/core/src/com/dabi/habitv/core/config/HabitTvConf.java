@@ -13,7 +13,12 @@ public interface HabitTvConf {
 
 	String CONF_FILE = "configuration.xml";	
 
-	String STAT_URL = "http://dabiboo.free.fr/cpt.php";
+	String STAT_ENABLED_PROPERTY = "habitv.stat.enabled";
+
+	String STAT_URL_PROPERTY = "habitv.stat.url";
+
+	// Telemetry endpoint is disabled by default and requires explicit opt-in.
+	String STAT_URL_DISABLED = "";
 	
 	String LOG_FILE = "habiTv.log"; 
 
