@@ -1,26 +1,37 @@
 package com.dabi.habitv.provider.arte;
 
-import java.util.Collection;
+import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import com.dabi.habitv.api.plugin.api.PluginProviderDownloaderInterface;
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.DownloadParamDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
 import com.dabi.habitv.api.plugin.exception.DownloadFailedException;
+import com.dabi.habitv.api.plugin.exception.TechnicalException;
 import com.dabi.habitv.api.plugin.holder.DownloaderPluginHolder;
 import com.dabi.habitv.api.plugin.holder.ProcessHolder;
 import com.dabi.habitv.framework.plugin.api.BasePluginWithProxy;
 import com.dabi.habitv.framework.plugin.utils.DownloadUtils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ArtePluginManager extends BasePluginWithProxy implements PluginProviderDownloaderInterface { // NO_UCD
+
+	private static final Pattern EPISODE_URL_PATTERN = Pattern.compile(
+			"https://www\\.arte\\.tv/[a-z]{2}/videos/\\d{6}-\\d{3}-[AF]/[^\"'\\s<>]+");
+
+	private static final String CATEGORY_ID_SEPARATOR = ":";
+
+	private static final int MAX_ZONE_PAGES = 25;
+
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Override
 	public String getName() {
@@ -29,85 +40,148 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 
 	@Override
 	public Set<EpisodeDTO> findEpisode(final CategoryDTO category) {
-		final Set<EpisodeDTO> episodes = new LinkedHashSet<>();
-
-		Document doc = Jsoup.parse(getUrlContent(category.getId()));
-		for (Element aEp : doc.select("section#videos article a")) {
-			String url = ArteConf.HOME_URL + aEp.attr("href");
-			final String name = aEp.select("h3").first().text();
-			if (!StringUtils.isEmpty(name)) {
-				episodes.add(new EpisodeDTO(category, name, url));
-			}
+		final String[] categoryParts = parseCategoryId(category.getId());
+		if (categoryParts == null) {
+			return new LinkedHashSet<>();
 		}
-//		for (Element aEp : doc.select("div#playlistContainer li")) {
-//			String url = ArteConf.HOME_URL + aEp.attr("href");
-//			final String name = aEp.select("h3").first().text();
-//			if (!StringUtils.isEmpty(name)) {
-//				episodes.add(new EpisodeDTO(category, name, url));
-//			}
-//		}		
-		return episodes;
+		try {
+			return loadEpisodesFromPage(category, categoryParts[0], categoryParts[1]);
+		} catch (final TechnicalException e) {
+			return new LinkedHashSet<>();
+		}
 	}
 
 	@Override
 	public Set<CategoryDTO> findCategory() {
 		final Set<CategoryDTO> categories = new LinkedHashSet<>();
 
-		final Document doc = Jsoup.parse(getUrlContent(ArteConf.HOME_URL));
-
-		final Elements aChannels = doc.select("ul.next-language__list li.next-language__list-item a");
-
-		for (final Element aLanguage : aChannels) {
-			String href = aLanguage.attr("href");
-			String language = aLanguage.text();
-			CategoryDTO languageCat = new CategoryDTO(ArteConf.NAME, language, href, ArteConf.EXTENSION);
+		for (final String[] language : ArteConf.LANGUAGES) {
+			final String langCode = language[0];
+			final String langLabel = language[1];
+			final String homeUrl = ArteConf.HOME_URL + "/" + langCode + "/";
+			final CategoryDTO languageCat = new CategoryDTO(ArteConf.NAME, langLabel, homeUrl, ArteConf.EXTENSION);
 			languageCat.setDownloadable(false);
-			languageCat.addSubCategories(findCategoryByLanguage(href));
+			for (final String[] pageCode : ArteConf.PAGE_CODES) {
+				final String categoryId = buildCategoryId(langCode, pageCode[0]);
+				final CategoryDTO mainCategory = new CategoryDTO(ArteConf.NAME, pageCode[1], categoryId, ArteConf.EXTENSION);
+				mainCategory.setDownloadable(true);
+				languageCat.addSubCategory(mainCategory);
+			}
 			categories.add(languageCat);
 		}
 
 		return categories;
 	}
 
-	private Collection<CategoryDTO> findCategoryByLanguage(String languageUrl) {
-		final Set<CategoryDTO> categories = new LinkedHashSet<>();
-
-		final Document doc = Jsoup.parse(getUrlContent(languageUrl));
-
-		final Elements aMainCats = doc.select("ul.next-menu-nav__main-menu li.next-menu-nav__menu-item a");
-
-		for (final Element aMainCat : aMainCats) {
-			String url = ArteConf.HOME_URL + aMainCat.attr("href");
-			String text = aMainCat.text();
-			CategoryDTO mainCat = new CategoryDTO(ArteConf.NAME, text, url, ArteConf.EXTENSION);
-			mainCat.setDownloadable(false);
-			mainCat.addSubCategories(findSubCategory(url));
-			categories.add(mainCat);
+	private Set<EpisodeDTO> loadEpisodesFromPage(final CategoryDTO category, final String languageCode, final String pageCode) {
+		final Set<EpisodeDTO> episodes = new LinkedHashSet<>();
+		final String pageUrl = buildPageUrl(languageCode, pageCode);
+		final JsonNode pageRoot = parseJson(getUrlContent(pageUrl), pageUrl);
+		final JsonNode zones = pageRoot.path("value").path("zones");
+		if (!zones.isArray()) {
+			return episodes;
 		}
-
-		return categories;
+		for (final JsonNode zone : zones) {
+			final JsonNode content = zone.path("content");
+			addEpisodesFromDataNode(category, episodes, content.path("data"));
+			loadZonePagination(category, episodes, languageCode, pageCode, zone.path("code").asText(), content.path("pagination"));
+		}
+		return episodes;
 	}
 
-	private Collection<CategoryDTO> findSubCategory(String catUrl) {
-		final Set<CategoryDTO> categories = new LinkedHashSet<>();
-
-		final Document doc = Jsoup.parse(getUrlContent(catUrl));
-
-		addSubCategories(categories, doc, "collections");
-		//addSubCategories(categories, doc, "playlists_");
-
-		return categories;
+	private void loadZonePagination(final CategoryDTO category, final Set<EpisodeDTO> episodes, final String languageCode,
+			final String pageCode, final String zoneCode, final JsonNode pagination) {
+		if (StringUtils.isEmpty(zoneCode) || !pagination.has("pages")) {
+			return;
+		}
+		final int pages = Math.min(pagination.path("pages").asInt(1), MAX_ZONE_PAGES);
+		for (int pageNumber = 2; pageNumber <= pages; pageNumber++) {
+			final String zoneUrl = buildZoneUrl(languageCode, zoneCode, pageCode, pageNumber);
+			try {
+				final JsonNode zoneRoot = parseJson(getUrlContent(zoneUrl), zoneUrl);
+				addEpisodesFromDataNode(category, episodes, zoneRoot.path("value").path("data"));
+			} catch (final TechnicalException e) {
+				// EMAC sometimes reports extra pages that return HTTP 400; keep already fetched episodes.
+				break;
+			}
+		}
 	}
 
-	private void addSubCategories(final Set<CategoryDTO> categories, final Document doc, String clazz) {
-		final Elements aMainCats = doc.select("div[class~="+clazz+"_] article a");
+	private void addEpisodesFromDataNode(final CategoryDTO category, final Set<EpisodeDTO> episodes, final JsonNode data) {
+		if (!data.isArray()) {
+			return;
+		}
+		final Map<String, EpisodeDTO> episodeByUrl = new LinkedHashMap<>();
+		for (final EpisodeDTO episode : episodes) {
+			episodeByUrl.put(episode.getId(), episode);
+		}
+		for (final JsonNode item : data) {
+			addEpisodeFromTeaser(category, episodeByUrl, item);
+		}
+		episodes.clear();
+		episodes.addAll(episodeByUrl.values());
+	}
 
-		for (final Element aMainCat : aMainCats) {
-			String href = aMainCat.attr("href");
-			String text = aMainCat.select("h3").first().text();
-			CategoryDTO cat = new CategoryDTO(ArteConf.NAME, text, href, ArteConf.EXTENSION);
-			cat.setDownloadable(true);
-			categories.add(cat);
+	private void addEpisodeFromTeaser(final CategoryDTO category, final Map<String, EpisodeDTO> episodeByUrl, final JsonNode item) {
+		final String url = resolveUrl(item.path("url").asText(null));
+		if (StringUtils.isEmpty(url) || !EPISODE_URL_PATTERN.matcher(url).find()) {
+			return;
+		}
+		String title = item.path("title").asText(null);
+		if (StringUtils.isEmpty(title)) {
+			title = item.path("subtitle").asText(null);
+		}
+		if (StringUtils.isEmpty(title)) {
+			return;
+		}
+		if (!episodeByUrl.containsKey(url)) {
+			episodeByUrl.put(url, new EpisodeDTO(category, title, url));
+		}
+	}
+
+	private String buildCategoryId(final String languageCode, final String pageCode) {
+		return languageCode + CATEGORY_ID_SEPARATOR + pageCode;
+	}
+
+	private String[] parseCategoryId(final String categoryId) {
+		if (StringUtils.isEmpty(categoryId)) {
+			return null;
+		}
+		final String[] parts = categoryId.split(CATEGORY_ID_SEPARATOR);
+		if (parts.length != 2 || StringUtils.isEmpty(parts[0]) || StringUtils.isEmpty(parts[1])) {
+			return null;
+		}
+		return parts;
+	}
+
+	private String buildPageUrl(final String languageCode, final String pageCode) {
+		return ArteConf.EMAC_API_BASE + "/" + languageCode + "/web/pages/" + pageCode + "/?authorizedCountry="
+				+ ArteConf.AUTHORIZED_COUNTRY;
+	}
+
+	private String buildZoneUrl(final String languageCode, final String zoneCode, final String pageCode, final int pageNumber) {
+		return ArteConf.EMAC_API_BASE + "/" + languageCode + "/web/zones/" + zoneCode + "/content?page=" + pageNumber
+				+ "&pageId=" + pageCode + "&authorizedCountry=" + ArteConf.AUTHORIZED_COUNTRY;
+	}
+
+	private String resolveUrl(final String url) {
+		if (StringUtils.isEmpty(url)) {
+			return url;
+		}
+		if (url.startsWith("http://") || url.startsWith("https://")) {
+			return url;
+		}
+		if (url.startsWith("/")) {
+			return ArteConf.HOME_URL + url;
+		}
+		return ArteConf.HOME_URL + "/" + url;
+	}
+
+	private JsonNode parseJson(final String json, final String sourceUrl) {
+		try {
+			return objectMapper.readTree(json);
+		} catch (final IOException e) {
+			throw new TechnicalException("Cannot parse Arte EMAC response from " + sourceUrl, e);
 		}
 	}
 
