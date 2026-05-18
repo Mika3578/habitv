@@ -43,12 +43,14 @@ governance-only PR.
 ## Required PR checks
 
 The **CI** workflow (`.github/workflows/ci.yml`) must pass on pull requests
-targeting `develop`. The required ruleset status check name is:
+targeting `develop`. The currently observed required ruleset status check name
+from a green PR run is:
 
 - `validate (zulu-8)`
 
-If GitHub displays a different check name (for example `CI / validate (zulu-8)`),
-align the ruleset with the name shown on a completed workflow run.
+If GitHub displays a different check name in the ruleset UI (for example
+`CI / validate (zulu-8)`), align the ruleset with the exact name shown on a
+completed workflow run.
 
 ## Security policy summary
 
@@ -70,7 +72,7 @@ Repository rulesets (preferred over legacy branch protection):
 | Ruleset | Targets | Intent |
 |---------|---------|--------|
 | `protect-develop` | `refs/heads/develop` | PR required, linear history, required CI check, up-to-date branch, conversation resolution, no force-push or deletion. |
-| `protect-stable-branches` | `refs/heads/master`, `refs/heads/main` (if present) | PR required, linear history, no force-push or deletion. |
+| `protect-stable-branches` | `refs/heads/master` | PR required, linear history, no force-push or deletion. |
 | `protect-release-tags` | `refs/tags/v*` | Prevent tag deletion and non-fast-forward updates; restrict tag changes where supported. |
 
 See `docs/github-rulesets/` for API payloads when rulesets must be applied

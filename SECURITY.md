@@ -1,6 +1,6 @@
 # Security policy
 
-## Supported branch
+## Supported branches
 
 Security fixes are accepted against **`develop`**, the active integration branch.
 
