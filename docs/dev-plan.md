@@ -10,7 +10,7 @@ work from a later phase.
 ## 🎯 Phase progress
 
 ```
-██████████████████░░░░░░  76%   (5 / 7 phases done, 1 in progress)
+███████████████░░░░░  77%   (5 / 7 phases done, 1 in progress)
 ```
 
 | Phase | Title | Status | Progress | Tracker items |
