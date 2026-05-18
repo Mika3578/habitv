@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Iterator;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -46,6 +47,7 @@ import com.dabi.habitv.utils.FileUtils;
 import com.dabi.habitv.utils.XMLUtils;
 
 public class XMLUserConfig implements UserConfig {
+	private static final String YOUTUBE_API_KEY = "youtubeApiKey";
 
 	private static final int DEFAULT_MAX_ATTEMPTS = 5;
 
@@ -486,6 +488,11 @@ public class XMLUserConfig implements UserConfig {
 	}
 
 	@Override
+	public String getYoutubeApiKey() {
+		return normalizeValue(getDownloader().get(YOUTUBE_API_KEY));
+	}
+
+	@Override
 	public void setMaxAttempts(int maxAttemps) {
 		DownloadConfig downloadConfig = loadDownloadConfig();
 		downloadConfig.setMaxAttempts(maxAttemps);
@@ -525,6 +532,46 @@ public class XMLUserConfig implements UserConfig {
 	public void setDemonCheckTime(int demonCheckTime) {
 		DownloadConfig downloadConfig = loadDownloadConfig();
 		downloadConfig.setDemonCheckTime(demonCheckTime);
+	}
+
+	@Override
+	public void setYoutubeApiKey(String youtubeApiKey) {
+		String normalizedValue = normalizeValue(youtubeApiKey);
+		Downloaders downloaders = loadDownloaders();
+		Iterator<Object> iterator = downloaders.getAny().iterator();
+		while (iterator.hasNext()) {
+			Object downloader = iterator.next();
+			if (YOUTUBE_API_KEY.equals(XMLUtils.getTagName(downloader))) {
+				if (normalizedValue == null) {
+					iterator.remove();
+				} else {
+					XMLUtils.setTagValue(downloader, normalizedValue);
+				}
+				return;
+			}
+		}
+		if (normalizedValue != null) {
+			downloaders.getAny().add(
+					XMLUtils.buildAnyElement(YOUTUBE_API_KEY, normalizedValue));
+		}
+	}
+
+	private Downloaders loadDownloaders() {
+		DownloadConfig downloadConfig = loadDownloadConfig();
+		Downloaders downloaders = downloadConfig.getDownloaders();
+		if (downloaders == null) {
+			downloaders = new Downloaders();
+			downloadConfig.setDownloaders(downloaders);
+		}
+		return downloaders;
+	}
+
+	private String normalizeValue(String value) {
+		if (value == null) {
+			return null;
+		}
+		String trimmed = value.trim();
+		return trimmed.isEmpty() ? null : trimmed;
 	}
 
 }

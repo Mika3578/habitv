@@ -344,3 +344,33 @@ Status legend: `proposed`, `in-progress`, `blocked`, `done`,
     `http://dabiboo.free.fr/repository` for these internal artifacts.
   - Scope is Maven dependency alignment only; obsolete provider
     endpoints and runtime plugin availability remain out of scope.
+
+## HBTV-013 — YouTube Data API key externalization
+
+- Status: in-progress
+- Priority: P1
+- Scope: Remove the hardcoded YouTube Data API key from
+  `plugins/youtube` and use runtime-provided configuration so 403
+  failures from revoked/restricted keys are diagnosable without
+  shipping credentials.
+- Acceptance criteria:
+  - `YoutubeConf` no longer embeds a concrete API key value.
+  - `YoutubePluginManager` resolves the key from runtime configuration.
+  - `trayView` configuration exposes a user-editable YouTube API key field
+    persisted in local user configuration.
+  - Playlist API request URL only includes supported parameters.
+  - Error messages include API request context while masking key values.
+- Validation:
+  - `mvn -B -ntp -DskipTests -pl plugins/youtube -am validate`
+    -> `BUILD SUCCESS`.
+  - `mvn -B -ntp -DskipTests -pl application/trayView,plugins/youtube -am compile`
+    -> `BUILD SUCCESS`.
+  - `mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeConfTest -Dsurefire.failIfNoSpecifiedTests=false test`
+    -> `BUILD SUCCESS`.
+- PR: TBD.
+- Notes:
+  - End users can set the key from the tray configuration tab; no
+    environment variable is required for standard usage.
+  - Runtime key lookup order: Java property
+    `habitv.youtube.apiKey`, then environment variable
+    `HABITV_YOUTUBE_API_KEY`.

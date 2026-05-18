@@ -7,6 +7,10 @@ public class TechnicalException extends RuntimeException {
 		super(e);
 	}
 
+	public TechnicalException(final String message, final Throwable cause) {
+		super(message, cause);
+	}
+
 	public TechnicalException(final String string) {
 		super(string);
 	}
