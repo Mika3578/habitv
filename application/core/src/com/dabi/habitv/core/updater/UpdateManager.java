@@ -44,8 +44,10 @@ public class UpdateManager {
 	}
 
 	public void process() {
-		if (!Boolean.getBoolean(FrameworkConf.UPDATE_ENABLED_PROPERTY)) {
-			LOG.debug("Plugin update check is disabled.");
+		final boolean updateEnabled = resolveUpdateEnabled();
+		if (!updateEnabled) {
+			LOG.info("Plugin update check is disabled by "
+					+ FrameworkConf.UPDATE_ENABLED_PROPERTY + "=false.");
 			return;
 		}
 		final String updateSite = System.getProperty(
@@ -73,6 +75,25 @@ public class UpdateManager {
 		} catch (Exception e) {
 			LOG.error("Plugin update failed; keeping local plugins.", e);
 		}
+	}
+
+	private static boolean resolveUpdateEnabled() {
+		final String configured = System
+				.getProperty(FrameworkConf.UPDATE_ENABLED_PROPERTY);
+		if (configured == null) {
+			return true;
+		}
+		final String normalized = configured.trim();
+		if ("true".equalsIgnoreCase(normalized)) {
+			return true;
+		}
+		if ("false".equalsIgnoreCase(normalized)) {
+			return false;
+		}
+		LOG.warn("Ignoring invalid " + FrameworkConf.UPDATE_ENABLED_PROPERTY
+				+ " value \"" + configured
+				+ "\"; defaulting to enabled update checks.");
+		return true;
 	}
 
 	public Publisher<UpdatePluginEvent> getUpdatePublisher() {
