@@ -49,31 +49,6 @@ resolve_static_repo_path() {
   print_resolution_help_and_fail
 }
 
-assert_git_checkout() {
-  repo_path=$1
-  if ! git -C "$repo_path" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    echo "Path is not a Git checkout: $repo_path" >&2
-    exit 1
-  fi
-}
-
-assert_habitv_repo_remote() {
-  repo_path=$1
-  remote_url=$(git -C "$repo_path" remote get-url origin 2>/dev/null || true)
-  if [ -z "$remote_url" ]; then
-    echo "Unable to read origin remote for $repo_path" >&2
-    exit 1
-  fi
-
-  case "$remote_url" in
-    *Mika3578/habitv-repo|*Mika3578/habitv-repo.git) ;;
-    *)
-      echo "Static repository origin must target Mika3578/habitv-repo. Found: $remote_url" >&2
-      exit 1
-      ;;
-  esac
-}
-
 repo_root=$(get_repo_root)
 resolved_static_repo_path=$(resolve_static_repo_path "${1-}" "$repo_root")
 
@@ -82,21 +57,21 @@ if [ ! -d "$resolved_static_repo_path" ]; then
   exit 1
 fi
 
-assert_git_checkout "$resolved_static_repo_path"
-assert_habitv_repo_remote "$resolved_static_repo_path"
+resolved_repository_path="$resolved_static_repo_path/repository"
+mkdir -p "$resolved_repository_path"
 
-resolved_static_repo_maven_path="$resolved_static_repo_path/maven"
-mkdir -p "$resolved_static_repo_maven_path"
+echo "Deploying Maven artifacts to: file://$resolved_repository_path"
+(
+  CDPATH= cd -- "$repo_root"
+  mvn -B -ntp -DskipTests clean deploy \
+    -DaltDeploymentRepository=habitv-local::default::file://../habitv-repo/repository
+)
 
-echo "Deploying Maven artifacts to: habitv-static-repo::default::file:///$resolved_static_repo_maven_path"
-mvn -B -ntp -DskipTests deploy \
-  "-DaltDeploymentRepository=habitv-static-repo::default::file:///$resolved_static_repo_maven_path"
-
-git -C "$resolved_static_repo_path" add .
-if git -C "$resolved_static_repo_path" diff --cached --quiet; then
-  echo "No artifact changes to publish."
-  exit 0
-fi
-
-git -C "$resolved_static_repo_path" commit -m "repo: publish Habitv Maven artifacts"
-git -C "$resolved_static_repo_path" push
+cat <<EOF
+Deploy complete. Publish with:
+  cd "$resolved_static_repo_path"
+  git status --short
+  git add repository
+  git commit -m "repo: publish habitv artifacts"
+  git push
+EOF
