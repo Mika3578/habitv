@@ -191,3 +191,176 @@ This file is reviewed:
   version, OS targets).
 
 Last refresh: see the latest commit touching this file.
+
+---
+
+## 🔄 11. Doc sync protocol (after every step)
+
+**Rule** — every commit that changes meaningful state must keep the
+documentation set in lockstep. A "meaningful state change" is any
+commit that creates, advances, completes, mitigates, supersedes, or
+contradicts an item that is already documented.
+
+### 11.1 What to update, by commit type
+
+| Type | `CHANGELOG.md` | `dev-tracker.{md,json}` | `risk-register.md` | `decision-log.md` |
+|------|:---:|:---:|:---:|:---:|
+| `feat` | ✅ Features | ✅ status / progress | 🟡 if mitigates | 🟡 if architectural |
+| `fix` | ✅ Fixes | 🟡 progress | 🟡 if mitigates | ❌ |
+| `refactor` | ✅ | ❌ | ❌ | 🟡 if shape change |
+| `perf` | ✅ | ❌ | ❌ | ❌ |
+| `docs` | 🟡 if user-facing | ✅ if scope/status | ✅ if risk listed | ✅ if ADR proposed |
+| `test` | ✅ Tests | 🟡 progress | 🟡 R-005 quarantine | ❌ |
+| `chore` | 🟡 if user-facing | ❌ | ❌ | ❌ |
+| `build` | ✅ Build | 🟡 progress | 🟡 if removes blocker | 🟡 if topology |
+| `ci` | ✅ Build | 🟡 progress | ❌ | ❌ |
+| `style` | ❌ | ❌ | ❌ | ❌ |
+| `revert` | ✅ | ✅ reopen | ✅ reopen | 🔁 supersede |
+
+`✅` = required when the commit touches that area · `🟡` = required
+**if** the commit's content matches the condition next to the icon ·
+`❌` = leave alone.
+
+### 11.2 What to update, by milestone
+
+| Milestone | Required updates |
+|---|---|
+| **PR merged** | Bump `progressPercent` on each item the PR advanced. Recompute the `summary` block in `dev-tracker.json`. Refresh the dashboard tables in `dev-tracker.md`, `dev-plan.md`, `risk-register.md`. |
+| **All criteria met for an item** | Flip `status` to `done`, set `progressPercent: 100`, recompute summaries, add a CHANGELOG entry summarizing the item. |
+| **Phase completed** | Mark the phase done in `dev-plan.md`. Recompute the phase progress bar. Refresh AGENTS.md "Current state at a glance" table (Section 1). |
+| **New risk identified** | Add row to `risk-register.md` dashboard table AND a dedicated section below it. Link from the relevant tracker item. |
+| **Risk mitigated** | Move the risk to the 🟢 Mitigated bucket. Annotate the mitigating PR in its `Status update` line. |
+| **New decision** | Append an ADR in `decision-log.md` and update its dashboard table. Reference the ADR id from any item it constrains. |
+
+### 11.3 How to verify before a PR
+
+The agent MUST run this checklist before requesting review:
+
+```bash
+# 1. The two tracker files agree on item ids
+diff <(grep -oE 'HBTV-[0-9]+' docs/dev-tracker.md  | sort -u) \
+     <(grep -oE 'HBTV-[0-9]+' docs/dev-tracker.json | sort -u)
+
+# 2. The JSON parses
+python3 -c "import json; json.load(open('docs/dev-tracker.json'))"
+
+# 3. The progress summary matches the items
+#    summary.done == count(items where status==done), etc.
+
+# 4. CHANGELOG has an Unreleased entry referencing this PR if user-facing
+grep -F "$(git rev-parse --short HEAD)" CHANGELOG.md || true
+```
+
+A PR that flunks 11.1, 11.2, or 11.3 must be amended before merge.
+
+---
+
+## 🧬 12. Rule lifecycle — meta-rules
+
+This section is the rulebook **about** the rulebook. It governs how
+rules in `AGENTS.md` can be created, modified, or deleted, including
+the rules in this very section.
+
+### 12.1 Rule identification
+
+Every rule is uniquely identified by its **section heading + index**:
+
+- `2.5` — "Replace `youtube-dl` plugin behavior with `yt-dlp`"
+  (a hard rule from Section 2's table)
+- `3` — "Conventional Commits …" (a process rule from Section 3)
+- `12.3` — "Modify a rule" (a meta-rule, this section)
+
+Rule classes and their breakage consequence:
+
+| Class | Found in | Breakage consequence |
+|------|---------|----------------------|
+| 🔴 **Hard rule** | Section 2 | PR reverted; incident logged |
+| 🟠 **Process rule** | Sections 3–11 | PR amended; warning logged |
+| 🟣 **Meta-rule** | Section 12 | PR blocked at review; cannot proceed without compliance |
+
+### 12.2 Create a rule
+
+To **add** a new rule:
+
+1. Open or update an ADR in `docs/decision-log.md` with status
+   `🟡 Proposed`. The ADR must carry:
+   - **Context** — why the rule is needed.
+   - **Decision** — the rule's exact wording.
+   - **Consequences** — what it constrains and how it interacts with
+     existing rules.
+2. Add the rule text to `AGENTS.md` in the same PR.
+3. If the rule is a 🔴 hard rule (Section 2), it must reference a
+   risk from `risk-register.md`. If no relevant risk exists, add one
+   in the same PR.
+4. On merge, the ADR transitions from `🟡 Proposed` to
+   `✅ Accepted`.
+
+### 12.3 Modify a rule
+
+To **change** an existing rule's wording, scope, or strictness:
+
+1. Open a new ADR (do not edit the old one) that **supersedes** the
+   prior ADR. Use the metadata line `Supersedes: ADR-00XX`.
+2. Edit the rule text in `AGENTS.md` in the same PR.
+3. Update the ADR dashboard in `decision-log.md`: the older ADR
+   becomes `🔁 Superseded`; the new one is `✅ Accepted` on merge.
+4. If the change weakens a 🔴 hard rule, the ADR must explicitly
+   identify the residual risk and link the `R-0XX` entry that now
+   carries it.
+
+### 12.4 Delete a rule
+
+To **remove** a rule entirely:
+
+1. Open an ADR with status `🟡 Proposed`. The decision must:
+   - Quote the removed rule verbatim.
+   - Explain why it is no longer needed (changed reality, replaced
+     by a different mechanism, etc.).
+   - Identify any residual risk that must be accepted, and link the
+     `R-0XX` entry created for it.
+2. Remove the rule text from `AGENTS.md` in the same PR.
+3. If the deleted rule was a 🔴 hard rule, the PR requires explicit
+   owner approval and cannot be self-approved by an AI agent.
+
+### 12.5 Conflict-of-interest safeguards
+
+These hold for AI agents in particular:
+
+- 🚫 An agent **may not** delete or weaken a hard rule in the same
+  PR that benefits from doing so. Split into two PRs: first the
+  rulebook change, then the work it enables.
+- 🚫 An agent **may not** silently amend a rule. Every change goes
+  through 12.2 / 12.3 / 12.4 with an ADR.
+- 🚫 An agent **may not** create a rule that exempts itself, a
+  specific tool, a specific branch, or a specific user from the
+  meta-rules.
+- ✅ An agent **must** flag a conflict between two existing rules
+  the moment it observes one, even if it does not have authority
+  to resolve it.
+
+### 12.6 Self-modification of meta-rules
+
+The meta-rules in Section 12 themselves can be changed — but with
+extra care:
+
+- The ADR proposing a change to Section 12 must remain in
+  `🟡 Proposed` for **at least 7 days** before it can be merged.
+- The cooling-off period prevents an agent from instantly weakening
+  its own constraints inside a single working session.
+- This 7-day cooling-off **does not apply** to fixing typos,
+  formatting, or clarifications that demonstrably do not change the
+  rules' force.
+
+### 12.7 Audit trail
+
+Any change to `AGENTS.md` must leave traceable evidence:
+
+- The commit message references the ADR id introducing or
+  superseding the change (e.g. `docs(agents): ... (ADR-0007)`).
+- The ADR references the section/rule it touches (e.g.
+  `Touches: AGENTS.md §11, §12`).
+- The dashboard tables in `decision-log.md` and `dev-tracker.md`
+  are refreshed in the same PR.
+
+A change that breaks the audit trail is invalid and must be
+reverted.

@@ -16,6 +16,7 @@ older ones rather than rewriting them in place.
 | `ADR-0004` | `habitv-repo` as the future static artifact repository | 🟡 Proposed |
 | `ADR-0005` | Provider cleanup is separate from build / governance bootstrap | ✅ Accepted |
 | `ADR-0006` | Runnable console baseline on `develop` before broader modernization | ✅ Accepted |
+| `ADR-0007` | Doc sync protocol & rule lifecycle (meta-rules) | ✅ Accepted |
 
 ---
 
@@ -190,6 +191,76 @@ provider cleanup out of scope.
   separately.
 - 🔁 PR #25 and PR #26 must be retargeted/rebased to `develop` (or
   recreated as scoped follow-ups) after this baseline lands.
+
+---
+
+## ✅ ADR-0007 — Doc sync protocol & rule lifecycle (meta-rules)
+
+| | |
+|---|---|
+| **Status** | ✅ Accepted |
+| **Date** | 2026-05-18 |
+| **Touches** | `AGENTS.md` §11, §12 |
+| **Supersedes** | — (additive) |
+
+**Context** — The repository now carries six tracked documents
+(`CHANGELOG.md`, `AGENTS.md`, `dev-tracker.md`, `dev-tracker.json`,
+`dev-plan.md`, `risk-register.md`, `decision-log.md`). They each
+encode a different facet of the modernization state and must agree
+with reality at all times. Two gaps remained after the docs refresh:
+
+1. **No explicit cadence** for keeping these documents in sync after
+   each step. Agents and humans were free to update some but not
+   others, creating drift.
+2. **No governance** for the rulebook itself. Rules in `AGENTS.md`
+   could be added, weakened, or quietly removed by any commit, with
+   no traceable approval and no protection against an AI agent
+   exempting itself from a constraint inside the very PR that
+   benefits from the exemption.
+
+**Decision** — Add two sections to `AGENTS.md`:
+
+- **§11 Doc sync protocol** — a table mapping each Conventional
+  Commits type to the documents that must be updated, a table of
+  per-milestone updates (PR merge, item completion, phase end, new
+  risk, new decision), and a pre-PR verification checklist. The
+  protocol is binding for every commit that changes meaningful
+  state.
+
+- **§12 Rule lifecycle (meta-rules)** — a self-applying rulebook
+  governing how rules in `AGENTS.md` can be created, modified, or
+  deleted. Three classes of rule (🔴 hard, 🟠 process, 🟣 meta) with
+  proportionate consequences on breakage. Every rule change requires
+  an ADR; rule deletions that remove a safeguard must point at the
+  risk-register entry that takes over. AI-specific conflict-of-
+  interest safeguards forbid an agent from weakening a hard rule
+  inside the same PR that benefits from the change. Section 12
+  protects itself with a **7-day cooling-off period** before any of
+  its own rules can be merged-changed (typos and formatting excepted).
+
+**Consequences**
+
+- ✅ Drift between the tracker, plan, risk register, decision log,
+  and changelog is now formally detectable: §11.3 ships a four-step
+  verification command set.
+- ✅ The rulebook is self-protecting against silent weakening: every
+  rule change requires an ADR and, for §12 itself, a cooling-off
+  period.
+- ⚠️ Slightly higher overhead per "meaningful" commit: the agent
+  must consider which documents the change touches. The §11.1 table
+  is designed so the answer is unambiguous and can be looked up in
+  seconds.
+- 🔁 Any future ADR that wants to lower the meta-rule barrier (for
+  example, to remove the cooling-off period) must itself go through
+  the cooling-off period it tries to remove.
+
+**Validation**
+```bash
+# §11.3 invariants on the current PR
+diff <(grep -oE 'HBTV-[0-9]+' docs/dev-tracker.md  | sort -u) \
+     <(grep -oE 'HBTV-[0-9]+' docs/dev-tracker.json | sort -u)   # empty diff
+python3 -c "import json; json.load(open('docs/dev-tracker.json'))"  # parses
+```
 
 ---
 
