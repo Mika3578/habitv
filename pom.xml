@@ -16,7 +16,22 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- Resolved from the reactor root when building with mvn from habitv/ -->
+		<habitv.deploy.repo.path>${maven.multiModuleProjectDirectory}/../habitv-repo/repository</habitv.deploy.repo.path>
 	</properties>
+
+	<distributionManagement>
+		<repository>
+			<id>habitv-local</id>
+			<name>Habitv local static repository</name>
+			<url>file://${habitv.deploy.repo.path}</url>
+		</repository>
+		<snapshotRepository>
+			<id>habitv-local</id>
+			<name>Habitv local static repository</name>
+			<url>file://${habitv.deploy.repo.path}</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 	 <scm>
         <connection>scm:git:https://github.com/Mika3578/habitv.git</connection>
