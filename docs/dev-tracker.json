@@ -17,13 +17,13 @@
     "P3"
   ],
   "summary": {
-    "done": 10,
+    "done": 11,
     "inProgress": 2,
     "proposed": 2,
     "deferred": 0,
     "blocked": 0,
-    "total": 14,
-    "overallProgressPercent": 80
+    "total": 15,
+    "overallProgressPercent": 83
   },
   "items": [
     {
@@ -343,6 +343,30 @@
       ],
       "pr": "fix: restore generated sources and launcher classpath (#44)",
       "notes": "application/habiTv now uses a small Java 8-compatible local URLClassLoader helper instead of the unavailable Utils4J.addToClasspath API. Incompatible utils4j Java 17 bytecode and broader transitive dependency vulnerability cleanup remain out of scope for a dedicated security PR."
+    },
+    {
+      "id": "maven-pr-validation",
+      "legacyCode": "HBTV-015",
+      "displayTitle": "Maven PR validation workflow",
+      "icon": "🧱",
+      "status": "done",
+      "priority": "P1",
+      "progressPercent": 100,
+      "scope": "Add the main Maven pull-request validation workflow with merge-blocking Java 8 checks and explicit non-blocking diagnostics for newer Java runtimes and full legacy test runs.",
+      "acceptanceCriteria": [
+        ".github/workflows/ci-maven.yml defines required Java 8 jobs: validate-java8, deterministic-tests-java8, and compile-and-package-java8.",
+        "Java 11/17/21/25 compatibility jobs exist as non-blocking diagnostics.",
+        "Full legacy test suite is non-blocking and only runs on workflow_dispatch and weekly schedule.",
+        "Workflow uses permissions: contents: read, concurrency cancellation, Maven cache, and artifact upload for diagnostics."
+      ],
+      "validation": [
+        "git status --short",
+        "mvn -B -ntp -DskipTests validate",
+        "mvn -B -ntp -pl fwk/api,fwk/framework,application/core,plugins/plugin-tester -am test",
+        "mvn -B -ntp -DskipTests package"
+      ],
+      "pr": "ci: add Maven PR validation workflow (this PR)",
+      "notes": "Java 8 remains the required baseline; Java 11+ stays diagnostic until JAXB and JavaFX modernization is complete."
     }
   ]
 }
