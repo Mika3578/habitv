@@ -85,8 +85,9 @@ public final class HabitvUpdateManifest {
 				return relativeUrl;
 			}
 			if (baseUrl != null && !baseUrl.isEmpty()) {
+				final String normalizedBase = UpdateRepositoryUrls.normalizeBaseUrl(baseUrl);
 				final String path = relativeUrl.startsWith("/") ? relativeUrl.substring(1) : relativeUrl;
-				return baseUrl + "/" + path;
+				return normalizedBase + "/" + path;
 			}
 			return UpdateRepositoryUrls.buildRepositoryUrl(relativeUrl);
 		}

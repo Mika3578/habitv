@@ -48,7 +48,7 @@ public class HabitvUpdateManifestTest {
 	}
 
 	@Test
-	public void loadFromRepositoryStoresBaseUrlAndEntryDownloadUrlUsesIt() {
+	public void parsedManifestHasNullBaseUrl() {
 		// Entries with relative URLs loaded via loadFromRepository must resolve against
 		// the URL that was passed, not against the system property.
 		final String content = "plugin|com.dabi.habitv|arte|4.1.0|jar|com/dabi/habitv/arte/4.1.0/arte-4.1.0.jar\n";

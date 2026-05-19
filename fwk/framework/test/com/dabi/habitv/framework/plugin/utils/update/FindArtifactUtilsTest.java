@@ -125,7 +125,7 @@ public class FindArtifactUtilsTest {
 	}
 
 	@Test
-	public void returnsNullWhenSnapshotMetadataUnavailableInsteadOfFallingThroughToDirectoryListing() {
+	public void returnsNullWhenSnapshotMetadataUnavailable() {
 		// No manifest entry for youtube and no metadata - only a version directory listing
 		addVersionListing();
 		// Metadata endpoint intentionally absent (no addSnapshotMetadata call)
@@ -138,7 +138,7 @@ public class FindArtifactUtilsTest {
 	}
 
 	@Test
-	public void doesNotLogSnapshotSkipWarningWhenManifestOnlyContainsWrongMajorVersionSnapshot() {
+	public void noWarningWhenSnapshotMajorVersionMismatch() {
 		// Manifest has a SNAPSHOT for a different major version (5.0, not 4.1)
 		addManifest("plugin|com.dabi.habitv|youtube|5.0-SNAPSHOT|jar|com/dabi/habitv/youtube/5.0-SNAPSHOT/youtube-5.0-SNAPSHOT.jar");
 
