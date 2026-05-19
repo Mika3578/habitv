@@ -17,13 +17,13 @@
     "P3"
   ],
   "summary": {
-    "done": 10,
+    "done": 11,
     "inProgress": 2,
     "proposed": 2,
     "deferred": 0,
     "blocked": 0,
-    "total": 14,
-    "overallProgressPercent": 80
+    "total": 15,
+    "overallProgressPercent": 83
   },
   "items": [
     {
@@ -343,6 +343,30 @@
       ],
       "pr": "fix: restore generated sources and launcher classpath (#44)",
       "notes": "application/habiTv now uses a small Java 8-compatible local URLClassLoader helper instead of the unavailable Utils4J.addToClasspath API. Incompatible utils4j Java 17 bytecode and broader transitive dependency vulnerability cleanup remain out of scope for a dedicated security PR."
+    },
+    {
+      "id": "repository-maintenance-automation",
+      "legacyCode": "HBTV-015",
+      "displayTitle": "Repository maintenance automation",
+      "icon": "🤖",
+      "status": "done",
+      "priority": "P1",
+      "progressPercent": 100,
+      "scope": "Add repository maintenance automation after Maven CI with Dependabot update PRs, dependency review gating, PR labeling, stale triage, and CodeQL workflow/doc coverage.",
+      "acceptanceCriteria": [
+        "Dependabot is configured for weekly Maven and GitHub Actions update pull requests with grouped updates and bounded PR volume.",
+        "Dependency Review runs on pull requests to develop/master and fails on high or critical vulnerabilities.",
+        "Pull request labeler applies repository labels from changed files with pull_request_target and no checkout of PR code.",
+        "Stale triage marks inactive issues/pull requests conservatively without auto-closing.",
+        "CodeQL workflow is present and documented independently from Maven CI.",
+        "docs/ci.md and docs/repository-maintenance.md document required checks and bot policy."
+      ],
+      "validation": [
+        "git status --short",
+        "mvn -B -ntp -DskipTests validate"
+      ],
+      "pr": "ci: add repository maintenance automation (this PR)",
+      "notes": "No deployment, secrets, auto-merge, or direct bot pushes to develop were introduced. Bots are limited to pull request workflows."
     }
   ]
 }

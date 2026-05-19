@@ -12,24 +12,24 @@
 > on each entry for compatibility with existing PRs and commits. See
 > the `descriptive-slug-ids` ADR for the rationale and full mapping.
 
-**Last refresh:** 2026-05-18 · **Active branch:** `develop`
+**Last refresh:** 2026-05-19 · **Active branch:** `develop`
 
 ---
 
 ## 📊 Overall progress
 
 ```
-███████████████░░░░░  77%
+█████████████████░░░  83%
 ```
 
 | Category | Count |
 |---------|------:|
-| ✅ Delivered | **10** |
-| 🟡 In progress | **1** |
-| 🔵 Proposed | **3** |
+| ✅ Delivered | **11** |
+| 🟡 In progress | **2** |
+| 🔵 Proposed | **2** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
-| **Total work items** | **14** |
+| **Total work items** | **15** |
 
 ---
 
@@ -41,6 +41,7 @@
 | ⚙️ `maven-reactor` — Maven reactor stabilization | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | ☕ `java8-baseline` — Java 8 compile baseline | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 🛡️ `branch-protection` — GitHub branch protection rules | 🔵 Proposed | 🟠 P1 | `░░░░░░░░░░░░░░░░░░░░` 0% |
+| 🤖 `repository-maintenance-automation` — Repository maintenance automation | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🔗 `legacy-url-migration` — Legacy URL migration (free.fr / SVN / FTP) | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 📦 `static-repo-publish` — Static artifact repository publication | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🟡 In progress | 🟡 P2 | `███████████░░░░░░░░░` 55% |
@@ -590,6 +591,46 @@ scope for a dedicated security PR.
 
 ---
 
+## 🤖 `repository-maintenance-automation` — Repository maintenance automation
+
+| | |
+|---|---|
+| **Status** | ✅ Done |
+| **Priority** | 🟠 P1 |
+| **Progress** | `████████████████████` 100% |
+| **Legacy code** | HBTV-015 |
+
+**Scope** — Add repository maintenance automation after Maven CI:
+Dependabot update pull requests, dependency review security checks,
+automatic pull request labeling, conservative stale triage, and
+CodeQL workflow/documentation coverage.
+
+**Acceptance criteria**
+- ✅ Dependabot is configured for weekly Maven and GitHub Actions PRs
+  with grouped updates and bounded open PR count
+- ✅ Dependency Review runs on pull requests to `develop` and `master`
+  and fails on high/critical vulnerable dependencies
+- ✅ Pull request labeler applies labels by file paths with
+  `pull_request_target` and no PR code checkout/execution
+- ✅ Stale triage marks inactive issues/PRs without auto-closing either
+- ✅ CodeQL workflow is added as a dedicated security scan workflow
+- ✅ `docs/ci.md` and `docs/repository-maintenance.md` document required
+  checks, maintenance policy, and bot constraints
+
+**Validation**
+```bash
+git status --short
+mvn -B -ntp -DskipTests validate
+```
+
+**Related PR** · `ci: add repository maintenance automation` (this PR)
+
+**Notes** — No deployment workflow, no secrets, no auto-merge, and no
+direct bot pushes to `develop`. Bots are limited to opening pull
+requests.
+
+---
+
 # 📈 What ships next
 
 Recommended merge / start order (see `dev-plan.md` for phase reasoning):
@@ -621,3 +662,4 @@ issue trackers:
 | HBTV-012 | `own-version-deps-align` |
 | HBTV-013 | `youtube-apikey` |
 | HBTV-014 | `jaxb-launcher-recovery` |
+| HBTV-015 | `repository-maintenance-automation` |
