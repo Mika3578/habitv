@@ -39,11 +39,49 @@ public class JavaFxRuntimeLocatorTest {
 	}
 
 	@Test
+	public void locateChecksLibLayout() throws IOException {
+		clearOverride();
+		final File fakeJavaHome = Files.createTempDirectory("fake-lib").toFile();
+		fakeJavaHome.deleteOnExit();
+		final File jfxrt = new File(fakeJavaHome, "lib/jfxrt.jar");
+		assertTrue(jfxrt.getParentFile().mkdirs());
+		assertTrue(jfxrt.createNewFile());
+		System.setProperty("java.home", fakeJavaHome.getAbsolutePath());
+		assertEquals(jfxrt, JavaFxRuntimeLocator.locate());
+	}
+
+	@Test
 	public void locateChecksJreExtLayout() throws IOException {
 		clearOverride();
 		final File fakeJavaHome = Files.createTempDirectory("fake-jre").toFile();
 		fakeJavaHome.deleteOnExit();
 		final File jfxrt = new File(fakeJavaHome, "jre/lib/ext/jfxrt.jar");
+		assertTrue(jfxrt.getParentFile().mkdirs());
+		assertTrue(jfxrt.createNewFile());
+		System.setProperty("java.home", fakeJavaHome.getAbsolutePath());
+		assertEquals(jfxrt, JavaFxRuntimeLocator.locate());
+	}
+
+	@Test
+	public void locateChecksLibExtLayout() throws IOException {
+		clearOverride();
+		final File fakeJavaHome = Files.createTempDirectory("fake-lib-ext").toFile();
+		fakeJavaHome.deleteOnExit();
+		final File jfxrt = new File(fakeJavaHome, "lib/ext/jfxrt.jar");
+		assertTrue(jfxrt.getParentFile().mkdirs());
+		assertTrue(jfxrt.createNewFile());
+		System.setProperty("java.home", fakeJavaHome.getAbsolutePath());
+		assertEquals(jfxrt, JavaFxRuntimeLocator.locate());
+	}
+
+	@Test
+	public void locateChecksParentJdkLibFallback() throws IOException {
+		clearOverride();
+		final File fakeJdkHome = Files.createTempDirectory("fake-jdk").toFile();
+		fakeJdkHome.deleteOnExit();
+		final File fakeJavaHome = new File(fakeJdkHome, "jre");
+		assertTrue(fakeJavaHome.mkdirs());
+		final File jfxrt = new File(fakeJdkHome, "lib/jfxrt.jar");
 		assertTrue(jfxrt.getParentFile().mkdirs());
 		assertTrue(jfxrt.createNewFile());
 		System.setProperty("java.home", fakeJavaHome.getAbsolutePath());

@@ -387,7 +387,9 @@ assumptions:
 - ⬜ Packaging blueprint accepted via dedicated ADR
 - ⬜ `habiTv-linux` + `habiTv-windows` re-enterable to the reactor
 
-**Validation** — Audit reviewed in PR; no code changes in this item.
+**Validation** — Audit reviewed in PR; code changes implemented in
+`application/habiTv` for JDK 8 `jfxrt.jar` resolution and covered by
+targeted unit tests.
 
 **Notes** — Risk `javafx-jdk8`. `HabitvLauncher` resolves `jfxrt.jar`
 from common JDK 8 layouts and supports `-Dhabitv.jfxrt.path`; GUI mode

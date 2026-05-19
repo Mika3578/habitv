@@ -228,7 +228,7 @@
         "habiTv-linux + habiTv-windows re-enterable to the reactor."
       ],
       "validation": [
-        "Audit reviewed in PR; no code changes in this item.",
+        "Audit reviewed in PR; code changes implemented in application/habiTv for JDK 8 jfxrt.jar resolution.",
         "mvn -B -ntp -pl application/habiTv -am -Dtest=JavaFxRuntimeLocatorTest -Dsurefire.failIfNoSpecifiedTests=false test -> BUILD SUCCESS"
       ],
       "pr": "TBD",

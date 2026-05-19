@@ -36,8 +36,8 @@ final class JavaFxRuntimeLocator {
 				return candidate;
 			}
 		}
-		final File jdkLib = new File(javaHome.getParentFile(), "lib" + File.separator + "jfxrt.jar");
-		if (jdkLib.isFile()) {
+		final File jdkLib = parentJdkLibCandidate(javaHome);
+		if (jdkLib != null && jdkLib.isFile()) {
 			return jdkLib;
 		}
 		return null;
@@ -53,8 +53,18 @@ final class JavaFxRuntimeLocator {
 		for (final String relativePath : RELATIVE_PATHS) {
 			paths.add(new File(javaHome, relativePath).getAbsolutePath());
 		}
-		paths.add(new File(javaHome.getParentFile(),
-				"lib" + File.separator + "jfxrt.jar").getAbsolutePath());
+		final File jdkLib = parentJdkLibCandidate(javaHome);
+		if (jdkLib != null) {
+			paths.add(jdkLib.getAbsolutePath());
+		}
 		return Collections.unmodifiableList(paths);
+	}
+
+	private static File parentJdkLibCandidate(final File javaHome) {
+		final File parent = javaHome.getParentFile();
+		if (parent == null) {
+			return null;
+		}
+		return new File(parent, "lib" + File.separator + "jfxrt.jar");
 	}
 }
