@@ -40,7 +40,7 @@
 | `plugins/lequipe` | `lequipe` | provider | needs live endpoint rewrite | Provider/downloader plugin uses HTML scraping; tests include historical Kewego stream-init references | rewrite provider |
 | `plugins/mlssoccer` | `mlssoccer` | provider | unknown / needs fixture | `MLSSoccerPluginManager` provider/downloader with HTTPS URLs; live endpoint compatibility not validated offline | add fixture tests |
 | `plugins/plugin-tester` | `plugin-tester` | test harness | infrastructure-only | `BasePluginProviderTester` / `BasePluginUpdateTester` provide shared live-style harness utilities | keep as-is |
-| `plugins/francetv` | `francetv` | provider | keep | `FranceTvPluginManager` queries `api-mobile.yatta.francetv.fr` catalogue; download delegated to `youtube` (yt-dlp); offline `FranceTvUrlsTest` + live `FranceTvPluginManagerTest`; replaces former `plugins/pluzz` (legacy `pluzz.` URLs still recognised by `canDownload`) | keep |
+| `plugins/francetv` | `francetv` | provider | keep | `FranceTvPluginManager` queries `api-mobile.yatta.francetv.fr` catalogue; download delegated to `youtube` (yt-dlp); offline `FranceTvUrlsTest` + live `FranceTvPluginManagerTest`; replaces former `plugins/pluzz` (legacy `pluzz.` URLs still recognised by `canDownload`, but existing grab-config entries still need the plugin id renamed to `francetv`) | keep |
 | `plugins/rtmpDump` | `rtmpDump` | downloader | keep | `RtmpDumpPluginDownloader` is binary wrapper with updater version pattern; dedicated test exists | keep as-is |
 | `plugins/sfr` | `sfr` | provider | unknown / needs fixture | `SFRConf` uses `sport.sfr.fr` API path; provider tests are live-network style only | add fixture tests |
 | `plugins/wat` | `wat` | provider | obsolete endpoint | `WatConf` points to TF1/WAT-era URLs; plugin naming and endpoint model reflect legacy provider branding | rewrite provider |
@@ -55,7 +55,7 @@
 | `D8` | `README.md` provider list; `D8PluginManager` inside `plugins/canalPlus` | No standalone module | embedded legacy sub-provider in `canalPlus` |
 | `D17` | `README.md` provider list; `D17PluginManager` inside `plugins/canalPlus` | No standalone module | embedded legacy sub-provider in `canalPlus` |
 | `NRJ12` / `nrj12` | Mentioned in `README.md` and tracker notes | No | historical reference only (missing module) |
-| `FranceTV / Pluzz` | `plugins/francetv` module replaces former `plugins/pluzz`; mobile catalogue + yt-dlp flow | Yes (`francetv`) | rename completed (PR #58) |
+| `FranceTV / Pluzz` | `plugins/francetv` module replaces former `plugins/pluzz`; mobile catalogue + yt-dlp flow | Yes (`francetv`) | rename completed (PR #58); existing grab-config entries still require manual `pluzz` → `francetv` migration |
 | `Kewego` | Legacy stream references in `plugins/lequipe/test/TestInitStream.java`; risk register mentions kewego in live tests | No dedicated module | historical endpoint dependency in tests |
 
 ---

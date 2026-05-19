@@ -32,22 +32,22 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 | Date | Commit | Change |
 |------|--------|--------|
-| 2026-05-18 | TBD | Replace `pluzz` provider with `francetv` (france.tv + yt-dlp) — users must rename `<plugin name="pluzz">` to `<plugin name="francetv">` in their grab-config XML (legacy `pluzz.` URLs in `canDownload` remain accepted) |
-| 2026-05-18 | TBD | Migrate YouTube plugin downloader defaults to yt-dlp |
+| 2026-05-18 | `2311bbc` | Replace `pluzz` provider with `francetv` (france.tv + yt-dlp) — users must rename `<plugin name="pluzz">` to `<plugin name="francetv">` in their grab-config XML (legacy `pluzz.` URLs in `canDownload` remain accepted) |
+| 2026-05-18 | PR [#52](https://github.com/Mika3578/habitv/pull/52) | Migrate YouTube plugin downloader defaults to yt-dlp |
 | 2026-05-17 | `7a61dd6` | Add runnable yt-dlp runtime path for `consoleView` |
 
 ### 🧪 Tests
 
 | Date | Commit | Change |
 |------|--------|--------|
-| 2026-05-18 | TBD | Expand offline yt-dlp defaults and command wiring tests |
+| 2026-05-18 | PR [#52](https://github.com/Mika3578/habitv/pull/52) | Expand offline yt-dlp defaults and command wiring tests |
 | 2026-05-17 | `0163d9a` | Cover yt-dlp command wiring (offline test) |
 
 ### 📚 Documentation
 
 | Date | Commit | Change |
 |------|--------|--------|
-| 2026-05-18 | TBD | Document yt-dlp CLI compatibility and tracker progress |
+| 2026-05-18 | PR [#52](https://github.com/Mika3578/habitv/pull/52) | Document yt-dlp CLI compatibility and tracker progress |
 | 2026-05-17 | `750640d` | Update modernization status after console baseline |
 | 2026-05-16 | `be5b667` | Update plugin tester dependency tracker |
 | 2026-05-16 | `993f3d0` | Add AI agent repository instructions |
