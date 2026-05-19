@@ -28,6 +28,12 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 | 2026-05-16 | `8caab37` | Align `plugin-tester` dependency versions |
 | 2026-05-16 | `e4d7e81` | Add Java 8 baseline validation workflow (CI) |
 
+### 🐛 Fixes
+
+| Date | Commit | Change |
+|------|--------|--------|
+| 2026-05-18 | TBD | Resolve JavaFX `jfxrt.jar` from common JDK 8 layouts in `HabitvLauncher` |
+
 ### ✨ Features
 
 | Date | Commit | Change |

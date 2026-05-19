@@ -45,7 +45,7 @@
 | 📦 `static-repo-publish` — Static artifact repository publication | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🟡 In progress | 🟡 P2 | `███████████░░░░░░░░░` 55% |
 | 🎬 `ytdlp-migration` — `youtube-dl` → `yt-dlp` migration | 🟡 In progress | 🟡 P2 | `███████████████░░░░░` 75% |
-| 🖼️ `javafx-modernization` — JavaFX & runtime packaging modernization | 🔵 Proposed | 🟡 P2 | `█░░░░░░░░░░░░░░░░░░░` 5% |
+| 🖼️ `javafx-modernization` — JavaFX & runtime packaging modernization | 🔵 Proposed | 🟡 P2 | `██░░░░░░░░░░░░░░░░░░` 10% |
 | 🧪 `plugin-tester-align` — `plugin-tester` reactor alignment | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | ▶️ `console-runnable` — Runnable console baseline | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 🔗 `own-version-deps-align` — Own-version plugin dependency alignment | ✅ Done | 🔴 P0 | `████████████████████` 100% |
@@ -371,7 +371,7 @@ rewrite, no live-network tests in this item.
 |---|---|
 | **Status** | 🔵 Proposed |
 | **Priority** | 🟡 P2 |
-| **Progress** | `█░░░░░░░░░░░░░░░░░░░` 5% |
+| **Progress** | `██░░░░░░░░░░░░░░░░░░` 10% |
 | **Legacy code** | HBTV-008 |
 
 **Scope** — Migrate JavaFX 2.x usage and `${jdk.home}` packaging
@@ -387,9 +387,14 @@ assumptions:
 - ⬜ Packaging blueprint accepted via dedicated ADR
 - ⬜ `habiTv-linux` + `habiTv-windows` re-enterable to the reactor
 
-**Validation** — Audit reviewed in PR; no code changes in this item.
+**Validation** — Audit reviewed in PR; code changes implemented in
+`application/habiTv` for JDK 8 `jfxrt.jar` resolution and covered by
+targeted unit tests.
 
-**Notes** — Risk `javafx-jdk8`. Largest single piece of remaining
+**Notes** — Risk `javafx-jdk8`. `HabitvLauncher` resolves `jfxrt.jar`
+from common JDK 8 layouts and supports `-Dhabitv.jfxrt.path`; GUI mode
+exits with diagnostics when JavaFX is missing. OpenJFX migration and
+platform packaging remain out of scope. Largest single piece of remaining
 work once `legacy-url-migration` + `static-repo-publish` +
 `provider-inventory` are clear.
 
