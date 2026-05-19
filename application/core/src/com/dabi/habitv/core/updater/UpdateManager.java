@@ -115,6 +115,14 @@ public class UpdateManager {
 		return new String[0];
 	}
 
+	/**
+	 * Resolves whether runtime update checks are enabled.
+	 * <p>
+	 * Defaults to {@code true} if the {@code habitv.update.enabled} system
+	 * property is absent or unrecognised. Pass {@code -Dhabitv.update.enabled=false}
+	 * at startup to opt out of update checks.
+	 * </p>
+	 */
 	private static boolean resolveUpdateEnabled() {
 		final String configured = System
 				.getProperty(FrameworkConf.UPDATE_ENABLED_PROPERTY);
