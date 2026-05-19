@@ -123,12 +123,12 @@
       "status": "done",
       "priority": "P0",
       "progressPercent": 100,
-      "scope": "Remove or replace every active reference to <scm>scm:svn:..., <repository>http://dabiboo.free.fr/repository, <distributionManagement>ftp://ftpperso.free.fr/repository + wagon-ftp, and runtime constants UPDATE_URL and STAT_URL.",
+      "scope": "Remove or replace every active reference to <scm>scm:svn:..., <repository>http://dabiboo.free.fr/repository, <distributionManagement>ftp://ftpperso.free.fr/repository + wagon-ftp, and runtime constants UPDATE_URL and STAT_URL while externalizing runtime update controls.",
       "acceptanceCriteria": [
         "Active POM/runtime references to dabiboo.free.fr, subversion.assembla.com, scm:svn, and cpt.php are removed.",
         "Root repository uses https://mika3578.github.io/habitv-repo/repository.",
         "Telemetry is opt-in via habitv.stat.enabled and habitv.stat.url.",
-        "Plugin updates are opt-in via habitv.update.enabled and optional habitv.update.url."
+        "Plugin updates are controlled via habitv.update.enabled (default enabled, set false to disable) and optional habitv.update.url."
       ],
       "validation": [
         "git grep -nIE \"dabiboo|free\\.fr|ftpperso|subversion\\.assembla|scm:svn\" -- . -> matches only documentation/history, no active code/POM endpoints.",
@@ -136,7 +136,7 @@
         "mvn -B -ntp -DskipTests compile -> BUILD SUCCESS (33 modules)"
       ],
       "pr": "chore: remove legacy DabiBoo repository wiring (#36)",
-      "notes": "Execution supersedes PR #25 plan-only work. Publication cutover and updater HTML index contract remain HBTV-005; do not enable habitv.update.enabled until static index.html or manifest layout is verified."
+      "notes": "Execution supersedes PR #25 plan-only work. Publication cutover and updater HTML index contract remain HBTV-005. Runtime update checks are enabled by default; use habitv.update.enabled=false only when startup updates must be bypassed."
     },
     {
       "id": "static-repo-publish",
@@ -161,7 +161,7 @@
         "python scripts/static-repo/validate_repository_layout.py <repository-root>"
       ],
       "pr": "habitv-repo #2 (merged); habitv PR #49 (publication status + tracker refresh)",
-      "notes": "Runtime updates remain disabled by default. Publication cutover is live on GitHub Pages with token-free HTTPS access. Developer SNAPSHOT updates use -Dhabitv.update.autoriseSnapshot=true while configuration.xml keeps autoriseSnapshot false. Runtime artifact resolution now prioritizes explicit manifest download paths and falls back to maven-metadata.xml for timestamped SNAPSHOT JAR names. Remaining follow-up: run one dedicated opt-in runtime update smoke test with habitv.update.enabled=true against the published URL."
+      "notes": "Runtime updates are enabled by default at startup. Publication cutover is live on GitHub Pages with token-free HTTPS access. Developer SNAPSHOT updates use -Dhabitv.update.autoriseSnapshot=true while configuration.xml keeps autoriseSnapshot false. Runtime artifact resolution now prioritizes explicit manifest download paths and falls back to maven-metadata.xml for timestamped SNAPSHOT JAR names. Remaining follow-up: run one dedicated opt-in runtime update smoke test with habitv.update.autoriseSnapshot=true against the published URL."
     },
     {
       "id": "provider-inventory",

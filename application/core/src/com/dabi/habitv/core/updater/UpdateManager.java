@@ -44,7 +44,7 @@ public class UpdateManager {
 	}
 
 	public void process() {
-		final boolean updateEnabled = Boolean.getBoolean(FrameworkConf.UPDATE_ENABLED_PROPERTY);
+		final boolean updateEnabled = resolveUpdateEnabled();
 		final String updateSite = System.getProperty(
 				FrameworkConf.UPDATE_URL_PROPERTY, site);
 		final String baseUrl = updateSite == null ? null
@@ -113,6 +113,25 @@ public class UpdateManager {
 		LOG.info("Update manifest not loaded from " + baseUrl + "/"
 				+ FrameworkConf.UPDATE_MANIFEST_FILE);
 		return new String[0];
+	}
+
+	private static boolean resolveUpdateEnabled() {
+		final String configured = System
+				.getProperty(FrameworkConf.UPDATE_ENABLED_PROPERTY);
+		if (configured == null) {
+			return true;
+		}
+		final String normalized = configured.trim();
+		if ("true".equalsIgnoreCase(normalized)) {
+			return true;
+		}
+		if ("false".equalsIgnoreCase(normalized)) {
+			return false;
+		}
+		LOG.warn("Ignoring invalid " + FrameworkConf.UPDATE_ENABLED_PROPERTY
+				+ " value \"" + configured
+				+ "\"; defaulting to enabled update checks.");
+		return true;
 	}
 
 	private static String[] splitPluginLines(final String pluginsList) {

@@ -149,7 +149,9 @@ GitHub Pages serves `repository/` at
 
 ## Runtime update discovery
 
-When `-Dhabitv.update.enabled=true` (optional `-Dhabitv.update.url=...`):
+By default, startup checks for plugin/tool updates use the configured
+repository base. You can override the base with `-Dhabitv.update.url=...` or
+disable startup updates with `-Dhabitv.update.enabled=false`.
 
 1. **Plugins** — `plugins.txt` first, fallback to plugin entries in
    `habitv-update-manifest.properties`.
@@ -159,8 +161,7 @@ When `-Dhabitv.update.enabled=true` (optional `-Dhabitv.update.url=...`):
    - directory listing fallback for non-SNAPSHOT artifacts.
 3. **External tools** — manifest `tool` entries, then `tools/<name>/<version>/<file>`.
 
-Updates are **disabled by default**. If GitHub Pages is unreachable, Habitv keeps
-local plugins and tools.
+If GitHub Pages is unreachable, Habitv keeps local plugins and tools.
 
 ### Development snapshot updates
 
