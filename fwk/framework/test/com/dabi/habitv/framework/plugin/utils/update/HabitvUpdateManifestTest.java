@@ -48,6 +48,32 @@ public class HabitvUpdateManifestTest {
 	}
 
 	@Test
+	public void parsedManifestHasNullBaseUrl() {
+		// Entries with relative URLs loaded via loadFromRepository must resolve against
+		// the URL that was passed, not against the system property.
+		final String content = "plugin|com.dabi.habitv|arte|4.1.0|jar|com/dabi/habitv/arte/4.1.0/arte-4.1.0.jar\n";
+		final HabitvUpdateManifest manifest = HabitvUpdateManifest.parse(content);
+		// parse() has no baseUrl context, so getBaseUrl() is null
+		assertEquals(null, manifest.getBaseUrl());
+	}
+
+	@Test
+	public void entryGetDownloadUrlWithExplicitBaseUrlPrefersThatBaseUrl() {
+		final Entry entry = HabitvUpdateManifest.parseLine(
+				"plugin|com.dabi.habitv|arte|4.1.0|jar|com/dabi/habitv/arte/4.1.0/arte-4.1.0.jar");
+		final String url = entry.getDownloadUrl("https://custom.example.com/repo");
+		assertEquals("https://custom.example.com/repo/com/dabi/habitv/arte/4.1.0/arte-4.1.0.jar", url);
+	}
+
+	@Test
+	public void entryGetDownloadUrlWithAbsoluteRelativeUrlIgnoresBaseUrl() {
+		final Entry entry = HabitvUpdateManifest.parseLine(
+				"plugin|com.dabi.habitv|arte|4.1.0|jar|https://cdn.example.com/arte-4.1.0.jar");
+		final String url = entry.getDownloadUrl("https://other.example.com/repo");
+		assertEquals("https://cdn.example.com/arte-4.1.0.jar", url);
+	}
+
+	@Test
 	public void parseLineAcceptsBomPrefixedPluginEntry() {
 		final Entry entry = HabitvUpdateManifest.parseLine(
 				"\uFEFFplugin|com.dabi.habitv|arte|4.1.0|jar|com/dabi/habitv/arte/4.1.0/arte-4.1.0.jar");

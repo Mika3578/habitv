@@ -69,7 +69,7 @@ public class XMLUserConfig implements UserConfig {
 
 	private static final boolean DEFAULT_UPDATE_ON_STARTUP = true;
 
-	private static final Boolean DEFAULT_AUTORISE_SNAPSHOT = false;
+	private static final Boolean DEFAULT_AUTORISE_SNAPSHOT = true;
 
 	private XMLUserConfig(final Configuration config) {
 		super();
@@ -478,7 +478,7 @@ public class XMLUserConfig implements UserConfig {
 	@Override
 	public boolean autoriseSnapshot() {
 		final boolean fromConfiguration = config.getUpdateConfig() == null
-				|| config.getUpdateConfig().getAutoriseSnapshot() == null ? false
+				|| config.getUpdateConfig().getAutoriseSnapshot() == null ? DEFAULT_AUTORISE_SNAPSHOT
 				: config.getUpdateConfig().getAutoriseSnapshot();
 		return UpdateConfigResolver.resolveAutoriseSnapshot(fromConfiguration);
 	}

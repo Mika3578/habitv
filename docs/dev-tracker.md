@@ -209,7 +209,7 @@ nothing technical but everyone has push access to `develop`.
 
 **Scope** — Remove active legacy DabiBoo/free.fr/SVN/Assembla wiring from
 Maven POMs and runtime paths; replace SCM metadata with GitHub; disable
-startup telemetry and plugin update checks by default; point Maven
+startup telemetry by default and externalize runtime update controls; point Maven
 `<repository>` at the public `habitv-repo` GitHub Pages base.
 
 **Acceptance criteria**
@@ -219,8 +219,8 @@ startup telemetry and plugin update checks by default; point Maven
   `https://mika3578.github.io/habitv-repo/repository`
 - ✅ Runtime telemetry ping is opt-in only (`habitv.stat.enabled=true`)
   and requires explicit URL configuration (`habitv.stat.url`)
-- ✅ Runtime plugin updates are opt-in only (`habitv.update.enabled=true`)
-  with optional `habitv.update.url`
+- ✅ Runtime plugin updates are controlled via `habitv.update.enabled`
+  (default enabled, set to `false` to disable) and optional `habitv.update.url`
 
 **Validation**
 ```bash
@@ -235,8 +235,8 @@ mvn -B -ntp -DskipTests compile      # BUILD SUCCESS (33 modules)
 **Notes** — Execution supersedes the documentation-only plan in PR #25.
 Functional publication cutover remains blocked under `static-repo-publish`
 until `habitv-repo` serves `/repository` with Apache-style directory
-listings. Do not enable `habitv.update.enabled` until static `index.html`
-files or an equivalent manifest layout are verified.
+listings. Runtime update checks are now enabled by default; use
+`habitv.update.enabled=false` to disable them temporarily.
 
 ---
 
@@ -270,13 +270,19 @@ python scripts/static-repo/validate_repository_layout.py "<repository-root>"
 
 **Related PRs** · habitv-repo #2 (merged) · habitv PR #49 (publication status + tracker refresh)
 
-**Notes** — Runtime updates stay disabled by default.
+**Notes** — Runtime updates are enabled by default at startup.
 Publication cutover is complete (`https://mika3578.github.io/habitv-repo/repository/`
-and `plugins.txt` live with no authentication). SNAPSHOT consumption for
+and `plugins.txt` live with no authentication). Local deploy uses profile
+`static-repo-deploy` and `habitv.deploy.repository.url`. Deploy uses
+`deployAtEnd=true` so a late reactor failure does not partially publish to
+`habitv-repo`. Live `*PluginManagerTest` classes are excluded from default
+`mvn test`; use `-Plive-provider-tests` explicitly. SNAPSHOT consumption for
 developers is opt-in via `-Dhabitv.update.autoriseSnapshot=true` while
 `configuration.xml` keeps `autoriseSnapshot` false. Remaining follow-up:
 run one dedicated opt-in runtime update smoke test with
-`-Dhabitv.update.enabled=true` against the published Pages URL.
+`-Dhabitv.update.autoriseSnapshot=true` against the published Pages URL.
+Runtime artifact resolution now prefers explicit manifest download paths and
+falls back to `maven-metadata.xml` for timestamped SNAPSHOT JAR filenames.
 
 ---
 
@@ -316,8 +322,11 @@ mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Ds
 plus historical references (`D8`, `D17`, `nrj12`, FranceTV/Pluzz,
 Kewego). An offline fixture policy and first local fixture baseline are
 now documented for `6play`, `canalPlus`, `pluzz`, `arte`, and `youtube`
-without rewriting providers. This item remains open for broader fixture
-capture and dedicated cleanup/rewrite PRs. Risks `live-tests-flaky`,
+without rewriting providers. Default `mvn test` skips live
+`*PluginManagerTest`; use `-Plive-provider-tests`. Arte live test
+currently fails (`categorie liste vide`) — provider drift, documented in
+inventory. This item remains open for broader fixture capture and
+dedicated cleanup/rewrite PRs. Risks `live-tests-flaky`,
 `provider-endpoints-dead`.
 
 ---

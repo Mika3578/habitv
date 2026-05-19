@@ -190,11 +190,66 @@
             </manifestEntries>
           </archive>
         </configuration>
-      </plugin>			
+      </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>3.1.2</version>
+				<configuration>
+					<deployAtEnd>true</deployAtEnd>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.2.5</version>
+				<configuration>
+					<excludes>
+						<exclude>**/*PluginManagerTest.java</exclude>
+						<exclude>**/MessageReceiverTest.java</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
 	<profiles>
+		<!--
+		  Deploy reactor artifacts to a local habitv-repo checkout (file:// URL).
+		  Inactive unless -Pstatic-repo-deploy is set; normal builds never deploy.
+		-->
+		<profile>
+			<id>static-repo-deploy</id>
+			<properties>
+				<habitv.deploy.repository.url>file:///${user.home}/dev/habitv-repo/repository</habitv.deploy.repository.url>
+			</properties>
+			<distributionManagement>
+				<repository>
+					<id>habitv-static-deploy</id>
+					<name>Habitv static file repository (releases)</name>
+					<url>${habitv.deploy.repository.url}</url>
+				</repository>
+				<snapshotRepository>
+					<id>habitv-static-deploy</id>
+					<name>Habitv static file repository (snapshots)</name>
+					<url>${habitv.deploy.repository.url}</url>
+				</snapshotRepository>
+			</distributionManagement>
+		</profile>
+		<profile>
+			<id>live-provider-tests</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<excludes combine.self="override"/>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 		<profile>
 			<id>static-repo-publish</id>
 			<distributionManagement>

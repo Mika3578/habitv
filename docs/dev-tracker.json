@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft-07/schema",
   "version": 3,
   "description": "Machine-readable mirror of docs/dev-tracker.md. Keep both files in sync. Identifiers use descriptive kebab-case slugs (see descriptive-slug-ids ADR).",
-  "lastRefresh": "2026-05-18",
+  "lastRefresh": "2026-05-19",
   "statusValues": [
     "proposed",
     "in-progress",
@@ -123,12 +123,12 @@
       "status": "done",
       "priority": "P0",
       "progressPercent": 100,
-      "scope": "Remove or replace every active reference to <scm>scm:svn:..., <repository>http://dabiboo.free.fr/repository, <distributionManagement>ftp://ftpperso.free.fr/repository + wagon-ftp, and runtime constants UPDATE_URL and STAT_URL.",
+      "scope": "Remove or replace every active reference to <scm>scm:svn:..., <repository>http://dabiboo.free.fr/repository, <distributionManagement>ftp://ftpperso.free.fr/repository + wagon-ftp, and runtime constants UPDATE_URL and STAT_URL while externalizing runtime update controls.",
       "acceptanceCriteria": [
         "Active POM/runtime references to dabiboo.free.fr, subversion.assembla.com, scm:svn, and cpt.php are removed.",
         "Root repository uses https://mika3578.github.io/habitv-repo/repository.",
         "Telemetry is opt-in via habitv.stat.enabled and habitv.stat.url.",
-        "Plugin updates are opt-in via habitv.update.enabled and optional habitv.update.url."
+        "Plugin updates are controlled via habitv.update.enabled (default enabled, set false to disable) and optional habitv.update.url."
       ],
       "validation": [
         "git grep -nIE \"dabiboo|free\\.fr|ftpperso|subversion\\.assembla|scm:svn\" -- . -> matches only documentation/history, no active code/POM endpoints.",
@@ -136,7 +136,7 @@
         "mvn -B -ntp -DskipTests compile -> BUILD SUCCESS (33 modules)"
       ],
       "pr": "chore: remove legacy DabiBoo repository wiring (#36)",
-      "notes": "Execution supersedes PR #25 plan-only work. Publication cutover and updater HTML index contract remain HBTV-005; do not enable habitv.update.enabled until static index.html or manifest layout is verified."
+      "notes": "Execution supersedes PR #25 plan-only work. Publication cutover and updater HTML index contract remain HBTV-005. Runtime update checks are enabled by default; use habitv.update.enabled=false only when startup updates must be bypassed."
     },
     {
       "id": "static-repo-publish",
@@ -161,7 +161,7 @@
         "python scripts/static-repo/validate_repository_layout.py <repository-root>"
       ],
       "pr": "habitv-repo #2 (merged); habitv PR #49 (publication status + tracker refresh)",
-      "notes": "Runtime updates remain disabled by default. Publication cutover is live on GitHub Pages with token-free HTTPS access. Developer SNAPSHOT updates use -Dhabitv.update.autoriseSnapshot=true while configuration.xml keeps autoriseSnapshot false. Remaining follow-up: run one dedicated opt-in runtime update smoke test with habitv.update.enabled=true against the published URL."
+      "notes": "Runtime updates are enabled by default at startup. Publication cutover is live on GitHub Pages with token-free HTTPS access. Developer SNAPSHOT updates use -Dhabitv.update.autoriseSnapshot=true while configuration.xml keeps autoriseSnapshot false. Runtime artifact resolution now prioritizes explicit manifest download paths and falls back to maven-metadata.xml for timestamped SNAPSHOT JAR names. Local static-repo deploy uses static-repo-deploy profile and habitv.deploy.repository.url; deployAtEnd=true prevents partial habitv-repo updates on reactor failure. Default mvn test skips live *PluginManagerTest; use -Plive-provider-tests. Arte live test currently fails (empty categories) — provider drift, not deploy regression. Remaining follow-up: run one dedicated opt-in runtime update smoke test with habitv.update.autoriseSnapshot=true against the published URL."
     },
     {
       "id": "provider-inventory",
@@ -186,7 +186,7 @@
         "mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test"
       ],
       "pr": "test/provider-offline-fixture-baseline (this PR)",
-      "notes": "Inventory baseline from PR #50 is extended with an offline fixture policy and first local fixture metadata/tests for 6play, canalPlus, pluzz, arte, and youtube. No provider rewrite, plugin removal, runtime updater change, yt-dlp migration, JavaFX modernization, or Maven publication change."
+      "notes": "Inventory baseline from PR #50 is extended with an offline fixture policy and first local fixture metadata/tests for 6play, canalPlus, pluzz, arte, and youtube. Arte live PluginManagerTest fails (categorie liste vide) — documented as provider drift; repair in dedicated provider PR. Default Surefire excludes *PluginManagerTest; offline fixture baselines stay enabled. No provider rewrite, plugin removal, runtime updater change, yt-dlp migration, JavaFX modernization, or Maven publication layout change in inventory-only work."
     },
     {
       "id": "ytdlp-migration",
