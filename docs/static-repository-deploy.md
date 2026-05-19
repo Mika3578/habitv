@@ -149,29 +149,34 @@ GitHub Pages serves `repository/` at
 
 ## Runtime update discovery
 
-When `-Dhabitv.update.enabled=true` (optional `-Dhabitv.update.url=...`):
+By default, startup checks for plugin/tool updates use the configured
+repository base. You can override the base with `-Dhabitv.update.url=...` or
+disable startup updates with `-Dhabitv.update.enabled=false`.
 
-1. **Plugins** — `plugins.txt` or `habitv-update-manifest.properties` plugin entries.
-2. **Artifact versions** — manifest, optional `index.html`, then Maven path layout.
+1. **Plugins** — `plugins.txt` first, fallback to plugin entries in
+   `habitv-update-manifest.properties`.
+2. **Artifact resolution (runtime priority)**:
+   - manifest entry with explicit final JAR path (preferred);
+   - `maven-metadata.xml` snapshotVersion (fallback when no manifest entry);
+   - directory listing fallback for non-SNAPSHOT artifacts.
 3. **External tools** — manifest `tool` entries, then `tools/<name>/<version>/<file>`.
 
-Updates are **disabled by default**. If GitHub Pages is unreachable, Habitv keeps
-local plugins and tools.
+If GitHub Pages is unreachable, Habitv keeps local plugins and tools.
 
-### Development snapshot updates
+### Snapshot artifacts
 
 Maven deploy publishes timestamped SNAPSHOT JARs (for example
-`arte-4.1.0-20260518.163022-1.jar`). Normal users must keep
-`updateConfig/autoriseSnapshot` set to `false` in `configuration.xml`.
+`arte-4.1.0-20260518.163022-1.jar`). Because the published static repository
+currently ships only `-SNAPSHOT` builds for every plugin, `autoriseSnapshot`
+defaults to `true` in `configuration.xml`. Do not rely on non-timestamped
+`artifactId-<version>-SNAPSHOT.jar` names on GitHub Pages.
 
-For local development against the published static repository, run Habitv with an
-explicit JVM override (configuration value is read first, then overridden only
-when the property is set):
+To pin to release-only behaviour (skip SNAPSHOT entries from the manifest),
+set `<autoriseSnapshot>false</autoriseSnapshot>` in `configuration.xml`, or
+pass `-Dhabitv.update.autoriseSnapshot=false`:
 
 ```bash
-java -Dhabitv.update.enabled=true \
-  -Dhabitv.update.autoriseSnapshot=true \
-  -jar habitv.jar
+java -Dhabitv.update.autoriseSnapshot=false -jar habitv.jar
 ```
 
 Supported values for `habitv.update.autoriseSnapshot` are `true` and `false`

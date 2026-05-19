@@ -65,12 +65,15 @@ public abstract class Updater {
 
 	private void updateFile(final File currentFolder, final String fileToUpdate) {
 		onChecking(fileToUpdate);
+		LOG.info("Resolving update artifact: artifactId=" + fileToUpdate + ", extension=" + getServerExtension());
 		final ArtifactVersion artifactNewVersion = FindArtifactUtils.findLastVersionUrl(groupId, fileToUpdate, coreVersion,
 				autoriseSnapshot, getServerExtension());
 		if (artifactNewVersion == null) {
-			LOG.info("Nothing found for " + fileToUpdate);
+			LOG.warn("Skipping artifact " + fileToUpdate + " because no downloadable URL could be resolved.");
 			return;
 		}
+		LOG.info("Resolved artifact " + fileToUpdate + " from " + artifactNewVersion.getSource()
+				+ " with version " + artifactNewVersion.getVersion() + " at " + artifactNewVersion.getUrl());
 		final File currentFile = new File(folderToUpdate + "/" + fileToUpdate + "." + getLocalExtension());
 		if (currentFile.exists()) {
 			final String currentVersion = getCurrentVersion(currentFile);//
@@ -96,6 +99,7 @@ public abstract class Updater {
 			onUpdate(current, artifactNewVersion);
 			File newVersion;
 			try {
+				LOG.info("Downloading artifact from " + artifactNewVersion.getUrl() + " to " + current.getPath() + ".tmp");
 				newVersion = new File(downloadFile(artifactNewVersion.getUrl(), current.getPath() + ".tmp"));
 			} catch (final IOException e) {
 				onUpdateError(current, artifactNewVersion);

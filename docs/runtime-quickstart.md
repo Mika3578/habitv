@@ -128,12 +128,22 @@ plugin itself is fully wired (see
 `plugins/youtube/test/.../YoutubePluginDownloaderCmdTest.java`); the
 limitation is purely network policy of the runtime environment.
 
-Startup telemetry and plugin update checks are disabled by default.
-Enable only when needed: `-Dhabitv.stat.enabled=true`
-`-Dhabitv.stat.url=...` and/or `-Dhabitv.update.enabled=true`
-(optional `-Dhabitv.update.url=...`).
+Startup telemetry is disabled by default. Plugin update checks are enabled by
+default on startup for GUI and console launches.
+Use `-Dhabitv.stat.enabled=true` and `-Dhabitv.stat.url=...` only when needed.
+You can disable runtime plugin updates explicitly with
+`-Dhabitv.update.enabled=false` (optional custom base:
+`-Dhabitv.update.url=...`).
 
-Development snapshot updates: keep `<autoriseSnapshot>false</autoriseSnapshot>`
-in `configuration.xml` and pass `-Dhabitv.update.autoriseSnapshot=true` when you
-need Maven timestamped SNAPSHOT plugin artifacts from the static repository.
-This override must not be enabled for normal end users.
+Snapshot artifacts: `<autoriseSnapshot>true</autoriseSnapshot>` is the
+default because the published static repository currently ships only Maven
+timestamped `-SNAPSHOT` plugin builds. To pin to release-only behaviour,
+set `<autoriseSnapshot>false</autoriseSnapshot>` in `configuration.xml`, or
+pass `-Dhabitv.update.autoriseSnapshot=false`.
+
+Reference launch command:
+
+```bash
+java -Dhabitv.update.url=https://mika3578.github.io/habitv-repo/repository/ \
+  -jar application/habiTv/target/habiTv-4.1.0-SNAPSHOT.jar
+```
