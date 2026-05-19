@@ -1,15 +1,13 @@
 package com.dabi.habitv.provider.francetv;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 
 import com.dabi.habitv.api.plugin.api.PluginProviderDownloaderInterface;
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
@@ -24,6 +22,8 @@ import com.dabi.habitv.framework.plugin.utils.DownloadUtils;
 
 public class FranceTvPluginManager extends BasePluginWithProxy implements PluginProviderDownloaderInterface {
 
+	private final FranceTvApiClient apiClient = new FranceTvApiClient(this);
+
 	@Override
 	public String getName() {
 		return FranceTvConf.NAME;
@@ -32,26 +32,30 @@ public class FranceTvPluginManager extends BasePluginWithProxy implements Plugin
 	@Override
 	public Set<EpisodeDTO> findEpisode(final CategoryDTO category) {
 		final Set<EpisodeDTO> episodes = new LinkedHashSet<>();
-		final String categoryUrl = category.getId();
-		final String pathPrefix = toPathPrefix(categoryUrl);
-		if (pathPrefix == null) {
+		final String programPath = FranceTvUrls.programPathFromCategoryUrl(category.getId());
+		if (programPath == null) {
 			return episodes;
 		}
 
-		final Document doc = Jsoup.parse(getUrlContent(categoryUrl));
-		for (final Element link : doc.select("a[href]")) {
-			final String href = link.attr("href");
-			if (!href.startsWith(pathPrefix) || !href.endsWith(".html")) {
-				continue;
+		try {
+			final List<Map<String, Object>> items = apiClient.fetchEpisodes(programPath);
+			for (final Map<String, Object> item : items) {
+				final Object type = item.get("type");
+				if (type == null || !FranceTvUrls.isReplayVideoType(String.valueOf(type))) {
+					continue;
+				}
+				final String pageUrl = FranceTvUrls.episodePageUrl(item);
+				if (StringUtils.isEmpty(pageUrl)) {
+					continue;
+				}
+				final String name = episodeDisplayName(item);
+				if (StringUtils.isEmpty(name)) {
+					continue;
+				}
+				episodes.add(new EpisodeDTO(category, name, pageUrl));
 			}
-			if (href.endsWith("/direct.html")) {
-				continue;
-			}
-			final String name = episodeName(link, href);
-			if (StringUtils.isEmpty(name)) {
-				continue;
-			}
-			episodes.add(new EpisodeDTO(category, name, toAbsoluteUrl(href)));
+		} catch (IOException e) {
+			getLog().error("Failed to fetch france.tv episodes for " + programPath, e);
 		}
 		return episodes;
 	}
@@ -64,38 +68,34 @@ public class FranceTvPluginManager extends BasePluginWithProxy implements Plugin
 			final CategoryDTO channel = new CategoryDTO(FranceTvConf.NAME, channelLabel(slug), channelUrl,
 					FranceTvConf.EXTENSION);
 			channel.setDownloadable(false);
-			channel.addSubCategories(findPrograms(channelUrl, slug));
+			channel.addSubCategories(findPrograms(slug));
 			categories.add(channel);
 		}
 		return categories;
 	}
 
-	private Collection<CategoryDTO> findPrograms(final String channelUrl, final String slug) {
+	private Collection<CategoryDTO> findPrograms(final String channelSlug) {
 		final Set<CategoryDTO> programs = new LinkedHashSet<>();
-		final Set<String> programPaths = new LinkedHashSet<>();
-		final String channelPrefix = "/" + slug + "/";
-		final Pattern programRootPattern = Pattern.compile("^/" + Pattern.quote(slug) + "/([^/]+)/");
-
-		final Document doc = Jsoup.parse(getUrlContent(channelUrl));
-		for (final Element link : doc.select("a[href^='" + channelPrefix + "']")) {
-			final String href = link.attr("href");
-			if (!href.endsWith("/") || href.contains(".html")) {
-				continue;
+		try {
+			final List<Map<String, Object>> items = apiClient.fetchPrograms(channelSlug);
+			for (final Map<String, Object> item : items) {
+				final Object rawPath = item.get("program_path");
+				if (rawPath == null) {
+					continue;
+				}
+				final String programPath = String.valueOf(rawPath);
+				final String programUrl = FranceTvUrls.programPageUrl(programPath);
+				if (StringUtils.isEmpty(programUrl)) {
+					continue;
+				}
+				final String programName = programLabel(item, programPath);
+				final CategoryDTO program = new CategoryDTO(FranceTvConf.NAME, programName, programUrl,
+						FranceTvConf.EXTENSION);
+				program.setDownloadable(true);
+				programs.add(program);
 			}
-			final Matcher matcher = programRootPattern.matcher(href);
-			if (!matcher.find()) {
-				continue;
-			}
-			programPaths.add("/" + slug + "/" + matcher.group(1) + "/");
-		}
-
-		for (final String programPath : programPaths) {
-			final String programUrl = FranceTvConf.HOME_URL + programPath;
-			final String programName = programLabel(programPath);
-			final CategoryDTO program = new CategoryDTO(FranceTvConf.NAME, programName, programUrl,
-					FranceTvConf.EXTENSION);
-			program.setDownloadable(true);
-			programs.add(program);
+		} catch (IOException e) {
+			getLog().error("Failed to fetch france.tv programs for channel " + channelSlug, e);
 		}
 		return programs;
 	}
@@ -124,43 +124,26 @@ public class FranceTvPluginManager extends BasePluginWithProxy implements Plugin
 		return "France " + slug.substring(slug.length() - 1);
 	}
 
-	private static String programLabel(final String programPath) {
-		final String slug = programPath.replaceAll("/$", "");
-		final int lastSlash = slug.lastIndexOf('/');
-		String segment = lastSlash >= 0 ? slug.substring(lastSlash + 1) : slug;
+	private static String programLabel(final Map<String, Object> item, final String programPath) {
+		final Object label = item.get("label");
+		if (label != null && StringUtils.isNotEmpty(String.valueOf(label))) {
+			return String.valueOf(label).trim();
+		}
+		final int lastUnderscore = programPath.lastIndexOf('_');
+		String segment = lastUnderscore >= 0 ? programPath.substring(lastUnderscore + 1) : programPath;
 		return segment.replace('-', ' ');
 	}
 
-	private static String episodeName(final Element link, final String href) {
-		String name = link.attr("title");
-		if (StringUtils.isEmpty(name)) {
-			name = link.text();
+	private static String episodeDisplayName(final Map<String, Object> item) {
+		final Object episodeTitle = item.get("episode_title");
+		if (episodeTitle != null && StringUtils.isNotEmpty(String.valueOf(episodeTitle))) {
+			return String.valueOf(episodeTitle).trim();
 		}
-		if (StringUtils.isEmpty(name)) {
-			name = href.replaceAll(".*/([^/]+)\\.html$", "$1").replace('-', ' ');
+		final Object title = item.get("title");
+		if (title != null && StringUtils.isNotEmpty(String.valueOf(title))) {
+			return String.valueOf(title).trim();
 		}
-		return name.trim();
-	}
-
-	private static String toAbsoluteUrl(final String href) {
-		if (href.startsWith("http://") || href.startsWith("https://")) {
-			return href;
-		}
-		if (href.startsWith("/")) {
-			return FranceTvConf.HOME_URL + href;
-		}
-		return FranceTvConf.HOME_URL + "/" + href;
-	}
-
-	private static String toPathPrefix(final String categoryUrl) {
-		if (StringUtils.isEmpty(categoryUrl)) {
-			return null;
-		}
-		final String withoutHost = categoryUrl.replace(FranceTvConf.HOME_URL, "");
-		if (!withoutHost.startsWith("/")) {
-			return null;
-		}
-		return withoutHost.endsWith("/") ? withoutHost : withoutHost + "/";
+		return "";
 	}
 
 }
