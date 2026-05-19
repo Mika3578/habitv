@@ -65,7 +65,7 @@ public class FranceTvPluginManager extends BasePluginWithProxy implements Plugin
 		final Set<CategoryDTO> categories = new LinkedHashSet<>();
 		for (final String slug : FranceTvConf.CHANNEL_SLUGS) {
 			final String channelUrl = FranceTvConf.HOME_URL + "/" + slug + "/";
-			final CategoryDTO channel = new CategoryDTO(FranceTvConf.NAME, channelLabel(slug), channelUrl,
+			final CategoryDTO channel = new CategoryDTO(FranceTvConf.NAME, FranceTvUrls.channelLabel(slug), channelUrl,
 					FranceTvConf.EXTENSION);
 			channel.setDownloadable(false);
 			channel.addSubCategories(findPrograms(slug));
@@ -111,17 +111,11 @@ public class FranceTvPluginManager extends BasePluginWithProxy implements Plugin
 		if (downloadInput.contains("france.tv") || downloadInput.contains("france2.")
 				|| downloadInput.contains("france3.") || downloadInput.contains("france4.")
 				|| downloadInput.contains("france5.") || downloadInput.contains("franceo.")
+				|| downloadInput.contains("franceinfo.fr") || downloadInput.contains("francetvinfo.fr")
 				|| downloadInput.contains("pluzz.")) {
 			return DownloadableState.SPECIFIC;
 		}
 		return DownloadableState.IMPOSSIBLE;
-	}
-
-	private static String channelLabel(final String slug) {
-		if ("france-o".equals(slug)) {
-			return "France O";
-		}
-		return "France " + slug.substring(slug.length() - 1);
 	}
 
 	private static String programLabel(final Map<String, Object> item, final String programPath) {

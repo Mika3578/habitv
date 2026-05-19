@@ -101,6 +101,21 @@ public class FranceTvUrlsTest {
 		assertFalse(FranceTvUrls.isReplayVideoType(""));
 	}
 
+	@Test
+	public void channelLabelMapsKnownSlugs() {
+		assertEquals("France 2", FranceTvUrls.channelLabel("france-2"));
+		assertEquals("France 3", FranceTvUrls.channelLabel("france-3"));
+		assertEquals("France 4", FranceTvUrls.channelLabel("france-4"));
+		assertEquals("France 5", FranceTvUrls.channelLabel("france-5"));
+		assertEquals("La 1ère", FranceTvUrls.channelLabel("la1ere"));
+	}
+
+	@Test
+	public void channelLabelEchoesUnknownSlug() {
+		assertEquals("franceinfo", FranceTvUrls.channelLabel("franceinfo"));
+		assertEquals("", FranceTvUrls.channelLabel(""));
+	}
+
 	private static Map<String, Object> sampleEpisode(final long id, final String title,
 			final String programPath, final Integer season) {
 		final Map<String, Object> item = new LinkedHashMap<>();

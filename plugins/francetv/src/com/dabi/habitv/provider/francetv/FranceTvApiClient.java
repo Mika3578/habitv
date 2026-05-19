@@ -20,7 +20,7 @@ final class FranceTvApiClient {
 
 	private static final ObjectMapper MAPPER = new ObjectMapper();
 
-	private static final int MAX_PAGES = 25;
+	private static final int MAX_PAGES = 100;
 
 	private static final int PAGE_SIZE = 20;
 

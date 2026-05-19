@@ -77,6 +77,23 @@ final class FranceTvUrls {
 		return "integrale".equals(type) || "unitaire".equals(type);
 	}
 
+	static String channelLabel(final String slug) {
+		switch (slug) {
+		case "france-2":
+			return "France 2";
+		case "france-3":
+			return "France 3";
+		case "france-4":
+			return "France 4";
+		case "france-5":
+			return "France 5";
+		case "la1ere":
+			return "La 1ère";
+		default:
+			return slug;
+		}
+	}
+
 	private static String programPathFromItem(final Map<String, Object> item) {
 		final Object program = item.get("program");
 		if (!(program instanceof Map)) {
