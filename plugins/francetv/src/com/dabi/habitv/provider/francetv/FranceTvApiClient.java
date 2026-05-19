@@ -26,9 +26,13 @@ final class FranceTvApiClient {
 		this.plugin = plugin;
 	}
 
+	static final int MAX_PAGES = 25;
+
+	static final int PAGE_SIZE = 20;
+
 	List<Map<String, Object>> fetchPrograms(final String channelSlug) throws IOException {
 		final List<Map<String, Object>> programs = new ArrayList<>();
-		for (int page = 0; page < 100; page++) {
+		for (int page = 0; page < MAX_PAGES; page++) {
 			final String url = FranceTvConf.API_MOBILE_URL + "/apps/regions/" + channelSlug + "/programs"
 					+ "?platform=" + FranceTvConf.API_PLATFORM + "&page=" + page;
 			final Map<String, Object> body = fetchJson(url);
@@ -37,7 +41,7 @@ final class FranceTvApiClient {
 				break;
 			}
 			programs.addAll(items);
-			if (items.size() < 20) {
+			if (items.size() < PAGE_SIZE) {
 				break;
 			}
 		}
@@ -46,7 +50,7 @@ final class FranceTvApiClient {
 
 	List<Map<String, Object>> fetchEpisodes(final String programPath) throws IOException {
 		final List<Map<String, Object>> episodes = new ArrayList<>();
-		for (int page = 0; page < 100; page++) {
+		for (int page = 0; page < MAX_PAGES; page++) {
 			final String url = FranceTvConf.API_MOBILE_URL + "/generic/taxonomy/" + programPath + "/contents"
 					+ "?platform=" + FranceTvConf.API_PLATFORM + "&page=" + page;
 			final Map<String, Object> body = fetchJson(url);
@@ -55,7 +59,7 @@ final class FranceTvApiClient {
 				break;
 			}
 			episodes.addAll(items);
-			if (items.size() < 20) {
+			if (items.size() < PAGE_SIZE) {
 				break;
 			}
 		}

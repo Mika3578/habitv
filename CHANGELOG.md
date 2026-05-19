@@ -32,7 +32,7 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 | Date | Commit | Change |
 |------|--------|--------|
-| 2026-05-18 | TBD | Replace `pluzz` provider with `francetv` (france.tv + yt-dlp) |
+| 2026-05-18 | TBD | Replace `pluzz` provider with `francetv` (france.tv + yt-dlp) — users must rename `<plugin name="pluzz">` to `<plugin name="francetv">` in their grab-config XML (legacy `pluzz.` URLs in `canDownload` remain accepted) |
 | 2026-05-18 | TBD | Migrate YouTube plugin downloader defaults to yt-dlp |
 | 2026-05-17 | `7a61dd6` | Add runnable yt-dlp runtime path for `consoleView` |
 
