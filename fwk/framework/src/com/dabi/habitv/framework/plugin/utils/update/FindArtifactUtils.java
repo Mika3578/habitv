@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.log4j.Logger;
@@ -144,6 +145,9 @@ public class FindArtifactUtils {
 			factory.setNamespaceAware(false);
 			factory.setExpandEntityReferences(false);
 			factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+			factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+			factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 			final Document document = factory.newDocumentBuilder().parse(
 					new InputSource(new StringReader(metadataContent)));
 			final NodeList snapshotVersionNodes = document.getElementsByTagName("snapshotVersion");
