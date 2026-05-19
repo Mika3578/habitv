@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 import org.junit.After;
 import org.junit.Test;
@@ -22,11 +23,11 @@ import com.dabi.habitv.api.plugin.exception.DownloadFailedException;
 import com.dabi.habitv.api.plugin.holder.DownloaderPluginHolder;
 import com.dabi.habitv.api.plugin.holder.ProcessHolder;
 import com.dabi.habitv.framework.FrameworkConf;
-import com.dabi.habitv.plugin.youtube.YoutubePluginDownloader;
+import com.dabi.habitv.framework.plugin.utils.CmdExecutor;
 
 /**
  * Opt-in live download test: ARTE episode URL via {@link ArtePluginManager}
- * delegating to yt-dlp ({@link YoutubePluginDownloader}).
+ * delegating to yt-dlp through the "youtube" downloader key.
  *
  * <p>Run only when explicitly enabled (network + yt-dlp + ffmpeg required):
  * <pre>
@@ -93,7 +94,7 @@ public class ArteYtDlpLiveDownloadTest {
 		downloadParam.addParam(FrameworkConf.PARAMETER_ARGS, YT_DLP_ARGS);
 
 		final Map<String, com.dabi.habitv.api.plugin.api.PluginDownloaderInterface> downloaders = new HashMap<>();
-		downloaders.put("youtube", new YoutubePluginDownloader());
+		downloaders.put("youtube", new YtDlpPassthroughDownloader());
 		final Map<String, String> binPaths = new HashMap<>();
 		binPaths.put("youtube", ytDlpBinary);
 		final DownloaderPluginHolder holder = new DownloaderPluginHolder(CMD_PROCESSOR,
@@ -156,6 +157,32 @@ public class ArteYtDlpLiveDownloadTest {
 		} catch (final InterruptedException e) {
 			Thread.currentThread().interrupt();
 			return null;
+		}
+	}
+
+	private static final class YtDlpPassthroughDownloader implements com.dabi.habitv.api.plugin.api.PluginDownloaderInterface {
+
+		@Override
+		public String getName() {
+			return "youtube";
+		}
+
+		@Override
+		public DownloadableState canDownload(final String downloadInput) {
+			return DownloadableState.SPECIFIC;
+		}
+
+		@Override
+		public ProcessHolder download(final DownloadParamDTO downloadParam, final DownloaderPluginHolder downloaders)
+				throws DownloadFailedException {
+			String cmd = downloaders.getBinPath("youtube") + " ";
+			final String cmdParam = downloadParam.getParam(FrameworkConf.PARAMETER_ARGS);
+			cmd += cmdParam;
+			cmd = cmd.replaceFirst(FrameworkConf.DOWNLOAD_INPUT,
+					Matcher.quoteReplacement(downloadParam.getDownloadInput()));
+			cmd = cmd.replaceFirst(FrameworkConf.DOWNLOAD_DESTINATION,
+					Matcher.quoteReplacement(downloadParam.getDownloadOutput()));
+			return new CmdExecutor(downloaders.getCmdProcessor(), cmd, -1);
 		}
 	}
 }
