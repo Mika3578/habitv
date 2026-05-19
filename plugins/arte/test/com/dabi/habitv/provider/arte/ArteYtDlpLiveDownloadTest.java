@@ -42,6 +42,9 @@ public class ArteYtDlpLiveDownloadTest {
 	private static final String LIVE_TESTS_PROPERTY = "habitv.liveTests";
 	private static final String YT_DLP_PATH_PROPERTY = "habitv.ytdlp.path";
 
+	private static final boolean IS_WINDOWS = System.getProperty("os.name", "").toLowerCase().contains("win");
+	private static final String CMD_PROCESSOR = IS_WINDOWS ? "cmd.exe /c #CMD#" : "/bin/sh -c #CMD#";
+
 	/** Stable replay URL; 15s low-quality clip keeps bandwidth small. */
 	private static final String SAMPLE_EPISODE_URL = "https://www.arte.tv/fr/videos/019729-000-A/talons-aiguilles/";
 
@@ -93,7 +96,7 @@ public class ArteYtDlpLiveDownloadTest {
 		downloaders.put("youtube", new YoutubePluginDownloader());
 		final Map<String, String> binPaths = new HashMap<>();
 		binPaths.put("youtube", ytDlpBinary);
-		final DownloaderPluginHolder holder = new DownloaderPluginHolder("",
+		final DownloaderPluginHolder holder = new DownloaderPluginHolder(CMD_PROCESSOR,
 				downloaders, binPaths, outputDir.getAbsolutePath(), outputDir.getAbsolutePath(),
 				outputDir.getAbsolutePath(), outputDir.getAbsolutePath());
 
@@ -136,8 +139,7 @@ public class ArteYtDlpLiveDownloadTest {
 			return file.getAbsolutePath();
 		}
 
-		final boolean windows = System.getProperty("os.name", "").toLowerCase().contains("win");
-		final String[] command = windows
+		final String[] command = IS_WINDOWS
 				? new String[] { "cmd.exe", "/c", "where yt-dlp" }
 				: new String[] { "sh", "-c", "command -v yt-dlp" };
 

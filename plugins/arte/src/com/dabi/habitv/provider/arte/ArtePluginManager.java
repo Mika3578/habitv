@@ -1,9 +1,7 @@
 package com.dabi.habitv.provider.arte;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -31,7 +29,7 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 
 	private static final int MAX_ZONE_PAGES = 25;
 
-	private final ObjectMapper objectMapper = new ObjectMapper();
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	@Override
 	public String getName() {
@@ -47,6 +45,7 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 		try {
 			return loadEpisodesFromPage(category, categoryParts[0], categoryParts[1]);
 		} catch (final TechnicalException e) {
+			getLog().warn("Failed to load Arte episodes for category " + category.getId(), e);
 			return new LinkedHashSet<>();
 		}
 	}
@@ -111,18 +110,12 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 		if (!data.isArray()) {
 			return;
 		}
-		final Map<String, EpisodeDTO> episodeByUrl = new LinkedHashMap<>();
-		for (final EpisodeDTO episode : episodes) {
-			episodeByUrl.put(episode.getId(), episode);
-		}
 		for (final JsonNode item : data) {
-			addEpisodeFromTeaser(category, episodeByUrl, item);
+			addEpisodeFromTeaser(category, episodes, item);
 		}
-		episodes.clear();
-		episodes.addAll(episodeByUrl.values());
 	}
 
-	private void addEpisodeFromTeaser(final CategoryDTO category, final Map<String, EpisodeDTO> episodeByUrl, final JsonNode item) {
+	private void addEpisodeFromTeaser(final CategoryDTO category, final Set<EpisodeDTO> episodes, final JsonNode item) {
 		final String url = resolveUrl(item.path("url").asText(null));
 		if (StringUtils.isEmpty(url) || !EPISODE_URL_PATTERN.matcher(url).find()) {
 			return;
@@ -134,9 +127,7 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 		if (StringUtils.isEmpty(title)) {
 			return;
 		}
-		if (!episodeByUrl.containsKey(url)) {
-			episodeByUrl.put(url, new EpisodeDTO(category, title, url));
-		}
+		episodes.add(new EpisodeDTO(category, title, url));
 	}
 
 	private String buildCategoryId(final String languageCode, final String pageCode) {
@@ -179,7 +170,7 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 
 	private JsonNode parseJson(final String json, final String sourceUrl) {
 		try {
-			return objectMapper.readTree(json);
+			return OBJECT_MAPPER.readTree(json);
 		} catch (final IOException e) {
 			throw new TechnicalException("Cannot parse Arte EMAC response from " + sourceUrl, e);
 		}
