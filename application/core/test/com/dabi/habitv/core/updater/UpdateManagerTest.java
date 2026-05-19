@@ -2,6 +2,8 @@ package com.dabi.habitv.core.updater;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -43,7 +45,7 @@ public class UpdateManagerTest {
 
 	@Test
 	public void processSkipsWhenUpdatesDisabled() {
-		System.clearProperty(FrameworkConf.UPDATE_ENABLED_PROPERTY);
+		System.setProperty(FrameworkConf.UPDATE_ENABLED_PROPERTY, "false");
 		System.setProperty(FrameworkConf.UPDATE_URL_PROPERTY, "https://updates.must-not-be-used.example/repository/");
 
 		final AtomicInteger notifications = new AtomicInteger();
@@ -57,6 +59,31 @@ public class UpdateManagerTest {
 		updateManager.process();
 
 		assertEquals(0, notifications.get());
+	}
+
+	@Test
+	public void resolveUpdateEnabledDefaultsToTrueWhenPropertyMissing()
+			throws Exception {
+		System.clearProperty(FrameworkConf.UPDATE_ENABLED_PROPERTY);
+		final Method resolveUpdateEnabled = UpdateManager.class
+				.getDeclaredMethod("resolveUpdateEnabled");
+		resolveUpdateEnabled.setAccessible(true);
+
+		assertTrue((Boolean) resolveUpdateEnabled.invoke(null));
+	}
+
+	@Test
+	public void resolveUpdateEnabledSupportsExplicitTrueFalse()
+			throws Exception {
+		final Method resolveUpdateEnabled = UpdateManager.class
+				.getDeclaredMethod("resolveUpdateEnabled");
+		resolveUpdateEnabled.setAccessible(true);
+
+		System.setProperty(FrameworkConf.UPDATE_ENABLED_PROPERTY, "true");
+		assertTrue((Boolean) resolveUpdateEnabled.invoke(null));
+
+		System.setProperty(FrameworkConf.UPDATE_ENABLED_PROPERTY, "false");
+		assertFalse((Boolean) resolveUpdateEnabled.invoke(null));
 	}
 
 	@Test
