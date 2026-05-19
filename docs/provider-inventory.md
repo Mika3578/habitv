@@ -131,6 +131,32 @@ Baseline tests added (local fixture loading only):
 
 ---
 
+## Live provider tests vs default Maven lifecycle
+
+Root `pom.xml` excludes `**/*PluginManagerTest.java` and live mailbox
+`MessageReceiverTest.java` from default Surefire runs.
+These tests call live broadcaster endpoints via `BasePluginProviderTester` and
+are opt-in only:
+
+```bash
+mvn -B -ntp test -Plive-provider-tests
+```
+
+Offline fixture baseline tests (for example `ArteOfflineFixtureBaselineTest`,
+`SixPlayOfflineFixtureBaselineTest`) remain in the default `mvn test` lifecycle.
+
+### Arte live provider drift (2026-05)
+
+`ArtePluginManagerTest` currently fails with `categorie liste vide` because the
+live Arte site no longer returns categories through the legacy parser. This is
+provider/runtime drift, not a static-repository deploy regression.
+
+- Tracked for repair in a dedicated provider PR (endpoint/parser rewrite).
+- Must not block `mvn deploy -Pstatic-repo-deploy` or default `mvn test`.
+- Reproduce with: `mvn -B -ntp test -Plive-provider-tests -pl plugins/arte -am`
+
+---
+
 ## Follow-up PR queue (safe order)
 
 1. **test(provider-inventory): add offline fixtures for unknown providers**

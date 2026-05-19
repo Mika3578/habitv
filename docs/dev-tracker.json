@@ -161,7 +161,7 @@
         "python scripts/static-repo/validate_repository_layout.py <repository-root>"
       ],
       "pr": "habitv-repo #2 (merged); habitv PR #49 (publication status + tracker refresh)",
-      "notes": "Runtime updates are enabled by default at startup. Publication cutover is live on GitHub Pages with token-free HTTPS access. Developer SNAPSHOT updates use -Dhabitv.update.autoriseSnapshot=true while configuration.xml keeps autoriseSnapshot false. Runtime artifact resolution now prioritizes explicit manifest download paths and falls back to maven-metadata.xml for timestamped SNAPSHOT JAR names. Remaining follow-up: run one dedicated opt-in runtime update smoke test with habitv.update.autoriseSnapshot=true against the published URL."
+      "notes": "Runtime updates are enabled by default at startup. Publication cutover is live on GitHub Pages with token-free HTTPS access. Developer SNAPSHOT updates use -Dhabitv.update.autoriseSnapshot=true while configuration.xml keeps autoriseSnapshot false. Runtime artifact resolution now prioritizes explicit manifest download paths and falls back to maven-metadata.xml for timestamped SNAPSHOT JAR names. Local static-repo deploy uses static-repo-deploy profile and habitv.deploy.repository.url; deployAtEnd=true prevents partial habitv-repo updates on reactor failure. Default mvn test skips live *PluginManagerTest; use -Plive-provider-tests. Arte live test currently fails (empty categories) — provider drift, not deploy regression. Remaining follow-up: run one dedicated opt-in runtime update smoke test with habitv.update.autoriseSnapshot=true against the published URL."
     },
     {
       "id": "provider-inventory",
@@ -186,7 +186,7 @@
         "mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test"
       ],
       "pr": "test/provider-offline-fixture-baseline (this PR)",
-      "notes": "Inventory baseline from PR #50 is extended with an offline fixture policy and first local fixture metadata/tests for 6play, canalPlus, pluzz, arte, and youtube. No provider rewrite, plugin removal, runtime updater change, yt-dlp migration, JavaFX modernization, or Maven publication change."
+      "notes": "Inventory baseline from PR #50 is extended with an offline fixture policy and first local fixture metadata/tests for 6play, canalPlus, pluzz, arte, and youtube. Arte live PluginManagerTest fails (categorie liste vide) — documented as provider drift; repair in dedicated provider PR. Default Surefire excludes *PluginManagerTest; offline fixture baselines stay enabled. No provider rewrite, plugin removal, runtime updater change, yt-dlp migration, JavaFX modernization, or Maven publication layout change in inventory-only work."
     },
     {
       "id": "ytdlp-migration",

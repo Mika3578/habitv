@@ -272,7 +272,11 @@ python scripts/static-repo/validate_repository_layout.py "<repository-root>"
 
 **Notes** — Runtime updates are enabled by default at startup.
 Publication cutover is complete (`https://mika3578.github.io/habitv-repo/repository/`
-and `plugins.txt` live with no authentication). SNAPSHOT consumption for
+and `plugins.txt` live with no authentication). Local deploy uses profile
+`static-repo-deploy` and `habitv.deploy.repository.url`. Deploy uses
+`deployAtEnd=true` so a late reactor failure does not partially publish to
+`habitv-repo`. Live `*PluginManagerTest` classes are excluded from default
+`mvn test`; use `-Plive-provider-tests` explicitly. SNAPSHOT consumption for
 developers is opt-in via `-Dhabitv.update.autoriseSnapshot=true` while
 `configuration.xml` keeps `autoriseSnapshot` false. Remaining follow-up:
 run one dedicated opt-in runtime update smoke test with
@@ -318,8 +322,11 @@ mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Ds
 plus historical references (`D8`, `D17`, `nrj12`, FranceTV/Pluzz,
 Kewego). An offline fixture policy and first local fixture baseline are
 now documented for `6play`, `canalPlus`, `pluzz`, `arte`, and `youtube`
-without rewriting providers. This item remains open for broader fixture
-capture and dedicated cleanup/rewrite PRs. Risks `live-tests-flaky`,
+without rewriting providers. Default `mvn test` skips live
+`*PluginManagerTest`; use `-Plive-provider-tests`. Arte live test
+currently fails (`categorie liste vide`) — provider drift, documented in
+inventory. This item remains open for broader fixture capture and
+dedicated cleanup/rewrite PRs. Risks `live-tests-flaky`,
 `provider-endpoints-dead`.
 
 ---
