@@ -135,16 +135,15 @@ You can disable runtime plugin updates explicitly with
 `-Dhabitv.update.enabled=false` (optional custom base:
 `-Dhabitv.update.url=...`).
 
-Development snapshot updates: keep `<autoriseSnapshot>false</autoriseSnapshot>`
-in `configuration.xml` and pass `-Dhabitv.update.autoriseSnapshot=true` when you
-need Maven timestamped SNAPSHOT plugin artifacts from the static repository.
-This override must not be enabled for normal end users.
+Snapshot artifacts: `<autoriseSnapshot>true</autoriseSnapshot>` is the
+default because the published static repository currently ships only Maven
+timestamped `-SNAPSHOT` plugin builds. To pin to release-only behaviour,
+set `<autoriseSnapshot>false</autoriseSnapshot>` in `configuration.xml`, or
+pass `-Dhabitv.update.autoriseSnapshot=false`.
 
 Reference launch command:
 
 ```bash
-java -Dhabitv.update.enabled=true \
-  -Dhabitv.update.autoriseSnapshot=true \
-  -Dhabitv.update.url=https://mika3578.github.io/habitv-repo/repository/ \
+java -Dhabitv.update.url=https://mika3578.github.io/habitv-repo/repository/ \
   -jar application/habiTv/target/habiTv-4.1.0-SNAPSHOT.jar
 ```

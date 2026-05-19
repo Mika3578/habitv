@@ -163,22 +163,20 @@ disable startup updates with `-Dhabitv.update.enabled=false`.
 
 If GitHub Pages is unreachable, Habitv keeps local plugins and tools.
 
-### Development snapshot updates
+### Snapshot artifacts
 
 Maven deploy publishes timestamped SNAPSHOT JARs (for example
-`arte-4.1.0-20260518.163022-1.jar`). Normal users must keep
-`updateConfig/autoriseSnapshot` set to `false` in `configuration.xml`.
-Do not rely on non-timestamped `artifactId-<version>-SNAPSHOT.jar` names on
-GitHub Pages.
+`arte-4.1.0-20260518.163022-1.jar`). Because the published static repository
+currently ships only `-SNAPSHOT` builds for every plugin, `autoriseSnapshot`
+defaults to `true` in `configuration.xml`. Do not rely on non-timestamped
+`artifactId-<version>-SNAPSHOT.jar` names on GitHub Pages.
 
-For local development against the published static repository, run Habitv with an
-explicit JVM override (configuration value is read first, then overridden only
-when the property is set):
+To pin to release-only behaviour (skip SNAPSHOT entries from the manifest),
+set `<autoriseSnapshot>false</autoriseSnapshot>` in `configuration.xml`, or
+pass `-Dhabitv.update.autoriseSnapshot=false`:
 
 ```bash
-java -Dhabitv.update.enabled=true \
-  -Dhabitv.update.autoriseSnapshot=true \
-  -jar habitv.jar
+java -Dhabitv.update.autoriseSnapshot=false -jar habitv.jar
 ```
 
 Supported values for `habitv.update.autoriseSnapshot` are `true` and `false`
