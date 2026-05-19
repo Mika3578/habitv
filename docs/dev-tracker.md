@@ -277,6 +277,8 @@ developers is opt-in via `-Dhabitv.update.autoriseSnapshot=true` while
 `configuration.xml` keeps `autoriseSnapshot` false. Remaining follow-up:
 run one dedicated opt-in runtime update smoke test with
 `-Dhabitv.update.autoriseSnapshot=true` against the published Pages URL.
+Runtime artifact resolution now prefers explicit manifest download paths and
+falls back to `maven-metadata.xml` for timestamped SNAPSHOT JAR filenames.
 
 ---
 

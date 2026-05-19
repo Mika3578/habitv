@@ -161,7 +161,7 @@
         "python scripts/static-repo/validate_repository_layout.py <repository-root>"
       ],
       "pr": "habitv-repo #2 (merged); habitv PR #49 (publication status + tracker refresh)",
-      "notes": "Runtime updates are enabled by default at startup. Publication cutover is live on GitHub Pages with token-free HTTPS access. Developer SNAPSHOT updates use -Dhabitv.update.autoriseSnapshot=true while configuration.xml keeps autoriseSnapshot false. Remaining follow-up: run one dedicated runtime update smoke test with habitv.update.autoriseSnapshot=true against the published URL."
+      "notes": "Runtime updates are enabled by default at startup. Publication cutover is live on GitHub Pages with token-free HTTPS access. Developer SNAPSHOT updates use -Dhabitv.update.autoriseSnapshot=true while configuration.xml keeps autoriseSnapshot false. Runtime artifact resolution now prioritizes explicit manifest download paths and falls back to maven-metadata.xml for timestamped SNAPSHOT JAR names. Remaining follow-up: run one dedicated opt-in runtime update smoke test with habitv.update.autoriseSnapshot=true against the published URL."
     },
     {
       "id": "provider-inventory",

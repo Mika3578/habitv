@@ -45,20 +45,24 @@ public class UpdateManager {
 
 	public void process() {
 		final boolean updateEnabled = resolveUpdateEnabled();
-		if (!updateEnabled) {
-			LOG.info("Plugin update check is disabled by "
-					+ FrameworkConf.UPDATE_ENABLED_PROPERTY + "=false.");
-			return;
-		}
 		final String updateSite = System.getProperty(
 				FrameworkConf.UPDATE_URL_PROPERTY, site);
+		final String baseUrl = updateSite == null ? null
+				: UpdateRepositoryUrls.normalizeBaseUrl(updateSite.trim());
+		LOG.info("Runtime plugin update configuration: enabled=" + updateEnabled
+				+ ", autoriseSnapshot=" + autoriseSnapshot + ", updateUrl="
+				+ baseUrl);
+		if (!updateEnabled) {
+			LOG.debug("Plugin update check is disabled.");
+			return;
+		}
 		if (updateSite == null || updateSite.trim().isEmpty()) {
 			LOG.warn("Plugin update check is enabled but no update URL is configured.");
 			return;
 		}
 		try {
 			LOG.info("Checking plugin updates...");
-			final String[] toUpdate = resolvePluginsToUpdate(updateSite);
+			final String[] toUpdate = resolvePluginsToUpdate(baseUrl);
 			if (toUpdate.length == 0) {
 				LOG.warn("No plugins listed for update; keeping local plugins.");
 				return;
@@ -75,6 +79,40 @@ public class UpdateManager {
 		} catch (Exception e) {
 			LOG.error("Plugin update failed; keeping local plugins.", e);
 		}
+	}
+
+	public Publisher<UpdatePluginEvent> getUpdatePublisher() {
+		return updatePublisher;
+	}
+
+	private String[] resolvePluginsToUpdate(final String baseUrl) {
+		try {
+			final String pluginsList = RetrieverUtils.getUrlContent(
+					baseUrl + "/" + FrameworkConf.PLUGINS_LIST_FILE, null);
+			if (pluginsList != null && !pluginsList.trim().isEmpty()) {
+				final String[] pluginIds = splitPluginLines(pluginsList);
+				LOG.info("plugins.txt loaded from " + baseUrl + "/"
+						+ FrameworkConf.PLUGINS_LIST_FILE + " with "
+						+ pluginIds.length + " plugin ids.");
+				return pluginIds;
+			}
+			LOG.info("plugins.txt loaded from " + baseUrl + "/"
+					+ FrameworkConf.PLUGINS_LIST_FILE + " but it is empty.");
+		} catch (final RuntimeException e) {
+			LOG.info("plugins.txt not loaded from " + baseUrl + "/"
+					+ FrameworkConf.PLUGINS_LIST_FILE + ": " + e.getMessage());
+		}
+		final HabitvUpdateManifest manifest = HabitvUpdateManifest.loadFromRepository(baseUrl);
+		if (!manifest.isEmpty()) {
+			LOG.info("Update manifest loaded from " + baseUrl + "/"
+					+ FrameworkConf.UPDATE_MANIFEST_FILE + " with "
+					+ manifest.getEntries().size()
+					+ " entries. Falling back to manifest artifact list because plugins.txt is unavailable.");
+			return manifest.getPluginArtifactIds();
+		}
+		LOG.info("Update manifest not loaded from " + baseUrl + "/"
+				+ FrameworkConf.UPDATE_MANIFEST_FILE);
+		return new String[0];
 	}
 
 	private static boolean resolveUpdateEnabled() {
@@ -94,28 +132,6 @@ public class UpdateManager {
 				+ " value \"" + configured
 				+ "\"; defaulting to enabled update checks.");
 		return true;
-	}
-
-	public Publisher<UpdatePluginEvent> getUpdatePublisher() {
-		return updatePublisher;
-	}
-
-	private String[] resolvePluginsToUpdate(final String updateSite) {
-		final String baseUrl = UpdateRepositoryUrls.normalizeBaseUrl(updateSite.trim());
-		try {
-			final String pluginsList = RetrieverUtils.getUrlContent(
-					baseUrl + "/" + FrameworkConf.PLUGINS_LIST_FILE, null);
-			if (pluginsList != null && !pluginsList.trim().isEmpty()) {
-				return splitPluginLines(pluginsList);
-			}
-		} catch (final RuntimeException e) {
-			LOG.debug("plugins.txt not available at " + baseUrl + ": " + e.getMessage());
-		}
-		final HabitvUpdateManifest manifest = HabitvUpdateManifest.loadFromRepository();
-		if (!manifest.isEmpty()) {
-			return manifest.getPluginArtifactIds();
-		}
-		return new String[0];
 	}
 
 	private static String[] splitPluginLines(final String pluginsList) {
