@@ -12,7 +12,7 @@ interface FranceTvConf {
 
 	String API_PLATFORM = "apps";
 
-	String[] CHANNEL_SLUGS = { "france-2", "france-3", "france-4", "france-5", "france-o" };
+	String[] CHANNEL_SLUGS = { "france-2", "france-3", "france-4", "france-5", "la1ere" };
 
 	String EXTENSION = FrameworkConf.MP4;
 
