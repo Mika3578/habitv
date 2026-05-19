@@ -13,7 +13,11 @@ Workflow: `.github/workflows/ci-maven.yml` (`Maven CI`)
 
 ### Required checks (branch protection)
 
-Configure branch protection to require only:
+Transition note: repository governance currently requires:
+
+- `CI / validate (zulu-8)` (from `.github/workflows/ci.yml`)
+
+When moving branch protection to this workflow, require:
 
 - `Maven CI / validate-java8`
 - `Maven CI / deterministic-tests-java8`
