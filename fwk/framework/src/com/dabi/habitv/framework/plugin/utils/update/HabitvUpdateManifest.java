@@ -77,8 +77,16 @@ public final class HabitvUpdateManifest {
 		}
 
 		public String getDownloadUrl() {
+			return getDownloadUrl(null);
+		}
+
+		public String getDownloadUrl(final String baseUrl) {
 			if (relativeUrl.startsWith("http://") || relativeUrl.startsWith("https://")) {
 				return relativeUrl;
+			}
+			if (baseUrl != null && !baseUrl.isEmpty()) {
+				final String path = relativeUrl.startsWith("/") ? relativeUrl.substring(1) : relativeUrl;
+				return baseUrl + "/" + path;
 			}
 			return UpdateRepositoryUrls.buildRepositoryUrl(relativeUrl);
 		}
@@ -86,12 +94,19 @@ public final class HabitvUpdateManifest {
 
 	private final List<Entry> entries;
 
-	private HabitvUpdateManifest(final List<Entry> entries) {
+	private final String baseUrl;
+
+	private HabitvUpdateManifest(final List<Entry> entries, final String baseUrl) {
 		this.entries = Collections.unmodifiableList(entries);
+		this.baseUrl = baseUrl;
 	}
 
 	public List<Entry> getEntries() {
 		return entries;
+	}
+
+	public String getBaseUrl() {
+		return baseUrl;
 	}
 
 	public List<Entry> findEntries(final String groupId, final String artifactId, final ArtifactKind kind) {
@@ -131,7 +146,8 @@ public final class HabitvUpdateManifest {
 		final String manifestUrl = normalizedBase + "/" + FrameworkConf.UPDATE_MANIFEST_FILE;
 		try {
 			final String content = RetrieverUtils.getUrlContent(manifestUrl, null);
-			return parse(content);
+			final HabitvUpdateManifest parsed = parse(content);
+			return new HabitvUpdateManifest(new ArrayList<>(parsed.entries), normalizedBase);
 		} catch (final RuntimeException e) {
 			LOG.debug("Update manifest not available at " + manifestUrl + ": " + e.getMessage());
 			return empty();
@@ -164,7 +180,7 @@ public final class HabitvUpdateManifest {
 				}
 			}
 		}
-		return new HabitvUpdateManifest(parsed);
+		return new HabitvUpdateManifest(parsed, null);
 	}
 
 	static Entry parseLine(final String line) {
@@ -207,7 +223,7 @@ public final class HabitvUpdateManifest {
 	}
 
 	public static HabitvUpdateManifest empty() {
-		return new HabitvUpdateManifest(Collections.<Entry>emptyList());
+		return new HabitvUpdateManifest(Collections.<Entry>emptyList(), null);
 	}
 
 	public boolean isEmpty() {

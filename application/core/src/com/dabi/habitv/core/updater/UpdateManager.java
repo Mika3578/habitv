@@ -86,16 +86,6 @@ public class UpdateManager {
 	}
 
 	private String[] resolvePluginsToUpdate(final String baseUrl) {
-		final HabitvUpdateManifest manifest = HabitvUpdateManifest.loadFromRepository(baseUrl);
-		if (manifest.isEmpty()) {
-			LOG.info("Update manifest not loaded from " + baseUrl + "/"
-					+ FrameworkConf.UPDATE_MANIFEST_FILE);
-		} else {
-			LOG.info("Update manifest loaded from " + baseUrl + "/"
-					+ FrameworkConf.UPDATE_MANIFEST_FILE + " with "
-					+ manifest.getEntries().size() + " entries.");
-		}
-
 		try {
 			final String pluginsList = RetrieverUtils.getUrlContent(
 					baseUrl + "/" + FrameworkConf.PLUGINS_LIST_FILE, null);
@@ -112,10 +102,16 @@ public class UpdateManager {
 			LOG.info("plugins.txt not loaded from " + baseUrl + "/"
 					+ FrameworkConf.PLUGINS_LIST_FILE + ": " + e.getMessage());
 		}
+		final HabitvUpdateManifest manifest = HabitvUpdateManifest.loadFromRepository(baseUrl);
 		if (!manifest.isEmpty()) {
-			LOG.info("Falling back to manifest artifact list because plugins.txt is unavailable.");
+			LOG.info("Update manifest loaded from " + baseUrl + "/"
+					+ FrameworkConf.UPDATE_MANIFEST_FILE + " with "
+					+ manifest.getEntries().size()
+					+ " entries. Falling back to manifest artifact list because plugins.txt is unavailable.");
 			return manifest.getPluginArtifactIds();
 		}
+		LOG.info("Update manifest not loaded from " + baseUrl + "/"
+				+ FrameworkConf.UPDATE_MANIFEST_FILE);
 		return new String[0];
 	}
 

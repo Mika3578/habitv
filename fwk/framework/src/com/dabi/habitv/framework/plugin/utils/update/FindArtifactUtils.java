@@ -202,7 +202,8 @@ public class FindArtifactUtils {
 			if (!matchesExtension(entry, extension)) {
 				continue;
 			}
-			if (entry.getVersion() != null && entry.getVersion().contains("SNAPSHOT")) {
+			if (entry.getVersion() != null && entry.getVersion().contains("SNAPSHOT")
+					&& (versionMaj == null || entry.getVersion().startsWith(versionMaj))) {
 				snapshotEntryFound = true;
 			}
 			if (!isVersionEligible(entry.getVersion(), versionMaj, autoriseSnapshot)) {
@@ -230,7 +231,7 @@ public class FindArtifactUtils {
 		Collections.sort(entries, (left, right) -> AlphanumComparator.INSTANCE
 				.compare(left.getRelativeUrl(), right.getRelativeUrl()));
 		final Entry entry = entries.get(entries.size() - 1);
-		return new ArtifactVersion(entry.getDownloadUrl(), version, ArtifactVersion.ResolutionSource.MANIFEST);
+		return new ArtifactVersion(entry.getDownloadUrl(manifest.getBaseUrl()), version, ArtifactVersion.ResolutionSource.MANIFEST);
 	}
 
 	private static boolean matchesExtension(final Entry entry, final String extension) {
@@ -284,11 +285,7 @@ public class FindArtifactUtils {
 		}
 		final String artifactVersionUrl = artifactURL + "/" + version;
 		if (version.contains("SNAPSHOT")) {
-			final ArtifactVersion snapshotVersion = findSnapshotVersionFromMetadata(artifactVersionUrl, artifactId, version,
-					extension);
-			if (snapshotVersion != null) {
-				return snapshotVersion;
-			}
+			return findSnapshotVersionFromMetadata(artifactVersionUrl, artifactId, version, extension);
 		}
 		items = findItems(Type.FILE, artifactVersionUrl);
 		final List<String> files = new LinkedList<>();
@@ -313,7 +310,7 @@ public class FindArtifactUtils {
 			final String metadataContent = RetrieverUtils.getUrlContent(metadataUrl, null);
 			final String snapshotValue = extractSnapshotValueFromMetadata(metadataContent, extension);
 			if (snapshotValue == null) {
-				LOG.warn("No <snapshotVersion> jar entry found in " + metadataUrl);
+				LOG.warn("No <snapshotVersion> " + extension + " entry found in " + metadataUrl);
 				return null;
 			}
 			final String finalFileName = artifactId + "-" + snapshotValue + "." + extension;

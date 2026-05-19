@@ -125,6 +125,53 @@ public class FindArtifactUtilsTest {
 	}
 
 	@Test
+	public void returnsNullWhenSnapshotMetadataUnavailableInsteadOfFallingThroughToDirectoryListing() {
+		// No manifest entry for youtube and no metadata - only a version directory listing
+		addVersionListing();
+		// Metadata endpoint intentionally absent (no addSnapshotMetadata call)
+
+		final ArtifactVersion resolved = FindArtifactUtils.findLastVersionUrl(GROUP_ID, ARTIFACT_ID, SNAPSHOT_VERSION,
+				true, "jar");
+
+		assertNull("SNAPSHOT resolution must fail when maven-metadata.xml is missing, not fall back to directory listing",
+				resolved);
+	}
+
+	@Test
+	public void doesNotLogSnapshotSkipWarningWhenManifestOnlyContainsWrongMajorVersionSnapshot() {
+		// Manifest has a SNAPSHOT for a different major version (5.0, not 4.1)
+		addManifest("plugin|com.dabi.habitv|youtube|5.0-SNAPSHOT|jar|com/dabi/habitv/youtube/5.0-SNAPSHOT/youtube-5.0-SNAPSHOT.jar");
+
+		final MemoryAppender appender = new MemoryAppender();
+		final Logger logger = Logger.getLogger(FindArtifactUtils.class);
+		logger.addAppender(appender);
+		try {
+			// Resolve with coreVersion that resolves to major "4.1"
+			final ArtifactVersion resolved = FindArtifactUtils.findLastVersionUrl(GROUP_ID, ARTIFACT_ID, SNAPSHOT_VERSION,
+					false, "jar");
+			assertNull(resolved);
+		} finally {
+			logger.removeAppender(appender);
+		}
+
+		assertTrue("No snapshot-disabled warning expected when the only SNAPSHOT is for a different major version",
+				!appender.contains("Skipping SNAPSHOT plugin artifact"));
+	}
+
+	@Test
+	public void manifestEntryDownloadUrlUsesManifestBaseUrlWhenRelative() {
+		final String baseUrl = "http://127.0.0.1:" + server.getAddress().getPort() + "/repository";
+		final String relativeUrl = "com/dabi/habitv/youtube/4.1.0-SNAPSHOT/" + TIMESTAMPED_JAR;
+		final HabitvUpdateManifest manifest = HabitvUpdateManifest.loadFromRepository(baseUrl);
+		// Build a synthetic entry to verify URL resolution path (parse-based)
+		final HabitvUpdateManifest.Entry entry = HabitvUpdateManifest.parseLine(
+				"plugin|com.dabi.habitv|youtube|4.1.0-SNAPSHOT|jar|" + relativeUrl);
+		assertNotNull(entry);
+		final String downloadUrl = entry.getDownloadUrl(UpdateRepositoryUrls.normalizeBaseUrl(baseUrl));
+		assertEquals(UpdateRepositoryUrls.normalizeBaseUrl(baseUrl) + "/" + relativeUrl, downloadUrl);
+	}
+
+	@Test
 	public void extractSnapshotValueFromMetadataUsesJarExtensionWithoutClassifier() {
 		final String metadata = buildMetadata();
 		final String snapshotValue = FindArtifactUtils.extractSnapshotValueFromMetadata(metadata, "jar");
