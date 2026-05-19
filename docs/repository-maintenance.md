@@ -16,7 +16,8 @@ triage while keeping merge control with maintainers.
 
 - Dependency Review blocks pull requests that introduce new `high` or
   `critical` vulnerabilities in dependencies.
-- CodeQL runs separately from Maven CI and reports code scanning alerts.
+- CodeQL default setup runs separately from Maven CI and reports code
+  scanning alerts.
 
 ## Triage automation
 

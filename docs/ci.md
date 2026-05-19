@@ -26,8 +26,8 @@ Do not require yet (diagnostic compatibility lanes and broad suite):
   on pull requests to `develop` and `master` and fails when newly
   introduced dependencies have `high` or `critical` known
   vulnerabilities.
-- **CodeQL** (`.github/workflows/codeql.yml`) runs as a dedicated code
-  scanning workflow and reports alerts in GitHub code scanning.
+- **CodeQL** default setup runs as repository code scanning and reports
+  alerts in GitHub code scanning.
 
 ## Maintenance automation
 
