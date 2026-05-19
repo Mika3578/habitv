@@ -1,0 +1,106 @@
+package com.dabi.habitv.provider.francetv;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import com.dabi.habitv.framework.plugin.api.BasePluginWithProxy;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+/**
+ * Thin client for france.tv mobile catalogue API (api-mobile.yatta.francetv.fr).
+ */
+final class FranceTvApiClient {
+
+	private static final TypeReference<Map<String, Object>> MAP_TYPE = new TypeReference<Map<String, Object>>() {
+	};
+
+	private static final ObjectMapper MAPPER = new ObjectMapper();
+
+	private static final int MAX_PAGES = 100;
+
+	private static final int PAGE_SIZE = 20;
+
+	private final BasePluginWithProxy plugin;
+
+	FranceTvApiClient(final BasePluginWithProxy plugin) {
+		this.plugin = plugin;
+	}
+
+	List<Map<String, Object>> fetchPrograms(final String channelSlug) throws IOException {
+		final List<Map<String, Object>> programs = new ArrayList<>();
+		boolean exhausted = false;
+		for (int page = 0; page < MAX_PAGES; page++) {
+			final String url = FranceTvConf.API_MOBILE_URL + "/apps/regions/" + channelSlug + "/programs"
+					+ "?platform=" + FranceTvConf.API_PLATFORM + "&page=" + page;
+			final Map<String, Object> body = fetchJson(url);
+			final List<Map<String, Object>> items = castItemList(body.get("items"));
+			if (items.isEmpty()) {
+				exhausted = true;
+				break;
+			}
+			programs.addAll(items);
+			if (items.size() < PAGE_SIZE) {
+				exhausted = true;
+				break;
+			}
+		}
+		if (!exhausted) {
+			warnTruncated("programs for channel " + channelSlug);
+		}
+		return programs;
+	}
+
+	List<Map<String, Object>> fetchEpisodes(final String programPath) throws IOException {
+		final List<Map<String, Object>> episodes = new ArrayList<>();
+		boolean exhausted = false;
+		for (int page = 0; page < MAX_PAGES; page++) {
+			final String url = FranceTvConf.API_MOBILE_URL + "/generic/taxonomy/" + programPath + "/contents"
+					+ "?platform=" + FranceTvConf.API_PLATFORM + "&page=" + page;
+			final Map<String, Object> body = fetchJson(url);
+			final List<Map<String, Object>> items = castItemList(body.get("items"));
+			if (items.isEmpty()) {
+				exhausted = true;
+				break;
+			}
+			episodes.addAll(items);
+			if (items.size() < PAGE_SIZE) {
+				exhausted = true;
+				break;
+			}
+		}
+		if (!exhausted) {
+			warnTruncated("episodes for program " + programPath);
+		}
+		return episodes;
+	}
+
+	private void warnTruncated(final String resource) {
+		plugin.getLog().warn("france.tv catalogue truncated after MAX_PAGES=" + MAX_PAGES
+				+ " (PAGE_SIZE=" + PAGE_SIZE + ") while fetching " + resource
+				+ "; some entries may be missing.");
+	}
+
+	private Map<String, Object> fetchJson(final String url) throws IOException {
+		return MAPPER.readValue(plugin.getInputStreamFromUrl(url), MAP_TYPE);
+	}
+
+	@SuppressWarnings("unchecked")
+	private static List<Map<String, Object>> castItemList(final Object raw) {
+		if (!(raw instanceof List)) {
+			return Collections.emptyList();
+		}
+		final List<?> list = (List<?>) raw;
+		final List<Map<String, Object>> items = new ArrayList<>(list.size());
+		for (final Object entry : list) {
+			if (entry instanceof Map) {
+				items.add((Map<String, Object>) entry);
+			}
+		}
+		return items;
+	}
+
+}

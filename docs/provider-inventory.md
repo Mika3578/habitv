@@ -40,7 +40,7 @@
 | `plugins/lequipe` | `lequipe` | provider | needs live endpoint rewrite | Provider/downloader plugin uses HTML scraping; tests include historical Kewego stream-init references | rewrite provider |
 | `plugins/mlssoccer` | `mlssoccer` | provider | unknown / needs fixture | `MLSSoccerPluginManager` provider/downloader with HTTPS URLs; live endpoint compatibility not validated offline | add fixture tests |
 | `plugins/plugin-tester` | `plugin-tester` | test harness | infrastructure-only | `BasePluginProviderTester` / `BasePluginUpdateTester` provide shared live-style harness utilities | keep as-is |
-| `plugins/pluzz` | `pluzz` | provider | renamed/replaced | `PluzzConf` still references `catalogue=Pluzz`; tracker notes and repo context indicate FranceTV naming replacement | deprecate provider |
+| `plugins/francetv` | `francetv` | provider | keep | `FranceTvPluginManager` queries `api-mobile.yatta.francetv.fr` catalogue; download delegated to `youtube` (yt-dlp); offline `FranceTvUrlsTest` + live `FranceTvPluginManagerTest`; replaces former `plugins/pluzz` (legacy `pluzz.` URLs still recognised by `canDownload`, but existing grab-config entries still need the plugin id renamed to `francetv`) | keep |
 | `plugins/rtmpDump` | `rtmpDump` | downloader | keep | `RtmpDumpPluginDownloader` is binary wrapper with updater version pattern; dedicated test exists | keep as-is |
 | `plugins/sfr` | `sfr` | provider | unknown / needs fixture | `SFRConf` uses `sport.sfr.fr` API path; provider tests are live-network style only | add fixture tests |
 | `plugins/wat` | `wat` | provider | obsolete endpoint | `WatConf` points to TF1/WAT-era URLs; plugin naming and endpoint model reflect legacy provider branding | rewrite provider |
@@ -55,7 +55,7 @@
 | `D8` | `README.md` provider list; `D8PluginManager` inside `plugins/canalPlus` | No standalone module | embedded legacy sub-provider in `canalPlus` |
 | `D17` | `README.md` provider list; `D17PluginManager` inside `plugins/canalPlus` | No standalone module | embedded legacy sub-provider in `canalPlus` |
 | `NRJ12` / `nrj12` | Mentioned in `README.md` and tracker notes | No | historical reference only (missing module) |
-| `FranceTV / Pluzz` | `plugins/pluzz` source constants (`catalogue=Pluzz`), tracker notes | Yes (`pluzz`) | renamed/replaced candidate |
+| `FranceTV / Pluzz` | `plugins/francetv` module replaces former `plugins/pluzz`; mobile catalogue + yt-dlp flow | Yes (`francetv`) | rename completed (PR #58); existing grab-config entries still require manual `pluzz` → `francetv` migration |
 | `Kewego` | Legacy stream references in `plugins/lequipe/test/TestInitStream.java`; risk register mentions kewego in live tests | No dedicated module | historical endpoint dependency in tests |
 
 ---
@@ -97,7 +97,7 @@
 |---|---|---|
 | `6play` | Local fixture metadata + offline baseline test | Legacy scraper targets static markup while current site is SPA-driven |
 | `canalPlus` (`D8`/`D17` family) | Local fixture metadata + offline baseline test | Multiple legacy endpoint families, highest rewrite risk |
-| `pluzz` | Local fixture metadata + offline baseline test | Renamed/replaced direction (`FranceTV`) must be documented before rewrite |
+| `francetv` (ex `pluzz`) | Local fixture metadata + offline `FranceTvUrlsTest` covering URL/slug builders | Replacement of the legacy `pluzz` module against `api-mobile.yatta.francetv.fr` |
 | `arte` | Local fixture metadata + offline baseline test | Legacy HTTP/RSS parsing assumptions need stable parser anchors |
 | `youtube` | Local fixture metadata + offline baseline test | Binary contract migrated to yt-dlp; live provider validation still separate |
 
@@ -117,7 +117,7 @@ provider endpoint fixtures.
 
 - `plugins/6play/test/resources/fixtures/6play/fixture-baseline.txt`
 - `plugins/canalPlus/test/resources/fixtures/canalplus/fixture-baseline.txt`
-- `plugins/pluzz/test/resources/fixtures/pluzz/fixture-baseline.txt`
+- `plugins/francetv/test/resources/fixtures/francetv/fixture-baseline.txt`
 - `plugins/arte/test/resources/fixtures/arte/fixture-baseline.txt`
 - `plugins/youtube/test/resources/fixtures/youtube/fixture-baseline.txt`
 
@@ -125,7 +125,7 @@ Baseline tests added (local fixture loading only):
 
 - `SixPlayOfflineFixtureBaselineTest`
 - `CanalPlusOfflineFixtureBaselineTest`
-- `PluzzOfflineFixtureBaselineTest`
+- `FranceTvOfflineFixtureBaselineTest` (+ `FranceTvUrlsTest` unit coverage)
 - `ArteOfflineFixtureBaselineTest`
 - `YoutubeOfflineFixtureBaselineTest`
 
@@ -163,8 +163,7 @@ provider/runtime drift, not a static-repository deploy regression.
    - Scope: `globalnews`, `mlssoccer`, `sfr`, `email`, plus RSS regression fixtures.
 2. **fix(provider-canal-family): rewrite canalPlus + d8 + d17 provider endpoints**
    - Scope: `plugins/canalPlus` only, with fixture-backed parser behavior.
-3. **fix(provider-francetv): replace pluzz provider with france.tv metadata flow**
-   - Scope: dedicated replacement/deprecation plan for `plugins/pluzz`.
+3. ✅ **fix(provider-francetv): replace pluzz provider with france.tv metadata flow** — delivered in PR #58 (`plugins/francetv`).
 4. **fix(provider-legacy-football): rewrite wat, beinsport, footyroom, lequipe**
    - Scope: endpoint/parser modernization with offline fixtures first.
 5. **docs(provider-cleanup): propose dedicated deprecation PRs for non-recoverable providers**

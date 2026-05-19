@@ -1,3 +1,0 @@
-http://www.pluzz.fr/layoutftv/players/player_video_simple/FTVIPlayer.Config.xml
-http://www.pluzz.fr/appftv/webservices/video/getInfosOeuvre.php?mode=zeri&id-diffusion=67033248
-http://www.pluzz.fr/appftv/webservices/video/catchup/getListeAutocompletion.php?support=1

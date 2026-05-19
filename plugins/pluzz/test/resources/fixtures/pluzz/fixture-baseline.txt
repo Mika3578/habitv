@@ -1,4 +1,0 @@
-provider=pluzz
-replacementHint=france.tv
-network=disabled
-note=Fixture placeholder documenting renamed/replaced direction.
