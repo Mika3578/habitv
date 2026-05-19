@@ -13,20 +13,31 @@ public class HabitvLauncher {
 
 	public static void main(final String[] args) throws Exception {
 		LogUtils.updateLog4jConfiguration();
-		addToClasspath("file:///" + System.getProperty("java.home")
-				+ File.separator + "lib" + File.separator + "jfxrt.jar");
-		System.out.println(System.getProperty("java.home"));
+		final boolean guiMode = args == null || args.length == 0;
+		final File jfxrt = JavaFxRuntimeLocator.locate();
+		if (jfxrt != null) {
+			addToClasspath(jfxrt);
+		} else if (guiMode) {
+			System.err.println("JavaFX runtime (jfxrt.jar) was not found.");
+			System.err.println("Set -D" + JavaFxRuntimeLocator.JFXRT_PATH_PROPERTY
+					+ "=<path-to-jfxrt.jar> or use a JDK 8 that bundles JavaFX.");
+			System.err.println("Checked paths:");
+			for (final String path : JavaFxRuntimeLocator.candidatePathsForDiagnostics()) {
+				System.err.println("  " + path);
+			}
+			System.exit(1);
+		}
 
-		if (args == null || args.length == 0) {
+		if (guiMode) {
 			HabiTvViewRunner.main(args);
 		} else {
 			ConsoleLauncher.main(args);
 		}
 	}
 
-	private static void addToClasspath(final String urlSpec) {
+	private static void addToClasspath(final File jarFile) {
 		try {
-			final URL url = new URL(urlSpec);
+			final URL url = jarFile.toURI().toURL();
 			final ClassLoader systemLoader = ClassLoader.getSystemClassLoader();
 			if (systemLoader instanceof URLClassLoader) {
 				final Method addURL = URLClassLoader.class.getDeclaredMethod("addURL",
@@ -39,8 +50,8 @@ public class HabitvLauncher {
 								+ systemLoader.getClass().getName());
 			}
 		} catch (final ReflectiveOperationException | java.net.MalformedURLException e) {
-			throw new IllegalStateException("Failed to add URL to classpath: "
-					+ urlSpec, e);
+			throw new IllegalStateException("Failed to add JavaFX runtime to classpath: "
+					+ jarFile.getAbsolutePath(), e);
 		}
 	}
 
