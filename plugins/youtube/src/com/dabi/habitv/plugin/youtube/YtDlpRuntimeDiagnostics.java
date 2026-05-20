@@ -61,7 +61,7 @@ public final class YtDlpRuntimeDiagnostics {
 		return message.toString();
 	}
 
-	public static File resolveYtDlpTempDir(final String binDir) {
+	static File computeYtDlpTempDir(final String binDir) {
 		File home = new File(binDir);
 		if (home.getName().equalsIgnoreCase("bin")) {
 			final File parent = home.getParentFile();
@@ -69,7 +69,11 @@ public final class YtDlpRuntimeDiagnostics {
 				home = parent;
 			}
 		}
-		final File tempDir = new File(home, "tmp" + File.separator + "yt-dlp");
+		return new File(home, "tmp" + File.separator + "yt-dlp");
+	}
+
+	public static File resolveYtDlpTempDir(final String binDir) {
+		final File tempDir = computeYtDlpTempDir(binDir);
 		if (!tempDir.exists() && !tempDir.mkdirs()) {
 			LOG.warn("Could not create yt-dlp temp directory: " + tempDir.getAbsolutePath());
 		}
@@ -93,16 +97,16 @@ public final class YtDlpRuntimeDiagnostics {
 			LOG.info("yt-dlp executable size bytes: " + executable.length());
 			LOG.info("yt-dlp executable last modified: " + new Date(executable.lastModified()));
 		}
-		final Map<String, String> env = buildYtDlpEnvironment(binDir);
-		LOG.info("yt-dlp process TEMP: " + env.get("TEMP"));
-		LOG.info("yt-dlp process TMP: " + env.get("TMP"));
+		final String tempPath = computeYtDlpTempDir(binDir).getAbsolutePath();
+		LOG.info("yt-dlp process TEMP: " + tempPath);
+		LOG.info("yt-dlp process TMP: " + tempPath);
 	}
 
 	public static void runPreflight(final String cmdProcessor, final String executablePath, final String binDir) {
-		logExecutableDiagnostics(executablePath, binDir);
 		if (!preflightEnabled) {
 			return;
 		}
+		logExecutableDiagnostics(executablePath, binDir);
 		final String versionCmd = executablePath + " --version";
 		final Map<String, String> env = buildYtDlpEnvironment(binDir);
 		final CmdExecutor versionExecutor = new CmdExecutor(cmdProcessor, versionCmd, 1000) {

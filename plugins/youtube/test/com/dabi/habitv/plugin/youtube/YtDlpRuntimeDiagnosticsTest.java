@@ -5,6 +5,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.util.UUID;
+
 import org.junit.Test;
 
 import com.dabi.habitv.api.plugin.exception.ExecutorFailedException;
@@ -50,6 +53,39 @@ public class YtDlpRuntimeDiagnosticsTest {
 		assertTrue(upgraded.getLastLine().contains("clear TEMP _MEI folders"));
 		assertTrue(upgraded.getLastLine().contains("replace yt-dlp.exe"));
 		assertTrue(upgraded.getLastLine().contains("run yt-dlp.exe --version"));
+	}
+
+	@Test
+	public void computeYtDlpTempDirDoesNotCreateDirectories() {
+		final File parent = new File(System.getProperty("java.io.tmpdir"),
+				"habitv-test-" + UUID.randomUUID());
+		final File binDir = new File(parent, "bin");
+		final File expectedTemp = new File(parent, "tmp" + File.separator + "yt-dlp");
+
+		final File computed = YtDlpRuntimeDiagnostics.computeYtDlpTempDir(binDir.getAbsolutePath());
+
+		assertEquals(expectedTemp.getAbsolutePath(), computed.getAbsolutePath());
+		assertFalse("compute must not create the parent directory", parent.exists());
+		assertFalse("compute must not create the temp directory", computed.exists());
+	}
+
+	@Test
+	public void runPreflightDisabledHasNoFilesystemSideEffects() {
+		final File parent = new File(System.getProperty("java.io.tmpdir"),
+				"habitv-test-" + UUID.randomUUID());
+		final File binDir = new File(parent, "bin");
+		final File expectedTemp = new File(parent, "tmp" + File.separator + "yt-dlp");
+
+		YtDlpRuntimeDiagnostics.setPreflightEnabled(false);
+		try {
+			YtDlpRuntimeDiagnostics.runPreflight("", binDir.getAbsolutePath() + File.separator + "yt-dlp",
+					binDir.getAbsolutePath());
+		} finally {
+			YtDlpRuntimeDiagnostics.setPreflightEnabled(true);
+		}
+
+		assertFalse("disabled preflight must not create the temp directory", expectedTemp.exists());
+		assertFalse("disabled preflight must not create the parent directory", parent.exists());
 	}
 
 }

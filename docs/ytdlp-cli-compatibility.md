@@ -94,8 +94,8 @@ Rename-Item "$env:USERPROFILE\habitv\bin\yt-dlp.exe" "yt-dlp.exe.broken" -ErrorA
 6. Test outside Habitv:
 
 ```powershell
-$env:USERPROFILE\habitv\bin\yt-dlp.exe --version
-$env:USERPROFILE\habitv\bin\yt-dlp.exe "https://www.france.tv/france-3/nouvelle-aquitaine_la-france-en-vrai-aquitaine/8456007-oleron-la-vie-continue.html" -o "$env:USERPROFILE\habitv\Downloads\manual-francetv-test.%(ext)s" --write-sub --write-auto-sub --no-check-certificate
+& "$env:USERPROFILE\habitv\bin\yt-dlp.exe" --version
+& "$env:USERPROFILE\habitv\bin\yt-dlp.exe" "https://www.france.tv/france-3/nouvelle-aquitaine_la-france-en-vrai-aquitaine/8456007-oleron-la-vie-continue.html" -o "$env:USERPROFILE\habitv\Downloads\manual-francetv-test.%(ext)s" --write-sub --write-auto-sub --no-check-certificate
 ```
 
 7. Retry the same URL through Habitv.
