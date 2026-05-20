@@ -18,12 +18,12 @@
   ],
   "summary": {
     "done": 12,
-    "inProgress": 3,
+    "inProgress": 4,
     "proposed": 2,
     "deferred": 0,
     "blocked": 0,
-    "total": 17,
-    "overallProgressPercent": 82
+    "total": 18,
+    "overallProgressPercent": 78
   },
   "items": [
     {
@@ -367,6 +367,28 @@
       ],
       "pr": "ci: add Maven PR validation workflow (#65)",
       "notes": "Java 8 remains the required baseline; Java 11+ stays diagnostic until JAXB and JavaFX modernization is complete."
+    },
+    {
+      "id": "dependency-security-audit",
+      "legacyCode": "HBTV-016",
+      "displayTitle": "Dependency security audit & remediation",
+      "icon": "🔒",
+      "status": "in-progress",
+      "priority": "P1",
+      "progressPercent": 15,
+      "scope": "Establish a documentation-first Dependabot triage baseline for the Java 8 Maven reactor without mass dependency upgrades. Follow-up PRs upgrade build plugins, logging, HTTPS resolution, and runtime libraries in a safe order.",
+      "acceptanceCriteria": [
+        "docs/security-dependency-audit.md records GitHub vulnerability counts, scope, risks, remediation order, and first fix candidates.",
+        "dev-tracker mirrors the work item in Markdown and JSON.",
+        "Optional scripts/security/maven-dependency-inventory.ps1 lists POMs and runs mvn validate (and optional dependency:tree).",
+        "Focused follow-up PRs address Maven plugins, log4j 1.x, and module-scoped runtime bumps without mixing provider rewrites."
+      ],
+      "validation": [
+        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS",
+        "scripts/security/maven-dependency-inventory.ps1 (optional -DependencyTree)"
+      ],
+      "pr": "security: add dependency vulnerability audit baseline (this PR)",
+      "notes": "Baseline PR security/dependabot-audit-baseline. GitHub reports 294 vulnerabilities (87 critical, 90 high, 89 moderate, 28 low). Dependabot API export to target/dependabot-alerts.json is local-only (gitignored)."
     },
     {
       "id": "critical-log4j-cve-remediation",
