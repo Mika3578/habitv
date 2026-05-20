@@ -49,17 +49,6 @@ mvn -B -ntp -DskipTests package
 
 ## Validation results
 
-### Command: `git status --short`
-
-Exit status: `0`
-
-```text
- M docs/dev-tracker.json
- M docs/dev-tracker.md
-?? .github/workflows/ci-maven.yml
-?? docs/ci.md
-```
-
 ### Command: `mvn -B -ntp -DskipTests validate`
 
 Exit status: `0`
