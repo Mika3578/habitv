@@ -603,6 +603,7 @@ scope for a dedicated security PR.
 | **Status** | ✅ Done |
 | **Priority** | 🟠 P1 |
 | **Progress** | `████████████████████` 100% |
+| **Legacy code** | `HBTV-020` |
 
 **Scope** — Align `application/core` hand-written config/grab-config
 callers with XSD-backed JAXB output and stop stale
