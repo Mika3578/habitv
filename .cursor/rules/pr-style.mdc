@@ -1,0 +1,56 @@
+---
+description: Pull request and squash merge metadata rules for Habitv
+globs:
+  - ".github/**"
+  - "docs/**"
+  - "CONTRIBUTING.md"
+  - "AGENTS.md"
+---
+
+# Habitv PR and squash merge style
+
+## Pull requests
+
+- Use English for PR titles, bodies, review comments, and merge metadata.
+- Keep PRs scoped to one tracker item when applicable.
+- Document validation commands actually run; default safe command is
+  `mvn -B -ntp -DskipTests validate`.
+- Fill `.github/pull_request_template.md` sections honestly.
+
+## Squash merge instructions
+
+When generating merge instructions, always include a clean squash merge title
+and body.
+
+- Never recommend keeping GitHub's default generated squash description when it
+  contains intermediate commit bullets or repeated `Co-authored-by` trailers.
+- Always provide a cleaned replacement body for the GitHub **Extended
+  description** field.
+- The squash title must use Conventional Commit style and may include the PR
+  number.
+- The squash body must describe the final result, validation, and important
+  scope notes only.
+
+### Example for PR #65
+
+**Squash title:**
+
+```text
+ci: add Maven PR validation workflow (#65)
+```
+
+**Squash body:**
+
+```text
+Establish Java 8 Maven validation as the pull request CI baseline.
+
+Includes:
+- Required Java 8 validation, deterministic test, and package jobs.
+- Non-blocking diagnostic jobs for newer Java versions.
+- CI documentation for required checks and local command parity.
+```
+
+## References
+
+- `docs/pull-request-style-guide.md`
+- `docs/repository-maintenance.md`

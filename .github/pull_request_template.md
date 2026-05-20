@@ -47,3 +47,16 @@
 - [ ] English used for branches, commits, comments, docs, and PR text
 - [ ] Documentation updated (`docs/dev-tracker.md`, `docs/dev-tracker.json`, risk register, decision log as needed)
 - [ ] No secrets, tokens, local paths, or build outputs committed
+
+## Suggested squash merge commit (optional)
+
+```text
+<type>(optional-scope): short summary (#PR_NUMBER)
+
+Short final summary of the merged change.
+
+Includes:
+- Main outcome.
+- Validation or documentation update.
+- Important compatibility note if needed.
+```
