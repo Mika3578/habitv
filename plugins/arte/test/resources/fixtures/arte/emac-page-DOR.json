@@ -1,0 +1,56 @@
+{
+  "value": {
+    "zones": [
+      {
+        "code": "listing_DOCUMENTARIES_main",
+        "content": {
+          "data": [
+            {
+              "url": "/fr/videos/119999-000-A/test-documentary-one/",
+              "title": "Test Documentary One"
+            },
+            {
+              "url": "https://www.arte.tv/fr/videos/119999-001-A/test-documentary-two/",
+              "title": "Test Documentary Two",
+              "subtitle": "Episode 2"
+            },
+            {
+              "url": "/fr/videos/119999-002-A/test-documentary-three/",
+              "title": "",
+              "subtitle": "Subtitle Only Three"
+            },
+            {
+              "url": "/fr/programmes/119999/",
+              "title": "Not An Episode (programmes path)"
+            },
+            {
+              "url": "",
+              "title": "Missing URL"
+            },
+            {
+              "url": "/fr/videos/119999-003-A/test-no-title/"
+            },
+            {
+              "url": "/fr/videos/119999-000-A/test-documentary-one/",
+              "title": "Duplicate Of First"
+            }
+          ],
+          "pagination": {
+            "pages": 2
+          }
+        }
+      },
+      {
+        "code": "",
+        "content": {
+          "data": [
+            {
+              "url": "/fr/videos/119999-100-A/no-zone-code/",
+              "title": "Zone Without Code"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
