@@ -754,9 +754,8 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 	private static final StringConverter<TreeItem<CategoryDTO>> STR_CONVERTER = new StringConverter<TreeItem<CategoryDTO>>() {
 		@Override
 		public String toString(TreeItem<CategoryDTO> treeItem) {
-			CategoryTreeItem categoryTreeItem = (CategoryTreeItem) treeItem;
-			return (treeItem == null || treeItem.getValue() == null) ? "" : categoryTreeItem.getValue().getName();
-			// + (hasSelectedChild(categoryTreeItem.getValue()) ? "*"
+			return (treeItem == null || treeItem.getValue() == null) ? "" : treeItem.getValue().getName();
+			// + (hasSelectedChild(treeItem.getValue()) ? "*"
 	        // : "");
 		}
 
