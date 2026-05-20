@@ -23,7 +23,7 @@
     "deferred": 0,
     "blocked": 0,
     "total": 20,
-    "overallProgressPercent": 77
+    "overallProgressPercent": 79
   },
   "items": [
     {
@@ -465,21 +465,26 @@
       "icon": "🧰",
       "status": "in-progress",
       "priority": "P3",
-      "progressPercent": 50,
-      "scope": "Document the external tools that would deliver the most value if introduced as new plugins (high and medium priority), and analyze the existing plugins that are obsolete or non-recoverable. No plugin module addition or removal in this item; each concrete addition or deprecation lands in a dedicated follow-up PR with its own tracker entry.",
+      "progressPercent": 85,
+      "scope": "Document the external tools that would deliver the most value if introduced as new plugins (high and medium priority), analyze the existing plugins that are obsolete or non-recoverable, and ship the first concrete section 3 plugin together with deprecation markers on the two Flash-era downloaders. Actual removal of plugins/rtmpDump and plugins/adobeHDS modules remains under provider-inventory tracker scope (separate dedicated PRs).",
       "acceptanceCriteria": [
         "docs/external-tools-recommendations.md covers high-value tool additions (rclone, mkvmerge, subliminal, apprise, streamlink) with integration constraints.",
         "docs/external-tools-recommendations.md covers medium-value tool additions (mediainfo, HandBrakeCLI, filebot, generic webhook, N_m3u8DL-RE).",
         "docs/external-tools-recommendations.md lists obsolescence candidates with cross-references to provider-inventory.md.",
-        "At least one section 3 plugin (e.g. rclone or apprise) lands as a dedicated follow-up PR with its own tracker item.",
-        "Dedicated deprecate-rtmpdump / deprecate-adobeHDS proposal PR with its own tracker item."
+        "First section 3 plugin (rclone) shipped: plugins/rclone with RcloneConf, RcloneCmdExecutor, RclonePluginExporterManager, 7 offline tests passing, module registered in plugins/pom.xml, Windows binary mapped in scripts/static-repo/tool-sources.properties.",
+        "@Deprecated annotation + runtime LOG.warn added on RtmpDumpPluginDownloader and AdobeHDSPluginDownloader.",
+        "Remaining section 3 plugins (mkvmerge, subliminal, apprise, streamlink) each land in dedicated follow-up PRs with their own tracker items.",
+        "Dedicated deprecate-rtmpdump / deprecate-adobeHDS removal PRs under provider-inventory scope with their own tracker items."
       ],
       "validation": [
-        "mvn -B -ntp -DskipTests validate",
+        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS (34 modules)",
+        "mvn -B -ntp -pl plugins/rclone -am -DskipTests install -> BUILD SUCCESS",
+        "mvn -B -ntp -pl plugins/rclone -Dsurefire.failIfNoSpecifiedTests=false test -> 7/7 OK",
+        "mvn -B -ntp -pl plugins/rtmpDump,plugins/adobeHDS -am -DskipTests compile -> BUILD SUCCESS",
         "git diff --check"
       ],
-      "pr": "docs: add external tools recommendations and obsolescence analysis (this PR)",
-      "notes": "Documentation only; no application code or CI behavior changes. No risk register or decision log update (no new risk surfaced, no architectural decision required for an analysis doc). Every follow-up PR derived from this analysis must carry its own ADR if it changes user-visible defaults."
+      "pr": "feat(rclone)+docs(external-tools): rclone exporter plugin and obsolescence analysis (this PR)",
+      "notes": "Doc + first section 3 plugin + deprecation markers shipped in this PR. No risk register or decision log update (no new risk surfaced, no architectural decision required for an exporter wrapper that follows the existing *PluginExporterManager pattern). Module removal of plugins/rtmpDump and plugins/adobeHDS requires a separate PR under provider-inventory scope per AGENTS.md section 2 hard rule."
     }
   ]
 }

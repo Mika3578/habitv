@@ -53,13 +53,13 @@ follows the existing plugin pattern (`*Conf` + `*CmdExecutor` +
 Windows binary through `scripts/static-repo/tool-sources.properties`,
 exactly like `yt-dlp.exe`.
 
-| Tool | Proposed module | Role | Why it matters here |
+| Tool | Module | Role | Why it matters here |
 |---|---|---|---|
-| `rclone` | `plugins/rclone` | exporter | Push downloaded files to Nextcloud, Google Drive, OneDrive, S3, WebDAV, SFTP, … in one shot. Replaces ad-hoc `cmd` + `curl` FTP recipes currently buried in `configuration.xml`. Single static binary, stable CLI, MIT license. |
-| `mkvmerge` (MKVToolNix) | `plugins/mkvmerge` | exporter | Mux yt-dlp's separate video + audio + subtitle outputs into one MKV, **losslessly and quickly** (no re-encode). Pairs naturally with `ytdlp-migration`. |
-| `subliminal` | `plugins/subliminal` | exporter | Auto-fetch subtitles when the source episode has none. Python CLI, multiple providers (OpenSubtitles, Addic7ed, …). |
-| `apprise` | `plugins/apprise` | exporter / notifier | One CLI, 90+ notification targets (Telegram, Discord, ntfy, Pushover, Slack, Matrix, Gotify, …). Modernizes the legacy SMTP-only `email` exporter for users who want push-to-phone notifications. |
-| `streamlink` | `plugins/streamlink` | downloader | HLS/live stream coverage where yt-dlp lacks a working extractor, particularly for French live sports/news pages. Backup downloader, no provider rewrite required. |
+| `rclone` | ✅ `plugins/rclone` *(shipped — this PR)* | exporter | Push downloaded files to Nextcloud, Google Drive, OneDrive, S3, WebDAV, SFTP, … in one shot. Replaces ad-hoc `cmd` + `curl` FTP recipes currently buried in `configuration.xml`. Single static binary, stable CLI, MIT license. |
+| `mkvmerge` (MKVToolNix) | 🔵 `plugins/mkvmerge` *(proposed)* | exporter | Mux yt-dlp's separate video + audio + subtitle outputs into one MKV, **losslessly and quickly** (no re-encode). Pairs naturally with `ytdlp-migration`. |
+| `subliminal` | 🔵 `plugins/subliminal` *(proposed)* | exporter | Auto-fetch subtitles when the source episode has none. Python CLI, multiple providers (OpenSubtitles, Addic7ed, …). |
+| `apprise` | 🔵 `plugins/apprise` *(proposed)* | exporter / notifier | One CLI, 90+ notification targets (Telegram, Discord, ntfy, Pushover, Slack, Matrix, Gotify, …). Modernizes the legacy SMTP-only `email` exporter for users who want push-to-phone notifications. |
+| `streamlink` | 🔵 `plugins/streamlink` *(proposed)* | downloader | HLS/live stream coverage where yt-dlp lacks a working extractor, particularly for French live sports/news pages. Backup downloader, no provider rewrite required. |
 
 ### Integration constraints
 
@@ -103,10 +103,10 @@ downloader-tool deprecation.
 
 ### 5.1 Runtime downloader tools (Flash-era)
 
-| Module | Reason | Recommended action |
-|---|---|---|
-| `plugins/rtmpDump` | Flash Player reached end-of-life on **2020-12-31**. Adobe RTMP-streamed content is virtually nonexistent on the French replay providers Habitv targets. `tool-sources.properties` already flags `rtmpdump.skip=true` because no maintained Windows binary exists upstream. | Dedicated `deprecate-rtmpdump` PR: keep the plugin classes for grab-config backward compatibility, mark the plugin as deprecated in the sample `configuration.xml`, and stop publishing the tool. Requires its own tracker item. |
-| `plugins/adobeHDS` | Adobe HDS shares Flash's EOL. `tool-sources.properties` already marks `adobeHDS.type=skip`. The bundled `AdobeHDS.php` requires a PHP runtime — an undocumented system dependency for end users. | Dedicated `deprecate-adobeHDS` PR with the same shape as `deprecate-rtmpdump`. Requires its own tracker item. |
+| Module | Reason | Status in this PR | Recommended next step |
+|---|---|---|---|
+| `plugins/rtmpDump` | Flash Player reached end-of-life on **2020-12-31**. Adobe RTMP-streamed content is virtually nonexistent on the French replay providers Habitv targets. `tool-sources.properties` already flags `rtmpdump.skip=true` because no maintained Windows binary exists upstream. | ✅ `@Deprecated` annotation + runtime `LOG.warn` added on `RtmpDumpPluginDownloader` so users see the intent immediately, without removing the module. | Dedicated `deprecate-rtmpdump` PR under `provider-inventory` scope: drop the module from `plugins/pom.xml`, delete the binary publication line in `tool-sources.properties`, document the migration path in the sample `configuration.xml`. Requires its own tracker item. |
+| `plugins/adobeHDS` | Adobe HDS shares Flash's EOL. `tool-sources.properties` already marks `adobeHDS.type=skip`. The bundled `AdobeHDS.php` requires a PHP runtime — an undocumented system dependency for end users. | ✅ `@Deprecated` annotation + runtime `LOG.warn` added on `AdobeHDSPluginDownloader` so users see the intent immediately, without removing the module. | Dedicated `deprecate-adobeHDS` PR with the same shape as `deprecate-rtmpdump`. Requires its own tracker item. |
 
 ### 5.2 Provider plugins already classified elsewhere
 
@@ -141,17 +141,21 @@ for completeness and **must not be removed outside the
 
 ---
 
-## 7. Out-of-scope confirmations
+## 7. Scope confirmations
 
-- No plugin module added or removed.
-- No `configuration.xml` change.
-- No `tool-sources.properties` change.
-- No runtime updater behavior change.
-- No provider parser or scraper change.
-- No new risk surfaced (risk register unchanged).
-- No architectural decision required (decision log unchanged); each
-  §3/§4 addition or §5 deprecation will carry its own ADR if it
-  changes user-visible defaults.
+This PR ships:
+- ✅ `docs/external-tools-recommendations.md` (this document)
+- ✅ `plugins/rclone` exporter module (Conf, CmdExecutor, ExporterManager, 7 offline tests passing)
+- ✅ `rclone.*` entries added to `scripts/static-repo/tool-sources.properties`
+- ✅ `rclone` module registered in `plugins/pom.xml`
+- ✅ `@Deprecated` annotation + runtime `LOG.warn` on `RtmpDumpPluginDownloader` and `AdobeHDSPluginDownloader`
+
+This PR **does not**:
+- ❌ Remove `plugins/rtmpDump` or `plugins/adobeHDS` (hard rule under `provider-inventory` tracker scope — separate PR required)
+- ❌ Add the other §3 (`mkvmerge`, `subliminal`, `apprise`, `streamlink`) or §4 plugins — each gets its own follow-up PR
+- ❌ Change `application/core/configuration.xml` (user-runtime config left untouched)
+- ❌ Change provider parser or scraper code
+- ❌ Surface a new risk (risk register unchanged) or require an architectural decision (decision log unchanged)
 
 ---
 

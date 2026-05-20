@@ -22,7 +22,7 @@ automatic category behavior, provider summary, doc map).
 ## 📊 Overall progress
 
 ```
-███████████████▌░░░░  77%
+███████████████▋░░░░  79%
 ```
 
 | Category | Count |
@@ -59,7 +59,7 @@ automatic category behavior, provider summary, doc map).
 | 🔒 `dependency-security-audit` — Dependency security audit & remediation | 🟡 In progress | 🟠 P1 | `███░░░░░░░░░░░░░░░░░` 15% |
 | 📝 `clean-squash-merge-policy` — Clean squash merge policy | 🟡 In progress | 🟢 P3 | `██████████░░░░░░░░░░` 50% |
 | 🔒 `critical-log4j-cve-remediation` — Critical Log4j 1.x CVE remediation | ✅ Done | 🔴 P0 | `████████████████████` 100% |
-| 🧰 `external-tools-recommendations` — External tools recommendations & obsolescence analysis | 🟡 In progress | 🟢 P3 | `██████████░░░░░░░░░░` 50% |
+| 🧰 `external-tools-recommendations` — External tools recommendations & obsolescence analysis | 🟡 In progress | 🟢 P3 | `█████████████████░░░` 85% |
 
 ---
 
@@ -786,15 +786,16 @@ behavior changes.
 |---|---|
 | **Status** | 🟡 In progress |
 | **Priority** | 🟢 P3 |
-| **Progress** | `██████████░░░░░░░░░░` 50% |
+| **Progress** | `█████████████████░░░` 85% |
 | **Legacy code** | N/A (post-restart slug-only item) |
 
-**Scope** — Document, in a single doc, the external tools that would
-deliver the most value if introduced as new plugins (high and medium
-priority), and analyze the existing plugins that are obsolete or
-non-recoverable. No plugin module addition or removal in this item;
-each concrete addition or deprecation lands in a dedicated follow-up
-PR with its own tracker entry.
+**Scope** — Document the external tools that would deliver the most
+value if introduced as new plugins (high and medium priority), analyze
+the existing plugins that are obsolete or non-recoverable, and ship
+the first concrete §3 plugin together with deprecation markers on the
+two Flash-era downloaders. Actual removal of `plugins/rtmpDump` and
+`plugins/adobeHDS` modules remains under `provider-inventory` tracker
+scope (separate dedicated PRs).
 
 **Acceptance criteria**
 - ✅ `docs/external-tools-recommendations.md` covers high-value tool
@@ -805,22 +806,33 @@ PR with its own tracker entry.
   `N_m3u8DL-RE`)
 - ✅ `docs/external-tools-recommendations.md` lists obsolescence
   candidates with cross-references to `provider-inventory.md`
-- ⬜ At least one §3 plugin (e.g. `rclone` or `apprise`) lands as a
-  dedicated follow-up PR with its own tracker item
-- ⬜ Dedicated `deprecate-rtmpdump` / `deprecate-adobeHDS` proposal PR
-  with its own tracker item
+- ✅ First §3 plugin (`rclone`) shipped: `plugins/rclone` with
+  `RcloneConf`, `RcloneCmdExecutor`, `RclonePluginExporterManager`,
+  7 offline tests passing, module registered in `plugins/pom.xml`,
+  Windows binary mapped in `scripts/static-repo/tool-sources.properties`
+- ✅ `@Deprecated` annotation + runtime `LOG.warn` added on
+  `RtmpDumpPluginDownloader` and `AdobeHDSPluginDownloader`
+- ⬜ Remaining §3 plugins (`mkvmerge`, `subliminal`, `apprise`,
+  `streamlink`) each land in dedicated follow-up PRs with their own
+  tracker items
+- ⬜ Dedicated `deprecate-rtmpdump` / `deprecate-adobeHDS` removal PRs
+  under `provider-inventory` scope with their own tracker items
 
 **Validation**
 ```bash
-mvn -B -ntp -DskipTests validate
+mvn -B -ntp -DskipTests validate                                   # BUILD SUCCESS (34 modules)
+mvn -B -ntp -pl plugins/rclone -am -DskipTests install            # BUILD SUCCESS
+mvn -B -ntp -pl plugins/rclone -Dsurefire.failIfNoSpecifiedTests=false test   # 7/7 OK
+mvn -B -ntp -pl plugins/rtmpDump,plugins/adobeHDS -am -DskipTests compile    # BUILD SUCCESS
 git diff --check
 ```
 
-**Notes** — Documentation only; no application code or CI behavior
-changes. No risk register or decision log update (no new risk surfaced,
-no architectural decision required for an analysis doc). Every
-follow-up PR derived from this analysis must carry its own ADR if it
-changes user-visible defaults.
+**Notes** — Doc + first §3 plugin + deprecation markers shipped in
+this PR. No risk register or decision log update (no new risk surfaced,
+no architectural decision required for an exporter wrapper that follows
+the existing `*PluginExporterManager` pattern). Module **removal** of
+`plugins/rtmpDump` and `plugins/adobeHDS` requires a separate PR under
+`provider-inventory` scope per AGENTS.md §2 hard rule.
 
 ---
 
