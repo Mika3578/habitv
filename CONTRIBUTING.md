@@ -9,6 +9,8 @@ contributions follow a stricter-than-usual workflow.
 > - [`docs/dev-plan.md`](docs/dev-plan.md) — phased modernization plan
 > - [`docs/dev-tracker.md`](docs/dev-tracker.md) — active work items
 > - [`docs/decision-log.md`](docs/decision-log.md) — accepted architecture decisions
+> - [`docs/automatic-category-download.md`](docs/automatic-category-download.md) — category watch / index behavior
+> - [`docs/ci.md`](docs/ci.md) — CI required vs diagnostic checks
 
 ---
 
@@ -84,7 +86,7 @@ Stronger goals are only safe for explicitly scoped modules.
 | `mvn -B -ntp -DskipTests compile` | 🟢 safe on `develop` since `own-version-deps-align` | Always |
 | `mvn -B -ntp -DskipTests package` | 🟡 scoped only | `-pl '!application/trayView,!application/habiTv'` |
 | `mvn -B -ntp test` | 🟠 network-dependent tests flap | Scoped per-module; document results |
-| `mvn -B -ntp verify` | ⛔ not safe yet | Wait for `java8-baseline` test-lifecycle work |
+| `mvn -B -ntp verify` | ⛔ not safe yet | Dedicated test-lifecycle tracker work |
 
 Always quote the **exact command output** in your PR body.
 
