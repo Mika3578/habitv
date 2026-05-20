@@ -64,7 +64,6 @@ public final class ConsoleLauncher {
 
 	}
 
-	@SuppressWarnings("static-access")
 	public static void main(final String[] args) {
 		if (args.length > 0 && DownloadUtils.isHttpUrl(args[0])) {
 			init();
@@ -339,7 +338,6 @@ public final class ConsoleLauncher {
 			String name = RetrieverUtils.getTitleByUrl(url);
 			coreManager.restart(new EpisodeDTO(new CategoryDTO("Manuel",
 					"Manuel", "Manuel", "mp4"), name, url), false);
-			// FIXME comment gérer l'exntesion ?
 		}
 	}
 

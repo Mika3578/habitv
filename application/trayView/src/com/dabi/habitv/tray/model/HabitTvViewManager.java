@@ -182,7 +182,7 @@ public class HabitTvViewManager extends Observable {
 	}
 
 	public Map<String, CategoryDTO> loadCategories() {
-		buildGrabConfigIfNeeded(); // TODO utiliser ça
+		buildGrabConfigIfNeeded();
 		return grabConfigDAO.load(LoadModeEnum.ALL);
 	}
 

@@ -39,12 +39,7 @@ public class ManualDlPopin extends Popin {
 			public void onAction() {
 				String url = manualForm.textField.getText();
 				String name = url.startsWith("http://") ? RetrieverUtils.getTitleByUrl(url) : url;
-				viewController.restart(new EpisodeDTO(new CategoryDTO("Manuel", "Manuel", "Manuel", "mp4"), name, url), false); // FIXME
-		                                                                                                                        // comment
-		                                                                                                                        // gérer
-		                                                                                                                        // l'exntesion
-		                                                                                                                        // ?
-
+				viewController.restart(new EpisodeDTO(new CategoryDTO("Manuel", "Manuel", "Manuel", "mp4"), name, url), false);
 			}
 
 		});
