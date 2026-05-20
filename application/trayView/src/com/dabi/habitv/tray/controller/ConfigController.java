@@ -9,8 +9,6 @@ import javafx.event.EventHandler;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.input.KeyEvent;
-
 import com.dabi.habitv.core.config.UserConfig;
 import com.dabi.habitv.tray.Popin;
 
@@ -99,10 +97,9 @@ public class ConfigController extends BaseController {
 			@Override
 			public void run() {
 				UserConfig userConfig = getController().loadUserConfig();
-				if (!userConfig.getMaxAttempts().equals(
-						nbrMaxAttempts.getText())) {
-					userConfig.setMaxAttempts(Integer.parseInt(nbrMaxAttempts
-							.getText()));
+				final Integer maxAttempts = Integer.parseInt(nbrMaxAttempts.getText());
+				if (!userConfig.getMaxAttempts().equals(maxAttempts)) {
+					userConfig.setMaxAttempts(maxAttempts);
 					saveConfig(userConfig);
 				}
 			}
@@ -115,10 +112,9 @@ public class ConfigController extends BaseController {
 			@Override
 			public void run() {
 				UserConfig userConfig = getController().loadUserConfig();
-				if (!userConfig.getDemonCheckTime().equals(
-						daemonCheckTimeSec.getText())) {
-					userConfig.setDemonCheckTime(Integer
-							.parseInt(daemonCheckTimeSec.getText()));
+				final Integer demonCheckTime = Integer.parseInt(daemonCheckTimeSec.getText());
+				if (!userConfig.getDemonCheckTime().equals(demonCheckTime)) {
+					userConfig.setDemonCheckTime(demonCheckTime);
 					saveConfig(userConfig);
 				}
 			}

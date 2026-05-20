@@ -1,5 +1,6 @@
 package com.dabi.habitv.console;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -8,11 +9,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -63,7 +64,6 @@ public final class ConsoleLauncher {
 
 	}
 
-	@SuppressWarnings("static-access")
 	public static void main(final String[] args) {
 		if (args.length > 0 && DownloadUtils.isHttpUrl(args[0])) {
 			init();
@@ -92,21 +92,19 @@ public final class ConsoleLauncher {
 			options.addOption(OPTION_RUN_EXPORT, "runExport", false,
 					"Reprise des exports en échec.");
 
-			options.addOption(OptionBuilder
-					.withLongOpt("plugins")
+			options.addOption(Option.builder(OPTION_PLUGIN)
+					.longOpt("plugins")
 					.hasArgs()
-					.withValueSeparator()
-					.withDescription(
-							"Pour lister les plugins concernés par la commande, si vide tous les plugins le seront.")
-					.create(OPTION_PLUGIN));
+					.valueSeparator()
+					.desc("Pour lister les plugins concernés par la commande, si vide tous les plugins le seront.")
+					.get());
 
-			options.addOption(OptionBuilder
-					.withLongOpt("categories")
+			options.addOption(Option.builder(OPTION_CATEGORY)
+					.longOpt("categories")
 					.hasArgs()
-					.withValueSeparator()
-					.withDescription(
-							"Pour lister les catégories concernées par la commande, si vide tous les catégories le seront.")
-					.create(OPTION_CATEGORY));
+					.valueSeparator()
+					.desc("Pour lister les catégories concernées par la commande, si vide tous les catégories le seront.")
+					.get());
 //
 //			options.addOption(OptionBuilder
 //					.withLongOpt("episodes")
@@ -117,7 +115,7 @@ public final class ConsoleLauncher {
 //					.create(OPTION_EPISODE));
 
 			// create the parser
-			CommandLineParser parser = new BasicParser();
+			CommandLineParser parser = new DefaultParser();
 			// parse the command line arguments
 			CommandLine line;
 			try {
@@ -308,8 +306,8 @@ public final class ConsoleLauncher {
 		while (it.hasNext()) {
 			CategoryDTO categoryDTO = it.next();
 			boolean subCatFound = checkAndDLMode(categoryDTO.getSubCategories(), categoryList);
-			if (!(subCatFound || categoryDTO.isSelected() || (categoryList != null && categoryList
-					.contains(categoryDTO)))) {
+			if (!(subCatFound || categoryDTO.isSelected() || matchesCategoryFilter(categoryDTO,
+					categoryList))) {
 				it.remove();
 			} else {
 				found = true;
@@ -318,13 +316,29 @@ public final class ConsoleLauncher {
 		return found;
 	}
 
+	private static boolean matchesCategoryFilter(final CategoryDTO category,
+			final List<String> categoryFilters) {
+		if (categoryFilters == null || category == null) {
+			return false;
+		}
+		for (final String filter : categoryFilters) {
+			if (filter == null) {
+				continue;
+			}
+			if (filter.equals(category.getId()) || filter.equals(category.getName())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private static void downloadEpisodes(String[] episodesUrl) {
 		info("downloadEpisodes" + Arrays.asList(episodesUrl));
+		final CategoryDTO manualCategory = new CategoryDTO("Manuel", "Manuel", "Manuel", "mp4");
 		for (String url : episodesUrl) {
-			String name = RetrieverUtils.getTitleByUrl(url);
-			coreManager.restart(new EpisodeDTO(new CategoryDTO("Manuel",
-					"Manuel", "Manuel", "mp4"), name, url), false);
-			// FIXME comment gérer l'exntesion ?
+			final String name = RetrieverUtils.getTitleByUrl(url);
+			final EpisodeDTO episode = new EpisodeDTO(manualCategory, name, url);
+			coreManager.restart(episode, false);
 		}
 	}
 
@@ -347,8 +361,10 @@ public final class ConsoleLauncher {
 	}
 
 	private static void usage(Options options) {
-		// Use the inbuilt formatter class
-		HelpFormatter formatter = new HelpFormatter();
-		formatter.printHelp("habiTv", options);
+		try {
+			HelpFormatter.builder().get().printHelp("habiTv", null, options, null, true);
+		} catch (IOException e) {
+			throw new IllegalStateException("Failed to print CLI help", e);
+		}
 	}
 }
