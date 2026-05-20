@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import com.dabi.habitv.api.plugin.exception.ExecutorFailedException;
 import com.dabi.habitv.api.plugin.holder.ProcessHolder;
-import com.dabi.habitv.plugin.ffmpeg.FFMPEGCmdExecutor;
 
 @Ignore
 public class TestFfmpegCmdExecutor {

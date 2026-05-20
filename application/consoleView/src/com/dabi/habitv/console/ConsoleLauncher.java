@@ -8,11 +8,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -92,21 +92,19 @@ public final class ConsoleLauncher {
 			options.addOption(OPTION_RUN_EXPORT, "runExport", false,
 					"Reprise des exports en échec.");
 
-			options.addOption(OptionBuilder
-					.withLongOpt("plugins")
+			options.addOption(Option.builder(OPTION_PLUGIN)
+					.longOpt("plugins")
 					.hasArgs()
-					.withValueSeparator()
-					.withDescription(
-							"Pour lister les plugins concernés par la commande, si vide tous les plugins le seront.")
-					.create(OPTION_PLUGIN));
+					.valueSeparator()
+					.desc("Pour lister les plugins concernés par la commande, si vide tous les plugins le seront.")
+					.get());
 
-			options.addOption(OptionBuilder
-					.withLongOpt("categories")
+			options.addOption(Option.builder(OPTION_CATEGORY)
+					.longOpt("categories")
 					.hasArgs()
-					.withValueSeparator()
-					.withDescription(
-							"Pour lister les catégories concernées par la commande, si vide tous les catégories le seront.")
-					.create(OPTION_CATEGORY));
+					.valueSeparator()
+					.desc("Pour lister les catégories concernées par la commande, si vide tous les catégories le seront.")
+					.get());
 //
 //			options.addOption(OptionBuilder
 //					.withLongOpt("episodes")
@@ -117,7 +115,7 @@ public final class ConsoleLauncher {
 //					.create(OPTION_EPISODE));
 
 			// create the parser
-			CommandLineParser parser = new BasicParser();
+			CommandLineParser parser = new DefaultParser();
 			// parse the command line arguments
 			CommandLine line;
 			try {
@@ -363,7 +361,6 @@ public final class ConsoleLauncher {
 	}
 
 	private static void usage(Options options) {
-		// Use the inbuilt formatter class
 		HelpFormatter formatter = new HelpFormatter();
 		formatter.printHelp("habiTv", options);
 	}

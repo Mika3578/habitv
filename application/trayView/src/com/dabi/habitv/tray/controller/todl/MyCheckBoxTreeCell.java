@@ -54,30 +54,32 @@ public abstract class MyCheckBoxTreeCell<T> extends TreeCell<T> {
 		this(new Callback<TreeItem<T>, ObservableValue<Boolean>>() {
 			@Override
 			public ObservableValue<Boolean> call(TreeItem<T> item) {
-				if (item instanceof CheckBoxTreeItem<?>) {
-					return ((CheckBoxTreeItem<?>) item).selectedProperty();
+				if (item instanceof CheckBoxTreeItem) {
+					return ((CheckBoxTreeItem<T>) item).selectedProperty();
 				}
 				return null;
 			}
 		}, strConverter);
 	}
 
-	private final static StringConverter defaultTreeItemStringConverter = new StringConverter<TreeItem>() {
-		@Override
-		public String toString(TreeItem treeItem) {
-			return (treeItem == null || treeItem.getValue() == null) ? ""
-					: treeItem.getValue().toString();
-		}
+	private static <T> StringConverter<TreeItem<T>> defaultTreeItemStringConverter() {
+		return new StringConverter<TreeItem<T>>() {
+			@Override
+			public String toString(TreeItem<T> treeItem) {
+				return (treeItem == null || treeItem.getValue() == null) ? ""
+						: treeItem.getValue().toString();
+			}
 
-		@Override
-		public TreeItem fromString(String string) {
-			return new TreeItem(string);
-		}
-	};
+			@Override
+			public TreeItem<T> fromString(String string) {
+				return new TreeItem<T>();
+			}
+		};
+	}
 
 	public MyCheckBoxTreeCell(
 			final Callback<TreeItem<T>, ObservableValue<Boolean>> getSelectedProperty) {
-		this(getSelectedProperty, defaultTreeItemStringConverter);
+		this(getSelectedProperty, defaultTreeItemStringConverter());
 	}
 
 	public MyCheckBoxTreeCell(
@@ -167,7 +169,7 @@ public abstract class MyCheckBoxTreeCell<T> extends TreeCell<T> {
 			setText(null);
 			setGraphic(null);
 		} else {
-			StringConverter c = getConverter();
+			StringConverter<TreeItem<T>> c = getConverter();
 			Callback<TreeItem<T>, ObservableValue<Boolean>> callback = getSelectedStateCallback();
 
 			// update the node content

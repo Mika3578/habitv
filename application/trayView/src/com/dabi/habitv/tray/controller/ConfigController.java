@@ -9,8 +9,6 @@ import javafx.event.EventHandler;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.input.KeyEvent;
-
 import com.dabi.habitv.core.config.UserConfig;
 import com.dabi.habitv.tray.Popin;
 
