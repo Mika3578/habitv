@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft-07/schema",
   "version": 3,
   "description": "Machine-readable mirror of docs/dev-tracker.md. Keep both files in sync. Identifiers use descriptive kebab-case slugs (see descriptive-slug-ids ADR).",
-  "lastRefresh": "2026-05-20",
+  "lastRefresh": "2026-05-21",
   "statusValues": [
     "proposed",
     "in-progress",
@@ -17,13 +17,13 @@
     "P3"
   ],
   "summary": {
-    "done": 12,
+    "done": 13,
     "inProgress": 4,
     "proposed": 2,
     "deferred": 0,
     "blocked": 0,
-    "total": 18,
-    "overallProgressPercent": 78
+    "total": 19,
+    "overallProgressPercent": 80
   },
   "items": [
     {
@@ -411,6 +411,30 @@
       ],
       "pr": "security: fix critical dependency CVE (this PR)",
       "notes": "CVE-2019-17571, CVE-2022-23305, CVE-2022-23307 on log4j 1.2.17. See docs/security-critical-cve-investigation.md. Log4j 2 / SLF4J migration deferred."
+    },
+    {
+      "id": "batch-episode-download-ui",
+      "legacyCode": "HBTV-020",
+      "displayTitle": "Batch episode download UI & queue controls",
+      "icon": "📥",
+      "status": "done",
+      "priority": "P2",
+      "progressPercent": 100,
+      "scope": "Multi-select episode enqueue, duplicate-safe queueing, maxConcurrentDownloads config, sortable metadata columns, and plugin/category tree labels in trayView.",
+      "acceptanceCriteria": [
+        "Users can select multiple episodes and enqueue via Download selected.",
+        "Duplicates skipped when already downloaded, queued, or downloading.",
+        "downloadConfig/maxConcurrentDownloads defaults to 1 with validation.",
+        "Episode table sortable by name; metadata columns show Unknown when absent.",
+        "Tree labels reflect plugin/category/show hierarchy from CategoryDTO."
+      ],
+      "validation": [
+        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS",
+        "mvn -B -ntp -pl application/core -Dtest=TaskMgrTest,DownloadTaskTest,XMLUserConfigTest test -> BUILD SUCCESS",
+        "mvn -B -ntp -pl application/trayView -DskipTests compile -> BUILD SUCCESS"
+      ],
+      "pr": "feat: add batch episode selection and download queue controls (TBD)",
+      "notes": "See docs/batch-episode-downloads.md. Provider metadata enrichment and queue pause/resume remain follow-up."
     },
     {
       "id": "clean-squash-merge-policy",
