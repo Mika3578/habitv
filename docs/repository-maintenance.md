@@ -55,8 +55,16 @@ aligned in the same commit when applicable:
 - `docs/risk-register.md` when risks change
 - `docs/decision-log.md` when architecture decisions change
 
+## CI governance
+
+When changing required checks, branch protection, or workflow job semantics,
+update `docs/required-checks-roadmap.md` and tracker item
+`required-checks-roadmap` in the same PR when the staged plan changes.
+
 ## Related documentation
 
+- `docs/required-checks-roadmap.md` — phased path to required CI and security checks
+- `docs/ci.md` — Maven CI workflow and local command parity
 - `docs/repository-governance.md` — branch protection and rulesets
 - `docs/pull-request-style-guide.md` — PR and squash merge style
 - `AGENTS.md` — agent and contributor rules

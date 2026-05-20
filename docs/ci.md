@@ -7,36 +7,40 @@
 - Java 11+ may fail until JAXB and JavaFX migration is complete.
 - No deployment, credentials, publishing, or auto-merge behavior is part of this workflow set.
 
+**Staged required-checks plan:** see [`required-checks-roadmap.md`](required-checks-roadmap.md)
+(tracker `required-checks-roadmap`, HBTV-016) for Phases 0–5, prerequisites,
+and branch-protection targets.
+
 ## Workflow coverage
 
 Workflow: `.github/workflows/ci-maven.yml` (`Maven CI`)
 
-### Required checks (branch protection)
+### Phase 0 — Required checks (branch protection target)
 
-Current required check for `develop` remains:
+Current required check for `develop` may still be:
 
 - `CI / validate (zulu-8)` (from `.github/workflows/ci.yml`)
 
-The `Maven CI` workflow is additive in this PR. It does not supersede the
-existing required `CI` check until repository governance and the ruleset are
-updated together.
+The `Maven CI` workflow does not supersede the legacy `CI` check until
+repository governance and the ruleset are updated together
+(`branch-protection`, `required-checks-roadmap`).
 
-After that governance/ruleset update, require:
+**Target required checks** (stable Java 8 baseline — Liberica JDK 8 + JavaFX):
 
 - `Maven CI / validate-java8`
 - `Maven CI / deterministic-tests-java8`
 - `Maven CI / compile-and-package-java8`
 - `Dependency Review / dependency-review`
 
-### Diagnostic checks (do not require)
+### Not required yet (Phases 1–4)
 
-Do not require:
+Do not require until the roadmap prerequisites are met:
 
-- `Maven CI / compatibility-java11`
-- `Maven CI / compatibility-java17`
-- `Maven CI / compatibility-java21`
-- `Maven CI / compatibility-java25`
-- `Maven CI / full-test-suite`
+- `Maven CI / compatibility-java11` through `compatibility-java25` (modern JDK
+  **validation** in Phase 1; **package** only after OpenJFX in Phase 2)
+- `Maven CI / full-test-suite` (Phase 3 — deterministic default tests only)
+- Live provider tests (`-Plive-tests` when introduced)
+- Dependency Review / CodeQL as required gates (Phase 4)
 
 ## Security workflows
 
