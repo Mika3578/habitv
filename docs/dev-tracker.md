@@ -19,17 +19,17 @@
 ## 📊 Overall progress
 
 ```
-███████████████░░░░░  77%
+███████████████▌░░░░  78%
 ```
 
 | Category | Count |
 |---------|------:|
-| ✅ Delivered | **11** |
+| ✅ Delivered | **12** |
 | 🟡 In progress | **4** |
 | 🔵 Proposed | **2** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
-| **Total work items** | **17** |
+| **Total work items** | **18** |
 
 ---
 
@@ -54,6 +54,7 @@
 | 🧱 `maven-pr-validation` — Maven PR validation workflow | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🔒 `dependency-security-audit` — Dependency security audit & remediation | 🟡 In progress | 🟠 P1 | `███░░░░░░░░░░░░░░░░░` 15% |
 | 📝 `clean-squash-merge-policy` — Clean squash merge policy | 🟡 In progress | 🟢 P3 | `██████████░░░░░░░░░░` 50% |
+| 🔒 `critical-log4j-cve-remediation` — Critical Log4j 1.x CVE remediation | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 
 ---
 
@@ -678,6 +679,40 @@ Recommended merge / start order (see `dev-plan.md` for phase reasoning):
 
 ---
 
+## 🔒 `critical-log4j-cve-remediation` — Critical Log4j 1.x CVE remediation
+
+| | |
+|---|---|
+| **Status** | ✅ Done |
+| **Priority** | 🔴 P0 |
+| **Progress** | `████████████████████` 100% |
+| **Legacy code** | HBTV-019 |
+
+**Scope** — Replace end-of-life `log4j:log4j` 1.2.17 with `reload4j` 1.2.26 to
+clear critical Dependabot alerts without a Java baseline or Log4j 2 API
+migration.
+
+**Acceptance criteria**
+- ✅ Root `dependencyManagement` and direct declarations use
+  `ch.qos.reload4j:reload4j:1.2.26`
+- ✅ `dependency:tree` no longer resolves `log4j:log4j:1.2.17`
+- ✅ `validate` and `compile` succeed for the full reactor on Java 8
+
+**Validation**
+```bash
+mvn -B -ntp -DskipTests dependency:tree   # reload4j:1.2.26 only
+mvn -B -ntp -DskipTests validate           # BUILD SUCCESS
+mvn -B -ntp -DskipTests compile            # BUILD SUCCESS (33 modules)
+```
+
+**Related PR** · `security: fix critical dependency CVE` (this PR)
+
+**Notes** — CVE-2019-17571, CVE-2022-23305, CVE-2022-23307.
+See `docs/security-critical-cve-investigation.md`. Log4j 2 / SLF4J
+migration and broader transitive cleanup deferred.
+
+---
+
 ## 📝 `clean-squash-merge-policy` — Clean squash merge policy
 
 | | |
@@ -732,3 +767,4 @@ issue trackers:
 | HBTV-015 | `maven-pr-validation` |
 | HBTV-016 | `dependency-security-audit` |
 | HBTV-018 | `clean-squash-merge-policy` |
+| HBTV-019 | `critical-log4j-cve-remediation` |

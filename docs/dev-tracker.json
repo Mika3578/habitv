@@ -17,13 +17,13 @@
     "P3"
   ],
   "summary": {
-    "done": 11,
+    "done": 12,
     "inProgress": 4,
     "proposed": 2,
     "deferred": 0,
     "blocked": 0,
-    "total": 17,
-    "overallProgressPercent": 77
+    "total": 18,
+    "overallProgressPercent": 78
   },
   "items": [
     {
@@ -389,6 +389,28 @@
       ],
       "pr": "security: add dependency vulnerability audit baseline (this PR)",
       "notes": "Baseline PR security/dependabot-audit-baseline. GitHub reports 294 vulnerabilities (87 critical, 90 high, 89 moderate, 28 low). Dependabot API export to target/dependabot-alerts.json is local-only (gitignored)."
+    },
+    {
+      "id": "critical-log4j-cve-remediation",
+      "legacyCode": "HBTV-019",
+      "displayTitle": "Critical Log4j 1.x CVE remediation",
+      "icon": "🔒",
+      "status": "done",
+      "priority": "P0",
+      "progressPercent": 100,
+      "scope": "Replace end-of-life log4j:log4j 1.2.17 with reload4j 1.2.26 to clear critical Dependabot CVEs without Java baseline or logging API migration.",
+      "acceptanceCriteria": [
+        "Root dependencyManagement and direct log4j declarations use ch.qos.reload4j:reload4j:1.2.26.",
+        "Maven dependency:tree no longer resolves log4j:log4j:1.2.17.",
+        "mvn validate and mvn compile succeed on Java 8 for the full reactor."
+      ],
+      "validation": [
+        "mvn -B -ntp -DskipTests dependency:tree -> reload4j:1.2.26, no log4j:log4j",
+        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS",
+        "mvn -B -ntp -DskipTests compile -> BUILD SUCCESS (33 modules)"
+      ],
+      "pr": "security: fix critical dependency CVE (this PR)",
+      "notes": "CVE-2019-17571, CVE-2022-23305, CVE-2022-23307 on log4j 1.2.17. See docs/security-critical-cve-investigation.md. Log4j 2 / SLF4J migration deferred."
     },
     {
       "id": "clean-squash-merge-policy",
