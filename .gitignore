@@ -1,8 +1,9 @@
 application/core/grabconfig.xml
 application/core/testGrabConfig.xml
 application/core/testOldGrabconfig.xml
-plugins/plugin-tester/habiTv.log
 .metadata/
+**/target/
+**/habiTv.log*
 *.project
 *.classpath
 .settings
@@ -11,6 +12,5 @@ application/core/generated/
 application/core/index/
 application/core/plugins/
 application/core/habiTv.lock
-application/core/habiTv.log
 application/core/bin/
 repository/
