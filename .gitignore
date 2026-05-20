@@ -1,16 +1,52 @@
+# Local / test config (application/core)
 application/core/grabconfig.xml
 application/core/testGrabConfig.xml
 application/core/testOldGrabconfig.xml
+
+# Eclipse workspace and project metadata
 .metadata/
-**/target/
-**/habiTv.log*
 *.project
 *.classpath
 .settings
-application/core/export.index
+.factorypath
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Maven
+**/target/
+**/dependency-reduced-pom.xml
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.next
+pom.xml.versionsBackup
+release.properties
+**/surefire-reports/
+
+# Runtime logs and JVM crash dumps
+**/habiTv.log*
+hs_err_pid*.log
+replay_pid*.log
+
+# Runtime indexes and single-instance lock
+**/*.index
+**/habiTv.lock
+
+# Application core local data
 application/core/generated/
 application/core/index/
 application/core/plugins/
-application/core/habiTv.lock
 application/core/bin/
+
+# Downloaded external tool binaries (plugins)
+plugins/**/bin/
+
+# Static repository deploy tree
 repository/
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
