@@ -181,12 +181,12 @@
         "docs/provider-inventory.md updated with an offline fixture policy and baseline.",
         "mvn -B -ntp -pl plugins/6play -am -Dtest=SixPlayOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test",
         "mvn -B -ntp -pl plugins/canalPlus -am -Dtest=CanalPlusOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test",
-        "mvn -B -ntp -pl plugins/pluzz -am -Dtest=PluzzOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test",
+        "mvn -B -ntp -pl plugins/francetv -am -Dtest=FranceTvOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test",
         "mvn -B -ntp -pl plugins/arte -am -Dtest=ArteOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test",
         "mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test"
       ],
       "pr": "test/provider-offline-fixture-baseline (this PR)",
-      "notes": "Inventory baseline from PR #50 is extended with an offline fixture policy and first local fixture metadata/tests for 6play, canalPlus, pluzz, arte, and youtube. Arte live PluginManagerTest fails (categorie liste vide) — documented as provider drift; repair in dedicated provider PR. Default Surefire excludes *PluginManagerTest; offline fixture baselines stay enabled. No provider rewrite, plugin removal, runtime updater change, yt-dlp migration, JavaFX modernization, or Maven publication layout change in inventory-only work."
+      "notes": "Inventory baseline from PR #50 extended with offline fixture policy and tests for 6play, canalPlus, francetv (ex pluzz), arte, and youtube. docs/provider-inventory.md includes current-status table and legacy naming (Pluzz, D8/D17, 6play). Arte live PluginManagerTest fails (categorie liste vide) — provider drift. Default Surefire excludes *PluginManagerTest. See docs/automatic-category-download.md for runtime watch behavior."
     },
     {
       "id": "ytdlp-migration",
@@ -295,7 +295,7 @@
         "mvn -B -ntp -DskipTests compile -> BUILD SUCCESS (33 modules)"
       ],
       "pr": "build: align own-version plugin internal dependencies (#33)",
-      "notes": "Own-version plugin modules (beinsport, footyroom, pluzz, ffmpeg) now use ${project.parent.version} for shared internal dependencyManagement coordinates. Risk legacy-maven-repo mitigated for local reactor compilation (external publication still pending legacy-url-migration)."
+      "notes": "Own-version plugin modules (beinsport, footyroom, francetv, ffmpeg) now use ${project.parent.version} for shared internal dependencyManagement coordinates. Risk legacy-maven-repo mitigated for local reactor compilation."
     },
     {
       "id": "youtube-apikey",
