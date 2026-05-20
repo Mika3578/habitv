@@ -24,15 +24,18 @@ public class ConfigController extends BaseController {
 
 	private TextField youtubeApiKey;
 
+	private TextField maxConcurrentDownloads;
+
 	public ConfigController(TextField downloadOuput, TextField nbrMaxAttempts,
 			TextField daemonCheckTimeSec, CheckBox autoUpdate,
-			TextField youtubeApiKey) {
+			TextField youtubeApiKey, TextField maxConcurrentDownloads) {
 		super();
 		this.downloadOuput = downloadOuput;
 		this.nbrMaxAttempts = nbrMaxAttempts;
 		this.daemonCheckTimeSec = daemonCheckTimeSec;
 		this.autoUpdate = autoUpdate;
 		this.youtubeApiKey = youtubeApiKey;
+		this.maxConcurrentDownloads = maxConcurrentDownloads;
 	}
 
 	public void init() {
@@ -62,6 +65,8 @@ public class ConfigController extends BaseController {
 				"si coché habiTv se mettra à jour automatiquement."));
 		youtubeApiKey.setTooltip(new Tooltip(
 				"Clé API YouTube Data v3. Laissez vide pour utiliser la variable d'environnement ou l'option Java."));
+		maxConcurrentDownloads.setTooltip(new Tooltip(
+				"Maximum number of episode downloads running at the same time (minimum 1)."));
 	}
 
 	private void loadConfig() {
@@ -72,6 +77,8 @@ public class ConfigController extends BaseController {
 				.getDemonCheckTime()));
 		autoUpdate.setSelected(userConfig.updateOnStartup());
 		youtubeApiKey.setText(userConfig.getYoutubeApiKey());
+		maxConcurrentDownloads.setText(String.valueOf(userConfig
+				.getMaxConcurrentDownloads()));
 	}
 
 	private void addButtonActions() {
@@ -136,6 +143,20 @@ public class ConfigController extends BaseController {
 			}
 		};
 		triggersave(youtubeApiKey, saveYoutubeApiKey);
+
+		Runnable saveMaxConcurrent = new Runnable() {
+
+			@Override
+			public void run() {
+				UserConfig userConfig = getController().loadUserConfig();
+				final int value = Integer.parseInt(maxConcurrentDownloads.getText());
+				if (userConfig.getMaxConcurrentDownloads() != value) {
+					userConfig.setMaxConcurrentDownloads(value);
+					saveConfig(userConfig);
+				}
+			}
+		};
+		triggersave(maxConcurrentDownloads, saveMaxConcurrent);
 
 		autoUpdate.setOnAction(new EventHandler<ActionEvent>() {
 

@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +12,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
+
+import com.dabi.habitv.core.event.EpisodeStateEnum;
+import com.dabi.habitv.core.task.EpisodeMetadataFormatting;
 
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
@@ -32,6 +36,7 @@ import com.dabi.habitv.tray.subscriber.CoreSubscriber;
 import com.dabi.habitv.utils.FilterUtils;
 
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -45,8 +50,11 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
@@ -75,9 +83,13 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 
 	private ProgressIndicator searchCategoryProgress;
 
-	private ListView<EpisodeDTO> episodeListView;
+	private TableView<EpisodeDTO> episodeTableView;
+
+	private Button downloadSelectedButton;
 
 	private TextField episodeFilter;
+
+	private final Map<EpisodeDTO, EpisodeStateEnum> episodeLiveStates = new HashMap<>();
 
 	private Collection<EpisodeDTO> currentEpisodes;
 
@@ -94,16 +106,17 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 	private CheckBox applySavedFilters;
 
 	public ToDownloadController(ProgressIndicator searchCategoryProgress, Button refreshCategoryButton, Button cleanCategoryButton,
-	        TreeView<CategoryDTO> toDLTree, Label indicationTextFlow, ListView<EpisodeDTO> episodeListView, TextField episodeFilter,
-	        TextField categoryFilter, CheckBox applySavedFilters, ChoiceBox<IncludeExcludeEnum> filterTypeChoice, Button addFilterButton,
-	        HBox currentFilterVBox) {
+	        TreeView<CategoryDTO> toDLTree, Label indicationTextFlow, TableView<EpisodeDTO> episodeTableView,
+	        Button downloadSelectedButton, TextField episodeFilter, TextField categoryFilter, CheckBox applySavedFilters,
+	        ChoiceBox<IncludeExcludeEnum> filterTypeChoice, Button addFilterButton, HBox currentFilterVBox) {
 		super();
 		this.refreshCategoryButton = refreshCategoryButton;
 		this.cleanCategoryButton = cleanCategoryButton;
 		this.toDLTree = toDLTree;
 		this.indicationText = indicationTextFlow;
 		this.searchCategoryProgress = searchCategoryProgress;
-		this.episodeListView = episodeListView;
+		this.episodeTableView = episodeTableView;
+		this.downloadSelectedButton = downloadSelectedButton;
 		this.episodeFilter = episodeFilter;
 		this.categoryFilter = categoryFilter;
 		this.filterTypeChoice = filterTypeChoice;
@@ -120,10 +133,125 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 	@Override
 	protected void init() {
 		loadTree();
+		initEpisodeTable();
 		addButtonsActions();
 		addTooltips();
 		initFilters();
 		initIncludeExcludeFilterHandler();
+	}
+
+	private void initEpisodeTable() {
+		episodeTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		episodeTableView.getColumns().clear();
+		episodeTableView.getColumns().add(buildEpisodeColumn("name", "Episode", 180));
+		episodeTableView.getColumns().add(buildEpisodeColumn("episodeDate", "Date", 90));
+		episodeTableView.getColumns().add(buildEpisodeColumn("durationSeconds", "Duration", 80));
+		episodeTableView.getColumns().add(buildEpisodeColumn("sizeBytes", "Size", 70));
+		episodeTableView.getColumns().add(buildStatusColumn());
+		episodeTableView.getColumns().add(buildSourceColumn());
+		episodeTableView.setRowFactory(tv -> new TableRow<EpisodeDTO>() {
+			@Override
+			protected void updateItem(EpisodeDTO episode, boolean empty) {
+				super.updateItem(episode, empty);
+				if (empty || episode == null) {
+					setStyle("");
+				} else if (downloadedEpisodes != null
+						&& downloadedEpisodes.contains(episode.getName())) {
+					setStyle("-fx-text-fill: gray;");
+				} else if (isSelected()) {
+					setStyle("-fx-background-color: -fx-selection-bar;");
+				} else {
+					setStyle("");
+				}
+			}
+		});
+		episodeTableView.getSelectionModel().getSelectedItems().addListener(
+				(javafx.collections.ListChangeListener.Change<? extends EpisodeDTO> change) -> {
+					downloadSelectedButton.setDisable(episodeTableView.getSelectionModel()
+							.getSelectedItems().isEmpty());
+				});
+		downloadSelectedButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				getController().downloadSelectedEpisodes(
+						new ArrayList<>(episodeTableView.getSelectionModel().getSelectedItems()));
+			}
+		});
+		episodeTableView.setContextMenu(buildEpisodeContextMenu());
+		episodeTableView.getSelectionModel().selectedItemProperty()
+				.addListener(new ChangeListener<EpisodeDTO>() {
+					@Override
+					public void changed(ObservableValue<? extends EpisodeDTO> observable,
+							EpisodeDTO oldValue, EpisodeDTO newValue) {
+						if (ouvrirUrl != null && newValue != null) {
+							ouvrirUrl.setDisable(!newValue.getId().startsWith("http:"));
+						}
+					}
+				});
+	}
+
+	private TableColumn<EpisodeDTO, String> buildEpisodeColumn(final String property,
+			final String title, final double prefWidth) {
+		final TableColumn<EpisodeDTO, String> column = new TableColumn<>(title);
+		column.setPrefWidth(prefWidth);
+		column.setCellValueFactory(features -> new ReadOnlyObjectWrapper<>(
+				formatEpisodeColumn(property, features.getValue())));
+		column.setComparator((left, right) -> {
+			if (left == null && right == null) {
+				return 0;
+			}
+			if (left == null) {
+				return -1;
+			}
+			if (right == null) {
+				return 1;
+			}
+			return left.compareToIgnoreCase(right);
+		});
+		column.setSortable(true);
+		return column;
+	}
+
+	private static String formatEpisodeColumn(final String property,
+			final EpisodeDTO episode) {
+		if (episode == null) {
+			return "";
+		}
+		if ("name".equals(property)) {
+			return episode.getName();
+		}
+		if ("episodeDate".equals(property)) {
+			return EpisodeMetadataFormatting.formatDate(episode.getEpisodeDate());
+		}
+		if ("durationSeconds".equals(property)) {
+			return EpisodeMetadataFormatting.formatDuration(episode.getDurationSeconds());
+		}
+		if ("sizeBytes".equals(property)) {
+			return EpisodeMetadataFormatting.formatSize(episode.getSizeBytes());
+		}
+		return "";
+	}
+
+	private TableColumn<EpisodeDTO, String> buildStatusColumn() {
+		final TableColumn<EpisodeDTO, String> column = new TableColumn<>("Status");
+		column.setPrefWidth(100);
+		column.setCellValueFactory(features -> {
+			final EpisodeDTO episode = features.getValue();
+			final String status = EpisodeDownloadStatusResolver.resolve(episode,
+					downloadedEpisodes, episodeLiveStates.get(episode));
+			return new javafx.beans.property.SimpleStringProperty(status);
+		});
+		column.setSortable(false);
+		return column;
+	}
+
+	private TableColumn<EpisodeDTO, String> buildSourceColumn() {
+		final TableColumn<EpisodeDTO, String> column = new TableColumn<>("Source");
+		column.setPrefWidth(120);
+		column.setCellValueFactory(features -> new javafx.beans.property.SimpleStringProperty(
+				EpisodeMetadataFormatting.formatSource(features.getValue())));
+		column.setSortable(false);
+		return column;
 	}
 
 	private void initIncludeExcludeFilterHandler() {
@@ -231,7 +359,7 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 
 	private void emptyEpisodeList() {
 		ObservableList<EpisodeDTO> obsEp = FXCollections.observableArrayList();
-		episodeListView.setItems(obsEp);
+		episodeTableView.setItems(obsEp);
 	}
 
 	private void buildContextMenu(final TreeItem<CategoryDTO> treeItem) {
@@ -377,7 +505,7 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 		ObservableList<EpisodeDTO> obsEp = FXCollections.observableArrayList();
 		obsEp.addAll(Arrays.asList(new EpisodeDTO(null, "Chargement...", "")));
 
-		episodeListView.setItems(obsEp);
+		episodeTableView.setItems(obsEp);
 		downloadedEpisodes = getController().getManager().findDownloadedEpisodes(category);
 
 		new Thread(new Runnable() {
@@ -389,7 +517,7 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 
 			        @Override
 			        public void run() {
-				        initListView(currentEpisodes);
+				        initEpisodeItems(currentEpisodes);
 				        filterEpisodeListView("");
 			        }
 		        });
@@ -399,48 +527,13 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 
 	}
 
-	private void initListView(final Collection<EpisodeDTO> episodes) {
+	private void initEpisodeItems(final Collection<EpisodeDTO> episodes) {
 		ObservableList<EpisodeDTO> obsEp = FXCollections.observableArrayList();
 		obsEp.addAll(episodes);
-
-		episodeListView.setItems(obsEp);
-
-		episodeListView.setCellFactory(new Callback<ListView<EpisodeDTO>, ListCell<EpisodeDTO>>() {
-			@Override
-			public ListCell<EpisodeDTO> call(ListView<EpisodeDTO> param) {
-				return new ListCell<EpisodeDTO>() {
-
-			        @Override
-			        protected void updateItem(EpisodeDTO episode, boolean empty) {
-				        super.updateItem(episode, empty);
-
-				        if (!empty) {
-					        setText(episode.getName());
-
-					        if (downloadedEpisodes.contains(episode.getName())) {
-						        setTextFill(Color.GRAY);
-					        } else {
-						        setTextFill(Color.BLACK);
-					        }
-				        } else {
-					        setText(null);
-				        }
-			        }
-		        };
-			}
-		});
-
-		episodeListView.setContextMenu(buildEpisodeContextMenu());
-
-		episodeListView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<EpisodeDTO>() {
-
-			@Override
-			public void changed(ObservableValue<? extends EpisodeDTO> observable, EpisodeDTO oldValue, EpisodeDTO newValue) {
-				if (ouvrirUrl != null && observable.getValue() != null) {
-					ouvrirUrl.setDisable(!observable.getValue().getId().startsWith("http:"));
-				}
-			}
-		});
+		episodeTableView.setItems(obsEp);
+		episodeTableView.getSelectionModel().clearSelection();
+		downloadSelectedButton.setDisable(true);
+		episodeTableView.refresh();
 	}
 
 	MenuItem ouvrirUrl = new MenuItem("Ouvrir dans le navigateur");
@@ -452,7 +545,7 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 
 			@Override
 			public void handle(ActionEvent event) {
-				getController().downloadEpisode(episodeListView.getSelectionModel().getSelectedItem());
+				getController().downloadEpisode(episodeTableView.getSelectionModel().getSelectedItem());
 			}
 		});
 		contextMenu.getItems().add(telecharger);
@@ -462,7 +555,7 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 
 			@Override
 			public void handle(ActionEvent event) {
-				getController().copyUrl(episodeListView.getSelectionModel().getSelectedItem());
+				getController().copyUrl(episodeTableView.getSelectionModel().getSelectedItem());
 			}
 		});
 		contextMenu.getItems().add(urlCopie);
@@ -471,7 +564,7 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 
 			@Override
 			public void handle(ActionEvent event) {
-				getController().openInBrowser(episodeListView.getSelectionModel().getSelectedItem());
+				getController().openInBrowser(episodeTableView.getSelectionModel().getSelectedItem());
 			}
 		});
 		contextMenu.getItems().add(ouvrirUrl);
@@ -481,7 +574,7 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 
 			@Override
 			public void handle(ActionEvent event) {
-				EpisodeDTO episode = episodeListView.getSelectionModel().getSelectedItem();
+				EpisodeDTO episode = episodeTableView.getSelectionModel().getSelectedItem();
 				getController().setDownloaded(episode);
 				filterEpisodeListView(episodeFilter.getText());
 				downloadedEpisodes.add(episode.getName());
@@ -573,7 +666,7 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 	}
 
 	private void filterEpisodeListView(String text) {
-		initListView(filterEpisodeList(text, this.filterTypeChoice.getValue().isInclude()));
+		initEpisodeItems(filterEpisodeList(text, this.filterTypeChoice.getValue().isInclude()));
 	}
 
 	private Collection<EpisodeDTO> filterEpisodeList(String text, boolean include) {
@@ -607,7 +700,10 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 		refreshCategoryButton.setTooltip(new Tooltip("Rafraichir l'arbre des catégories."));
 		cleanCategoryButton.setTooltip(new Tooltip("Enlever les catégories périmées."));
 		indicationText.setText(
-		        "Sélectionner les catégories à surveiller pour le téléchargement automatique \n et cliquer sur les épisodes à droite pour le téléchargement manuel.");
+		        "Select categories to watch for automatic downloads. "
+		        + "Select one or more episodes and use Download selected, or use the context menu.");
+		downloadSelectedButton.setTooltip(new Tooltip(
+		        "Enqueue all selected episodes for download (skips duplicates)."));
 	}
 
 	private void addButtonsActions() {
@@ -647,7 +743,7 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 	}
 
 	private void loadTree(Map<String, CategoryDTO> pluginsToDisplay) {
-		TreeItem<CategoryDTO> root = new CategoryTreeItem(new CategoryDTO(null, "Chaines", "root", null));
+		TreeItem<CategoryDTO> root = new CategoryTreeItem(new CategoryDTO(null, "Plugins", "root", null));
 		toDLTree.setRoot(root);
 		toDLTree.setShowRoot(false);
 		toDLTree.setCellFactory(forTreeView());
@@ -715,7 +811,26 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 	}
 
 	@Override
-	public void update(RetreiveEvent event) {
+	public void update(final RetreiveEvent event) {
+		if (event == null || event.getEpisode() == null) {
+			return;
+		}
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				episodeLiveStates.put(event.getEpisode(), event.getState());
+				if (event.getState() == EpisodeStateEnum.DOWNLOADED
+						|| event.getState() == EpisodeStateEnum.READY) {
+					if (downloadedEpisodes != null) {
+						downloadedEpisodes.add(event.getEpisode().getName());
+					}
+					episodeLiveStates.remove(event.getEpisode());
+				}
+				if (episodeTableView != null) {
+					episodeTableView.refresh();
+				}
+			}
+		});
 	}
 
 	private int searchCount;
@@ -754,29 +869,45 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 	private static final StringConverter<TreeItem<CategoryDTO>> STR_CONVERTER = new StringConverter<TreeItem<CategoryDTO>>() {
 		@Override
 		public String toString(TreeItem<CategoryDTO> treeItem) {
-			return (treeItem == null || treeItem.getValue() == null) ? "" : treeItem.getValue().getName();
-			// + (hasSelectedChild(treeItem.getValue()) ? "*"
-	        // : "");
+			return formatTreeItemLabel(treeItem);
 		}
-
-		// private boolean hasSelectedChild(CategoryDTO categoryDTO) {
-	    // for (CategoryDTO subCategoryDTO : categoryDTO.getSubCategories()) {
-	    // if (subCategoryDTO.isSelected()) {
-	    // return true;
-	    // } else {
-	    // if (hasSelectedChild(subCategoryDTO)) {
-	    // return true;
-	    // }
-	    // }
-	    // }
-	    // return false;
-	    // }
 
 		@Override
 		public TreeItem<CategoryDTO> fromString(String string) {
 			return new TreeItem<CategoryDTO>();
 		}
 	};
+
+	static String formatTreeItemLabel(final TreeItem<CategoryDTO> treeItem) {
+		if (treeItem == null || treeItem.getValue() == null) {
+			return "";
+		}
+		final CategoryDTO category = treeItem.getValue();
+		final int depth = treeDepth(treeItem);
+		if (category.isTemplate()) {
+			return "Template: " + category.getName();
+		}
+		switch (depth) {
+		case 1:
+			return "Plugin: " + category.getName();
+		case 2:
+			return "Category: " + category.getName();
+		case 3:
+			return "Show: " + category.getName();
+		default:
+			return "Group: " + category.getName();
+		}
+	}
+
+	private static int treeDepth(final TreeItem<CategoryDTO> treeItem) {
+		int depth = 0;
+		TreeItem<CategoryDTO> current = treeItem;
+		while (current != null && current.getParent() != null) {
+			depth++;
+			current = current.getParent();
+		}
+		return depth;
+	}
 
 	private static Callback<TreeView<CategoryDTO>, TreeCell<CategoryDTO>> forTreeView(
 	        final Callback<TreeItem<CategoryDTO>, ObservableValue<Boolean>> getSelectedProperty) {
