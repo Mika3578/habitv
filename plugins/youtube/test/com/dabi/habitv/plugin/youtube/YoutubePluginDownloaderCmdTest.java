@@ -9,6 +9,8 @@ import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.dabi.habitv.api.plugin.api.PluginDownloaderInterface;
@@ -19,6 +21,16 @@ import com.dabi.habitv.api.plugin.holder.ProcessHolder;
 import com.dabi.habitv.framework.plugin.utils.CmdExecutor;
 
 public class YoutubePluginDownloaderCmdTest {
+
+	@Before
+	public void disablePreflight() {
+		YtDlpRuntimeDiagnostics.setPreflightEnabled(false);
+	}
+
+	@After
+	public void restorePreflight() {
+		YtDlpRuntimeDiagnostics.setPreflightEnabled(true);
+	}
 
 	@Test
 	public void youtubeUrlIsAcceptedBySpecificDownloader() {
