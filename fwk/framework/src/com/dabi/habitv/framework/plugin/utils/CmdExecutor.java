@@ -166,16 +166,12 @@ public class CmdExecutor implements ProcessHolder {
 		try {
 			final Map<String, String> envOverrides = getProcessEnvironment();
 			final boolean hasEnvOverrides = envOverrides != null && !envOverrides.isEmpty();
+			final String[] mergedEnv = hasEnvOverrides ? buildMergedEnvironmentArray(envOverrides) : null;
 			if (cmdProcessor == null || cmdProcessor.isEmpty()) {
 				if (LOG.isDebugEnabled()) {
 					LOG.debug("cmd : " + cmd);
 				}
-				if (!hasEnvOverrides) {
-					return Runtime.getRuntime().exec(cmd);
-				}
-				final ProcessBuilder processBuilder = new ProcessBuilder(cmd);
-				applyEnvironmentOverrides(processBuilder, envOverrides);
-				return processBuilder.start();
+				return Runtime.getRuntime().exec(cmd, mergedEnv);
 			} else {
 				final String[] cmdArgs = cmdProcessor.split(" ");
 				for (int i = 0; i < cmdArgs.length; i++) {
@@ -186,24 +182,25 @@ public class CmdExecutor implements ProcessHolder {
 				if (LOG.isDebugEnabled()) {
 					LOG.debug("cmd : " + cmdArgs);
 				}
-				if (!hasEnvOverrides) {
-					return Runtime.getRuntime().exec(cmdArgs);
-				}
-				final ProcessBuilder processBuilder = new ProcessBuilder(cmdArgs);
-				applyEnvironmentOverrides(processBuilder, envOverrides);
-				return processBuilder.start();
+				return Runtime.getRuntime().exec(cmdArgs, mergedEnv);
 			}
 		} catch (final IOException e) {
 			throw new ExecutorFailedException(cmd, e.getMessage(), e.getMessage(), e);
 		}
 	}
 
-	private static void applyEnvironmentOverrides(final ProcessBuilder processBuilder,
-			final Map<String, String> envOverrides) {
-		final Map<String, String> environment = processBuilder.environment();
+	private static String[] buildMergedEnvironmentArray(final Map<String, String> envOverrides) {
+		final Map<String, String> environment = System.getenv();
+		final Map<String, String> merged = new java.util.HashMap<String, String>(environment);
 		for (final Map.Entry<String, String> entry : envOverrides.entrySet()) {
-			environment.put(entry.getKey(), entry.getValue());
+			merged.put(entry.getKey(), entry.getValue());
 		}
+		final String[] envp = new String[merged.size()];
+		int i = 0;
+		for (final Map.Entry<String, String> entry : merged.entrySet()) {
+			envp[i++] = entry.getKey() + "=" + entry.getValue();
+		}
+		return envp;
 	}
 
 	private Thread treatCmdOutput(final InputStream inputStream, final StringBuffer fullOutput) {

@@ -107,6 +107,11 @@ public final class YtDlpRuntimeDiagnostics {
 		final Map<String, String> env = buildYtDlpEnvironment(binDir);
 		final CmdExecutor versionExecutor = new CmdExecutor(cmdProcessor, versionCmd, 1000) {
 			@Override
+			protected long getHungProcessTime() {
+				return 1000;
+			}
+
+			@Override
 			protected Map<String, String> getProcessEnvironment() {
 				return env;
 			}

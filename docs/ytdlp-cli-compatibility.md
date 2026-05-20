@@ -84,18 +84,18 @@ Get-ChildItem "$env:TEMP" -Directory -Filter "_MEI*" -ErrorAction SilentlyContin
 3. Rename the current binary:
 
 ```powershell
-Rename-Item "C:\Users\Mika\habitv\bin\yt-dlp.exe" "yt-dlp.exe.broken" -ErrorAction SilentlyContinue
+Rename-Item "$env:USERPROFILE\habitv\bin\yt-dlp.exe" "yt-dlp.exe.broken" -ErrorAction SilentlyContinue
 ```
 
 4. Download a fresh official Windows `yt-dlp.exe` from:
    https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe
-5. Install it as `C:\Users\Mika\habitv\bin\yt-dlp.exe` (adjust paths to your
+5. Install it as `%USERPROFILE%\habitv\bin\yt-dlp.exe` (adjust paths to your
    Habitv home directory).
 6. Test outside Habitv:
 
 ```powershell
-C:\Users\Mika\habitv\bin\yt-dlp.exe --version
-C:\Users\Mika\habitv\bin\yt-dlp.exe "https://www.france.tv/france-3/nouvelle-aquitaine_la-france-en-vrai-aquitaine/8456007-oleron-la-vie-continue.html" -o "C:\Users\Mika\habitv\Downloads\manual-francetv-test.%(ext)s" --write-sub --write-auto-sub --no-check-certificate
+$env:USERPROFILE\habitv\bin\yt-dlp.exe --version
+$env:USERPROFILE\habitv\bin\yt-dlp.exe "https://www.france.tv/france-3/nouvelle-aquitaine_la-france-en-vrai-aquitaine/8456007-oleron-la-vie-continue.html" -o "$env:USERPROFILE\habitv\Downloads\manual-francetv-test.%(ext)s" --write-sub --write-auto-sub --no-check-certificate
 ```
 
 7. Retry the same URL through Habitv.
