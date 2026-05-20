@@ -12,24 +12,24 @@
 > on each entry for compatibility with existing PRs and commits. See
 > the `descriptive-slug-ids` ADR for the rationale and full mapping.
 
-**Last refresh:** 2026-05-19 · **Active branch:** `develop`
+**Last refresh:** 2026-05-20 · **Active branch:** `develop`
 
 ---
 
 ## 📊 Overall progress
 
 ```
-█████████████████░░░  83%
+████████████████░░░░  78%
 ```
 
 | Category | Count |
 |---------|------:|
 | ✅ Delivered | **11** |
-| 🟡 In progress | **2** |
+| 🟡 In progress | **3** |
 | 🔵 Proposed | **2** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
-| **Total work items** | **15** |
+| **Total work items** | **16** |
 
 ---
 
@@ -52,6 +52,7 @@
 | 🔑 `youtube-apikey` — YouTube Data API key externalization | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🧩 `jaxb-launcher-recovery` — JAXB generated sources & launcher classpath recovery | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🧱 `maven-pr-validation` — Maven PR validation workflow | ✅ Done | 🟠 P1 | `████████████████████` 100% |
+| 🔒 `dependency-security-audit` — Dependency security audit & remediation | 🟡 In progress | 🟠 P1 | `███░░░░░░░░░░░░░░░░░` 15% |
 
 ---
 
@@ -623,10 +624,46 @@ mvn -B -ntp -pl fwk/api,fwk/framework,application/core,plugins/plugin-tester -am
 mvn -B -ntp -DskipTests package
 ```
 
-**Related PR** · `ci: add Maven PR validation workflow` (this PR)
+**Related PR** · `ci: add Maven PR validation workflow` (#65)
 
 **Notes** — Java 8 remains the required baseline; Java 11+ stays
 diagnostic until JAXB and JavaFX modernization work is complete.
+
+---
+
+## 🔒 `dependency-security-audit` — Dependency security audit & remediation
+
+| | |
+|---|---|
+| **Status** | 🟡 In progress |
+| **Priority** | 🟠 P1 |
+| **Progress** | `███░░░░░░░░░░░░░░░░░` 15% |
+| **Legacy code** | HBTV-016 |
+
+**Scope** — Establish a documentation-first Dependabot triage baseline
+for the Java 8 Maven reactor without mass dependency upgrades. Follow-up
+PRs upgrade build plugins, logging, HTTPS resolution, and runtime
+libraries in a safe order.
+
+**Acceptance criteria**
+- ✅ `docs/security-dependency-audit.md` records GitHub vulnerability
+  counts, scope, risks, remediation order, and first fix candidates
+- 🟡 `dev-tracker` mirrors the work item in Markdown and JSON
+- 🟡 Optional `scripts/security/maven-dependency-inventory.ps1` lists
+  POMs and runs `mvn validate` (and optional `dependency:tree`)
+- ⬜ Focused follow-up PRs address Maven plugins, log4j 1.x, and
+  module-scoped runtime bumps without mixing provider rewrites
+
+**Validation**
+```bash
+mvn -B -ntp -DskipTests validate
+pwsh -File scripts/security/maven-dependency-inventory.ps1 -DependencyTree
+```
+
+**Notes** — Baseline branch `security/dependabot-audit-baseline`. GitHub
+reports **294** vulnerabilities (87 critical, 90 high, 89 moderate,
+28 low). Dependabot API export to `target/dependabot-alerts.json` is
+local-only (gitignored).
 
 ---
 
@@ -662,3 +699,4 @@ issue trackers:
 | HBTV-013 | `youtube-apikey` |
 | HBTV-014 | `jaxb-launcher-recovery` |
 | HBTV-015 | `maven-pr-validation` |
+| HBTV-016 | `dependency-security-audit` |
