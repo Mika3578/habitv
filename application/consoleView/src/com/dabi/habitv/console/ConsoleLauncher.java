@@ -334,10 +334,11 @@ public final class ConsoleLauncher {
 
 	private static void downloadEpisodes(String[] episodesUrl) {
 		info("downloadEpisodes" + Arrays.asList(episodesUrl));
+		final CategoryDTO manualCategory = new CategoryDTO("Manuel", "Manuel", "Manuel", "mp4");
 		for (String url : episodesUrl) {
-			String name = RetrieverUtils.getTitleByUrl(url);
-			coreManager.restart(new EpisodeDTO(new CategoryDTO("Manuel",
-					"Manuel", "Manuel", "mp4"), name, url), false);
+			final String name = RetrieverUtils.getTitleByUrl(url);
+			final EpisodeDTO episode = new EpisodeDTO(manualCategory, name, url);
+			coreManager.restart(episode, false);
 		}
 	}
 
