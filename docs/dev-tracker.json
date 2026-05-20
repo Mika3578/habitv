@@ -18,12 +18,12 @@
   ],
   "summary": {
     "done": 11,
-    "inProgress": 3,
+    "inProgress": 4,
     "proposed": 2,
     "deferred": 0,
     "blocked": 0,
-    "total": 16,
-    "overallProgressPercent": 81
+    "total": 17,
+    "overallProgressPercent": 79
   },
   "items": [
     {
@@ -367,6 +367,30 @@
       ],
       "pr": "ci: add Maven PR validation workflow (#65)",
       "notes": "Java 8 remains the required baseline; Java 11+ stays diagnostic until JAXB and JavaFX modernization is complete."
+    },
+    {
+      "id": "community-alpha-release-readiness",
+      "legacyCode": "HBTV-016",
+      "displayTitle": "Community alpha release readiness",
+      "icon": "🧪",
+      "status": "in-progress",
+      "priority": "P1",
+      "progressPercent": 35,
+      "scope": "Documentation and release readiness for the first community alpha / technical preview. No provider rewrites, no Java baseline change, no dependency mass-upgrade.",
+      "acceptanceCriteria": [
+        "docs/community-alpha-release.md describes alpha scope, Java 8 + JavaFX runtime, build/validate commands, Windows launch, limitations, and tester expectations.",
+        "docs/provider-status.md classifies providers for alpha testing.",
+        "docs/release-checklist.md covers pre-release validation and GitHub draft steps.",
+        ".github/ISSUE_TEMPLATE/community-alpha-test-report.md collects structured alpha feedback.",
+        "Tracker entry community-alpha-release-readiness (HBTV-016) present in dev-tracker.md and dev-tracker.json."
+      ],
+      "validation": [
+        "git status --short",
+        "mvn -B -ntp -DskipTests validate",
+        "mvn -B -ntp test"
+      ],
+      "pr": "docs: prepare community alpha release readiness (this PR)",
+      "notes": "Alpha is honest and limited; provider compatibility claims stay in provider-status.md. Security dependency audit remains in progress."
     },
     {
       "id": "clean-squash-merge-policy",

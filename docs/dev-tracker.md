@@ -19,17 +19,17 @@
 ## 📊 Overall progress
 
 ```
-████████████████░░░░  81%
+████████████████░░░░  79%
 ```
 
 | Category | Count |
 |---------|------:|
 | ✅ Delivered | **11** |
-| 🟡 In progress | **3** |
+| 🟡 In progress | **4** |
 | 🔵 Proposed | **2** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
-| **Total work items** | **16** |
+| **Total work items** | **17** |
 
 ---
 
@@ -52,6 +52,7 @@
 | 🔑 `youtube-apikey` — YouTube Data API key externalization | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🧩 `jaxb-launcher-recovery` — JAXB generated sources & launcher classpath recovery | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🧱 `maven-pr-validation` — Maven PR validation workflow | ✅ Done | 🟠 P1 | `████████████████████` 100% |
+| 🧪 `community-alpha-release-readiness` — Community alpha release readiness | 🟡 In progress | 🟠 P1 | `███████░░░░░░░░░░░░░` 35% |
 | 📝 `clean-squash-merge-policy` — Clean squash merge policy | 🟡 In progress | 🟢 P3 | `██████████░░░░░░░░░░` 50% |
 
 ---
@@ -641,6 +642,40 @@ Recommended merge / start order (see `dev-plan.md` for phase reasoning):
 
 ---
 
+## 🧪 `community-alpha-release-readiness` — Community alpha release readiness
+
+| | |
+|---|---|
+| **Status** | 🟡 In progress |
+| **Priority** | 🟠 P1 |
+| **Progress** | `███████░░░░░░░░░░░░░` 35% |
+| **Legacy code** | HBTV-016 |
+
+**Scope** — Documentation and release readiness for the first community alpha /
+technical preview. No provider rewrites, no Java baseline change, no dependency
+mass-upgrade.
+
+**Acceptance criteria**
+- ⬜ `docs/community-alpha-release.md` — alpha scope, runtime, build, Windows launch, limitations
+- ⬜ `docs/provider-status.md` — alpha provider classification
+- ⬜ `docs/release-checklist.md` — GitHub pre-release checklist
+- ⬜ `.github/ISSUE_TEMPLATE/community-alpha-test-report.md` — structured tester feedback
+- ⬜ Tracker mirrors updated (`community-alpha-release-readiness`)
+
+**Validation**
+```bash
+git status --short
+mvn -B -ntp -DskipTests validate
+mvn -B -ntp test
+```
+
+**Related PR** · `docs: prepare community alpha release readiness` (this PR)
+
+**Notes** — Alpha must not claim full provider support. Security dependency audit
+remains in progress (`jaxb-launcher-recovery` follow-up). See also `provider-inventory`.
+
+---
+
 ## 📝 `clean-squash-merge-policy` — Clean squash merge policy
 
 | | |
@@ -693,4 +728,5 @@ issue trackers:
 | HBTV-013 | `youtube-apikey` |
 | HBTV-014 | `jaxb-launcher-recovery` |
 | HBTV-015 | `maven-pr-validation` |
+| HBTV-016 | `community-alpha-release-readiness` |
 | HBTV-018 | `clean-squash-merge-policy` |
