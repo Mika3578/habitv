@@ -25,6 +25,7 @@
 						<all>
 							<element name="downloadOuput" type="string" minOccurs="0" />
 							<element name="maxAttempts" type="int" minOccurs="0" />
+							<element name="maxConcurrentDownloads" type="int" minOccurs="0" />
 							<element name="demonCheckTime" type="int" minOccurs="0" />
 							<element name="fileNameCutSize" type="int" minOccurs="0" />
 							<element name="downloaders" maxOccurs="1" minOccurs="0">

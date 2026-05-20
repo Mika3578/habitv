@@ -1,9 +1,11 @@
 package com.dabi.habitv.core.config;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 import org.junit.After;
@@ -19,6 +21,60 @@ public class XMLUserConfigTest {
 
 	@After
 	public void tearDown() throws Exception {
+	}
+
+	@Test
+	public void maxConcurrentDownloadsDefaultsToOneWhenMissing() throws Exception {
+		final File file = File.createTempFile("habitv-config-", ".xml");
+		file.deleteOnExit();
+		Files.write(file.toPath(), minimalConfigWithoutMaxConcurrent().getBytes(
+				StandardCharsets.UTF_8));
+		assertEquals(1, XMLUserConfig.readConfigForTest(file).getMaxConcurrentDownloads());
+	}
+
+	@Test
+	public void maxConcurrentDownloadsReadsConfiguredValue() throws Exception {
+		final File file = File.createTempFile("habitv-config-", ".xml");
+		file.deleteOnExit();
+		Files.write(file.toPath(), ("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+				+ "<ns2:configuration xmlns:ns2=\"http://www.dabi.com/habitv/configuration/entities\">\n"
+				+ "    <proxies/>\n"
+				+ "    <osConfig/>\n"
+				+ "    <downloadConfig>\n"
+				+ "        <maxConcurrentDownloads>3</maxConcurrentDownloads>\n"
+				+ "        <downloadOuput>/tmp/#EPISODE#.mp4</downloadOuput>\n"
+				+ "    </downloadConfig>\n"
+				+ "</ns2:configuration>\n").getBytes(StandardCharsets.UTF_8));
+		assertEquals(3, XMLUserConfig.readConfigForTest(file).getMaxConcurrentDownloads());
+	}
+
+	@Test
+	public void maxConcurrentDownloadsFallsBackWhenInvalid() {
+		assertEquals(1, XMLUserConfig.resolveMaxConcurrentDownloads(Integer.valueOf(0)));
+		assertEquals(1, XMLUserConfig.resolveMaxConcurrentDownloads(null));
+	}
+
+	@Test
+	public void maxConcurrentDownloadsRoundTrip() throws Exception {
+		final File file = File.createTempFile("habitv-config-", ".xml");
+		file.deleteOnExit();
+		Files.write(file.toPath(), minimalConfigWithoutMaxConcurrent().getBytes(
+				StandardCharsets.UTF_8));
+		final XMLUserConfig config = XMLUserConfig.readConfigForTest(file);
+		config.setMaxConcurrentDownloads(2);
+		XMLUserConfig.saveConfig(file, config);
+		assertEquals(2, XMLUserConfig.readConfigForTest(file).getMaxConcurrentDownloads());
+	}
+
+	private static String minimalConfigWithoutMaxConcurrent() {
+		return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+				+ "<ns2:configuration xmlns:ns2=\"http://www.dabi.com/habitv/configuration/entities\">\n"
+				+ "    <proxies/>\n"
+				+ "    <osConfig/>\n"
+				+ "    <downloadConfig>\n"
+				+ "        <downloadOuput>/tmp/#EPISODE#.mp4</downloadOuput>\n"
+				+ "    </downloadConfig>\n"
+				+ "</ns2:configuration>\n";
 	}
 
 	@Test
