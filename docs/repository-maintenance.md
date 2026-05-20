@@ -31,6 +31,21 @@ message.
 - The final commit title should follow Conventional Commits and include the PR
   number.
 
+## Repository automation checks
+
+This repository uses conservative automation for dependency hygiene and triage
+while keeping merge control with maintainers.
+
+- Dependabot opens pull requests for Maven and GitHub Actions updates.
+- Dependabot is configured to ignore semver-major updates.
+- Auto-merge is intentionally disabled.
+- Bots open pull requests only and must not push directly to `develop`.
+- Dependency Review blocks pull requests that introduce new `high` or
+  `critical` vulnerabilities in dependencies.
+- CodeQL runs separately from Maven CI and reports code scanning alerts.
+- Stale triage labels inactive issues and pull requests without auto-closing
+  them.
+
 ## Documentation sync
 
 When a change updates process or governance documentation, keep these files
@@ -45,3 +60,4 @@ aligned in the same commit when applicable:
 - `docs/repository-governance.md` — branch protection and rulesets
 - `docs/pull-request-style-guide.md` — PR and squash merge style
 - `AGENTS.md` — agent and contributor rules
+- `docs/ci.md` — CI, security checks, and required/diagnostic lanes

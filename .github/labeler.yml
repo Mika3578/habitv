@@ -1,0 +1,71 @@
+ci:
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/workflows/**"
+          - ".github/actions/**"
+
+docs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "docs/**"
+          - "*.md"
+
+maven:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/pom.xml"
+          - ".mvn/**"
+
+java:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/*.java"
+
+application:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "application/**"
+
+framework:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "fwk/**"
+
+plugins:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "plugins/**"
+
+provider:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "plugins/**/provider/**"
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/src/test/**"
+          - "**/*Test.java"
+
+security:
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/dependabot.yml"
+          - ".github/workflows/dependency-review.yml"
+          - ".github/workflows/codeql.yml"
+          - "SECURITY.md"
+
+repository:
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/**"
+          - "docs/repository-*.md"
+          - "AGENTS.md"
+
+packaging:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "application/habiTv/**"
+          - "application/habiTv-linux/**"
+          - "application/habiTv-windows/**"
+          - "scripts/static-repo/**"

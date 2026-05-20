@@ -1,0 +1,35 @@
+name: Stale Triage
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: stale-triage-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  stale:
+    name: stale-triage
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Mark stale issues and pull requests
+        uses: actions/stale@v10
+        with:
+          days-before-issue-stale: 90
+          days-before-issue-close: -1
+          days-before-pr-stale: 45
+          days-before-pr-close: -1
+          stale-issue-label: stale
+          stale-pr-label: stale
+          exempt-issue-labels: "pinned,security,regression,provider,java-modernization,good first issue,help wanted"
+          exempt-pr-labels: "pinned,security,regression,provider,java-modernization,good first issue,help wanted"
+          stale-issue-message: "This issue has been marked as stale because it has had no activity for 90 days."
+          stale-pr-message: "This pull request has been marked as stale because it has had no activity for 45 days."

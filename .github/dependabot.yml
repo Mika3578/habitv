@@ -1,38 +1,45 @@
 # Dependabot version 2 — dependency update policy for develop integration.
 version: 2
 updates:
-  - package-ecosystem: maven
+  - package-ecosystem: "maven"
     directory: "/"
-    target-branch: develop
+    target-branch: "develop"
     schedule:
-      interval: weekly
+      interval: "weekly"
+      day: "monday"
+      time: "07:00"
+      timezone: "Europe/Paris"
     open-pull-requests-limit: 5
     labels:
-      - dependencies
-      - java
-      - maven
+      - "dependencies"
+      - "maven"
     groups:
-      maven-minor-patch:
-        patterns:
-          - "*"
+      maven-minor-and-patch:
         update-types:
-          - minor
-          - patch
+          - "minor"
+          - "patch"
     ignore:
-      # Avoid accidental major upgrades (Java/framework migration) in this phase.
       - dependency-name: "*"
         update-types:
-          - version-update:semver-major
+          - "version-update:semver-major"
 
-  - package-ecosystem: github-actions
+  - package-ecosystem: "github-actions"
     directory: "/"
-    target-branch: develop
+    target-branch: "develop"
     schedule:
-      interval: weekly
+      interval: "weekly"
+      day: "monday"
+      time: "07:30"
+      timezone: "Europe/Paris"
+    open-pull-requests-limit: 5
     labels:
-      - dependencies
-      - github-actions
+      - "dependencies"
+      - "github-actions"
     groups:
       github-actions:
         patterns:
           - "*"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
