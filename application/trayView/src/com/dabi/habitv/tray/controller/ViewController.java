@@ -8,7 +8,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+
+import com.dabi.habitv.core.task.BatchEnqueueResult;
 
 import org.apache.log4j.Logger;
 
@@ -326,6 +329,25 @@ public class ViewController implements CoreSubscriber {
 	public void downloadEpisode(EpisodeDTO episode) {
 		try {
 			getManager().restart(episode, false);
+		} catch (Exception e) {
+			LOG.error("", e);
+			Popin.error(e.getMessage());
+		}
+	}
+
+	public void downloadSelectedEpisodes(final List<EpisodeDTO> episodes) {
+		if (episodes == null || episodes.isEmpty()) {
+			Popin.error("Select at least one episode to download.");
+			return;
+		}
+		try {
+			final BatchEnqueueResult result = getManager()
+					.enqueueEpisodesForDownload(episodes);
+			final int added = result.getAddedCount();
+			final int skipped = result.getSkippedCount();
+			if (added == 0) {
+				Popin.error("No episodes were queued. They may already be downloaded or in the queue.");
+			}
 		} catch (Exception e) {
 			LOG.error("", e);
 			Popin.error(e.getMessage());

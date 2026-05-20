@@ -96,7 +96,10 @@ public class WindowController {
 	private TreeView<CategoryDTO> toDLTree;
 
 	@FXML
-	private ListView<EpisodeDTO> episodeListView;
+	private javafx.scene.control.TableView<EpisodeDTO> episodeTableView;
+
+	@FXML
+	private Button downloadSelectedButton;
 
 	@FXML
 	private TextField episodeFilter;
@@ -137,6 +140,9 @@ public class WindowController {
 
 	@FXML
 	private TextField youtubeApiKey;
+
+	@FXML
+	private TextField maxConcurrentDownloads;
 
 	private boolean trayMode = false;
 
@@ -192,15 +198,15 @@ public class WindowController {
 			ToDownloadController toDlController = new ToDownloadController(
 					searchCategoryProgress, refreshCategoryButton,
 					cleanCategoryButton, toDLTree, indicationText,
-					episodeListView, episodeFilter, categoryFilter,
-					applySavedFilters, filterTypeChoice, addFilterButton,
-					currentFilterVBox);
+					episodeTableView, downloadSelectedButton, episodeFilter,
+					categoryFilter, applySavedFilters, filterTypeChoice,
+					addFilterButton, currentFilterVBox);
 			toDlController.init(controller, manager, primaryStage);
 			manager.attach(toDlController);
 
 			new ConfigController(downloadOuput, nbrMaxAttempts,
-					daemonCheckTimeSec, autoUpdate, youtubeApiKey).init(controller, manager,
-					primaryStage);
+					daemonCheckTimeSec, autoUpdate, youtubeApiKey,
+					maxConcurrentDownloads).init(controller, manager, primaryStage);
 
 			controller.startDownloadCheckDemon();
 

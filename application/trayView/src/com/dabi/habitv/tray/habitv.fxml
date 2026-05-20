@@ -151,10 +151,29 @@
 												</AnchorPane>
 												<AnchorPane>
 													<children>
-														<ListView fx:id="episodeListView"
-															AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-															AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
-															BorderPane.alignment="CENTER" />
+														<VBox AnchorPane.bottomAnchor="0.0"
+															AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+															AnchorPane.topAnchor="0.0">
+															<children>
+																<HBox spacing="5.0">
+																	<children>
+																		<Button fx:id="downloadSelectedButton"
+																			disable="true" mnemonicParsing="false"
+																			text="Download selected" />
+																	</children>
+																	<padding>
+																		<Insets bottom="5.0" left="5.0" right="5.0"
+																			top="5.0" />
+																	</padding>
+																</HBox>
+																<TableView fx:id="episodeTableView"
+																	VBox.vgrow="ALWAYS">
+																	<columnResizePolicy>
+																		<TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+																	</columnResizePolicy>
+																</TableView>
+															</children>
+														</VBox>
 													</children>
 												</AnchorPane>
 											</items>
@@ -239,6 +258,8 @@
 											vgrow="SOMETIMES" />
 										<RowConstraints minHeight="10.0" prefHeight="30.0"
 											vgrow="SOMETIMES" />
+										<RowConstraints minHeight="10.0" prefHeight="30.0"
+											vgrow="SOMETIMES" />
 									</rowConstraints>
 									<children>
 										<Label text="Destination des téléchargements : "
@@ -266,6 +287,11 @@
 										<TextField fx:id="youtubeApiKey"
 											BorderPane.alignment="CENTER" GridPane.columnIndex="1"
 											GridPane.rowIndex="4" />
+										<Label text="Max simultaneous downloads : "
+											GridPane.columnIndex="0" GridPane.rowIndex="5" />
+										<TextField fx:id="maxConcurrentDownloads"
+											maxWidth="50.0" prefWidth="50.0" GridPane.columnIndex="1"
+											GridPane.rowIndex="5" />
 									</children>
 									<padding>
 										<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
