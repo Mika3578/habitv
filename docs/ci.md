@@ -8,7 +8,7 @@
 - No deployment, credentials, publishing, or auto-merge behavior is part of this workflow set.
 
 **Staged required-checks plan:** see [`required-checks-roadmap.md`](required-checks-roadmap.md)
-(tracker `required-checks-roadmap`, HBTV-016) for Phases 0–5, prerequisites,
+(tracker `required-checks-roadmap`, HBTV-017) for Phases 0–5, prerequisites,
 and branch-protection targets.
 
 ## Workflow coverage

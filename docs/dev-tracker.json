@@ -19,11 +19,11 @@
   "summary": {
     "done": 12,
     "inProgress": 4,
-    "proposed": 2,
+    "proposed": 3,
     "deferred": 0,
     "blocked": 0,
-    "total": 18,
-    "overallProgressPercent": 78
+    "total": 19,
+    "overallProgressPercent": 74
   },
   "items": [
     {
@@ -345,6 +345,28 @@
       "notes": "application/habiTv now uses a small Java 8-compatible local URLClassLoader helper instead of the unavailable Utils4J.addToClasspath API. Incompatible utils4j Java 17 bytecode and broader transitive dependency vulnerability cleanup remain out of scope for a dedicated security PR."
     },
     {
+      "id": "jaxb-config-model-alignment",
+      "legacyCode": "HBTV-020",
+      "displayTitle": "JAXB config/grab-config model & IDE alignment",
+      "icon": "🧬",
+      "status": "done",
+      "priority": "P1",
+      "progressPercent": 100,
+      "scope": "Align application/core config and grab-config Java callers with XSD-backed JAXB output; prevent stale application/core/generated trees from shadowing target/generated-sources/jaxb in Maven and IDE Java resolution.",
+      "acceptanceCriteria": [
+        "configuration.xsd and grab-config.xsd retain updateOnStartup, autoriseSnapshot, and grab-config boolean flags.",
+        "XMLUserConfig and GrabConfigDAO use isXxx() accessors emitted by jaxb2-maven-plugin for optional xs:boolean fields.",
+        "Maven removes legacy application/core/generated on initialize."
+      ],
+      "validation": [
+        "mvn -B -ntp -DskipTests generate-sources -> BUILD SUCCESS",
+        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS",
+        "mvn -B -ntp -pl application/core -am test -> BUILD SUCCESS"
+      ],
+      "pr": "fix/jaxb-config-model-alignment (this PR)",
+      "notes": "Builds on jaxb2-maven-plugin migration (#70). Reload Java workspace after mvn generate-sources so target/generated-sources/jaxb is indexed. Optional local java.import.exclusions for application/core/generated/** when .vscode/settings.json exists locally."
+    },
+    {
       "id": "maven-pr-validation",
       "legacyCode": "HBTV-015",
       "displayTitle": "Maven PR validation workflow",
@@ -433,6 +455,28 @@
       ],
       "pr": "docs: add clean squash merge policy (this PR)",
       "notes": "Documentation and workflow only; no application code or CI behavior changes."
+    },
+    {
+      "id": "required-checks-roadmap",
+      "legacyCode": "HBTV-017",
+      "displayTitle": "Required CI checks roadmap",
+      "icon": "🛣️",
+      "status": "proposed",
+      "priority": "P1",
+      "progressPercent": 0,
+      "scope": "Document the staged path to make Maven CI, JDK compatibility, deterministic tests, and security gates required on develop. CI governance and documentation only; no runtime behavior changes and no JavaFX migration.",
+      "acceptanceCriteria": [
+        "docs/required-checks-roadmap.md defines Phases 0-5 with required vs not-yet-required checks.",
+        "docs/ci.md links the roadmap and reflects Phase 0 baseline checks.",
+        "Warning states required checks must be stable, deterministic, and actionable.",
+        "docs/dev-tracker.md and docs/dev-tracker.json stay in sync."
+      ],
+      "validation": [
+        "git status --short",
+        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS"
+      ],
+      "pr": "docs: add required checks roadmap (this PR)",
+      "notes": "Planned roadmap (status proposed). Modern JDK package compatibility must not be marked done until OpenJFX packaging works (javafx-modernization). Full test suite required only after -Plive-tests isolation (provider-inventory). This PR does not change runtime behavior or migrate JavaFX."
     }
   ]
 }

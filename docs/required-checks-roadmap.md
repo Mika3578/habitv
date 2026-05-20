@@ -4,7 +4,7 @@ Staged path to make all Maven CI, JDK compatibility, test, and security
 checks **required** on `develop` (and eventually `master`) without hiding
 failures or requiring unstable gates prematurely.
 
-**Tracker item:** `required-checks-roadmap` (HBTV-016)
+**Tracker item:** `required-checks-roadmap` (HBTV-017)
 
 **Scope of this document:** CI governance and documentation only. It does
 not change application runtime behavior, Maven reactor topology, or JavaFX

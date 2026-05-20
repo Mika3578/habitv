@@ -19,17 +19,17 @@
 ## 📊 Overall progress
 
 ```
-███████████████▌░░░░  78%
+██████████████░░░░░░  74%
 ```
 
 | Category | Count |
 |---------|------:|
 | ✅ Delivered | **12** |
 | 🟡 In progress | **4** |
-| 🔵 Proposed | **2** |
+| 🔵 Proposed | **3** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
-| **Total work items** | **18** |
+| **Total work items** | **19** |
 
 ---
 
@@ -51,10 +51,12 @@
 | 🔗 `own-version-deps-align` — Own-version plugin dependency alignment | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 🔑 `youtube-apikey` — YouTube Data API key externalization | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🧩 `jaxb-launcher-recovery` — JAXB generated sources & launcher classpath recovery | ✅ Done | 🟠 P1 | `████████████████████` 100% |
+| 🧬 `jaxb-config-model-alignment` — JAXB config/grab-config model & IDE alignment | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🧱 `maven-pr-validation` — Maven PR validation workflow | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🔒 `dependency-security-audit` — Dependency security audit & remediation | 🟡 In progress | 🟠 P1 | `███░░░░░░░░░░░░░░░░░` 15% |
 | 📝 `clean-squash-merge-policy` — Clean squash merge policy | 🟡 In progress | 🟢 P3 | `██████████░░░░░░░░░░` 50% |
 | 🔒 `critical-log4j-cve-remediation` — Critical Log4j 1.x CVE remediation | ✅ Done | 🔴 P0 | `████████████████████` 100% |
+| 🛣️ `required-checks-roadmap` — Required CI checks roadmap | 🔵 Proposed | 🟠 P1 | `░░░░░░░░░░░░░░░░░░░░` 0% |
 
 ---
 
@@ -594,6 +596,43 @@ scope for a dedicated security PR.
 
 ---
 
+## 🧬 `jaxb-config-model-alignment` — JAXB config/grab-config model & IDE alignment
+
+| | |
+|---|---|
+| **Status** | ✅ Done |
+| **Priority** | 🟠 P1 |
+| **Progress** | `████████████████████` 100% |
+
+**Scope** — Align `application/core` hand-written config/grab-config
+callers with XSD-backed JAXB output and stop stale
+`application/core/generated` trees from shadowing
+`target/generated-sources/jaxb` in Maven and Cursor/VS Code Java.
+
+**Acceptance criteria**
+- ✅ `configuration.xsd` and `grab-config.xsd` retain
+  `updateOnStartup`, `autoriseSnapshot`, and grab-config boolean flags
+- ✅ `XMLUserConfig` / `GrabConfigDAO` use `isXxx()` accessors emitted
+  by `jaxb2-maven-plugin` for optional `xs:boolean` fields
+- ✅ Maven removes legacy `application/core/generated` on `initialize`
+
+**Validation**
+```bash
+mvn -B -ntp -DskipTests generate-sources
+mvn -B -ntp -DskipTests validate
+mvn -B -ntp -pl application/core -am test
+```
+
+**Related PR** · `fix/jaxb-config-model-alignment` (this branch)
+
+**Notes** — Builds on `jaxb2-maven-plugin` migration (#70). After
+`mvn generate-sources`, reload the Java workspace so
+`target/generated-sources/jaxb` is indexed. Optional local Cursor/VS
+Code setting (`.vscode/settings.json` is gitignored):
+`java.import.exclusions`: `["**/application/core/generated/**"]`.
+
+---
+
 ## 🧱 `maven-pr-validation` — Maven PR validation workflow
 
 | | |
@@ -666,6 +705,42 @@ pwsh -File scripts/security/maven-dependency-inventory.ps1 -DependencyTree
 reports **294** vulnerabilities (87 critical, 90 high, 89 moderate,
 28 low). Dependabot API export to `target/dependabot-alerts.json` is
 local-only (gitignored).
+
+---
+
+## 🛣️ `required-checks-roadmap` — Required CI checks roadmap
+
+| | |
+|---|---|
+| **Status** | 🔵 Proposed (planned) |
+| **Priority** | 🟠 P1 |
+| **Progress** | `░░░░░░░░░░░░░░░░░░░░` 0% |
+| **Legacy code** | HBTV-017 |
+
+**Scope** — Document the staged path to make Maven CI, JDK compatibility,
+deterministic tests, and security gates required on `develop`. CI governance
+and documentation only; no runtime behavior changes and no JavaFX migration in
+this item.
+
+**Acceptance criteria**
+- ⬜ `docs/required-checks-roadmap.md` defines Phases 0–5 with required vs
+  not-yet-required checks
+- ⬜ `docs/ci.md` links the roadmap and reflects Phase 0 baseline checks
+- ⬜ Warning documents that required checks must be stable, deterministic, and
+  actionable (no live network / unrepaired JavaFX gates)
+- ⬜ Tracker mirrors updated in `docs/dev-tracker.json`
+
+**Validation**
+```bash
+git status --short
+mvn -B -ntp -DskipTests validate
+```
+
+**Notes** — Depends on `maven-pr-validation` for workflow job names. Modern
+JDK package compatibility must not be marked done until OpenJFX packaging
+works (`javafx-modernization`). Full test suite becomes required only after
+`-Plive-tests` isolation (`provider-inventory`). See
+`docs/required-checks-roadmap.md`.
 
 ---
 
@@ -766,5 +841,6 @@ issue trackers:
 | HBTV-014 | `jaxb-launcher-recovery` |
 | HBTV-015 | `maven-pr-validation` |
 | HBTV-016 | `dependency-security-audit` |
+| HBTV-017 | `required-checks-roadmap` |
 | HBTV-018 | `clean-squash-merge-policy` |
 | HBTV-019 | `critical-log4j-cve-remediation` |
