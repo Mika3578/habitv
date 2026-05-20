@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -105,7 +106,7 @@ public class CmdExecutor implements ProcessHolder {
 		}
 
 		if (process.exitValue() != 0 || (getLastOutputLine() != null && !isSuccess(fullOutput.toString()))) {
-			throw new ExecutorFailedException(cmd, fullOutput.toString(), lastOutputLine, null);
+			throw buildFailureException(cmd, fullOutput.toString(), lastOutputLine, null);
 		}
 		this.fullOutput = fullOutput.toString();
 	}
@@ -152,13 +153,29 @@ public class CmdExecutor implements ProcessHolder {
 		return -1;
 	}
 
+	protected Map<String, String> getProcessEnvironment() {
+		return null;
+	}
+
+	protected ExecutorFailedException buildFailureException(final String failedCmd, final String fullOutput,
+			final String lastLine, final Throwable cause) {
+		return new ExecutorFailedException(failedCmd, fullOutput, lastLine, cause);
+	}
+
 	protected Process buildProcess() throws ExecutorFailedException {
 		try {
+			final Map<String, String> envOverrides = getProcessEnvironment();
+			final boolean hasEnvOverrides = envOverrides != null && !envOverrides.isEmpty();
 			if (cmdProcessor == null || cmdProcessor.isEmpty()) {
 				if (LOG.isDebugEnabled()) {
 					LOG.debug("cmd : " + cmd);
 				}
-				return Runtime.getRuntime().exec(cmd);
+				if (!hasEnvOverrides) {
+					return Runtime.getRuntime().exec(cmd);
+				}
+				final ProcessBuilder processBuilder = new ProcessBuilder(cmd);
+				applyEnvironmentOverrides(processBuilder, envOverrides);
+				return processBuilder.start();
 			} else {
 				final String[] cmdArgs = cmdProcessor.split(" ");
 				for (int i = 0; i < cmdArgs.length; i++) {
@@ -169,10 +186,23 @@ public class CmdExecutor implements ProcessHolder {
 				if (LOG.isDebugEnabled()) {
 					LOG.debug("cmd : " + cmdArgs);
 				}
-				return Runtime.getRuntime().exec(cmdArgs);
+				if (!hasEnvOverrides) {
+					return Runtime.getRuntime().exec(cmdArgs);
+				}
+				final ProcessBuilder processBuilder = new ProcessBuilder(cmdArgs);
+				applyEnvironmentOverrides(processBuilder, envOverrides);
+				return processBuilder.start();
 			}
 		} catch (final IOException e) {
 			throw new ExecutorFailedException(cmd, e.getMessage(), e.getMessage(), e);
+		}
+	}
+
+	private static void applyEnvironmentOverrides(final ProcessBuilder processBuilder,
+			final Map<String, String> envOverrides) {
+		final Map<String, String> environment = processBuilder.environment();
+		for (final Map.Entry<String, String> entry : envOverrides.entrySet()) {
+			environment.put(entry.getKey(), entry.getValue());
 		}
 	}
 

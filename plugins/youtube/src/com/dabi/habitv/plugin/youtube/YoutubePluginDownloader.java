@@ -41,7 +41,8 @@ public class YoutubePluginDownloader extends BaseUpdatablePlugin implements Plug
 		// }
 
 		try {
-			return (new YtDlpCmdExecutor(downloaders.getCmdProcessor(), cmd));
+			YtDlpRuntimeDiagnostics.runPreflight(downloaders.getCmdProcessor(), binParam, downloaders.getBinDir());
+			return new YtDlpCmdExecutor(downloaders.getCmdProcessor(), cmd, binParam, downloaders.getBinDir());
 		} catch (final ExecutorFailedException e) {
 			throw new DownloadFailedException(e);
 		}
