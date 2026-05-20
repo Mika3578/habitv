@@ -1,6 +1,6 @@
 # Dependency security audit baseline
 
-> **Tracker:** `dependency-security-audit` (HBTV-015)  
+> **Tracker:** `dependency-security-audit` (HBTV-016)  
 > **Branch:** `security/dependabot-audit-baseline`  
 > **Last refresh:** 2026-05-20
 
@@ -112,10 +112,11 @@ Declared directly under `<build><plugins>` in root `pom.xml`:
 |--------|--------|---------|
 | `application/core` | `maven-jaxb-plugin` (XJC) | 1.1.1 |
 | `application/core` | `build-helper-maven-plugin` | 3.6.0 |
-| `application/habiTv`, `application/consoleView` | `maven-assembly-plugin` | 2.4.3 |
-| `application/trayView` | (plugin) | 2.0 |
-| `application/habiTv-linux` / `habiTv-windows` | JavaFX / bundling plugins | 2.8, 1.6 |
-| `build/static-repo-publisher` | (plugin) | 3.5.0 |
+| `application/habiTv`, `application/consoleView` | `maven-shade-plugin` | 2.4.3 |
+| `application/trayView` | `javafx-maven-plugin` (`com.zenjava`) | 2.0 |
+| `application/habiTv-linux` / `habiTv-windows` | `maven-dependency-plugin` | 2.8 |
+| `application/habiTv-linux` / `habiTv-windows` | `maven-antrun-plugin` | 1.6 |
+| `build/static-repo-publisher` | `exec-maven-plugin` (`org.codehaus.mojo`) | 3.5.0 |
 
 ### Repositories
 

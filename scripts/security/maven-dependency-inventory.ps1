@@ -33,7 +33,7 @@ $repoRoot = Get-RepoRoot
 Write-Host "Repository root: $repoRoot"
 
 $pomFiles = Get-ChildItem -Path $repoRoot -Filter pom.xml -Recurse -File |
-    Where-Object { $_.FullName -notmatch '\\target\\' } |
+    Where-Object { $_.FullName -notmatch '[\\/]target[\\/]' } |
     Sort-Object FullName
 
 Write-Host ""
