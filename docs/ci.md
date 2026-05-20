@@ -1,18 +1,36 @@
 # CI and security checks
 
-This repository uses independent GitHub workflows for build validation,
-dependency security, and maintenance triage.
+## Baseline and intent
 
-## Required checks recommendation
+- Java 8 is the current required baseline for merge-blocking checks.
+- Java 11, 17, 21, and 25 are diagnostic compatibility checks only.
+- Java 11+ may fail until JAXB and JavaFX migration is complete.
+- No deployment, credentials, publishing, or auto-merge behavior is part of this workflow set.
 
-Require before merge:
+## Workflow coverage
+
+Workflow: `.github/workflows/ci-maven.yml` (`Maven CI`)
+
+### Required checks (branch protection)
+
+Current required check for `develop` remains:
+
+- `CI / validate (zulu-8)` (from `.github/workflows/ci.yml`)
+
+The `Maven CI` workflow is additive in this PR. It does not supersede the
+existing required `CI` check until repository governance and the ruleset are
+updated together.
+
+After that governance/ruleset update, require:
 
 - `Maven CI / validate-java8`
 - `Maven CI / deterministic-tests-java8`
 - `Maven CI / compile-and-package-java8`
 - `Dependency Review / dependency-review`
 
-Do not require yet (diagnostic compatibility lanes and broad suite):
+### Diagnostic checks (do not require)
+
+Do not require:
 
 - `Maven CI / compatibility-java11`
 - `Maven CI / compatibility-java17`
@@ -22,21 +40,30 @@ Do not require yet (diagnostic compatibility lanes and broad suite):
 
 ## Security workflows
 
-- **Dependency Review** (`.github/workflows/dependency-review.yml`) runs
-  on pull requests to `develop` and `master` and fails when newly
-  introduced dependencies have `high` or `critical` known
-  vulnerabilities.
-- **CodeQL** default setup runs as repository code scanning and reports
-  alerts in GitHub code scanning.
+- `Dependency Review` (`.github/workflows/dependency-review.yml`) runs on pull
+  requests and fails when newly introduced dependencies have `high` or
+  `critical` vulnerabilities.
+- `CodeQL` default setup runs as repository code scanning and reports alerts in
+  GitHub code scanning.
 
-## Maintenance automation
+## Maintenance automation workflows
 
-- **Dependabot** (`.github/dependabot.yml`) opens pull requests for
-  Maven and GitHub Actions updates on a weekly schedule.
-- **Pull Request Labeler** (`.github/workflows/labeler.yml`) applies
-  labels based on changed files to help triage and routing.
-- **Stale Triage** (`.github/workflows/stale.yml`) labels inactive
-  issues and pull requests; it is not configured to auto-close them.
+- `Dependabot` (`.github/dependabot.yml`) opens pull requests for Maven and
+  GitHub Actions updates on a weekly schedule.
+- `Pull request labeler` (`.github/workflows/labeler.yml`) applies labels by
+  changed file paths.
+- `Stale triage` (`.github/workflows/stale.yml`) labels inactive issues and
+  pull requests without auto-closing them.
 
-Labeler and stale triage are operational helpers and are not required
-status checks for merging.
+Labeler and stale triage are operational helpers and are not required status
+checks for merging.
+
+## Local command parity
+
+Run the same required Java 8 commands locally:
+
+```bash
+mvn -B -ntp -DskipTests validate
+mvn -B -ntp -pl fwk/api,fwk/framework,application/core,plugins/plugin-tester -am test
+mvn -B -ntp -DskipTests package
+```

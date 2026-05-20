@@ -12,24 +12,24 @@
 > on each entry for compatibility with existing PRs and commits. See
 > the `descriptive-slug-ids` ADR for the rationale and full mapping.
 
-**Last refresh:** 2026-05-19 · **Active branch:** `develop`
+**Last refresh:** 2026-05-20 · **Active branch:** `develop`
 
 ---
 
 ## 📊 Overall progress
 
 ```
-█████████████████░░░  83%
+███████████████▌░░░░  78%
 ```
 
 | Category | Count |
 |---------|------:|
-| ✅ Delivered | **11** |
-| 🟡 In progress | **2** |
+| ✅ Delivered | **12** |
+| 🟡 In progress | **4** |
 | 🔵 Proposed | **2** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
-| **Total work items** | **15** |
+| **Total work items** | **18** |
 
 ---
 
@@ -41,7 +41,6 @@
 | ⚙️ `maven-reactor` — Maven reactor stabilization | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | ☕ `java8-baseline` — Java 8 compile baseline | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 🛡️ `branch-protection` — GitHub branch protection rules | 🔵 Proposed | 🟠 P1 | `░░░░░░░░░░░░░░░░░░░░` 0% |
-| 🤖 `repository-maintenance-automation` — Repository maintenance automation | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🔗 `legacy-url-migration` — Legacy URL migration (free.fr / SVN / FTP) | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 📦 `static-repo-publish` — Static artifact repository publication | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🟡 In progress | 🟡 P2 | `███████████░░░░░░░░░` 55% |
@@ -52,6 +51,10 @@
 | 🔗 `own-version-deps-align` — Own-version plugin dependency alignment | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 🔑 `youtube-apikey` — YouTube Data API key externalization | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🧩 `jaxb-launcher-recovery` — JAXB generated sources & launcher classpath recovery | ✅ Done | 🟠 P1 | `████████████████████` 100% |
+| 🧱 `maven-pr-validation` — Maven PR validation workflow | ✅ Done | 🟠 P1 | `████████████████████` 100% |
+| 🔒 `dependency-security-audit` — Dependency security audit & remediation | 🟡 In progress | 🟠 P1 | `███░░░░░░░░░░░░░░░░░` 15% |
+| 📝 `clean-squash-merge-policy` — Clean squash merge policy | 🟡 In progress | 🟢 P3 | `██████████░░░░░░░░░░` 50% |
+| 🔒 `critical-log4j-cve-remediation` — Critical Log4j 1.x CVE remediation | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 
 ---
 
@@ -591,7 +594,7 @@ scope for a dedicated security PR.
 
 ---
 
-## 🤖 `repository-maintenance-automation` — Repository maintenance automation
+## 🧱 `maven-pr-validation` — Maven PR validation workflow
 
 | | |
 |---|---|
@@ -600,34 +603,69 @@ scope for a dedicated security PR.
 | **Progress** | `████████████████████` 100% |
 | **Legacy code** | HBTV-015 |
 
-**Scope** — Add repository maintenance automation after Maven CI:
-Dependabot update pull requests, dependency review security checks,
-automatic pull request labeling, conservative stale triage, and
-CodeQL workflow/documentation coverage.
+**Scope** — Add the main Maven pull-request validation workflow with
+merge-blocking Java 8 checks and explicit non-blocking diagnostics for
+newer Java runtimes and full legacy test runs.
 
 **Acceptance criteria**
-- ✅ Dependabot is configured for weekly Maven and GitHub Actions PRs
-  with grouped updates and bounded open PR count
-- ✅ Dependency Review runs on pull requests to `develop` and `master`
-  and fails on high/critical vulnerable dependencies
-- ✅ Pull request labeler applies labels by file paths with
-  `pull_request_target` and no PR code checkout/execution
-- ✅ Stale triage marks inactive issues/PRs without auto-closing either
-- ✅ CodeQL workflow is added as a dedicated security scan workflow
-- ✅ `docs/ci.md` and `docs/repository-maintenance.md` document required
-  checks, maintenance policy, and bot constraints
+- ✅ `.github/workflows/ci-maven.yml` defines required Java 8 jobs:
+  `validate-java8`, `deterministic-tests-java8`,
+  `compile-and-package-java8`
+- ✅ Java 11/17/21/25 compatibility jobs exist as non-blocking
+  diagnostics
+- ✅ Full legacy test suite is non-blocking and only runs on
+  `workflow_dispatch` and weekly schedule
+- ✅ Workflow uses `permissions: contents: read`, concurrency cancel,
+  Maven cache, and uploads build/test artifacts for diagnostics
 
 **Validation**
 ```bash
 git status --short
 mvn -B -ntp -DskipTests validate
+mvn -B -ntp -pl fwk/api,fwk/framework,application/core,plugins/plugin-tester -am test
+mvn -B -ntp -DskipTests package
 ```
 
-**Related PR** · `ci: add repository maintenance automation` (this PR)
+**Related PR** · `ci: add Maven PR validation workflow` (#65)
 
-**Notes** — No deployment workflow, no secrets, no auto-merge, and no
-direct bot pushes to `develop`. Bots are limited to opening pull
-requests.
+**Notes** — Java 8 remains the required baseline; Java 11+ stays
+diagnostic until JAXB and JavaFX modernization work is complete.
+
+---
+
+## 🔒 `dependency-security-audit` — Dependency security audit & remediation
+
+| | |
+|---|---|
+| **Status** | 🟡 In progress |
+| **Priority** | 🟠 P1 |
+| **Progress** | `███░░░░░░░░░░░░░░░░░` 15% |
+| **Legacy code** | HBTV-016 |
+
+**Scope** — Establish a documentation-first Dependabot triage baseline
+for the Java 8 Maven reactor without mass dependency upgrades. Follow-up
+PRs upgrade build plugins, logging, HTTPS resolution, and runtime
+libraries in a safe order.
+
+**Acceptance criteria**
+- ✅ `docs/security-dependency-audit.md` records GitHub vulnerability
+  counts, scope, risks, remediation order, and first fix candidates
+- 🟡 `dev-tracker` mirrors the work item in Markdown and JSON
+- 🟡 Optional `scripts/security/maven-dependency-inventory.ps1` lists
+  POMs and runs `mvn validate` (and optional `dependency:tree`)
+- ⬜ Focused follow-up PRs address Maven plugins, log4j 1.x, and
+  module-scoped runtime bumps without mixing provider rewrites
+
+**Validation**
+```bash
+mvn -B -ntp -DskipTests validate
+pwsh -File scripts/security/maven-dependency-inventory.ps1 -DependencyTree
+```
+
+**Notes** — Baseline branch `security/dependabot-audit-baseline`. GitHub
+reports **294** vulnerabilities (87 critical, 90 high, 89 moderate,
+28 low). Dependabot API export to `target/dependabot-alerts.json` is
+local-only (gitignored).
 
 ---
 
@@ -638,6 +676,70 @@ Recommended merge / start order (see `dev-plan.md` for phase reasoning):
 1. 🔵 **Apply branch protection** → close `branch-protection`
 2. 🟡 **Complete `provider-inventory` follow-up fixture/rewrite PRs**
 3. 🔵 Then in any order: `ytdlp-migration`, `javafx-modernization`
+
+---
+
+## 🔒 `critical-log4j-cve-remediation` — Critical Log4j 1.x CVE remediation
+
+| | |
+|---|---|
+| **Status** | ✅ Done |
+| **Priority** | 🔴 P0 |
+| **Progress** | `████████████████████` 100% |
+| **Legacy code** | HBTV-019 |
+
+**Scope** — Replace end-of-life `log4j:log4j` 1.2.17 with `reload4j` 1.2.26 to
+clear critical Dependabot alerts without a Java baseline or Log4j 2 API
+migration.
+
+**Acceptance criteria**
+- ✅ Root `dependencyManagement` and direct declarations use
+  `ch.qos.reload4j:reload4j:1.2.26`
+- ✅ `dependency:tree` no longer resolves `log4j:log4j:1.2.17`
+- ✅ `validate` and `compile` succeed for the full reactor on Java 8
+
+**Validation**
+```bash
+mvn -B -ntp -DskipTests dependency:tree   # reload4j:1.2.26 only
+mvn -B -ntp -DskipTests validate           # BUILD SUCCESS
+mvn -B -ntp -DskipTests compile            # BUILD SUCCESS (33 modules)
+```
+
+**Related PR** · `security: fix critical dependency CVE` (this PR)
+
+**Notes** — CVE-2019-17571, CVE-2022-23305, CVE-2022-23307.
+See `docs/security-critical-cve-investigation.md`. Log4j 2 / SLF4J
+migration and broader transitive cleanup deferred.
+
+---
+
+## 📝 `clean-squash-merge-policy` — Clean squash merge policy
+
+| | |
+|---|---|
+| **Status** | 🟡 In progress |
+| **Priority** | 🟢 P3 |
+| **Progress** | `██████████░░░░░░░░░░` 50% |
+| **Legacy code** | HBTV-018 |
+
+**Scope** — Document clean GitHub squash merge metadata. Add Cursor rule for
+squash title/body cleanup. Add suggested squash merge section to the PR
+template.
+
+**Acceptance criteria**
+- ⬜ `docs/pull-request-style-guide.md` defines squash merge commit policy
+- ⬜ `docs/repository-maintenance.md` documents squash merge metadata duties
+- ⬜ `.cursor/rules/pr-style.mdc` guides clean squash merge instructions
+- ⬜ `.github/pull_request_template.md` includes optional suggested squash block
+
+**Validation**
+```bash
+mvn -B -ntp -DskipTests validate
+# Co-authored-by trailer grep: only bad example in pull-request-style-guide.md
+```
+
+**Notes** — Documentation and workflow only; no application code or CI
+behavior changes.
 
 ---
 
@@ -662,4 +764,7 @@ issue trackers:
 | HBTV-012 | `own-version-deps-align` |
 | HBTV-013 | `youtube-apikey` |
 | HBTV-014 | `jaxb-launcher-recovery` |
-| HBTV-015 | `repository-maintenance-automation` |
+| HBTV-015 | `maven-pr-validation` |
+| HBTV-016 | `dependency-security-audit` |
+| HBTV-018 | `clean-squash-merge-policy` |
+| HBTV-019 | `critical-log4j-cve-remediation` |

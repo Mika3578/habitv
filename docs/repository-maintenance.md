@@ -1,33 +1,63 @@
-# Repository maintenance automation
+# Repository maintenance
 
-This repository uses conservative automation for dependency hygiene and
-triage while keeping merge control with maintainers.
+Day-to-day maintenance tasks for the Habitv repository: merge hygiene,
+documentation sync, and contributor-facing metadata.
 
-## Dependency updates
+## PR metadata policy
 
-- Dependabot opens pull requests for:
-  - Maven dependency updates
-  - GitHub Actions updates
-- Dependabot pull requests must pass Maven CI before merge.
+Pull request metadata must stay accurate and readable for reviewers and for
+future history readers after squash merge.
+
+- PR titles and bodies use English.
+- PR bodies document real validation commands and honest outcomes.
+- Tracker references use descriptive slugs from `docs/dev-tracker.md`,
+  optionally paired with the legacy `HBTV-XXX` code from the same entry
+  (for example `clean-squash-merge-policy` (HBTV-018)).
+- Squash merge titles follow Conventional Commits and include the PR number.
+- Squash merge bodies summarize the merged outcome, not intermediate commits.
+
+See `docs/pull-request-style-guide.md` for examples and the full squash merge
+commit policy.
+
+### Squash merge metadata
+
+The person merging a PR is responsible for cleaning the final squash commit
+message.
+
+- The final squash commit must summarize the PR outcome, not list every
+  intermediate commit.
+- Generated `Co-authored-by` trailers should be removed unless intentionally
+  kept.
+- The final commit title should follow Conventional Commits and include the PR
+  number.
+
+## Repository automation checks
+
+This repository uses conservative automation for dependency hygiene and triage
+while keeping merge control with maintainers.
+
+- Dependabot opens pull requests for Maven and GitHub Actions updates.
+- Dependabot is configured to ignore semver-major updates.
 - Auto-merge is intentionally disabled.
 - Bots open pull requests only and must not push directly to `develop`.
-
-## Security checks
-
 - Dependency Review blocks pull requests that introduce new `high` or
   `critical` vulnerabilities in dependencies.
-- CodeQL default setup runs separately from Maven CI and reports code
-  scanning alerts.
+- CodeQL runs separately from Maven CI and reports code scanning alerts.
+- Stale triage labels inactive issues and pull requests without auto-closing
+  them.
 
-## Triage automation
+## Documentation sync
 
-- Pull request labeler applies labels from changed file paths to support
-  review routing and queue management.
-- Stale triage labels inactive issues and pull requests.
-- Stale triage does not auto-close issues.
-- Stale triage does not auto-close pull requests.
+When a change updates process or governance documentation, keep these files
+aligned in the same commit when applicable:
 
-## Compatibility policy note
+- `docs/dev-tracker.md` and `docs/dev-tracker.json`
+- `docs/risk-register.md` when risks change
+- `docs/decision-log.md` when architecture decisions change
 
-Modern Java compatibility lanes (`java11+`) remain diagnostic until JAXB
-and JavaFX modernization work is complete.
+## Related documentation
+
+- `docs/repository-governance.md` — branch protection and rulesets
+- `docs/pull-request-style-guide.md` — PR and squash merge style
+- `AGENTS.md` — agent and contributor rules
+- `docs/ci.md` — CI, security checks, and required/diagnostic lanes

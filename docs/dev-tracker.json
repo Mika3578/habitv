@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft-07/schema",
   "version": 3,
   "description": "Machine-readable mirror of docs/dev-tracker.md. Keep both files in sync. Identifiers use descriptive kebab-case slugs (see descriptive-slug-ids ADR).",
-  "lastRefresh": "2026-05-19",
+  "lastRefresh": "2026-05-20",
   "statusValues": [
     "proposed",
     "in-progress",
@@ -17,13 +17,13 @@
     "P3"
   ],
   "summary": {
-    "done": 11,
-    "inProgress": 2,
+    "done": 12,
+    "inProgress": 4,
     "proposed": 2,
     "deferred": 0,
     "blocked": 0,
-    "total": 15,
-    "overallProgressPercent": 83
+    "total": 18,
+    "overallProgressPercent": 78
   },
   "items": [
     {
@@ -345,28 +345,94 @@
       "notes": "application/habiTv now uses a small Java 8-compatible local URLClassLoader helper instead of the unavailable Utils4J.addToClasspath API. Incompatible utils4j Java 17 bytecode and broader transitive dependency vulnerability cleanup remain out of scope for a dedicated security PR."
     },
     {
-      "id": "repository-maintenance-automation",
+      "id": "maven-pr-validation",
       "legacyCode": "HBTV-015",
-      "displayTitle": "Repository maintenance automation",
-      "icon": "🤖",
+      "displayTitle": "Maven PR validation workflow",
+      "icon": "🧱",
       "status": "done",
       "priority": "P1",
       "progressPercent": 100,
-      "scope": "Add repository maintenance automation after Maven CI with Dependabot update PRs, dependency review gating, PR labeling, stale triage, and CodeQL workflow/doc coverage.",
+      "scope": "Add the main Maven pull-request validation workflow with merge-blocking Java 8 checks and explicit non-blocking diagnostics for newer Java runtimes and full legacy test runs.",
       "acceptanceCriteria": [
-        "Dependabot is configured for weekly Maven and GitHub Actions update pull requests with grouped updates and bounded PR volume.",
-        "Dependency Review runs on pull requests to develop/master and fails on high or critical vulnerabilities.",
-        "Pull request labeler applies repository labels from changed files with pull_request_target and no checkout of PR code.",
-        "Stale triage marks inactive issues/pull requests conservatively without auto-closing.",
-        "CodeQL workflow is present and documented independently from Maven CI.",
-        "docs/ci.md and docs/repository-maintenance.md document required checks and bot policy."
+        ".github/workflows/ci-maven.yml defines required Java 8 jobs: validate-java8, deterministic-tests-java8, and compile-and-package-java8.",
+        "Java 11/17/21/25 compatibility jobs exist as non-blocking diagnostics.",
+        "Full legacy test suite is non-blocking and only runs on workflow_dispatch and weekly schedule.",
+        "Workflow uses permissions: contents: read, concurrency cancellation, Maven cache, and artifact upload for diagnostics."
       ],
       "validation": [
         "git status --short",
-        "mvn -B -ntp -DskipTests validate"
+        "mvn -B -ntp -DskipTests validate",
+        "mvn -B -ntp -pl fwk/api,fwk/framework,application/core,plugins/plugin-tester -am test",
+        "mvn -B -ntp -DskipTests package"
       ],
-      "pr": "ci: add repository maintenance automation (this PR)",
-      "notes": "No deployment, secrets, auto-merge, or direct bot pushes to develop were introduced. Bots are limited to pull request workflows."
+      "pr": "ci: add Maven PR validation workflow (#65)",
+      "notes": "Java 8 remains the required baseline; Java 11+ stays diagnostic until JAXB and JavaFX modernization is complete."
+    },
+    {
+      "id": "dependency-security-audit",
+      "legacyCode": "HBTV-016",
+      "displayTitle": "Dependency security audit & remediation",
+      "icon": "🔒",
+      "status": "in-progress",
+      "priority": "P1",
+      "progressPercent": 15,
+      "scope": "Establish a documentation-first Dependabot triage baseline for the Java 8 Maven reactor without mass dependency upgrades. Follow-up PRs upgrade build plugins, logging, HTTPS resolution, and runtime libraries in a safe order.",
+      "acceptanceCriteria": [
+        "docs/security-dependency-audit.md records GitHub vulnerability counts, scope, risks, remediation order, and first fix candidates.",
+        "dev-tracker mirrors the work item in Markdown and JSON.",
+        "Optional scripts/security/maven-dependency-inventory.ps1 lists POMs and runs mvn validate (and optional dependency:tree).",
+        "Focused follow-up PRs address Maven plugins, log4j 1.x, and module-scoped runtime bumps without mixing provider rewrites."
+      ],
+      "validation": [
+        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS",
+        "scripts/security/maven-dependency-inventory.ps1 (optional -DependencyTree)"
+      ],
+      "pr": "security: add dependency vulnerability audit baseline (this PR)",
+      "notes": "Baseline PR security/dependabot-audit-baseline. GitHub reports 294 vulnerabilities (87 critical, 90 high, 89 moderate, 28 low). Dependabot API export to target/dependabot-alerts.json is local-only (gitignored)."
+    },
+    {
+      "id": "critical-log4j-cve-remediation",
+      "legacyCode": "HBTV-019",
+      "displayTitle": "Critical Log4j 1.x CVE remediation",
+      "icon": "🔒",
+      "status": "done",
+      "priority": "P0",
+      "progressPercent": 100,
+      "scope": "Replace end-of-life log4j:log4j 1.2.17 with reload4j 1.2.26 to clear critical Dependabot CVEs without Java baseline or logging API migration.",
+      "acceptanceCriteria": [
+        "Root dependencyManagement and direct log4j declarations use ch.qos.reload4j:reload4j:1.2.26.",
+        "Maven dependency:tree no longer resolves log4j:log4j:1.2.17.",
+        "mvn validate and mvn compile succeed on Java 8 for the full reactor."
+      ],
+      "validation": [
+        "mvn -B -ntp -DskipTests dependency:tree -> reload4j:1.2.26, no log4j:log4j",
+        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS",
+        "mvn -B -ntp -DskipTests compile -> BUILD SUCCESS (33 modules)"
+      ],
+      "pr": "security: fix critical dependency CVE (this PR)",
+      "notes": "CVE-2019-17571, CVE-2022-23305, CVE-2022-23307 on log4j 1.2.17. See docs/security-critical-cve-investigation.md. Log4j 2 / SLF4J migration deferred."
+    },
+    {
+      "id": "clean-squash-merge-policy",
+      "legacyCode": "HBTV-018",
+      "displayTitle": "Clean squash merge policy",
+      "icon": "📝",
+      "status": "in-progress",
+      "priority": "P3",
+      "progressPercent": 50,
+      "scope": "Document clean GitHub squash merge metadata. Add Cursor rule for squash title/body cleanup. Add suggested squash merge section to the PR template.",
+      "acceptanceCriteria": [
+        "docs/pull-request-style-guide.md defines squash merge commit policy.",
+        "docs/repository-maintenance.md documents squash merge metadata duties.",
+        ".cursor/rules/pr-style.mdc guides clean squash merge instructions.",
+        ".github/pull_request_template.md includes optional suggested squash block."
+      ],
+      "validation": [
+        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS",
+        "Co-authored-by trailer grep: only bad example in pull-request-style-guide.md"
+      ],
+      "pr": "docs: add clean squash merge policy (this PR)",
+      "notes": "Documentation and workflow only; no application code or CI behavior changes."
     }
   ]
 }
