@@ -77,7 +77,7 @@ public class DownloadUtils {
 		}
 
 		if (possibleDownloaders.isEmpty()) {
-			return downloaders.getPlugin(FrameworkConf.DEFAULT_DOWNLOADER); // TODO
+			return downloaders.getPlugin(FrameworkConf.DEFAULT_DOWNLOADER);
 		}
 
 		return possibleDownloaders.iterator().next();
