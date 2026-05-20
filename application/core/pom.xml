@@ -47,50 +47,50 @@
 		</resources>
 		<plugins>
 			<plugin>
-				<groupId>com.sun.tools.xjc.maven2</groupId>
-				<artifactId>maven-jaxb-plugin</artifactId>
-				<version>1.1.1</version>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxb2-maven-plugin</artifactId>
+				<version>2.5.0</version>
 				<executions>
 					<execution>
-						<id>config</id>
+						<id>generate-config-model</id>
 						<goals>
-							<goal>generate</goal>
+							<goal>xjc</goal>
 						</goals>
 						<configuration>
-							<generatePackage>com.dabi.habitv.config.entities</generatePackage>
-							<schemaDirectory>xsd</schemaDirectory>
-							<generateDirectory>${jaxb.generated.dir}</generateDirectory>
-							<includeSchemas>
-								<includeSchema>config.xsd</includeSchema>
-							</includeSchemas>
+							<sources>
+								<source>${project.basedir}/xsd/config.xsd</source>
+							</sources>
+							<packageName>com.dabi.habitv.config.entities</packageName>
+							<outputDirectory>${jaxb.generated.dir}</outputDirectory>
+							<clearOutputDir>true</clearOutputDir>
 						</configuration>
 					</execution>
 					<execution>
-						<id>configuration</id>
+						<id>generate-configuration-model</id>
 						<goals>
-							<goal>generate</goal>
+							<goal>xjc</goal>
 						</goals>
 						<configuration>
-							<generatePackage>com.dabi.habitv.configuration.entities</generatePackage>
-							<schemaDirectory>xsd</schemaDirectory>
-							<generateDirectory>${jaxb.generated.dir}</generateDirectory>
-							<includeSchemas>
-								<includeSchema>configuration.xsd</includeSchema>
-							</includeSchemas>
+							<sources>
+								<source>${project.basedir}/xsd/configuration.xsd</source>
+							</sources>
+							<packageName>com.dabi.habitv.configuration.entities</packageName>
+							<outputDirectory>${jaxb.generated.dir}</outputDirectory>
+							<clearOutputDir>false</clearOutputDir>
 						</configuration>
 					</execution>					
 					<execution>
-						<id>grabconfig</id>
+						<id>generate-grabconfig-model</id>
 						<goals>
-							<goal>generate</goal>
+							<goal>xjc</goal>
 						</goals>
 						<configuration>
-							<generatePackage>com.dabi.habitv.grabconfig.entities</generatePackage>
-							<schemaDirectory>xsd</schemaDirectory>
-							<generateDirectory>${jaxb.generated.dir}</generateDirectory>
-							<includeSchemas>
-								<includeSchema>grab-config.xsd</includeSchema>
-							</includeSchemas>
+							<sources>
+								<source>${project.basedir}/xsd/grab-config.xsd</source>
+							</sources>
+							<packageName>com.dabi.habitv.grabconfig.entities</packageName>
+							<outputDirectory>${jaxb.generated.dir}</outputDirectory>
+							<clearOutputDir>false</clearOutputDir>
 						</configuration>
 					</execution>
 				</executions>
