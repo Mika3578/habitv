@@ -29,6 +29,7 @@
 		<module>lequipe</module>
 		<module>mlssoccer</module>
 		<module>francetv</module>
+		<module>rclone</module>
 		<module>RSS</module>
 		<module>rtmpDump</module>
 		<module>sfr</module>
