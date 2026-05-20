@@ -624,7 +624,7 @@ mvn -B -ntp -DskipTests validate
 mvn -B -ntp -pl application/core -am test
 ```
 
-**Related PR** · `fix/jaxb-config-model-alignment` (this branch)
+**Related PR** · `build: use maintained JAXB generator for core` (#70)
 
 **Notes** — Builds on `jaxb2-maven-plugin` migration (#70). After
 `mvn generate-sources`, reload the Java workspace so
@@ -845,3 +845,4 @@ issue trackers:
 | HBTV-017 | `required-checks-roadmap` |
 | HBTV-018 | `clean-squash-merge-policy` |
 | HBTV-019 | `critical-log4j-cve-remediation` |
+| HBTV-020 | `jaxb-config-model-alignment` |

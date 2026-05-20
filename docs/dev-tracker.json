@@ -363,7 +363,7 @@
         "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS",
         "mvn -B -ntp -pl application/core -am test -> BUILD SUCCESS"
       ],
-      "pr": "fix/jaxb-config-model-alignment (this PR)",
+      "pr": "build: use maintained JAXB generator for core (#70)",
       "notes": "Builds on jaxb2-maven-plugin migration (#70). Reload Java workspace after mvn generate-sources so target/generated-sources/jaxb is indexed. Optional local java.import.exclusions for application/core/generated/** when .vscode/settings.json exists locally."
     },
     {
