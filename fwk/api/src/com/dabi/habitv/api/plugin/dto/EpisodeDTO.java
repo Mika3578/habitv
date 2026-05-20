@@ -1,6 +1,7 @@
 package com.dabi.habitv.api.plugin.dto;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import com.dabi.habitv.api.plugin.exception.InvalidEpisodeException;
 
@@ -15,6 +16,12 @@ public class EpisodeDTO implements Comparable<EpisodeDTO>, Serializable {
 	private final String id;
 
 	private int num = 0;
+
+	private Date episodeDate;
+
+	private Long durationSeconds;
+
+	private Long sizeBytes;
 
 	public EpisodeDTO(final CategoryDTO category, final String name,
 			final String id) {
@@ -119,6 +126,30 @@ public class EpisodeDTO implements Comparable<EpisodeDTO>, Serializable {
 
 	public void setNum(final int i) {
 		this.num = i;
+	}
+
+	public Date getEpisodeDate() {
+		return episodeDate;
+	}
+
+	public void setEpisodeDate(final Date episodeDate) {
+		this.episodeDate = episodeDate;
+	}
+
+	public Long getDurationSeconds() {
+		return durationSeconds;
+	}
+
+	public void setDurationSeconds(final Long durationSeconds) {
+		this.durationSeconds = durationSeconds;
+	}
+
+	public Long getSizeBytes() {
+		return sizeBytes;
+	}
+
+	public void setSizeBytes(final Long sizeBytes) {
+		this.sizeBytes = sizeBytes;
 	}
 
 }

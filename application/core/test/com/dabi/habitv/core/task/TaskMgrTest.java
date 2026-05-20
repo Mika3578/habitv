@@ -245,6 +245,84 @@ public class TaskMgrTest {
 	}
 
 	@Test
+	public final void enforcesMaxConcurrentDownloadsOfOne() {
+		taskMgr = new TaskMgr<AbstractTask<Object>, Object>(1, new TaskMgrListener() {
+
+			@Override
+			public void onAllTreatmentDone() {
+				allTreatmentDone = true;
+			}
+
+			@Override
+			public void onFailed(final Throwable throwable) {
+				allTreatmentDone = false;
+			}
+		}, null);
+		taskMgr.addTask(buildSleepTask("t1", 500), buildSleepTask("t1", 500));
+		taskMgr.addTask(buildSleepTask("t2", 500), buildSleepTask("t2", 500));
+		try {
+			Thread.sleep(50);
+		} catch (final InterruptedException e) {
+			fail();
+		}
+		assertEquals(1, taskMgr.getActiveTaskCount());
+		assertTrue(taskMgr.getQueuedOrActiveTaskCount() >= 2);
+		taskMgr.shutdown(2000);
+	}
+
+	@Test
+	public final void enforcesMaxConcurrentDownloadsOfTwo() {
+		taskMgr = new TaskMgr<AbstractTask<Object>, Object>(2, new TaskMgrListener() {
+
+			@Override
+			public void onAllTreatmentDone() {
+				allTreatmentDone = true;
+			}
+
+			@Override
+			public void onFailed(final Throwable throwable) {
+				allTreatmentDone = false;
+			}
+		}, null);
+		for (int i = 0; i < 3; i++) {
+			final AbstractTask<Object> task = buildSleepTask("task" + i, 400);
+			taskMgr.addTask(task, task);
+		}
+		try {
+			Thread.sleep(50);
+		} catch (final InterruptedException e) {
+			fail();
+		}
+		assertTrue(taskMgr.getQueuedOrActiveTaskCount() >= 2);
+		taskMgr.shutdown(2000);
+	}
+
+	private AbstractTask<Object> buildSleepTask(final String name, final long sleepMs) {
+		return new AbstractTaskForTest() {
+
+			@Override
+			protected Object doCall() {
+				try {
+					Thread.sleep(sleepMs);
+				} catch (final InterruptedException e) {
+					fail();
+				}
+				return null;
+			}
+
+			@Override
+			protected void failed(final Throwable e) {
+				throw new TechnicalException(e);
+			}
+
+			@Override
+			public String toString() {
+				return name;
+			}
+		};
+	}
+
+	@Test
 	public final void indicateWhenAllTreatmentAreDone() {
 		buildSimultaneousTask(2, null, null, false);
 		assertFalse(allTreatmentDone);

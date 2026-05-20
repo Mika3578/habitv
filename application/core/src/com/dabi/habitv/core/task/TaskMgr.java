@@ -9,9 +9,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
+
 import com.dabi.habitv.api.plugin.exception.TechnicalException;
 
 public class TaskMgr<T extends AbstractTask<R>, R> {
+
+	private static final Logger LOG = Logger.getLogger(TaskMgr.class);
 
 	private static final int DEFAULT_KEEP_ALIVE_TIME_SEC = 10;
 
@@ -45,8 +49,33 @@ public class TaskMgr<T extends AbstractTask<R>, R> {
 			executorService = initExecutor(category);
 			category2ExecutorService.put(category, executorService);
 		}
+		final ThreadPoolExecutor pool = (ThreadPoolExecutor) executorService;
+		if (pool.getActiveCount() >= pool.getMaximumPoolSize()) {
+			LOG.info("Queue waiting for " + task + " because concurrency limit "
+					+ pool.getMaximumPoolSize() + " was reached on pool "
+					+ category);
+		}
 		task.addedTo(category, executorService.submit(task));
 		object2Task.put(object, task);
+	}
+
+	public synchronized boolean hasQueuedOrActiveTask(final Object object) {
+		final T task = object2Task.get(object);
+		return task != null && task.isQueuedOrActive();
+	}
+
+	public synchronized int getActiveTaskCount() {
+		int active = 0;
+		for (final T task : object2Task.values()) {
+			if (task.isRunning()) {
+				active++;
+			}
+		}
+		return active;
+	}
+
+	public synchronized int getQueuedOrActiveTaskCount() {
+		return object2Task.size();
 	}
 
 	private ExecutorService initExecutor(final String category) {
