@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
 import com.dabi.habitv.api.plugin.api.PluginDownloaderInterface;
 import com.dabi.habitv.api.plugin.api.PluginWithProxyInterface;
 import com.dabi.habitv.api.plugin.dto.DownloadParamDTO;
@@ -22,12 +24,30 @@ import com.dabi.habitv.api.plugin.holder.ProcessHolder;
 import com.dabi.habitv.framework.FrameworkConf;
 import com.dabi.habitv.framework.plugin.api.update.BaseUpdatablePlugin;
 
+/**
+ * Deprecated since Adobe Flash and Adobe HDS reached end-of-life on
+ * 2020-12-31; the bundled AdobeHDS.php requires an undocumented PHP
+ * runtime on the user's machine and no maintained Windows binary is
+ * published upstream (see scripts/static-repo/tool-sources.properties:
+ * adobeHDS.type=skip). Scheduled for removal under a dedicated
+ * provider-inventory follow-up.
+ */
+@Deprecated
 public class AdobeHDSPluginDownloader extends BaseUpdatablePlugin implements
 		PluginDownloaderInterface, PluginWithProxyInterface {
+
+	private static final Logger LOG = Logger
+			.getLogger(AdobeHDSPluginDownloader.class);
 
 	private static final Pattern VERSION_PATTERN = Pattern
 			.compile("AdobeHDS v([0-9A-Za-z.-]*) .*");
 	private Map<ProtocolEnum, ProxyDTO> protocol2proxy;
+
+	public AdobeHDSPluginDownloader() {
+		LOG.warn("adobeHDS downloader is deprecated (Flash/HDS EOL 2020-12-31) "
+				+ "and scheduled for removal; prefer yt-dlp or ffmpeg "
+				+ "for current providers.");
+	}
 
 	@Override
 	public String getName() {

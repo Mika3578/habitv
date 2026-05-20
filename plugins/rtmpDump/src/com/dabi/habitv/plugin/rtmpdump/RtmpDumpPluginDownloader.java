@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
 import com.dabi.habitv.api.plugin.api.PluginDownloaderInterface;
 import com.dabi.habitv.api.plugin.api.PluginWithProxyInterface;
 import com.dabi.habitv.api.plugin.dto.DownloadParamDTO;
@@ -16,14 +18,31 @@ import com.dabi.habitv.api.plugin.holder.ProcessHolder;
 import com.dabi.habitv.framework.FrameworkConf;
 import com.dabi.habitv.framework.plugin.api.update.BaseUpdatablePlugin;
 
+/**
+ * Deprecated since Adobe Flash reached end-of-life on 2020-12-31; RTMP
+ * streaming is virtually nonexistent on the French replay providers this
+ * project targets and no maintained Windows binary is published upstream
+ * (see scripts/static-repo/tool-sources.properties: rtmpdump.skip=true).
+ * Scheduled for removal under a dedicated provider-inventory follow-up.
+ */
+@Deprecated
 public class RtmpDumpPluginDownloader extends BaseUpdatablePlugin implements
 		PluginDownloaderInterface, PluginWithProxyInterface {
+
+	private static final Logger LOG = Logger
+			.getLogger(RtmpDumpPluginDownloader.class);
 
 	private static final String RTMPDUMP_PREFIX = "rtmp:";
 
 	private static final Pattern VERSION_PATTERN = Pattern
 			.compile("RTMPDump ([0-9A-Za-z.-]*) .*");
 	private Map<ProtocolEnum, ProxyDTO> protocol2proxy;
+
+	public RtmpDumpPluginDownloader() {
+		LOG.warn("rtmpDump downloader is deprecated (Flash EOL 2020-12-31) "
+				+ "and scheduled for removal; prefer yt-dlp, ffmpeg, or "
+				+ "streamlink for current providers.");
+	}
 
 	@Override
 	public String getName() {
