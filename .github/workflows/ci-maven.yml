@@ -33,11 +33,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Set up Zulu JDK 8
+      - name: Set up Liberica JDK 8 with JavaFX
         uses: actions/setup-java@v5
         with:
-          distribution: zulu
+          distribution: liberica
           java-version: "8"
+          java-package: jdk+fx
           cache: maven
 
       - name: Build tooling info
@@ -67,11 +68,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Set up Zulu JDK 8
+      - name: Set up Liberica JDK 8 with JavaFX
         uses: actions/setup-java@v5
         with:
-          distribution: zulu
+          distribution: liberica
           java-version: "8"
+          java-package: jdk+fx
           cache: maven
 
       - name: Build tooling info
@@ -101,11 +103,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Set up Zulu JDK 8
+      - name: Set up Liberica JDK 8 with JavaFX
         uses: actions/setup-java@v5
         with:
-          distribution: zulu
+          distribution: liberica
           java-version: "8"
+          java-package: jdk+fx
           cache: maven
 
       - name: Build tooling info
@@ -180,11 +183,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Set up Zulu JDK 8
+      - name: Set up Liberica JDK 8 with JavaFX
         uses: actions/setup-java@v5
         with:
-          distribution: zulu
+          distribution: liberica
           java-version: "8"
+          java-package: jdk+fx
           cache: maven
 
       - name: Build tooling info
