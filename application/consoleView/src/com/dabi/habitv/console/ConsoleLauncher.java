@@ -308,14 +308,30 @@ public final class ConsoleLauncher {
 		while (it.hasNext()) {
 			CategoryDTO categoryDTO = it.next();
 			boolean subCatFound = checkAndDLMode(categoryDTO.getSubCategories(), categoryList);
-			if (!(subCatFound || categoryDTO.isSelected() || (categoryList != null && categoryList
-					.contains(categoryDTO)))) {
+			if (!(subCatFound || categoryDTO.isSelected() || matchesCategoryFilter(categoryDTO,
+					categoryList))) {
 				it.remove();
 			} else {
 				found = true;
 			}
 		}
 		return found;
+	}
+
+	private static boolean matchesCategoryFilter(final CategoryDTO category,
+			final List<String> categoryFilters) {
+		if (categoryFilters == null || category == null) {
+			return false;
+		}
+		for (final String filter : categoryFilters) {
+			if (filter == null) {
+				continue;
+			}
+			if (filter.equals(category.getId()) || filter.equals(category.getName())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static void downloadEpisodes(String[] episodesUrl) {
