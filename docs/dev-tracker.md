@@ -19,17 +19,17 @@
 ## 📊 Overall progress
 
 ```
-████████████████░░░░  78%
+███████████████░░░░░  77%
 ```
 
 | Category | Count |
 |---------|------:|
 | ✅ Delivered | **11** |
-| 🟡 In progress | **3** |
+| 🟡 In progress | **4** |
 | 🔵 Proposed | **2** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
-| **Total work items** | **16** |
+| **Total work items** | **17** |
 
 ---
 
@@ -53,6 +53,7 @@
 | 🧩 `jaxb-launcher-recovery` — JAXB generated sources & launcher classpath recovery | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🧱 `maven-pr-validation` — Maven PR validation workflow | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🔒 `dependency-security-audit` — Dependency security audit & remediation | 🟡 In progress | 🟠 P1 | `███░░░░░░░░░░░░░░░░░` 15% |
+| 📝 `clean-squash-merge-policy` — Clean squash merge policy | 🟡 In progress | 🟢 P3 | `██████████░░░░░░░░░░` 50% |
 
 ---
 
@@ -677,6 +678,36 @@ Recommended merge / start order (see `dev-plan.md` for phase reasoning):
 
 ---
 
+## 📝 `clean-squash-merge-policy` — Clean squash merge policy
+
+| | |
+|---|---|
+| **Status** | 🟡 In progress |
+| **Priority** | 🟢 P3 |
+| **Progress** | `██████████░░░░░░░░░░` 50% |
+| **Legacy code** | HBTV-018 |
+
+**Scope** — Document clean GitHub squash merge metadata. Add Cursor rule for
+squash title/body cleanup. Add suggested squash merge section to the PR
+template.
+
+**Acceptance criteria**
+- ⬜ `docs/pull-request-style-guide.md` defines squash merge commit policy
+- ⬜ `docs/repository-maintenance.md` documents squash merge metadata duties
+- ⬜ `.cursor/rules/pr-style.mdc` guides clean squash merge instructions
+- ⬜ `.github/pull_request_template.md` includes optional suggested squash block
+
+**Validation**
+```bash
+mvn -B -ntp -DskipTests validate
+# Co-authored-by trailer grep: only bad example in pull-request-style-guide.md
+```
+
+**Notes** — Documentation and workflow only; no application code or CI
+behavior changes.
+
+---
+
 # 🗂️ Legacy code index
 
 For incoming references in PR descriptions, commits, and external
@@ -700,3 +731,4 @@ issue trackers:
 | HBTV-014 | `jaxb-launcher-recovery` |
 | HBTV-015 | `maven-pr-validation` |
 | HBTV-016 | `dependency-security-audit` |
+| HBTV-018 | `clean-squash-merge-policy` |

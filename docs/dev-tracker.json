@@ -18,12 +18,12 @@
   ],
   "summary": {
     "done": 11,
-    "inProgress": 3,
+    "inProgress": 4,
     "proposed": 2,
     "deferred": 0,
     "blocked": 0,
-    "total": 16,
-    "overallProgressPercent": 78
+    "total": 17,
+    "overallProgressPercent": 77
   },
   "items": [
     {
@@ -389,6 +389,28 @@
       ],
       "pr": "security: add dependency vulnerability audit baseline (this PR)",
       "notes": "Baseline PR security/dependabot-audit-baseline. GitHub reports 294 vulnerabilities (87 critical, 90 high, 89 moderate, 28 low). Dependabot API export to target/dependabot-alerts.json is local-only (gitignored)."
+    },
+    {
+      "id": "clean-squash-merge-policy",
+      "legacyCode": "HBTV-018",
+      "displayTitle": "Clean squash merge policy",
+      "icon": "📝",
+      "status": "in-progress",
+      "priority": "P3",
+      "progressPercent": 50,
+      "scope": "Document clean GitHub squash merge metadata. Add Cursor rule for squash title/body cleanup. Add suggested squash merge section to the PR template.",
+      "acceptanceCriteria": [
+        "docs/pull-request-style-guide.md defines squash merge commit policy.",
+        "docs/repository-maintenance.md documents squash merge metadata duties.",
+        ".cursor/rules/pr-style.mdc guides clean squash merge instructions.",
+        ".github/pull_request_template.md includes optional suggested squash block."
+      ],
+      "validation": [
+        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS",
+        "Co-authored-by trailer grep: only bad example in pull-request-style-guide.md"
+      ],
+      "pr": "docs: add clean squash merge policy (this PR)",
+      "notes": "Documentation and workflow only; no application code or CI behavior changes."
     }
   ]
 }
