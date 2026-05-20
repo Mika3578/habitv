@@ -1,5 +1,6 @@
 package com.dabi.habitv.console;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -11,8 +12,8 @@ import java.util.Set;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -361,7 +362,10 @@ public final class ConsoleLauncher {
 	}
 
 	private static void usage(Options options) {
-		HelpFormatter formatter = new HelpFormatter();
-		formatter.printHelp("habiTv", options);
+		try {
+			HelpFormatter.builder().get().printHelp("habiTv", null, options, null, true);
+		} catch (IOException e) {
+			throw new IllegalStateException("Failed to print CLI help", e);
+		}
 	}
 }
