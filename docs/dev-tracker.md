@@ -12,24 +12,24 @@
 > on each entry for compatibility with existing PRs and commits. See
 > the `descriptive-slug-ids` ADR for the rationale and full mapping.
 
-**Last refresh:** 2026-05-18 · **Active branch:** `develop`
+**Last refresh:** 2026-05-19 · **Active branch:** `develop`
 
 ---
 
 ## 📊 Overall progress
 
 ```
-███████████████░░░░░  77%
+█████████████████░░░  83%
 ```
 
 | Category | Count |
 |---------|------:|
-| ✅ Delivered | **10** |
-| 🟡 In progress | **1** |
-| 🔵 Proposed | **3** |
+| ✅ Delivered | **11** |
+| 🟡 In progress | **2** |
+| 🔵 Proposed | **2** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
-| **Total work items** | **14** |
+| **Total work items** | **15** |
 
 ---
 
@@ -51,6 +51,7 @@
 | 🔗 `own-version-deps-align` — Own-version plugin dependency alignment | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 🔑 `youtube-apikey` — YouTube Data API key externalization | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🧩 `jaxb-launcher-recovery` — JAXB generated sources & launcher classpath recovery | ✅ Done | 🟠 P1 | `████████████████████` 100% |
+| 🧱 `maven-pr-validation` — Maven PR validation workflow | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 
 ---
 
@@ -590,6 +591,45 @@ scope for a dedicated security PR.
 
 ---
 
+## 🧱 `maven-pr-validation` — Maven PR validation workflow
+
+| | |
+|---|---|
+| **Status** | ✅ Done |
+| **Priority** | 🟠 P1 |
+| **Progress** | `████████████████████` 100% |
+| **Legacy code** | HBTV-015 |
+
+**Scope** — Add the main Maven pull-request validation workflow with
+merge-blocking Java 8 checks and explicit non-blocking diagnostics for
+newer Java runtimes and full legacy test runs.
+
+**Acceptance criteria**
+- ✅ `.github/workflows/ci-maven.yml` defines required Java 8 jobs:
+  `validate-java8`, `deterministic-tests-java8`,
+  `compile-and-package-java8`
+- ✅ Java 11/17/21/25 compatibility jobs exist as non-blocking
+  diagnostics
+- ✅ Full legacy test suite is non-blocking and only runs on
+  `workflow_dispatch` and weekly schedule
+- ✅ Workflow uses `permissions: contents: read`, concurrency cancel,
+  Maven cache, and uploads build/test artifacts for diagnostics
+
+**Validation**
+```bash
+git status --short
+mvn -B -ntp -DskipTests validate
+mvn -B -ntp -pl fwk/api,fwk/framework,application/core,plugins/plugin-tester -am test
+mvn -B -ntp -DskipTests package
+```
+
+**Related PR** · `ci: add Maven PR validation workflow` (this PR)
+
+**Notes** — Java 8 remains the required baseline; Java 11+ stays
+diagnostic until JAXB and JavaFX modernization work is complete.
+
+---
+
 # 📈 What ships next
 
 Recommended merge / start order (see `dev-plan.md` for phase reasoning):
@@ -621,3 +661,4 @@ issue trackers:
 | HBTV-012 | `own-version-deps-align` |
 | HBTV-013 | `youtube-apikey` |
 | HBTV-014 | `jaxb-launcher-recovery` |
+| HBTV-015 | `maven-pr-validation` |
