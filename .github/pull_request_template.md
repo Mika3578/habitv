@@ -34,8 +34,9 @@
 
 ## Linked tracker item
 
-<!-- HBTV-XXX from docs/dev-tracker.md when applicable. -->
-- HBTV-
+<!-- Descriptive slug from docs/dev-tracker.md; add (HBTV-XXX) when the entry
+     has a legacy code. Use N/A when no tracker item applies. -->
+- `tracker-slug` (HBTV-XXX)
 
 ## Checklist
 

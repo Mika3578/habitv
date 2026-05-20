@@ -15,7 +15,8 @@ globs:
 - Keep PRs scoped to one tracker item when applicable.
 - Document validation commands actually run; default safe command is
   `mvn -B -ntp -DskipTests validate`.
-- Fill `.github/pull_request_template.md` sections honestly.
+- Fill every required (non-optional) section of
+  `.github/pull_request_template.md` honestly.
 
 ## Squash merge instructions
 
@@ -26,8 +27,8 @@ and body.
   contains intermediate commit bullets or repeated `Co-authored-by` trailers.
 - Always provide a cleaned replacement body for the GitHub **Extended
   description** field.
-- The squash title must use Conventional Commit style and may include the PR
-  number.
+- The squash title must use Conventional Commit style and must include the PR
+  number when merging through GitHub.
 - The squash body must describe the final result, validation, and important
   scope notes only.
 

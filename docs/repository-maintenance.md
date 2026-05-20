@@ -10,7 +10,9 @@ future history readers after squash merge.
 
 - PR titles and bodies use English.
 - PR bodies document real validation commands and honest outcomes.
-- Tracker references use descriptive slugs from `docs/dev-tracker.md`.
+- Tracker references use descriptive slugs from `docs/dev-tracker.md`,
+  optionally paired with the legacy `HBTV-XXX` code from the same entry
+  (for example `clean-squash-merge-policy` (HBTV-018)).
 - Squash merge titles follow Conventional Commits and include the PR number.
 - Squash merge bodies summarize the merged outcome, not intermediate commits.
 

@@ -8,8 +8,11 @@ review comments, and squash merge metadata.
 - Use a clear summary in the PR title; Conventional Commit style is preferred
   for the eventual squash merge title.
 - Keep the PR body focused on outcome, scope, validation, and risks.
-- Reference one tracker slug from `docs/dev-tracker.md` when applicable.
-- Fill every section of `.github/pull_request_template.md`.
+- Reference one tracker slug from `docs/dev-tracker.md` when applicable;
+  add the legacy `HBTV-XXX` code in parentheses when the entry defines one
+  (for example `clean-squash-merge-policy` (HBTV-018)).
+- Fill every required (non-optional) section of
+  `.github/pull_request_template.md`.
 
 ## Branch and commit hygiene
 
