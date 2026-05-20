@@ -6,18 +6,31 @@ interface ArteConf {
 
 	String NAME = "arte";
 
-	String CAT_PAGE = "http://www.arte.tv/guide/fr/plus7";
+	String HOME_URL = "https://www.arte.tv";
 
-	String ID_EMISSION_TOKEN = "#ID_EMISSION#";
+	String EMAC_API_BASE = "https://www.arte.tv/api/rproxy/emac/v4";
 
-	String RSS_CATEGORY_URL = "http://videos.arte.tv/fr/do_delegate/videos/programmes/" + ID_EMISSION_TOKEN + ",view,rss.xml";
+	/** Query param required by EMAC zone listing endpoints. */
+	String AUTHORIZED_COUNTRY = "FR";
 
-	String ID_EPISODE_TOKEN = "#ID_EPISODE#";
+	String[][] LANGUAGES = {
+			{ "fr", "Français" },
+			{ "de", "Deutsch" },
+			{ "en", "English" },
+	};
 
-	String RTMPDUMP_CMD = "-r \"#VIDEO_URL#\" -c 1935 -m 10 -o \"#FILE_DEST#\"";
-
-	String HOME_URL = "http://www.arte.tv";
+	/**
+	 * Stable EMAC page codes used to discover replay categories.
+	 */
+	String[][] PAGE_CODES = {
+			{ "DOR", "Documentaries" },
+			{ "CIN", "Cinema" },
+			{ "SER", "Series" },
+			{ "ACT", "News & Society" },
+			{ "CPO", "Culture & Pop" },
+			{ "SCI", "Science" },
+			{ "HIS", "History" },
+	};
 
 	String EXTENSION = FrameworkConf.MP4;
-
 }
