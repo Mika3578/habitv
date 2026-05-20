@@ -13,11 +13,15 @@ Workflow: `.github/workflows/ci-maven.yml` (`Maven CI`)
 
 ### Required checks (branch protection)
 
-Transition note: repository governance currently requires:
+Current required check for `develop` remains:
 
 - `CI / validate (zulu-8)` (from `.github/workflows/ci.yml`)
 
-When moving branch protection to this workflow, require:
+The `Maven CI` workflow is additive in this PR. It does not supersede the
+existing required `CI` check until repository governance and the ruleset are
+updated together.
+
+After that governance/ruleset update, require:
 
 - `Maven CI / validate-java8`
 - `Maven CI / deterministic-tests-java8`
@@ -50,7 +54,6 @@ mvn -B -ntp -DskipTests package
 Exit status: `0`
 
 ```text
- M .gitignore
  M docs/dev-tracker.json
  M docs/dev-tracker.md
 ?? .github/workflows/ci-maven.yml
