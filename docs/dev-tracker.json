@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft-07/schema",
   "version": 3,
   "description": "Machine-readable mirror of docs/dev-tracker.md. Keep both files in sync. Identifiers use descriptive kebab-case slugs (see descriptive-slug-ids ADR).",
-  "lastRefresh": "2026-05-19",
+  "lastRefresh": "2026-05-20",
   "statusValues": [
     "proposed",
     "in-progress",
@@ -18,12 +18,12 @@
   ],
   "summary": {
     "done": 11,
-    "inProgress": 2,
+    "inProgress": 3,
     "proposed": 2,
     "deferred": 0,
     "blocked": 0,
-    "total": 15,
-    "overallProgressPercent": 83
+    "total": 16,
+    "overallProgressPercent": 81
   },
   "items": [
     {
@@ -365,8 +365,30 @@
         "mvn -B -ntp -pl fwk/api,fwk/framework,application/core,plugins/plugin-tester -am test",
         "mvn -B -ntp -DskipTests package"
       ],
-      "pr": "ci: add Maven PR validation workflow (this PR)",
+      "pr": "ci: add Maven PR validation workflow (#65)",
       "notes": "Java 8 remains the required baseline; Java 11+ stays diagnostic until JAXB and JavaFX modernization is complete."
+    },
+    {
+      "id": "clean-squash-merge-policy",
+      "legacyCode": "HBTV-018",
+      "displayTitle": "Clean squash merge policy",
+      "icon": "📝",
+      "status": "in-progress",
+      "priority": "P3",
+      "progressPercent": 50,
+      "scope": "Document clean GitHub squash merge metadata. Add Cursor rule for squash title/body cleanup. Add suggested squash merge section to the PR template.",
+      "acceptanceCriteria": [
+        "docs/pull-request-style-guide.md defines squash merge commit policy.",
+        "docs/repository-maintenance.md documents squash merge metadata duties.",
+        ".cursor/rules/pr-style.mdc guides clean squash merge instructions.",
+        ".github/pull_request_template.md includes optional suggested squash block."
+      ],
+      "validation": [
+        "mvn -B -ntp -DskipTests validate -> BUILD SUCCESS",
+        "Co-authored-by trailer grep: only bad example in pull-request-style-guide.md"
+      ],
+      "pr": "docs: add clean squash merge policy (this PR)",
+      "notes": "Documentation and workflow only; no application code or CI behavior changes."
     }
   ]
 }
