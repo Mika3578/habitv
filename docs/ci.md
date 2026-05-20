@@ -67,3 +67,58 @@ mvn -B -ntp -DskipTests validate
 mvn -B -ntp -pl fwk/api,fwk/framework,application/core,plugins/plugin-tester -am test
 mvn -B -ntp -DskipTests package
 ```
+
+## Validation results
+
+### Command: `mvn -B -ntp -DskipTests validate`
+
+Exit status: `0`
+
+Relevant output excerpt:
+
+```text
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] ...
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+```
+
+### Command: `mvn -B -ntp -pl fwk/api,fwk/framework,application/core,plugins/plugin-tester -am test`
+
+Exit status: `0`
+
+Relevant output excerpt:
+
+```text
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] ...
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+```
+
+### Command: `mvn -B -ntp -DskipTests package`
+
+Exit status: `0`
+
+Relevant output excerpt:
+
+```text
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] ...
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+```
+
+If one of these commands fails because of a pre-existing baseline blocker
+that reproduces on latest `develop` and is unrelated to this CI workflow or
+documentation change, record the exact failing command, exit status, and
+relevant error excerpt here and in the pull request body.
