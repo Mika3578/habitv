@@ -49,6 +49,59 @@ No provider rewrite or live endpoint validation is included in the binary
 migration PR; non-YouTube URL domains accepted by `YoutubePluginDownloader`
 are unchanged.
 
+## Controlled temp directory (Windows)
+
+PyInstaller onefile builds of `yt-dlp.exe` extract runtime files into `TEMP`/`TMP`.
+Habitv sets both variables to `<habitv-home>/tmp/yt-dlp` for yt-dlp child processes
+so extraction does not depend on a crowded or permission-broken system temp folder.
+
+Before each download, Habitv runs `yt-dlp.exe --version` as a preflight check. If
+stderr contains PyInstaller signatures (`[PYI-`, `Failed to extract`, `Cryptodome`,
+`_MEI`), the failure is reported as a **yt-dlp bootstrap error**, not a provider
+URL parsing failure.
+
+## Troubleshooting: yt-dlp PyInstaller extraction failure on Windows
+
+Symptoms in logs:
+
+```text
+[PYI-17924:ERROR] Failed to extract Cryptodome\PublicKey\_ec_ws.pyd: decompression resulted in return code -1!
+[PYI-17924:ERROR] Failed to extract entry: Cryptodome\PublicKey\_ec_ws.pyd.
+```
+
+This happens **before** any site-specific extraction (for example France.tv). The
+first manual test is always `yt-dlp.exe --version`, then a direct URL download.
+
+### Recovery steps
+
+1. Stop Habitv.
+2. Remove stale PyInstaller temp folders:
+
+```powershell
+Get-ChildItem "$env:TEMP" -Directory -Filter "_MEI*" -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+```
+
+3. Rename the current binary:
+
+```powershell
+Rename-Item "C:\Users\Mika\habitv\bin\yt-dlp.exe" "yt-dlp.exe.broken" -ErrorAction SilentlyContinue
+```
+
+4. Download a fresh official Windows `yt-dlp.exe` from:
+   https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe
+5. Install it as `C:\Users\Mika\habitv\bin\yt-dlp.exe` (adjust paths to your
+   Habitv home directory).
+6. Test outside Habitv:
+
+```powershell
+C:\Users\Mika\habitv\bin\yt-dlp.exe --version
+C:\Users\Mika\habitv\bin\yt-dlp.exe "https://www.france.tv/france-3/nouvelle-aquitaine_la-france-en-vrai-aquitaine/8456007-oleron-la-vie-continue.html" -o "C:\Users\Mika\habitv\Downloads\manual-francetv-test.%(ext)s" --write-sub --write-auto-sub --no-check-certificate
+```
+
+7. Retry the same URL through Habitv.
+
+Tracker: `ytdlp-runtime-diagnostics`.
+
 ## Out of scope for this contract
 
 - Provider discovery / `canDownload()` domain list changes
