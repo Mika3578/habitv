@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
 
 public final class EpisodeMetadataFormatting {
@@ -68,5 +69,33 @@ public final class EpisodeMetadataFormatting {
 			return UNKNOWN;
 		}
 		return status;
+	}
+
+	public static String programPageUrl(final EpisodeDTO episode) {
+		if (episode == null) {
+			return null;
+		}
+		final CategoryDTO category = episode.getCategory();
+		if (category == null) {
+			return null;
+		}
+		final String categoryId = category.getId();
+		if (categoryId != null && (categoryId.startsWith("http://")
+				|| categoryId.startsWith("https://"))) {
+			return categoryId;
+		}
+		return null;
+	}
+
+	public static String formatProgramLinkLabel(final EpisodeDTO episode) {
+		if (episode == null) {
+			return UNKNOWN;
+		}
+		final CategoryDTO category = episode.getCategory();
+		if (category == null || category.getName() == null
+				|| category.getName().trim().isEmpty()) {
+			return UNKNOWN;
+		}
+		return category.getName();
 	}
 }
