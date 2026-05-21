@@ -120,24 +120,41 @@ public class DownloadedDAOTest {
 	public final void readsLegacyIndexFileWhenNewIndexDoesNotExist() throws IOException {
 		final CategoryDTO legacyCategory = new CategoryDTO("legacy-plugin",
 				"legacy-show", "new-id", "mp4");
-		final File tempDir = new File("target/legacy-index-"
-				+ System.nanoTime());
-		assertTrue(tempDir.mkdirs());
-		final String legacyIndexFile = tempDir.getPath() + "/"
-				+ FileUtils.sanitizeFilename(legacyCategory.getPlugin() + "_"
-						+ legacyCategory.getName() + ".index");
-		final String episodeName = "legacy-episode";
-		try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(
-				new FileOutputStream(legacyIndexFile), HabitTvConf.ENCODING))) {
-			writer.println(episodeName);
+		final File tempDir = new File(System.getProperty("java.io.tmpdir"),
+				"habitv-legacy-index-" + System.nanoTime());
+		try {
+			assertTrue(tempDir.mkdirs());
+			final String legacyIndexFile = new File(tempDir, FileUtils
+					.sanitizeFilename(legacyCategory.getPlugin() + "_"
+							+ legacyCategory.getName() + ".index")).getPath();
+			final String episodeName = "legacy-episode";
+			try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(
+					new FileOutputStream(legacyIndexFile), HabitTvConf.ENCODING))) {
+				writer.println(episodeName);
+			}
+			final DownloadedDAO legacyDao = new DownloadedDAO(legacyCategory,
+					tempDir.getPath());
+			final EpisodeDTO episode = new EpisodeDTO(legacyCategory, episodeName, "id");
+			assertTrue(DownloadedDAO.containsEpisodeOrLegacyName(
+					legacyDao.findDownloadedFiles(), episode));
+		} finally {
+			deleteRecursively(tempDir);
 		}
-		final DownloadedDAO legacyDao = new DownloadedDAO(legacyCategory,
-				tempDir.getPath());
-		final EpisodeDTO episode = new EpisodeDTO(legacyCategory, episodeName, "id");
-		assertTrue(DownloadedDAO.containsEpisodeOrLegacyName(
-				legacyDao.findDownloadedFiles(), episode));
-		assertTrue(new File(legacyIndexFile).delete());
-		assertTrue(tempDir.delete());
+	}
+
+	private void deleteRecursively(final File file) {
+		if (file == null || !file.exists()) {
+			return;
+		}
+		if (file.isDirectory()) {
+			final File[] children = file.listFiles();
+			if (children != null) {
+				for (File child : children) {
+					deleteRecursively(child);
+				}
+			}
+		}
+		assertTrue(file.delete());
 	}
 
 }

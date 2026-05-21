@@ -311,8 +311,11 @@ public class TaskMgrTest {
 					return true;
 				}
 				Thread.sleep(25);
+			} catch (final InterruptedException e) {
+				Thread.currentThread().interrupt();
+				throw new AssertionError("Interrupted while waiting for condition", e);
 			} catch (final Exception e) {
-				return false;
+				throw new AssertionError("Failed while waiting for condition", e);
 			}
 		}
 		return false;

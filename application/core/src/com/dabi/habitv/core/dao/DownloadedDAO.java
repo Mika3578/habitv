@@ -66,13 +66,16 @@ public class DownloadedDAO {
 	}
 
 	private String getLegacyFileIndex() {
-		return indexDir + "/" + FileUtils.sanitizeFilename(category.getPlugin() + "_"
-				+ category.getName() + ".index");
+		return indexDir + "/" + buildLegacyIndexFileName(".index");
 	}
 
 	private String getLegacyManualFileIndex() {
-		return indexDir + "/" + FileUtils.sanitizeFilename(category.getPlugin() + "_"
-				+ category.getName() + "_manual.index");
+		return indexDir + "/" + buildLegacyIndexFileName("_manual.index");
+	}
+
+	private String buildLegacyIndexFileName(final String suffix) {
+		return FileUtils.sanitizeFilename(category.getPlugin() + "_"
+				+ category.getName() + suffix);
 	}
 
 	private static String buildIndexFileName(final CategoryDTO category,
