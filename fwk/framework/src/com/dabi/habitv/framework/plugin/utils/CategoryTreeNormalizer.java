@@ -10,7 +10,11 @@ import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 
 /**
  * Pads shallow provider category trees to a consistent depth below the plugin
- * node: chaine → categorie → emission (downloadable leaf).
+ * node: chaine → categorie → emission.
+ *
+ * Only synthetic nodes created by this normalizer are forced to be
+ * non-downloadable. Existing provider nodes keep their original downloadability
+ * semantics because some providers intentionally expose downloadable branches.
  */
 public final class CategoryTreeNormalizer {
 
@@ -31,14 +35,12 @@ public final class CategoryTreeNormalizer {
 		final List<CategoryDTO> rootList = new ArrayList<>(roots);
 		final int maxDepth = maxStructureDepth(rootList);
 		if (maxDepth >= TARGET_DEPTH) {
-			enforceNonDownloadableBranches(rootList);
 			return new LinkedHashSet<>(rootList);
 		}
 		if (maxDepth == 2) {
 			for (final CategoryDTO root : rootList) {
 				insertCategoryLevel(root, DEFAULT_CATEGORY_NAME);
 			}
-			enforceNonDownloadableBranches(rootList);
 			return new LinkedHashSet<>(rootList);
 		}
 		return singletonSet(wrapRootsInDefaultChannel(pluginName, rootList));
@@ -72,7 +74,6 @@ public final class CategoryTreeNormalizer {
 		if (children == null || children.isEmpty()) {
 			return;
 		}
-		parent.setDownloadable(false);
 		final CategoryDTO category = new CategoryDTO(parent.getPlugin(), categoryName,
 				syntheticId(parent.getId(), "programmes"), parent.getExtension());
 		category.setDownloadable(false);
@@ -81,22 +82,6 @@ public final class CategoryTreeNormalizer {
 		}
 		parent.getSubCategories().clear();
 		parent.addSubCategory(category);
-	}
-
-	private static void enforceNonDownloadableBranches(final Collection<CategoryDTO> nodes) {
-		for (final CategoryDTO node : nodes) {
-			enforceNonDownloadableBranches(node);
-		}
-	}
-
-	private static void enforceNonDownloadableBranches(final CategoryDTO node) {
-		final Collection<CategoryDTO> subs = node.getSubCategories();
-		if (subs != null && !subs.isEmpty()) {
-			node.setDownloadable(false);
-			for (final CategoryDTO child : subs) {
-				enforceNonDownloadableBranches(child);
-			}
-		}
 	}
 
 	static int structureDepth(final CategoryDTO node) {
