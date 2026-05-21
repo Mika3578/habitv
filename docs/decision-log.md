@@ -445,7 +445,7 @@ updates by default behind `habitv.update.enabled` with optional
 | **Status** | 🟡 Proposed |
 | **Date** | 2026-05-21 |
 | **Tracker** | `own-version-deps-align` (related) |
-| **Touches** | `CONTRIBUTING.md`, `plugins/*/pom.xml` |
+| **Touches** | `AGENTS.md` §4, `CONTRIBUTING.md`, `.github/copilot-instructions.md`, `.github/pull_request_template.md`, `plugins/*/pom.xml` |
 
 **Context** — Plugin POMs under `plugins/*/pom.xml` inherit
 `4.1.0-SNAPSHOT` from the root POM, but four already override the
