@@ -9,9 +9,9 @@ reactor.
 | Topic | Current state |
 |-------|----------------|
 | Integration branch | [`develop`](https://github.com/Mika3578/habitv/tree/develop) |
-| Java baseline | **Java 8** (Temurin/Zulu 8 in CI) — required for JAXB 2.x and JavaFX 2.x |
+| Java baseline | **Java 8** — CI uses Zulu 8 for legacy validate, Liberica 8 `jdk+fx` for Maven CI Java 8 jobs, and Temurin 8 in the `master`-only legacy build |
 | Root `mvn validate` / `mvn compile` | Works on `develop` |
-| Full `mvn package` (GUI) | Blocked on JavaFX / `jdk.home` — use scoped builds (see below) |
+| Full `mvn package` (GUI) | Works with a JDK 8 that includes JavaFX; platform packaging modules use separate `jdk.home` setup |
 | Artifact / plugin updates | HTTPS static repo ([`habitv-repo`](https://github.com/Mika3578/habitv-repo)) — legacy `dabiboo.free.fr` removed |
 | Provider plugins | Mixed: some work offline; many replay sites changed — see [provider inventory](docs/provider-inventory.md) |
 
@@ -69,7 +69,7 @@ Runtime layout and manual download: [`docs/runtime-quickstart.md`](docs/runtime-
 |---------|---------------------|--------|
 | `mvn -B -ntp -DskipTests validate` | Safe, default | 33 reactor modules |
 | `mvn -B -ntp -DskipTests compile` | Safe | Java 8 only |
-| `mvn -B -ntp -DskipTests package` | Scoped | Exclude `trayView`, `habiTv` unless JavaFX is set up |
+| `mvn -B -ntp -DskipTests package` | Java 8 + JavaFX | Requires a JDK 8 with JavaFX for GUI modules; use scoped builds for console-only validation |
 | `mvn -B -ntp test` | Partial | Live `*PluginManagerTest` excluded by default |
 | `mvn -B -ntp test -Plive-provider-tests` | Opt-in | Hits real broadcaster networks |
 | `mvn -B -ntp verify` | Not safe yet | Full lifecycle still gated |
