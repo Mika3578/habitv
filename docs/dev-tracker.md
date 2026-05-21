@@ -22,17 +22,17 @@ automatic category behavior, provider summary, doc map).
 ## 📊 Overall progress
 
 ```
-███████████████▌░░░░  78%
+███████████████▋░░░░  79%
 ```
 
 | Category | Count |
 |---------|------:|
 | ✅ Delivered | **12** |
-| 🟡 In progress | **4** |
+| 🟡 In progress | **5** |
 | 🔵 Proposed | **2** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
-| **Total work items** | **18** |
+| **Total work items** | **19** |
 
 ---
 
@@ -48,6 +48,7 @@ automatic category behavior, provider summary, doc map).
 | 📦 `static-repo-publish` — Static artifact repository publication | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🟡 In progress | 🟡 P2 | `███████████░░░░░░░░░` 55% |
 | 🎬 `ytdlp-migration` — `youtube-dl` → `yt-dlp` migration | 🟡 In progress | 🟡 P2 | `███████████████░░░░░` 75% |
+| 🩺 `ytdlp-runtime-diagnostics` — yt-dlp Windows runtime diagnostics | 🟡 In progress | 🟡 P2 | `██████████████████░░` 90% |
 | 🖼️ `javafx-modernization` — JavaFX & runtime packaging modernization | 🔵 Proposed | 🟡 P2 | `██░░░░░░░░░░░░░░░░░░` 10% |
 | 🧪 `plugin-tester-align` — `plugin-tester` reactor alignment | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | ▶️ `console-runnable` — Runnable console baseline | ✅ Done | 🔴 P0 | `████████████████████` 100% |
@@ -370,6 +371,37 @@ mvn -B -ntp -pl plugins/youtube -am -Dsurefire.failIfNoSpecifiedTests=false test
 Static-repo tool metadata in `scripts/static-repo/tool-sources.properties` uses
 `yt-dlp`; publishing the zip to `habitv-repo` is a separate PR. No provider
 rewrite, no live-network tests in this item.
+
+---
+
+## 🩺 `ytdlp-runtime-diagnostics` — yt-dlp Windows runtime diagnostics
+
+| | |
+|---|---|
+| **Status** | 🟡 In progress |
+| **Priority** | 🟡 P2 |
+| **Progress** | `██████████████████░░` 90% |
+| **Legacy code** | HBTV-007a |
+
+**Scope** — Detect yt-dlp PyInstaller bootstrap failures before media downloads,
+log safe binary/temp diagnostics, route yt-dlp `TEMP`/`TMP` to
+`<habitv-home>/tmp/yt-dlp`, and document Windows recovery steps.
+
+**Acceptance criteria**
+- ✅ Preflight `yt-dlp --version` before each download
+- ✅ Classify `[PYI-` / `Failed to extract` / `Cryptodome` / `_MEI` stderr
+- ✅ Actionable user message (clear `_MEI` folders, replace binary, run `--version`)
+- ✅ Unit tests for PyInstaller vs generic downloader errors
+- ✅ Troubleshooting in `docs/ytdlp-cli-compatibility.md`
+
+**Validation**
+```bash
+mvn -B -ntp -DskipTests validate
+mvn -B -ntp -pl fwk/framework,plugins/youtube -am test
+```
+
+**Notes** — Independent from France.tv provider URL parsing. No downloader
+architecture rewrite.
 
 ---
 
