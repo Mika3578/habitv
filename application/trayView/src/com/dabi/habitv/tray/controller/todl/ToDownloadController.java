@@ -744,11 +744,8 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 	}
 
 	private static boolean isHttpUrl(final EpisodeDTO episode) {
-		if (episode == null || episode.getId() == null) {
-			return false;
-		}
-		final String id = episode.getId();
-		return id.startsWith("http://") || id.startsWith("https://");
+		return episode != null && episode.getId() != null
+				&& DownloadUtils.isHttpUrl(episode.getId());
 	}
 
 	private void addButtonsActions() {
