@@ -53,6 +53,13 @@ yet stabilized (see `docs/audit-master-baseline.md`).
 - Adding OWASP, SBOM, or static-analysis plugins in this phase.
 - Reformatting files, renaming variables outside a change, or moving
   packages.
+- Bumping a `plugins/*/pom.xml` `<version>` for changes that do not
+  match a `plugin-versioning-policy` trigger (downloader/parser
+  behaviour, user-facing endpoint, user-facing configuration). See
+  the "Plugin versioning" section of `CONTRIBUTING.md`. Inside a
+  bumped plugin, internal reactor deps (`api`, `framework`,
+  `plugin-tester`) MUST use `${project.parent.version}`, never
+  `${project.version}`.
 
 ## Things to encourage
 

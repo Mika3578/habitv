@@ -160,9 +160,11 @@ jobs:
       - name: Maven validate diagnostic
         run: mvn -B -ntp -DskipTests validate
 
-      # Java 11+ package diagnostics are non-blocking by design.
+      # Java 11+ package diagnostics exclude JavaFX-dependent modules until the
+      # JavaFX migration is complete (trayView and habiTv directly import the
+      # javafx.* packages bundled only in Liberica JDK 8 with jdk+fx).
       - name: Maven package diagnostic
-        run: mvn -B -ntp -DskipTests package
+        run: mvn -B -ntp -DskipTests -pl '!application/trayView,!application/habiTv' package
 
       - name: Upload Maven artifacts
         if: always()

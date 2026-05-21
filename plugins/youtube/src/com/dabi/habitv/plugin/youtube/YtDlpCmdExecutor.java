@@ -1,8 +1,10 @@
 package com.dabi.habitv.plugin.youtube;
 
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.dabi.habitv.api.plugin.exception.ExecutorFailedException;
 import com.dabi.habitv.framework.FrameworkConf;
 import com.dabi.habitv.framework.plugin.utils.CmdExecutor;
 
@@ -15,8 +17,39 @@ public class YtDlpCmdExecutor extends CmdExecutor {
 	private static final Pattern PROGRESS_PATTERN = Pattern
 			.compile(".*\\s(\\d+.\\d+)%.*");
 
+	private final String executablePath;
+
+	private final String binDir;
+
 	public YtDlpCmdExecutor(final String cmdProcessor, final String cmd) {
+		this(cmdProcessor, cmd, null, null);
+	}
+
+	public YtDlpCmdExecutor(final String cmdProcessor, final String cmd, final String executablePath,
+			final String binDir) {
 		super(cmdProcessor, cmd, YoutubeConf.MAX_HUNG_TIME);
+		this.executablePath = executablePath;
+		this.binDir = binDir;
+	}
+
+	@Override
+	protected Map<String, String> getProcessEnvironment() {
+		if (binDir == null) {
+			return null;
+		}
+		return YtDlpRuntimeDiagnostics.buildYtDlpEnvironment(binDir);
+	}
+
+	@Override
+	protected ExecutorFailedException buildFailureException(final String failedCmd, final String fullOutput,
+			final String lastLine, final Throwable cause) {
+		final String pathForMessage = executablePath != null ? executablePath : failedCmd;
+		if (YtDlpRuntimeDiagnostics.isBootstrapExtractionFailure(fullOutput)
+				|| YtDlpRuntimeDiagnostics.isBootstrapExtractionFailure(lastLine)) {
+			return new ExecutorFailedException(failedCmd, fullOutput,
+					YtDlpRuntimeDiagnostics.buildBootstrapFailureUserMessage(pathForMessage), cause);
+		}
+		return super.buildFailureException(failedCmd, fullOutput, lastLine, cause);
 	}
 
 	@Override

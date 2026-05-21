@@ -2,26 +2,32 @@
 
 ## Baseline and intent
 
-- Java 8 is the current required baseline for merge-blocking checks.
-- Java 11, 17, 21, and 25 are diagnostic compatibility checks only.
-- Java 11+ may fail until JAXB and JavaFX migration is complete.
-- No deployment, credentials, publishing, or auto-merge behavior is part of this workflow set.
+- **Java 8** is the required compile and merge baseline for `develop`.
+- Java 11, 17, 21, and 25 jobs are **diagnostic only** (may fail until JAXB and
+  JavaFX migration completes).
+- No deployment, credential publishing, or auto-merge from bots.
 
-## Workflow coverage
+## Workflows
 
-Workflow: `.github/workflows/ci-maven.yml` (`Maven CI`)
+| Workflow | File | Role |
+|----------|------|------|
+| CI | `.github/workflows/ci.yml` | Legacy required check for `develop`: `CI / validate (zulu-8)` |
+| Maven CI | `.github/workflows/ci-maven.yml` | `develop` PR validation: validate, deterministic tests, package |
+| Build | `.github/workflows/build.yml` | Legacy `master` push/PR coverage only; not part of the `develop` merge baseline |
+| Dependency Review | `.github/workflows/dependency-review.yml` | Blocks new high/critical dependency issues on PRs |
+| CodeQL | (repository default setup) | Code scanning alerts |
+| Labeler | `.github/workflows/labeler.yml` | Path-based PR labels (not required) |
+| Stale | `.github/workflows/stale.yml` | Inactivity labels (no auto-close) |
 
-### Required checks (branch protection)
+### Required checks today
 
-Current required check for `develop` remains:
+Branch protection on `develop` currently requires:
 
-- `CI / validate (zulu-8)` (from `.github/workflows/ci.yml`)
+- `CI / validate (zulu-8)` from `.github/workflows/ci.yml`
 
-The `Maven CI` workflow is additive in this PR. It does not supersede the
-existing required `CI` check until repository governance and the ruleset are
-updated together.
+### Planned required checks (after ruleset update)
 
-After that governance/ruleset update, require:
+When governance catches up (`branch-protection` tracker item), require:
 
 - `Maven CI / validate-java8`
 - `Maven CI / deterministic-tests-java8`
@@ -30,37 +36,34 @@ After that governance/ruleset update, require:
 
 ### Diagnostic checks (do not require)
 
-Do not require:
+- `Maven CI / compatibility-java11` (and 17, 21, 25)
+- `Maven CI / full-test-suite` (workflow_dispatch / schedule only)
 
-- `Maven CI / compatibility-java11`
-- `Maven CI / compatibility-java17`
-- `Maven CI / compatibility-java21`
-- `Maven CI / compatibility-java25`
-- `Maven CI / full-test-suite`
+## Live network tests
 
-## Security workflows
+Default `mvn test` **excludes** live provider tests (`*PluginManagerTest`, etc.).
+Use opt-in profile:
 
-- `Dependency Review` (`.github/workflows/dependency-review.yml`) runs on pull
-  requests and fails when newly introduced dependencies have `high` or
-  `critical` vulnerabilities.
-- `CodeQL` default setup runs as repository code scanning and reports alerts in
-  GitHub code scanning.
+```bash
+mvn -B -ntp test -Plive-provider-tests
+```
 
-## Maintenance automation workflows
+Prefer offline fixture tests for provider changes; quarantine or replace live
+tests over time (`provider-inventory`, `live-tests-flaky` risk).
 
-- `Dependabot` (`.github/dependabot.yml`) opens pull requests for Maven and
-  GitHub Actions updates on a weekly schedule.
-- `Pull request labeler` (`.github/workflows/labeler.yml`) applies labels by
-  changed file paths.
-- `Stale triage` (`.github/workflows/stale.yml`) labels inactive issues and
-  pull requests without auto-closing them.
+## Maintenance automation
 
-Labeler and stale triage are operational helpers and are not required status
-checks for merging.
+- **Dependabot** (`.github/dependabot.yml`) — weekly Maven and GitHub Actions
+  update PRs; semver-major ignored; no auto-merge.
+- **Dependency Review** — fails PRs that introduce new high/critical vulns in
+  dependencies.
+- **CodeQL** — separate from Maven CI.
+
+Details: [`repository-maintenance.md`](repository-maintenance.md).
 
 ## Local command parity
 
-Run the same required Java 8 commands locally:
+Run the same Java 8 commands locally before opening a PR:
 
 ```bash
 mvn -B -ntp -DskipTests validate
@@ -68,57 +71,7 @@ mvn -B -ntp -pl fwk/api,fwk/framework,application/core,plugins/plugin-tester -am
 mvn -B -ntp -DskipTests package
 ```
 
-## Validation results
+Paste **exact** command output in the PR body (exit code and relevant lines).
 
-### Command: `mvn -B -ntp -DskipTests validate`
-
-Exit status: `0`
-
-Relevant output excerpt:
-
-```text
-[INFO] Scanning for projects...
-[INFO] ------------------------------------------------------------------------
-[INFO] Reactor Build Order:
-[INFO] ...
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-```
-
-### Command: `mvn -B -ntp -pl fwk/api,fwk/framework,application/core,plugins/plugin-tester -am test`
-
-Exit status: `0`
-
-Relevant output excerpt:
-
-```text
-[INFO] Scanning for projects...
-[INFO] ------------------------------------------------------------------------
-[INFO] Reactor Build Order:
-[INFO] ...
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-```
-
-### Command: `mvn -B -ntp -DskipTests package`
-
-Exit status: `0`
-
-Relevant output excerpt:
-
-```text
-[INFO] Scanning for projects...
-[INFO] ------------------------------------------------------------------------
-[INFO] Reactor Build Order:
-[INFO] ...
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-```
-
-If one of these commands fails because of a pre-existing baseline blocker
-that reproduces on latest `develop` and is unrelated to this CI workflow or
-documentation change, record the exact failing command, exit status, and
-relevant error excerpt here and in the pull request body.
+If a command fails on latest `develop` for a reason unrelated to your change,
+document the failure honestly in the PR and link the tracker/risk item.
