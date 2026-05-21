@@ -8,7 +8,7 @@ import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
 
 public final class EpisodeMetadataFormatting {
 
-	private static final String UNKNOWN = "Unknown";
+	private static final String UNKNOWN = "Inconnu";
 
 	private EpisodeMetadataFormatting() {
 	}

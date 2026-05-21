@@ -15,17 +15,17 @@ public class EpisodeMetadataFormattingTest {
 
 	@Test
 	public void formatDateHandlesNull() {
-		assertEquals("Unknown", EpisodeMetadataFormatting.formatDate(null));
+		assertEquals("Inconnu", EpisodeMetadataFormatting.formatDate(null));
 	}
 
 	@Test
 	public void formatDurationHandlesNull() {
-		assertEquals("Unknown", EpisodeMetadataFormatting.formatDuration(null));
+		assertEquals("Inconnu", EpisodeMetadataFormatting.formatDuration(null));
 	}
 
 	@Test
 	public void formatSizeHandlesNull() {
-		assertEquals("Unknown", EpisodeMetadataFormatting.formatSize(null));
+		assertEquals("Inconnu", EpisodeMetadataFormatting.formatSize(null));
 	}
 
 	@Test
