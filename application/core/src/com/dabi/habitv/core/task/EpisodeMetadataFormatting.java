@@ -60,11 +60,7 @@ public final class EpisodeMetadataFormatting {
 				|| episode.getId().trim().isEmpty()) {
 			return UNKNOWN;
 		}
-		final String id = episode.getId();
-		if (id.startsWith("http://") || id.startsWith("https://")) {
-			return id;
-		}
-		return id;
+		return episode.getId();
 	}
 
 	public static String formatStatusLabel(final String status) {
