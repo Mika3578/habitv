@@ -74,7 +74,7 @@ for the full rationale.
   detection, binary swap such as `youtube-dl` → `yt-dlp`).
 - A user-facing endpoint or channel slug changes (e.g. swapping a
   dead provider URL).
-- A user-facing configuration changes (API key resolution, defaults,
+- A user-facing configuration change (API key resolution, defaults,
   credential layout).
 
 **Do NOT bump for:**

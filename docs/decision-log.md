@@ -451,11 +451,14 @@ updates by default behind `habitv.update.enabled` with optional
 `4.1.0-SNAPSHOT` from the root POM, but four already override the
 version: `beinsport`, `footyroom`, `francetv` at `4.1.1-SNAPSHOT`,
 and `ffmpeg` at `4.1.2-SNAPSHOT`. The runtime updater
-(`fwk/framework/.../FindArtifactUtils.java:259-267`) filters
-candidates on `major.minor` (`4.1.`) and accepts any patch, so
-per-plugin patch versions are supported by design. However, no
-written rule defined **when** a plugin should bump. Recent
-functional changes to `youtube` (yt-dlp downloader migration,
+(`fwk/framework/.../FindArtifactUtils.java:259-267`) computes the
+candidate prefix via `getVersionMaj`, which returns the first two
+dot-separated segments of the configured core version (e.g. `4.1`
+for `4.1.0-SNAPSHOT`), and filters available artifacts with
+`entry.getVersion().startsWith(versionMaj)`. Per-plugin patch
+versions on the same `4.1` line are therefore supported by design.
+However, no written rule defined **when** a plugin should bump.
+Recent functional changes to `youtube` (yt-dlp downloader migration,
 PR #52) and `arte` (EMAC API discovery fix, PR #55) shipped without
 a bump, so the runtime updater cannot advertise them to users.
 Conversely, `francetv` was bumped before its substantial follow-up
