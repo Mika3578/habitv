@@ -55,12 +55,53 @@ public final class EpisodeMetadataFormatting {
 				Double.valueOf(bytes / (1024.0 * 1024.0 * 1024.0)));
 	}
 
+	/**
+	 * Program (emission) page URL from the episode category, when the provider
+	 * stores an HTTP(S) identifier on the downloadable category node.
+	 */
+	public static String programPageUrl(final EpisodeDTO episode) {
+		if (episode == null || episode.getCategory() == null) {
+			return null;
+		}
+		final String categoryId = episode.getCategory().getId();
+		if (categoryId == null || categoryId.trim().isEmpty()) {
+			return null;
+		}
+		if (categoryId.startsWith("http://") || categoryId.startsWith("https://")) {
+			return categoryId.trim();
+		}
+		return null;
+	}
+
+	public static String formatProgramLinkLabel(final EpisodeDTO episode) {
+		final String url = programPageUrl(episode);
+		if (url == null) {
+			return UNKNOWN;
+		}
+		if (episode.getCategory() != null && episode.getCategory().getName() != null
+				&& !episode.getCategory().getName().trim().isEmpty()) {
+			return episode.getCategory().getName().trim();
+		}
+		return shortenUrl(url);
+	}
+
 	public static String formatSource(final EpisodeDTO episode) {
+		final String programUrl = programPageUrl(episode);
+		if (programUrl != null) {
+			return programUrl;
+		}
 		if (episode == null || episode.getId() == null
 				|| episode.getId().trim().isEmpty()) {
 			return UNKNOWN;
 		}
-		return episode.getId();
+		return episode.getId().trim();
+	}
+
+	private static String shortenUrl(final String url) {
+		if (url.length() <= 48) {
+			return url;
+		}
+		return url.substring(0, 45) + "...";
 	}
 
 	public static String formatStatusLabel(final String status) {

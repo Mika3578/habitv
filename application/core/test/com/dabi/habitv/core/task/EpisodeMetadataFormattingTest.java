@@ -55,4 +55,15 @@ public class EpisodeMetadataFormattingTest {
 		final Date date = calendar.getTime();
 		assertEquals("2024-01-15", EpisodeMetadataFormatting.formatDate(date));
 	}
+
+	@Test
+	public void programPageUrlUsesCategoryHttpId() {
+		final CategoryDTO program = new CategoryDTO("francetv", "Journal 20h",
+				"https://www.france.tv/france-2/journal-20-heures/", "mp4");
+		final EpisodeDTO episode = new EpisodeDTO(program, "ep1",
+				"https://www.france.tv/france-2/journal-20-heures/1-ep.html");
+		assertEquals("https://www.france.tv/france-2/journal-20-heures/",
+				EpisodeMetadataFormatting.programPageUrl(episode));
+		assertEquals("Journal 20h", EpisodeMetadataFormatting.formatProgramLinkLabel(episode));
+	}
 }
