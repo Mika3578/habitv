@@ -1,3 +1,3 @@
-providerFamily=canalPlus,d8,d17
+providerFamily=canalPlus,d8,d17,cnews
 network=disabled
-note=Fixture placeholder for split Canal+/D8/D17 endpoint rewrite planning.
+note=Fixture placeholder for split Canal+/D8/D17/CNews endpoint rewrite planning.

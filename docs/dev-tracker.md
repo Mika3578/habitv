@@ -327,10 +327,13 @@ mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Ds
 
 **Notes** — Inventory baseline is now documented in
 [`provider-inventory.md`](provider-inventory.md) for every plugin module
-plus historical references (`D8`, `D17`, `nrj12`, FranceTV/Pluzz,
+plus historical references (`D8`, `D17`, `CNews`, `nrj12`, FranceTV/Pluzz,
 Kewego). An offline fixture policy and first local fixture baseline are
 now documented for `6play`, `canalPlus`, `francetv` (ex `pluzz`), `arte`, and `youtube`
-without rewriting providers. Default `mvn test` skips live
+without rewriting providers. The canal-family fixture metadata now lists
+`cnews` alongside `canalPlus`/`d8`/`d17` after the CNews sub-provider was
+added (`CNewsConf` + `CNewsPluginManager`) for
+`https://www.canalplus.com/chaines/cnews`. Default `mvn test` skips live
 `*PluginManagerTest`; use `-Plive-provider-tests`. Arte live test
 currently fails (`categorie liste vide`) — provider drift, documented in
 inventory. This item remains open for broader fixture capture and

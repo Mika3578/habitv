@@ -111,6 +111,7 @@ Replay sites change often. Treat README-era names as **legacy labels**:
 |-------------|-------------------------|
 | Pluzz | France Télévisions / France.tv — module `plugins/francetv` (rename grab-config `pluzz` → `francetv`) |
 | D8 / D17 | Canal-era channels — embedded in `plugins/canalPlus` (obsolete endpoints) |
+| CNews | Canal+ group news channel — embedded `cnews` sub-provider in `plugins/canalPlus` (HOME_URL `https://www.canalplus.com/chaines/cnews`) |
 | 6play | M6+ / M6 replay area — `plugins/6play` (needs rewrite) |
 | NRJ12 | Historical reference only — no module in reactor |
 

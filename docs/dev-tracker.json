@@ -186,7 +186,7 @@
         "mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test"
       ],
       "pr": "test/provider-offline-fixture-baseline (this PR)",
-      "notes": "Inventory baseline from PR #50 extended with offline fixture policy and tests for 6play, canalPlus, francetv (ex pluzz), arte, and youtube. docs/provider-inventory.md includes current-status table and legacy naming (Pluzz, D8/D17, 6play). Arte live PluginManagerTest fails (categorie liste vide) — provider drift. Default Surefire excludes *PluginManagerTest. See docs/automatic-category-download.md for runtime watch behavior."
+      "notes": "Inventory baseline from PR #50 extended with offline fixture policy and tests for 6play, canalPlus, francetv (ex pluzz), arte, and youtube. docs/provider-inventory.md includes current-status table and legacy naming (Pluzz, D8/D17, CNews, 6play). Canal-family fixture metadata extended to include cnews after CNews sub-provider (CNewsConf + CNewsPluginManager, https://www.canalplus.com/chaines/cnews) was added inside plugins/canalPlus. Arte live PluginManagerTest fails (categorie liste vide) — provider drift. Default Surefire excludes *PluginManagerTest. See docs/automatic-category-download.md for runtime watch behavior."
     },
     {
       "id": "ytdlp-migration",

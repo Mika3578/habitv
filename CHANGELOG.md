@@ -39,6 +39,7 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-05-21 | TBD | `canalPlus` plugin: add `cnews` sub-provider for the CNews channel page (`https://www.canalplus.com/chaines/cnews`), mirroring the embedded D8/D17 pattern (`CNewsConf` + `CNewsPluginManager`) so users can reference `cnews` in their grab-config |
 | 2026-05-19 | PR [#64](https://github.com/Mika3578/habitv/pull/64) | `francetv` provider: replace dead `france-o` channel slug with `la1ere` (Outre-mer La 1ère), centralise channel labels in `FranceTvUrls`, accept `franceinfo.fr` / `francetvinfo.fr` URLs in `canDownload`, raise `MAX_PAGES` to 100 |
 | 2026-05-18 | `2311bbc` | Replace `pluzz` provider with `francetv` (france.tv + yt-dlp) — users must rename `<plugin name="pluzz">` to `<plugin name="francetv">` in their grab-config XML (legacy `pluzz.` URLs in `canDownload` remain accepted) |
 | 2026-05-18 | PR [#52](https://github.com/Mika3578/habitv/pull/52) | Migrate YouTube plugin downloader defaults to yt-dlp |
@@ -48,6 +49,7 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-05-21 | TBD | Add `CNewsPluginWiringTest` (offline) and refresh `CanalPlusOfflineFixtureBaselineTest` + `fixture-baseline.txt` to include `cnews` in the canal provider family |
 | 2026-05-18 | PR [#52](https://github.com/Mika3578/habitv/pull/52) | Expand offline yt-dlp defaults and command wiring tests |
 | 2026-05-17 | `0163d9a` | Cover yt-dlp command wiring (offline test) |
 
