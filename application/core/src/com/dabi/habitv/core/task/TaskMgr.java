@@ -90,10 +90,12 @@ public class TaskMgr<T extends AbstractTask<R>, R> {
 					taskMgrListener.onAllTreatmentDone();
 				}
 
-				Iterator<Entry<Object, T>> it = object2Task.entrySet().iterator();
-				while (it.hasNext()) {
-					if (!it.next().getValue().isRunning()) {
-						it.remove();
+				synchronized (TaskMgr.this) {
+					Iterator<Entry<Object, T>> it = object2Task.entrySet().iterator();
+					while (it.hasNext()) {
+						if (it.next().getValue().isFinished()) {
+							it.remove();
+						}
 					}
 				}
 			}
