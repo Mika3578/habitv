@@ -1,7 +1,42 @@
 # 🔌 Provider and plugin inventory (HBTV-006)
 
 **Tracker item**: `provider-inventory` (`HBTV-006`)  
-**Scope in this PR**: documentation, classification, and offline fixture baseline (no module removal, no provider rewrite, no runtime behavior change)
+**Status:** in progress (~55%) — inventory and offline fixtures; rewrites are
+separate PRs per module.
+
+---
+
+## Current status and future work
+
+| Area | Status | Next steps |
+|------|--------|------------|
+| Reactor / build | All listed modules compile in the Maven reactor | Keep `mvn validate` green |
+| `francetv` (ex Pluzz) | **Keep** — France.tv mobile API + yt-dlp download | Migrate user grab-config `pluzz` → `francetv` |
+| `youtube` | **Keep** — yt-dlp binary contract (see `ytdlp-migration`) | Publish `yt-dlp` tool zip to `habitv-repo` |
+| `arte`, `6play`, `lequipe`, … | **Needs rewrite** or live drift | Fixture-first parser PRs |
+| `canalPlus` (+ embedded D8/D17) | **Obsolete** Canal-era endpoints | Dedicated canal-family rewrite |
+| `wat`, `beinsport`, `clubic`, `footyroom` | **Obsolete** branding/URLs | Deprecation or rewrite PRs |
+| `nrj12` | **Not in reactor** | Historical README name only |
+| Live `*PluginManagerTest` | Quarantined (`-Plive-provider-tests`) | Replace with offline fixtures over time |
+
+**Legacy naming (docs and old configs):**
+
+- **Pluzz** → treat as **France Télévisions / France.tv**; module is
+  `plugins/francetv`.
+- **D8 / D17** → legacy Canal+ channel plugins inside `plugins/canalPlus`, not
+  standalone modules.
+- **6play** → legacy M6 branding; module `plugins/6play` targets old `6play.fr`
+  (modern M6+ replay is a future rewrite target).
+
+Unsupported or obsolete providers stay **documented** here until a dedicated
+deprecation PR removes them (tracker + risk register), never silently dropped.
+
+---
+
+## Inventory scope (baseline PR)
+
+Documentation, classification, and offline fixture baseline — no module removal,
+no provider rewrite, no runtime behavior change in inventory-only work.
 
 ---
 
