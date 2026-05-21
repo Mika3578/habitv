@@ -11,9 +11,9 @@
 
 | Workflow | File | Role |
 |----------|------|------|
-| CI | `.github/workflows/ci.yml` | Legacy required check: `CI / validate (zulu-8)` |
-| Maven CI | `.github/workflows/ci-maven.yml` | PR validation: validate, deterministic tests, package |
-| Build | `.github/workflows/build.yml` | Additional build coverage |
+| CI | `.github/workflows/ci.yml` | Legacy required check for `develop`: `CI / validate (zulu-8)` |
+| Maven CI | `.github/workflows/ci-maven.yml` | `develop` PR validation: validate, deterministic tests, package |
+| Build | `.github/workflows/build.yml` | Legacy `master` push/PR coverage only; not part of the `develop` merge baseline |
 | Dependency Review | `.github/workflows/dependency-review.yml` | Blocks new high/critical dependency issues on PRs |
 | CodeQL | (repository default setup) | Code scanning alerts |
 | Labeler | `.github/workflows/labeler.yml` | Path-based PR labels (not required) |
