@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -52,6 +54,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -143,10 +146,10 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 	private void initEpisodeTable() {
 		episodeTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		episodeTableView.getColumns().clear();
-		episodeTableView.getColumns().add(buildEpisodeColumn("name", "Épisode", 180));
-		episodeTableView.getColumns().add(buildEpisodeColumn("episodeDate", "Date", 90));
-		episodeTableView.getColumns().add(buildEpisodeColumn("durationSeconds", "Durée", 80));
-		episodeTableView.getColumns().add(buildEpisodeColumn("sizeBytes", "Taille", 70));
+		episodeTableView.getColumns().add(buildNameColumn());
+		episodeTableView.getColumns().add(buildDateColumn());
+		episodeTableView.getColumns().add(buildDurationColumn());
+		episodeTableView.getColumns().add(buildSizeColumn());
 		episodeTableView.getColumns().add(buildStatusColumn());
 		episodeTableView.getColumns().add(buildSourceColumn());
 		episodeTableView.setRowFactory(tv -> new TableRow<EpisodeDTO>() {
@@ -190,13 +193,67 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 				});
 	}
 
-	private TableColumn<EpisodeDTO, String> buildEpisodeColumn(final String property,
-			final String title, final double prefWidth) {
-		final TableColumn<EpisodeDTO, String> column = new TableColumn<>(title);
+	private TableColumn<EpisodeDTO, String> buildNameColumn() {
+		final TableColumn<EpisodeDTO, String> column = new TableColumn<>("Épisode");
+		column.setPrefWidth(180);
+		column.setCellValueFactory(features -> new ReadOnlyObjectWrapper<>(
+				features.getValue() == null ? "" : features.getValue().getName()));
+		column.setComparator(nullsFirst(String.CASE_INSENSITIVE_ORDER));
+		column.setSortable(true);
+		return column;
+	}
+
+	private TableColumn<EpisodeDTO, Date> buildDateColumn() {
+		final TableColumn<EpisodeDTO, Date> column = new TableColumn<>("Date");
+		column.setPrefWidth(90);
+		column.setCellValueFactory(features -> new ReadOnlyObjectWrapper<>(
+				features.getValue() == null ? null : features.getValue().getEpisodeDate()));
+		column.setCellFactory(col -> new TableCell<EpisodeDTO, Date>() {
+			@Override
+			protected void updateItem(final Date item, final boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty ? "" : EpisodeMetadataFormatting.formatDate(item));
+			}
+		});
+		column.setComparator(nullsFirst(Comparator.<Date>naturalOrder()));
+		column.setSortable(true);
+		return column;
+	}
+
+	private TableColumn<EpisodeDTO, Long> buildDurationColumn() {
+		return buildLongColumn("Durée", 80,
+				episode -> episode.getDurationSeconds(),
+				EpisodeMetadataFormatting::formatDuration);
+	}
+
+	private TableColumn<EpisodeDTO, Long> buildSizeColumn() {
+		return buildLongColumn("Taille", 70,
+				episode -> episode.getSizeBytes(),
+				EpisodeMetadataFormatting::formatSize);
+	}
+
+	private TableColumn<EpisodeDTO, Long> buildLongColumn(final String title,
+			final double prefWidth,
+			final java.util.function.Function<EpisodeDTO, Long> extractor,
+			final java.util.function.Function<Long, String> formatter) {
+		final TableColumn<EpisodeDTO, Long> column = new TableColumn<>(title);
 		column.setPrefWidth(prefWidth);
 		column.setCellValueFactory(features -> new ReadOnlyObjectWrapper<>(
-				formatEpisodeColumn(property, features.getValue())));
-		column.setComparator((left, right) -> {
+				features.getValue() == null ? null : extractor.apply(features.getValue())));
+		column.setCellFactory(col -> new TableCell<EpisodeDTO, Long>() {
+			@Override
+			protected void updateItem(final Long item, final boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty ? "" : formatter.apply(item));
+			}
+		});
+		column.setComparator(nullsFirst(Comparator.<Long>naturalOrder()));
+		column.setSortable(true);
+		return column;
+	}
+
+	private static <T> Comparator<T> nullsFirst(final Comparator<T> base) {
+		return (left, right) -> {
 			if (left == null && right == null) {
 				return 0;
 			}
@@ -206,30 +263,8 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 			if (right == null) {
 				return 1;
 			}
-			return left.compareToIgnoreCase(right);
-		});
-		column.setSortable(true);
-		return column;
-	}
-
-	private static String formatEpisodeColumn(final String property,
-			final EpisodeDTO episode) {
-		if (episode == null) {
-			return "";
-		}
-		if ("name".equals(property)) {
-			return episode.getName();
-		}
-		if ("episodeDate".equals(property)) {
-			return EpisodeMetadataFormatting.formatDate(episode.getEpisodeDate());
-		}
-		if ("durationSeconds".equals(property)) {
-			return EpisodeMetadataFormatting.formatDuration(episode.getDurationSeconds());
-		}
-		if ("sizeBytes".equals(property)) {
-			return EpisodeMetadataFormatting.formatSize(episode.getSizeBytes());
-		}
-		return "";
+			return base.compare(left, right);
+		};
 	}
 
 	private TableColumn<EpisodeDTO, String> buildStatusColumn() {
