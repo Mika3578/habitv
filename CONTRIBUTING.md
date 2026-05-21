@@ -60,6 +60,44 @@ WIP                   ← do not commit WIP
 
 ---
 
+## 🏷️ Plugin versioning
+
+Each `plugins/*/pom.xml` inherits `<version>` from the root POM by
+default. A plugin **MAY** override the version and publish on its own
+patch line when at least one user-visible trigger applies. See the
+`plugin-versioning-policy` ADR in [`docs/decision-log.md`](docs/decision-log.md)
+for the full rationale.
+
+**Bump the plugin's `<version>` when:**
+
+- The downloader or parser behavior changes (URL handling, format
+  detection, binary swap such as `youtube-dl` → `yt-dlp`).
+- A user-facing endpoint or channel slug changes (e.g. swapping a
+  dead provider URL).
+- A user-facing configuration change (API key resolution, defaults,
+  credential layout).
+
+**Do NOT bump for:**
+
+- Offline test fixtures.
+- Build, CI, or IDE cleanup.
+- Dependency management or reactor alignment.
+- Internal renames invisible to a configured user.
+- Documentation-only changes.
+
+**Conventions:**
+
+- Keep the `-SNAPSHOT` suffix while `CHANGELOG.md` `[Unreleased]` has
+  not been cut. Dropping `-SNAPSHOT` is gated by `static-repo-publish`.
+- Internal reactor dependencies (`api`, `framework`, `plugin-tester`)
+  inside a bumped plugin MUST use `${project.parent.version}`, never
+  `${project.version}` (cf. `own-version-deps-align`). A bare
+  `${project.version}` in a plugin whose version differs from the
+  parent resolves to a non-existent artifact at compile time.
+- The PR body must name which trigger applies when bumping.
+
+---
+
 ## 🎯 One tracker item per PR
 
 | Rule | Detail |
