@@ -15,7 +15,7 @@ separate PRs per module.
 | `francetv` (ex Pluzz) | **Keep** — France.tv mobile API + yt-dlp download | Migrate user grab-config `pluzz` → `francetv` |
 | `youtube` | **Keep** — yt-dlp binary contract (see `ytdlp-migration`) | Publish `yt-dlp` tool zip to `habitv-repo` |
 | `arte`, `6play`, `lequipe`, … | **Needs rewrite** or live drift | Fixture-first parser PRs |
-| `canalPlus` (+ embedded D8/D17) | **Obsolete** Canal-era endpoints | Dedicated canal-family rewrite |
+| `canalPlus` (+ embedded D8/CStar) | **Obsolete** Canal-era endpoints | Dedicated canal-family rewrite |
 | `wat`, `beinsport`, `clubic`, `footyroom` | **Obsolete** branding/URLs | Deprecation or rewrite PRs |
 | `nrj12` | **Not in reactor** | Historical README name only |
 | Live `*PluginManagerTest` | Quarantined (`-Plive-provider-tests`) | Replace with offline fixtures over time |
@@ -24,8 +24,8 @@ separate PRs per module.
 
 - **Pluzz** → treat as **France Télévisions / France.tv**; module is
   `plugins/francetv`.
-- **D8 / D17** → legacy Canal+ channel plugins inside `plugins/canalPlus`, not
-  standalone modules.
+- **D8 / CStar** (CStar is the rebranded D17) → legacy Canal+ channel plugins
+  inside `plugins/canalPlus`, not standalone modules.
 - **6play** → legacy M6 branding; module `plugins/6play` targets old `6play.fr`
   (modern M6+ replay is a future rewrite target).
 
@@ -64,7 +64,7 @@ no provider rewrite, no runtime behavior change in inventory-only work.
 | `plugins/aria2` | `aria2` | downloader | keep | `Aria2PluginDownloader` wraps `aria2c`; dedicated test exists | keep as-is |
 | `plugins/arte` | `arte` | provider | needs live endpoint rewrite | `ArteConf` uses legacy HTTP guide/rss URLs and scraping selectors; provider tests are live-network style | add fixture tests |
 | `plugins/beinsport` | `beinsport` | provider | obsolete endpoint | `BeinSportConf` uses legacy `beinsports.com/us/videos` and Dailymotion mapping; known candidate in tracker notes | rewrite provider |
-| `plugins/canalPlus` | `canalPlus` | provider | obsolete endpoint | `CanalPlusConf`/`D8Conf`/`D17Conf` use old Canal service URLs and channel-specific legacy endpoints | rewrite provider |
+| `plugins/canalPlus` | `canalPlus` | provider | obsolete endpoint | `CanalPlusConf`/`D8Conf`/`CStarConf` use old Canal service URLs and channel-specific legacy endpoints | rewrite provider |
 | `plugins/clubic` | `clubic` | provider | obsolete endpoint | `ClubicConf` targets legacy Clubic video pages via HTML selectors; provider test is live-network | deprecate provider |
 | `plugins/cmd` | `cmd` | exporter | infrastructure-only | `CmdPluginExporterManager` and `CmdPluginDownloaderManager` are command wrappers, no provider endpoint logic | keep as-is |
 | `plugins/curl` | `curl` | exporter | infrastructure-only | `CurlPluginExporterManager` plus downloader wrapper; utility integration layer | keep as-is |
@@ -89,7 +89,7 @@ no provider rewrite, no runtime behavior change in inventory-only work.
 | Name in docs/config | Found in code/docs | In plugins aggregator? | Classification |
 |---|---|---|---|
 | `D8` | `README.md` provider list; `D8PluginManager` inside `plugins/canalPlus` | No standalone module | embedded legacy sub-provider in `canalPlus` |
-| `D17` | `README.md` provider list; `D17PluginManager` inside `plugins/canalPlus` | No standalone module | embedded legacy sub-provider in `canalPlus` |
+| `CStar` (ex `D17`) | `README.md` provider list; `CStarPluginManager` inside `plugins/canalPlus` | No standalone module | embedded legacy sub-provider in `canalPlus` (renamed from `D17` when the channel rebranded to CStar; new home URL `https://www.canalplus.com/chaines/cstar`) |
 | `NRJ12` / `nrj12` | Mentioned in `README.md` and tracker notes | No | historical reference only (missing module) |
 | `FranceTV / Pluzz` | `plugins/francetv` module replaces former `plugins/pluzz`; mobile catalogue + yt-dlp flow | Yes (`francetv`) | rename completed (PR #58); existing grab-config entries still require manual `pluzz` → `francetv` migration |
 | `Kewego` | Legacy stream references in `plugins/lequipe/test/TestInitStream.java`; risk register mentions kewego in live tests | No dedicated module | historical endpoint dependency in tests |
@@ -132,7 +132,7 @@ no provider rewrite, no runtime behavior change in inventory-only work.
 | Provider | Baseline status in this PR | Why first |
 |---|---|---|
 | `6play` | Local fixture metadata + offline baseline test | Legacy scraper targets static markup while current site is SPA-driven |
-| `canalPlus` (`D8`/`D17` family) | Local fixture metadata + offline baseline test | Multiple legacy endpoint families, highest rewrite risk |
+| `canalPlus` (`D8`/`CStar` family) | Local fixture metadata + offline baseline test | Multiple legacy endpoint families, highest rewrite risk |
 | `francetv` (ex `pluzz`) | Local fixture metadata + offline `FranceTvUrlsTest` covering URL/slug builders | Replacement of the legacy `pluzz` module against `api-mobile.yatta.francetv.fr` |
 | `arte` | Local fixture metadata + offline baseline test | Legacy HTTP/RSS parsing assumptions need stable parser anchors |
 | `youtube` | Local fixture metadata + offline baseline test | Binary contract migrated to yt-dlp; live provider validation still separate |
@@ -197,7 +197,7 @@ provider/runtime drift, not a static-repository deploy regression.
 
 1. **test(provider-inventory): add offline fixtures for unknown providers**
    - Scope: `globalnews`, `mlssoccer`, `sfr`, `email`, plus RSS regression fixtures.
-2. **fix(provider-canal-family): rewrite canalPlus + d8 + d17 provider endpoints**
+2. **fix(provider-canal-family): rewrite canalPlus + d8 + cstar provider endpoints**
    - Scope: `plugins/canalPlus` only, with fixture-backed parser behavior.
 3. ✅ **fix(provider-francetv): replace pluzz provider with france.tv metadata flow** — delivered in PR #58 (`plugins/francetv`).
 4. **fix(provider-legacy-football): rewrite wat, beinsport, footyroom, lequipe**
