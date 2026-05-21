@@ -242,8 +242,8 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 		final int selectedCount = episodeTableView.getSelectionModel().getSelectedItems()
 				.size();
 		downloadSelectedButton
-				.setText(selectedCount > 0 ? "Download selected (" + selectedCount + ")"
-						: "Download selected");
+				.setText(selectedCount > 0 ? "Télécharger la sélection (" + selectedCount + ")"
+						: "Télécharger la sélection");
 		downloadSelectedButton.setDisable(selectedCount == 0);
 		clearSelectionButton.setDisable(selectedCount == 0);
 		final int itemCount = episodeTableView.getItems() == null ? 0
@@ -339,7 +339,7 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 	}
 
 	private TableColumn<EpisodeDTO, Void> buildProgramLinkColumn() {
-		final TableColumn<EpisodeDTO, Void> column = new TableColumn<>("Program");
+		final TableColumn<EpisodeDTO, Void> column = new TableColumn<>("Programme");
 		column.setPrefWidth(140);
 		column.setSortable(false);
 		column.setCellFactory(col -> new ProgramLinkTableCell());
@@ -351,7 +351,7 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 		column.setPrefWidth(110);
 		column.setSortable(false);
 		column.setCellFactory(col -> new TableCell<EpisodeDTO, Void>() {
-			private final Button actionButton = new Button("Download");
+			private final Button actionButton = new Button("Télécharger");
 			{
 				actionButton.setOnAction(new EventHandler<ActionEvent>() {
 					@Override
@@ -727,7 +727,7 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 					public void run() {
 						updateDownloadSelectionUi();
 						if (result != null) {
-							new Popin().show("Download queue", buildBatchQueueSummary(result));
+							new Popin().show("File de téléchargement", buildBatchQueueSummary(result));
 						}
 					}
 				});
@@ -737,8 +737,8 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 
 	private String buildBatchQueueSummary(final BatchEnqueueResult result) {
 		final StringBuilder summary = new StringBuilder();
-		summary.append("Added: ").append(result.getAddedCount()).append('\n');
-		summary.append("Skipped: ").append(result.getSkippedCount());
+		summary.append("Ajoutés : ").append(result.getAddedCount()).append('\n');
+		summary.append("Ignorés : ").append(result.getSkippedCount());
 		final Map<EnqueueSkipReason, Integer> skipCounts = new HashMap<>();
 		for (EpisodeEnqueueResult item : result.getResults()) {
 			if (item.getSkipReason() != null) {
@@ -748,14 +748,14 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 			}
 		}
 		if (!skipCounts.isEmpty()) {
-			summary.append("\n\nSkipped details:");
-			appendReason(summary, "already downloaded",
+			summary.append("\n\nDétails des éléments ignorés :");
+			appendReason(summary, "déjà téléchargés",
 					skipCounts.get(EnqueueSkipReason.ALREADY_DOWNLOADED));
-			appendReason(summary, "already queued",
+			appendReason(summary, "déjà en file",
 					skipCounts.get(EnqueueSkipReason.ALREADY_QUEUED));
-			appendReason(summary, "already downloading",
+			appendReason(summary, "téléchargement en cours",
 					skipCounts.get(EnqueueSkipReason.ALREADY_DOWNLOADING));
-			appendReason(summary, "duplicate in selection",
+			appendReason(summary, "doublons dans la sélection",
 					skipCounts.get(EnqueueSkipReason.DUPLICATE_IN_BATCH));
 		}
 		return summary.toString();

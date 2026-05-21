@@ -161,10 +161,10 @@
 																			disable="true" mnemonicParsing="false"
 																			text="Télécharger la sélection" />
 																		<Button fx:id="selectAllEpisodesButton"
-																			mnemonicParsing="false" text="Select all" />
+																			mnemonicParsing="false" text="Tout sélectionner" />
 																		<Button fx:id="clearSelectionButton"
 																			disable="true" mnemonicParsing="false"
-																			text="Clear selection" />
+																			text="Effacer la sélection" />
 																	</children>
 																	<padding>
 																		<Insets bottom="5.0" left="5.0" right="5.0"
