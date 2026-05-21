@@ -18,12 +18,12 @@
   ],
   "summary": {
     "done": 12,
-    "inProgress": 4,
+    "inProgress": 5,
     "proposed": 2,
     "deferred": 0,
     "blocked": 0,
-    "total": 18,
-    "overallProgressPercent": 78
+    "total": 19,
+    "overallProgressPercent": 79
   },
   "items": [
     {
@@ -211,6 +211,30 @@
       ],
       "pr": "feat(youtube): migrate downloader binary to yt-dlp (TBD)",
       "notes": "Plugin module id remains youtube. Static-repo tool metadata uses yt-dlp; habitv-repo publication is separate. No provider rewrite or live-network tests."
+    },
+    {
+      "id": "ytdlp-runtime-diagnostics",
+      "legacyCode": "HBTV-007a",
+      "displayTitle": "yt-dlp Windows runtime diagnostics",
+      "icon": "🩺",
+      "status": "in-progress",
+      "priority": "P2",
+      "progressPercent": 90,
+      "scope": "Detect yt-dlp PyInstaller bootstrap failures before downloads, log actionable binary/temp diagnostics, use habitv-home temp for yt-dlp extraction, document Windows recovery.",
+      "acceptanceCriteria": [
+        "Preflight yt-dlp --version before each download (done).",
+        "Classify [PYI- / Failed to extract / Cryptodome / _MEI stderr as bootstrap failure (done).",
+        "User-facing message mentions clear TEMP _MEI folders, replace yt-dlp.exe, run yt-dlp.exe --version (done).",
+        "Set TEMP/TMP to <habitv-home>/tmp/yt-dlp for yt-dlp processes (done).",
+        "Unit tests for PyInstaller vs generic errors (done).",
+        "Troubleshooting section in docs/ytdlp-cli-compatibility.md (done)."
+      ],
+      "validation": [
+        "mvn -B -ntp -DskipTests validate",
+        "mvn -B -ntp -pl fwk/framework,plugins/youtube -am test"
+      ],
+      "pr": "fix: improve yt-dlp Windows runtime diagnostics (TBD)",
+      "notes": "Independent from France.tv provider URL parsing. No downloader architecture rewrite."
     },
     {
       "id": "javafx-modernization",
