@@ -116,6 +116,22 @@ public final class TokenReplacer {
 		return toCut.substring(0, Math.min(size, toCut.length()));
 	}
 
+	/**
+	 * Compatibility bridge for stale inner classes compiled by other compilers
+	 * expecting synthetic accessors with the access$N naming.
+	 */
+	static String access$0(final String input) {
+		return ensure(input);
+	}
+
+	static String access$1(final String toCut, final List<String> params) {
+		return cut(toCut, params);
+	}
+
+	static String access$2(final int size, final String toCut) {
+		return cut(size, toCut);
+	}
+
 	public static void setCutSize(final Integer cutSize) {
 
 		for (final Entry<String, Replacer> ref2Replacer : new ArrayList<>(REF2REPLACER.entrySet())) {

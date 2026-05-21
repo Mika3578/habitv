@@ -326,12 +326,19 @@ public class TaskMgrTest {
 	public final void indicateWhenAllTreatmentAreDone() {
 		buildSimultaneousTask(2, null, null, false);
 		assertFalse(allTreatmentDone);
-		try {
-			Thread.sleep(1000);
-		} catch (final InterruptedException e) {
-			fail();
-		}
-		assertTrue(allTreatmentDone);
+		assertTrue(waitForAllTreatmentDone(3000));
 		taskMgr.shutdown(0);
+	}
+
+	private boolean waitForAllTreatmentDone(final long timeoutMs) {
+		final long deadline = System.currentTimeMillis() + timeoutMs;
+		while (!allTreatmentDone && System.currentTimeMillis() < deadline) {
+			try {
+				Thread.sleep(25);
+			} catch (final InterruptedException e) {
+				fail();
+			}
+		}
+		return allTreatmentDone;
 	}
 }

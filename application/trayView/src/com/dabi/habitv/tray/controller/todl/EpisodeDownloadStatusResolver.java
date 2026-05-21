@@ -3,6 +3,7 @@ package com.dabi.habitv.tray.controller.todl;
 import java.util.Set;
 
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
+import com.dabi.habitv.core.dao.DownloadedDAO;
 import com.dabi.habitv.core.event.EpisodeStateEnum;
 
 final class EpisodeDownloadStatusResolver {
@@ -16,8 +17,7 @@ final class EpisodeDownloadStatusResolver {
 		if (episode == null) {
 			return "Unknown";
 		}
-		if (downloadedEpisodeNames != null
-				&& downloadedEpisodeNames.contains(episode.getName())) {
+		if (DownloadedDAO.containsEpisode(downloadedEpisodeNames, episode)) {
 			return "Downloaded";
 		}
 		if (liveState != null) {
