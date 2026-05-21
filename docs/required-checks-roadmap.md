@@ -58,8 +58,10 @@ parity is confirmed.
 
 - `Maven CI / compatibility-java11` (and 17, 21, 25) — validation or package
   on modern JDKs
-- `Maven CI / full-test-suite` — includes live provider/network tests
-- Provider live tests (any job or profile hitting real endpoints)
+- `Maven CI / full-test-suite` — default deterministic tests only until it is
+  explicitly retargeted; it must not include live provider/network tests when
+  made required
+- Provider live tests (`-Plive-provider-tests` or any job hitting real endpoints)
 - Broad dependency or static-analysis gates that are still noisy or lack
   owner remediation playbooks
 - Deployment, release, or publish workflows
@@ -142,14 +144,14 @@ provider behavior tested separately.
 
 **Engineering milestones (follow-up PRs):**
 
-1. Split offline/deterministic tests from live provider tests.
-2. Move network/provider tests behind an explicit Maven profile, e.g.
-   `-Plive-tests` (name to match implementation PR).
+1. Keep offline/deterministic tests separate from live provider tests.
+2. Keep network/provider tests behind the existing explicit Maven profile
+   `-Plive-provider-tests`.
 3. Add local fixtures for provider HTML/API parsing where feasible.
 4. Ensure default `mvn test` (no profile) is CI-safe and does not call live
    endpoints.
 5. Retarget `full-test-suite` to run default deterministic tests when made
-   required; keep `-Plive-tests` on `workflow_dispatch` / schedule only.
+   required; keep `-Plive-provider-tests` on `workflow_dispatch` / schedule only.
 
 **When stable, make required:**
 
@@ -159,7 +161,7 @@ provider behavior tested separately.
 
 **Remain optional / non-required:**
 
-- `-Plive-tests` or equivalent provider live jobs
+- `-Plive-provider-tests` or equivalent provider live jobs
 - Weekly scheduled full legacy runs until live tests are quarantined
 
 ---
@@ -212,7 +214,7 @@ After Phases 0–4 prerequisites are met, the **target** required check set:
 
 | Optional / non-required | Notes |
 |-------------------------|--------|
-| Live provider tests (`-Plive-tests`) | Manual or scheduled only |
+| Live provider tests (`-Plive-provider-tests`) | Manual or scheduled only |
 | `Maven CI / compatibility-java25` | Experimental newest JDK |
 | Deploy / release / static publish workflows | Owner-triggered |
 | Legacy `CI / validate (zulu-8)` | Remove when redundant with Maven CI |
@@ -249,7 +251,7 @@ security dashboard cleanup.
 ## Follow-up PRs (implementation, not this doc PR)
 
 1. OpenJFX support for modern JDK packaging (`javafx-modernization`).
-2. Split offline tests from live provider tests (`provider-inventory`).
+2. Expand offline provider tests and fixtures (`provider-inventory`).
 3. Provider fixtures for deterministic parsing tests.
 4. Progressive hardening of Dependency Review severities and CodeQL setup.
 5. Ruleset update to match Phase 0 required checks (`branch-protection`).
