@@ -52,7 +52,9 @@ public class FranceTvPluginManager extends BasePluginWithProxy implements Plugin
 				if (StringUtils.isEmpty(name)) {
 					continue;
 				}
-				episodes.add(new EpisodeDTO(category, name, pageUrl));
+				final EpisodeDTO episode = new EpisodeDTO(category, name, pageUrl);
+				FranceTvEpisodeMetadata.apply(item, episode);
+				episodes.add(episode);
 			}
 		} catch (IOException e) {
 			getLog().error("Failed to fetch france.tv episodes for " + programPath, e);
@@ -75,29 +77,13 @@ public class FranceTvPluginManager extends BasePluginWithProxy implements Plugin
 	}
 
 	private Collection<CategoryDTO> findPrograms(final String channelSlug) {
-		final Set<CategoryDTO> programs = new LinkedHashSet<>();
 		try {
-			final List<Map<String, Object>> items = apiClient.fetchPrograms(channelSlug);
-			for (final Map<String, Object> item : items) {
-				final Object rawPath = item.get("program_path");
-				if (rawPath == null) {
-					continue;
-				}
-				final String programPath = String.valueOf(rawPath);
-				final String programUrl = FranceTvUrls.programPageUrl(programPath);
-				if (StringUtils.isEmpty(programUrl)) {
-					continue;
-				}
-				final String programName = programLabel(item, programPath);
-				final CategoryDTO program = new CategoryDTO(FranceTvConf.NAME, programName, programUrl,
-						FranceTvConf.EXTENSION);
-				program.setDownloadable(true);
-				programs.add(program);
-			}
+			return FranceTvProgramCatalog.groupProgramsByRubrique(channelSlug,
+					apiClient.fetchPrograms(channelSlug));
 		} catch (IOException e) {
 			getLog().error("Failed to fetch france.tv programs for channel " + channelSlug, e);
+			return new LinkedHashSet<>();
 		}
-		return programs;
 	}
 
 	@Override
@@ -116,16 +102,6 @@ public class FranceTvPluginManager extends BasePluginWithProxy implements Plugin
 			return DownloadableState.SPECIFIC;
 		}
 		return DownloadableState.IMPOSSIBLE;
-	}
-
-	private static String programLabel(final Map<String, Object> item, final String programPath) {
-		final Object label = item.get("label");
-		if (label != null && StringUtils.isNotEmpty(String.valueOf(label))) {
-			return String.valueOf(label).trim();
-		}
-		final int lastUnderscore = programPath.lastIndexOf('_');
-		String segment = lastUnderscore >= 0 ? programPath.substring(lastUnderscore + 1) : programPath;
-		return segment.replace('-', ' ');
 	}
 
 	private static String episodeDisplayName(final Map<String, Object> item) {
