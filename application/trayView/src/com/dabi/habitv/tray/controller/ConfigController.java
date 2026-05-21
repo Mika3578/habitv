@@ -66,7 +66,7 @@ public class ConfigController extends BaseController {
 		youtubeApiKey.setTooltip(new Tooltip(
 				"Clé API YouTube Data v3. Laissez vide pour utiliser la variable d'environnement ou l'option Java."));
 		maxConcurrentDownloads.setTooltip(new Tooltip(
-				"Maximum number of episode downloads running at the same time (minimum 1)."));
+				"Nombre maximum de téléchargements d'épisodes exécutés en même temps (minimum 1)."));
 	}
 
 	private void loadConfig() {
@@ -149,9 +149,16 @@ public class ConfigController extends BaseController {
 			@Override
 			public void run() {
 				UserConfig userConfig = getController().loadUserConfig();
-				final int value = Integer.parseInt(maxConcurrentDownloads.getText());
-				if (userConfig.getMaxConcurrentDownloads() != value) {
-					userConfig.setMaxConcurrentDownloads(value);
+				final int currentValue = Math.max(1, userConfig.getMaxConcurrentDownloads());
+				final Integer newValue = parsePositiveInteger(maxConcurrentDownloads.getText());
+				if (newValue == null) {
+					maxConcurrentDownloads.setText(String.valueOf(currentValue));
+					new Popin().show("Configuration invalide",
+							"Le nombre maximum de téléchargements simultanés doit être un entier supérieur ou égal à 1.");
+					return;
+				}
+				if (userConfig.getMaxConcurrentDownloads() != newValue.intValue()) {
+					userConfig.setMaxConcurrentDownloads(newValue);
 					saveConfig(userConfig);
 				}
 			}
@@ -197,5 +204,14 @@ public class ConfigController extends BaseController {
 		}
 		String trimmed = value.trim();
 		return trimmed.isEmpty() ? null : trimmed;
+	}
+
+	private Integer parsePositiveInteger(String value) {
+		try {
+			final int parsed = Integer.parseInt(value == null ? "" : value.trim());
+			return parsed < 1 ? Integer.valueOf(1) : Integer.valueOf(parsed);
+		} catch (NumberFormatException e) {
+			return null;
+		}
 	}
 }
