@@ -65,6 +65,16 @@ public class DownloadedDAO {
 		return indexDir + "/" + buildIndexFileName(category, "_manual.index");
 	}
 
+	private String getLegacyFileIndex() {
+		return indexDir + "/" + FileUtils.sanitizeFilename(category.getPlugin() + "_"
+				+ category.getName() + ".index");
+	}
+
+	private String getLegacyManualFileIndex() {
+		return indexDir + "/" + FileUtils.sanitizeFilename(category.getPlugin() + "_"
+				+ category.getName() + "_manual.index");
+	}
+
 	private static String buildIndexFileName(final CategoryDTO category,
 			final String suffix) {
 		final String plugin = category.getPlugin();
@@ -79,7 +89,9 @@ public class DownloadedDAO {
 
 	public Set<String> findDownloadedFiles() {
 		Set<String> dlFiles = readFile(getFileIndex());
+		dlFiles.addAll(readFile(getLegacyFileIndex()));
 		dlFiles.addAll(readFile(getManualFileIndex()));
+		dlFiles.addAll(readFile(getLegacyManualFileIndex()));
 		return dlFiles;
 	}
 

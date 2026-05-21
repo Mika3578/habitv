@@ -107,6 +107,8 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 
 	private Set<String> downloadedEpisodes;
 
+	private volatile boolean enqueueInProgress;
+
 	private ChoiceBox<IncludeExcludeEnum> filterTypeChoice;
 
 	private HBox currentFilterVBox;
@@ -168,7 +170,8 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 				super.updateItem(episode, empty);
 				if (empty || episode == null) {
 					setStyle("");
-				} else if (DownloadedDAO.containsEpisode(downloadedEpisodes, episode)) {
+				} else if (DownloadedDAO.containsEpisodeOrLegacyName(downloadedEpisodes,
+						episode)) {
 					setStyle("-fx-text-fill: gray;");
 				} else if (isSelected()) {
 					setStyle("-fx-background-color: -fx-selection-bar;");
@@ -244,6 +247,10 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 		downloadSelectedButton
 				.setText(selectedCount > 0 ? "Télécharger la sélection (" + selectedCount + ")"
 						: "Télécharger la sélection");
+		if (enqueueInProgress) {
+			setManualDownloadControlsDisabled(true);
+			return;
+		}
 		downloadSelectedButton.setDisable(selectedCount == 0);
 		clearSelectionButton.setDisable(selectedCount == 0);
 		final int itemCount = episodeTableView.getItems() == null ? 0
@@ -388,7 +395,7 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 
 		private ProgramLinkTableCell() {
 			link.setOnAction(event -> {
-				final String url = EpisodeMetadataFormatting.programPageUrl(episodeAtRow());
+				final String url = programPageUrl(episodeAtRow());
 				if (url != null) {
 					getController().openInBrowser(url);
 				}
@@ -407,14 +414,35 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 				setGraphic(null);
 				return;
 			}
-			final String url = EpisodeMetadataFormatting.programPageUrl(episode);
-			final String label = EpisodeMetadataFormatting.formatProgramLinkLabel(episode);
+			final String url = programPageUrl(episode);
+			final String label = formatProgramLinkLabel(episode);
 			if (url == null) {
 				setGraphic(new Label(label));
 			} else {
 				link.setText(label);
 				setGraphic(link);
 			}
+		}
+
+		private String programPageUrl(final EpisodeDTO episode) {
+			if (episode == null || episode.getCategory() == null) {
+				return null;
+			}
+			final String categoryId = episode.getCategory().getId();
+			if (categoryId != null && (categoryId.startsWith("http://")
+					|| categoryId.startsWith("https://"))) {
+				return categoryId;
+			}
+			return null;
+		}
+
+		private String formatProgramLinkLabel(final EpisodeDTO episode) {
+			if (episode == null || episode.getCategory() == null
+					|| episode.getCategory().getName() == null
+					|| episode.getCategory().getName().trim().isEmpty()) {
+				return "Inconnu";
+			}
+			return episode.getCategory().getName();
 		}
 
 		private EpisodeDTO episodeAtRow() {
@@ -716,21 +744,28 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 			updateDownloadSelectionUi();
 			return;
 		}
+		enqueueInProgress = true;
 		setManualDownloadControlsDisabled(true);
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				final BatchEnqueueResult result = getController()
-						.downloadSelectedEpisodes(selectedEpisodes);
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-						updateDownloadSelectionUi();
-						if (result != null) {
-							new Popin().show("File de téléchargement", buildBatchQueueSummary(result));
+				BatchEnqueueResult result = null;
+				try {
+					result = getController().downloadSelectedEpisodes(selectedEpisodes);
+				} finally {
+					final BatchEnqueueResult finalResult = result;
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							enqueueInProgress = false;
+							updateDownloadSelectionUi();
+							if (finalResult != null) {
+								new Popin().show("File de téléchargement",
+										buildBatchQueueSummary(finalResult));
+							}
 						}
-					}
-				});
+					});
+				}
 			}
 		}).start();
 	}
