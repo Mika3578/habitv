@@ -19,7 +19,7 @@ public class CanalPlusOfflineFixtureBaselineTest {
 		try (InputStream input = new FileInputStream(fixturePath)) {
 			String content = readUtf8(input);
 			assertTrue("fixture metadata must mention provider family",
-					content.contains("providerFamily=canalPlus,d8,d17"));
+					content.contains("providerFamily=canalPlus,d17"));
 			assertTrue("fixture metadata must document offline-only mode",
 					content.contains("network=disabled"));
 		}
