@@ -45,8 +45,9 @@ habiTv est développé en Java 1.7, il se base sur différents outils externes p
 
 habiTv est actuellement développé et testé sous Windows et linux.
 
-## Batch downloads (tray UI)
+## Téléchargements par lot (interface de zone de notification)
 
-The JavaFX tray application supports multi-episode selection, duplicate-safe
-batch enqueue, configurable `maxConcurrentDownloads`, and best-effort metadata
-columns. See [docs/batch-episode-downloads.md](docs/batch-episode-downloads.md).
+L'application JavaFX de zone de notification prend en charge la sélection
+de plusieurs épisodes, l'ajout en lot avec prévention des doublons, la
+configuration de `maxConcurrentDownloads` et des colonnes de métadonnées
+gérées au mieux. Voir [docs/batch-episode-downloads.md](docs/batch-episode-downloads.md).
