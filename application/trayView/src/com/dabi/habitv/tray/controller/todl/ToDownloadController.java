@@ -143,10 +143,10 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 	private void initEpisodeTable() {
 		episodeTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		episodeTableView.getColumns().clear();
-		episodeTableView.getColumns().add(buildEpisodeColumn("name", "Episode", 180));
+		episodeTableView.getColumns().add(buildEpisodeColumn("name", "Épisode", 180));
 		episodeTableView.getColumns().add(buildEpisodeColumn("episodeDate", "Date", 90));
-		episodeTableView.getColumns().add(buildEpisodeColumn("durationSeconds", "Duration", 80));
-		episodeTableView.getColumns().add(buildEpisodeColumn("sizeBytes", "Size", 70));
+		episodeTableView.getColumns().add(buildEpisodeColumn("durationSeconds", "Durée", 80));
+		episodeTableView.getColumns().add(buildEpisodeColumn("sizeBytes", "Taille", 70));
 		episodeTableView.getColumns().add(buildStatusColumn());
 		episodeTableView.getColumns().add(buildSourceColumn());
 		episodeTableView.setRowFactory(tv -> new TableRow<EpisodeDTO>() {
@@ -183,8 +183,8 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 					@Override
 					public void changed(ObservableValue<? extends EpisodeDTO> observable,
 							EpisodeDTO oldValue, EpisodeDTO newValue) {
-						if (ouvrirUrl != null && newValue != null) {
-							ouvrirUrl.setDisable(!newValue.getId().startsWith("http:"));
+						if (ouvrirUrl != null) {
+							ouvrirUrl.setDisable(!isHttpUrl(newValue));
 						}
 					}
 				});
@@ -233,7 +233,7 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 	}
 
 	private TableColumn<EpisodeDTO, String> buildStatusColumn() {
-		final TableColumn<EpisodeDTO, String> column = new TableColumn<>("Status");
+		final TableColumn<EpisodeDTO, String> column = new TableColumn<>("Statut");
 		column.setPrefWidth(100);
 		column.setCellValueFactory(features -> {
 			final EpisodeDTO episode = features.getValue();
@@ -567,6 +567,8 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 				getController().openInBrowser(episodeTableView.getSelectionModel().getSelectedItem());
 			}
 		});
+		contextMenu.setOnShowing(event -> ouvrirUrl
+				.setDisable(!isHttpUrl(episodeTableView.getSelectionModel().getSelectedItem())));
 		contextMenu.getItems().add(ouvrirUrl);
 
 		MenuItem marquerTelecharger = new MenuItem("Marquer comme téléchargé");
@@ -699,11 +701,19 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 	private void addTooltips() {
 		refreshCategoryButton.setTooltip(new Tooltip("Rafraichir l'arbre des catégories."));
 		cleanCategoryButton.setTooltip(new Tooltip("Enlever les catégories périmées."));
-		indicationText.setText(
-		        "Select categories to watch for automatic downloads. "
-		        + "Select one or more episodes and use Download selected, or use the context menu.");
+		indicationText.setText("Sélectionnez des catégories pour les téléchargements automatiques. "
+				+ "Sélectionnez un ou plusieurs épisodes puis utilisez « Télécharger la sélection » "
+				+ "ou le menu contextuel.");
 		downloadSelectedButton.setTooltip(new Tooltip(
-		        "Enqueue all selected episodes for download (skips duplicates)."));
+				"Ajoute tous les épisodes sélectionnés dans la file (en ignorant les doublons)."));
+	}
+
+	private static boolean isHttpUrl(final EpisodeDTO episode) {
+		if (episode == null || episode.getId() == null) {
+			return false;
+		}
+		final String id = episode.getId();
+		return id.startsWith("http://") || id.startsWith("https://");
 	}
 
 	private void addButtonsActions() {

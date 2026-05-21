@@ -12,20 +12,16 @@ public final class EpisodeIdentity {
 	private final String categoryName;
 	private final String episodeId;
 	private final String episodeName;
-	private final String outputPath;
 
 	public EpisodeIdentity(final String plugin, final String categoryName,
-			final String episodeId, final String episodeName,
-			final String outputPath) {
+			final String episodeId, final String episodeName) {
 		this.plugin = plugin;
 		this.categoryName = categoryName;
 		this.episodeId = episodeId;
 		this.episodeName = episodeName;
-		this.outputPath = outputPath;
 	}
 
-	public static EpisodeIdentity fromEpisode(final EpisodeDTO episode,
-			final String outputPath) {
+	public static EpisodeIdentity fromEpisode(final EpisodeDTO episode) {
 		if (episode == null) {
 			return null;
 		}
@@ -33,7 +29,7 @@ public final class EpisodeIdentity {
 		final String plugin = category == null ? null : category.getPlugin();
 		final String categoryName = category == null ? null : category.getName();
 		return new EpisodeIdentity(plugin, categoryName, episode.getId(),
-				episode.getName(), outputPath);
+				episode.getName());
 	}
 
 	public String getPlugin() {
@@ -52,15 +48,11 @@ public final class EpisodeIdentity {
 		return episodeName;
 	}
 
-	public String getOutputPath() {
-		return outputPath;
-	}
-
 	public boolean matchesEpisode(final EpisodeDTO episode) {
 		if (episode == null) {
 			return false;
 		}
-		final EpisodeIdentity other = fromEpisode(episode, null);
+		final EpisodeIdentity other = fromEpisode(episode);
 		if (episodeId != null && episodeId.equals(other.episodeId)) {
 			return true;
 		}

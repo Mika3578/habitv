@@ -21,8 +21,7 @@ public final class EpisodeDuplicateDetector {
 		if (alreadyQueued) {
 			return EnqueueSkipReason.ALREADY_QUEUED;
 		}
-		final EpisodeIdentity identity = EpisodeIdentity.fromEpisode(episode,
-				null);
+		final EpisodeIdentity identity = EpisodeIdentity.fromEpisode(episode);
 		if (identity != null && !seenInBatch.add(identity)) {
 			return EnqueueSkipReason.DUPLICATE_IN_BATCH;
 		}

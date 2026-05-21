@@ -129,11 +129,11 @@ public class EpisodeDTO implements Comparable<EpisodeDTO>, Serializable {
 	}
 
 	public Date getEpisodeDate() {
-		return episodeDate;
+		return episodeDate == null ? null : new Date(episodeDate.getTime());
 	}
 
 	public void setEpisodeDate(final Date episodeDate) {
-		this.episodeDate = episodeDate;
+		this.episodeDate = episodeDate == null ? null : new Date(episodeDate.getTime());
 	}
 
 	public Long getDurationSeconds() {

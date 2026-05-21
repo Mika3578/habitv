@@ -188,14 +188,15 @@ public final class EpisodeManager extends AbstractManager implements TaskAdder {
 		if (episodes == null || episodes.isEmpty()) {
 			return new BatchEnqueueResult(results);
 		}
+		final Map<String, Set<String>> downloadedEpisodesByCategory = new HashMap<>();
 		final EpisodeDuplicateDetector duplicateDetector = new EpisodeDuplicateDetector();
 		for (final EpisodeDTO episode : episodes) {
 			if (episode == null || episode.getCategory() == null) {
 				continue;
 			}
 			final EnqueueSkipReason skipReason = duplicateDetector.detectSkipReason(
-					episode, isAlreadyDownloaded(episode), isRetrieveQueued(episode),
-					isDownloadActive(episode));
+					episode, isAlreadyDownloaded(episode, downloadedEpisodesByCategory),
+					isRetrieveQueued(episode), isDownloadActive(episode));
 			if (skipReason != null) {
 				LOG.info("Duplicate skipped for " + episode + ": " + skipReason);
 				results.add(new EpisodeEnqueueResult(episode, TaskState.ALREADY_ADD,
@@ -209,10 +210,21 @@ public final class EpisodeManager extends AbstractManager implements TaskAdder {
 		return new BatchEnqueueResult(results);
 	}
 
-	private boolean isAlreadyDownloaded(final EpisodeDTO episode) {
-		final DownloadedDAO dlDAO = new DownloadedDAO(episode.getCategory(),
-				downloader.getIndexDir());
-		return dlDAO.findDownloadedFiles().contains(episode.getName());
+	private boolean isAlreadyDownloaded(final EpisodeDTO episode,
+			final Map<String, Set<String>> downloadedEpisodesByCategory) {
+		final String categoryKey = getCategoryKey(episode.getCategory());
+		Set<String> downloadedEpisodes = downloadedEpisodesByCategory.get(categoryKey);
+		if (downloadedEpisodes == null) {
+			final DownloadedDAO dlDAO = new DownloadedDAO(episode.getCategory(),
+					downloader.getIndexDir());
+			downloadedEpisodes = dlDAO.findDownloadedFiles();
+			downloadedEpisodesByCategory.put(categoryKey, downloadedEpisodes);
+		}
+		return downloadedEpisodes.contains(episode.getName());
+	}
+
+	private String getCategoryKey(final CategoryDTO category) {
+		return category.getPlugin() + "#" + category.getName();
 	}
 
 	private boolean isRetrieveQueued(final EpisodeDTO episode) {
