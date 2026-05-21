@@ -77,6 +77,16 @@ final class FranceTvUrls {
 		return "integrale".equals(type) || "unitaire".equals(type);
 	}
 
+	static String rubriquePageUrl(final String channelSlug, final String urlComplete) {
+		if (StringUtils.isEmpty(channelSlug)) {
+			return null;
+		}
+		if (StringUtils.isEmpty(urlComplete)) {
+			return FranceTvConf.HOME_URL + "/" + channelSlug + "/";
+		}
+		return FranceTvConf.HOME_URL + "/" + channelSlug + "/" + urlComplete + "/";
+	}
+
 	static String channelLabel(final String slug) {
 		switch (slug) {
 		case "france-2":
