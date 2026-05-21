@@ -104,8 +104,15 @@ public class ConfigController extends BaseController {
 			@Override
 			public void run() {
 				UserConfig userConfig = getController().loadUserConfig();
-				final Integer maxAttempts = Integer.parseInt(nbrMaxAttempts.getText());
-				if (!userConfig.getMaxAttempts().equals(maxAttempts)) {
+				final Integer currentValue = userConfig.getMaxAttempts();
+				final Integer maxAttempts = parsePositiveInteger(nbrMaxAttempts.getText());
+				if (maxAttempts == null) {
+					nbrMaxAttempts.setText(String.valueOf(currentValue));
+					new Popin().show("Configuration invalide",
+							"Le nombre maximum de tentatives doit être un entier supérieur ou égal à 1.");
+					return;
+				}
+				if (!currentValue.equals(maxAttempts)) {
 					userConfig.setMaxAttempts(maxAttempts);
 					saveConfig(userConfig);
 				}
@@ -119,8 +126,15 @@ public class ConfigController extends BaseController {
 			@Override
 			public void run() {
 				UserConfig userConfig = getController().loadUserConfig();
-				final Integer demonCheckTime = Integer.parseInt(daemonCheckTimeSec.getText());
-				if (!userConfig.getDemonCheckTime().equals(demonCheckTime)) {
+				final Integer currentValue = userConfig.getDemonCheckTime();
+				final Integer demonCheckTime = parsePositiveInteger(daemonCheckTimeSec.getText());
+				if (demonCheckTime == null) {
+					daemonCheckTimeSec.setText(String.valueOf(currentValue));
+					new Popin().show("Configuration invalide",
+							"La période entre deux recherches doit être un entier supérieur ou égal à 1.");
+					return;
+				}
+				if (!currentValue.equals(demonCheckTime)) {
 					userConfig.setDemonCheckTime(demonCheckTime);
 					saveConfig(userConfig);
 				}
