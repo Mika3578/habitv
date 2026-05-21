@@ -51,19 +51,6 @@ public class CanalPlusEndpointAvailabilityTest {
 	}
 
 	@Test
-	public void d8CategoryDiscoveryReturnsEmptyWhenEndpointIsForbidden() {
-		D8PluginManager manager = new D8PluginManager() {
-			@Override
-			protected String getUrlContent(final String url, final String encoding) {
-				throw new TechnicalException(
-						new IOException("Server returned HTTP response code: 403 for URL: https://www.canalplus.com/chaines/c8"));
-			}
-		};
-
-		assertTrue(manager.findCategory().isEmpty());
-	}
-
-	@Test
 	public void cStarCategoryDiscoveryReturnsEmptyWhenEndpointIsForbidden() {
 		CStarPluginManager manager = new CStarPluginManager() {
 			@Override
@@ -86,9 +73,9 @@ public class CanalPlusEndpointAvailabilityTest {
 	@Test
 	public void unavailableMessageIncludesShortCause() {
 		assertEquals(
-				"d8: Canal+ provider endpoint is no longer reachable or requires protected access. Cause: IOException: HTTP 403 for URL: https://www.canalplus.com/chaines/c8",
-				CanalPlusEndpointAvailability.buildCategoryUnavailableMessage("d8",
+				"cstar: Canal+ provider endpoint is no longer reachable or requires protected access. Cause: IOException: HTTP 403 for URL: https://www.canalplus.com/chaines/cstar",
+				CanalPlusEndpointAvailability.buildCategoryUnavailableMessage("cstar",
 						new TechnicalException(new IOException(
-								"Server returned HTTP response code: 403 for URL: https://www.canalplus.com/chaines/c8"))));
+								"Server returned HTTP response code: 403 for URL: https://www.canalplus.com/chaines/cstar"))));
 	}
 }

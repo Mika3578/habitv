@@ -329,11 +329,11 @@ mvn -B -ntp -pl plugins/arte -am -Dtest=ArteOfflineFixtureBaselineTest -Dsurefir
 mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test
 ```
 
-**Related PR** · `docs: capture provider offline fixture baseline` (merged), `fix(provider-canalplus): rename d17 to cstar and handle deprecated endpoints` (PR #91)
+**Related PR** · `docs: capture provider offline fixture baseline` (merged), `fix(provider-canalplus): rename d17 to cstar and handle deprecated endpoints` (PR #91), `chore(canalPlus): remove obsolete D8 sub-provider` (PR #92)
 
 **Notes** — Inventory baseline is now documented in
 [`provider-inventory.md`](provider-inventory.md) for every plugin module
-plus historical references (`D8`, `CStar` (ex `D17`), `nrj12`, FranceTV/Pluzz,
+plus historical references (`CStar` (ex `D17`), `nrj12`, FranceTV/Pluzz,
 Kewego). An offline fixture policy and first local fixture baseline are
 now documented for `6play`, `canalPlus`, `francetv` (ex `pluzz`), `arte`, and `youtube`
 without rewriting providers. Default `mvn test` skips live
@@ -341,7 +341,9 @@ without rewriting providers. Default `mvn test` skips live
 `D17` rename to `CStar` and adds graceful fallback in the Canal+ family:
 category discovery now returns an empty set with a provider-level
 diagnostic when `service.mycanal.fr` is unreachable or channel pages
-return HTTP 403. Arte live test currently fails (`categorie liste vide`) —
+return HTTP 403. PR #92 removes the obsolete embedded `D8` sub-provider
+(dead `www.d8.tv` endpoints; channel rebranded to C8). Arte live test
+currently fails (`categorie liste vide`) —
 provider drift, documented in inventory. This item remains open for
 broader fixture capture and dedicated cleanup/rewrite PRs. See also
 [`automatic-category-download.md`](automatic-category-download.md).
