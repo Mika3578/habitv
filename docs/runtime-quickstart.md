@@ -1,12 +1,15 @@
 # Habitv runtime quickstart
 
-This guide walks through running habitv with a working YouTube download
-provider on a Linux machine. It assumes a clean checkout of the
-modernized branch and Java 8+ on the PATH.
+This guide walks through running Habitv with a working YouTube download
+provider on a Linux machine. It assumes a clean checkout of **`develop`**
+and **JDK 8** on the PATH (Java 11+ is not supported for the full GUI yet).
+
+For automatic category watch behavior (index baseline, deduplication limits),
+see [`automatic-category-download.md`](automatic-category-download.md).
 
 ## Prerequisites
 
-- JDK 8 or later (the reactor compiles with `<source>1.8</source>`)
+- **JDK 8** (required baseline; reactor uses `<source>1.8</source>`)
 - Maven 3.6+
 - `yt-dlp` on the PATH (`apt install yt-dlp` on recent Ubuntu, or
   `pip install --user yt-dlp`)

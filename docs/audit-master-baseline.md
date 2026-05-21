@@ -1,5 +1,11 @@
 # Habitv master baseline audit
 
+> **Historical document** — snapshot of the repository at the `master` tip when
+> modernization restarted (`gov-bootstrap` / HBTV-000). Many items below are
+> **already fixed on `develop`** (reactor wiring, Java 8, legacy URL removal,
+> static repo). For current status use [`README.md`](../README.md),
+> [`dev-plan.md`](dev-plan.md), and [`dev-tracker.md`](dev-tracker.md).
+
 Initial audit of the repository at the `master` tip from which the
 restart-from-master modernization begins. Captured during the
 HBTV-000 bootstrap PR.
