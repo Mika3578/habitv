@@ -112,9 +112,9 @@ final class FranceTvProgramCatalog {
 	}
 
 	private static String programLabel(final Map<String, Object> item, final String programPath) {
-		final Object label = item.get("label");
-		if (label != null && StringUtils.isNotEmpty(String.valueOf(label))) {
-			return String.valueOf(label).trim();
+		final String label = stringValue(item.get("label"));
+		if (StringUtils.isNotEmpty(label)) {
+			return label;
 		}
 		final int lastUnderscore = programPath.lastIndexOf('_');
 		final String segment = lastUnderscore >= 0 ? programPath.substring(lastUnderscore + 1) : programPath;
