@@ -65,6 +65,19 @@ public class DownloadedDAO {
 		return indexDir + "/" + buildIndexFileName(category, "_manual.index");
 	}
 
+	private String getLegacyFileIndex() {
+		return indexDir + "/" + buildLegacyIndexFileName(".index");
+	}
+
+	private String getLegacyManualFileIndex() {
+		return indexDir + "/" + buildLegacyIndexFileName("_manual.index");
+	}
+
+	private String buildLegacyIndexFileName(final String suffix) {
+		return FileUtils.sanitizeFilename(category.getPlugin() + "_"
+				+ category.getName() + suffix);
+	}
+
 	private static String buildIndexFileName(final CategoryDTO category,
 			final String suffix) {
 		final String plugin = category.getPlugin();
@@ -79,7 +92,9 @@ public class DownloadedDAO {
 
 	public Set<String> findDownloadedFiles() {
 		Set<String> dlFiles = readFile(getFileIndex());
+		dlFiles.addAll(readFile(getLegacyFileIndex()));
 		dlFiles.addAll(readFile(getManualFileIndex()));
+		dlFiles.addAll(readFile(getLegacyManualFileIndex()));
 		return dlFiles;
 	}
 
@@ -204,6 +219,7 @@ public class DownloadedDAO {
 	void initIndex() {
 		final String fileIndex = getFileIndex();
 		(new File(fileIndex)).delete();
+		(new File(getLegacyFileIndex())).delete();
 		LOG.info("réinitialisation de l'index " + fileIndex);
 		indexExist = false;
 	}
@@ -211,6 +227,7 @@ public class DownloadedDAO {
 	void initManualIndex() {
 		final String fileIndex = getManualFileIndex();
 		(new File(fileIndex)).delete();
+		(new File(getLegacyManualFileIndex())).delete();
 		LOG.info("réinitialisation de l'index " + fileIndex);
 		manualIndexExist = false;
 	}
