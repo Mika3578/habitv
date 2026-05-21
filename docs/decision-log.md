@@ -24,6 +24,7 @@ older ones rather than rewriting them in place.
 | `doc-sync-and-rule-lifecycle` | Doc sync protocol & rule lifecycle (meta-rules) | ✅ Accepted |
 | `descriptive-slug-ids` | Switch tracker / risk / ADR identifiers to descriptive slugs | ✅ Accepted |
 | `legacy-dabiboo-svn-removal` | Remove active legacy DabiBoo/SVN wiring from build and runtime paths | ✅ Accepted |
+| `plugin-versioning-policy` | When to bump a plugin `<version>` independently of the parent POM | 🟡 Proposed |
 
 ---
 
@@ -434,6 +435,74 @@ updates by default behind `habitv.update.enabled` with optional
   `index.html` or manifest files on GitHub Pages.
 - ✅ Functional Maven/publication cutover remains a separate
   `static-repo-publish` item.
+
+---
+
+## 🟡 `plugin-versioning-policy` — When to bump a plugin `<version>` independently of the parent POM
+
+| | |
+|---|---|
+| **Status** | 🟡 Proposed |
+| **Date** | 2026-05-21 |
+| **Tracker** | `own-version-deps-align` (related) |
+| **Touches** | `CONTRIBUTING.md`, `plugins/*/pom.xml` |
+
+**Context** — Plugin POMs under `plugins/*/pom.xml` inherit
+`4.1.0-SNAPSHOT` from the root POM, but four already override the
+version: `beinsport`, `footyroom`, `francetv` at `4.1.1-SNAPSHOT`,
+and `ffmpeg` at `4.1.2-SNAPSHOT`. The runtime updater
+(`fwk/framework/.../FindArtifactUtils.java:259-267`) filters
+candidates on `major.minor` (`4.1.`) and accepts any patch, so
+per-plugin patch versions are supported by design. However, no
+written rule defined **when** a plugin should bump. Recent
+functional changes to `youtube` (yt-dlp downloader migration,
+PR #52) and `arte` (EMAC API discovery fix, PR #55) shipped without
+a bump, so the runtime updater cannot advertise them to users.
+Conversely, `francetv` was bumped before its substantial follow-up
+(PR #64) that extended channel slugs, URL acceptance, and
+`MAX_PAGES`.
+
+**Decision** — A plugin's `<version>` MAY override the parent only
+when at least one of the following trigger conditions holds.
+Otherwise the plugin inherits the parent version.
+
+Bump triggers (any of):
+- Downloader or parser behavior change (URL handling, format
+  detection, binary swap such as `youtube-dl` → `yt-dlp`).
+- User-facing endpoint or channel slug change (e.g. swapping a
+  dead provider URL).
+- User-facing configuration change (API key resolution, defaults,
+  credential layout).
+
+Non-triggers (do not bump):
+- Offline test fixtures.
+- Build, CI, or IDE cleanup.
+- Dependency management or reactor alignment.
+- Internal renames invisible to a configured user.
+- Documentation-only changes.
+
+Suffix rule — keep `-SNAPSHOT` while `CHANGELOG.md` `[Unreleased]`
+has not been cut. Dropping `-SNAPSHOT` is gated by the
+`static-repo-publish` tracker item.
+
+Internal dependency rule (carried over from `own-version-deps-align`)
+— shared reactor dependencies (`api`, `framework`, `plugin-tester`)
+in a bumped plugin MUST stay on `${project.parent.version}`, never
+`${project.version}`. A `${project.version}` reference in a plugin
+whose version differs from the parent will resolve to a non-existent
+artifact at compile time.
+
+**Consequences**
+- ✅ The runtime updater can advertise a new version of a single
+  plugin to users without forcing a full reactor release.
+- ✅ Reviewers can challenge an unjustified bump (or the lack of one)
+  against an enumerated trigger list, instead of arguing taste.
+- ⚠️ Plugin authors must keep a one-line note in their PR body
+  identifying which trigger applies; the policy is enforced at
+  review, not by tooling.
+- 🔁 The policy formalises the implicit pattern used by `beinsport`,
+  `footyroom`, `francetv`, `ffmpeg`. Existing overrides are
+  grandfathered; no retroactive renames.
 
 ---
 
