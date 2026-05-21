@@ -4,11 +4,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
+import com.dabi.habitv.framework.plugin.utils.DownloadUtils;
 
 public final class EpisodeMetadataFormatting {
 
 	private static final String UNKNOWN = "Inconnu";
+
+	public static final String PROGRAM_URL_PARAM = "PROGRAM_URL";
 
 	private EpisodeMetadataFormatting() {
 	}
@@ -68,5 +72,40 @@ public final class EpisodeMetadataFormatting {
 			return UNKNOWN;
 		}
 		return status;
+	}
+
+	public static String programPageUrl(final EpisodeDTO episode) {
+		if (episode == null) {
+			return null;
+		}
+		final CategoryDTO category = episode.getCategory();
+		if (category == null) {
+			return null;
+		}
+		final String explicit = category.getParameter(PROGRAM_URL_PARAM);
+		if (isHttpUrl(explicit)) {
+			return explicit;
+		}
+		final String categoryId = category.getId();
+		if (isHttpUrl(categoryId)) {
+			return categoryId;
+		}
+		return null;
+	}
+
+	public static String formatProgramLinkLabel(final EpisodeDTO episode) {
+		if (episode == null) {
+			return UNKNOWN;
+		}
+		final CategoryDTO category = episode.getCategory();
+		if (category == null || category.getName() == null
+				|| category.getName().trim().isEmpty()) {
+			return UNKNOWN;
+		}
+		return category.getName();
+	}
+
+	private static boolean isHttpUrl(final String value) {
+		return value != null && DownloadUtils.isHttpUrl(value);
 	}
 }
