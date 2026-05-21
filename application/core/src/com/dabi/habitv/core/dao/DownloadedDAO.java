@@ -219,6 +219,7 @@ public class DownloadedDAO {
 	void initIndex() {
 		final String fileIndex = getFileIndex();
 		(new File(fileIndex)).delete();
+		(new File(getLegacyFileIndex())).delete();
 		LOG.info("réinitialisation de l'index " + fileIndex);
 		indexExist = false;
 	}
@@ -226,6 +227,7 @@ public class DownloadedDAO {
 	void initManualIndex() {
 		final String fileIndex = getManualFileIndex();
 		(new File(fileIndex)).delete();
+		(new File(getLegacyManualFileIndex())).delete();
 		LOG.info("réinitialisation de l'index " + fileIndex);
 		manualIndexExist = false;
 	}
