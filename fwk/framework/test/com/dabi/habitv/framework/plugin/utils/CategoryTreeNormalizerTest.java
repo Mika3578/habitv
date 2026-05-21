@@ -28,9 +28,9 @@ public class CategoryTreeNormalizerTest {
 		assertEquals(1, normalized.size());
 		final CategoryDTO m6 = normalized.iterator().next();
 		assertEquals("M6", m6.getName());
-		assertFalse(m6.isDownloadable());
 		final CategoryDTO programs = m6.getSubCategories().iterator().next();
 		assertEquals(CategoryTreeNormalizer.DEFAULT_CATEGORY_NAME, programs.getName());
+		assertFalse(programs.isDownloadable());
 		final CategoryDTO showNode = programs.getSubCategories().iterator().next();
 		assertEquals("Show", showNode.getName());
 		assertTrue(showNode.isDownloadable());
@@ -38,7 +38,7 @@ public class CategoryTreeNormalizerTest {
 	}
 
 	@Test
-	public void leavesFourLevelTreeUnchanged() {
+	public void leavesThreeLevelTreeUnchanged() {
 		final CategoryDTO channel = new CategoryDTO("francetv", "France 2", "http://f2", "mp4");
 		channel.setDownloadable(false);
 		final CategoryDTO rubrique = new CategoryDTO("francetv", "Info", "http://f2/info", "mp4");
@@ -57,6 +57,25 @@ public class CategoryTreeNormalizerTest {
 	}
 
 	@Test
+	public void preservesDownloadableBranchesInExistingDeepTree() {
+		final CategoryDTO channel = new CategoryDTO("canalPlus", "Parent", "parent", "mp4");
+		channel.setDownloadable(true);
+		final CategoryDTO rubrique = new CategoryDTO("canalPlus", "Rubrique", "rubrique", "mp4");
+		rubrique.setDownloadable(false);
+		final CategoryDTO program = new CategoryDTO("canalPlus", "Program", "program", "mp4");
+		program.setDownloadable(true);
+		rubrique.addSubCategory(program);
+		channel.addSubCategory(rubrique);
+
+		final Set<CategoryDTO> normalized = CategoryTreeNormalizer.normalize("canalPlus",
+				new LinkedHashSet<>(Arrays.asList(channel)));
+
+		final CategoryDTO normalizedChannel = normalized.iterator().next();
+		assertTrue(normalizedChannel.isDownloadable());
+		assertEquals(3, CategoryTreeNormalizer.structureDepth(normalizedChannel));
+	}
+
+	@Test
 	public void wrapsSingleDownloadableRootInPrincipalAndPrograms() {
 		final CategoryDTO leaf = new CategoryDTO("mlssoccer", "Highlights", "http://highlights", "mp4");
 		leaf.setDownloadable(true);
@@ -70,6 +89,7 @@ public class CategoryTreeNormalizerTest {
 		final Iterator<CategoryDTO> it = channel.getSubCategories().iterator();
 		final CategoryDTO category = it.next();
 		assertEquals(CategoryTreeNormalizer.DEFAULT_CATEGORY_NAME, category.getName());
+		assertFalse(category.isDownloadable());
 		assertEquals("Highlights", category.getSubCategories().iterator().next().getName());
 	}
 }
