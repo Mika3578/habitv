@@ -110,7 +110,7 @@ Replay sites change often. Treat README-era names as **legacy labels**:
 | Legacy name | Modern meaning / module |
 |-------------|-------------------------|
 | Pluzz | France Télévisions / France.tv — module `plugins/francetv` (rename grab-config `pluzz` → `francetv`) |
-| D8 / D17 | Canal-era channels — embedded in `plugins/canalPlus` (obsolete endpoints) |
+| D8 / CStar (ex D17) | Canal-era channels — embedded in `plugins/canalPlus` (obsolete endpoints) |
 | 6play | M6+ / M6 replay area — `plugins/6play` (needs rewrite) |
 | NRJ12 | Historical reference only — no module in reactor |
 
