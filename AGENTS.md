@@ -64,7 +64,35 @@ French TV catch-up content via pluggable provider plugins.
 
 ---
 
-## 📝 3. Commit policy
+## 📝 3. Commit and branch policy
+
+### 3.1 Branch names
+
+**Branch names must be explicit and descriptive** — kebab-case,
+English, prefixed with the same type vocabulary as commits
+(`feat/`, `fix/`, `docs/`, `chore/`, `build/`, `ci/`, `test/`,
+`refactor/`, `perf/`, `style/`). The slug must name the change,
+not a session id.
+
+```
+✅ feat/canalplus-cnews
+✅ fix/arte-categories-empty
+✅ docs/provider-inventory-cnews
+❌ claude/youthful-albattani-rH19M    (auto-generated session id)
+❌ tmp/test                            (codename)
+❌ wip                                 (no scope)
+```
+
+If the session was started with an auto-generated branch name
+(web/IDE defaults), **rename it before opening the PR**:
+
+```bash
+git branch -m <auto-name> feat/<short-explicit-slug>
+git push origin -u feat/<short-explicit-slug>
+git push origin --delete <auto-name>
+```
+
+### 3.2 Commit messages
 
 Conventional Commits, English, imperative, lowercase, ≤ 72 chars.
 

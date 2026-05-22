@@ -25,6 +25,7 @@ older ones rather than rewriting them in place.
 | `descriptive-slug-ids` | Switch tracker / risk / ADR identifiers to descriptive slugs | ✅ Accepted |
 | `legacy-dabiboo-svn-removal` | Remove active legacy DabiBoo/SVN wiring from build and runtime paths | ✅ Accepted |
 | `plugin-versioning-policy` | When to bump a plugin `<version>` independently of the parent POM | 🟡 Proposed |
+| `explicit-branch-names` | Branch names must be explicit and descriptive (no auto-generated session ids) | 🟡 Proposed |
 
 ---
 
@@ -506,6 +507,56 @@ artifact at compile time.
 - 🔁 The policy formalises the implicit pattern used by `beinsport`,
   `footyroom`, `francetv`, `ffmpeg`. Existing overrides are
   grandfathered; no retroactive renames.
+
+---
+
+## 🟡 `explicit-branch-names` — Branch names must be explicit and descriptive
+
+| | |
+|---|---|
+| **Status** | 🟡 Proposed |
+| **Date** | 2026-05-22 |
+| **Tracker** | `gov-bootstrap` |
+| **Risks** | — |
+| **Touches** | `AGENTS.md` §3, `CONTRIBUTING.md` Branching |
+| **Supersedes** | — (additive) |
+
+**Context** — Sessions started from Claude Code on the web (and
+similar IDE/CI defaults) auto-generate opaque branch names of the
+form `claude/<adjective>-<scientist>-<suffix>` (e.g.
+`claude/youthful-albattani-rH19M`). These names carry no
+information about the change, clutter the branch list, make PR
+hygiene harder to audit, and break the symmetry with the
+`feat/`, `fix/`, `docs/`, … convention already documented in
+`CONTRIBUTING.md` §Branching.
+
+**Decision** — Branch names that target `develop` (or `master`)
+must be **explicit and descriptive**:
+
+- kebab-case, English, lowercase ASCII
+- prefixed with the same vocabulary used by Conventional Commits:
+  `feat/`, `fix/`, `docs/`, `chore/`, `build/`, `ci/`, `test/`,
+  `refactor/`, `perf/`, `style/`, `revert/`
+- 2–6 words after the prefix; the slug names the change, not a
+  session identifier
+
+Auto-generated, random, codename, or single-word branches
+(`claude/...`, `tmp/...`, `wip`, `test`) are not allowed on PRs
+targeting protected branches. If a session was created with such
+a name, rename it before opening the PR (procedure in
+`CONTRIBUTING.md` §Branching).
+
+**Consequences**
+
+- ✅ Branch list stays scannable; the change is obvious from
+  `git branch -a` without opening every PR.
+- ✅ Aligns the branch namespace with the commit-type vocabulary
+  already enforced at review.
+- ⚠️ Web/IDE sessions that default to a generated name require an
+  explicit rename + PR retarget. The procedure is documented;
+  enforcement is at review time, not in tooling.
+- 🔁 No existing branches are renamed retroactively. The rule
+  applies to new PRs from the merge date onward.
 
 ---
 

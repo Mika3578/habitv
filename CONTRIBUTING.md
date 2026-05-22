@@ -26,6 +26,29 @@ contributions follow a stricter-than-usual workflow.
 All modernization branches must target **`develop`**.
 The restart bootstrap PR targets `master`. Everything else targets `develop`.
 
+**Branch names must be explicit and descriptive** — they describe the
+change in kebab-case, English. Auto-generated, random, or codename
+branches (e.g. `claude/youthful-albattani-rH19M`, `tmp/abc123`,
+`wip/xyz`) are **not allowed** on PRs targeting `develop` or `master`.
+
+```
+✅ feat/canalplus-cnews
+✅ fix/arte-categories-empty
+✅ docs/provider-inventory-cnews
+❌ claude/youthful-albattani-rH19M
+❌ tmp/test
+❌ wip
+```
+
+If a session was created with an auto-generated branch name (web/IDE
+defaults), rename it before opening the PR:
+
+```bash
+git branch -m <auto-name> feat/<short-explicit-slug>
+git push origin -u feat/<short-explicit-slug>
+git push origin --delete <auto-name>
+```
+
 ---
 
 ## 📝 Commit style
