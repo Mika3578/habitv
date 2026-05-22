@@ -85,4 +85,35 @@ public class EpisodeMetadataFormattingTest {
 				"https://www.france.tv/france-2/journal-20-heures/1-ep.html");
 		assertEquals("Journal 20h", EpisodeMetadataFormatting.formatProgramLinkLabel(episode));
 	}
+
+	@Test
+	public void formatProgramLinkLabelFallsBackToShortenedProgramUrlWhenNameMissing() {
+		final String longUrl = "  https://example.com/abcdefghijklmnopqrstuvwxyz0123456789/extra  ";
+		final EpisodeDTO nullNameEpisode = new EpisodeDTO(
+				new CategoryDTO("plugin", null, longUrl, "mp4"), "ep1", "episode-id");
+		assertEquals("https://example.com/abcdefghijklmnopqrstuvwxy...",
+				EpisodeMetadataFormatting.formatProgramLinkLabel(nullNameEpisode));
+		final EpisodeDTO blankNameEpisode = new EpisodeDTO(
+				new CategoryDTO("plugin", "   ", longUrl, "mp4"), "ep2", "episode-id");
+		assertEquals("https://example.com/abcdefghijklmnopqrstuvwxy...",
+				EpisodeMetadataFormatting.formatProgramLinkLabel(blankNameEpisode));
+	}
+
+	@Test
+	public void formatSourcePrefersTrimmedProgramPageUrlForHttpAndHttpsCategoryIds() {
+		final EpisodeDTO httpEpisode = new EpisodeDTO(
+				new CategoryDTO("plugin", "program", "  http://example.com/program  ", "mp4"), "ep1",
+				"episode-id");
+		assertEquals("http://example.com/program", EpisodeMetadataFormatting.formatSource(httpEpisode));
+		final EpisodeDTO httpsEpisode = new EpisodeDTO(
+				new CategoryDTO("plugin", "program", "  https://example.com/program  ", "mp4"), "ep2",
+				"episode-id");
+		assertEquals("https://example.com/program",
+				EpisodeMetadataFormatting.formatSource(httpsEpisode));
+	}
+
+	@Test
+	public void formatStatusLabelTrimsWhitespace() {
+		assertEquals("DONE", EpisodeMetadataFormatting.formatStatusLabel("  DONE  "));
+	}
 }

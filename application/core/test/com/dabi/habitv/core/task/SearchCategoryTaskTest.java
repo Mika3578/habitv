@@ -137,6 +137,57 @@ public class SearchCategoryTaskTest {
 		assertTrue(done);
 	}
 
+	@Test
+	public void testSearchCategoryTaskNormalizesShallowTree() {
+		final PluginProviderDownloaderInterface provider = new PluginProviderDownloaderInterface() {
+
+			@Override
+			public String getName() {
+				return "provider";
+			}
+
+			@Override
+			public Set<EpisodeDTO> findEpisode(final CategoryDTO category) {
+				return null;
+			}
+
+			@Override
+			public Set<CategoryDTO> findCategory() {
+				final Set<CategoryDTO> roots = new LinkedHashSet<>();
+				roots.add(new CategoryDTO("provider", "Emission A", "emission-a", "mp4"));
+				return roots;
+			}
+
+			@Override
+			public ProcessHolder download(final DownloadParamDTO downloadParam,
+					final DownloaderPluginHolder downloaders) throws DownloadFailedException {
+				return ProcessHolder.EMPTY_PROCESS_HOLDER;
+			}
+
+			@Override
+			public DownloadableState canDownload(final String downloadInput) {
+				return DownloadableState.IMPOSSIBLE;
+			}
+		};
+
+		final SearchCategoryTask localTask = new SearchCategoryTask("provider", provider,
+				new Publisher<SearchCategoryEvent>());
+		final SearchCategoryResult result = localTask.call();
+		assertTrue(result.isSuccess());
+		assertEquals(1, result.getCategoryList().size());
+
+		final CategoryDTO channel = result.getCategoryList().iterator().next();
+		assertEquals("Principal", channel.getName());
+		assertEquals(1, channel.getSubCategories().size());
+
+		final CategoryDTO category = channel.getSubCategories().iterator().next();
+		assertEquals("Programmes", category.getName());
+		assertEquals(1, category.getSubCategories().size());
+
+		final CategoryDTO emission = category.getSubCategories().iterator().next();
+		assertEquals("Emission A", emission.getName());
+	}
+
 	public final void testSearchCategoryTaskFailed() {
 		init(true);
 		task.adding();

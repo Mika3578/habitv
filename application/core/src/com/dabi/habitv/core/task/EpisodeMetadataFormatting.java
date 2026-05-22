@@ -9,6 +9,8 @@ import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
 public final class EpisodeMetadataFormatting {
 
 	private static final String UNKNOWN = "Inconnu";
+	private static final int MAX_SHORT_URL_LENGTH = 48;
+	private static final int SHORT_URL_PREFIX_LENGTH = 45;
 
 	private EpisodeMetadataFormatting() {
 	}
@@ -106,16 +108,16 @@ public final class EpisodeMetadataFormatting {
 	}
 
 	private static String shortenUrl(final String url) {
-		if (url.length() <= 48) {
+		if (url.length() <= MAX_SHORT_URL_LENGTH) {
 			return url;
 		}
-		return url.substring(0, 45) + "...";
+		return url.substring(0, SHORT_URL_PREFIX_LENGTH) + "...";
 	}
 
 	public static String formatStatusLabel(final String status) {
 		if (status == null || status.trim().isEmpty()) {
 			return UNKNOWN;
 		}
-		return status;
+		return status.trim();
 	}
 }

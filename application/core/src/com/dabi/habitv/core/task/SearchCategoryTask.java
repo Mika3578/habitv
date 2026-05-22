@@ -57,7 +57,7 @@ public final class SearchCategoryTask extends
 			return new SearchCategoryResult(channel,
 					CategoryTreeNormalizer.normalize(channel, provider.findCategory()));
 		} catch (Exception e) {
-			LOG.error("", e);
+			LOG.error("Failed to build categories for channel " + channel, e);
 			return new SearchCategoryResult(channel);
 		}
 	}
