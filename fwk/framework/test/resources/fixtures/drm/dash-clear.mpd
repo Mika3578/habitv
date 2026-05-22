@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Synthetic DASH MPD fixture without any ContentProtection element.
+  Used to verify that the classifier reports DIRECT_DOWNLOAD_SUPPORTED
+  for non-DRM DASH.
+-->
+<MPD xmlns="urn:mpeg:dash:schema:mpd:2011" type="static" mediaPresentationDuration="PT10S">
+  <Period>
+    <AdaptationSet mimeType="video/mp4">
+      <Representation id="1" bandwidth="500000" codecs="avc1.42c01e"/>
+    </AdaptationSet>
+  </Period>
+</MPD>

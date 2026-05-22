@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Synthetic DASH MPD fixture for offline DRM classification tests.
+  No live URLs, no real keys, no media. Used only to verify that
+  ContentProtection markers are detected as DRM by the safe classifier.
+-->
+<MPD xmlns="urn:mpeg:dash:schema:mpd:2011" type="static" mediaPresentationDuration="PT10S">
+  <Period>
+    <AdaptationSet mimeType="video/mp4">
+      <ContentProtection schemeIdUri="urn:mpeg:dash:mp4protection:2011" value="cenc"/>
+      <ContentProtection schemeIdUri="urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed" value="Widevine"/>
+      <ContentProtection schemeIdUri="urn:uuid:9a04f079-9840-4286-ab92-e65be0885f95" value="PlayReady"/>
+      <Representation id="1" bandwidth="500000" codecs="avc1.42c01e"/>
+    </AdaptationSet>
+  </Period>
+</MPD>

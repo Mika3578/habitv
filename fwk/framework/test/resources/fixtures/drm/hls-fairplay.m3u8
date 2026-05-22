@@ -1,0 +1,9 @@
+#EXTM3U
+#EXT-X-VERSION:5
+#EXT-X-TARGETDURATION:6
+#EXT-X-KEY:METHOD=SAMPLE-AES,KEYFORMAT="com.apple.streamingkeydelivery",URI="skd://fixture-only"
+#EXTINF:6.0,
+segment0.ts
+#EXTINF:6.0,
+segment1.ts
+#EXT-X-ENDLIST
