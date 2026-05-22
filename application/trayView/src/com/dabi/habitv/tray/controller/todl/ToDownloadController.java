@@ -395,7 +395,7 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 
 		private ProgramLinkTableCell() {
 			link.setOnAction(event -> {
-				final String url = programPageUrl(episodeAtRow());
+				final String url = EpisodeMetadataFormatting.programPageUrl(episodeAtRow());
 				if (url != null) {
 					getController().openInBrowser(url);
 				}
@@ -414,35 +414,14 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 				setGraphic(null);
 				return;
 			}
-			final String url = programPageUrl(episode);
-			final String label = formatProgramLinkLabel(episode);
+			final String url = EpisodeMetadataFormatting.programPageUrl(episode);
+			final String label = EpisodeMetadataFormatting.formatProgramLinkLabel(episode);
 			if (url == null) {
 				setGraphic(new Label(label));
 			} else {
 				link.setText(label);
 				setGraphic(link);
 			}
-		}
-
-		private String programPageUrl(final EpisodeDTO episode) {
-			if (episode == null || episode.getCategory() == null) {
-				return null;
-			}
-			final String categoryId = episode.getCategory().getId();
-			if (categoryId != null && (categoryId.startsWith("http://")
-					|| categoryId.startsWith("https://"))) {
-				return categoryId;
-			}
-			return null;
-		}
-
-		private String formatProgramLinkLabel(final EpisodeDTO episode) {
-			if (episode == null || episode.getCategory() == null
-					|| episode.getCategory().getName() == null
-					|| episode.getCategory().getName().trim().isEmpty()) {
-				return "Inconnu";
-			}
-			return episode.getCategory().getName();
 		}
 
 		private EpisodeDTO episodeAtRow() {
