@@ -12,7 +12,7 @@ public final class EpisodeMetadataFormatting {
 
 	private static final String UNKNOWN = "Inconnu";
 
-	public static final String PROGRAM_URL_PARAM = "PROGRAM_URL";
+	private static final String PROGRAM_URL_PARAM = "PROGRAM_URL";
 
 	private EpisodeMetadataFormatting() {
 	}
