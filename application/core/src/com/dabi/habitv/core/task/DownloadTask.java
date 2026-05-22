@@ -10,6 +10,7 @@ import com.dabi.habitv.api.plugin.api.PluginProviderInterface;
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.DownloadParamDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
+import com.dabi.habitv.api.plugin.dto.ProtectedContentStatus;
 import com.dabi.habitv.api.plugin.exception.DownloadFailedException;
 import com.dabi.habitv.api.plugin.exception.ExecutorStoppedException;
 import com.dabi.habitv.api.plugin.exception.TechnicalException;
@@ -56,6 +57,14 @@ public class DownloadTask extends AbstractEpisodeTask {
 
 	@Override
 	protected void failed(final Throwable e) {
+		final DRMProtectedException drm = unwrapDrm(e);
+		if (drm != null) {
+			LOG.info("Direct download skipped (DRM boundary) for "
+					+ getEpisode() + " — " + drm.getMessage());
+			publisher.addNews(new RetreiveEvent(getEpisode(),
+					drm.getState(), "drm-boundary"));
+			return;
+		}
 		LOG.error("Download failed for " + getEpisode(), e);
 		if (e instanceof ExecutorStoppedException) {
 			publisher.addNews(new RetreiveEvent(getEpisode(),
@@ -64,6 +73,17 @@ public class DownloadTask extends AbstractEpisodeTask {
 			publisher.addNews(new RetreiveEvent(getEpisode(),
 					EpisodeStateEnum.DOWNLOAD_FAILED, e, "download"));
 		}
+	}
+
+	private static DRMProtectedException unwrapDrm(final Throwable e) {
+		Throwable cursor = e;
+		while (cursor != null) {
+			if (cursor instanceof DRMProtectedException) {
+				return (DRMProtectedException) cursor;
+			}
+			cursor = cursor.getCause();
+		}
+		return null;
 	}
 
 	@Override
@@ -140,6 +160,7 @@ public class DownloadTask extends AbstractEpisodeTask {
 
 	private ProcessHolder download(final String outputTmpFileName)
 			throws DownloadFailedException {
+		enforceDrmBoundary();
 		final DownloadParamDTO downloadParam = buildDownloadParam(outputTmpFileName);
 
 		final PluginDownloaderInterface downloader;
@@ -164,6 +185,54 @@ public class DownloadTask extends AbstractEpisodeTask {
 				category.getExtension());
 		downloadParam.getParams().putAll(category.getParameters());
 		return downloadParam;
+	}
+
+	/**
+	 * Enforce Habitv's official DRM/CDM boundary before any direct download
+	 * is attempted. For episodes classified as DRM-protected, the direct
+	 * downloader is skipped and a non-failure DRM state is reported instead.
+	 *
+	 * <p>Public metadata stays visible (the EpisodeDTO is unchanged) and the
+	 * official playback URL, when present, is logged and included on the
+	 * raised exception so the UI can surface it. The rest of the queue is
+	 * unaffected: only this single task short-circuits.
+	 */
+	private void enforceDrmBoundary() throws DRMProtectedException {
+		final EpisodeDTO episode = getEpisode();
+		final ProtectedContentStatus status = episode.getProtectedContentStatus();
+		if (status == null) {
+			return;
+		}
+		final EpisodeStateEnum mapped = mapToRuntimeState(status);
+		if (mapped == null) {
+			return;
+		}
+		final String officialUrl = episode.getOfficialPlaybackUrl();
+		throw new DRMProtectedException(mapped,
+				"Direct download is not available for DRM-protected content under Habitv's official DRM/CDM boundary.",
+				officialUrl);
+	}
+
+	private static EpisodeStateEnum mapToRuntimeState(final ProtectedContentStatus status) {
+		switch (status) {
+		case OFFICIAL_PLAYBACK_ONLY:
+			return EpisodeStateEnum.DIRECT_DOWNLOAD_UNSUPPORTED_DRM;
+		case OFFICIAL_DRM_INTEGRATION_REQUIRED:
+			return EpisodeStateEnum.DRM_REQUIRED_OFFICIAL_INTEGRATION_MISSING;
+		case OFFICIAL_DRM_INTEGRATION_AVAILABLE:
+			return EpisodeStateEnum.DRM_SUPPORTED_BY_OFFICIAL_INTEGRATION;
+		case METADATA_ONLY_DRM_PROTECTED:
+			return EpisodeStateEnum.METADATA_ONLY_DRM_PROTECTED;
+		case AUTH_REQUIRED_UNSUPPORTED:
+			return EpisodeStateEnum.PROVIDER_REQUIRES_AUTH;
+		case REGION_LOCKED_UNSUPPORTED:
+			return EpisodeStateEnum.PROVIDER_REGION_LOCKED;
+		case BROKEN_OR_OBSOLETE:
+			return EpisodeStateEnum.PROVIDER_BROKEN_OR_OBSOLETE;
+		case DIRECT_DOWNLOAD_SUPPORTED:
+		default:
+			return null;
+		}
 	}
 
 	@Override
