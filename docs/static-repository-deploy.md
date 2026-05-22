@@ -1,8 +1,10 @@
 # Static repository publication (`habitv-repo`)
 
 Habitv publishes Maven artifacts and external tool binaries to a local staging
-directory that is committed in the `habitv-repo` Git repository and served
-publicly via GitHub Pages.
+directory that is committed in the separate [`habitv-repo`](https://github.com/Mika3578/habitv-repo)
+repository and served publicly via GitHub Pages. This replaces the legacy
+`http://dabiboo.free.fr/repository` host (removed from active POMs on
+`develop`).
 
 | Role | Location |
 |------|----------|

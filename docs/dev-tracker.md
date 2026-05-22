@@ -14,6 +14,9 @@
 
 **Last refresh:** 2026-05-20 · **Active branch:** `develop`
 
+**Documentation entry point:** [`README.md`](../README.md) (overview, build matrix,
+automatic category behavior, provider summary, doc map).
+
 ---
 
 ## 📊 Overall progress
@@ -45,6 +48,7 @@
 | 📦 `static-repo-publish` — Static artifact repository publication | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🟡 In progress | 🟡 P2 | `███████████░░░░░░░░░` 55% |
 | 🎬 `ytdlp-migration` — `youtube-dl` → `yt-dlp` migration | 🟡 In progress | 🟡 P2 | `███████████████░░░░░` 75% |
+| 🩺 `ytdlp-runtime-diagnostics` — yt-dlp Windows runtime diagnostics | 🟡 In progress | 🟡 P2 | `██████████████████░░` 90% |
 | 🖼️ `javafx-modernization` — JavaFX & runtime packaging modernization | 🔵 Proposed | 🟡 P2 | `██░░░░░░░░░░░░░░░░░░` 10% |
 | 🧪 `plugin-tester-align` — `plugin-tester` reactor alignment | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | ▶️ `console-runnable` — Runnable console baseline | ✅ Done | 🔴 P0 | `████████████████████` 100% |
@@ -315,7 +319,7 @@ renamed, broken parser). No code removal in this item.
 docs/provider-inventory.md updated with offline fixture policy and baseline
 mvn -B -ntp -pl plugins/6play -am -Dtest=SixPlayOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test
 mvn -B -ntp -pl plugins/canalPlus -am -Dtest=CanalPlusOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test
-mvn -B -ntp -pl plugins/pluzz -am -Dtest=PluzzOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test
+mvn -B -ntp -pl plugins/francetv -am -Dtest=FranceTvOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test
 mvn -B -ntp -pl plugins/arte -am -Dtest=ArteOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test
 mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test
 ```
@@ -326,13 +330,14 @@ mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Ds
 [`provider-inventory.md`](provider-inventory.md) for every plugin module
 plus historical references (`D8`, `D17`, `nrj12`, FranceTV/Pluzz,
 Kewego). An offline fixture policy and first local fixture baseline are
-now documented for `6play`, `canalPlus`, `pluzz`, `arte`, and `youtube`
+now documented for `6play`, `canalPlus`, `francetv` (ex `pluzz`), `arte`, and `youtube`
 without rewriting providers. Default `mvn test` skips live
 `*PluginManagerTest`; use `-Plive-provider-tests`. Arte live test
 currently fails (`categorie liste vide`) — provider drift, documented in
 inventory. This item remains open for broader fixture capture and
-dedicated cleanup/rewrite PRs. Risks `live-tests-flaky`,
-`provider-endpoints-dead`.
+dedicated cleanup/rewrite PRs. See also
+[`automatic-category-download.md`](automatic-category-download.md).
+Risks `live-tests-flaky`, `provider-endpoints-dead`.
 
 ---
 
@@ -367,6 +372,37 @@ mvn -B -ntp -pl plugins/youtube -am -Dsurefire.failIfNoSpecifiedTests=false test
 Static-repo tool metadata in `scripts/static-repo/tool-sources.properties` uses
 `yt-dlp`; publishing the zip to `habitv-repo` is a separate PR. No provider
 rewrite, no live-network tests in this item.
+
+---
+
+## 🩺 `ytdlp-runtime-diagnostics` — yt-dlp Windows runtime diagnostics
+
+| | |
+|---|---|
+| **Status** | 🟡 In progress |
+| **Priority** | 🟡 P2 |
+| **Progress** | `██████████████████░░` 90% |
+| **Legacy code** | HBTV-007a |
+
+**Scope** — Detect yt-dlp PyInstaller bootstrap failures before media downloads,
+log safe binary/temp diagnostics, route yt-dlp `TEMP`/`TMP` to
+`<habitv-home>/tmp/yt-dlp`, and document Windows recovery steps.
+
+**Acceptance criteria**
+- ✅ Preflight `yt-dlp --version` before each download
+- ✅ Classify `[PYI-` / `Failed to extract` / `Cryptodome` / `_MEI` stderr
+- ✅ Actionable user message (clear `_MEI` folders, replace binary, run `--version`)
+- ✅ Unit tests for PyInstaller vs generic downloader errors
+- ✅ Troubleshooting in `docs/ytdlp-cli-compatibility.md`
+
+**Validation**
+```bash
+mvn -B -ntp -DskipTests validate
+mvn -B -ntp -pl fwk/framework,plugins/youtube -am test
+```
+
+**Notes** — Independent from France.tv provider URL parsing. No downloader
+architecture rewrite.
 
 ---
 
@@ -499,7 +535,7 @@ mvn -B -ntp -DskipTests compile      # BUILD SUCCESS (33 modules)
 **Related PR** · `build: align own-version plugin internal dependencies` (#33)
 
 **Notes** — Own-version plugin modules (`beinsport`, `footyroom`,
-`pluzz`, `ffmpeg`) now use `${project.parent.version}` for shared
+`francetv`, `ffmpeg`) now use `${project.parent.version}` for shared
 internal dependencyManagement coordinates. Risk `legacy-maven-repo`
 mitigated for local reactor compilation (external publication still
 pending `legacy-url-migration`).

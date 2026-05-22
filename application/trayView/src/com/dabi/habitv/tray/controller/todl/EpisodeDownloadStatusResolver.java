@@ -15,22 +15,23 @@ final class EpisodeDownloadStatusResolver {
 			final Set<String> downloadedEpisodeNames,
 			final EpisodeStateEnum liveState) {
 		if (episode == null) {
-			return "Unknown";
+			return "Inconnu";
 		}
-		if (DownloadedDAO.containsEpisode(downloadedEpisodeNames, episode)) {
-			return "Downloaded";
+		if (DownloadedDAO.containsEpisodeOrLegacyName(downloadedEpisodeNames,
+				episode)) {
+			return "Téléchargé";
 		}
 		if (liveState != null) {
 			if (liveState == EpisodeStateEnum.DOWNLOAD_STARTING) {
-				return "Downloading";
+				return "Téléchargement";
 			}
 			if (liveState == EpisodeStateEnum.TO_DOWNLOAD) {
-				return "Queued";
+				return "En file";
 			}
 			if (liveState.isInProgress()) {
-				return "In progress";
+				return "En cours";
 			}
 		}
-		return "Available";
+		return "Disponible";
 	}
 }
