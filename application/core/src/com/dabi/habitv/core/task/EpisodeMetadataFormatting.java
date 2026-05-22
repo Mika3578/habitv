@@ -79,9 +79,12 @@ public final class EpisodeMetadataFormatting {
 	}
 
 	public static String formatProgramLinkLabel(final EpisodeDTO episode) {
-		if (episode.getCategory() != null && episode.getCategory().getName() != null
-				&& !episode.getCategory().getName().trim().isEmpty()) {
-			return episode.getCategory().getName().trim();
+		if (episode != null && episode.getCategory() != null
+				&& episode.getCategory().getName() != null) {
+			final String trimmedCategoryName = episode.getCategory().getName().trim();
+			if (!trimmedCategoryName.isEmpty()) {
+				return trimmedCategoryName;
+			}
 		}
 		final String url = programPageUrl(episode);
 		if (url == null) {
