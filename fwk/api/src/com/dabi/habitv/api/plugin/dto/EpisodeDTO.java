@@ -16,6 +16,12 @@ public class EpisodeDTO implements Comparable<EpisodeDTO>, Serializable {
 
 	private int num = 0;
 
+	/** Optional DRM/official-playback classification. {@code null} when unknown. */
+	private ProtectedContentStatus protectedContentStatus;
+
+	/** Optional official playback URL (provider page, partner deep link). {@code null} when none. */
+	private String officialPlaybackUrl;
+
 	public EpisodeDTO(final CategoryDTO category, final String name,
 			final String id) {
 		this.category = category;
@@ -119,6 +125,33 @@ public class EpisodeDTO implements Comparable<EpisodeDTO>, Serializable {
 
 	public void setNum(final int i) {
 		this.num = i;
+	}
+
+	public ProtectedContentStatus getProtectedContentStatus() {
+		return protectedContentStatus;
+	}
+
+	public void setProtectedContentStatus(final ProtectedContentStatus status) {
+		this.protectedContentStatus = status;
+	}
+
+	public String getOfficialPlaybackUrl() {
+		return officialPlaybackUrl;
+	}
+
+	public void setOfficialPlaybackUrl(final String url) {
+		this.officialPlaybackUrl = url;
+	}
+
+	/**
+	 * @return {@code true} when this episode is classified as DRM-protected and
+	 *         direct download must not be attempted.
+	 */
+	public boolean isDrmProtected() {
+		return protectedContentStatus != null
+				&& (protectedContentStatus == ProtectedContentStatus.OFFICIAL_PLAYBACK_ONLY
+				|| protectedContentStatus == ProtectedContentStatus.OFFICIAL_DRM_INTEGRATION_REQUIRED
+				|| protectedContentStatus == ProtectedContentStatus.METADATA_ONLY_DRM_PROTECTED);
 	}
 
 }
