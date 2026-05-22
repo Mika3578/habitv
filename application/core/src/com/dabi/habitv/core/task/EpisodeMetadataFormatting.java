@@ -104,7 +104,6 @@ public final class EpisodeMetadataFormatting {
 		}
 		return category.getName();
 	}
-
 	private static boolean isHttpUrl(final String value) {
 		return value != null && DownloadUtils.isHttpUrl(value);
 	}

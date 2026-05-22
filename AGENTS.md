@@ -90,6 +90,7 @@ Conventional Commits, English, imperative, lowercase, ≤ 72 chars.
 | Diff size | Keep small and focused; reject opportunistic refactors |
 | History | Linear inside feature branches; no merge commits |
 | Doc sync | Update tracker, risk register, decision log on meaningful changes |
+| Plugin version bump | A `plugins/*/pom.xml` `<version>` override must match a `plugin-versioning-policy` trigger (downloader/parser, user-facing endpoint, user-facing configuration). Name the trigger in the PR body. Internal reactor deps in a bumped plugin MUST use `${project.parent.version}`. |
 
 ---
 

@@ -16,7 +16,9 @@ application/core/testOldGrabconfig.xml
 *.iml
 
 # Maven
+target/
 **/target/
+**/target/**
 **/dependency-reduced-pom.xml
 pom.xml.tag
 pom.xml.releaseBackup

@@ -1,63 +1,85 @@
 # Repository maintenance
 
-Day-to-day maintenance tasks for the Habitv repository: merge hygiene,
-documentation sync, and contributor-facing metadata.
+Day-to-day maintenance for the Habitv repository: branching, merge hygiene,
+documentation sync, and automation expectations.
+
+## Branch model
+
+| Branch | Role |
+|--------|------|
+| `develop` | Integration line for modernization — **branch from here** |
+| `master` | Stable baseline snapshot |
+| `feature/*`, `fix/*`, `docs/*`, `build/*`, `ci/*`, … | Short-lived topic branches |
+
+Modernization PRs target **`develop`** with linear history (no merge commits on
+the feature branch). Squash merge to `develop` with a cleaned title/body (see
+below).
+
+## Contributor workflow
+
+1. Sync to latest `develop`.
+2. Pick or add a tracker item in [`dev-tracker.md`](dev-tracker.md).
+3. Keep the PR scoped to **one** logical change / tracker item.
+4. Use [Conventional Commits](https://www.conventionalcommits.org/) in English.
+5. Run validation (default: `mvn -B -ntp -DskipTests validate`).
+6. Paste exact command output in the PR body.
+7. Update `dev-tracker.md` + `dev-tracker.json` (and risk/decision docs when
+   applicable) in the same PR when state changes.
+
+See [`CONTRIBUTING.md`](../CONTRIBUTING.md) and [`AGENTS.md`](../AGENTS.md).
 
 ## PR metadata policy
 
-Pull request metadata must stay accurate and readable for reviewers and for
-future history readers after squash merge.
+- PR titles and bodies in **English**.
+- Reference one tracker slug (e.g. `provider-inventory`).
+- Squash merge title: Conventional Commits + PR number.
+- Squash body: final outcome and validation — not intermediate commit bullets.
+- Remove accidental `Co-authored-by` trailers unless intentional.
 
-- PR titles and bodies use English.
-- PR bodies document real validation commands and honest outcomes.
-- Tracker references use descriptive slugs from `docs/dev-tracker.md`,
-  optionally paired with the legacy `HBTV-XXX` code from the same entry
-  (for example `clean-squash-merge-policy` (HBTV-018)).
-- Squash merge titles follow Conventional Commits and include the PR number.
-- Squash merge bodies summarize the merged outcome, not intermediate commits.
+See [`pull-request-style-guide.md`](pull-request-style-guide.md).
 
-See `docs/pull-request-style-guide.md` for examples and the full squash merge
-commit policy.
+## Repository automation
 
-### Squash merge metadata
+| Automation | Behavior |
+|------------|----------|
+| Dependabot | Weekly Maven + Actions update PRs; no major bumps; no auto-merge |
+| Dependency Review | Blocks new high/critical dependency vulnerabilities on PRs |
+| CodeQL | Code scanning (separate from Maven CI) |
+| Stale triage | Labels inactive issues/PRs; does not auto-close |
+| PR labeler | Path-based labels; not a required check |
 
-The person merging a PR is responsible for cleaning the final squash commit
-message.
-
-- The final squash commit must summarize the PR outcome, not list every
-  intermediate commit.
-- Generated `Co-authored-by` trailers should be removed unless intentionally
-  kept.
-- The final commit title should follow Conventional Commits and include the PR
-  number.
-
-## Repository automation checks
-
-This repository uses conservative automation for dependency hygiene and triage
-while keeping merge control with maintainers.
-
-- Dependabot opens pull requests for Maven and GitHub Actions updates.
-- Dependabot is configured to ignore semver-major updates.
-- Auto-merge is intentionally disabled.
-- Bots open pull requests only and must not push directly to `develop`.
-- Dependency Review blocks pull requests that introduce new `high` or
-  `critical` vulnerabilities in dependencies.
-- CodeQL runs separately from Maven CI and reports code scanning alerts.
-- Stale triage labels inactive issues and pull requests without auto-closing
-  them.
+Live provider tests must not become required checks until replaced or reliably
+quarantined — see [`ci.md`](ci.md).
 
 ## Documentation sync
 
-When a change updates process or governance documentation, keep these files
-aligned in the same commit when applicable:
+When process, scope, or status changes, keep aligned in the **same commit**:
 
-- `docs/dev-tracker.md` and `docs/dev-tracker.json`
-- `docs/risk-register.md` when risks change
-- `docs/decision-log.md` when architecture decisions change
+| Change type | Update |
+|-------------|--------|
+| Work item progress | `dev-tracker.md` + `dev-tracker.json` |
+| Risk added/mitigated | `risk-register.md` |
+| Architecture decision | `decision-log.md` (ADR) |
+| User-facing release notes | `CHANGELOG.md` (when applicable) |
+
+Machine/human tracker parity check (before PR):
+
+```bash
+python3 -c "
+import json, re
+md = open('docs/dev-tracker.md', encoding='utf-8').read()
+js = json.load(open('docs/dev-tracker.json', encoding='utf-8'))
+md_slugs = set(re.findall(r'\`([a-z][a-z0-9-]{4,})\`', md))
+js_slugs = {i['id'] for i in js['items']}
+missing = js_slugs - md_slugs
+assert not missing, missing
+print('OK:', len(js_slugs), 'items')
+"
+```
 
 ## Related documentation
 
-- `docs/repository-governance.md` — branch protection and rulesets
-- `docs/pull-request-style-guide.md` — PR and squash merge style
-- `AGENTS.md` — agent and contributor rules
-- `docs/ci.md` — CI, security checks, and required/diagnostic lanes
+- [`repository-governance.md`](repository-governance.md) — branch protection and rulesets
+- [`ci.md`](ci.md) — required vs diagnostic CI jobs
+- [`dev-plan.md`](dev-plan.md) — phased roadmap
+- [`README.md`](../README.md) — project entry point

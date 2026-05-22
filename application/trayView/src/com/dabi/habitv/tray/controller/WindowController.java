@@ -11,7 +11,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableView;
@@ -100,6 +99,12 @@ public class WindowController {
 
 	@FXML
 	private Button downloadSelectedButton;
+
+	@FXML
+	private Button selectAllEpisodesButton;
+
+	@FXML
+	private Button clearSelectionButton;
 
 	@FXML
 	private TextField episodeFilter;
@@ -198,7 +203,8 @@ public class WindowController {
 			ToDownloadController toDlController = new ToDownloadController(
 					searchCategoryProgress, refreshCategoryButton,
 					cleanCategoryButton, toDLTree, indicationText,
-					episodeTableView, downloadSelectedButton, episodeFilter,
+					episodeTableView, downloadSelectedButton,
+					selectAllEpisodesButton, clearSelectionButton, episodeFilter,
 					categoryFilter, applySavedFilters, filterTypeChoice,
 					addFilterButton, currentFilterVBox);
 			toDlController.init(controller, manager, primaryStage);

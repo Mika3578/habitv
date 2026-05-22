@@ -1,9 +1,15 @@
 # 🗺️ Habitv Development Plan
 
-High-level phased roadmap for restarting Habitv modernization from
-`master`. Each phase is delivered by one or more small PRs tied to
-[`dev-tracker.md`](dev-tracker.md). No phase is allowed to bundle
-work from a later phase.
+High-level phased roadmap for the Habitv modernization restart.
+**Integration branch:** `develop` (PR-based, linear history on feature
+branches). Each phase is delivered by one or more small PRs tied to
+[`dev-tracker.md`](dev-tracker.md). No phase is allowed to bundle work from a
+later phase.
+
+> **Legacy vs current** — Phases 0–4 removed obsolete Dabiboo/free.fr Maven
+> and runtime URLs; active work is Phases 5–7 (yt-dlp, providers, JavaFX).
+> Historical pre-restart findings live in
+> [`audit-master-baseline.md`](audit-master-baseline.md) (snapshot only).
 
 ---
 
@@ -135,9 +141,9 @@ Remaining: live fixture validation, `habitv-repo` `yt-dlp` tool zip publication.
   and parsable (offline against captured fixtures, not live).
 - Mark obsolete or renamed providers with a deprecation plan and
   dedicated removal PRs.
-- Baseline classification doc added at `docs/provider-inventory.md`;
-  offline fixture policy + first local fixture baseline added for
-  `6play`, `canalPlus`, `pluzz`, `arte`, and `youtube`.
+- Baseline classification doc at `docs/provider-inventory.md`;
+  offline fixture baseline for `6play`, `canalPlus`, `francetv` (ex
+  `pluzz`), `arte`, and `youtube`.
 
 **Tracker** — `provider-inventory`.
 

@@ -220,11 +220,12 @@ public final class EpisodeManager extends AbstractManager implements TaskAdder {
 			downloadedEpisodes = dlDAO.findDownloadedFiles();
 			downloadedEpisodesByCategory.put(categoryKey, downloadedEpisodes);
 		}
-		return downloadedEpisodes.contains(episode.getName());
+		return DownloadedDAO.containsEpisodeOrLegacyName(downloadedEpisodes,
+				episode);
 	}
 
 	private String getCategoryKey(final CategoryDTO category) {
-		return category.getPlugin() + "#" + category.getName();
+		return category.getPlugin() + "#" + category.getId();
 	}
 
 	private boolean isRetrieveQueued(final EpisodeDTO episode) {

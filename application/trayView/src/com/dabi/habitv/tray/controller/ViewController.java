@@ -335,22 +335,18 @@ public class ViewController implements CoreSubscriber {
 		}
 	}
 
-	public void downloadSelectedEpisodes(final List<EpisodeDTO> episodes) {
+	public BatchEnqueueResult downloadSelectedEpisodes(final List<EpisodeDTO> episodes) {
 		if (episodes == null || episodes.isEmpty()) {
 			Popin.error("Select at least one episode to download.");
-			return;
+			return null;
 		}
 		try {
-			final BatchEnqueueResult result = getManager()
+			return getManager()
 					.enqueueEpisodesForDownload(episodes);
-			final int added = result.getAddedCount();
-			final int skipped = result.getSkippedCount();
-			if (added == 0) {
-				Popin.error("No episodes were queued. They may already be downloaded or in the queue.");
-			}
 		} catch (Exception e) {
 			LOG.error("", e);
 			Popin.error(e.getMessage());
+			return null;
 		}
 	}
 
@@ -363,9 +359,18 @@ public class ViewController implements CoreSubscriber {
 				.setContents(new StringSelection(episode.getId()), null);
 	}
 
-	public void openInBrowser(EpisodeDTO episodeDTO) {
+	public void openInBrowser(final EpisodeDTO episodeDTO) {
+		if (episodeDTO != null) {
+			openInBrowser(episodeDTO.getId());
+		}
+	}
+
+	public void openInBrowser(final String url) {
+		if (url == null || url.trim().isEmpty()) {
+			return;
+		}
 		try {
-			Desktop.getDesktop().browse(new URI(episodeDTO.getId()));
+			Desktop.getDesktop().browse(new URI(url.trim()));
 		} catch (Exception e) {
 			LOG.error("", e);
 			Popin.error(e.getMessage());

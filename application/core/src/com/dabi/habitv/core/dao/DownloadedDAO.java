@@ -25,6 +25,7 @@ import com.dabi.habitv.utils.FileUtils;
 public class DownloadedDAO {
 
 	private static final Logger LOG = Logger.getLogger(DownloadedDAO.class);
+	private static final String EPISODE_KEY_PREFIX = "episode-key|";
 
 	private final String indexDir;
 
@@ -57,19 +58,70 @@ public class DownloadedDAO {
 	}
 
 	public static String getFileIndex(String indexDir, CategoryDTO category) {
-		return (indexDir + "/" + FileUtils.sanitizeFilename(category
-				.getPlugin() + "_" + category.getName() + ".index"));
+		return indexDir + "/" + buildIndexFileName(category, ".index");
 	}
 
 	private String getManualFileIndex() {
-		return (indexDir + "/" + FileUtils.sanitizeFilename(category
-				.getPlugin() + "_" + category.getName() + "_manual.index"));
+		return indexDir + "/" + buildIndexFileName(category, "_manual.index");
+	}
+
+	private String getLegacyFileIndex() {
+		return indexDir + "/" + buildLegacyIndexFileName(".index");
+	}
+
+	private String getLegacyManualFileIndex() {
+		return indexDir + "/" + buildLegacyIndexFileName("_manual.index");
+	}
+
+	private String buildLegacyIndexFileName(final String suffix) {
+		return FileUtils.sanitizeFilename(category.getPlugin() + "_"
+				+ category.getName() + suffix);
+	}
+
+	private static String buildIndexFileName(final CategoryDTO category,
+			final String suffix) {
+		final String plugin = category.getPlugin();
+		final String name = category.getName();
+		final String id = category.getId();
+		final String categoryIdentity = plugin + "|" + id;
+		final String identityHash = Integer
+				.toHexString(categoryIdentity.hashCode());
+		return FileUtils
+				.sanitizeFilename(plugin + "_" + name + "_" + identityHash + suffix);
 	}
 
 	public Set<String> findDownloadedFiles() {
 		Set<String> dlFiles = readFile(getFileIndex());
+		dlFiles.addAll(readFile(getLegacyFileIndex()));
 		dlFiles.addAll(readFile(getManualFileIndex()));
+		dlFiles.addAll(readFile(getLegacyManualFileIndex()));
 		return dlFiles;
+	}
+
+	public static String buildEpisodeKey(final EpisodeDTO episode) {
+		if (episode == null || episode.getCategory() == null) {
+			return null;
+		}
+		final CategoryDTO category = episode.getCategory();
+		return EPISODE_KEY_PREFIX + normalize(category.getPlugin()) + "|"
+				+ normalize(category.getId()) + "|" + normalize(episode.getId())
+				+ "|" + normalize(episode.getName());
+	}
+
+	public static boolean containsEpisode(final Set<String> downloadedEntries,
+			final EpisodeDTO episode) {
+		final String episodeKey = buildEpisodeKey(episode);
+		return episodeKey != null && downloadedEntries != null
+				&& downloadedEntries.contains(episodeKey);
+	}
+
+	public static boolean containsEpisodeOrLegacyName(
+			final Set<String> downloadedEntries, final EpisodeDTO episode) {
+		if (containsEpisode(downloadedEntries, episode)) {
+			return true;
+		}
+		return downloadedEntries != null && episode != null
+				&& downloadedEntries.contains(episode.getName());
 	}
 
 	private Set<String> readFile(String file) {
@@ -143,9 +195,17 @@ public class DownloadedDAO {
 			final EpisodeDTO... episodes) {
 		Collection<String> toAddList = new ArrayList<>(episodes.length);
 		for (EpisodeDTO episodeDTO : episodes) {
-			toAddList.add(episodeDTO.getName());
+			final String episodeKey = buildEpisodeKey(episodeDTO);
+			if (episodeKey != null) {
+				toAddList.add(episodeKey);
+			}
 		}
 		return toAddList;
+	}
+
+	private static String normalize(final String value) {
+		return value == null ? "" : value.replace('\n', ' ').replace('\r', ' ')
+				.trim();
 	}
 
 	public boolean isIndexCreated() {
@@ -159,6 +219,7 @@ public class DownloadedDAO {
 	void initIndex() {
 		final String fileIndex = getFileIndex();
 		(new File(fileIndex)).delete();
+		(new File(getLegacyFileIndex())).delete();
 		LOG.info("réinitialisation de l'index " + fileIndex);
 		indexExist = false;
 	}
@@ -166,6 +227,7 @@ public class DownloadedDAO {
 	void initManualIndex() {
 		final String fileIndex = getManualFileIndex();
 		(new File(fileIndex)).delete();
+		(new File(getLegacyManualFileIndex())).delete();
 		LOG.info("réinitialisation de l'index " + fileIndex);
 		manualIndexExist = false;
 	}

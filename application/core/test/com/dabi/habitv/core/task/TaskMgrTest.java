@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.concurrent.Callable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -260,11 +261,13 @@ public class TaskMgrTest {
 		}, null);
 		taskMgr.addTask(buildSleepTask("t1", 500), buildSleepTask("t1", 500));
 		taskMgr.addTask(buildSleepTask("t2", 500), buildSleepTask("t2", 500));
-		try {
-			Thread.sleep(50);
-		} catch (final InterruptedException e) {
-			fail();
-		}
+		assertTrue(waitForCondition(new Callable<Boolean>() {
+			@Override
+			public Boolean call() {
+				return taskMgr.getActiveTaskCount() == 1
+						&& taskMgr.getQueuedOrActiveTaskCount() >= 2;
+			}
+		}, 1000));
 		assertEquals(1, taskMgr.getActiveTaskCount());
 		assertTrue(taskMgr.getQueuedOrActiveTaskCount() >= 2);
 		taskMgr.shutdown(2000);
@@ -288,13 +291,34 @@ public class TaskMgrTest {
 			final AbstractTask<Object> task = buildSleepTask("task" + i, 400);
 			taskMgr.addTask(task, task);
 		}
-		try {
-			Thread.sleep(50);
-		} catch (final InterruptedException e) {
-			fail();
-		}
+		assertTrue(waitForCondition(new Callable<Boolean>() {
+			@Override
+			public Boolean call() {
+				return taskMgr.getActiveTaskCount() <= 2
+						&& taskMgr.getQueuedOrActiveTaskCount() >= 2;
+			}
+		}, 1000));
 		assertTrue(taskMgr.getQueuedOrActiveTaskCount() >= 2);
 		taskMgr.shutdown(2000);
+	}
+
+	private boolean waitForCondition(final Callable<Boolean> condition,
+			final long timeoutMillis) {
+		final long end = System.currentTimeMillis() + timeoutMillis;
+		while (System.currentTimeMillis() < end) {
+			try {
+				if (Boolean.TRUE.equals(condition.call())) {
+					return true;
+				}
+				Thread.sleep(25);
+			} catch (final InterruptedException e) {
+				Thread.currentThread().interrupt();
+				throw new AssertionError("Interrupted while waiting for condition", e);
+			} catch (final Exception e) {
+				throw new AssertionError("Failed while waiting for condition", e);
+			}
+		}
+		return false;
 	}
 
 	private AbstractTask<Object> buildSleepTask(final String name, final long sleepMs) {
@@ -326,12 +350,19 @@ public class TaskMgrTest {
 	public final void indicateWhenAllTreatmentAreDone() {
 		buildSimultaneousTask(2, null, null, false);
 		assertFalse(allTreatmentDone);
-		try {
-			Thread.sleep(1000);
-		} catch (final InterruptedException e) {
-			fail();
-		}
-		assertTrue(allTreatmentDone);
+		assertTrue(waitForAllTreatmentDone(3000));
 		taskMgr.shutdown(0);
+	}
+
+	private boolean waitForAllTreatmentDone(final long timeoutMs) {
+		final long deadline = System.currentTimeMillis() + timeoutMs;
+		while (!allTreatmentDone && System.currentTimeMillis() < deadline) {
+			try {
+				Thread.sleep(25);
+			} catch (final InterruptedException e) {
+				fail();
+			}
+		}
+		return allTreatmentDone;
 	}
 }
