@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
 
 public final class EpisodeMetadataFormatting {
@@ -65,23 +64,28 @@ public final class EpisodeMetadataFormatting {
 			return null;
 		}
 		final String categoryId = episode.getCategory().getId();
-		if (categoryId == null || categoryId.trim().isEmpty()) {
+		if (categoryId == null) {
 			return null;
 		}
-		if (categoryId.startsWith("http://") || categoryId.startsWith("https://")) {
-			return categoryId.trim();
+		final String trimmedCategoryId = categoryId.trim();
+		if (trimmedCategoryId.isEmpty()) {
+			return null;
+		}
+		if (trimmedCategoryId.startsWith("http://")
+				|| trimmedCategoryId.startsWith("https://")) {
+			return trimmedCategoryId;
 		}
 		return null;
 	}
 
 	public static String formatProgramLinkLabel(final EpisodeDTO episode) {
-		final String url = programPageUrl(episode);
-		if (url == null) {
-			return UNKNOWN;
-		}
 		if (episode.getCategory() != null && episode.getCategory().getName() != null
 				&& !episode.getCategory().getName().trim().isEmpty()) {
 			return episode.getCategory().getName().trim();
+		}
+		final String url = programPageUrl(episode);
+		if (url == null) {
+			return UNKNOWN;
 		}
 		return shortenUrl(url);
 	}
@@ -110,33 +114,5 @@ public final class EpisodeMetadataFormatting {
 			return UNKNOWN;
 		}
 		return status;
-	}
-
-	public static String programPageUrl(final EpisodeDTO episode) {
-		if (episode == null) {
-			return null;
-		}
-		final CategoryDTO category = episode.getCategory();
-		if (category == null) {
-			return null;
-		}
-		final String categoryId = category.getId();
-		if (categoryId != null && (categoryId.startsWith("http://")
-				|| categoryId.startsWith("https://"))) {
-			return categoryId;
-		}
-		return null;
-	}
-
-	public static String formatProgramLinkLabel(final EpisodeDTO episode) {
-		if (episode == null) {
-			return UNKNOWN;
-		}
-		final CategoryDTO category = episode.getCategory();
-		if (category == null || category.getName() == null
-				|| category.getName().trim().isEmpty()) {
-			return UNKNOWN;
-		}
-		return category.getName();
 	}
 }
