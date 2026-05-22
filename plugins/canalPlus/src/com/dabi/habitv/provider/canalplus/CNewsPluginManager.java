@@ -78,7 +78,10 @@ public class CNewsPluginManager extends BasePluginWithProxy implements PluginPro
 
 	@Override
 	public DownloadableState canDownload(final String downloadInput) {
-		if (downloadInput.startsWith(CNewsConf.HOME_URL) || downloadInput.contains("/cnews/") || downloadInput.contains("cnews.")) {
+		if (downloadInput == null) {
+			return DownloadableState.IMPOSSIBLE;
+		}
+		if (downloadInput.contains("vid=")) {
 			return DownloadableState.SPECIFIC;
 		}
 		return DownloadableState.IMPOSSIBLE;
