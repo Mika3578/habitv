@@ -48,7 +48,7 @@ automatic category behavior, provider summary, doc map).
 | 🛡️ `branch-protection` — GitHub branch protection rules | 🔵 Proposed | 🟠 P1 | `░░░░░░░░░░░░░░░░░░░░` 0% |
 | 🔗 `legacy-url-migration` — Legacy URL migration (free.fr / SVN / FTP) | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 📦 `static-repo-publish` — Static artifact repository publication | ✅ Done | 🟠 P1 | `████████████████████` 100% |
-| 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🟡 In progress | 🟡 P2 | `███████████░░░░░░░░░` 55% |
+| 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🟡 In progress | 🟡 P2 | `████████████░░░░░░░░` 60% |
 | 🎬 `ytdlp-migration` — `youtube-dl` → `yt-dlp` migration | 🟡 In progress | 🟡 P2 | `███████████████░░░░░` 75% |
 | 🩺 `ytdlp-runtime-diagnostics` — yt-dlp Windows runtime diagnostics | 🟡 In progress | 🟡 P2 | `██████████████████░░` 90% |
 | 🖼️ `javafx-modernization` — JavaFX & runtime packaging modernization | 🔵 Proposed | 🟡 P2 | `██░░░░░░░░░░░░░░░░░░` 10% |
@@ -306,7 +306,7 @@ falls back to `maven-metadata.xml` for timestamped SNAPSHOT JAR filenames.
 |---|---|
 | **Status** | 🟡 In progress |
 | **Priority** | 🟡 P2 |
-| **Progress** | `███████████░░░░░░░░░` 55% |
+| **Progress** | `████████████░░░░░░░░` 60% |
 | **Legacy code** | HBTV-006 |
 
 **Scope** — Inventory every plugin in `plugins/` (22 in the aggregator
@@ -329,18 +329,21 @@ mvn -B -ntp -pl plugins/arte -am -Dtest=ArteOfflineFixtureBaselineTest -Dsurefir
 mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test
 ```
 
-**Related PR** · `docs: capture provider offline fixture baseline` (this PR)
+**Related PR** · `docs: capture provider offline fixture baseline` (merged), `fix(provider-canalplus): rename d17 to cstar and handle deprecated endpoints` (PR #91)
 
 **Notes** — Inventory baseline is now documented in
 [`provider-inventory.md`](provider-inventory.md) for every plugin module
-plus historical references (`D8`, `D17`, `nrj12`, FranceTV/Pluzz,
+plus historical references (`D8`, `CStar` (ex `D17`), `nrj12`, FranceTV/Pluzz,
 Kewego). An offline fixture policy and first local fixture baseline are
 now documented for `6play`, `canalPlus`, `francetv` (ex `pluzz`), `arte`, and `youtube`
 without rewriting providers. Default `mvn test` skips live
-`*PluginManagerTest`; use `-Plive-provider-tests`. Arte live test
-currently fails (`categorie liste vide`) — provider drift, documented in
-inventory. This item remains open for broader fixture capture and
-dedicated cleanup/rewrite PRs. See also
+`*PluginManagerTest`; use `-Plive-provider-tests`. PR #91 keeps the
+`D17` rename to `CStar` and adds graceful fallback in the Canal+ family:
+category discovery now returns an empty set with a provider-level
+diagnostic when `service.mycanal.fr` is unreachable or channel pages
+return HTTP 403. Arte live test currently fails (`categorie liste vide`) —
+provider drift, documented in inventory. This item remains open for
+broader fixture capture and dedicated cleanup/rewrite PRs. See also
 [`automatic-category-download.md`](automatic-category-download.md).
 Risks `live-tests-flaky`, `provider-endpoints-dead`.
 
