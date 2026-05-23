@@ -9,7 +9,7 @@ assignees: []
 ## Scope slug
 
 <!-- Use a descriptive kebab-case scope, e.g. provider-youtube-ytdlp -->
-scope-
+provider-youtube-ytdlp
 
 ## Scope
 

@@ -31,9 +31,9 @@ Deprecated branch prefixes:
 
 Before creating any branch, run:
 git fetch --all --prune
-git branch -a --list "*[short-scope]*"
-gh pr list --repo Mika3578/habitv --state open --search "[short-scope]"
-git check-ref-format --branch "[branch-name]"
+git branch -a --list "*<short-scope>*"
+gh pr list --repo Mika3578/habitv --state open --search "<short-scope>"
+git check-ref-format --branch "<branch-name>"
 
 If an existing branch or PR already covers the same scope, do not create a duplicate. Reuse or update the existing branch/PR instead.
 

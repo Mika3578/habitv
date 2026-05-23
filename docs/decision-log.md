@@ -517,7 +517,7 @@ artifact at compile time.
 | **Status** | 🟡 Proposed |
 | **Date** | 2026-05-23 |
 | **Tracker** | `gov-bootstrap` (follow-up) |
-| **Touches** | `AGENTS.md`, `.cursor/rules/habitv-master.mdc`, `.cursor/rules/pr-style.mdc`, `.github/copilot-instructions.md`, `CONTRIBUTING.md`, `.github/pull_request_template.md`, `CLAUDE.md` |
+| **Touches** | `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/habitv-master.mdc`, `.cursor/rules/pr-style.mdc`, `.github/copilot-instructions.md`, `.github/pull_request_template.md`, `.github/ISSUE_TEMPLATE/*`, `.github/workflows/build.yml`, `CONTRIBUTING.md`, `README.md`, `docs/ci.md`, `docs/dev-plan.md`, `docs/dev-tracker.md`, `docs/dev-tracker.json`, `docs/github-repository-settings.md`, `docs/provider-inventory.md`, `docs/pull-request-style-guide.md`, `docs/repository-governance.md`, `docs/repository-maintenance.md`, `docs/security-critical-cve-investigation.md`, `docs/security-dependency-audit.md` |
 | **Legacy code** | ADR-0010 |
 
 **Context** — Workflow guidance drifted across AI and contributor

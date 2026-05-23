@@ -129,7 +129,7 @@ Full table, fixture policy, and follow-up queue:
    - docs-only PR: `git diff --check`
    - code PR: `mvn -B -ntp -DskipTests validate`
    Paste **exact command output** in the PR body.
-5. Keep PRs small; linear history (no merge commits on feature branches).
+5. Keep PRs small; linear history (no merge commits on work branches).
 
 Details: [`CONTRIBUTING.md`](CONTRIBUTING.md), [`AGENTS.md`](AGENTS.md),
 [`docs/pull-request-style-guide.md`](docs/pull-request-style-guide.md).

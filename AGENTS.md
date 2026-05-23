@@ -212,7 +212,8 @@ Before opening a PR:
 2. Verify the branch is based on the latest `develop`.
 3. Run:
    - `git status --short`
-   - `mvn -B -ntp -DskipTests validate`
+   - docs-only PR: `git diff --check`
+   - non-docs PR: `mvn -B -ntp -DskipTests validate`
 4. Include exact validation results in the PR body.
 
 If tracking is needed, use GitHub-native tracking:
