@@ -352,25 +352,18 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 	}
 
 	private String findNameById(String id, String defaultName) {
-		String name;
-		if (defaultName == null) {
-			if (DownloadUtils.isHttpUrl(id)) {
-				name = RetrieverUtils.getTitleByUrl(id);
-				if (name == null || name.trim().isEmpty()) {
-					name = id;
-				}
-			} else {
-				File file = new File(id);
-				if (file.exists()) {
-					name = file.getName();
-				} else {
-					name = defaultName;
-				}
-			}
-		} else {
-			name = defaultName;
+		if (defaultName != null && !defaultName.trim().isEmpty()) {
+			return defaultName;
 		}
-		return name;
+		if (id == null) {
+			return defaultName;
+		}
+		if (DownloadUtils.isHttpUrl(id)) {
+			String name = RetrieverUtils.getTitleByUrl(id);
+			return name == null || name.trim().isEmpty() ? id : name;
+		}
+		File file = new File(id);
+		return file.exists() ? file.getName() : id;
 	}
 
 	private void fillEpisodeList(final CategoryDTO category) {
