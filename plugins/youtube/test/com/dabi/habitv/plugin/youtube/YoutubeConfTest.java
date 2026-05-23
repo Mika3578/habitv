@@ -34,6 +34,7 @@ public class YoutubeConfTest {
 		assertFalse(YoutubeConf.DUMP_CMD.contains("--write-subs"));
 		assertFalse(YoutubeConf.DUMP_CMD.contains("--write-auto-sub"));
 		assertFalse(YoutubeConf.DUMP_CMD.contains("--write-auto-subs"));
+		assertFalse(YoutubeConf.DUMP_CMD.contains("--all-subs"));
 		assertFalse(YoutubeConf.DUMP_CMD.contains("--embed-subs"));
 	}
 
