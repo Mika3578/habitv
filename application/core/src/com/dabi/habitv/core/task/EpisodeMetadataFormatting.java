@@ -10,7 +10,6 @@ public final class EpisodeMetadataFormatting {
 
 	private static final String UNKNOWN = "Inconnu";
 	private static final int MAX_SHORT_URL_LENGTH = 48;
-	private static final int SHORT_URL_PREFIX_LENGTH = 45;
 
 	private EpisodeMetadataFormatting() {
 	}
@@ -111,7 +110,9 @@ public final class EpisodeMetadataFormatting {
 		if (url.length() <= MAX_SHORT_URL_LENGTH) {
 			return url;
 		}
-		return url.substring(0, SHORT_URL_PREFIX_LENGTH) + "...";
+		final int ellipsisLength = 3;
+		final int prefixLength = MAX_SHORT_URL_LENGTH - ellipsisLength;
+		return url.substring(0, prefixLength) + "...";
 	}
 
 	public static String formatStatusLabel(final String status) {

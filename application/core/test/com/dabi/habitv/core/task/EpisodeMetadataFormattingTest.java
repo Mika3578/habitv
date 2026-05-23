@@ -116,4 +116,46 @@ public class EpisodeMetadataFormattingTest {
 	public void formatStatusLabelTrimsWhitespace() {
 		assertEquals("DONE", EpisodeMetadataFormatting.formatStatusLabel("  DONE  "));
 	}
+
+	@Test
+	public void formatProgramLinkLabelReturnsUnknownWhenCategoryIsNullAndNoUrl() {
+		final EpisodeDTO nullCategoryEpisode = new EpisodeDTO(null, "ep1", "episode-id");
+		assertEquals("Inconnu", EpisodeMetadataFormatting.formatProgramLinkLabel(nullCategoryEpisode));
+	}
+
+	@Test
+	public void formatSourceReturnsEpisodeIdWhenCategoryIdIsNotHttpUrl() {
+		final EpisodeDTO episode = new EpisodeDTO(
+				new CategoryDTO("plugin", "program", "category-id", "mp4"), "ep1", "  episode-id  ");
+		assertEquals("episode-id", EpisodeMetadataFormatting.formatSource(episode));
+	}
+
+	@Test
+	public void formatSourceReturnsUnknownWhenEpisodeIdIsBlankAndNoProgramUrl() {
+		final EpisodeDTO episode = new EpisodeDTO(
+				new CategoryDTO("plugin", "program", "category-id", "mp4"), "ep1", "  ");
+		assertEquals("Inconnu", EpisodeMetadataFormatting.formatSource(episode));
+	}
+
+	@Test
+	public void shortenUrlDoesNotTruncateShortUrls() {
+		final String shortUrl = "https://example.com/short";
+		final EpisodeDTO episode = new EpisodeDTO(
+				new CategoryDTO("plugin", null, shortUrl, "mp4"), "ep1", "id");
+		assertEquals(shortUrl, EpisodeMetadataFormatting.formatProgramLinkLabel(episode));
+	}
+
+	@Test
+	public void shortenUrlTruncatesAtExactlyMaxLength() {
+		final String urlExactly48 = "https://example.com/xxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+		final EpisodeDTO episode48 = new EpisodeDTO(
+				new CategoryDTO("plugin", null, urlExactly48, "mp4"), "ep1", "id");
+		assertEquals(urlExactly48, EpisodeMetadataFormatting.formatProgramLinkLabel(episode48));
+
+		final String urlExactly49 = "https://example.com/xxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+		final EpisodeDTO episode49 = new EpisodeDTO(
+				new CategoryDTO("plugin", null, urlExactly49, "mp4"), "ep1", "id");
+		assertEquals("https://example.com/xxxxxxxxxxxxxxxxxxxxxxxxx...",
+				EpisodeMetadataFormatting.formatProgramLinkLabel(episode49));
+	}
 }
