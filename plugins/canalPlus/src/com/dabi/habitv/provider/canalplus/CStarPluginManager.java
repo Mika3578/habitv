@@ -75,7 +75,7 @@ public class CStarPluginManager extends BasePluginWithProxy implements PluginPro
 			return categories;
 		} catch (RuntimeException e) {
 			if (CanalPlusEndpointAvailability.isUnavailable(e)) {
-				getLog().warn(CanalPlusEndpointAvailability.buildCategoryUnavailableMessage(getName()), e);
+				getLog().warn(CanalPlusEndpointAvailability.buildCategoryUnavailableMessage(getName(), e));
 				return new LinkedHashSet<>();
 			}
 			throw e;

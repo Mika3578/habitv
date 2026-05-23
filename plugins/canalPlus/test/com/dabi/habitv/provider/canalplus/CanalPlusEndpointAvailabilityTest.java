@@ -14,6 +14,31 @@ import com.dabi.habitv.api.plugin.exception.TechnicalException;
 public class CanalPlusEndpointAvailabilityTest {
 
 	@Test
+	public void shortCauseMessageReturnsUnknownCauseWhenThrowableIsNull() {
+		assertEquals("unknown cause", CanalPlusEndpointAvailability.shortCauseMessage(null));
+	}
+
+	@Test
+	public void shortCauseMessageFormatsUnknownHostException() {
+		assertEquals("UnknownHostException: service.mycanal.fr",
+				CanalPlusEndpointAvailability.shortCauseMessage(new UnknownHostException("service.mycanal.fr")));
+	}
+
+	@Test
+	public void shortCauseMessageUsesDeepestRootCause() {
+		RuntimeException nested = new RuntimeException(new TechnicalException(new UnknownHostException("service.mycanal.fr")));
+		assertEquals("UnknownHostException: service.mycanal.fr", CanalPlusEndpointAvailability.shortCauseMessage(nested));
+	}
+
+	@Test
+	public void shortCauseMessageFormatsHttp403Message() {
+		TechnicalException wrapped = new TechnicalException(
+				new IOException("Server returned HTTP response code: 403 for URL: https://www.canalplus.com/chaines/c8"));
+		assertEquals("IOException: HTTP 403 for URL: https://www.canalplus.com/chaines/c8",
+				CanalPlusEndpointAvailability.shortCauseMessage(wrapped));
+	}
+
+	@Test
 	public void canalPlusCategoryDiscoveryReturnsEmptyWhenLegacyHostIsUnavailable() {
 		CanalPlusPluginManager manager = new CanalPlusPluginManager() {
 			@Override
@@ -56,5 +81,14 @@ public class CanalPlusEndpointAvailabilityTest {
 		assertEquals(
 				"canalPlus: Canal+ provider endpoint is no longer reachable or requires protected access.",
 				CanalPlusEndpointAvailability.buildCategoryUnavailableMessage("canalPlus"));
+	}
+
+	@Test
+	public void unavailableMessageIncludesShortCause() {
+		assertEquals(
+				"d8: Canal+ provider endpoint is no longer reachable or requires protected access. Cause: IOException: HTTP 403 for URL: https://www.canalplus.com/chaines/c8",
+				CanalPlusEndpointAvailability.buildCategoryUnavailableMessage("d8",
+						new TechnicalException(new IOException(
+								"Server returned HTTP response code: 403 for URL: https://www.canalplus.com/chaines/c8"))));
 	}
 }

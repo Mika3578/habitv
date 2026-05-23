@@ -92,7 +92,7 @@ public class D8PluginManager extends BasePluginWithProxy implements PluginProvid
 			return categories;
 		} catch (RuntimeException e) {
 			if (CanalPlusEndpointAvailability.isUnavailable(e)) {
-				getLog().warn(CanalPlusEndpointAvailability.buildCategoryUnavailableMessage(getName()), e);
+				getLog().warn(CanalPlusEndpointAvailability.buildCategoryUnavailableMessage(getName(), e));
 				return new LinkedHashSet<>();
 			}
 			throw e;
