@@ -329,7 +329,7 @@ mvn -B -ntp -pl plugins/arte -am -Dtest=ArteOfflineFixtureBaselineTest -Dsurefir
 mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test
 ```
 
-**Related PR** · `docs: capture provider offline fixture baseline` (merged), `fix(provider-canalplus): rename d17 to cstar and handle deprecated endpoints` (PR #91), `chore(canalPlus): remove obsolete D8 sub-provider` (PR #92)
+**Related PR** · `docs: capture provider offline fixture baseline` (merged), `fix(provider-canalplus): rename d17 to cstar and handle deprecated endpoints` (PR #91), `refactor(provider-canalplus): remove obsolete d8 sub-provider` (PR #92)
 
 **Notes** — Inventory baseline is now documented in
 [`provider-inventory.md`](provider-inventory.md) for every plugin module

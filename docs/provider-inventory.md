@@ -24,9 +24,9 @@ separate PRs per module.
 
 - **Pluzz** → treat as **France Télévisions / France.tv**; module is
   `plugins/francetv`.
-- **CStar** (ex `D17`) → legacy Canal+ channel plugin inside `plugins/canalPlus`,
-  not a standalone module.
-- **D8** → removed (obsolete Canal+ channel; dead `www.d8.tv` endpoints).
+- **CStar** (ex D17) → legacy Canal+ channel plugin inside `plugins/canalPlus`,
+  not a standalone module. The obsolete **D8** sub-provider was removed (channel
+  rebranded to C8; dead `www.d8.tv` endpoints).
 - **6play** → legacy M6 branding; module `plugins/6play` targets old `6play.fr`
   (modern M6+ replay is a future rewrite target).
 
@@ -65,7 +65,7 @@ no provider rewrite, no runtime behavior change in inventory-only work.
 | `plugins/aria2` | `aria2` | downloader | keep | `Aria2PluginDownloader` wraps `aria2c`; dedicated test exists | keep as-is |
 | `plugins/arte` | `arte` | provider | needs live endpoint rewrite | `ArteConf` uses legacy HTTP guide/rss URLs and scraping selectors; provider tests are live-network style | add fixture tests |
 | `plugins/beinsport` | `beinsport` | provider | obsolete endpoint | `BeinSportConf` uses legacy `beinsports.com/us/videos` and Dailymotion mapping; known candidate in tracker notes | rewrite provider |
-| `plugins/canalPlus` | `canalPlus` | provider | degraded (graceful unavailable handling) | `CanalPlusPluginManager` and `CStarPluginManager` return an empty category set with a provider-level diagnostic when Canal+ legacy/protected endpoints are unreachable (`service.mycanal.fr` DNS failure, HTTP 403 on channel pages); obsolete embedded `D8` sub-provider removed | keep graceful handling; plan dedicated endpoint rewrite |
+| `plugins/canalPlus` | `canalPlus` | provider | degraded (graceful unavailable handling) | `CanalPlusPluginManager` and `CStarPluginManager` return an empty category set with a provider-level diagnostic when Canal+ legacy/protected endpoints are unreachable (`service.mycanal.fr` DNS failure, HTTP 403 on channel pages); obsolete `D8` sub-provider removed | keep graceful handling; plan dedicated endpoint rewrite |
 | `plugins/clubic` | `clubic` | provider | obsolete endpoint | `ClubicConf` targets legacy Clubic video pages via HTML selectors; provider test is live-network | deprecate provider |
 | `plugins/cmd` | `cmd` | exporter | infrastructure-only | `CmdPluginExporterManager` and `CmdPluginDownloaderManager` are command wrappers, no provider endpoint logic | keep as-is |
 | `plugins/curl` | `curl` | exporter | infrastructure-only | `CurlPluginExporterManager` plus downloader wrapper; utility integration layer | keep as-is |
@@ -89,8 +89,8 @@ no provider rewrite, no runtime behavior change in inventory-only work.
 
 | Name in docs/config | Found in code/docs | In plugins aggregator? | Classification |
 |---|---|---|---|
-| `D8` | Removed — previously `D8PluginManager` inside `plugins/canalPlus` | No standalone module | obsolete Canal+ channel, deleted |
-| `CStar` (ex `D17`) | `README.md` provider list; `CStarPluginManager` inside `plugins/canalPlus` | No standalone module | embedded legacy sub-provider in `canalPlus` (renamed from `D17` when the channel rebranded to CStar; new home URL `https://www.canalplus.com/chaines/cstar`) |
+| `D8` | Former `D8PluginManager` in `plugins/canalPlus` (removed) | No standalone module | removed — channel rebranded to C8; dead `www.d8.tv` / `service.canal-plus.com` endpoints |
+| `CStar` (ex `D17`) | `README.md` provider list; `CStarPluginManager` inside `plugins/canalPlus` | No standalone module | embedded legacy sub-provider in `canalPlus` (renamed from `D17` when the channel rebranded to CStar; home URL `https://www.canalplus.com/chaines/cstar`) |
 | `NRJ12` / `nrj12` | Mentioned in `README.md` and tracker notes | No | historical reference only (missing module) |
 | `FranceTV / Pluzz` | `plugins/francetv` module replaces former `plugins/pluzz`; mobile catalogue + yt-dlp flow | Yes (`francetv`) | rename completed (PR #58); existing grab-config entries still require manual `pluzz` → `francetv` migration |
 | `Kewego` | Legacy stream references in `plugins/lequipe/test/TestInitStream.java`; risk register mentions kewego in live tests | No dedicated module | historical endpoint dependency in tests |

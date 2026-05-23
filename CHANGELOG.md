@@ -33,6 +33,7 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-05-23 | TBD | Remove obsolete embedded `D8` sub-provider from `plugins/canalPlus` (dead `www.d8.tv` endpoints; channel rebranded to C8); drop `d8` from sample `grabconfig.xml`; update offline fixture baseline to `canalPlus,cstar` |
 | 2026-05-18 | TBD | Resolve JavaFX `jfxrt.jar` from common JDK 8 layouts in `HabitvLauncher` |
 
 ### ✨ Features
@@ -55,7 +56,6 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 | Date | Commit | Change |
 |------|--------|--------|
-| 2026-05-23 | PR [#92](https://github.com/Mika3578/habitv/pull/92) | Remove obsolete embedded `D8` sub-provider from `canalPlus`; update provider inventory, offline fixture baseline (`canalPlus,cstar`), and console grab-config |
 | 2026-05-18 | PR [#52](https://github.com/Mika3578/habitv/pull/52) | Document yt-dlp CLI compatibility and tracker progress |
 | 2026-05-17 | `750640d` | Update modernization status after console baseline |
 | 2026-05-16 | `be5b667` | Update plugin tester dependency tracker |
