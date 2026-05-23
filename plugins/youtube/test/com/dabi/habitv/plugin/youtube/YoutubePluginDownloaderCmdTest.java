@@ -171,6 +171,32 @@ public class YoutubePluginDownloaderCmdTest {
 	}
 
 	@Test
+	public void customParameterArgsDoNotAppendEmbedSubtitlesFlags() throws Exception {
+		final HashMap<String, String> downloaderName2Bin = new HashMap<>();
+		downloaderName2Bin.put(YoutubeConf.NAME, "/usr/bin/yt-dlp");
+		final DownloaderPluginHolder downloaders = new DownloaderPluginHolder(
+				"/bin/sh -c #CMD#",
+				Collections.<String, PluginDownloaderInterface>emptyMap(),
+				downloaderName2Bin, "/tmp/out", "/tmp/idx", "/tmp/bin",
+				"/tmp/plugins");
+
+		final DownloadParamDTO param = new DownloadParamDTO(
+				"https://www.youtube.com/watch?v=jNQXAC9IVRw",
+				"/tmp/out/test.mp4", "mp4");
+		param.addParam(FrameworkConf.PARAMETER_ARGS,
+				" \"#VIDEO_URL#\" -o \"#FILE_DEST#\" --no-check-certificate");
+		param.addParam(FrameworkConf.PARAMETER_EMBED_SUBTITLES, "true");
+
+		final ProcessHolder holder = new YoutubePluginDownloader()
+				.download(param, downloaders);
+		final String cmd = readCmd(holder);
+		assertTrue(cmd.contains("--no-check-certificate"));
+		assertFalse(cmd.contains("--embed-subs"));
+		assertFalse(cmd.contains("--sub-langs"));
+		assertFalse(cmd.contains("--sub-format"));
+	}
+
+	@Test
 	public void downloadWithMp3ArgsIncludesExtractAudioFlags() throws Exception {
 		final HashMap<String, String> downloaderName2Bin = new HashMap<>();
 		downloaderName2Bin.put(YoutubeConf.NAME, "/usr/bin/yt-dlp");
