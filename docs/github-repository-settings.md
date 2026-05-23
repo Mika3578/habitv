@@ -83,4 +83,5 @@ there.
    git push -u origin develop`) and apply the same branch
    protection.
 4. Optionally set `develop` as the default branch.
-5. Track this work as HBTV-003 in `docs/dev-tracker.md`.
+5. Track this work under the `branch-protection` item in
+   `docs/dev-tracker.md` (legacy code mapping remains historical only).

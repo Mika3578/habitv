@@ -1,6 +1,7 @@
-# 🔌 Provider and plugin inventory (HBTV-006)
+# 🔌 Provider and plugin inventory
 
-**Tracker item**: `provider-inventory` (`HBTV-006`)  
+**Tracker item**: `provider-inventory`  
+**Legacy code**: `HBTV-006` (historical reference only)  
 **Status:** in progress (~55%) — inventory and offline fixtures; rewrites are
 separate PRs per module.
 

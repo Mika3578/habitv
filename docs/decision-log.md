@@ -551,6 +551,22 @@ and make enforcement unclear.
 
 ---
 
+## 2026-05-23 - Remove HBTV-style tracker IDs from workflow naming
+
+`AGENTS.md` remains the source of truth for AI agent workflow policy.
+
+HBTV-style tracker IDs such as `hbtv-006` and `HBTV-015` are deprecated
+for new branch names, PR titles, commit subjects, and workflow
+documentation.
+
+Future work should use descriptive Conventional Commit scopes and
+GitHub-native tracking through issues, labels, projects, and milestones.
+
+Existing historical tracker references may remain only when needed to
+preserve context.
+
+---
+
 ## 📝 How to add a new ADR
 
 1. Pick a descriptive kebab-case slug (e.g. `enable-spotbugs`).

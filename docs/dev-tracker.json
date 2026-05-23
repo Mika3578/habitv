@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema",
   "version": 3,
-  "description": "Machine-readable mirror of docs/dev-tracker.md. Keep both files in sync. Identifiers use descriptive kebab-case slugs (see descriptive-slug-ids ADR).",
+  "description": "Machine-readable mirror of docs/dev-tracker.md. Keep both files in sync. Identifiers use descriptive kebab-case slugs (see descriptive-slug-ids ADR). Legacy HBTV codes are historical-only and not for new workflow naming.",
   "lastRefresh": "2026-05-23",
   "statusValues": [
     "proposed",

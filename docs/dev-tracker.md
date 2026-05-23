@@ -11,6 +11,8 @@
 > kebab-case slug. The opaque legacy codes (`HBTV-XXX`) are preserved
 > on each entry for compatibility with existing PRs and commits. See
 > the `descriptive-slug-ids` ADR for the rationale and full mapping.
+> Legacy codes are historical-only and must not be used for new branch
+> names, PR titles, commit subjects, or workflow naming.
 
 **Last refresh:** 2026-05-23 · **Active branch:** `develop`
 

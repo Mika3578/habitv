@@ -27,11 +27,15 @@
 - Risk:
 - Rollback:
 
-## Linked tracker item
+## Related issue
 
-<!-- Descriptive slug from docs/dev-tracker.md; add (HBTV-XXX) when the entry
-     has a legacy code. Use N/A when no tracker item applies. -->
-- `tracker-slug` (HBTV-XXX)
+<!-- Optional: include a real GitHub issue number, e.g. #123. -->
+- N/A
+
+## Scope
+
+<!-- Short descriptive scope, e.g. provider-youtube-ytdlp. -->
+-
 
 ## Checklist
 

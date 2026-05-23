@@ -105,18 +105,20 @@ for the full rationale.
 
 ---
 
-## 🎯 One tracker item per PR
+## 🎯 One scope per PR
 
 | Rule | Detail |
 |------|--------|
-| Tracker ID | Reference one work-item slug (e.g. `legacy-url-migration`) from `docs/dev-tracker.md` in the PR body |
+| Related issue | Optional: reference a real GitHub issue (e.g. `#123`) when one exists |
+| Scope | Use one clear descriptive scope in branch name and PR body (e.g. `provider-youtube-ytdlp`) |
 | Scope discipline | One logical change. No opportunistic refactors or formatting passes |
-| Linear history | No merge commits inside feature branches; squash or rebase only |
+| Linear history | No merge commits inside work branches; squash or rebase only |
 | Doc sync | Update `docs/dev-tracker.{md,json}`, `docs/risk-register.md`, `docs/decision-log.md` when behavior or scope changes |
 | English only | Branches, commits, code comments, docs, PR text |
 
-If your change does not fit any tracker item, open one first via the
-`modernization` issue template before coding.
+Do not use local tracker IDs (e.g. `hbtv-*` / `HBTV-*`) for new branch
+names, PR titles, or commit subjects. Use descriptive scopes and
+GitHub-native tracking (issues, labels, projects, milestones).
 
 ---
 

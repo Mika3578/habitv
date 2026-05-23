@@ -81,8 +81,8 @@ manually.
 
 - Java baseline migration beyond Java 8.
 - Plugin or provider modernization.
-- Maven artifact repository migration (HBTV-004).
-- Runtime updater URL or layout changes (HBTV-005).
+- Maven artifact repository migration (`legacy-url-migration`).
+- Runtime updater URL or layout changes (`static-repo-publish`).
 
 Tracker items and ADRs in `docs/dev-tracker.md` and `docs/decision-log.md`
 govern when those areas may change.

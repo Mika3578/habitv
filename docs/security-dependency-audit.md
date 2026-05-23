@@ -1,6 +1,7 @@
 # Dependency security audit baseline
 
-> **Tracker:** `dependency-security-audit` (HBTV-016)  
+> **Tracker:** `dependency-security-audit`  
+> **Legacy code:** `HBTV-016` (historical reference only)  
 > **Branch:** `security/dependabot-audit-baseline`  
 > **Last refresh:** 2026-05-20
 

@@ -105,21 +105,40 @@ Deprecated prefixes (do not create new branches with these):
   `refactor/provider-...`, `docs/provider-...`, or `test/provider-...`
 
 Branch format:
-`<type>/<tracker-or-pr-id>-<short-scope>`
+`<type>/<short-scope>`
 
 Examples:
-- `fix/hbtv-006-youtube-ytdlp`
-- `fix/pr-91-canalplus-cstar`
-- `chore/hbtv-012-remove-obsolete-providers`
-- `test/hbtv-006-provider-offline-fixtures`
-- `ci/hbtv-020-maven-pr-validation`
-- `docs/hbtv-006-provider-inventory`
+- `fix/provider-youtube-ytdlp`
+- `feat/provider-francetv-metadata`
+- `docs/provider-inventory-update`
+- `test/provider-offline-fixtures`
+- `ci/maven-pr-validation`
+- `refactor/provider-canalplus-cleanup`
+
+HBTV-style tracker IDs are deprecated.
+
+Do not use tracker IDs such as `hbtv-006`, `HBTV-015`, `hbtv-***`, or
+`HBTV***` in:
+- branch names
+- PR titles
+- commit subjects
+- active documentation headings
+- AI workflow rules
+- PR templates
+
+Use descriptive Conventional Commit scopes instead.
+
+Examples:
+- `fix(provider-youtube): switch downloader to yt-dlp`
+- `docs(agents): align AI rules policy`
+- `test(providers): add offline fixtures`
+- `ci(maven): harden PR validation`
 
 Before creating any branch, run:
 ```bash
 git fetch --all --prune
-git branch -a --list "*<scope>*"
-gh pr list --state open --search "<scope>"
+git branch -a --list "*<short-scope>*"
+gh pr list --repo Mika3578/habitv --state open --search "<short-scope>"
 git check-ref-format --branch "<branch-name>"
 ```
 
@@ -135,7 +154,7 @@ Keep history linear on work branches (no merge commits).
 
 | Rule | Detail |
 |------|--------|
-| Tracker reference | Reference one work-item slug (e.g. `legacy-url-migration`) in the PR body |
+| Related issue / scope | Optionally reference a real GitHub issue (e.g. `#123`) and include a clear descriptive scope |
 | Template | Fill every section of `.github/pull_request_template.md` |
 | Diff size | Keep small and focused; reject opportunistic refactors |
 | History | Linear inside work branches; no merge commits |
@@ -144,7 +163,8 @@ Keep history linear on work branches (no merge commits).
 
 AI-agent PR target policy:
 - Agent-created PRs must always target `Mika3578/habitv`.
-- Agents must never open PRs directly against `ikfon10/habitv`.
+- Agents must never create, update, close, or comment on PRs in
+  `ikfon10/habitv`.
 - `ikfon10/habitv` may be used as an upstream/reference repository only.
 - PRs from `Mika3578/habitv` to `ikfon10/habitv` are maintainer-controlled
   and must not be automated by Cursor, Claude, Codex, or Copilot unless
@@ -169,12 +189,23 @@ Wrong:
 gh pr create --repo ikfon10/habitv ...
 ```
 
+PR title policy:
+- PR titles must use Conventional Commits.
+- Good: `docs(agents): align AI rules policy`
+- Good: `fix(provider-youtube): switch downloader to yt-dlp`
+- Good: `ci(maven): harden PR validation`
+- Bad: `HBTV-006 fix youtube provider`
+- Bad: `docs(HBTV-015): update agent rules`
+- Bad: `fix/hbtv-006-youtube-ytdlp`
+
 Required PR body sections:
-1. `Summary`
-2. `Changes`
-3. `Validation`
-4. `Risk / rollback`
-5. `Notes`
+1. `Related issue` (optional `#<issue-number>`)
+2. `Scope` (short descriptive scope, e.g. `provider-youtube-ytdlp`)
+3. `Summary`
+4. `Changes`
+5. `Validation`
+6. `Risk / rollback`
+7. `Notes`
 
 Before opening a PR:
 1. Verify no open PR already covers the same scope.
@@ -183,6 +214,14 @@ Before opening a PR:
    - `git status --short`
    - `mvn -B -ntp -DskipTests validate`
 4. Include exact validation results in the PR body.
+
+If tracking is needed, use GitHub-native tracking:
+- a real GitHub issue number (e.g. `#123`)
+- labels
+- project fields
+- milestones
+
+Do not invent local tracker IDs.
 
 ---
 
