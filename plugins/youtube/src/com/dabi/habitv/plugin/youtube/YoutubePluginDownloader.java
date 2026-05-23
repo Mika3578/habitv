@@ -32,7 +32,6 @@ public class YoutubePluginDownloader extends BaseUpdatablePlugin implements Plug
 			// audio extraction/conversion with -x.
 			// Subtitle embedding is opt-in because default downloads should stay video/audio only and must not leave subtitle sidecar files.
 			// Auto-generated subtitles are intentionally not enabled here; they should be added later as a separate advanced option.
-			// TODO: Add a separate advanced option to include auto-generated subtitles when official subtitles are unavailable.
 			cmd += YoutubeConf.DUMP_CMD;
 			if (isEmbedSubtitlesEnabled(downloadParam)) {
 				cmd += YoutubeConf.DUMP_CMD_EMBED_SUBS;
