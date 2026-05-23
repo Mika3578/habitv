@@ -19,10 +19,12 @@ defined in `AGENTS.md`.
 ## Contributor workflow
 
 1. Sync to latest `develop`.
-2. Pick or add a tracker item in [`dev-tracker.md`](dev-tracker.md).
-3. Keep the PR scoped to **one** logical change / tracker item.
+2. Pick or add a descriptive scope item in [`dev-tracker.md`](dev-tracker.md).
+3. Keep the PR scoped to **one** logical change / scope.
 4. Use [Conventional Commits](https://www.conventionalcommits.org/) in English.
-5. Run validation (default: `mvn -B -ntp -DskipTests validate`).
+5. Run validation:
+   - docs-only PR: `git diff --check`
+   - default code PR: `mvn -B -ntp -DskipTests validate`
 6. Paste exact command output in the PR body.
 7. Update `dev-tracker.md` + `dev-tracker.json` (and risk/decision docs when
    applicable) in the same PR when state changes.
@@ -32,7 +34,7 @@ See [`CONTRIBUTING.md`](../CONTRIBUTING.md) and [`AGENTS.md`](../AGENTS.md).
 ## PR metadata policy
 
 - PR titles and bodies in **English**.
-- Reference one tracker slug (e.g. `provider-inventory`).
+- Reference one descriptive scope slug (e.g. `provider-inventory`).
 - Squash merge title: Conventional Commits + PR number.
 - Squash body: final outcome and validation — not intermediate commit bullets.
 - Remove accidental `Co-authored-by` trailers unless intentional.

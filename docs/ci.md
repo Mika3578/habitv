@@ -63,7 +63,14 @@ Details: [`repository-maintenance.md`](repository-maintenance.md).
 
 ## Local command parity
 
-Run the same Java 8 commands locally before opening a PR:
+Before opening a PR:
+
+- Docs-only PR: run `git diff --check`.
+- Default code PR: run `mvn -B -ntp -DskipTests validate`.
+- Stronger local commands are scoped and optional unless the PR
+  explicitly targets CI/build behavior.
+
+Scoped Java 8 command set (when needed):
 
 ```bash
 mvn -B -ntp -DskipTests validate

@@ -4,14 +4,19 @@
 
 <!-- One or two sentences describing what this PR delivers and why. -->
 
+## Scope
+
+<!-- Short descriptive scope, e.g. provider-youtube-ytdlp. -->
+-
+
+## Related issue
+
+<!-- Optional: include a real GitHub issue number, e.g. #123. -->
+- N/A
+
 ## Changes
 
 <!-- Bullet list of what this PR changes. -->
--
-
-## Notes
-
-<!-- Bullet list of intentional non-changes to avoid scope creep. -->
 -
 
 ## Validation
@@ -27,14 +32,9 @@
 - Risk:
 - Rollback:
 
-## Related issue
+## Notes
 
-<!-- Optional: include a real GitHub issue number, e.g. #123. -->
-- N/A
-
-## Scope
-
-<!-- Short descriptive scope, e.g. provider-youtube-ytdlp. -->
+<!-- Bullet list of intentional non-changes to avoid scope creep. -->
 -
 
 ## Checklist

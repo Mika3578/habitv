@@ -5,9 +5,9 @@ coding agent working on the Habitv repository. These instructions
 complement, but do not replace, the human review process.
 
 **Source of truth policy** — `AGENTS.md` is the single source of truth
-for repository-wide AI agent workflow policy (branch naming, duplicate
-prevention, commits, PR structure, validation, linear history, and
-documentation sync).
+for AI-agent workflow policy in this repository. Tool-specific files
+must reference `AGENTS.md` and must not duplicate conflicting workflow
+rules.
 
 > 📚 **Companion files** (read them before acting):
 > - [`CONTRIBUTING.md`](CONTRIBUTING.md) — branch / commit / PR policy
@@ -227,7 +227,21 @@ Do not invent local tracker IDs.
 
 ## 🧪 6. Validation policy
 
-Default validation command for this phase:
+Validation baseline by PR type:
+
+- Docs-only PR:
+  - `git diff --check`
+  - Maven is not required unless build files changed.
+- Default code PR:
+  - `mvn -B -ntp -DskipTests validate`
+- Java/code-impacting PR:
+  - `mvn -B -ntp -DskipTests validate`
+  - Targeted compile/test commands relevant to the touched modules.
+- Full package:
+  - Run only when explicitly scoped and document JavaFX/JDK 8
+    constraints.
+
+Default validation command for non-docs changes:
 
 ```bash
 mvn -B -ntp -DskipTests validate

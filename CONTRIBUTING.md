@@ -126,6 +126,8 @@ GitHub-native tracking (issues, labels, projects, milestones).
 
 The current safe validation level is **`validate`**.
 Stronger goals are only safe for explicitly scoped modules.
+For docs-only PRs, run `git diff --check`; Maven commands are optional
+unless build files changed.
 
 | Goal | Status in current phase | When to use |
 |------|------------------------|-------------|
