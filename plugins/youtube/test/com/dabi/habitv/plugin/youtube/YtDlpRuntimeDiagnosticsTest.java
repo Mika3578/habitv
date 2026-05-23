@@ -88,4 +88,55 @@ public class YtDlpRuntimeDiagnosticsTest {
 		assertFalse("disabled preflight must not create the parent directory", parent.exists());
 	}
 
+	@Test
+	public void runPreflightAllowsStartupLongerThanOneSecond() {
+		final File parent = new File(System.getProperty("java.io.tmpdir"),
+				"habitv-test-" + UUID.randomUUID());
+		final File binDir = new File(parent, "bin");
+		final File javaHome = new File(System.getProperty("java.home"));
+		final boolean windows = System.getProperty("os.name").toLowerCase().contains("win");
+		final String javaExecName = windows ? "java.exe" : "java";
+		final String cmdProcessor = windows ? "cmd.exe /c #CMD#" : "/bin/sh -c #CMD#";
+		final String javaExec = new File(javaHome, "bin" + File.separator + javaExecName).getAbsolutePath();
+		final String classPath = System.getProperty("java.class.path");
+		final String quotedJavaExec = "\"" + javaExec + "\"";
+		final String quotedClassPath = "\"" + classPath + "\"";
+		final String executablePath = quotedJavaExec + " -cp " + quotedClassPath + " "
+				+ SlowVersionMain.class.getName();
+
+		try {
+			final long startedAt = System.currentTimeMillis();
+			YtDlpRuntimeDiagnostics.runPreflight(cmdProcessor, executablePath, binDir.getAbsolutePath());
+			final long elapsedMs = System.currentTimeMillis() - startedAt;
+
+			assertTrue("preflight should allow command startup longer than one second, elapsed ms=" + elapsedMs,
+					elapsedMs >= 1200L);
+		} finally {
+			deleteRecursively(parent);
+		}
+	}
+
+	private static void deleteRecursively(final File file) {
+		if (file == null || !file.exists()) {
+			return;
+		}
+		if (file.isDirectory()) {
+			final File[] children = file.listFiles();
+			if (children != null) {
+				for (final File child : children) {
+					deleteRecursively(child);
+				}
+			}
+		}
+		file.delete();
+	}
+
+	public static class SlowVersionMain {
+
+		public static void main(final String[] args) throws InterruptedException {
+			Thread.sleep(1500L);
+			System.out.println("2026.05.21");
+		}
+	}
+
 }
