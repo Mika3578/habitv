@@ -94,7 +94,9 @@ public class YtDlpRuntimeDiagnosticsTest {
 				"habitv-test-" + UUID.randomUUID());
 		final File binDir = new File(parent, "bin");
 		final File javaHome = new File(System.getProperty("java.home"));
-		final String javaExecName = System.getProperty("os.name").toLowerCase().contains("win") ? "java.exe" : "java";
+		final boolean windows = System.getProperty("os.name").toLowerCase().contains("win");
+		final String javaExecName = windows ? "java.exe" : "java";
+		final String cmdProcessor = windows ? "cmd.exe /c #CMD#" : "/bin/sh -c #CMD#";
 		final String javaExec = new File(javaHome, "bin" + File.separator + javaExecName).getAbsolutePath();
 		final String classPath = System.getProperty("java.class.path");
 		final String quotedJavaExec = "\"" + javaExec + "\"";
@@ -104,7 +106,7 @@ public class YtDlpRuntimeDiagnosticsTest {
 
 		try {
 			final long startedAt = System.currentTimeMillis();
-			YtDlpRuntimeDiagnostics.runPreflight("", executablePath, binDir.getAbsolutePath());
+			YtDlpRuntimeDiagnostics.runPreflight(cmdProcessor, executablePath, binDir.getAbsolutePath());
 			final long elapsedMs = System.currentTimeMillis() - startedAt;
 
 			assertTrue("preflight should allow command startup longer than one second, elapsed ms=" + elapsedMs,
