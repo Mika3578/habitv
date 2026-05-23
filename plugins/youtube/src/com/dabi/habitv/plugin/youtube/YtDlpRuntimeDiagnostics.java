@@ -20,6 +20,9 @@ public final class YtDlpRuntimeDiagnostics {
 	private static final Logger LOG = Logger.getLogger(YtDlpRuntimeDiagnostics.class);
 
 	static final String USER_MESSAGE_PREFIX = "yt-dlp failed before the download started";
+	private static final int YT_DLP_PREFLIGHT_TIMEOUT_SECONDS = 10;
+	private static final long YT_DLP_PREFLIGHT_TIMEOUT_MILLIS = YT_DLP_PREFLIGHT_TIMEOUT_SECONDS * 1000L;
+	private static final int OUTPUT_SNIPPET_MAX_LENGTH = 300;
 
 	private static final String[] PYINSTALLER_SIGNATURES = { "[PYI-", "Failed to extract", "Cryptodome", "_MEI" };
 
@@ -108,11 +111,12 @@ public final class YtDlpRuntimeDiagnostics {
 		}
 		logExecutableDiagnostics(executablePath, binDir);
 		final String versionCmd = executablePath + " --version";
+		LOG.info("yt-dlp preflight command: " + versionCmd);
 		final Map<String, String> env = buildYtDlpEnvironment(binDir);
-		final CmdExecutor versionExecutor = new CmdExecutor(cmdProcessor, versionCmd, 1000) {
+		final CmdExecutor versionExecutor = new CmdExecutor(cmdProcessor, versionCmd, YT_DLP_PREFLIGHT_TIMEOUT_MILLIS) {
 			@Override
 			protected long getHungProcessTime() {
-				return 1000;
+				return YT_DLP_PREFLIGHT_TIMEOUT_MILLIS;
 			}
 
 			@Override
@@ -125,12 +129,15 @@ public final class YtDlpRuntimeDiagnostics {
 				return true;
 			}
 		};
+		final long startedAt = System.currentTimeMillis();
 		try {
 			versionExecutor.start();
 		} catch (final ExecutorFailedException e) {
+			logPreflightOutcome(startedAt, e.getFullOuput());
 			throw asBootstrapFailureIfNeeded(versionCmd, e.getFullOuput(), executablePath, e);
 		}
 		final String fullOutput = versionExecutor.getFullOutput();
+		logPreflightOutcome(startedAt, fullOutput);
 		if (isBootstrapExtractionFailure(fullOutput)) {
 			throw new ExecutorFailedException(versionCmd, fullOutput,
 					buildBootstrapFailureUserMessage(executablePath), null);
@@ -146,5 +153,28 @@ public final class YtDlpRuntimeDiagnostics {
 			return new ExecutorFailedException(cmd, fullOutput, buildBootstrapFailureUserMessage(executablePath), cause);
 		}
 		return cause;
+	}
+
+	private static void logPreflightOutcome(final long startedAt, final String fullOutput) {
+		final long elapsedMs = System.currentTimeMillis() - startedAt;
+		LOG.info("yt-dlp preflight elapsed ms: " + elapsedMs);
+		final String snippet = buildOutputSnippet(fullOutput);
+		if (snippet != null) {
+			LOG.info("yt-dlp preflight output snippet: " + snippet);
+		}
+	}
+
+	private static String buildOutputSnippet(final String fullOutput) {
+		if (fullOutput == null) {
+			return null;
+		}
+		final String compact = fullOutput.replace('\r', ' ').replace('\n', ' ').trim();
+		if (compact.isEmpty()) {
+			return null;
+		}
+		if (compact.length() <= OUTPUT_SNIPPET_MAX_LENGTH) {
+			return compact;
+		}
+		return compact.substring(0, OUTPUT_SNIPPET_MAX_LENGTH) + "...";
 	}
 }

@@ -88,4 +88,32 @@ public class YtDlpRuntimeDiagnosticsTest {
 		assertFalse("disabled preflight must not create the parent directory", parent.exists());
 	}
 
+	@Test
+	public void runPreflightAllowsStartupLongerThanOneSecond() {
+		final File parent = new File(System.getProperty("java.io.tmpdir"),
+				"habitv-test-" + UUID.randomUUID());
+		final File binDir = new File(parent, "bin");
+		final File javaHome = new File(System.getProperty("java.home"));
+		final String javaExecName = System.getProperty("os.name").toLowerCase().contains("win") ? "java.exe" : "java";
+		final String javaExec = new File(javaHome, "bin" + File.separator + javaExecName).getAbsolutePath();
+		final String classPath = System.getProperty("java.class.path");
+		final String executablePath = javaExec + " -cp " + classPath + " "
+				+ SlowVersionMain.class.getName();
+
+		final long startedAt = System.currentTimeMillis();
+		YtDlpRuntimeDiagnostics.runPreflight("", executablePath, binDir.getAbsolutePath());
+		final long elapsedMs = System.currentTimeMillis() - startedAt;
+
+		assertTrue("preflight should allow command startup longer than one second, elapsed ms=" + elapsedMs,
+				elapsedMs >= 1200L);
+	}
+
+	public static class SlowVersionMain {
+
+		public static void main(final String[] args) throws InterruptedException {
+			Thread.sleep(1500L);
+			System.out.println("2026.05.21");
+		}
+	}
+
 }
