@@ -2,7 +2,7 @@
 
 > **Tracker:** `dependency-security-audit`  
 > **Legacy code:** `HBTV-016` (historical reference only)  
-> **Branch:** `security/dependabot-audit-baseline`  
+> **Branch:** `security/dependabot-audit-baseline` (legacy prefix; historical reference only)  
 > **Last refresh:** 2026-05-20
 
 ## GitHub warning summary

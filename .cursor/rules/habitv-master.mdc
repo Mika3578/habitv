@@ -39,7 +39,7 @@ They exist to keep modernization safe, incremental, and reviewable.
 - Follow `AGENTS.md` as the source of truth for PR target policy,
   branch naming, duplicate branch/PR prevention, commit style, PR
   structure, validation, and linear history.
-- Use small PRs scoped to a single tracker item.
+- Use small PRs scoped to a single descriptive scope (see `docs/dev-tracker.md`).
 - Use English for branches, commits, comments, docs, and PR text.
 
 ## Documentation discipline
