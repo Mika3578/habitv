@@ -142,6 +142,33 @@ Keep history linear on work branches (no merge commits).
 | Doc sync | Update tracker, risk register, decision log on meaningful changes |
 | Plugin version bump | A `plugins/*/pom.xml` `<version>` override must match a `plugin-versioning-policy` trigger (downloader/parser, user-facing endpoint, user-facing configuration). Name the trigger in the PR body. Internal reactor deps in a bumped plugin MUST use `${project.parent.version}`. |
 
+AI-agent PR target policy:
+- Agent-created PRs must always target `Mika3578/habitv`.
+- Agents must never open PRs directly against `ikfon10/habitv`.
+- `ikfon10/habitv` may be used as an upstream/reference repository only.
+- PRs from `Mika3578/habitv` to `ikfon10/habitv` are maintainer-controlled
+  and must not be automated by Cursor, Claude, Codex, or Copilot unless
+  explicitly requested as a separate task.
+
+Safe GitHub CLI examples:
+
+Correct:
+```bash
+git push -u origin docs/align-ai-rules-policy
+
+gh pr create \
+  --repo Mika3578/habitv \
+  --base develop \
+  --head docs/align-ai-rules-policy \
+  --title "docs(agents): align AI rules policy" \
+  --body-file /tmp/habitv-ai-rules-pr-body.md
+```
+
+Wrong:
+```bash
+gh pr create --repo ikfon10/habitv ...
+```
+
 Required PR body sections:
 1. `Summary`
 2. `Changes`

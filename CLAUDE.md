@@ -3,6 +3,7 @@
 AGENTS.md is the single source of truth for repository-wide AI agent workflow policy.
 
 Before making changes, read and follow AGENTS.md for:
+- PR target policy
 - branch naming
 - commit style
 - pull request structure
@@ -45,3 +46,6 @@ Use English for:
 - AI rule files
 
 Keep Git history linear.
+
+For this workflow, agent-created PRs must target `Mika3578/habitv`
+and must not be opened directly against `ikfon10/habitv`.

@@ -36,9 +36,9 @@ They exist to keep modernization safe, incremental, and reviewable.
 
 ## Branching and PRs
 
-- Follow `AGENTS.md` as the source of truth for branch naming, duplicate
-  branch/PR prevention, commit style, PR structure, validation, and
-  linear history.
+- Follow `AGENTS.md` as the source of truth for PR target policy,
+  branch naming, duplicate branch/PR prevention, commit style, PR
+  structure, validation, and linear history.
 - Use small PRs scoped to a single tracker item.
 - Use English for branches, commits, comments, docs, and PR text.
 

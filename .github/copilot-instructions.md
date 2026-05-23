@@ -10,6 +10,7 @@ narrowly-scoped suggestions over rewrites.
 ## Workflow policy source of truth
 
 Follow `AGENTS.md` as the source of truth for:
+- PR target policy
 - branch naming
 - duplicate branch and PR prevention
 - commit style

@@ -30,6 +30,9 @@ Before creating a new branch, follow the duplicate-prevention checks
 defined in `AGENTS.md` (`git fetch --all --prune`, matching branch/PR
 search, and `git check-ref-format --branch`).
 
+For AI-agent workflow, PR target policy is defined in `AGENTS.md`:
+agent-created PRs target `Mika3578/habitv` (not `ikfon10/habitv`).
+
 ---
 
 ## 📝 Commit style

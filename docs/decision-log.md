@@ -535,6 +535,9 @@ and make enforcement unclear.
   `chore/`, `docs/`, `test/`, `ci/`, and `refactor/`.
 - Deprecated prefixes are `feature/`, `build/`, `runtime/`, and
   `provider/`, with explicit replacement mapping in `AGENTS.md`.
+- Agent-created PRs must target `Mika3578/habitv`. Agents do not open
+  PRs directly against `ikfon10/habitv`; that upstream flow remains
+  maintainer-controlled unless explicitly requested.
 - Before creating a branch, run duplicate/collision checks:
   `git fetch --all --prune`, branch scope search, open PR scope search,
   and `git check-ref-format --branch`.
