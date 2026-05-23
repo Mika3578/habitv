@@ -97,7 +97,9 @@ public class YtDlpRuntimeDiagnosticsTest {
 		final String javaExecName = System.getProperty("os.name").toLowerCase().contains("win") ? "java.exe" : "java";
 		final String javaExec = new File(javaHome, "bin" + File.separator + javaExecName).getAbsolutePath();
 		final String classPath = System.getProperty("java.class.path");
-		final String executablePath = javaExec + " -cp " + classPath + " "
+		final String quotedJavaExec = "\"" + javaExec + "\"";
+		final String quotedClassPath = "\"" + classPath + "\"";
+		final String executablePath = quotedJavaExec + " -cp " + quotedClassPath + " "
 				+ SlowVersionMain.class.getName();
 
 		final long startedAt = System.currentTimeMillis();
