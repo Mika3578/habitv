@@ -7,6 +7,17 @@ is staged through tracker items in `docs/dev-tracker.md`.
 Treat the codebase as production legacy: prefer conservative,
 narrowly-scoped suggestions over rewrites.
 
+## Workflow policy source of truth
+
+Follow `AGENTS.md` as the source of truth for:
+- branch naming
+- duplicate branch and PR prevention
+- commit style
+- PR structure
+- validation commands
+- linear Git history
+- documentation sync requirements
+
 ## Compatibility constraints
 
 - Target Java 8 only. Do not suggest Java 9+ language features

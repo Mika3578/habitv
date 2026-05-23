@@ -4,12 +4,12 @@
 
 <!-- One or two sentences describing what this PR delivers and why. -->
 
-## Scope
+## Changes
 
 <!-- Bullet list of what this PR changes. -->
 -
 
-## Out of scope
+## Notes
 
 <!-- Bullet list of intentional non-changes to avoid scope creep. -->
 -
@@ -17,20 +17,15 @@
 ## Validation
 
 <!-- Commands actually run locally and their honest outcome. -->
+- `git status --short`
 - `git diff --check`
 - `mvn -B -ntp -DskipTests validate`
 
-## Risk
+## Risk / rollback
 
-<!-- Reference docs/risk-register.md IDs (R-00X) impacted or introduced. -->
-- Affected risks:
-- New risks:
-- Mitigation:
-
-## Rollback
-
-<!-- How to revert this PR safely if it breaks develop. -->
-- Revert commit(s) via `git revert <sha>` and re-run validation.
+<!-- Reference docs/risk-register.md IDs impacted/introduced and describe rollback. -->
+- Risk:
+- Rollback:
 
 ## Linked tracker item
 
@@ -41,6 +36,8 @@
 ## Checklist
 
 - [ ] Branch was created from `develop`
+- [ ] Duplicate-prevention checks completed before branch creation (see `AGENTS.md`)
+- [ ] No open PR already covered the same scope before opening this PR
 - [ ] No unrelated source changes
 - [ ] `git diff --check` passed
 - [ ] `mvn -B -ntp -DskipTests validate` passed or baseline failure documented

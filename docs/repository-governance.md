@@ -13,9 +13,9 @@ security, and automation boundaries for the modernization restart.
 |--------|------|
 | `develop` | Default integration branch. All active work merges here first. |
 | `master` / `main` | Legacy stable baseline when present. Protected from direct pushes. |
-| Short-lived branches | Created from `develop`: `feature/*`, `fix/*`, `chore/*`, `docs/*`, `ci/*`, and other prefixes defined in `AGENTS.md`. |
+| Short-lived branches | Created from `develop`: `fix/*`, `feat/*`, `chore/*`, `docs/*`, `test/*`, `ci/*`, `refactor/*` (see `AGENTS.md`). |
 
-Do not base modernization feature branches on `master` unless a tracker item
+Do not base modernization work branches on `master` unless a tracker item
 explicitly requires it.
 
 ## Merge model
@@ -29,7 +29,7 @@ explicitly requires it.
 
 ## Required local validation before opening a PR
 
-Run from the repository root on the feature branch:
+Run from the repository root on the work branch:
 
 ```bash
 git diff --check

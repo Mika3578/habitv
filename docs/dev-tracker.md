@@ -12,7 +12,7 @@
 > on each entry for compatibility with existing PRs and commits. See
 > the `descriptive-slug-ids` ADR for the rationale and full mapping.
 
-**Last refresh:** 2026-05-20 · **Active branch:** `develop`
+**Last refresh:** 2026-05-23 · **Active branch:** `develop`
 
 **Documentation entry point:** [`README.md`](../README.md) (overview, build matrix,
 automatic category behavior, provider summary, doc map).
@@ -107,7 +107,9 @@ git log --oneline -5                 # bootstrap commits present
 
 **Notes** — Documentation/workflow only; no runtime or provider changes.
 GitHub UI-level settings application moved to its own item
-(`branch-protection`).
+(`branch-protection`). Follow-up policy alignment makes `AGENTS.md`
+the source of truth for AI workflow rules and aligns tool-specific
+instruction files by reference.
 
 ---
 

@@ -4,6 +4,11 @@ Instructions for **Codex, Cursor, Claude, Copilot** and any other AI
 coding agent working on the Habitv repository. These instructions
 complement, but do not replace, the human review process.
 
+**Source of truth policy** — `AGENTS.md` is the single source of truth
+for repository-wide AI agent workflow policy (branch naming, duplicate
+prevention, commits, PR structure, validation, linear history, and
+documentation sync).
+
 > 📚 **Companion files** (read them before acting):
 > - [`CONTRIBUTING.md`](CONTRIBUTING.md) — branch / commit / PR policy
 > - [`docs/dev-plan.md`](docs/dev-plan.md) — phased modernization plan
@@ -81,20 +86,80 @@ Conventional Commits, English, imperative, lowercase, ≤ 72 chars.
 
 ---
 
-## 🎯 4. PR policy
+## 🌿 4. Branch naming and duplicate prevention
+
+Allowed work branch prefixes (only):
+- `fix/`
+- `feat/`
+- `chore/`
+- `docs/`
+- `test/`
+- `ci/`
+- `refactor/`
+
+Deprecated prefixes (do not create new branches with these):
+- `feature/` → `feat/`
+- `build/` → `ci/` for CI/build automation, or `chore/` for maintenance
+- `runtime/` → `fix/`, `feat/`, or `refactor/` depending on scope
+- `provider/` → `fix/provider-...`, `feat/provider-...`,
+  `refactor/provider-...`, `docs/provider-...`, or `test/provider-...`
+
+Branch format:
+`<type>/<tracker-or-pr-id>-<short-scope>`
+
+Examples:
+- `fix/hbtv-006-youtube-ytdlp`
+- `fix/pr-91-canalplus-cstar`
+- `chore/hbtv-012-remove-obsolete-providers`
+- `test/hbtv-006-provider-offline-fixtures`
+- `ci/hbtv-020-maven-pr-validation`
+- `docs/hbtv-006-provider-inventory`
+
+Before creating any branch, run:
+```bash
+git fetch --all --prune
+git branch -a --list "*<scope>*"
+gh pr list --state open --search "<scope>"
+git check-ref-format --branch "<branch-name>"
+```
+
+If an existing branch or open PR already covers the same scope, do not
+create a duplicate. Reuse the existing branch/PR, or create a clearly
+scoped follow-up branch.
+
+Keep history linear on work branches (no merge commits).
+
+---
+
+## 🎯 5. PR policy
 
 | Rule | Detail |
 |------|--------|
 | Tracker reference | Reference one work-item slug (e.g. `legacy-url-migration`) in the PR body |
 | Template | Fill every section of `.github/pull_request_template.md` |
 | Diff size | Keep small and focused; reject opportunistic refactors |
-| History | Linear inside feature branches; no merge commits |
+| History | Linear inside work branches; no merge commits |
 | Doc sync | Update tracker, risk register, decision log on meaningful changes |
 | Plugin version bump | A `plugins/*/pom.xml` `<version>` override must match a `plugin-versioning-policy` trigger (downloader/parser, user-facing endpoint, user-facing configuration). Name the trigger in the PR body. Internal reactor deps in a bumped plugin MUST use `${project.parent.version}`. |
 
+Required PR body sections:
+1. `Summary`
+2. `Changes`
+3. `Validation`
+4. `Risk / rollback`
+5. `Notes`
+
+Before opening a PR:
+1. Verify no open PR already covers the same scope.
+2. Verify the branch is based on the latest `develop`.
+3. Run:
+   - `git status --short`
+   - `mvn -B -ntp -DskipTests validate`
+4. Include exact validation results in the PR body.
+
 ---
 
-## 🧪 5. Validation policy
+## 🧪 6. Validation policy
 
 Default validation command for this phase:
 
@@ -116,7 +181,7 @@ command + output** in the PR body.
 
 ---
 
-## 🛠️ 6. How to maintain trackers
+## 🛠️ 7. How to maintain trackers
 
 `docs/dev-tracker.md` and `docs/dev-tracker.json` are **mirrors**.
 Always update both in the same commit. Fields per item:
@@ -137,7 +202,7 @@ or `ADR-00XX` reference. Append-only; supersede rather than rewrite.
 
 ---
 
-## 🧯 7. How to handle failures
+## 🧯 8. How to handle failures
 
 ### Test failure
 1. Read the failing assertion **and** the test before editing code.
@@ -162,7 +227,7 @@ You **must**:
 
 ---
 
-## 🔐 8. Security awareness
+## 🔐 9. Security awareness
 
 - ❌ Never introduce hardcoded API keys, passwords, or tokens.
 - ❌ Never extend the existing hardcoded credentials (Gmail tests,
@@ -174,7 +239,7 @@ You **must**:
 
 ---
 
-## 🗣️ 9. Communication conventions
+## 🗣️ 10. Communication conventions
 
 - Always reply in **English** in code, commits, comments, docs, and PR
   text — regardless of the user's prompt language.
@@ -185,7 +250,7 @@ You **must**:
 
 ---
 
-## 📅 10. Update cadence
+## 📅 11. Update cadence
 
 This file is reviewed:
 - On every phase transition in `docs/dev-plan.md`.
@@ -197,14 +262,14 @@ Last refresh: see the latest commit touching this file.
 
 ---
 
-## 🔄 11. Doc sync protocol (after every step)
+## 🔄 12. Doc sync protocol (after every step)
 
 **Rule** — every commit that changes meaningful state must keep the
 documentation set in lockstep. A "meaningful state change" is any
 commit that creates, advances, completes, mitigates, supersedes, or
 contradicts an item that is already documented.
 
-### 11.1 What to update, by commit type
+### 12.1 What to update, by commit type
 
 | Type | `CHANGELOG.md` | `dev-tracker.{md,json}` | `risk-register.md` | `decision-log.md` |
 |------|:---:|:---:|:---:|:---:|
@@ -224,7 +289,7 @@ contradicts an item that is already documented.
 **if** the commit's content matches the condition next to the icon ·
 `❌` = leave alone.
 
-### 11.2 What to update, by milestone
+### 12.2 What to update, by milestone
 
 | Milestone | Required updates |
 |---|---|
@@ -235,7 +300,7 @@ contradicts an item that is already documented.
 | **Risk mitigated** | Move the risk to the 🟢 Mitigated bucket. Annotate the mitigating PR in its `Status update` line. |
 | **New decision** | Append an ADR in `decision-log.md` and update its dashboard table. Reference the ADR id from any item it constrains. |
 
-### 11.3 How to verify before a PR
+### 12.3 How to verify before a PR
 
 The agent MUST run this checklist before requesting review:
 
@@ -271,34 +336,34 @@ EOF
 grep -F "$(git rev-parse --short HEAD)" CHANGELOG.md || true
 ```
 
-A PR that flunks 11.1, 11.2, or 11.3 must be amended before merge.
+A PR that flunks 12.1, 12.2, or 12.3 must be amended before merge.
 
 ---
 
-## 🧬 12. Rule lifecycle — meta-rules
+## 🧬 13. Rule lifecycle — meta-rules
 
 This section is the rulebook **about** the rulebook. It governs how
 rules in `AGENTS.md` can be created, modified, or deleted, including
 the rules in this very section.
 
-### 12.1 Rule identification
+### 13.1 Rule identification
 
 Every rule is uniquely identified by its **section heading + index**:
 
 - `2.5` — "Replace `youtube-dl` plugin behavior with `yt-dlp`"
   (a hard rule from Section 2's table)
 - `3` — "Conventional Commits …" (a process rule from Section 3)
-- `12.3` — "Modify a rule" (a meta-rule, this section)
+- `13.3` — "Modify a rule" (a meta-rule, this section)
 
 Rule classes and their breakage consequence:
 
 | Class | Found in | Breakage consequence |
 |------|---------|----------------------|
 | 🔴 **Hard rule** | Section 2 | PR reverted; incident logged |
-| 🟠 **Process rule** | Sections 3–11 | PR amended; warning logged |
-| 🟣 **Meta-rule** | Section 12 | PR blocked at review; cannot proceed without compliance |
+| 🟠 **Process rule** | Sections 3–12 | PR amended; warning logged |
+| 🟣 **Meta-rule** | Section 13 | PR blocked at review; cannot proceed without compliance |
 
-### 12.2 Create a rule
+### 13.2 Create a rule
 
 To **add** a new rule:
 
@@ -315,7 +380,7 @@ To **add** a new rule:
 4. On merge, the ADR transitions from `🟡 Proposed` to
    `✅ Accepted`.
 
-### 12.3 Modify a rule
+### 13.3 Modify a rule
 
 To **change** an existing rule's wording, scope, or strictness:
 
@@ -328,7 +393,7 @@ To **change** an existing rule's wording, scope, or strictness:
    identify the residual risk and link the risk slug that now
    carries it.
 
-### 12.4 Delete a rule
+### 13.4 Delete a rule
 
 To **remove** a rule entirely:
 
@@ -342,7 +407,7 @@ To **remove** a rule entirely:
 3. If the deleted rule was a 🔴 hard rule, the PR requires explicit
    owner approval and cannot be self-approved by an AI agent.
 
-### 12.5 Conflict-of-interest safeguards
+### 13.5 Conflict-of-interest safeguards
 
 These hold for AI agents in particular:
 
@@ -350,7 +415,7 @@ These hold for AI agents in particular:
   PR that benefits from doing so. Split into two PRs: first the
   rulebook change, then the work it enables.
 - 🚫 An agent **may not** silently amend a rule. Every change goes
-  through 12.2 / 12.3 / 12.4 with an ADR.
+  through 13.2 / 13.3 / 13.4 with an ADR.
 - 🚫 An agent **may not** create a rule that exempts itself, a
   specific tool, a specific branch, or a specific user from the
   meta-rules.
@@ -358,12 +423,12 @@ These hold for AI agents in particular:
   the moment it observes one, even if it does not have authority
   to resolve it.
 
-### 12.6 Self-modification of meta-rules
+### 13.6 Self-modification of meta-rules
 
-The meta-rules in Section 12 themselves can be changed — but with
+The meta-rules in Section 13 themselves can be changed — but with
 extra care:
 
-- The ADR proposing a change to Section 12 must remain in
+- The ADR proposing a change to Section 13 must remain in
   `🟡 Proposed` for **at least 7 days** before it can be merged.
 - The cooling-off period prevents an agent from instantly weakening
   its own constraints inside a single working session.
@@ -371,7 +436,7 @@ extra care:
   formatting, or clarifications that demonstrably do not change the
   rules' force.
 
-### 12.7 Audit trail
+### 13.7 Audit trail
 
 Any change to `AGENTS.md` must leave traceable evidence:
 
@@ -379,7 +444,7 @@ Any change to `AGENTS.md` must leave traceable evidence:
   superseding the change (e.g.
   `docs(agents): ... (doc-sync-and-rule-lifecycle)`).
 - The ADR references the section/rule it touches (e.g.
-  `Touches: AGENTS.md §11, §12`).
+  `Touches: AGENTS.md §12, §13`).
 - The dashboard tables in `decision-log.md` and `dev-tracker.md`
   are refreshed in the same PR.
 

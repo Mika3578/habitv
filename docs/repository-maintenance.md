@@ -9,11 +9,12 @@ documentation sync, and automation expectations.
 |--------|------|
 | `develop` | Integration line for modernization — **branch from here** |
 | `master` | Stable baseline snapshot |
-| `feature/*`, `fix/*`, `docs/*`, `build/*`, `ci/*`, … | Short-lived topic branches |
+| `fix/*`, `feat/*`, `chore/*`, `docs/*`, `test/*`, `ci/*`, `refactor/*` | Short-lived topic branches |
 
 Modernization PRs target **`develop`** with linear history (no merge commits on
-the feature branch). Squash merge to `develop` with a cleaned title/body (see
-below).
+work branches). Squash merge to `develop` with a cleaned title/body (see
+below). Follow duplicate-prevention checks before creating any new branch as
+defined in `AGENTS.md`.
 
 ## Contributor workflow
 

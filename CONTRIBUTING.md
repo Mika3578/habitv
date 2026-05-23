@@ -20,11 +20,15 @@ contributions follow a stricter-than-usual workflow.
 |--------|------|-------------|
 | `master` | Stable baseline | 🔒 Protected |
 | `develop` | Integration line for modernization | 🔒 Protected |
-| `feature/*`, `fix/*`, `chore/*`, `build/*`, `ci/*`, `docs/*`, `test/*` | Short-lived branches | ✅ Allowed |
+| `fix/*`, `feat/*`, `chore/*`, `docs/*`, `test/*`, `ci/*`, `refactor/*` | Short-lived branches | ✅ Allowed |
 | `legacy` | Historical reference | 🔒 Frozen |
 
 All modernization branches must target **`develop`**.
 The restart bootstrap PR targets `master`. Everything else targets `develop`.
+
+Before creating a new branch, follow the duplicate-prevention checks
+defined in `AGENTS.md` (`git fetch --all --prune`, matching branch/PR
+search, and `git check-ref-format --branch`).
 
 ---
 
