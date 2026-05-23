@@ -102,12 +102,31 @@ public class YtDlpRuntimeDiagnosticsTest {
 		final String executablePath = quotedJavaExec + " -cp " + quotedClassPath + " "
 				+ SlowVersionMain.class.getName();
 
-		final long startedAt = System.currentTimeMillis();
-		YtDlpRuntimeDiagnostics.runPreflight("", executablePath, binDir.getAbsolutePath());
-		final long elapsedMs = System.currentTimeMillis() - startedAt;
+		try {
+			final long startedAt = System.currentTimeMillis();
+			YtDlpRuntimeDiagnostics.runPreflight("", executablePath, binDir.getAbsolutePath());
+			final long elapsedMs = System.currentTimeMillis() - startedAt;
 
-		assertTrue("preflight should allow command startup longer than one second, elapsed ms=" + elapsedMs,
-				elapsedMs >= 1200L);
+			assertTrue("preflight should allow command startup longer than one second, elapsed ms=" + elapsedMs,
+					elapsedMs >= 1200L);
+		} finally {
+			deleteRecursively(parent);
+		}
+	}
+
+	private static void deleteRecursively(final File file) {
+		if (file == null || !file.exists()) {
+			return;
+		}
+		if (file.isDirectory()) {
+			final File[] children = file.listFiles();
+			if (children != null) {
+				for (final File child : children) {
+					deleteRecursively(child);
+				}
+			}
+		}
+		file.delete();
 	}
 
 	public static class SlowVersionMain {
