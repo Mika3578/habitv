@@ -60,21 +60,26 @@ public class CStarPluginManager extends BasePluginWithProxy implements PluginPro
 
 	@Override
 	public Set<CategoryDTO> findCategory() {
-		final Set<CategoryDTO> categories = new LinkedHashSet<>();
-
-		final org.jsoup.nodes.Document doc = Jsoup.parse(getUrlContent(CStarConf.HOME_URL, CStarConf.ENCODING));
-
-		final Elements select = doc.select(".main-menu").get(0).children();
-		for (final Element liElement : select) {
-			final Element aElement = liElement.child(0);
-			final String url = aElement.attr("href");
-			final String name = aElement.text();
-			final CategoryDTO categoryDTO = new CategoryDTO(CStarConf.NAME, name, url, CStarConf.EXTENSION);
-			categoryDTO.addSubCategories(findSubCategories(url));
-			categories.add(categoryDTO);
+		try {
+			final Set<CategoryDTO> categories = new LinkedHashSet<>();
+			final org.jsoup.nodes.Document doc = Jsoup.parse(getUrlContent(CStarConf.HOME_URL, CStarConf.ENCODING));
+			final Elements select = doc.select(".main-menu").get(0).children();
+			for (final Element liElement : select) {
+				final Element aElement = liElement.child(0);
+				final String url = aElement.attr("href");
+				final String name = aElement.text();
+				final CategoryDTO categoryDTO = new CategoryDTO(CStarConf.NAME, name, url, CStarConf.EXTENSION);
+				categoryDTO.addSubCategories(findSubCategories(url));
+				categories.add(categoryDTO);
+			}
+			return categories;
+		} catch (RuntimeException e) {
+			if (CanalPlusEndpointAvailability.isUnavailable(e)) {
+				getLog().warn(CanalPlusEndpointAvailability.buildCategoryUnavailableMessage(getName()), e);
+				return new LinkedHashSet<>();
+			}
+			throw e;
 		}
-
-		return categories;
 	}
 
 	@Override

@@ -64,7 +64,7 @@ no provider rewrite, no runtime behavior change in inventory-only work.
 | `plugins/aria2` | `aria2` | downloader | keep | `Aria2PluginDownloader` wraps `aria2c`; dedicated test exists | keep as-is |
 | `plugins/arte` | `arte` | provider | needs live endpoint rewrite | `ArteConf` uses legacy HTTP guide/rss URLs and scraping selectors; provider tests are live-network style | add fixture tests |
 | `plugins/beinsport` | `beinsport` | provider | obsolete endpoint | `BeinSportConf` uses legacy `beinsports.com/us/videos` and Dailymotion mapping; known candidate in tracker notes | rewrite provider |
-| `plugins/canalPlus` | `canalPlus` | provider | obsolete endpoint | `CanalPlusConf`/`D8Conf`/`CStarConf` use old Canal service URLs and channel-specific legacy endpoints | rewrite provider |
+| `plugins/canalPlus` | `canalPlus` | provider | degraded (graceful unavailable handling) | `CanalPlusPluginManager`, `D8PluginManager`, and `CStarPluginManager` now return an empty category set with a provider-level diagnostic when Canal+ legacy/protected endpoints are unreachable (`service.mycanal.fr` DNS failure, HTTP 403 on channel pages) | keep graceful handling; plan dedicated endpoint rewrite |
 | `plugins/clubic` | `clubic` | provider | obsolete endpoint | `ClubicConf` targets legacy Clubic video pages via HTML selectors; provider test is live-network | deprecate provider |
 | `plugins/cmd` | `cmd` | exporter | infrastructure-only | `CmdPluginExporterManager` and `CmdPluginDownloaderManager` are command wrappers, no provider endpoint logic | keep as-is |
 | `plugins/curl` | `curl` | exporter | infrastructure-only | `CurlPluginExporterManager` plus downloader wrapper; utility integration layer | keep as-is |
@@ -197,8 +197,10 @@ provider/runtime drift, not a static-repository deploy regression.
 
 1. **test(provider-inventory): add offline fixtures for unknown providers**
    - Scope: `globalnews`, `mlssoccer`, `sfr`, `email`, plus RSS regression fixtures.
-2. **fix(provider-canal-family): rewrite canalPlus + d8 + cstar provider endpoints**
+2. 🟡 **fix(provider-canal-family): rewrite canalPlus + d8 + cstar provider endpoints**
    - Scope: `plugins/canalPlus` only, with fixture-backed parser behavior.
+   - Current state: PR #91 keeps `D17` renamed to `CStar` and adds graceful
+     handling for deprecated/protected Canal+ endpoints without bypass logic.
 3. ✅ **fix(provider-francetv): replace pluzz provider with france.tv metadata flow** — delivered in PR #58 (`plugins/francetv`).
 4. **fix(provider-legacy-football): rewrite wat, beinsport, footyroom, lequipe**
    - Scope: endpoint/parser modernization with offline fixtures first.

@@ -170,7 +170,7 @@
       "icon": "🔌",
       "status": "in-progress",
       "priority": "P2",
-      "progressPercent": 55,
+      "progressPercent": 60,
       "scope": "Inventory every plugin in plugins/ (22 in aggregator + plugin-tester); record current status (working, obsolete endpoint, renamed, broken parser). No code removal in this item.",
       "acceptanceCriteria": [
         "Inventory table per plugin with last-known status.",
@@ -185,8 +185,8 @@
         "mvn -B -ntp -pl plugins/arte -am -Dtest=ArteOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test",
         "mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test"
       ],
-      "pr": "test/provider-offline-fixture-baseline (this PR)",
-      "notes": "Inventory baseline from PR #50 extended with offline fixture policy and tests for 6play, canalPlus, francetv (ex pluzz), arte, and youtube. docs/provider-inventory.md includes current-status table and legacy naming (Pluzz, D8/CStar (ex D17), 6play). Arte live PluginManagerTest fails (categorie liste vide) — provider drift. Default Surefire excludes *PluginManagerTest. See docs/automatic-category-download.md for runtime watch behavior."
+      "pr": "test/provider-offline-fixture-baseline (merged), fix(provider-canalplus): rename d17 to cstar and handle deprecated endpoints (PR #91)",
+      "notes": "Inventory baseline from PR #50 extended with offline fixture policy and tests for 6play, canalPlus, francetv (ex pluzz), arte, and youtube. docs/provider-inventory.md includes current-status table and legacy naming (Pluzz, D8/CStar (ex D17), 6play). PR #91 preserves D17 -> CStar and adds graceful fallback for canalPlus/d8/cstar category discovery when legacy or protected endpoints fail (service.mycanal.fr DNS failure, HTTP 403 on channel pages). Default Surefire excludes *PluginManagerTest. Arte live PluginManagerTest still fails (categorie liste vide) due to provider drift. See docs/automatic-category-download.md for runtime watch behavior."
     },
     {
       "id": "ytdlp-migration",

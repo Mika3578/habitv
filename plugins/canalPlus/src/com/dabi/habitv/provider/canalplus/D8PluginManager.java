@@ -77,22 +77,26 @@ public class D8PluginManager extends BasePluginWithProxy implements PluginProvid
 
 	@Override
 	public Set<CategoryDTO> findCategory() {
-		final Set<CategoryDTO> categories = new LinkedHashSet<>();
-
-		final org.jsoup.nodes.Document doc = Jsoup.parse(getUrlContent(D8Conf.HOME_URL, D8Conf.ENCODING));
-
-		final Elements select = doc.select("#nav").get(0).child(0).children();
-		for (final Element liElement : select) {
-			final Element aElement = liElement.child(0);
-			final String url = aElement.attr("href");
-			final String name = aElement.text();
-			final CategoryDTO categoryDTO = new CategoryDTO(D8Conf.NAME, name, url, D8Conf.EXTENSION);
-			categoryDTO.addSubCategories(findSubCategories(url));
-			categories.add(categoryDTO);
-
+		try {
+			final Set<CategoryDTO> categories = new LinkedHashSet<>();
+			final org.jsoup.nodes.Document doc = Jsoup.parse(getUrlContent(D8Conf.HOME_URL, D8Conf.ENCODING));
+			final Elements select = doc.select("#nav").get(0).child(0).children();
+			for (final Element liElement : select) {
+				final Element aElement = liElement.child(0);
+				final String url = aElement.attr("href");
+				final String name = aElement.text();
+				final CategoryDTO categoryDTO = new CategoryDTO(D8Conf.NAME, name, url, D8Conf.EXTENSION);
+				categoryDTO.addSubCategories(findSubCategories(url));
+				categories.add(categoryDTO);
+			}
+			return categories;
+		} catch (RuntimeException e) {
+			if (CanalPlusEndpointAvailability.isUnavailable(e)) {
+				getLog().warn(CanalPlusEndpointAvailability.buildCategoryUnavailableMessage(getName()), e);
+				return new LinkedHashSet<>();
+			}
+			throw e;
 		}
-
-		return categories;
 	}
 
 	@Override
