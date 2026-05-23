@@ -24,7 +24,7 @@ older ones rather than rewriting them in place.
 | `doc-sync-and-rule-lifecycle` | Doc sync protocol & rule lifecycle (meta-rules) | ✅ Accepted |
 | `descriptive-slug-ids` | Switch tracker / risk / ADR identifiers to descriptive slugs | ✅ Accepted |
 | `legacy-dabiboo-svn-removal` | Remove active legacy DabiBoo/SVN wiring from build and runtime paths | ✅ Accepted |
-| `ai-policy-source-of-truth` | Align AI workflow policy around AGENTS.md source of truth | 🟡 Proposed |
+| `ai-policy-source-of-truth` | Align AI workflow policy around AGENTS.md source of truth | ✅ Accepted |
 | `plugin-versioning-policy` | When to bump a plugin `<version>` independently of the parent POM | 🟡 Proposed |
 
 ---
@@ -510,11 +510,11 @@ artifact at compile time.
 
 ---
 
-## 🟡 `ai-policy-source-of-truth` — Align AI workflow policy around AGENTS.md source of truth
+## ✅ `ai-policy-source-of-truth` — Align AI workflow policy around AGENTS.md source of truth
 
 | | |
 |---|---|
-| **Status** | 🟡 Proposed |
+| **Status** | ✅ Accepted |
 | **Date** | 2026-05-23 |
 | **Tracker** | `gov-bootstrap` (follow-up) |
 | **Touches** | `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/habitv-master.mdc`, `.cursor/rules/pr-style.mdc`, `.github/copilot-instructions.md`, `.github/pull_request_template.md`, `.github/ISSUE_TEMPLATE/*`, `.github/workflows/build.yml`, `CONTRIBUTING.md`, `README.md`, `docs/ci.md`, `docs/dev-plan.md`, `docs/dev-tracker.md`, `docs/dev-tracker.json`, `docs/github-repository-settings.md`, `docs/provider-inventory.md`, `docs/pull-request-style-guide.md`, `docs/repository-governance.md`, `docs/repository-maintenance.md`, `docs/security-critical-cve-investigation.md`, `docs/security-dependency-audit.md` |

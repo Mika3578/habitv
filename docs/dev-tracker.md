@@ -109,10 +109,11 @@ git log --oneline -5                 # bootstrap commits present
 
 **Notes** — Documentation/workflow only; no runtime or provider changes.
 GitHub UI-level settings application moved to its own item
-(`branch-protection`). Follow-up policy alignment makes `AGENTS.md`
-the source of truth for AI workflow rules and aligns tool-specific
-instruction files by reference, including agent PR target policy
-(`Mika3578/habitv` first, upstream PR flow maintainer-controlled).
+(`branch-protection`). Follow-up policy alignment captured in ADR
+`ai-policy-source-of-truth` (✅ Accepted): `AGENTS.md` is the source
+of truth for AI workflow rules; tool-specific files reference it by
+reference, including agent PR target policy (`Mika3578/habitv` first,
+upstream PR flow maintainer-controlled).
 
 ---
 
