@@ -2,6 +2,7 @@ package com.dabi.habitv.plugin.youtube;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -71,9 +72,41 @@ public class YoutubePluginDownloaderCmdTest {
 		assertTrue(cmd.startsWith("/usr/bin/yt-dlp "));
 		assertTrue(cmd.contains("https://www.youtube.com/watch?v=jNQXAC9IVRw"));
 		assertTrue(cmd.contains("/tmp/out/test.mp4"));
-		assertTrue(cmd.contains("--write-sub"));
-		assertTrue(cmd.contains("--write-auto-sub"));
+		assertTrue(cmd.contains("-f \"bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/bv*+ba/b\""));
+		assertTrue(cmd.contains("--merge-output-format mp4"));
 		assertTrue(cmd.contains("--no-check-certificate"));
+		assertFalse(cmd.contains("--audio-quality"));
+		assertFalse(cmd.contains("--extract-audio"));
+		assertFalse(cmd.contains("-x"));
+		assertFalse(cmd.contains("--audio-format"));
+		assertFalse(cmd.contains("--write-sub"));
+		assertFalse(cmd.contains("--write-subs"));
+		assertFalse(cmd.contains("--write-auto-sub"));
+		assertFalse(cmd.contains("--write-auto-subs"));
+		assertFalse(cmd.contains("--embed-subs"));
+	}
+
+	@Test
+	public void downloadDailymotionUrlUsesSameDefaultVideoSelector() throws Exception {
+		final HashMap<String, String> downloaderName2Bin = new HashMap<>();
+		downloaderName2Bin.put(YoutubeConf.NAME, "/usr/bin/yt-dlp");
+		final DownloaderPluginHolder downloaders = new DownloaderPluginHolder(
+				"/bin/sh -c #CMD#",
+				Collections.<String, PluginDownloaderInterface>emptyMap(),
+				downloaderName2Bin, "/tmp/out", "/tmp/idx", "/tmp/bin",
+				"/tmp/plugins");
+
+		final DownloadParamDTO param = new DownloadParamDTO(
+				"https://www.dailymotion.com/video/x9example",
+				"/tmp/out/dm-test.mp4", "mp4");
+
+		final ProcessHolder holder = new YoutubePluginDownloader()
+				.download(param, downloaders);
+		final String cmd = readCmd(holder);
+		assertTrue(cmd.contains("-f \"bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/bv*+ba/b\""));
+		assertTrue(cmd.contains("--merge-output-format mp4"));
+		assertFalse(cmd.contains("--write-subs"));
+		assertFalse(cmd.contains("--write-auto-subs"));
 	}
 
 	@Test

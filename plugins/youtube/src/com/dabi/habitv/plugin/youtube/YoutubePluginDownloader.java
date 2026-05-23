@@ -27,6 +27,9 @@ public class YoutubePluginDownloader extends BaseUpdatablePlugin implements Plug
 		String cmd = binParam + " ";
 		final String cmdParam = downloadParam.getParam(FrameworkConf.PARAMETER_ARGS);
 		if (cmdParam == null) {
+			// For video downloads, audio quality is controlled by yt-dlp format selection.
+			// --audio-quality is intentionally not used here because it only applies to
+			// audio extraction/conversion with -x.
 			cmd += YoutubeConf.DUMP_CMD;
 		} else {
 			cmd += cmdParam;
