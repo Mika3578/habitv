@@ -30,7 +30,12 @@ public class YoutubePluginDownloader extends BaseUpdatablePlugin implements Plug
 			// For video downloads, audio quality is controlled by yt-dlp format selection.
 			// --audio-quality is intentionally not used here because it only applies to
 			// audio extraction/conversion with -x.
+			// Subtitle embedding is opt-in because default downloads should stay video/audio only and must not leave subtitle sidecar files.
+			// Auto-generated subtitles are intentionally not enabled here; they should be added later as a separate advanced option.
 			cmd += YoutubeConf.DUMP_CMD;
+			if (isEmbedSubtitlesEnabled(downloadParam)) {
+				cmd += YoutubeConf.DUMP_CMD_EMBED_SUBS;
+			}
 		} else {
 			cmd += cmdParam;
 		}
@@ -86,6 +91,11 @@ public class YoutubePluginDownloader extends BaseUpdatablePlugin implements Plug
 		} else {
 			return DownloadableState.IMPOSSIBLE;
 		}
+	}
+
+	private boolean isEmbedSubtitlesEnabled(final DownloadParamDTO downloadParam) {
+		return Boolean.parseBoolean(downloadParam
+				.getParam(FrameworkConf.PARAMETER_EMBED_SUBTITLES));
 	}
 
 }

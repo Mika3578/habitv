@@ -20,6 +20,7 @@ import com.dabi.habitv.core.dao.DownloadedDAO;
 import com.dabi.habitv.core.event.EpisodeStateEnum;
 import com.dabi.habitv.core.event.RetreiveEvent;
 import com.dabi.habitv.core.token.TokenReplacer;
+import com.dabi.habitv.framework.FrameworkConf;
 import com.dabi.habitv.framework.plugin.utils.DownloadUtils;
 
 public class DownloadTask extends AbstractEpisodeTask {
@@ -163,6 +164,10 @@ public class DownloadTask extends AbstractEpisodeTask {
 				getEpisode().getId(), outputTmpFileName,
 				category.getExtension());
 		downloadParam.getParams().putAll(category.getParameters());
+		if (downloaders.isEmbedSubtitlesEnabled()) {
+			downloadParam.addParam(FrameworkConf.PARAMETER_EMBED_SUBTITLES,
+					Boolean.TRUE.toString());
+		}
 		return downloadParam;
 	}
 

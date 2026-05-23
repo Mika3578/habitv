@@ -17,6 +17,7 @@ public final class YoutubeConf {
 	 * {@link com.dabi.habitv.framework.FrameworkConf#DOWNLOAD_DESTINATION} are resolved at runtime.
 	 */
 	public static final String DUMP_CMD = " \"#VIDEO_URL#\" -o \"#FILE_DEST#\" -f \"bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/bv*+ba/b\" --merge-output-format mp4 --no-check-certificate";
+	public static final String DUMP_CMD_EMBED_SUBS = " --embed-subs --sub-langs \"fr.*,fr,en.*,en,-live_chat\" --sub-format \"srt/vtt/best\"";
 	/**
 	 * Default MP3 extraction flags for yt-dlp ({@code --extract-audio} / {@code --audio-format}).
 	 */

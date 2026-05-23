@@ -39,6 +39,8 @@ public interface UserConfig {
 
 	String getYoutubeApiKey();
 
+	boolean getEmbedSubtitles();
+
 	void setMaxAttempts(int parseInt);
 
 	void setUpdateOnStartup(boolean updateOnStartup);
@@ -48,5 +50,7 @@ public interface UserConfig {
 	void setDemonCheckTime(int demonCheckTime);
 
 	void setYoutubeApiKey(String youtubeApiKey);
+
+	void setEmbedSubtitles(boolean embedSubtitles);
 
 }

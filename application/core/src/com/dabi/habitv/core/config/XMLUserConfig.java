@@ -48,6 +48,7 @@ import com.dabi.habitv.utils.XMLUtils;
 
 public class XMLUserConfig implements UserConfig {
 	private static final String YOUTUBE_API_KEY = "youtubeApiKey";
+	private static final String EMBED_SUBTITLES = "embedSubtitles";
 
 	private static final int DEFAULT_MAX_ATTEMPTS = 5;
 
@@ -494,6 +495,22 @@ public class XMLUserConfig implements UserConfig {
 	}
 
 	@Override
+	public boolean getEmbedSubtitles() {
+		Downloaders downloaders = config.getDownloadConfig() == null ? null
+				: config.getDownloadConfig().getDownloaders();
+		if (downloaders == null) {
+			return false;
+		}
+		for (Object downloader : downloaders.getAny()) {
+			if (EMBED_SUBTITLES.equals(XMLUtils.getTagName(downloader))) {
+				return Boolean.parseBoolean(normalizeValue(XMLUtils
+						.getTagValue(downloader)));
+			}
+		}
+		return false;
+	}
+
+	@Override
 	public void setMaxAttempts(int maxAttemps) {
 		DownloadConfig downloadConfig = loadDownloadConfig();
 		downloadConfig.setMaxAttempts(maxAttemps);
@@ -554,6 +571,28 @@ public class XMLUserConfig implements UserConfig {
 		if (normalizedValue != null) {
 			downloaders.getAny().add(
 					XMLUtils.buildAnyElement(YOUTUBE_API_KEY, normalizedValue));
+		}
+	}
+
+	@Override
+	public void setEmbedSubtitles(boolean embedSubtitles) {
+		Downloaders downloaders = loadDownloaders();
+		Iterator<Object> iterator = downloaders.getAny().iterator();
+		while (iterator.hasNext()) {
+			Object downloader = iterator.next();
+			if (EMBED_SUBTITLES.equals(XMLUtils.getTagName(downloader))) {
+				if (!embedSubtitles) {
+					iterator.remove();
+				} else {
+					XMLUtils.setTagValue(downloader, Boolean.TRUE.toString());
+				}
+				return;
+			}
+		}
+		if (embedSubtitles) {
+			downloaders.getAny().add(
+					XMLUtils.buildAnyElement(EMBED_SUBTITLES, Boolean.TRUE
+							.toString()));
 		}
 	}
 

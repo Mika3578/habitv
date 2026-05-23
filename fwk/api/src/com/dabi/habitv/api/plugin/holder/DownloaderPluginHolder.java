@@ -18,8 +18,17 @@ public final class DownloaderPluginHolder extends AbstractPluginHolder<PluginDow
 
 	private final String pluginDir;
 
+	private final boolean embedSubtitles;
+
 	public DownloaderPluginHolder(final String cmdProcessor, final Map<String, PluginDownloaderInterface> downloaderName2downloader,
 			final Map<String, String> downloaderName2BinPath, final String downloadOutputDir, final String indexDir, final String binDir, final String pluginDir) {
+		this(cmdProcessor, downloaderName2downloader, downloaderName2BinPath,
+				downloadOutputDir, indexDir, binDir, pluginDir, false);
+	}
+
+	public DownloaderPluginHolder(final String cmdProcessor, final Map<String, PluginDownloaderInterface> downloaderName2downloader,
+			final Map<String, String> downloaderName2BinPath, final String downloadOutputDir, final String indexDir, final String binDir, final String pluginDir,
+			final boolean embedSubtitles) {
 		super(downloaderName2downloader);
 		this.cmdProcessor = cmdProcessor;
 		this.downloaderName2BinPath = downloaderName2BinPath;
@@ -27,6 +36,7 @@ public final class DownloaderPluginHolder extends AbstractPluginHolder<PluginDow
 		this.indexDir = indexDir;
 		this.binDir = binDir;
 		this.pluginDir = pluginDir;
+		this.embedSubtitles = embedSubtitles;
 	}
 
 	public String getBinPath(final String downloaderName) {
@@ -51,6 +61,10 @@ public final class DownloaderPluginHolder extends AbstractPluginHolder<PluginDow
 
 	public String getPluginDir() {
 		return pluginDir;
+	}
+
+	public boolean isEmbedSubtitlesEnabled() {
+		return embedSubtitles;
 	}
 
 }
