@@ -1,15 +1,15 @@
 ---
 name: Modernization task
 about: Tracked modernization or governance change for Habitv
-title: "HBTV-XXX: <short summary>"
+title: "<descriptive-scope>: <short summary>"
 labels: ["modernization", "tracker"]
 assignees: []
 ---
 
-## Tracker ID
+## Scope slug
 
-<!-- Must match an entry in docs/dev-tracker.md and docs/dev-tracker.json -->
-HBTV-
+<!-- Use a descriptive kebab-case scope, e.g. provider-youtube-ytdlp -->
+provider-youtube-ytdlp
 
 ## Scope
 

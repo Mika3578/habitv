@@ -6,48 +6,49 @@
 
 ## Scope
 
-<!-- Bullet list of what this PR changes. -->
+<!-- Short descriptive scope, e.g. provider-youtube-ytdlp. -->
 -
 
-## Out of scope
+## Related issue
 
-<!-- Bullet list of intentional non-changes to avoid scope creep. -->
+<!-- Optional: include a real GitHub issue number, e.g. #123. -->
+- N/A
+
+## Changes
+
+<!-- Bullet list of what this PR changes. -->
 -
 
 ## Validation
 
 <!-- Commands actually run locally and their honest outcome. -->
+- `git status --short`
 - `git diff --check`
-- `mvn -B -ntp -DskipTests validate`
+- `mvn -B -ntp -DskipTests validate` (required for code changes; optional for docs-only unless build files changed)
 
-## Risk
+## Risk / rollback
 
-<!-- Reference docs/risk-register.md IDs (R-00X) impacted or introduced. -->
-- Affected risks:
-- New risks:
-- Mitigation:
+<!-- Reference docs/risk-register.md IDs impacted/introduced and describe rollback. -->
+- Risk:
+- Rollback:
 
-## Rollback
+## Notes
 
-<!-- How to revert this PR safely if it breaks develop. -->
-- Revert commit(s) via `git revert <sha>` and re-run validation.
-
-## Linked tracker item
-
-<!-- Descriptive slug from docs/dev-tracker.md; add (HBTV-XXX) when the entry
-     has a legacy code. Use N/A when no tracker item applies. -->
-- `tracker-slug` (HBTV-XXX)
+<!-- Bullet list of intentional non-changes to avoid scope creep. -->
+-
 
 ## Checklist
 
 - [ ] Branch was created from `develop`
+- [ ] Duplicate-prevention checks completed before branch creation (see `AGENTS.md`)
+- [ ] No open PR already covered the same scope before opening this PR
 - [ ] No unrelated source changes
 - [ ] `git diff --check` passed
-- [ ] `mvn -B -ntp -DskipTests validate` passed or baseline failure documented
+- [ ] `mvn -B -ntp -DskipTests validate` passed (or was N/A for docs-only PRs with no build file changes)
 - [ ] PR keeps linear history
 - [ ] English used for branches, commits, comments, docs, and PR text
 - [ ] Documentation updated (`docs/dev-tracker.md`, `docs/dev-tracker.json`, risk register, decision log as needed)
-- [ ] If a `plugins/*/pom.xml` `<version>` is bumped, the trigger from `plugin-versioning-policy` is named in Summary/Scope (downloader/parser, user-facing endpoint, or user-facing configuration), and internal deps use `${project.parent.version}`
+- [ ] If a `plugins/*/pom.xml` `<version>` is bumped, the trigger from `plugin-versioning-policy` is named in Summary/Changes (downloader/parser, user-facing endpoint, or user-facing configuration), and internal deps use `${project.parent.version}`
 - [ ] No secrets, tokens, local paths, or build outputs committed
 
 ## Suggested squash merge commit (optional)

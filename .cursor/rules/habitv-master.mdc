@@ -10,8 +10,8 @@ They exist to keep modernization safe, incremental, and reviewable.
 
 ## Java baseline
 
-- Always keep Java 8 compatibility unless an explicit tracker item
-  (e.g. HBTV-002 successor) says otherwise and is referenced in the PR.
+- Always keep Java 8 compatibility unless an explicit tracked migration
+  item says otherwise and is referenced in the PR.
 - Do not introduce Java 9+ language features or JDK 11/17/21-only APIs.
 - Any Java baseline migration must happen in a dedicated migration PR
   with an ADR in `docs/decision-log.md`.
@@ -36,11 +36,11 @@ They exist to keep modernization safe, incremental, and reviewable.
 
 ## Branching and PRs
 
-- Use small PRs scoped to a single tracker item.
+- Follow `AGENTS.md` as the source of truth for PR target policy,
+  branch naming, duplicate branch/PR prevention, commit style, PR
+  structure, validation, and linear history.
+- Use small PRs scoped to a single descriptive scope (see `docs/dev-tracker.md`).
 - Use English for branches, commits, comments, docs, and PR text.
-- Keep linear history (no merge commits in feature branches).
-- Branch naming: `chore/...`, `build/...`, `ci/...`, `docs/...`,
-  `test/...`, `runtime/...`, `provider/...`, `fix/...`, `feature/...`.
 
 ## Documentation discipline
 

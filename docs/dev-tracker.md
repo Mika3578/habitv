@@ -11,8 +11,10 @@
 > kebab-case slug. The opaque legacy codes (`HBTV-XXX`) are preserved
 > on each entry for compatibility with existing PRs and commits. See
 > the `descriptive-slug-ids` ADR for the rationale and full mapping.
+> Legacy codes are historical-only and must not be used for new branch
+> names, PR titles, commit subjects, or workflow naming.
 
-**Last refresh:** 2026-05-20 · **Active branch:** `develop`
+**Last refresh:** 2026-05-23 · **Active branch:** `develop`
 
 **Documentation entry point:** [`README.md`](../README.md) (overview, build matrix,
 automatic category behavior, provider summary, doc map).
@@ -107,7 +109,11 @@ git log --oneline -5                 # bootstrap commits present
 
 **Notes** — Documentation/workflow only; no runtime or provider changes.
 GitHub UI-level settings application moved to its own item
-(`branch-protection`).
+(`branch-protection`). Follow-up policy alignment captured in ADR
+`ai-policy-source-of-truth` (✅ Accepted): `AGENTS.md` is the source
+of truth for AI workflow rules; tool-specific files reference it by
+reference, including agent PR target policy (`Mika3578/habitv` first,
+upstream PR flow maintainer-controlled).
 
 ---
 
