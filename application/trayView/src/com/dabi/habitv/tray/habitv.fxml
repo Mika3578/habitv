@@ -268,7 +268,7 @@
 										<TextField fx:id="youtubeApiKey"
 											BorderPane.alignment="CENTER" GridPane.columnIndex="1"
 											GridPane.rowIndex="4" />
-										<Label text="Embed subtitles when available"
+										<Label text="Intégrer les sous-titres lorsqu'ils sont disponibles :"
 											GridPane.columnIndex="0" GridPane.rowIndex="5" />
 										<CheckBox fx:id="embedSubtitles"
 											mnemonicParsing="false" GridPane.columnIndex="1"

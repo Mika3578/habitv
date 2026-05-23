@@ -66,7 +66,7 @@ public class ConfigController extends BaseController {
 		youtubeApiKey.setTooltip(new Tooltip(
 				"Clé API YouTube Data v3. Laissez vide pour utiliser la variable d'environnement ou l'option Java."));
 		embedSubtitles.setTooltip(new Tooltip(
-				"Embed subtitles in the downloaded video when available."));
+				"Intègre les sous-titres dans la vidéo téléchargée lorsqu'ils sont disponibles. Nécessite ffmpeg via le post-traitement yt-dlp."));
 	}
 
 	private void loadConfig() {
