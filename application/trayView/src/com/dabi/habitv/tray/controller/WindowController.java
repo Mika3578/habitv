@@ -138,6 +138,9 @@ public class WindowController {
 	@FXML
 	private TextField youtubeApiKey;
 
+	@FXML
+	private CheckBox embedSubtitles;
+
 	private boolean trayMode = false;
 
 	public WindowController() {
@@ -199,7 +202,8 @@ public class WindowController {
 			manager.attach(toDlController);
 
 			new ConfigController(downloadOuput, nbrMaxAttempts,
-					daemonCheckTimeSec, autoUpdate, youtubeApiKey).init(controller, manager,
+					daemonCheckTimeSec, autoUpdate, youtubeApiKey,
+					embedSubtitles).init(controller, manager,
 					primaryStage);
 
 			controller.startDownloadCheckDemon();

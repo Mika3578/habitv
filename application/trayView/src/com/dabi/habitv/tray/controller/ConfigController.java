@@ -24,15 +24,18 @@ public class ConfigController extends BaseController {
 
 	private TextField youtubeApiKey;
 
+	private CheckBox embedSubtitles;
+
 	public ConfigController(TextField downloadOuput, TextField nbrMaxAttempts,
 			TextField daemonCheckTimeSec, CheckBox autoUpdate,
-			TextField youtubeApiKey) {
+			TextField youtubeApiKey, CheckBox embedSubtitles) {
 		super();
 		this.downloadOuput = downloadOuput;
 		this.nbrMaxAttempts = nbrMaxAttempts;
 		this.daemonCheckTimeSec = daemonCheckTimeSec;
 		this.autoUpdate = autoUpdate;
 		this.youtubeApiKey = youtubeApiKey;
+		this.embedSubtitles = embedSubtitles;
 	}
 
 	public void init() {
@@ -62,6 +65,8 @@ public class ConfigController extends BaseController {
 				"si coché habiTv se mettra à jour automatiquement."));
 		youtubeApiKey.setTooltip(new Tooltip(
 				"Clé API YouTube Data v3. Laissez vide pour utiliser la variable d'environnement ou l'option Java."));
+		embedSubtitles.setTooltip(new Tooltip(
+				"Embed subtitles in the downloaded video when available."));
 	}
 
 	private void loadConfig() {
@@ -72,6 +77,7 @@ public class ConfigController extends BaseController {
 				.getDemonCheckTime()));
 		autoUpdate.setSelected(userConfig.updateOnStartup());
 		youtubeApiKey.setText(userConfig.getYoutubeApiKey());
+		embedSubtitles.setSelected(userConfig.getEmbedSubtitles());
 	}
 
 	private void addButtonActions() {
@@ -143,6 +149,16 @@ public class ConfigController extends BaseController {
 			public void handle(ActionEvent arg0) {
 				UserConfig userConfig = getController().loadUserConfig();
 				userConfig.setUpdateOnStartup(autoUpdate.isSelected());
+				saveConfig(userConfig);
+			}
+		});
+
+		embedSubtitles.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent arg0) {
+				UserConfig userConfig = getController().loadUserConfig();
+				userConfig.setEmbedSubtitles(embedSubtitles.isSelected());
 				saveConfig(userConfig);
 			}
 		});
