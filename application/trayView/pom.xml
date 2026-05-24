@@ -101,7 +101,7 @@
 					<archive>
 						<manifestEntries>
 							<JavaFX-Version>2.2+</JavaFX-Version>
-							<Main-Class>com.dabi.habitv.tray.HabiTvSplashScreen	</Main-Class>
+							<Main-Class>com.dabi.habitv.tray.HabiTvSplashScreen</Main-Class>
 							<implementation-version>2.2</implementation-version>
 							<JavaFX-Application-Class>com.dabi.habitv.tray.HabiTvSplashScreen</JavaFX-Application-Class>
 							<!-- The artifactId (name) of the jfxrt.jar ... see dependency system 
