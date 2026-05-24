@@ -43,7 +43,6 @@
 				<jdk>[9,)</jdk>
 			</activation>
 			<properties>
-				<javafx.platform>linux</javafx.platform>
 				<openjfx.version>17.0.13</openjfx.version>
 			</properties>
 			<dependencies>
