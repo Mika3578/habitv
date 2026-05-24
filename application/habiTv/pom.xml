@@ -31,7 +31,7 @@
 	</dependencies>
 	<profiles>
 		<!--
-		  On JDK 9+, JavaFX 2.x is no longer bundled with the JDK. The
+		  On JDK 11+, JavaFX 2.x is no longer bundled with the JDK. The
 		  launcher references trayView whose ancestor extends
 		  javafx.application.Application, so javac needs the JavaFX API
 		  available even though HabitvLauncher itself does not import it.
@@ -40,7 +40,7 @@
 		<profile>
 			<id>javafx-openjfx-compile</id>
 			<activation>
-				<jdk>[9,)</jdk>
+				<jdk>[11,)</jdk>
 			</activation>
 			<properties>
 				<openjfx.version>17.0.13</openjfx.version>
