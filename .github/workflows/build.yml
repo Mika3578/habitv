@@ -16,16 +16,17 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  # Windows-only validation: the Ubuntu Java 8 validate is already covered by
+  # the Maven CI workflow, so this workflow exists to add the Windows signal.
   validate:
-    name: validate (${{ matrix.os }}, java8)
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - ubuntu-latest
-          - windows-latest
-    runs-on: ${{ matrix.os }}
+    name: validate (windows, java8)
+    runs-on: windows-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v6
