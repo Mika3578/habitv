@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.concurrent.Callable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -245,15 +246,154 @@ public class TaskMgrTest {
 	}
 
 	@Test
+	public final void enforcesMaxConcurrentDownloadsOfOne() {
+		taskMgr = new TaskMgr<AbstractTask<Object>, Object>(1, new TaskMgrListener() {
+
+			@Override
+			public void onAllTreatmentDone() {
+				allTreatmentDone = true;
+			}
+
+			@Override
+			public void onFailed(final Throwable throwable) {
+				allTreatmentDone = false;
+			}
+		}, null);
+		taskMgr.addTask(buildSleepTask("t1", 500), buildSleepTask("t1", 500));
+		taskMgr.addTask(buildSleepTask("t2", 500), buildSleepTask("t2", 500));
+		assertTrue(waitForCondition(new Callable<Boolean>() {
+			@Override
+			public Boolean call() {
+				return taskMgr.getActiveTaskCount() == 1
+						&& taskMgr.getQueuedOrActiveTaskCount() >= 2;
+			}
+		}, 1000));
+		assertEquals(1, taskMgr.getActiveTaskCount());
+		assertTrue(taskMgr.getQueuedOrActiveTaskCount() >= 2);
+		taskMgr.shutdown(2000);
+	}
+
+	@Test
+	public final void enforcesMaxConcurrentDownloadsOfTwo() {
+		taskMgr = new TaskMgr<AbstractTask<Object>, Object>(2, new TaskMgrListener() {
+
+			@Override
+			public void onAllTreatmentDone() {
+				allTreatmentDone = true;
+			}
+
+			@Override
+			public void onFailed(final Throwable throwable) {
+				allTreatmentDone = false;
+			}
+		}, null);
+		for (int i = 0; i < 3; i++) {
+			final AbstractTask<Object> task = buildSleepTask("task" + i, 400);
+			taskMgr.addTask(task, task);
+		}
+		assertTrue(waitForCondition(new Callable<Boolean>() {
+			@Override
+			public Boolean call() {
+				return taskMgr.getActiveTaskCount() <= 2
+						&& taskMgr.getQueuedOrActiveTaskCount() >= 2;
+			}
+		}, 1000));
+		assertTrue(taskMgr.getQueuedOrActiveTaskCount() >= 2);
+		taskMgr.shutdown(2000);
+	}
+
+	private boolean waitForCondition(final Callable<Boolean> condition,
+			final long timeoutMillis) {
+		final long end = System.currentTimeMillis() + timeoutMillis;
+		while (System.currentTimeMillis() < end) {
+			try {
+				if (Boolean.TRUE.equals(condition.call())) {
+					return true;
+				}
+				Thread.sleep(25);
+			} catch (final InterruptedException e) {
+				Thread.currentThread().interrupt();
+				throw new AssertionError("Interrupted while waiting for condition", e);
+			} catch (final Exception e) {
+				throw new AssertionError("Failed while waiting for condition", e);
+			}
+		}
+		return false;
+	}
+
+	private AbstractTask<Object> buildSleepTask(final String name, final long sleepMs) {
+		return new AbstractTaskForTest() {
+
+			@Override
+			protected Object doCall() {
+				try {
+					Thread.sleep(sleepMs);
+				} catch (final InterruptedException e) {
+					fail();
+				}
+				return null;
+			}
+
+			@Override
+			protected void failed(final Throwable e) {
+				throw new TechnicalException(e);
+			}
+
+			@Override
+			public String toString() {
+				return name;
+			}
+		};
+	}
+
+	@Test
+	public final void queuedOrActiveCountExcludesFinishedTasks() {
+		taskMgr = new TaskMgr<AbstractTask<Object>, Object>(1, new TaskMgrListener() {
+
+			@Override
+			public void onAllTreatmentDone() {
+				allTreatmentDone = true;
+			}
+
+			@Override
+			public void onFailed(final Throwable throwable) {
+				allTreatmentDone = false;
+			}
+		}, null);
+		final AbstractTask<Object> task = buildSleepTask("done-task", 50);
+		taskMgr.addTask(task, task);
+		assertTrue(waitForCondition(new Callable<Boolean>() {
+			@Override
+			public Boolean call() {
+				return taskMgr.getQueuedOrActiveTaskCount() >= 1;
+			}
+		}, 1000));
+		taskMgr.shutdown(2000);
+		assertTrue(waitForCondition(new Callable<Boolean>() {
+			@Override
+			public Boolean call() {
+				return taskMgr.getQueuedOrActiveTaskCount() == 0;
+			}
+		}, 2000));
+	}
+
+	@Test
 	public final void indicateWhenAllTreatmentAreDone() {
 		buildSimultaneousTask(2, null, null, false);
 		assertFalse(allTreatmentDone);
-		try {
-			Thread.sleep(1000);
-		} catch (final InterruptedException e) {
-			fail();
-		}
-		assertTrue(allTreatmentDone);
+		assertTrue(waitForAllTreatmentDone(3000));
 		taskMgr.shutdown(0);
+	}
+
+	private boolean waitForAllTreatmentDone(final long timeoutMs) {
+		final long deadline = System.currentTimeMillis() + timeoutMs;
+		while (!allTreatmentDone && System.currentTimeMillis() < deadline) {
+			try {
+				Thread.sleep(25);
+			} catch (final InterruptedException e) {
+				fail();
+			}
+		}
+		return allTreatmentDone;
 	}
 }

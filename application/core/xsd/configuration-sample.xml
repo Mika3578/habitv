@@ -16,6 +16,7 @@
   <downloadConfig>
     <downloadOuput>downloadOuput</downloadOuput>
     <maxAttempts>0</maxAttempts>
+    <maxConcurrentDownloads>1</maxConcurrentDownloads>
     <demonCheckTime>0</demonCheckTime>
     <fileNameCutSize>0</fileNameCutSize>
     <downloaders/>

@@ -52,6 +52,8 @@ public class XMLUserConfig implements UserConfig {
 
 	private static final int DEFAULT_MAX_ATTEMPTS = 5;
 
+	private static final int DEFAULT_MAX_CONCURRENT_DOWNLOADS = 1;
+
 	private static final int DEFAULT_CHECK_TIME = 1800;
 
 	private static final int DEFAULT_CUT_SIZE = 40;
@@ -107,6 +109,17 @@ public class XMLUserConfig implements UserConfig {
 			PropertyException {
 		saveConfig(new File(DirUtils.getConfFile()),
 				((XMLUserConfig) userConfig).config);
+	}
+
+	static XMLUserConfig readConfigForTest(final File confFile)
+			throws JAXBException, UnsupportedEncodingException,
+			FileNotFoundException {
+		return new XMLUserConfig(readConfig(confFile));
+	}
+
+	static void saveConfig(final File confFile, final XMLUserConfig userConfig)
+			throws JAXBException, PropertyException {
+		saveConfig(confFile, userConfig.config);
 	}
 
 	private static Configuration convertOldConfig(Config oldConfig) {
@@ -287,6 +300,7 @@ public class XMLUserConfig implements UserConfig {
 		downloadConfig.setDemonCheckTime(DEFAULT_CHECK_TIME);
 		downloadConfig.setDownloadOuput(DEFAULT_DL_OUTPUT);
 		downloadConfig.setMaxAttempts(DEFAULT_MAX_ATTEMPTS);
+		downloadConfig.setMaxConcurrentDownloads(DEFAULT_MAX_CONCURRENT_DOWNLOADS);
 
 		UpdateConfig updateConfig = new UpdateConfig();
 		updateConfig.setAutoriseSnapshot(DEFAULT_AUTORISE_SNAPSHOT);
@@ -457,6 +471,27 @@ public class XMLUserConfig implements UserConfig {
 	public Integer getMaxAttempts() {
 		return config.getDownloadConfig() == null ? null : config
 				.getDownloadConfig().getMaxAttempts();
+	}
+
+	@Override
+	public int getMaxConcurrentDownloads() {
+		return resolveMaxConcurrentDownloads(config.getDownloadConfig() == null
+				? null
+				: config.getDownloadConfig().getMaxConcurrentDownloads());
+	}
+
+	static int resolveMaxConcurrentDownloads(final Integer configured) {
+		if (configured == null || configured.intValue() < 1) {
+			return DEFAULT_MAX_CONCURRENT_DOWNLOADS;
+		}
+		return configured.intValue();
+	}
+
+	@Override
+	public void setMaxConcurrentDownloads(final int maxConcurrentDownloads) {
+		final DownloadConfig downloadConfig = loadDownloadConfig();
+		downloadConfig.setMaxConcurrentDownloads(
+				resolveMaxConcurrentDownloads(Integer.valueOf(maxConcurrentDownloads)));
 	}
 
 	@Override

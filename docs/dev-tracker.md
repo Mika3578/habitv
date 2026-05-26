@@ -14,7 +14,7 @@
 > Legacy codes are historical-only and must not be used for new branch
 > names, PR titles, commit subjects, or workflow naming.
 
-**Last refresh:** 2026-05-23 · **Active branch:** `develop`
+**Last refresh:** 2026-05-26 · **Active branch:** `develop`
 
 **Documentation entry point:** [`README.md`](../README.md) (overview, build matrix,
 automatic category behavior, provider summary, doc map).
@@ -24,17 +24,17 @@ automatic category behavior, provider summary, doc map).
 ## 📊 Overall progress
 
 ```
-███████████████▌░░░░  77%
+███████████████▊░░░░  78%
 ```
 
 | Category | Count |
 |---------|------:|
-| ✅ Delivered | **12** |
+| ✅ Delivered | **13** |
 | 🟡 In progress | **6** |
 | 🔵 Proposed | **2** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
-| **Total work items** | **20** |
+| **Total work items** | **21** |
 
 ---
 
@@ -61,6 +61,7 @@ automatic category behavior, provider summary, doc map).
 | 🔒 `dependency-security-audit` — Dependency security audit & remediation | 🟡 In progress | 🟠 P1 | `███░░░░░░░░░░░░░░░░░` 15% |
 | 📝 `clean-squash-merge-policy` — Clean squash merge policy | 🟡 In progress | 🟢 P3 | `██████████░░░░░░░░░░` 50% |
 | 🔒 `critical-log4j-cve-remediation` — Critical Log4j 1.x CVE remediation | ✅ Done | 🔴 P0 | `████████████████████` 100% |
+| 📥 `batch-episode-download-ui` — Batch episode download UI & queue controls | ✅ Done | 🟡 P2 | `████████████████████` 100% |
 | 🧰 `external-tools-recommendations` — External tools recommendations & obsolescence analysis | 🟡 In progress | 🟢 P3 | `██████████░░░░░░░░░░` 50% |
 
 ---
@@ -758,6 +759,40 @@ mvn -B -ntp -DskipTests compile            # BUILD SUCCESS (33 modules)
 **Notes** — CVE-2019-17571, CVE-2022-23305, CVE-2022-23307.
 See `docs/security-critical-cve-investigation.md`. Log4j 2 / SLF4J
 migration and broader transitive cleanup deferred.
+
+---
+
+## 📥 `batch-episode-download-ui` — Batch episode download UI & queue controls
+
+| | |
+|---|---|
+| **Status** | ✅ Done |
+| **Priority** | 🟡 P2 |
+| **Progress** | `████████████████████` 100% |
+| **Legacy code** | HBTV-020 |
+
+**Scope** — Multi-select episode enqueue, duplicate-safe queueing,
+`maxConcurrentDownloads` in `downloadConfig`, sortable metadata columns, and
+plugin/category/show tree labels in `trayView`.
+
+**Acceptance criteria**
+- ✅ Multi-select table and **Download selected** action
+- ✅ Skip duplicates (downloaded, queued, downloading, batch duplicate)
+- ✅ `maxConcurrentDownloads` in XSD/XML with default 1 and UI config field
+- ✅ Sortable episode name; metadata columns show **Unknown** when absent
+- ✅ Tree labels: Plugin / Category / Show / Group from `CategoryDTO` nesting
+
+**Validation**
+```bash
+mvn -B -ntp -DskipTests validate
+mvn -B -ntp -pl application/core -Dtest=TaskMgrTest,DownloadTaskTest,XMLUserConfigTest test
+mvn -B -ntp -pl application/trayView -DskipTests compile
+```
+
+**Related PR** · `feat: add batch episode selection and download queue controls` (TBD)
+
+**Notes** — See `docs/batch-episode-downloads.md`. Provider metadata and queue
+pause/resume are follow-up.
 
 ---
 

@@ -102,6 +102,14 @@ public class FranceTvUrlsTest {
 	}
 
 	@Test
+	public void sectionPageUrlUsesCategorySlugUnderChannel() {
+		assertEquals("https://www.france.tv/france-3/cinema/",
+				FranceTvUrls.sectionPageUrl("france-3", "cinema"));
+		assertEquals("https://www.france.tv/france-2/",
+				FranceTvUrls.sectionPageUrl("france-2", null));
+	}
+
+	@Test
 	public void channelLabelMapsKnownSlugs() {
 		assertEquals("France 2", FranceTvUrls.channelLabel("france-2"));
 		assertEquals("France 3", FranceTvUrls.channelLabel("france-3"));

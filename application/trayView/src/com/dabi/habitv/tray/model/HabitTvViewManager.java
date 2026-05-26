@@ -19,6 +19,7 @@ import com.dabi.habitv.core.dao.GrabConfigDAO.LoadModeEnum;
 import com.dabi.habitv.core.event.SearchEvent;
 import com.dabi.habitv.core.event.SearchStateEnum;
 import com.dabi.habitv.core.mgr.CoreManager;
+import com.dabi.habitv.core.task.BatchEnqueueResult;
 import com.dabi.habitv.tray.subscriber.CoreSubscriber;
 import com.dabi.habitv.tray.subscriber.SubscriberAdapter;
 import com.dabi.habitv.tray.subscriber.UpdateSubscriber;
@@ -214,6 +215,11 @@ public class HabitTvViewManager extends Observable {
 
 	public void restart(EpisodeDTO episode, boolean exportOnly) {
 		coreManager.restart(episode, exportOnly);
+	}
+
+	public BatchEnqueueResult enqueueEpisodesForDownload(
+			final Collection<EpisodeDTO> episodes) {
+		return coreManager.enqueueEpisodesForDownload(episodes);
 	}
 
 	public Collection<EpisodeDTO> findEpisodeByCategory(CategoryDTO category) {

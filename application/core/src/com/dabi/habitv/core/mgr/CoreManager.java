@@ -39,7 +39,8 @@ public final class CoreManager {
 		applyYoutubeApiKey(config.getYoutubeApiKey());
 		pluginManager = new PluginManager(config);
 		episodeManager = new EpisodeManager(pluginManager.getDownloadersHolder(), pluginManager.getExportersHolder(),
-		        pluginManager.getProvidersHolder(), taskName2PoolSizeMap, config.getMaxAttempts(), DirUtils.getAppDir());
+		        pluginManager.getProvidersHolder(), taskName2PoolSizeMap, config.getMaxAttempts(),
+		        config.getMaxConcurrentDownloads(), DirUtils.getAppDir());
 		categoryManager = new CategoryManager(pluginManager.getProvidersHolder(), taskName2PoolSizeMap);
 
 		setProxy(config);
@@ -150,6 +151,11 @@ public final class CoreManager {
 
 	public void restart(EpisodeDTO episode, boolean exportOnly) {
 		episodeManager.restart(episode, exportOnly);
+	}
+
+	public com.dabi.habitv.core.task.BatchEnqueueResult enqueueEpisodesForDownload(
+			final Collection<EpisodeDTO> episodes) {
+		return episodeManager.enqueueEpisodesForDownload(episodes);
 	}
 
 	public Collection<EpisodeDTO> findEpisodeByCategory(CategoryDTO category) {

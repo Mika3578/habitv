@@ -11,7 +11,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableView;
@@ -96,7 +95,16 @@ public class WindowController {
 	private TreeView<CategoryDTO> toDLTree;
 
 	@FXML
-	private ListView<EpisodeDTO> episodeListView;
+	private javafx.scene.control.TableView<EpisodeDTO> episodeTableView;
+
+	@FXML
+	private Button downloadSelectedButton;
+
+	@FXML
+	private Button selectAllEpisodesButton;
+
+	@FXML
+	private Button clearSelectionButton;
 
 	@FXML
 	private TextField episodeFilter;
@@ -137,6 +145,9 @@ public class WindowController {
 
 	@FXML
 	private TextField youtubeApiKey;
+
+	@FXML
+	private TextField maxConcurrentDownloads;
 
 	@FXML
 	private CheckBox embedSubtitles;
@@ -195,16 +206,17 @@ public class WindowController {
 			ToDownloadController toDlController = new ToDownloadController(
 					searchCategoryProgress, refreshCategoryButton,
 					cleanCategoryButton, toDLTree, indicationText,
-					episodeListView, episodeFilter, categoryFilter,
-					applySavedFilters, filterTypeChoice, addFilterButton,
-					currentFilterVBox);
+					episodeTableView, downloadSelectedButton,
+					selectAllEpisodesButton, clearSelectionButton, episodeFilter,
+					categoryFilter, applySavedFilters, filterTypeChoice,
+					addFilterButton, currentFilterVBox);
 			toDlController.init(controller, manager, primaryStage);
 			manager.attach(toDlController);
 
 			new ConfigController(downloadOuput, nbrMaxAttempts,
 					daemonCheckTimeSec, autoUpdate, youtubeApiKey,
-					embedSubtitles).init(controller, manager,
-					primaryStage);
+					maxConcurrentDownloads, embedSubtitles).init(controller,
+					manager, primaryStage);
 
 			controller.startDownloadCheckDemon();
 

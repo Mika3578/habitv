@@ -98,6 +98,14 @@ abstract class AbstractTask<R> implements Callable<R> {
 		return running;
 	}
 
+	public boolean isFinished() {
+		return future != null && future.isDone();
+	}
+
+	public boolean isQueuedOrActive() {
+		return future != null && !future.isDone();
+	}
+
 	public void cancel() {
 		canceled = true;
 		if (future != null) {
