@@ -53,7 +53,7 @@ jobs:
 
       - name: Upload Maven artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: validate-java8-artifacts
           path: |
@@ -91,7 +91,7 @@ jobs:
 
       - name: Upload Maven artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: deterministic-tests-java8-artifacts
           path: |
@@ -129,7 +129,7 @@ jobs:
 
       - name: Upload Maven artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: compile-and-package-java8-artifacts
           path: |
@@ -214,7 +214,7 @@ jobs:
 
       - name: Upload Maven artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: compatibility-java${{ matrix.java }}-artifacts
           path: |
@@ -253,7 +253,7 @@ jobs:
 
       - name: Upload Maven artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: full-test-suite-artifacts
           path: |
