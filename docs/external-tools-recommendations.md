@@ -11,8 +11,9 @@ follow-up PR queue. **No** plugin module is added or removed, **no**
 ## 1. Purpose
 
 Habitv ships five binary integrations (`yt-dlp`/`youtube-dl`, `ffmpeg`,
-`curl`, `aria2c`, `rtmpdump`) and a handful of internal exporter or
-notifier modules (`cmd`, `file`, `email`). This document records:
+`curl`, `aria2c`, `rtmpdump`) and several internal plugins without a
+bundled binary: `cmd` (exporter), `file` (provider and downloader), and
+`email` (mailbox-input provider). This document records:
 
 - which **additional** external tools would deliver the most user value
   if introduced as new exporter/notifier/downloader plugins,
@@ -23,7 +24,7 @@ notifier modules (`cmd`, `file`, `email`). This document records:
 
 Every concrete plugin addition or module removal will land in a
 **separate** follow-up PR with its own tracker entry. This document is
-strictly proposals.
+strictly a set of proposals.
 
 ---
 
@@ -41,7 +42,9 @@ contracts currently honored by Habitv:
 | `aria2c` | `plugins/aria2` | downloader | active |
 | `rtmpdump` | `plugins/rtmpDump` | downloader (RTMP/Flash) | obsolete — see §5.1 |
 | `AdobeHDS.php` | `plugins/adobeHDS` | downloader (Adobe HDS/Flash) | obsolete — see §5.1 |
-| no external binary | `plugins/cmd`, `plugins/file`, `plugins/email` | exporters / mailbox channel | active |
+| no external binary | `plugins/cmd` | exporter | active |
+| no external binary | `plugins/file` | provider + downloader | active |
+| no external binary | `plugins/email` | provider (mailbox input) | active |
 
 ---
 
@@ -122,11 +125,13 @@ for completeness and **must not be removed outside the
 | Embedded `D8` / `D17` sub-providers in `plugins/canalPlus` | renamed channels (C8, CSTAR) | covered by canal-family rewrite (`provider-inventory` follow-up #2) |
 | Historical `NRJ12`, `Kewego`, `pluzz` references | no live module / renamed | already addressed — no further action |
 
-### 5.3 Internal exporter modules
+### 5.3 Internal plugins (non-binary)
 
 | Module | Observation | Recommendation |
 |---|---|---|
-| `plugins/email` | Currently used as both notification channel and obscure "provider" input. Apprise (§3) covers the notification side cleanly. | **Keep** until §3 `apprise` plugin ships. Then evaluate whether to deprecate the SMTP/IMAP code paths in a dedicated PR. |
+| `plugins/cmd` | Generic exporter wrapping user-defined shell commands. | **Keep**; complements dedicated exporter plugins such as `rclone`. |
+| `plugins/file` | Local filesystem provider and downloader. | **Keep**; not an exporter. |
+| `plugins/email` | Mailbox-input provider; some deployments also use it for SMTP notification. Apprise (§3) covers push notifications more cleanly. | **Keep** until §3 `apprise` plugin ships. Then evaluate whether to narrow SMTP/IMAP notification use in a dedicated PR. |
 
 ---
 
