@@ -24,17 +24,17 @@ automatic category behavior, provider summary, doc map).
 ## 📊 Overall progress
 
 ```
-███████████████▋░░░░  79%
+███████████████▌░░░░  77%
 ```
 
 | Category | Count |
 |---------|------:|
 | ✅ Delivered | **12** |
-| 🟡 In progress | **5** |
+| 🟡 In progress | **6** |
 | 🔵 Proposed | **2** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
-| **Total work items** | **19** |
+| **Total work items** | **20** |
 
 ---
 
@@ -61,6 +61,7 @@ automatic category behavior, provider summary, doc map).
 | 🔒 `dependency-security-audit` — Dependency security audit & remediation | 🟡 In progress | 🟠 P1 | `███░░░░░░░░░░░░░░░░░` 15% |
 | 📝 `clean-squash-merge-policy` — Clean squash merge policy | 🟡 In progress | 🟢 P3 | `██████████░░░░░░░░░░` 50% |
 | 🔒 `critical-log4j-cve-remediation` — Critical Log4j 1.x CVE remediation | ✅ Done | 🔴 P0 | `████████████████████` 100% |
+| 🧰 `external-tools-recommendations` — External tools recommendations & obsolescence analysis | 🟡 In progress | 🟢 P3 | `██████████░░░░░░░░░░` 50% |
 
 ---
 
@@ -787,6 +788,50 @@ mvn -B -ntp -DskipTests validate
 
 **Notes** — Documentation and workflow only; no application code or CI
 behavior changes.
+
+---
+
+## 🧰 `external-tools-recommendations` — External tools recommendations & obsolescence analysis
+
+| | |
+|---|---|
+| **Status** | 🟡 In progress |
+| **Priority** | 🟢 P3 |
+| **Progress** | `██████████░░░░░░░░░░` 50% |
+| **Legacy code** | N/A (post-restart slug-only item) |
+
+**Scope** — Document, in a single doc, the external tools that would
+deliver the most value if introduced as new plugins (high and medium
+priority), and analyze the existing plugins that are obsolete or
+non-recoverable. No plugin module addition or removal in this item;
+each concrete addition or deprecation lands in a dedicated follow-up
+PR with its own tracker entry.
+
+**Acceptance criteria**
+- ✅ `docs/external-tools-recommendations.md` covers high-value tool
+  additions (`rclone`, `mkvmerge`, `subliminal`, `apprise`,
+  `streamlink`) with integration constraints
+- ✅ `docs/external-tools-recommendations.md` covers medium-value tool
+  additions (`mediainfo`, `HandBrakeCLI`, `filebot`, generic webhook,
+  `N_m3u8DL-RE`)
+- ✅ `docs/external-tools-recommendations.md` lists obsolescence
+  candidates with cross-references to `provider-inventory.md`
+- ⬜ At least one §3 plugin (e.g. `rclone` or `apprise`) lands as a
+  dedicated follow-up PR with its own tracker item
+- ⬜ Dedicated `deprecate-rtmpdump` / `deprecate-adobeHDS` proposal PR
+  with its own tracker item
+
+**Validation**
+```bash
+mvn -B -ntp -DskipTests validate
+git diff --check
+```
+
+**Notes** — Documentation only; no application code or CI behavior
+changes. No risk register or decision log update (no new risk surfaced,
+no architectural decision required for an analysis doc). Every
+follow-up PR derived from this analysis must carry its own ADR if it
+changes user-visible defaults.
 
 ---
 
