@@ -37,6 +37,8 @@ public class DownloadTask extends AbstractEpisodeTask {
 
 	private boolean manual;
 
+	private volatile ProcessHolder currentProcessHolder;
+
 	public DownloadTask(final EpisodeDTO episode,
 			final PluginProviderInterface provider,
 			final DownloaderPluginHolder downloaders,
@@ -85,6 +87,15 @@ public class DownloadTask extends AbstractEpisodeTask {
 		LOG.info("Cancel of " + getEpisode() + " done");
 		publisher.addNews(new RetreiveEvent(getEpisode(),
 				EpisodeStateEnum.STOPPED));
+	}
+
+	@Override
+	public void cancel() {
+		final ProcessHolder ph = currentProcessHolder;
+		super.cancel();
+		if (ph != null) {
+			ph.stop();
+		}
 	}
 
 	@Override
@@ -154,7 +165,12 @@ public class DownloadTask extends AbstractEpisodeTask {
 				downloadParam, downloaders);
 		publisher.addNews(new RetreiveEvent(getEpisode(),
 				EpisodeStateEnum.DOWNLOAD_STARTING, downloadProcessHolder));
-		downloadProcessHolder.start();
+		currentProcessHolder = downloadProcessHolder;
+		try {
+			downloadProcessHolder.start();
+		} finally {
+			currentProcessHolder = null;
+		}
 		return downloadProcessHolder;
 	}
 

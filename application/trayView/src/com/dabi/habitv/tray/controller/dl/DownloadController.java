@@ -98,6 +98,9 @@ public class DownloadController extends BaseController implements
 					for (ActionProgress actionProgress : actionProgressList) {
 						if (actionProgress.getProcessHolder() != null) {
 							actionProgress.getProcessHolder().stop();
+						} else {
+							getController().cancel(
+									actionProgress.getEpisode());
 						}
 					}
 				}

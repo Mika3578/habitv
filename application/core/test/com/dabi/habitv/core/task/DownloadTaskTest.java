@@ -218,6 +218,132 @@ public class DownloadTaskTest {
 	// assertTrue(!(new File(filename)).exists());
 	// }
 
+
+	public final void testCancelActiveDownloadStopsProcessAndPublishesStopped() throws InterruptedException {
+		final CategoryDTO category = new CategoryDTO("channel", "category",
+				"identifier", "extension");
+		final EpisodeDTO episode = new EpisodeDTO(category, "cancelEpisode", "videoUrl");
+
+		final boolean[] stopCalled = {false};
+		final Object lock = new Object();
+		final boolean[] holderStarted = {false};
+
+		final MockProcessHolder blockingHolder = new MockProcessHolder() {
+			@Override
+			public void start() {
+				synchronized (lock) {
+					holderStarted[0] = true;
+					lock.notifyAll();
+					while (!stopCalled[0]) {
+						try {
+							lock.wait(5000);
+						} catch (final InterruptedException e) {
+							return;
+						}
+					}
+				}
+			}
+
+			@Override
+			public void stop() {
+				synchronized (lock) {
+					stopCalled[0] = true;
+					lock.notifyAll();
+				}
+			}
+		};
+
+		final PluginProviderDownloaderInterface provider = new PluginProviderDownloaderInterface() {
+			@Override
+			public String getName() { return "provider"; }
+			@Override
+			public Set<EpisodeDTO> findEpisode(final CategoryDTO cat) { return null; }
+			@Override
+			public Set<CategoryDTO> findCategory() { return null; }
+			@Override
+			public ProcessHolder download(final DownloadParamDTO downloadParam,
+					final DownloaderPluginHolder downloaders) throws DownloadFailedException {
+				return blockingHolder;
+			}
+			@Override
+			public DownloadableState canDownload(final String downloadInput) {
+				return DownloadableState.IMPOSSIBLE;
+			}
+		};
+
+		final DownloaderPluginHolder downloader = new DownloaderPluginHolder(
+				null, null, null,
+				"#EPISODE_NAME§20#_#CHANNEL_NAME#_#TVSHOW_NAME#_#EXTENSION#",
+				"indexDir", "bin", "plugins");
+		final Publisher<RetreiveEvent> publisher = new Publisher<>();
+		final boolean[] stoppedEventReceived = {false};
+		final boolean[] downloadFailedEventReceived = {false};
+		publisher.attach(new Subscriber<RetreiveEvent>() {
+			@Override
+			public void update(final RetreiveEvent event) {
+				if (event.getState() == EpisodeStateEnum.STOPPED) {
+					stoppedEventReceived[0] = true;
+				} else if (event.getState() == EpisodeStateEnum.DOWNLOAD_FAILED) {
+					downloadFailedEventReceived[0] = true;
+				}
+			}
+		});
+		final DownloadedDAO downloadedDAO = new DownloadedDAO(category, ".") {
+			@Override
+			public void addDownloadedFiles(final boolean manual, final EpisodeDTO... episodes) {
+				downloaded = true;
+			}
+		};
+
+		task = new DownloadTask(episode, provider, downloader, publisher, downloadedDAO, false);
+
+		final TaskMgr<AbstractTask<Object>, Object> cancelTaskMgr =
+				new TaskMgr<AbstractTask<Object>, Object>(1,
+						new TaskMgrListener() {
+							@Override public void onAllTreatmentDone() {}
+							@Override public void onFailed(final Throwable t) {}
+						}, null);
+
+		cancelTaskMgr.addTask(episode, (AbstractTask<Object>) task);
+
+		// Wait until the process holder's start() is entered
+		synchronized (lock) {
+			while (!holderStarted[0]) {
+				lock.wait(5000);
+			}
+		}
+
+		// Cancel the active download task
+		cancelTaskMgr.cancelTask(episode);
+
+		// Wait for the STOPPED event (or timeout)
+		final long deadline = System.currentTimeMillis() + 5000;
+		while (!stoppedEventReceived[0] && System.currentTimeMillis() < deadline) {
+			Thread.sleep(25);
+		}
+
+		assertTrue("STOPPED event must be published on cancel", stoppedEventReceived[0]);
+		assertFalse("DOWNLOAD_FAILED must not be published on cancel", downloadFailedEventReceived[0]);
+		assertTrue("processHolder.stop() must be called on cancel", stopCalled[0]);
+		assertFalse("episode must not be marked as downloaded on cancel", downloaded);
+
+		cancelTaskMgr.shutdownNow();
+	}
+
+	// @Test
+	// public final void testDownloadRemovePreviousFile() throws IOException {
+	// final String filename =
+	// "episode1234567890123_channel_category_extension";
+	// final FileWriter fileWriter = new FileWriter(filename);
+	// fileWriter.write("test");
+	// fileWriter.close();
+	// init(false);
+	// task.addedTo("download", null);
+	// task.call();
+	// assertTrue(downloaded);
+	// assertTrue(!(new File(filename)).exists());
+	// }
+
 	@Test
 	@Ignore
 	public final void testMatchingFiles() {

@@ -65,6 +65,9 @@ public class CmdExecutor implements ProcessHolder {
 
 	public void start() {
 		init();
+		if (stopped) {
+			throw new ExecutorStoppedException(cmd);
+		}
 		final StringBuffer fullOutput = new StringBuffer();
 
 		try {
@@ -94,6 +97,9 @@ public class CmdExecutor implements ProcessHolder {
 				process.waitFor();
 			}
 		} catch (final InterruptedException e) {
+			if (process != null) {
+				process.destroy();
+			}
 			throw new ExecutorFailedException(cmd, fullOutput.toString(), lastOutputLine, e);
 		} finally {
 			if (process != null) {
@@ -116,10 +122,8 @@ public class CmdExecutor implements ProcessHolder {
 		hungThread = false;
 		ended = false;
 		process = null;
-		stopped = false;
 		lastOutputLine = null;
 		progression = null;
-
 	}
 
 	private Thread buildKillerThread(final StringBuffer fullOutput, final Process process) {

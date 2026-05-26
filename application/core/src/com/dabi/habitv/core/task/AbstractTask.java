@@ -20,7 +20,7 @@ abstract class AbstractTask<R> implements Callable<R> {
 
 	private boolean running = false;
 
-	private boolean canceled = false;
+	private volatile boolean canceled = false;
 
 	@Override
 	public final R call() { // NO_UCD (test only)
@@ -36,10 +36,12 @@ abstract class AbstractTask<R> implements Callable<R> {
 				}
 				ended();
 			} catch (final Throwable e) {
-				if (listener != null) {
-					listener.onTaskFailed();
+				if (!canceled) {
+					if (listener != null) {
+						listener.onTaskFailed();
+					}
+					failed(e);
 				}
-				failed(e);
 				throw new TaskFailedException(e);
 			} finally {
 				running = false;
@@ -108,8 +110,14 @@ abstract class AbstractTask<R> implements Callable<R> {
 
 	public void cancel() {
 		canceled = true;
+		final boolean wasAlreadyDone = future != null && future.isDone();
 		if (future != null) {
 			future.cancel(true);
+		}
+		// If the task was queued (not yet started and not already finished),
+		// call() will never run on the executor, so fire canceled() explicitly.
+		if (!running && !wasAlreadyDone) {
+			canceled();
 		}
 	}
 

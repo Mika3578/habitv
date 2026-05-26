@@ -385,6 +385,134 @@ public class TaskMgrTest {
 		taskMgr.shutdown(0);
 	}
 
+	@Test
+	public final void cancelQueuedTaskFiresCanceledCallback() {
+		taskMgr = new TaskMgr<AbstractTask<Object>, Object>(1, new TaskMgrListener() {
+			@Override
+			public void onAllTreatmentDone() {
+				allTreatmentDone = true;
+			}
+			@Override
+			public void onFailed(final Throwable throwable) {
+				allTreatmentDone = false;
+			}
+		}, null);
+
+		// Add a long-running task to saturate the single-thread pool
+		final AbstractTask<Object> blocker = buildSleepTask("blocker", 2000);
+		taskMgr.addTask(blocker, blocker);
+
+		// Wait for the blocker to start
+		assertTrue(waitForCondition(new Callable<Boolean>() {
+			@Override
+			public Boolean call() {
+				return taskMgr.getActiveTaskCount() == 1;
+			}
+		}, 1000));
+
+		// Add a second task that will be queued
+		final boolean[] canceledFired = {false};
+		final boolean[] doCallFired = {false};
+		final AbstractTask<Object> queued = new AbstractTaskForTest() {
+			@Override
+			protected Object doCall() {
+				doCallFired[0] = true;
+				return null;
+			}
+			@Override
+			protected void failed(final Throwable e) {
+				fail("failed should not be called on a cancelled queued task");
+			}
+			@Override
+			protected void canceled() {
+				canceledFired[0] = true;
+			}
+			@Override
+			public String toString() {
+				return "queued-task";
+			}
+		};
+		taskMgr.addTask(queued, queued);
+
+		// Cancel the queued task
+		taskMgr.cancelTask(queued);
+
+		// canceled() must fire and doCall() must not run
+		assertTrue(waitForCondition(new Callable<Boolean>() {
+			@Override
+			public Boolean call() {
+				return canceledFired[0];
+			}
+		}, 2000));
+		assertTrue(canceledFired[0]);
+		assertFalse(doCallFired[0]);
+
+		taskMgr.shutdownNow();
+	}
+
+	@Test
+	public final void cancelActiveTaskFiresCanceledNotFailed() {
+		taskMgr = new TaskMgr<AbstractTask<Object>, Object>(1, new TaskMgrListener() {
+			@Override
+			public void onAllTreatmentDone() {
+				allTreatmentDone = true;
+			}
+			@Override
+			public void onFailed(final Throwable throwable) {
+				allTreatmentDone = false;
+			}
+		}, null);
+
+		final boolean[] canceledFired = {false};
+		final boolean[] failedFired = {false};
+		final boolean[] startedRunning = {false};
+
+		final AbstractTask<Object> activeTask = new AbstractTaskForTest() {
+			@Override
+			protected Object doCall() throws Exception {
+				startedRunning[0] = true;
+				Thread.sleep(30000);
+				return null;
+			}
+			@Override
+			protected void failed(final Throwable e) {
+				failedFired[0] = true;
+			}
+			@Override
+			protected void canceled() {
+				canceledFired[0] = true;
+			}
+			@Override
+			public String toString() {
+				return "active-task";
+			}
+		};
+		taskMgr.addTask(activeTask, activeTask);
+
+		// Wait for task to start executing
+		assertTrue(waitForCondition(new Callable<Boolean>() {
+			@Override
+			public Boolean call() {
+				return startedRunning[0];
+			}
+		}, 1000));
+
+		// Cancel the running task
+		taskMgr.cancelTask(activeTask);
+
+		// canceled() must fire; failed() must not
+		assertTrue(waitForCondition(new Callable<Boolean>() {
+			@Override
+			public Boolean call() {
+				return canceledFired[0];
+			}
+		}, 2000));
+		assertTrue(canceledFired[0]);
+		assertFalse(failedFired[0]);
+
+		taskMgr.shutdownNow();
+	}
+
 	private boolean waitForAllTreatmentDone(final long timeoutMs) {
 		final long deadline = System.currentTimeMillis() + timeoutMs;
 		while (!allTreatmentDone && System.currentTimeMillis() < deadline) {
