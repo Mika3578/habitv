@@ -219,6 +219,7 @@ public class DownloadTaskTest {
 	// }
 
 
+	@Test
 	public final void testCancelActiveDownloadStopsProcessAndPublishesStopped() throws InterruptedException {
 		final CategoryDTO category = new CategoryDTO("channel", "category",
 				"identifier", "extension");
