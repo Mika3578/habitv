@@ -18,8 +18,18 @@ updates:
         update-types:
           - "minor"
           - "patch"
+    # Major bumps are allowed (opened as individual PRs for review) except
+    # for artifacts whose major release crosses into the jakarta.* namespace.
+    # Those would violate the Java 8 / no-jakarta-migration hard rule
+    # (AGENTS.md section 2) and must not be proposed automatically.
     ignore:
-      - dependency-name: "*"
+      - dependency-name: "javax.xml.bind:jaxb-api"
+        update-types:
+          - "version-update:semver-major"
+      - dependency-name: "org.glassfish.jaxb:jaxb-runtime"
+        update-types:
+          - "version-update:semver-major"
+      - dependency-name: "javax.mail:mail"
         update-types:
           - "version-update:semver-major"
 
@@ -35,11 +45,11 @@ updates:
     labels:
       - "dependencies"
       - "github-actions"
+    # No ignore filter: every action is pinned to a floating major tag
+    # (for example actions/checkout@v6), so the only update Dependabot can
+    # ever offer is the next major. Ignoring majors here suppressed all
+    # action PRs, so majors are allowed and grouped into a single PR.
     groups:
       github-actions:
         patterns:
           - "*"
-    ignore:
-      - dependency-name: "*"
-        update-types:
-          - "version-update:semver-major"
