@@ -1,0 +1,118 @@
+package com.dabi.habitv.framework.plugin.utils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import org.junit.Test;
+
+import com.dabi.habitv.api.plugin.dto.CategoryDTO;
+
+public class CategoryTreeNormalizerTest {
+
+	@Test
+	public void padsChannelToEmissionWithProgramsLevel() {
+		final CategoryDTO channel = new CategoryDTO("sixplay", "M6", "http://m6", "mp4");
+		final CategoryDTO show = new CategoryDTO("sixplay", "Show", "http://show", "mp4");
+		show.setDownloadable(true);
+		channel.addSubCategory(show);
+
+		final Set<CategoryDTO> normalized = CategoryTreeNormalizer.normalize("sixplay",
+				new LinkedHashSet<>(Arrays.asList(channel)));
+
+		assertEquals(1, normalized.size());
+		final CategoryDTO m6 = normalized.iterator().next();
+		assertEquals("M6", m6.getName());
+		final CategoryDTO programs = m6.getSubCategories().iterator().next();
+		assertEquals(CategoryTreeNormalizer.DEFAULT_CATEGORY_NAME, programs.getName());
+		assertFalse(programs.isDownloadable());
+		final CategoryDTO showNode = programs.getSubCategories().iterator().next();
+		assertEquals("Show", showNode.getName());
+		assertTrue(showNode.isDownloadable());
+		assertEquals(3, CategoryTreeNormalizer.structureDepth(m6));
+	}
+
+	@Test
+	public void leavesThreeLevelTreeUnchanged() {
+		final CategoryDTO channel = new CategoryDTO("francetv", "France 2", "http://f2", "mp4");
+		channel.setDownloadable(false);
+		final CategoryDTO rubrique = new CategoryDTO("francetv", "Info", "http://f2/info", "mp4");
+		rubrique.setDownloadable(false);
+		final CategoryDTO program = new CategoryDTO("francetv", "JT", "http://jt", "mp4");
+		program.setDownloadable(true);
+		rubrique.addSubCategory(program);
+		channel.addSubCategory(rubrique);
+
+		final Set<CategoryDTO> normalized = CategoryTreeNormalizer.normalize("francetv",
+				new LinkedHashSet<>(Arrays.asList(channel)));
+
+		assertEquals(1, normalized.size());
+		assertEquals(3, CategoryTreeNormalizer.structureDepth(normalized.iterator().next()));
+		assertEquals("Info", normalized.iterator().next().getSubCategories().iterator().next().getName());
+	}
+
+	@Test
+	public void preservesDownloadableBranchesInExistingDeepTree() {
+		final CategoryDTO channel = new CategoryDTO("canalPlus", "Parent", "parent", "mp4");
+		channel.setDownloadable(true);
+		final CategoryDTO rubrique = new CategoryDTO("canalPlus", "Rubrique", "rubrique", "mp4");
+		rubrique.setDownloadable(false);
+		final CategoryDTO program = new CategoryDTO("canalPlus", "Program", "program", "mp4");
+		program.setDownloadable(true);
+		rubrique.addSubCategory(program);
+		channel.addSubCategory(rubrique);
+
+		final Set<CategoryDTO> normalized = CategoryTreeNormalizer.normalize("canalPlus",
+				new LinkedHashSet<>(Arrays.asList(channel)));
+
+		final CategoryDTO normalizedChannel = normalized.iterator().next();
+		assertTrue(normalizedChannel.isDownloadable());
+		assertEquals(3, CategoryTreeNormalizer.structureDepth(normalizedChannel));
+	}
+
+	@Test
+	public void normalizesShallowRootEvenWhenAnotherRootIsAlreadyDeep() {
+		final CategoryDTO deepChannel = new CategoryDTO("francetv", "France 2", "http://f2", "mp4");
+		deepChannel.setDownloadable(false);
+		final CategoryDTO section = new CategoryDTO("francetv", "Info", "http://f2/info", "mp4");
+		section.setDownloadable(false);
+		final CategoryDTO program = new CategoryDTO("francetv", "JT", "http://jt", "mp4");
+		program.setDownloadable(true);
+		section.addSubCategory(program);
+		deepChannel.addSubCategory(section);
+
+		final CategoryDTO shallowLeaf = new CategoryDTO("francetv", "Direct", "http://direct", "mp4");
+		shallowLeaf.setDownloadable(true);
+
+		final Set<CategoryDTO> normalized = CategoryTreeNormalizer.normalize("francetv",
+				new LinkedHashSet<>(Arrays.asList(deepChannel, shallowLeaf)));
+
+		assertEquals(2, normalized.size());
+		for (final CategoryDTO root : normalized) {
+			assertEquals(3, CategoryTreeNormalizer.structureDepth(root));
+		}
+	}
+
+	@Test
+	public void wrapsSingleDownloadableRootInPrincipalAndPrograms() {
+		final CategoryDTO leaf = new CategoryDTO("mlssoccer", "Highlights", "http://highlights", "mp4");
+		leaf.setDownloadable(true);
+
+		final Set<CategoryDTO> normalized = CategoryTreeNormalizer.normalize("mlssoccer",
+				new LinkedHashSet<>(Arrays.asList(leaf)));
+
+		assertEquals(1, normalized.size());
+		final CategoryDTO channel = normalized.iterator().next();
+		assertEquals(CategoryTreeNormalizer.DEFAULT_CHANNEL_NAME, channel.getName());
+		final Iterator<CategoryDTO> it = channel.getSubCategories().iterator();
+		final CategoryDTO category = it.next();
+		assertEquals(CategoryTreeNormalizer.DEFAULT_CATEGORY_NAME, category.getName());
+		assertFalse(category.isDownloadable());
+		assertEquals("Highlights", category.getSubCategories().iterator().next().getName());
+	}
+}
