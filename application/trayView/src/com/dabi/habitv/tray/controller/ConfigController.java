@@ -24,17 +24,21 @@ public class ConfigController extends BaseController {
 
 	private TextField youtubeApiKey;
 
+	private TextField maxConcurrentDownloads;
+
 	private CheckBox embedSubtitles;
 
 	public ConfigController(TextField downloadOuput, TextField nbrMaxAttempts,
 			TextField daemonCheckTimeSec, CheckBox autoUpdate,
-			TextField youtubeApiKey, CheckBox embedSubtitles) {
+			TextField youtubeApiKey, TextField maxConcurrentDownloads,
+			CheckBox embedSubtitles) {
 		super();
 		this.downloadOuput = downloadOuput;
 		this.nbrMaxAttempts = nbrMaxAttempts;
 		this.daemonCheckTimeSec = daemonCheckTimeSec;
 		this.autoUpdate = autoUpdate;
 		this.youtubeApiKey = youtubeApiKey;
+		this.maxConcurrentDownloads = maxConcurrentDownloads;
 		this.embedSubtitles = embedSubtitles;
 	}
 
@@ -65,6 +69,8 @@ public class ConfigController extends BaseController {
 				"si coché habiTv se mettra à jour automatiquement."));
 		youtubeApiKey.setTooltip(new Tooltip(
 				"Clé API YouTube Data v3. Laissez vide pour utiliser la variable d'environnement ou l'option Java."));
+		maxConcurrentDownloads.setTooltip(new Tooltip(
+				"Nombre maximum de téléchargements d'épisodes exécutés en même temps (minimum 1)."));
 		embedSubtitles.setTooltip(new Tooltip(
 				"Intègre les sous-titres dans la vidéo téléchargée lorsqu'ils sont disponibles. Nécessite ffmpeg via le post-traitement yt-dlp."));
 	}
@@ -77,6 +83,8 @@ public class ConfigController extends BaseController {
 				.getDemonCheckTime()));
 		autoUpdate.setSelected(userConfig.updateOnStartup());
 		youtubeApiKey.setText(userConfig.getYoutubeApiKey());
+		maxConcurrentDownloads.setText(String.valueOf(Math.max(1,
+				userConfig.getMaxConcurrentDownloads())));
 		embedSubtitles.setSelected(userConfig.getEmbedSubtitles());
 	}
 
@@ -103,8 +111,16 @@ public class ConfigController extends BaseController {
 			@Override
 			public void run() {
 				UserConfig userConfig = getController().loadUserConfig();
-				final Integer maxAttempts = Integer.parseInt(nbrMaxAttempts.getText());
-				if (!userConfig.getMaxAttempts().equals(maxAttempts)) {
+				final Integer currentValue = userConfig.getMaxAttempts();
+				final Integer maxAttempts = parsePositiveInteger(nbrMaxAttempts.getText());
+				if (maxAttempts == null) {
+					nbrMaxAttempts.setText(String.valueOf(currentValue));
+					new Popin().show("Configuration invalide",
+							"Le nombre maximum de tentatives doit être un entier supérieur ou égal à 1.");
+					return;
+				}
+				nbrMaxAttempts.setText(String.valueOf(maxAttempts.intValue()));
+				if (!currentValue.equals(maxAttempts)) {
 					userConfig.setMaxAttempts(maxAttempts);
 					saveConfig(userConfig);
 				}
@@ -118,8 +134,16 @@ public class ConfigController extends BaseController {
 			@Override
 			public void run() {
 				UserConfig userConfig = getController().loadUserConfig();
-				final Integer demonCheckTime = Integer.parseInt(daemonCheckTimeSec.getText());
-				if (!userConfig.getDemonCheckTime().equals(demonCheckTime)) {
+				final Integer currentValue = userConfig.getDemonCheckTime();
+				final Integer demonCheckTime = parsePositiveInteger(daemonCheckTimeSec.getText());
+				if (demonCheckTime == null) {
+					daemonCheckTimeSec.setText(String.valueOf(currentValue));
+					new Popin().show("Configuration invalide",
+							"La période entre deux recherches doit être un entier supérieur ou égal à 1.");
+					return;
+				}
+				daemonCheckTimeSec.setText(String.valueOf(demonCheckTime.intValue()));
+				if (!currentValue.equals(demonCheckTime)) {
 					userConfig.setDemonCheckTime(demonCheckTime);
 					saveConfig(userConfig);
 				}
@@ -142,6 +166,28 @@ public class ConfigController extends BaseController {
 			}
 		};
 		triggersave(youtubeApiKey, saveYoutubeApiKey);
+
+		Runnable saveMaxConcurrent = new Runnable() {
+
+			@Override
+			public void run() {
+				UserConfig userConfig = getController().loadUserConfig();
+				final int currentValue = Math.max(1, userConfig.getMaxConcurrentDownloads());
+				final Integer newValue = parsePositiveInteger(maxConcurrentDownloads.getText());
+				if (newValue == null) {
+					maxConcurrentDownloads.setText(String.valueOf(currentValue));
+					new Popin().show("Configuration invalide",
+							"Le nombre maximum de téléchargements simultanés doit être un entier supérieur ou égal à 1.");
+					return;
+				}
+				maxConcurrentDownloads.setText(String.valueOf(newValue.intValue()));
+				if (userConfig.getMaxConcurrentDownloads() != newValue.intValue()) {
+					userConfig.setMaxConcurrentDownloads(newValue);
+					saveConfig(userConfig);
+				}
+			}
+		};
+		triggersave(maxConcurrentDownloads, saveMaxConcurrent);
 
 		autoUpdate.setOnAction(new EventHandler<ActionEvent>() {
 
@@ -192,5 +238,14 @@ public class ConfigController extends BaseController {
 		}
 		String trimmed = value.trim();
 		return trimmed.isEmpty() ? null : trimmed;
+	}
+
+	private Integer parsePositiveInteger(String value) {
+		try {
+			final int parsed = Integer.parseInt(value == null ? "" : value.trim());
+			return parsed < 1 ? Integer.valueOf(1) : Integer.valueOf(parsed);
+		} catch (NumberFormatException e) {
+			return null;
+		}
 	}
 }
