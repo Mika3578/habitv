@@ -43,16 +43,20 @@ governance-only PR.
 ## Required PR checks
 
 The **Maven CI** workflow (`.github/workflows/ci-maven.yml`) must pass on pull
-requests targeting `develop`. The Phase 0 required status check contexts are:
+requests targeting `develop`. The live `protect-develop` required status check
+contexts are:
 
-- `Maven CI / validate-java8`
-- `Maven CI / deterministic-tests-java8`
-- `Maven CI / compile-and-package-java8`
+- `validate-java8`
+- `deterministic-tests-java8`
+- `compile-and-package-java8`
+- `dependency-review`
 
-These replace the legacy `validate (zulu-8)` check, which was produced by the
-removed `.github/workflows/ci.yml`. If GitHub displays a different check name
-in the ruleset UI, align the ruleset with the exact name shown on a completed
-workflow run.
+The first three are Maven CI jobs. `dependency-review` is provided by the
+Dependency Review workflow. These replace the legacy `validate (zulu-8)` /
+`CI / validate (zulu-8)` check, which was produced by the removed
+`.github/workflows/ci.yml`. Do not use workflow-prefixed check names (for
+example `Maven CI / validate-java8`) in the ruleset unless GitHub Settings
+later displays them that way.
 
 The live `protect-develop` ruleset additionally enforces `code_scanning`
 (CodeQL, `medium_or_higher`), `code_quality` (`notes`), and a

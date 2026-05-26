@@ -24,22 +24,23 @@
 
 ### Required checks today
 
-The `protect-develop` ruleset should require the Phase 0 Maven baseline jobs:
+The live `protect-develop` ruleset requires these exact status check contexts:
 
-- `Maven CI / validate-java8`
-- `Maven CI / deterministic-tests-java8`
-- `Maven CI / compile-and-package-java8`
+- `validate-java8`
+- `deterministic-tests-java8`
+- `compile-and-package-java8`
+- `dependency-review`
 
-### Planned required checks (after ruleset update)
-
-When governance catches up (`branch-protection` tracker item), require:
-
-- `Dependency Review / dependency-review`
+The first three are Maven CI checks (`ci-maven.yml`). `dependency-review` is
+provided by Dependency Review (`dependency-review.yml`). Do not use
+workflow-prefixed check names (for example `Maven CI / validate-java8`) unless
+GitHub Settings later displays them that way. The removed legacy check was
+`validate (zulu-8)` / `CI / validate (zulu-8)`.
 
 ### Diagnostic checks (do not require)
 
-- `Maven CI / compatibility-java11` (and 17, 21, 25)
-- `Maven CI / full-test-suite` (workflow_dispatch / schedule only)
+- `compatibility-java11` (and 17, 21, 25)
+- `full-test-suite` (workflow_dispatch / schedule only)
 
 ## Live network tests
 

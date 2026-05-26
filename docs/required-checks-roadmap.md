@@ -47,22 +47,24 @@ distribution, not assumed for all Java 8 packages).
 
 | Check context | Job | Command |
 |---------------|-----|---------|
-| `Maven CI / validate-java8` | `validate-java8` | `mvn -B -ntp -DskipTests validate` |
-| `Maven CI / deterministic-tests-java8` | `deterministic-tests-java8` | `mvn -B -ntp -pl fwk/api,fwk/framework,application/core,plugins/plugin-tester -am test` |
-| `Maven CI / compile-and-package-java8` | `compile-and-package-java8` | `mvn -B -ntp -DskipTests package` |
+| `validate-java8` | `validate-java8` | `mvn -B -ntp -DskipTests validate` |
+| `deterministic-tests-java8` | `deterministic-tests-java8` | `mvn -B -ntp -pl fwk/api,fwk/framework,application/core,plugins/plugin-tester -am test` |
+| `compile-and-package-java8` | `compile-and-package-java8` | `mvn -B -ntp -DskipTests package` |
+| `dependency-review` | `dependency-review` | GitHub Dependency Review |
 
-The `protect-develop` ruleset must be updated to require the three `Maven CI`
-jobs above. Until that change is applied, the ruleset still lists the legacy
-`validate (zulu-8)` check, which can no longer report because
+The `protect-develop` ruleset must require the four checks above (the three
+Maven CI jobs plus `dependency-review`). Until that change is applied, the
+ruleset may still list the legacy `validate (zulu-8)` check, which can no
+longer report because
 `.github/workflows/ci.yml` was removed — leaving it "Expected — Waiting for
 status to be reported" and blocking every `develop` merge. Apply the updated
 `docs/github-rulesets/protect-develop.json` to unblock.
 
 ### Not required yet
 
-- `Maven CI / compatibility-java11` (and 17, 21, 25) — validation or package
+- `compatibility-java11` (and 17, 21, 25) — validation or package
   on modern JDKs
-- `Maven CI / full-test-suite` — default deterministic tests only until it is
+- `full-test-suite` — default deterministic tests only until it is
   explicitly retargeted; it must not include live provider/network tests when
   made required
 - Provider live tests (`-Plive-provider-tests` or any job hitting real endpoints)
@@ -95,10 +97,10 @@ Package steps stay diagnostic until Phase 2 succeeds.
 
 | Check context | Scope |
 |---------------|--------|
-| `Maven CI / compatibility-java11` | `validate` only |
-| `Maven CI / compatibility-java17` | `validate` only |
-| `Maven CI / compatibility-java21` | `validate` only |
-| `Maven CI / compatibility-java25` | `validate` only (optional / experimental) |
+| `compatibility-java11` | `validate` only |
+| `compatibility-java17` | `validate` only |
+| `compatibility-java21` | `validate` only |
+| `compatibility-java25` | `validate` only (optional / experimental) |
 
 Name these checks clearly as **validation**, not package compatibility. Do
 not mark Java 11/17/21/25 package jobs as required while OpenJFX migration is
@@ -133,7 +135,7 @@ assumptions.
 
 **Only after real package success on CI**, add required checks such as:
 
-- `Maven CI / package-java17` (example name — align with workflow job names
+- `package-java17` (example name — align with workflow job names
   when introduced)
 - Do **not** mark compatibility package matrix jobs as done in the tracker
   until OpenJFX packaging actually works in CI artifacts.
@@ -165,7 +167,7 @@ provider behavior tested separately.
 
 | Check context | Scope |
 |---------------|--------|
-| `Maven CI / full-test-suite` (or renamed `deterministic-full-tests`) | Default offline suite on Java 8 |
+| `full-test-suite` (or renamed `deterministic-full-tests`) | Default offline suite on Java 8 |
 
 **Remain optional / non-required:**
 
@@ -183,8 +185,9 @@ upgrades.
 
 - Dependabot (`.github/dependabot.yml`) opens scoped Maven and GitHub Actions
   update PRs; major bumps ignored by policy.
-- Dependency Review can run on PRs when enabled at the org/repo level.
-- CodeQL is **not** yet configured; add it before requiring analysis.
+- Dependency Review is part of the live `protect-develop` required checks.
+- Code scanning is enabled via the live `protect-develop` ruleset and remains
+  owner-managed.
 
 **Policy (document before requiring):**
 
@@ -211,9 +214,9 @@ After Phases 0–4 prerequisites are met, the **target** required check set:
 
 | Required | Notes |
 |----------|--------|
-| `Maven CI / validate-java8` | While Java 8 remains supported |
-| `Maven CI / deterministic-tests-java8` | Or superseded by Phase 3 full deterministic suite |
-| `Maven CI / compile-and-package-java8` | Java 8 package baseline |
+| `validate-java8` | While Java 8 remains supported |
+| `deterministic-tests-java8` | Or superseded by Phase 3 full deterministic suite |
+| `compile-and-package-java8` | Java 8 package baseline |
 | Modern JDK `validate` jobs | Phase 1 |
 | Modern LTS **package** job(s) | Phase 2 — selected 17 and/or 21 only |
 | Deterministic full test job | Phase 3 |
@@ -223,9 +226,9 @@ After Phases 0–4 prerequisites are met, the **target** required check set:
 | Optional / non-required | Notes |
 |-------------------------|--------|
 | Live provider tests (`-Plive-provider-tests`) | Manual or scheduled only |
-| `Maven CI / compatibility-java25` | Experimental newest JDK |
+| `compatibility-java25` | Experimental newest JDK |
 | Deploy / release / static publish workflows | Owner-triggered |
-| Legacy `CI / validate (zulu-8)` | Remove when redundant with Maven CI |
+| Legacy `validate (zulu-8)` / `CI / validate (zulu-8)` | Removed (no longer exists) |
 
 Governance application is tracked under `branch-protection` and
 `docs/repository-governance.md`.

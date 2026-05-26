@@ -61,6 +61,21 @@ Under **Settings -> Branches -> Branch protection rules** for
 
 Apply the same rule set to `develop` once it is created.
 
+## Live required checks for `develop`
+
+The live `protect-develop` ruleset requires these exact status check contexts:
+
+- `validate-java8`
+- `deterministic-tests-java8`
+- `compile-and-package-java8`
+- `dependency-review`
+
+The first three are Maven CI checks. `dependency-review` is already part of
+the live required checks. The removed legacy check was `validate (zulu-8)` /
+`CI / validate (zulu-8)`. Do not use workflow-prefixed names (for example
+`Maven CI / validate-java8`) unless GitHub Settings later displays them that
+way.
+
 ## Recommended initial required checks
 
 Once the `build` workflow has run at least once on a PR, mark the

@@ -26,9 +26,10 @@
         "strict_required_status_checks_policy": true,
         "do_not_enforce_on_create": true,
         "required_status_checks": [
-          { "context": "Maven CI / validate-java8" },
-          { "context": "Maven CI / deterministic-tests-java8" },
-          { "context": "Maven CI / compile-and-package-java8" }
+          { "context": "validate-java8" },
+          { "context": "deterministic-tests-java8" },
+          { "context": "compile-and-package-java8" },
+          { "context": "dependency-review" }
         ]
       }
     },
