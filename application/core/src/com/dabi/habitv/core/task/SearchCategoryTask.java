@@ -4,6 +4,7 @@ import com.dabi.habitv.api.plugin.api.PluginProviderInterface;
 import com.dabi.habitv.api.plugin.pub.Publisher;
 import com.dabi.habitv.core.event.SearchCategoryEvent;
 import com.dabi.habitv.core.event.SearchCategoryStateEnum;
+import com.dabi.habitv.framework.plugin.utils.CategoryTreeNormalizer;
 
 public final class SearchCategoryTask extends
 		AbstractTask<SearchCategoryResult> {
@@ -53,9 +54,10 @@ public final class SearchCategoryTask extends
 	@Override
 	protected SearchCategoryResult doCall() {
 		try {
-			return new SearchCategoryResult(channel, provider.findCategory());
+			return new SearchCategoryResult(channel,
+					CategoryTreeNormalizer.normalize(channel, provider.findCategory()));
 		} catch (Exception e) {
-			LOG.error("", e);
+			LOG.error("Failed to build categories for channel " + channel, e);
 			return new SearchCategoryResult(channel);
 		}
 	}
