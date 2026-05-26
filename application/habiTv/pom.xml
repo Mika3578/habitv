@@ -6,7 +6,7 @@
 		<version>4.1.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-	
+
 	<artifactId>habiTv</artifactId>
 	<packaging>jar</packaging>
 	<name>habiTv</name>
@@ -15,7 +15,7 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>com.dabi.habitv</groupId>
 			<artifactId>trayView</artifactId>
@@ -31,11 +31,13 @@
 	</dependencies>
 	<profiles>
 		<!--
-		  On JDK 11+, JavaFX 2.x is no longer bundled with the JDK. The
-		  launcher references trayView whose ancestor extends
-		  javafx.application.Application, so javac needs the JavaFX API
-		  available even though HabitvLauncher itself does not import it.
-		  Match trayView/pom.xml's javafx-openjfx-compile profile.
+		  On JDK 11+, JavaFX is no longer bundled with the JDK. Supply the
+		  JavaFX API as compile-only ("provided") dependencies so this module
+		  compiles on JDK 11+ build hosts. HabitvLauncher does not import
+		  JavaFX directly, but trayView does; match trayView's
+		  javafx-openjfx-compile profile. Not a runtime migration: Java 8
+		  remains the baseline and runtime still uses jfxrt.jar classpath
+		  bootstrapping via HabitvLauncher.
 		-->
 		<profile>
 			<id>javafx-openjfx-compile</id>
@@ -83,6 +85,6 @@
           </execution>
         </executions>
       </plugin>
-    </plugins>		
+    </plugins>
 	</build>
 </project>
