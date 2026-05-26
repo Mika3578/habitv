@@ -15,7 +15,6 @@
 
 | Workflow | File | Role |
 |----------|------|------|
-| CI | `.github/workflows/ci.yml` | Legacy required check for `develop`: `CI / validate (zulu-8)` |
 | Maven CI | `.github/workflows/ci-maven.yml` | `develop` PR validation: validate, deterministic tests, package |
 | Build | `.github/workflows/build.yml` | Legacy `master` push/PR coverage only; not part of the `develop` merge baseline |
 | Dependency Review | `.github/workflows/dependency-review.yml` | Blocks new high/critical dependency issues on PRs |
@@ -25,17 +24,16 @@
 
 ### Required checks today
 
-Branch protection on `develop` currently requires:
+The `protect-develop` ruleset should require the Phase 0 Maven baseline jobs:
 
-- `CI / validate (zulu-8)` from `.github/workflows/ci.yml`
+- `Maven CI / validate-java8`
+- `Maven CI / deterministic-tests-java8`
+- `Maven CI / compile-and-package-java8`
 
 ### Planned required checks (after ruleset update)
 
 When governance catches up (`branch-protection` tracker item), require:
 
-- `Maven CI / validate-java8`
-- `Maven CI / deterministic-tests-java8`
-- `Maven CI / compile-and-package-java8`
 - `Dependency Review / dependency-review`
 
 ### Diagnostic checks (do not require)

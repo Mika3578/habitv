@@ -45,14 +45,14 @@ governance-only PR.
 The **Maven CI** workflow (`.github/workflows/ci-maven.yml`) must pass on pull
 requests targeting `develop`. The Phase 0 required status check contexts are:
 
-- `validate-java8`
-- `deterministic-tests-java8`
-- `compile-and-package-java8`
+- `Maven CI / validate-java8`
+- `Maven CI / deterministic-tests-java8`
+- `Maven CI / compile-and-package-java8`
 
 These replace the legacy `validate (zulu-8)` check, which was produced by the
 removed `.github/workflows/ci.yml`. If GitHub displays a different check name
-in the ruleset UI (for example with a `Maven CI /` workflow prefix), align the
-ruleset with the exact name shown on a completed workflow run.
+in the ruleset UI, align the ruleset with the exact name shown on a completed
+workflow run.
 
 The live `protect-develop` ruleset additionally enforces `code_scanning`
 (CodeQL, `medium_or_higher`), `code_quality` (`notes`), and a
