@@ -25,8 +25,9 @@ Do **not** add a check to branch protection when it:
 
 - Depends on live provider websites, replay endpoints, or other external
   network behavior that the project does not control.
-- Fails for reasons contributors cannot fix in the PR (for example missing
-  OpenJFX on Java 11+ before migration work lands).
+- Fails for reasons contributors cannot fix in the PR (for example a JDK 11+
+  build host without the `javafx-openjfx-compile` profile resolving, or
+  missing end-user OpenJFX **runtime** packaging before migration lands).
 - Produces noisy security alerts without a documented remediation path.
 
 Non-blocking jobs must remain visible (no `continue-on-error` used to hide
@@ -38,7 +39,8 @@ are explicitly **not** required).
 ## Phase 0 — Current required baseline
 
 **Goal:** Keep merge-blocking checks limited to the Java 8 baseline that
-already works in CI (Liberica JDK 8 with bundled JavaFX).
+already works in CI (Liberica JDK 8 `jdk+fx` — JavaFX included in that
+distribution, not assumed for all Java 8 packages).
 
 ### Required (target for `develop` ruleset)
 
@@ -100,9 +102,9 @@ Name these checks clearly as **validation**, not package compatibility. Do
 not mark Java 11/17/21/25 package jobs as required while OpenJFX migration is
 incomplete.
 
-**Prerequisites:** JAXB/module-path issues tracked under `jaxb-mismatch` must
-not cause chronic false failures on `validate` for the modules in the default
-reactor.
+**Prerequisites:** JAXB and modular-JDK classpath issues tracked under
+`jaxb-mismatch` must not cause chronic false failures on `validate` for the
+modules in the default reactor.
 
 ---
 
@@ -116,9 +118,13 @@ assumptions.
 
 **Engineering milestones (follow-up PRs, not this roadmap PR):**
 
-1. Add OpenJFX dependencies or JDK-version profiles for Java 11+.
-2. Ensure `application/trayView` compiles and `mvn -DskipTests package`
-   succeeds on the target LTS (prefer **Java 17** or **Java 21**).
+1. ✅ **Partial (PR #100):** `javafx-openjfx-compile` profile — provided-scope
+   OpenJFX on JDK 11+ **build** hosts for compile/package bridge. **Remaining:**
+   ship OpenJFX (or jlink/jpackage layout) for **end-user runtime** on modern
+   JDKs.
+2. Ensure `application/trayView` **runtime** packaging and `mvn -DskipTests
+   package` succeed on the target LTS (first milestone **Java 17**, stable
+   target **Java 21**) — not only compile on JDK 11+.
 3. Keep Java 8 compatibility until a separate ADR retires it.
 4. Leave `application/habiTv-linux` and `application/habiTv-windows` out of
    required gates until explicitly brought into the reactor or replaced.

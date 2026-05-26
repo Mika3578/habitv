@@ -153,8 +153,9 @@ Remaining: live fixture validation, `habitv-repo` `yt-dlp` tool zip publication.
 
 🔵 **Proposed** · `█░░░░░░░░░░░░░░░░░░░` 5%
 
-- Migrate JavaFX 2.x (JDK-bundled `jfxrt`) to OpenJFX with a modern
-  build (`jpackage`, `jlink`, or equivalent).
+- Migrate JavaFX 2.x (`jfxrt.jar` on Java 8; optional provided OpenJFX at
+  compile on JDK 11+ per PR #100) to **shipped** OpenJFX runtime packaging
+  (`jpackage`, `jlink`, or equivalent).
 - Re-evaluate `application/habiTv-linux` and `habiTv-windows`
   packaging.
 - Modernize the runtime updater (HTTPS, signed metadata) once the

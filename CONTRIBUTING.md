@@ -147,7 +147,9 @@ Do not, without a dedicated tracker item and an accepted ADR:
 
 - Restructure the Maven reactor or aggregator topology.
 - Migrate the Java baseline beyond Java 8.
-- Migrate JavaFX (JDK-bundled `jfxrt`) to OpenJFX.
+- Migrate JavaFX (`jfxrt.jar` on Java 8 runtime) to shipped OpenJFX runtime
+  packaging (compile bridge on JDK 11+ is not sufficient — see
+  `docs/java-runtime-policy.md`).
 - Regenerate JAXB-bound classes or move to `jakarta.*`.
 - Replace `youtube-dl` with `yt-dlp` (see `ytdlp-migration`).
 - Change runtime updater URLs or layout (see `static-repo-publish`).

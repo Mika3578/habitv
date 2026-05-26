@@ -2,9 +2,13 @@
 
 ## Baseline and intent
 
-- **Java 8** is the required compile and merge baseline for `develop`.
-- Java 11, 17, 21, and 25 jobs are **diagnostic only** (may fail until JAXB and
-  JavaFX migration completes).
+- **Java 8** is the required compile and merge baseline for `develop`
+  (`source`/`target` **1.8**; supported **runtime** baseline).
+- Java 11, 17, 21, and 25 jobs are **diagnostic only** (build-host checks;
+  not proof of Java 11/17/21 **runtime** support). JDK 11+ may compile GUI
+  modules using the provided OpenJFX profile ([PR #100](https://github.com/Mika3578/habitv/pull/100));
+  end-user runtime migration is tracked under `javafx-modernization`. See
+  [`java-runtime-policy.md`](java-runtime-policy.md).
 - No deployment, credential publishing, or auto-merge from bots.
 
 ## Workflows
