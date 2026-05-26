@@ -2,7 +2,9 @@
 
 This guide walks through running Habitv with a working YouTube download
 provider on a Linux machine. It assumes a clean checkout of **`develop`**
-and **JDK 8** on the PATH (Java 11+ is not supported for the full GUI yet).
+and **JDK 8** on the PATH for runtime-aligned workflows. End-user **GUI
+runtime** remains Java 8; JDK 11+ is not a supported Habitv runtime (see
+[`java-runtime-policy.md`](java-runtime-policy.md)).
 
 For automatic category watch behavior (index baseline, deduplication limits),
 see [`automatic-category-download.md`](automatic-category-download.md).
@@ -21,9 +23,11 @@ see [`automatic-category-download.md`](automatic-category-download.md).
 mvn -B -ntp -DskipTests -pl '!application/trayView,!application/habiTv' package
 ```
 
-The JavaFX-based GUI modules (`trayView`, `habiTv`) are excluded for
-now because they depend on the JDK-bundled JavaFX runtime, which is
-not part of OpenJDK 11+. The CLI launcher (`consoleView`) is fully
+The JavaFX-based GUI modules (`trayView`, `habiTv`) are excluded from
+this quickstart because they need a **JavaFX-capable JDK 8** at runtime
+(`jfxrt.jar` / launcher classpath). Plain JDK 8 builds without JavaFX,
+and JDK 11+ runtimes, are not supported for the full GUI yet. The CLI
+launcher (`consoleView`) is fully
 functional and ships everything needed for download/export pipelines.
 
 Produces:

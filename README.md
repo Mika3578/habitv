@@ -9,9 +9,9 @@ reactor.
 | Topic | Current state |
 |-------|----------------|
 | Integration branch | [`develop`](https://github.com/Mika3578/habitv/tree/develop) |
-| Java baseline | **Java 8** — CI uses Zulu 8 for legacy validate, Liberica 8 `jdk+fx` for Maven CI Java 8 jobs, and Temurin 8 in the `master`-only legacy build |
-| Root `mvn validate` / `mvn compile` | Works on `develop` |
-| Full `mvn package` (GUI) | Works with a JDK 8 that includes JavaFX; platform packaging modules use separate `jdk.home` setup |
+| Java baseline | **Java 8** runtime and `source`/`target` **1.8** — see [`docs/java-runtime-policy.md`](docs/java-runtime-policy.md) |
+| Root `mvn validate` / `mvn compile` | Works on `develop` (Java 8 required CI; JDK 11+ diagnostic) |
+| Full `mvn package` (GUI) | On **Java 8**, use a JDK 8 distribution **with JavaFX** (e.g. Liberica Full JDK 8, Zulu 8 with FX); do not assume every Java 8 package includes FX. JDK 11+ build hosts use a **compile-only** OpenJFX profile ([PR #100](https://github.com/Mika3578/habitv/pull/100)) — not a Java 11+ **runtime** yet |
 | Artifact / plugin updates | HTTPS static repo ([`habitv-repo`](https://github.com/Mika3578/habitv-repo)) — legacy `dabiboo.free.fr` removed |
 | Provider plugins | Mixed: some work offline; many replay sites changed — see [provider inventory](docs/provider-inventory.md) |
 
@@ -32,7 +32,11 @@ reactor.
 
 ## Quick start (developers)
 
-**Prerequisites:** JDK 8, Maven 3.6+, Git.
+**Prerequisites:** JDK 8 for runtime-aligned work, Maven 3.6+, Git. GUI
+packaging on Java 8 needs a **JavaFX-capable** JDK 8 (see
+[`docs/java-runtime-policy.md`](docs/java-runtime-policy.md)). Building on
+JDK 11+ is supported for CI parity but does not change the Java 8 runtime
+baseline.
 
 ```bash
 git clone https://github.com/Mika3578/habitv.git
@@ -68,8 +72,8 @@ Runtime layout and manual download: [`docs/runtime-quickstart.md`](docs/runtime-
 | Command | Status on `develop` | Notes |
 |---------|---------------------|--------|
 | `mvn -B -ntp -DskipTests validate` | Safe, default | 33 reactor modules |
-| `mvn -B -ntp -DskipTests compile` | Safe | Java 8 only |
-| `mvn -B -ntp -DskipTests package` | Java 8 + JavaFX | Requires a JDK 8 with JavaFX for GUI modules; use scoped builds for console-only validation |
+| `mvn -B -ntp -DskipTests compile` | Safe | Bytecode **1.8**; required CI on Java 8 |
+| `mvn -B -ntp -DskipTests package` | Java 8 + JavaFX (GUI) | GUI modules need JavaFX on the **build** JDK (Java 8 FX-capable distro, or JDK 11+ with provided OpenJFX at compile — see runtime policy). Console-only scoped build avoids GUI/JavaFX |
 | `mvn -B -ntp test` | Partial | Live `*PluginManagerTest` excluded by default |
 | `mvn -B -ntp test -Plive-provider-tests` | Opt-in | Hits real broadcaster networks |
 | `mvn -B -ntp verify` | Not safe yet | Full lifecycle still gated |
@@ -78,13 +82,17 @@ CI parity: [`docs/ci.md`](docs/ci.md).
 
 ### Known build constraints
 
-- **Java 8 only** for this phase — no Java 9+ language features or APIs.
+- **Java 8** is the supported **runtime** baseline; compiler stays at
+  **1.8**. No Java 9+ language features or APIs in application code.
+- **JDK 11+** may be used on build hosts (provided OpenJFX profile per
+  [PR #100](https://github.com/Mika3578/habitv/pull/100)); that is not
+  Java 11/17/21 **runtime** migration.
 - **JAXB**: configuration/grabconfig types are generated under
   `target/generated-sources/jaxb` in `application/core` (see tracker
   `jaxb-launcher-recovery`).
-- **JavaFX**: `application/habiTv`, `trayView`, and out-of-reactor
-  `habiTv-linux` / `habiTv-windows` expect JDK 8 with `jfxrt.jar` (tracker
-  `javafx-modernization`).
+- **JavaFX**: GUI modules use JavaFX 2.x / `jfxrt.jar` on **Java 8
+  runtime**; use a **JavaFX-capable** JDK 8 for local GUI builds. JDK 11+
+  does not bundle JavaFX. Tracker: `javafx-modernization`.
 - **Legacy HTTP repo** (`dabiboo.free.fr`, FTP deploy, SVN SCM): removed from
   active POMs; history in [`docs/audit-master-baseline.md`](docs/audit-master-baseline.md).
 
@@ -140,6 +148,7 @@ Details: [`CONTRIBUTING.md`](CONTRIBUTING.md), [`AGENTS.md`](AGENTS.md),
 
 | Document | Purpose |
 |----------|---------|
+| [`docs/java-runtime-policy.md`](docs/java-runtime-policy.md) | Java 8 baseline, JavaFX, JDK 11+ build bridge, migration roadmap |
 | [`docs/dev-plan.md`](docs/dev-plan.md) | Phased modernization roadmap |
 | [`docs/dev-tracker.md`](docs/dev-tracker.md) | Work items (mirror: `dev-tracker.json`) |
 | [`docs/automatic-category-download.md`](docs/automatic-category-download.md) | Category watch, index, deduplication limits |
