@@ -6,10 +6,13 @@ import java.util.Locale;
 
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
+import com.dabi.habitv.framework.plugin.utils.DownloadUtils;
 
 public final class EpisodeMetadataFormatting {
 
 	private static final String UNKNOWN = "Inconnu";
+	private static final int MAX_SHORT_URL_LENGTH = 48;
+	private static final String PROGRAM_URL_PARAM = "PROGRAM_URL";
 
 	private EpisodeMetadataFormatting() {
 	}
@@ -56,46 +59,74 @@ public final class EpisodeMetadataFormatting {
 				Double.valueOf(bytes / (1024.0 * 1024.0 * 1024.0)));
 	}
 
+	/**
+	 * Program (emission) page URL from the episode category, when the provider
+	 * stores an HTTP(S) identifier on the downloadable category node or in
+	 * {@link #PROGRAM_URL_PARAM}.
+	 */
+	public static String programPageUrl(final EpisodeDTO episode) {
+		if (episode == null || episode.getCategory() == null) {
+			return null;
+		}
+		final CategoryDTO category = episode.getCategory();
+		final String explicitUrl = trimToHttpUrl(category.getParameter(PROGRAM_URL_PARAM));
+		if (explicitUrl != null) {
+			return explicitUrl;
+		}
+		return trimToHttpUrl(category.getId());
+	}
+
+	public static String formatProgramLinkLabel(final EpisodeDTO episode) {
+		if (episode != null && episode.getCategory() != null
+				&& episode.getCategory().getName() != null) {
+			final String trimmedCategoryName = episode.getCategory().getName().trim();
+			if (!trimmedCategoryName.isEmpty()) {
+				return trimmedCategoryName;
+			}
+		}
+		final String url = programPageUrl(episode);
+		if (url == null) {
+			return UNKNOWN;
+		}
+		return shortenUrl(url);
+	}
+
 	public static String formatSource(final EpisodeDTO episode) {
+		final String programUrl = programPageUrl(episode);
+		if (programUrl != null) {
+			return programUrl;
+		}
 		if (episode == null || episode.getId() == null
 				|| episode.getId().trim().isEmpty()) {
 			return UNKNOWN;
 		}
-		return episode.getId();
+		return episode.getId().trim();
+	}
+
+	private static String shortenUrl(final String url) {
+		if (url.length() <= MAX_SHORT_URL_LENGTH) {
+			return url;
+		}
+		final int ellipsisLength = 3;
+		final int prefixLength = MAX_SHORT_URL_LENGTH - ellipsisLength;
+		return url.substring(0, prefixLength) + "...";
 	}
 
 	public static String formatStatusLabel(final String status) {
 		if (status == null || status.trim().isEmpty()) {
 			return UNKNOWN;
 		}
-		return status;
+		return status.trim();
 	}
 
-	public static String programPageUrl(final EpisodeDTO episode) {
-		if (episode == null) {
+	private static String trimToHttpUrl(final String value) {
+		if (value == null) {
 			return null;
 		}
-		final CategoryDTO category = episode.getCategory();
-		if (category == null) {
+		final String trimmed = value.trim();
+		if (trimmed.isEmpty() || !DownloadUtils.isHttpUrl(trimmed)) {
 			return null;
 		}
-		final String categoryId = category.getId();
-		if (categoryId != null && (categoryId.startsWith("http://")
-				|| categoryId.startsWith("https://"))) {
-			return categoryId;
-		}
-		return null;
-	}
-
-	public static String formatProgramLinkLabel(final EpisodeDTO episode) {
-		if (episode == null) {
-			return UNKNOWN;
-		}
-		final CategoryDTO category = episode.getCategory();
-		if (category == null || category.getName() == null
-				|| category.getName().trim().isEmpty()) {
-			return UNKNOWN;
-		}
-		return category.getName();
+		return trimmed;
 	}
 }
