@@ -426,24 +426,11 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 		}
 
 		private String programPageUrl(final EpisodeDTO episode) {
-			if (episode == null || episode.getCategory() == null) {
-				return null;
-			}
-			final String categoryId = episode.getCategory().getId();
-			if (categoryId != null && (categoryId.startsWith("http://")
-					|| categoryId.startsWith("https://"))) {
-				return categoryId;
-			}
-			return null;
+			return EpisodeMetadataFormatting.programPageUrl(episode);
 		}
 
 		private String formatProgramLinkLabel(final EpisodeDTO episode) {
-			if (episode == null || episode.getCategory() == null
-					|| episode.getCategory().getName() == null
-					|| episode.getCategory().getName().trim().isEmpty()) {
-				return "Inconnu";
-			}
-			return episode.getCategory().getName();
+			return EpisodeMetadataFormatting.formatProgramLinkLabel(episode);
 		}
 
 		private EpisodeDTO episodeAtRow() {
