@@ -18,6 +18,7 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-05-26 | TBD | Relax Dependabot policy so it can actually open PRs: allow GitHub Actions major bumps (every action is pinned to a floating major tag, so majors were the only possible update and the blanket ignore suppressed all PRs) and allow Maven majors except for jakarta-crossing artifacts (`jaxb-api`, `jaxb-runtime`, `javax.mail:mail`) guarded by the Java 8 / no-jakarta hard rule |
 | 2026-05-21 | TBD | Define `plugin-versioning-policy` ADR in `docs/decision-log.md`, document the policy in `CONTRIBUTING.md`, extend `AGENTS.md` §4 / `.github/copilot-instructions.md` / `.github/pull_request_template.md`, and bump `youtube` (`4.1.1-SNAPSHOT`), `arte` (`4.1.1-SNAPSHOT`), `francetv` (`4.1.2-SNAPSHOT`) accordingly |
 | 2026-05-17 | `d68f795` | Align JDT compliance with Java 8 (PR [#32](https://github.com/Mika3578/habitv/pull/32)) |
 | 2026-05-17 | `a659383` | Standardize static repository workspace layout (PR [#34](https://github.com/Mika3578/habitv/pull/34)) |
