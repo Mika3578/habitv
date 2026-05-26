@@ -42,14 +42,23 @@ governance-only PR.
 
 ## Required PR checks
 
-The **CI** workflow (`.github/workflows/ci.yml`) must pass on pull requests
-targeting `develop`. Use the expected required ruleset status check context:
+The **Maven CI** workflow (`.github/workflows/ci-maven.yml`) must pass on pull
+requests targeting `develop`. The Phase 0 required status check contexts are:
 
-- `CI / validate (zulu-8)`
+- `validate-java8`
+- `deterministic-tests-java8`
+- `compile-and-package-java8`
 
-If GitHub displays a different check name in the ruleset UI (for example
-`validate (zulu-8)` without the workflow prefix), align the ruleset with the
-exact name shown on a completed workflow run.
+These replace the legacy `validate (zulu-8)` check, which was produced by the
+removed `.github/workflows/ci.yml`. If GitHub displays a different check name
+in the ruleset UI (for example with a `Maven CI /` workflow prefix), align the
+ruleset with the exact name shown on a completed workflow run.
+
+The live `protect-develop` ruleset additionally enforces `code_scanning`
+(CodeQL, `medium_or_higher`), `code_quality` (`notes`), and a
+`copilot_code_review` rule. Requiring CodeQL precedes the
+`required-checks-roadmap.md` Phase 4 schedule; keep or defer it deliberately
+(see that roadmap before treating CodeQL as a stable required gate).
 
 ## Security policy summary
 

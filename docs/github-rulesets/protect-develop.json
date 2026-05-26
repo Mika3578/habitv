@@ -16,7 +16,8 @@
         "dismiss_stale_reviews_on_push": false,
         "require_code_owner_review": false,
         "require_last_push_approval": false,
-        "required_review_thread_resolution": true
+        "required_review_thread_resolution": true,
+        "allowed_merge_methods": ["squash"]
       }
     },
     {
@@ -25,9 +26,9 @@
         "strict_required_status_checks_policy": true,
         "do_not_enforce_on_create": true,
         "required_status_checks": [
-          {
-            "context": "CI / validate (zulu-8)"
-          }
+          { "context": "validate-java8" },
+          { "context": "deterministic-tests-java8" },
+          { "context": "compile-and-package-java8" }
         ]
       }
     },
@@ -39,6 +40,32 @@
     },
     {
       "type": "deletion"
+    },
+    {
+      "type": "code_scanning",
+      "parameters": {
+        "code_scanning_tools": [
+          {
+            "tool": "CodeQL",
+            "security_alerts_threshold": "medium_or_higher",
+            "alerts_threshold": "errors_and_warnings"
+          }
+        ]
+      }
+    },
+    {
+      "type": "code_quality",
+      "parameters": {
+        "severity": "notes"
+      }
+    },
+    {
+      "type": "copilot_code_review",
+      "parameters": {
+        "review_on_push": false,
+        "review_draft_pull_requests": false
+      }
     }
-  ]
+  ],
+  "bypass_actors": []
 }

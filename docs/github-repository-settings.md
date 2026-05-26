@@ -64,15 +64,15 @@ Apply the same rule set to `develop` once it is created.
 ## Recommended initial required checks
 
 Once the `build` workflow has run at least once on a PR, mark the
-following checks as required for `master`:
+following check as required for `master`:
 
-- `build / validate (ubuntu-latest, java8)`
-- `build / validate (windows-latest, java8)`
+- `build / validate (windows, java8)`
 
-These check names come from `.github/workflows/build.yml` job name
-`validate` with the matrix `os` values. If the actual rendered
-check names differ in the GitHub UI, use the names as displayed
-there.
+This check name comes from `.github/workflows/build.yml` job name
+`validate (windows, java8)`. The workflow is now Windows-only — the
+Ubuntu Java 8 validation is covered by `Maven CI` (`ci-maven.yml`). If
+the actual rendered check name differs in the GitHub UI, use the name as
+displayed there.
 
 ## After bootstrap merge — recommended sequence
 

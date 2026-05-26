@@ -13,7 +13,8 @@ tracked separately (`javafx-modernization`, `provider-inventory`, risks
 `javafx-jdk8`, `live-tests-flaky`).
 
 **Related automation:** `.github/workflows/ci-maven.yml` (`Maven CI`),
-`.github/workflows/ci.yml` (`CI`), `.github/dependabot.yml`
+`.github/dependabot.yml`. The legacy `.github/workflows/ci.yml` (`CI`) has
+been removed; its `validate (zulu-8)` check no longer exists.
 
 ---
 
@@ -50,11 +51,12 @@ distribution, not assumed for all Java 8 packages).
 | `Maven CI / deterministic-tests-java8` | `deterministic-tests-java8` | `mvn -B -ntp -pl fwk/api,fwk/framework,application/core,plugins/plugin-tester -am test` |
 | `Maven CI / compile-and-package-java8` | `compile-and-package-java8` | `mvn -B -ntp -DskipTests package` |
 
-Until the repository ruleset is updated, `develop` may still list the legacy
-`CI / validate (zulu-8)` check from `.github/workflows/ci.yml`. When
-governance updates land (`branch-protection`), align required checks with the
-three `Maven CI` jobs above and drop redundant legacy-only gates once
-parity is confirmed.
+The `protect-develop` ruleset must be updated to require the three `Maven CI`
+jobs above. Until that change is applied, the ruleset still lists the legacy
+`validate (zulu-8)` check, which can no longer report because
+`.github/workflows/ci.yml` was removed — leaving it "Expected — Waiting for
+status to be reported" and blocking every `develop` merge. Apply the updated
+`docs/github-rulesets/protect-develop.json` to unblock.
 
 ### Not required yet
 
