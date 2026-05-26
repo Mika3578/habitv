@@ -29,6 +29,8 @@ public interface UserConfig {
 
 	Integer getMaxAttempts();
 
+	int getMaxConcurrentDownloads();
+
 	Integer getDemonCheckTime();
 
 	boolean updateOnStartup();
@@ -42,6 +44,8 @@ public interface UserConfig {
 	boolean getEmbedSubtitles();
 
 	void setMaxAttempts(int parseInt);
+
+	void setMaxConcurrentDownloads(int maxConcurrentDownloads);
 
 	void setUpdateOnStartup(boolean updateOnStartup);
 

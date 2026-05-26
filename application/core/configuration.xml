@@ -5,6 +5,7 @@
     <downloadConfig>
         <downloadOuput>D:/divx/regular/#TVSHOW_NAME#-#EPISODE_NAME_CUT#.#EXTENSION#</downloadOuput>
         <maxAttempts>5</maxAttempts>
+        <maxConcurrentDownloads>1</maxConcurrentDownloads>
         <demonCheckTime>1800</demonCheckTime>
         <fileNameCutSize>50</fileNameCutSize>
         <downloaders>
