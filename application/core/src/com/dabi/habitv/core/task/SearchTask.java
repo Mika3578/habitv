@@ -114,7 +114,8 @@ public class SearchTask extends AbstractTask<Object> {
 			int i = 0;
 			for (final EpisodeDTO episode : episodeList) {
 				episode.setNum(i);
-				isDownloaded = dlFiles.contains(episode.getName());
+				isDownloaded = DownloadedDAO.containsEpisodeOrLegacyName(dlFiles,
+						episode);
 				isErrorDownloaded = errorFiles.contains(episode.getFullNameNoNum());
 				if (indexCreated && FilterUtils.filterByIncludeExcludeAndDownloaded(episode, category.getInclude(), category.getExclude())
 						&& !isDownloaded && !isErrorDownloaded) {

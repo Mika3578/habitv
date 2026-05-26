@@ -251,7 +251,8 @@ public class SearchTaskTest {
 			@Override
 			public Set<String> findDownloadedFiles() {
 				final Set<String> dlFiles = new HashSet<>();
-				dlFiles.add("episodeDl");
+				dlFiles.add(DownloadedDAO.buildEpisodeKey(
+						new EpisodeDTO(category, "episodeDl", "videoUrl")));
 				return dlFiles;
 			}
 

@@ -1,5 +1,6 @@
 package com.dabi.habitv.core.mgr;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -7,6 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.log4j.Logger;
 
 import com.dabi.habitv.api.plugin.api.PluginProviderInterface;
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
@@ -23,7 +26,11 @@ import com.dabi.habitv.core.event.EpisodeStateEnum;
 import com.dabi.habitv.core.event.RetreiveEvent;
 import com.dabi.habitv.core.event.SearchEvent;
 import com.dabi.habitv.core.event.SearchStateEnum;
+import com.dabi.habitv.core.task.BatchEnqueueResult;
 import com.dabi.habitv.core.task.DownloadTask;
+import com.dabi.habitv.core.task.EnqueueSkipReason;
+import com.dabi.habitv.core.task.EpisodeDuplicateDetector;
+import com.dabi.habitv.core.task.EpisodeEnqueueResult;
 import com.dabi.habitv.core.task.ExportTask;
 import com.dabi.habitv.core.task.RetrieveTask;
 import com.dabi.habitv.core.task.SearchTask;
@@ -36,6 +43,10 @@ import com.dabi.habitv.core.task.TaskState;
 import com.dabi.habitv.core.task.TaskTypeEnum;
 
 public final class EpisodeManager extends AbstractManager implements TaskAdder {
+
+	private static final Logger LOG = Logger.getLogger(EpisodeManager.class);
+
+	private static final String DOWNLOAD_POOL_CATEGORY = "default";
 
 	private final TaskMgr<RetrieveTask, Object> retreiveMgr;
 
@@ -62,15 +73,15 @@ public final class EpisodeManager extends AbstractManager implements TaskAdder {
 	private final Integer maxAttempts;
 
 	EpisodeManager(final DownloaderPluginHolder downloader, final ExporterPluginHolder exporter,
-			final ProviderPluginHolder providerPluginHolder, final Map<String, Integer> taskName2PoolSize, final Integer maxAttempts,
-			String appDir) {
+			final ProviderPluginHolder providerPluginHolder, final Map<String, Integer> taskName2PoolSize,
+			final Integer maxAttempts, final int maxConcurrentDownloads, String appDir) {
 		super(providerPluginHolder);
 		exportDAO = new ExportDAO(appDir);
 		// task mgrs
 		retreiveMgr = new TaskMgr<RetrieveTask, Object>(TaskTypeEnum.retreive.getPoolSize(taskName2PoolSize),
 				buildRetreiveTaskMgrListener(), taskName2PoolSize);
-		downloadMgr = new TaskMgr<DownloadTask, Object>(TaskTypeEnum.download.getPoolSize(taskName2PoolSize),
-				buildDownloadTaskMgrListener(), taskName2PoolSize);
+		downloadMgr = new TaskMgr<DownloadTask, Object>(maxConcurrentDownloads,
+				buildDownloadTaskMgrListener(), Collections.<String, Integer> emptyMap());
 		exportMgr = new TaskMgr<ExportTask, Object>(TaskTypeEnum.export.getPoolSize(taskName2PoolSize), buildExportTaskMgrListener(),
 				taskName2PoolSize);
 		searchMgr = new TaskMgr<SearchTask, Object>(TaskTypeEnum.search.getPoolSize(taskName2PoolSize), buildSearchTaskMgrListener(),
@@ -167,8 +178,63 @@ public final class EpisodeManager extends AbstractManager implements TaskAdder {
 
 	@Override
 	public TaskAdResult addDownloadTask(final DownloadTask downloadTask, final String channel) {
-		downloadMgr.addTask(downloadTask.getEpisode(), downloadTask, channel);
+		downloadMgr.addTask(downloadTask.getEpisode(), downloadTask, DOWNLOAD_POOL_CATEGORY);
 		return new TaskAdResult(TaskState.ADDED);
+	}
+
+	public synchronized BatchEnqueueResult enqueueEpisodesForDownload(
+			final Collection<EpisodeDTO> episodes) {
+		final List<EpisodeEnqueueResult> results = new ArrayList<>();
+		if (episodes == null || episodes.isEmpty()) {
+			return new BatchEnqueueResult(results);
+		}
+		final Map<String, Set<String>> downloadedEpisodesByCategory = new HashMap<>();
+		final EpisodeDuplicateDetector duplicateDetector = new EpisodeDuplicateDetector();
+		for (final EpisodeDTO episode : episodes) {
+			if (episode == null || episode.getCategory() == null) {
+				continue;
+			}
+			final EnqueueSkipReason skipReason = duplicateDetector.detectSkipReason(
+					episode, isAlreadyDownloaded(episode, downloadedEpisodesByCategory),
+					isRetrieveQueued(episode), isDownloadActive(episode));
+			if (skipReason != null) {
+				LOG.info("Duplicate skipped for " + episode + ": " + skipReason);
+				results.add(new EpisodeEnqueueResult(episode, TaskState.ALREADY_ADD,
+						skipReason));
+				continue;
+			}
+			LOG.info("Episode queued for download: " + episode);
+			restart(episode, false);
+			results.add(new EpisodeEnqueueResult(episode, TaskState.ADDED, null));
+		}
+		return new BatchEnqueueResult(results);
+	}
+
+	private boolean isAlreadyDownloaded(final EpisodeDTO episode,
+			final Map<String, Set<String>> downloadedEpisodesByCategory) {
+		final String categoryKey = getCategoryKey(episode.getCategory());
+		Set<String> downloadedEpisodes = downloadedEpisodesByCategory.get(categoryKey);
+		if (downloadedEpisodes == null) {
+			final DownloadedDAO dlDAO = new DownloadedDAO(episode.getCategory(),
+					downloader.getIndexDir());
+			downloadedEpisodes = dlDAO.findDownloadedFiles();
+			downloadedEpisodesByCategory.put(categoryKey, downloadedEpisodes);
+		}
+		return DownloadedDAO.containsEpisodeOrLegacyName(downloadedEpisodes,
+				episode);
+	}
+
+	private String getCategoryKey(final CategoryDTO category) {
+		return category.getPlugin() + "#" + category.getId();
+	}
+
+	private boolean isRetrieveQueued(final EpisodeDTO episode) {
+		return runningRetreiveTasks.contains(episode.hashCode())
+				|| retreiveMgr.hasQueuedOrActiveTask(episode);
+	}
+
+	private boolean isDownloadActive(final EpisodeDTO episode) {
+		return downloadMgr.hasQueuedOrActiveTask(episode);
 	}
 
 	private synchronized boolean isRetreiveTaskAdded(final RetrieveTask retreiveTask) {

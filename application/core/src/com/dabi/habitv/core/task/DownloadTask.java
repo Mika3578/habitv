@@ -77,7 +77,7 @@ public class DownloadTask extends AbstractEpisodeTask {
 
 	@Override
 	protected void started() {
-		LOG.info("Download of " + getEpisode() + " is starting");
+		LOG.info("Download started for " + getEpisode());
 	}
 
 	@Override
