@@ -6,15 +6,15 @@ plugin/category tree mapping.
 
 ## Batch selection
 
-On the downloads tab (labeled **A télécharger** in the UI), episodes are
+On the **To download** tab (French UI label: **A télécharger**), episodes are
 listed in a multi-select table.
 Users can:
 
 - Select multiple rows with mouse or keyboard (Ctrl/Cmd, Shift where supported).
-- Use **Download selected** to enqueue all selected episodes at once.
+- Use **Télécharger la sélection** to enqueue all selected episodes at once.
 - Use the context menu to download a single episode (unchanged).
 
-If nothing is selected, **Download selected** stays disabled. If every
+If nothing is selected, **Télécharger la sélection** stays disabled. If every
 selection is skipped, the UI shows an error pop-in.
 
 ## Duplicate prevention
