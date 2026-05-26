@@ -41,7 +41,8 @@ land.
 ## JavaFX on Java 8
 
 The tray/GUI modules (`application/trayView`, `application/habiTv`, and
-out-of-reactor `habiTv-linux` / `habiTv-windows`) use **JavaFX 2.x** APIs
+out-of-reactor `application/habiTv-linux` / `application/habiTv-windows`)
+use **JavaFX 2.x** APIs
 and, on Java 8, expect **`jfxrt.jar`** on the classpath (resolved by
 `HabitvLauncher` or `${jdk.home}` in legacy packaging POMs).
 
