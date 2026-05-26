@@ -33,6 +33,7 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-05-23 | TBD | Remove obsolete embedded `D8` sub-provider from `plugins/canalPlus` (dead `www.d8.tv` endpoints; channel rebranded to C8); drop `d8` from sample `grabconfig.xml`; update offline fixture baseline to `canalPlus,cstar` |
 | 2026-05-18 | TBD | Resolve JavaFX `jfxrt.jar` from common JDK 8 layouts in `HabitvLauncher` |
 
 ### ✨ Features

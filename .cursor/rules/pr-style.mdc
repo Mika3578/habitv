@@ -9,10 +9,14 @@ globs:
 
 # Habitv PR and squash merge style
 
+Follow `AGENTS.md` as the source of truth for PR target policy, branch
+naming, duplicate branch/PR prevention, commit style, PR structure,
+validation, and linear history.
+
 ## Pull requests
 
 - Use English for PR titles, bodies, review comments, and merge metadata.
-- Keep PRs scoped to one tracker item when applicable.
+- Keep PRs scoped to one descriptive scope item when applicable.
 - Document validation commands actually run; default safe command is
   `mvn -B -ntp -DskipTests validate`.
 - Fill every required (non-optional) section of

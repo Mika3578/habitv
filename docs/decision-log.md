@@ -24,6 +24,7 @@ older ones rather than rewriting them in place.
 | `doc-sync-and-rule-lifecycle` | Doc sync protocol & rule lifecycle (meta-rules) | ✅ Accepted |
 | `descriptive-slug-ids` | Switch tracker / risk / ADR identifiers to descriptive slugs | ✅ Accepted |
 | `legacy-dabiboo-svn-removal` | Remove active legacy DabiBoo/SVN wiring from build and runtime paths | ✅ Accepted |
+| `ai-policy-source-of-truth` | Align AI workflow policy around AGENTS.md source of truth | ✅ Accepted |
 | `plugin-versioning-policy` | When to bump a plugin `<version>` independently of the parent POM | 🟡 Proposed |
 
 ---
@@ -509,6 +510,63 @@ artifact at compile time.
 
 ---
 
+## ✅ `ai-policy-source-of-truth` — Align AI workflow policy around AGENTS.md source of truth
+
+| | |
+|---|---|
+| **Status** | ✅ Accepted |
+| **Date** | 2026-05-23 |
+| **Tracker** | `gov-bootstrap` (follow-up) |
+| **Touches** | `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/habitv-master.mdc`, `.cursor/rules/pr-style.mdc`, `.github/copilot-instructions.md`, `.github/pull_request_template.md`, `.github/ISSUE_TEMPLATE/*`, `.github/workflows/build.yml`, `CONTRIBUTING.md`, `README.md`, `docs/ci.md`, `docs/dev-plan.md`, `docs/dev-tracker.md`, `docs/dev-tracker.json`, `docs/github-repository-settings.md`, `docs/provider-inventory.md`, `docs/pull-request-style-guide.md`, `docs/repository-governance.md`, `docs/repository-maintenance.md`, `docs/security-critical-cve-investigation.md`, `docs/security-dependency-audit.md` |
+| **Legacy code** | ADR-0010 |
+
+**Context** — Workflow guidance drifted across AI and contributor
+instruction files, especially around branch prefixes and duplicate
+work prevention. Inconsistent rules increase duplicate branches/PRs
+and make enforcement unclear.
+
+**Decision**
+- `AGENTS.md` is the single source of truth for repository-wide AI
+  agent workflow policy.
+- Tool-specific rule files should stay short and reference
+  `AGENTS.md` for branch naming, commit style, PR structure,
+  validation, duplicate prevention, linear history, and doc sync.
+- Allowed work-branch prefixes are restricted to `fix/`, `feat/`,
+  `chore/`, `docs/`, `test/`, `ci/`, and `refactor/`.
+- Deprecated prefixes are `feature/`, `build/`, `runtime/`, and
+  `provider/`, with explicit replacement mapping in `AGENTS.md`.
+- Agent-created PRs must target `Mika3578/habitv`. Agents do not open
+  PRs directly against `ikfon10/habitv`; that upstream flow remains
+  maintainer-controlled unless explicitly requested.
+- Before creating a branch, run duplicate/collision checks:
+  `git fetch --all --prune`, branch scope search, open PR scope search,
+  and `git check-ref-format --branch`.
+
+**Consequences**
+- ✅ Branch naming and duplicate-prevention workflow are consistent for
+  AI tools and human contributors.
+- ✅ Tool-specific files remain concise and less likely to diverge.
+- ⚠️ Follow-up edits that change workflow policy must continue using
+  ADR-backed updates per the AGENTS rule lifecycle.
+
+---
+
+## 2026-05-23 - Remove HBTV-style tracker IDs from workflow naming
+
+`AGENTS.md` remains the source of truth for AI agent workflow policy.
+
+HBTV-style tracker IDs such as `hbtv-006` and `HBTV-015` are deprecated
+for new branch names, PR titles, commit subjects, and workflow
+documentation.
+
+Future work should use descriptive Conventional Commit scopes and
+GitHub-native tracking through issues, labels, projects, and milestones.
+
+Existing historical tracker references may remain only when needed to
+preserve context.
+
+---
+
 ## 📝 How to add a new ADR
 
 1. Pick a descriptive kebab-case slug (e.g. `enable-spotbugs`).
@@ -583,3 +641,4 @@ current slugs. Source of truth is the per-entry `Legacy code` field.
 | ADR-0007 | `doc-sync-and-rule-lifecycle` |
 | ADR-0008 | `descriptive-slug-ids` |
 | ADR-0009 | `legacy-dabiboo-svn-removal` |
+| ADR-0010 | `ai-policy-source-of-truth` |

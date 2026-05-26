@@ -74,7 +74,12 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 			final Map<String, Object> mainData = mapper.readValue(getInputStreamFromUrl(CanalPlusConf.URL_HOME), Map.class);
 			String urlMainPage = getUrlMainPage(mainData);
 			return findCategoriesFromUrl(null, urlMainPage);
-
+		} catch (RuntimeException e) {
+			if (CanalPlusEndpointAvailability.isUnavailable(e)) {
+				getLog().warn(CanalPlusEndpointAvailability.buildCategoryUnavailableMessage(getName(), e));
+				return new LinkedHashSet<>();
+			}
+			throw e;
 		} catch (IOException e) {
 			throw new DownloadFailedException(e);
 		}

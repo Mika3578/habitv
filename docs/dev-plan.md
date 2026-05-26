@@ -16,7 +16,7 @@ later phase.
 ## 🎯 Phase progress
 
 ```
-███████████████░░░░░  77%   (5 / 7 phases done, 1 in progress)
+███████████████▋░░░░  79%   (tracker-aligned overall progress)
 ```
 
 | Phase | Title | Status | Progress | Tracker items |

@@ -20,11 +20,18 @@ contributions follow a stricter-than-usual workflow.
 |--------|------|-------------|
 | `master` | Stable baseline | 🔒 Protected |
 | `develop` | Integration line for modernization | 🔒 Protected |
-| `feature/*`, `fix/*`, `chore/*`, `build/*`, `ci/*`, `docs/*`, `test/*` | Short-lived branches | ✅ Allowed |
+| `fix/*`, `feat/*`, `chore/*`, `docs/*`, `test/*`, `ci/*`, `refactor/*` | Short-lived branches | ✅ Allowed |
 | `legacy` | Historical reference | 🔒 Frozen |
 
 All modernization branches must target **`develop`**.
 The restart bootstrap PR targets `master`. Everything else targets `develop`.
+
+Before creating a new branch, follow the duplicate-prevention checks
+defined in `AGENTS.md` (`git fetch --all --prune`, matching branch/PR
+search, and `git check-ref-format --branch`).
+
+For AI-agent workflow, PR target policy is defined in `AGENTS.md`:
+agent-created PRs target `Mika3578/habitv` (not `ikfon10/habitv`).
 
 ---
 
@@ -98,18 +105,20 @@ for the full rationale.
 
 ---
 
-## 🎯 One tracker item per PR
+## 🎯 One scope per PR
 
 | Rule | Detail |
 |------|--------|
-| Tracker ID | Reference one work-item slug (e.g. `legacy-url-migration`) from `docs/dev-tracker.md` in the PR body |
+| Related issue | Optional: reference a real GitHub issue (e.g. `#123`) when one exists |
+| Scope | Use one clear descriptive scope in branch name and PR body (e.g. `provider-youtube-ytdlp`) |
 | Scope discipline | One logical change. No opportunistic refactors or formatting passes |
-| Linear history | No merge commits inside feature branches; squash or rebase only |
+| Linear history | No merge commits inside work branches; squash or rebase only |
 | Doc sync | Update `docs/dev-tracker.{md,json}`, `docs/risk-register.md`, `docs/decision-log.md` when behavior or scope changes |
 | English only | Branches, commits, code comments, docs, PR text |
 
-If your change does not fit any tracker item, open one first via the
-`modernization` issue template before coding.
+Do not use local tracker IDs (e.g. `hbtv-*` / `HBTV-*`) for new branch
+names, PR titles, or commit subjects. Use descriptive scopes and
+GitHub-native tracking (issues, labels, projects, milestones).
 
 ---
 
@@ -117,6 +126,8 @@ If your change does not fit any tracker item, open one first via the
 
 The current safe validation level is **`validate`**.
 Stronger goals are only safe for explicitly scoped modules.
+For docs-only PRs, run `git diff --check`; Maven commands are optional
+unless build files changed.
 
 | Goal | Status in current phase | When to use |
 |------|------------------------|-------------|

@@ -11,7 +11,7 @@
 
 <artifactId>youtube</artifactId>
 	<name>youtube</name>
-	<version>4.1.1-SNAPSHOT</version>
+	<version>4.1.2-SNAPSHOT</version>
 	<dependencies>
 		<dependency>
 			<groupId>com.dabi.habitv</groupId>

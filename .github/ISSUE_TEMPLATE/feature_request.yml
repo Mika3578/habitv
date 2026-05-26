@@ -7,7 +7,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Large architectural changes need a tracker item (HBTV-XXX) and often an ADR.
+        Large architectural changes need a scoped work item and often an ADR.
         See `docs/dev-tracker.md`.
 
   - type: textarea
@@ -33,8 +33,8 @@ body:
   - type: input
     id: tracker
     attributes:
-      label: Tracker item (if any)
-      placeholder: HBTV-XXX
+      label: Related issue or scope (optional)
+      placeholder: "#123 or provider-youtube-ytdlp"
 
   - type: checkboxes
     id: scope

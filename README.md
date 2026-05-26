@@ -95,8 +95,9 @@ CI parity: [`docs/ci.md`](docs/ci.md).
 - Plugin JARs and tool binaries are published to
   **`https://mika3578.github.io/habitv-repo/repository/`** (see
   [`docs/static-repository-deploy.md`](docs/static-repository-deploy.md)).
-- Updates are **on by default** at startup; disable with
-  `-Dhabitv.update.enabled=false` or configuration.
+- Runtime update behavior must follow current code/runtime configuration.
+  On current `develop`, updates are enabled at startup and can be
+  disabled with `-Dhabitv.update.enabled=false` or configuration.
 - **SNAPSHOT / timestamped** plugin artifacts: default runtime config allows
   snapshot resolution; see [`docs/runtime-quickstart.md`](docs/runtime-quickstart.md).
 - Telemetry to legacy hosts is **opt-in** (`habitv.stat.enabled`).
@@ -110,7 +111,7 @@ Replay sites change often. Treat README-era names as **legacy labels**:
 | Legacy name | Modern meaning / module |
 |-------------|-------------------------|
 | Pluzz | France Télévisions / France.tv — module `plugins/francetv` (rename grab-config `pluzz` → `francetv`) |
-| D8 / D17 | Canal-era channels — embedded in `plugins/canalPlus` (obsolete endpoints) |
+| CStar (ex D17) | Canal-era channel — embedded in `plugins/canalPlus` (obsolete endpoints; D8 removed, rebranded to C8) |
 | 6play | M6+ / M6 replay area — `plugins/6play` (needs rewrite) |
 | NRJ12 | Historical reference only — no module in reactor |
 
@@ -122,10 +123,13 @@ Full table, fixture policy, and follow-up queue:
 ## Contributing
 
 1. Branch from latest **`develop`** (`docs/…`, `fix/…`, `feat/…`, etc.).
-2. One tracker item per PR — see [`docs/dev-tracker.md`](docs/dev-tracker.md).
+2. One descriptive scope per PR — see [`docs/dev-tracker.md`](docs/dev-tracker.md).
 3. [Conventional Commits](https://www.conventionalcommits.org/) in English.
-4. Run validation; paste **exact command output** in the PR body.
-5. Keep PRs small; linear history (no merge commits on feature branches).
+4. Validation:
+   - docs-only PR: `git diff --check`
+   - code PR: `mvn -B -ntp -DskipTests validate`
+   Paste **exact command output** in the PR body.
+5. Keep PRs small; linear history (no merge commits on work branches).
 
 Details: [`CONTRIBUTING.md`](CONTRIBUTING.md), [`AGENTS.md`](AGENTS.md),
 [`docs/pull-request-style-guide.md`](docs/pull-request-style-guide.md).
@@ -161,7 +165,9 @@ Details: [`CONTRIBUTING.md`](CONTRIBUTING.md), [`AGENTS.md`](AGENTS.md),
   [`docs/automatic-category-download.md`](docs/automatic-category-download.md)).
 - GUI packaging (`habiTv`, platform installers) is not yet aligned with the
   modernized reactor baseline.
-- `youtube-dl` is deprecated in favor of **yt-dlp** (`ytdlp-migration` tracker).
+- `youtube-dl` is deprecated in favor of **yt-dlp**. Do not make
+  opportunistic yt-dlp changes outside `ytdlp-migration`; follow
+  [`docs/ytdlp-cli-compatibility.md`](docs/ytdlp-cli-compatibility.md).
 
 ---
 

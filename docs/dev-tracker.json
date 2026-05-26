@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema",
   "version": 3,
-  "description": "Machine-readable mirror of docs/dev-tracker.md. Keep both files in sync. Identifiers use descriptive kebab-case slugs (see descriptive-slug-ids ADR).",
-  "lastRefresh": "2026-05-20",
+  "description": "Machine-readable mirror of docs/dev-tracker.md. Keep both files in sync. Identifiers use descriptive kebab-case slugs (see descriptive-slug-ids ADR). Legacy HBTV codes are historical-only and not for new workflow naming.",
+  "lastRefresh": "2026-05-23",
   "statusValues": [
     "proposed",
     "in-progress",
@@ -46,7 +46,7 @@
         "git log --oneline -5 -> bootstrap commits present"
       ],
       "pr": "chore: bootstrap restart workflow from master (#21)",
-      "notes": "Documentation/workflow only. GitHub UI-level settings application moved to branch-protection."
+      "notes": "Documentation/workflow only. GitHub UI-level settings application moved to branch-protection. Follow-up policy alignment makes AGENTS.md the source of truth for AI workflow rules and aligns tool-specific instruction files by reference, including agent PR target policy (Mika3578/habitv first, upstream PR flow maintainer-controlled)."
     },
     {
       "id": "maven-reactor",
@@ -170,7 +170,7 @@
       "icon": "🔌",
       "status": "in-progress",
       "priority": "P2",
-      "progressPercent": 55,
+      "progressPercent": 60,
       "scope": "Inventory every plugin in plugins/ (22 in aggregator + plugin-tester); record current status (working, obsolete endpoint, renamed, broken parser). No code removal in this item.",
       "acceptanceCriteria": [
         "Inventory table per plugin with last-known status.",
@@ -185,8 +185,8 @@
         "mvn -B -ntp -pl plugins/arte -am -Dtest=ArteOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test",
         "mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test"
       ],
-      "pr": "test/provider-offline-fixture-baseline (this PR)",
-      "notes": "Inventory baseline from PR #50 extended with offline fixture policy and tests for 6play, canalPlus, francetv (ex pluzz), arte, and youtube. docs/provider-inventory.md includes current-status table and legacy naming (Pluzz, D8/D17, 6play). Arte live PluginManagerTest fails (categorie liste vide) — provider drift. Default Surefire excludes *PluginManagerTest. See docs/automatic-category-download.md for runtime watch behavior."
+      "pr": "test/provider-offline-fixture-baseline (merged), fix(provider-canalplus): rename d17 to cstar and handle deprecated endpoints (PR #91), refactor(provider-canalplus): remove obsolete d8 sub-provider (PR #92)",
+      "notes": "Inventory baseline from PR #50 extended with offline fixture policy and tests for 6play, canalPlus, francetv (ex pluzz), arte, and youtube. docs/provider-inventory.md includes current-status table and legacy naming (Pluzz, CStar (ex D17), 6play). PR #91 preserves D17 -> CStar and adds graceful fallback for canalPlus/cstar category discovery when legacy or protected endpoints fail (service.mycanal.fr DNS failure, HTTP 403 on channel pages). PR #92 removes the obsolete embedded D8 sub-provider (dead www.d8.tv endpoints; channel rebranded to C8). Default Surefire excludes *PluginManagerTest. Arte live PluginManagerTest still fails (categorie liste vide) due to provider drift. See docs/automatic-category-download.md for runtime watch behavior."
     },
     {
       "id": "ytdlp-migration",

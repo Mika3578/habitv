@@ -1,6 +1,7 @@
 package com.dabi.habitv.plugin.youtube;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -22,9 +23,19 @@ public class YoutubeConfTest {
 	public void defaultVideoCommandIncludesUrlAndOutputPlaceholders() {
 		assertTrue(YoutubeConf.DUMP_CMD.contains("#VIDEO_URL#"));
 		assertTrue(YoutubeConf.DUMP_CMD.contains("#FILE_DEST#"));
-		assertTrue(YoutubeConf.DUMP_CMD.contains("--write-sub"));
-		assertTrue(YoutubeConf.DUMP_CMD.contains("--write-auto-sub"));
+		assertTrue(YoutubeConf.DUMP_CMD.contains("-f \"bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/bv*+ba/b\""));
+		assertTrue(YoutubeConf.DUMP_CMD.contains("--merge-output-format mp4"));
 		assertTrue(YoutubeConf.DUMP_CMD.contains("--no-check-certificate"));
+		assertFalse(YoutubeConf.DUMP_CMD.contains("--audio-quality"));
+		assertFalse(YoutubeConf.DUMP_CMD.contains("--extract-audio"));
+		assertFalse(YoutubeConf.DUMP_CMD.contains("-x"));
+		assertFalse(YoutubeConf.DUMP_CMD.contains("--audio-format"));
+		assertFalse(YoutubeConf.DUMP_CMD.contains("--write-sub"));
+		assertFalse(YoutubeConf.DUMP_CMD.contains("--write-subs"));
+		assertFalse(YoutubeConf.DUMP_CMD.contains("--write-auto-sub"));
+		assertFalse(YoutubeConf.DUMP_CMD.contains("--write-auto-subs"));
+		assertFalse(YoutubeConf.DUMP_CMD.contains("--all-subs"));
+		assertFalse(YoutubeConf.DUMP_CMD.contains("--embed-subs"));
 	}
 
 	@Test

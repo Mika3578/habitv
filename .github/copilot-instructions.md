@@ -7,6 +7,18 @@ is staged through tracker items in `docs/dev-tracker.md`.
 Treat the codebase as production legacy: prefer conservative,
 narrowly-scoped suggestions over rewrites.
 
+## Workflow policy source of truth
+
+Follow `AGENTS.md` as the source of truth for:
+- PR target policy
+- branch naming
+- duplicate branch and PR prevention
+- commit style
+- PR structure
+- validation commands
+- linear Git history
+- documentation sync requirements
+
 ## Compatibility constraints
 
 - Target Java 8 only. Do not suggest Java 9+ language features
@@ -17,8 +29,8 @@ narrowly-scoped suggestions over rewrites.
   reactor restructures, parent POM rewrites, or aggregator merges
   unless an explicit tracker item is referenced in the prompt.
 - Do not propose provider rewrites (e.g. canalPlus, arte, pluzz,
-  6play, youtube). Provider changes go through dedicated tracker
-  items HBTV-006 / HBTV-007 / future.
+  6play, youtube). Provider changes go through dedicated scoped work
+  tracked in repository docs.
 
 ## Key modules
 
@@ -47,8 +59,9 @@ yet stabilized (see `docs/audit-master-baseline.md`).
 ## Things to avoid suggesting
 
 - Replacing `javax.xml.bind` with `jakarta.xml.bind`.
-- Replacing `youtube-dl` with `yt-dlp` (tracked under HBTV-007).
-- Upgrading or replacing JavaFX dependencies (tracked under HBTV-008).
+- Replacing `youtube-dl` with `yt-dlp` (tracked under `ytdlp-migration`).
+- Upgrading or replacing JavaFX dependencies (tracked under
+  `javafx-modernization`).
 - Adding network-dependent tests to the default lifecycle.
 - Adding OWASP, SBOM, or static-analysis plugins in this phase.
 - Reformatting files, renaming variables outside a change, or moving

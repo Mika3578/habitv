@@ -45,7 +45,8 @@ public class PluginManager {
 				config.getCmdProcessor(),
 				pluginFactory.loadPlugins(PluginDownloaderInterface.class),
 				config.getDownloader(), config.getDownloadOuput(),
-				config.getIndexDir(), config.getBinDir(), config.getPluginDir());
+				config.getIndexDir(), config.getBinDir(), config.getPluginDir(),
+				config.getEmbedSubtitles());
 		providersHolder = new ProviderPluginHolder(
 				pluginFactory.loadPlugins(PluginProviderInterface.class));
 		exportersHolder = new ExporterPluginHolder(

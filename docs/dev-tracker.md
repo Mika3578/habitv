@@ -11,8 +11,10 @@
 > kebab-case slug. The opaque legacy codes (`HBTV-XXX`) are preserved
 > on each entry for compatibility with existing PRs and commits. See
 > the `descriptive-slug-ids` ADR for the rationale and full mapping.
+> Legacy codes are historical-only and must not be used for new branch
+> names, PR titles, commit subjects, or workflow naming.
 
-**Last refresh:** 2026-05-20 · **Active branch:** `develop`
+**Last refresh:** 2026-05-23 · **Active branch:** `develop`
 
 **Documentation entry point:** [`README.md`](../README.md) (overview, build matrix,
 automatic category behavior, provider summary, doc map).
@@ -46,7 +48,7 @@ automatic category behavior, provider summary, doc map).
 | 🛡️ `branch-protection` — GitHub branch protection rules | 🔵 Proposed | 🟠 P1 | `░░░░░░░░░░░░░░░░░░░░` 0% |
 | 🔗 `legacy-url-migration` — Legacy URL migration (free.fr / SVN / FTP) | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 📦 `static-repo-publish` — Static artifact repository publication | ✅ Done | 🟠 P1 | `████████████████████` 100% |
-| 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🟡 In progress | 🟡 P2 | `███████████░░░░░░░░░` 55% |
+| 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🟡 In progress | 🟡 P2 | `████████████░░░░░░░░` 60% |
 | 🎬 `ytdlp-migration` — `youtube-dl` → `yt-dlp` migration | 🟡 In progress | 🟡 P2 | `███████████████░░░░░` 75% |
 | 🩺 `ytdlp-runtime-diagnostics` — yt-dlp Windows runtime diagnostics | 🟡 In progress | 🟡 P2 | `██████████████████░░` 90% |
 | 🖼️ `javafx-modernization` — JavaFX & runtime packaging modernization | 🔵 Proposed | 🟡 P2 | `██░░░░░░░░░░░░░░░░░░` 10% |
@@ -108,7 +110,11 @@ git log --oneline -5                 # bootstrap commits present
 
 **Notes** — Documentation/workflow only; no runtime or provider changes.
 GitHub UI-level settings application moved to its own item
-(`branch-protection`).
+(`branch-protection`). Follow-up policy alignment captured in ADR
+`ai-policy-source-of-truth` (✅ Accepted): `AGENTS.md` is the source
+of truth for AI workflow rules; tool-specific files reference it by
+reference, including agent PR target policy (`Mika3578/habitv` first,
+upstream PR flow maintainer-controlled).
 
 ---
 
@@ -301,7 +307,7 @@ falls back to `maven-metadata.xml` for timestamped SNAPSHOT JAR filenames.
 |---|---|
 | **Status** | 🟡 In progress |
 | **Priority** | 🟡 P2 |
-| **Progress** | `███████████░░░░░░░░░` 55% |
+| **Progress** | `████████████░░░░░░░░` 60% |
 | **Legacy code** | HBTV-006 |
 
 **Scope** — Inventory every plugin in `plugins/` (22 in the aggregator
@@ -324,18 +330,23 @@ mvn -B -ntp -pl plugins/arte -am -Dtest=ArteOfflineFixtureBaselineTest -Dsurefir
 mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test
 ```
 
-**Related PR** · `docs: capture provider offline fixture baseline` (this PR)
+**Related PR** · `docs: capture provider offline fixture baseline` (merged), `fix(provider-canalplus): rename d17 to cstar and handle deprecated endpoints` (PR #91), `refactor(provider-canalplus): remove obsolete d8 sub-provider` (PR #92)
 
 **Notes** — Inventory baseline is now documented in
 [`provider-inventory.md`](provider-inventory.md) for every plugin module
-plus historical references (`D8`, `D17`, `nrj12`, FranceTV/Pluzz,
+plus historical references (`CStar` (ex `D17`), `nrj12`, FranceTV/Pluzz,
 Kewego). An offline fixture policy and first local fixture baseline are
 now documented for `6play`, `canalPlus`, `francetv` (ex `pluzz`), `arte`, and `youtube`
 without rewriting providers. Default `mvn test` skips live
-`*PluginManagerTest`; use `-Plive-provider-tests`. Arte live test
-currently fails (`categorie liste vide`) — provider drift, documented in
-inventory. This item remains open for broader fixture capture and
-dedicated cleanup/rewrite PRs. See also
+`*PluginManagerTest`; use `-Plive-provider-tests`. PR #91 keeps the
+`D17` rename to `CStar` and adds graceful fallback in the Canal+ family:
+category discovery now returns an empty set with a provider-level
+diagnostic when `service.mycanal.fr` is unreachable or channel pages
+return HTTP 403. PR #92 removes the obsolete embedded `D8` sub-provider
+(dead `www.d8.tv` endpoints; channel rebranded to C8). Arte live test
+currently fails (`categorie liste vide`) —
+provider drift, documented in inventory. This item remains open for
+broader fixture capture and dedicated cleanup/rewrite PRs. See also
 [`automatic-category-download.md`](automatic-category-download.md).
 Risks `live-tests-flaky`, `provider-endpoints-dead`.
 

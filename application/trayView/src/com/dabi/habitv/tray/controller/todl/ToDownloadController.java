@@ -310,7 +310,8 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 		final CategoryForm categoryForm = new CategoryForm(templateCategory);
 		Double width = categoryForm.getAdvisedWidth();
 		Double height = categoryForm.getAdvisedHeight();
-		new Popin(width, height).show("Ajout d'une catégorie " + templateCategory.getName(), categoryForm).setOkButtonHandler(new ButtonHandler() {
+		final Popin popin = width == null || height == null ? new Popin() : new Popin(width, height);
+		popin.show("Ajout d'une catégorie " + templateCategory.getName(), categoryForm).setOkButtonHandler(new ButtonHandler() {
 
 			@Override
 			public void onAction() {
@@ -344,33 +345,25 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 
 	private CategoryDTO buildCategoryFromTemplateV2(CategoryDTO templateCategory, String text) {
 		String id = templateCategory.getId().split("!!")[0].replace("§ID§", text);
-		CategoryDTO categoryDTO = new CategoryDTO(templateCategory.getPlugin(), findNameById(id), id, FrameworkConf.MP4);
+		CategoryDTO categoryDTO = new CategoryDTO(templateCategory.getPlugin(), findNameById(id, text), id, FrameworkConf.MP4);
 		categoryDTO.setState(StatusEnum.USER);
 		categoryDTO.setDownloadable(true);
 		return categoryDTO;
 	}
 
-	private String findNameById(String id) {
-		return findNameById(id, null);
-	}
-
 	private String findNameById(String id, String defaultName) {
-		String name;
-		if (defaultName == null) {
-			if (DownloadUtils.isHttpUrl(id)) {
-				name = RetrieverUtils.getTitleByUrl(id);
-			} else {
-				File file = new File(id);
-				if (file.exists()) {
-					name = file.getName();
-				} else {
-					name = defaultName;
-				}
-			}
-		} else {
-			name = defaultName;
+		if (defaultName != null && !defaultName.trim().isEmpty()) {
+			return defaultName;
 		}
-		return name;
+		if (id == null) {
+			return defaultName;
+		}
+		if (DownloadUtils.isHttpUrl(id)) {
+			String name = RetrieverUtils.getTitleByUrl(id);
+			return name == null || name.trim().isEmpty() ? id : name;
+		}
+		File file = new File(id);
+		return file.exists() ? file.getName() : id;
 	}
 
 	private void fillEpisodeList(final CategoryDTO category) {

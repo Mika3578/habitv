@@ -3,7 +3,7 @@ name: build
 # Conservative baseline CI for the restart from master.
 # Intentionally validate-only (no compile, no tests) to avoid masking the
 # legacy reactor/plugin issues documented in docs/audit-master-baseline.md.
-# Subsequent PRs (HBTV-001, HBTV-002) will widen this workflow.
+# Subsequent PRs (`maven-reactor`, `java8-baseline`) will widen this workflow.
 
 on:
   push:

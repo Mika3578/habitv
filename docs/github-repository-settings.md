@@ -10,16 +10,17 @@ apply them manually under **Settings** on
 - `master` — stable / release baseline.
 - `develop` — integration branch for active modernization, created
   from `master` after the bootstrap PR is merged.
-- Feature branches branch from `develop` (after bootstrap) using:
+- Work branches branch from `develop` (after bootstrap) using:
   - `chore/...`
-  - `build/...`
   - `ci/...`
   - `docs/...`
   - `test/...`
-  - `runtime/...`
-  - `provider/...`
   - `fix/...`
-  - `feature/...`
+  - `feat/...`
+  - `refactor/...`
+- Deprecated prefixes (`feature/...`, `build/...`, `runtime/...`,
+  `provider/...`) are not used for new branches. Use the replacement
+  mapping defined in `AGENTS.md`.
 
 ## Recommended default branch
 
@@ -82,4 +83,5 @@ there.
    git push -u origin develop`) and apply the same branch
    protection.
 4. Optionally set `develop` as the default branch.
-5. Track this work as HBTV-003 in `docs/dev-tracker.md`.
+5. Track this work under the `branch-protection` item in
+   `docs/dev-tracker.md` (legacy code mapping remains historical only).

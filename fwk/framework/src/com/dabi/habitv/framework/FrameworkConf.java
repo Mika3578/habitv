@@ -10,6 +10,8 @@ public interface FrameworkConf {
 
 	String PARAMETER_ARGS = "ARGUMENTS";
 
+	String PARAMETER_EMBED_SUBTITLES = "EMBED_SUBTITLES";
+
 	String DOWNLOADER_PARAM = "downloader";
 
 	long TIME_BETWEEN_LOG = 2000L;
