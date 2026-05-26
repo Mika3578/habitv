@@ -26,6 +26,52 @@
 			<artifactId>reload4j</artifactId>
 		</dependency>
 	</dependencies>
+	<profiles>
+		<!--
+		  On JDK 11+, JavaFX is no longer bundled with the JDK. Supply the
+		  JavaFX API as compile-only ("provided") dependencies so the reactor
+		  compiles on JDK 11+ build hosts. This is not a runtime migration:
+		  Java 8 remains the baseline. At runtime, HabitvLauncher still adds
+		  jfxrt.jar (or -Dhabitv.jfxrt.path) to the classpath, not JPMS
+		  module-path bootstrapping. See AGENTS.md hard rules
+		  ("javafx-modernization").
+		-->
+		<profile>
+			<id>javafx-openjfx-compile</id>
+			<activation>
+				<jdk>[11,)</jdk>
+			</activation>
+			<properties>
+				<openjfx.version>17.0.13</openjfx.version>
+			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-base</artifactId>
+					<version>${openjfx.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-graphics</artifactId>
+					<version>${openjfx.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-controls</artifactId>
+					<version>${openjfx.version}</version>
+					<scope>provided</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-fxml</artifactId>
+					<version>${openjfx.version}</version>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 	<build>
 		<resources>
 			<resource>
@@ -55,10 +101,10 @@
 					<archive>
 						<manifestEntries>
 							<JavaFX-Version>2.2+</JavaFX-Version>
-							<Main-Class>com.dabi.habitv.tray.HabiTvSplashScreen	</Main-Class>
+							<Main-Class>com.dabi.habitv.tray.HabiTvSplashScreen</Main-Class>
 							<implementation-version>2.2</implementation-version>
 							<JavaFX-Application-Class>com.dabi.habitv.tray.HabiTvSplashScreen</JavaFX-Application-Class>
-							<!-- The artifactId (name) of the jfxrt.jar ... see dependency system 
+							<!-- The artifactId (name) of the jfxrt.jar ... see dependency system
 								scope -->
 							<Class-Path>javafx-2.2.jar</Class-Path>
 						</manifestEntries>
