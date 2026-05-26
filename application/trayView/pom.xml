@@ -28,12 +28,13 @@
 	</dependencies>
 	<profiles>
 		<!--
-		  On JDK 11+, JavaFX 2.x is no longer bundled with the JDK. Supply the
-		  JavaFX classes as compile-only ("provided") dependencies so the
-		  reactor compiles end-to-end. At runtime, JavaFX is still expected
-		  to come from the JDK (Liberica/Zulu JDK 8 + JavaFX) or from an
-		  external OpenJFX module path, matching the existing launcher
-		  bootstrap. See AGENTS.md hard rules §2 ("javafx-modernization").
+		  On JDK 11+, JavaFX is no longer bundled with the JDK. Supply the
+		  JavaFX API as compile-only ("provided") dependencies so the reactor
+		  compiles on JDK 11+ build hosts. This is not a runtime migration:
+		  Java 8 remains the baseline. At runtime, HabitvLauncher still adds
+		  jfxrt.jar (or -Dhabitv.jfxrt.path) to the classpath, not JPMS
+		  module-path bootstrapping. See AGENTS.md hard rules
+		  ("javafx-modernization").
 		-->
 		<profile>
 			<id>javafx-openjfx-compile</id>
