@@ -41,6 +41,25 @@ GitHub Settings later displays them that way. The removed legacy check was
 
 - `compatibility-java11` (and 17, 21, 25)
 - `full-test-suite` (workflow_dispatch / schedule only)
+- `validate-macos` (cross-platform Java 8 validate signal; complements the
+  Windows `build.yml` signal — informational only, not in `protect-develop`)
+
+## Reusable composite actions
+
+Shared Maven CI steps live under `.github/actions/` so the jobs stay DRY
+(inspired by the `spring-petclinic` / Apache Commons reusable-build pattern):
+
+| Action | Role |
+|--------|------|
+| `setup-build-jdk` | Set up a JDK (`distribution`, `java-version`, `java-package` inputs) with the Maven cache, then print `java`/`mvn` versions and `git status` |
+| `upload-maven-artifacts` | Upload Surefire reports and built jars under a per-job `name` |
+
+## Runner hardening
+
+Every `actions/checkout` step sets `persist-credentials: false`. No CI job
+pushes to git or reuses the workflow token after checkout, so the persisted
+credential is dropped to shrink the supply-chain surface (Apache Commons /
+OpenSSF Scorecard practice).
 
 ## Live network tests
 

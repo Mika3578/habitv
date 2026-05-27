@@ -1,0 +1,22 @@
+name: Upload Maven artifacts
+description: >-
+  Upload Surefire reports and built jars produced by a Maven job. Centralises
+  the artifact-upload block shared by every Maven CI job.
+
+inputs:
+  name:
+    description: Artifact name (must be unique per job).
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Upload Maven artifacts
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ inputs.name }}
+        path: |
+          **/target/surefire-reports/**
+          **/target/*.jar
+        if-no-files-found: ignore
+        retention-days: 7
