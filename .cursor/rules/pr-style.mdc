@@ -9,58 +9,23 @@ globs:
 
 # Habitv PR and squash merge style
 
-Follow `AGENTS.md` as the source of truth for PR target policy, branch
-naming, duplicate branch/PR prevention, commit style, PR structure,
-validation, and linear history.
-
-Branch names for agent-created PRs must use allowed Habitv prefixes only
-(`feat/`, `fix/`, `docs/`, `chore/`, `test/`, `refactor/`, `ci/`).
-Never open a PR from `claude/**`, `cursor/**`, or other forbidden
-prefixes — rename per `AGENTS.md` §4 first.
+Follow `AGENTS.md` for PR target policy, branch naming, governance
+levels, validation, doc sync at PR readiness, boy-scout limits, and
+justified N/A in PR sections.
 
 ## Pull requests
 
-- Use English for PR titles, bodies, review comments, and merge metadata.
-- Keep PRs scoped to one descriptive scope item when applicable.
-- Document validation commands actually run; default safe command is
-  `mvn -B -ntp -DskipTests validate`.
-- Fill every required (non-optional) section of
-  `.github/pull_request_template.md` honestly.
+- English for titles, bodies, and review comments.
+- Fill `.github/pull_request_template.md` honestly; justified N/A is OK.
+- Document commands actually run.
 
 ## Squash merge instructions
 
-When generating merge instructions, always include a clean squash merge title
-and body.
+When generating merge instructions, provide a clean squash title and body.
 
-- Never recommend keeping GitHub's default generated squash description when it
-  contains intermediate commit bullets or repeated `Co-authored-by` trailers.
-- Always provide a cleaned replacement body for the GitHub **Extended
-  description** field.
-- The squash title must use Conventional Commit style and must include the PR
-  number when merging through GitHub.
-- The squash body must describe the final result, validation, and important
-  scope notes only.
+- Do not keep GitHub's default squash description when it lists
+  intermediate commits or repeated `Co-authored-by` trailers.
+- Squash title: Conventional Commits + PR number when merging on GitHub.
+- Squash body: final outcome, validation, and scope notes only.
 
-### Example for PR #65
-
-**Squash title:**
-
-```text
-ci: add Maven PR validation workflow (#65)
-```
-
-**Squash body:**
-
-```text
-Establish Java 8 Maven validation as the pull request CI baseline.
-
-Includes:
-- Required Java 8 validation, deterministic test, and package jobs.
-- Non-blocking diagnostic jobs for newer Java versions.
-- CI documentation for required checks and local command parity.
-```
-
-## References
-
-- `docs/pull-request-style-guide.md`
-- `docs/repository-maintenance.md`
+See `docs/pull-request-style-guide.md` and `docs/repository-maintenance.md`.

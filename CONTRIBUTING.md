@@ -26,9 +26,10 @@ contributions follow a stricter-than-usual workflow.
 All modernization branches must target **`develop`**.
 The restart bootstrap PR targets `master`. Everything else targets `develop`.
 
-Before creating a new branch, follow the duplicate-prevention checks
-defined in `AGENTS.md` (`git fetch --all --prune`, matching branch/PR
-search, and `git check-ref-format --branch`).
+Before creating a **new PR branch**, run the duplicate-prevention checks
+in `AGENTS.md` (optional for local WIP or when continuing an existing
+branch). Always validate the branch name with
+`git check-ref-format --branch`.
 
 **AI agents** must not use tool-specific or session-generated branch
 names (`claude/**`, `anthropic/**`, `ai/**`, `cursor/**`, `codex/**`,
@@ -118,9 +119,10 @@ for the full rationale.
 |------|--------|
 | Related issue | Optional: reference a real GitHub issue (e.g. `#123`) when one exists |
 | Scope | Use one clear descriptive scope in branch name and PR body (e.g. `provider-youtube-ytdlp`) |
-| Scope discipline | One logical change. No opportunistic refactors or formatting passes |
+| Scope discipline | One logical change; limited boy-scout cleanup per `AGENTS.md` |
 | Linear history | No merge commits inside work branches; squash or rebase only |
-| Doc sync | Update `docs/dev-tracker.{md,json}`, `docs/risk-register.md`, `docs/decision-log.md` when behavior or scope changes |
+| Doc sync | At PR readiness — see `AGENTS.md` governance levels and doc sync |
+| Governance | L0/L1/L2 matrix in `AGENTS.md` defines tracker and ADR requirements |
 | English only | Branches, commits, code comments, docs, PR text |
 
 Do not use local tracker IDs (e.g. `hbtv-*` / `HBTV-*`) for new branch
@@ -158,11 +160,15 @@ Do not, without a dedicated tracker item and an accepted ADR:
   packaging (compile bridge on JDK 11+ is not sufficient — see
   `docs/java-runtime-policy.md`).
 - Regenerate JAXB-bound classes or move to `jakarta.*`.
-- Replace `youtube-dl` with `yt-dlp` (see `ytdlp-migration`).
+- Change download behavior or default downloader selection without
+  `ytdlp-migration` or a dedicated PR scope (wiring-only prep allowed
+  when tracked and behavior-preserving).
 - Change runtime updater URLs or layout (see `static-repo-publish`).
-- Migrate FTP/HTTP repositories (see `legacy-url-migration`).
+- Reintroduce obsolete HTTP/FTP hosts as runtime or build dependencies
+  (see `legacy-url-migration`; historical hosts in docs only as context).
 - Remove or rename provider/plugin modules (see `provider-inventory`).
-- Add OWASP, SBOM, or static-analysis plugins.
+- Add blocking security, SBOM, or static-analysis gates without a
+  tracker item and CI policy ADR.
 
 ---
 

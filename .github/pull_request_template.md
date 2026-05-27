@@ -11,7 +11,7 @@
 
 ## Related issue
 
-<!-- Optional: include a real GitHub issue number, e.g. #123. -->
+<!-- Optional: #123, or N/A with brief reason. -->
 - N/A
 
 ## Changes
@@ -21,35 +21,34 @@
 
 ## Validation
 
-<!-- Commands actually run locally and their honest outcome. -->
-- `git status --short`
-- `git diff --check`
-- `mvn -B -ntp -DskipTests validate` (required for code changes; optional for docs-only unless build files changed)
+<!-- Commands actually run, or justified N/A. Example for docs-only:
+N/A — docs-only change; reviewed Markdown diff and ran git diff --check. -->
+-
 
 ## Risk / rollback
 
-<!-- Reference docs/risk-register.md IDs impacted/introduced and describe rollback. -->
-- Risk:
-- Rollback:
+<!-- Honest risk level and rollback steps. Example for docs-only:
+Low — rules/documentation-only change. Rollback: revert this commit. -->
+-
 
 ## Notes
 
-<!-- Bullet list of intentional non-changes to avoid scope creep. -->
+<!-- Intentional non-changes, or N/A. -->
 -
 
 ## Checklist
 
 - [ ] Branch was created from `develop`
-- [ ] Branch name uses an allowed prefix (`feat/`, `fix/`, `docs/`, `chore/`, `test/`, `refactor/`, `ci/`) — not `claude/**`, `cursor/**`, `ai/**`, `wip/**`, or other tool/session names (see `AGENTS.md` §4)
-- [ ] Duplicate-prevention checks completed before branch creation (see `AGENTS.md`)
+- [ ] Branch name uses an allowed prefix (`feat/`, `fix/`, `docs/`, `chore/`, `test/`, `refactor/`, `ci/`) — not `claude/**`, `cursor/**`, `ai/**`, `codex/**`, `wip/**`, `feature/**`, or other tool/session names (`AGENTS.md` branch naming)
+- [ ] Duplicate-prevention checks run before **new PR branch** creation (optional for local WIP / existing branch — `AGENTS.md`)
 - [ ] No open PR already covered the same scope before opening this PR
-- [ ] No unrelated source changes
+- [ ] Scope matches governance level (L0/L1/L2 in `AGENTS.md`)
 - [ ] `git diff --check` passed
-- [ ] `mvn -B -ntp -DskipTests validate` passed (or was N/A for docs-only PRs with no build file changes)
+- [ ] `mvn -B -ntp -DskipTests validate` passed, or justified N/A in Validation
 - [ ] PR keeps linear history
 - [ ] English used for branches, commits, comments, docs, and PR text
-- [ ] Documentation updated (`docs/dev-tracker.md`, `docs/dev-tracker.json`, risk register, decision log as needed)
-- [ ] If a `plugins/*/pom.xml` `<version>` is bumped, the trigger from `plugin-versioning-policy` is named in Summary/Changes (downloader/parser, user-facing endpoint, or user-facing configuration), and internal deps use `${project.parent.version}`
+- [ ] Documentation updated at PR readiness when required (tracker, risk, ADR per L1/L2)
+- [ ] If a `plugins/*/pom.xml` `<version>` is bumped, the `plugin-versioning-policy` trigger is named and internal deps use `${project.parent.version}`
 - [ ] No secrets, tokens, local paths, or build outputs committed
 
 ## Suggested squash merge commit (optional)

@@ -5,61 +5,32 @@ alwaysApply: true
 
 # Habitv master modernization rules
 
-These rules apply to all AI-assisted work on the Habitv repository.
-They exist to keep modernization safe, incremental, and reviewable.
+`AGENTS.md` is the **canonical** enforcement document for repository
+and AI-agent policy. This file adds Cursor-specific reminders only.
 
-## Java baseline
+## Before acting
 
-- Always keep Java 8 compatibility unless an explicit tracked migration
-  item says otherwise and is referenced in the PR.
-- Do not introduce Java 9+ language features or JDK 11/17/21-only APIs.
-- Any Java baseline migration must happen in a dedicated migration PR
-  with an ADR in `docs/decision-log.md`.
+1. Read `AGENTS.md` (hard rules, governance L0/L1/L2, branch naming,
+   PR policy, validation, doc sync at PR readiness).
+2. Use **audit mode** for read-only questions; use **delivery mode**
+   when implementing or opening a PR.
 
-## Architecture and scope
+## Cursor-specific
 
-- Do not rewrite architecture without a tracker item AND an ADR.
-- Do not perform opportunistic refactors or formatting changes.
-- Do not remove legacy code unless there is a dedicated deprecation PR
-  with a tracker item and migration notes.
-- Never mix unrelated fixes in the same branch.
+- **Branch names** — never let the IDE pick a name. Use only allowed
+  prefixes (`feat/`, `fix/`, `docs/`, `chore/`, `test/`, `refactor/`,
+  `ci/`). Forbidden: `claude/`, `anthropic/`, `ai/`, `assistant/`,
+  `cursor/`, `codex/`, `temp/`, `wip/`, `feature/`, and generated or
+  session-based names. Rename invalid branches before commit, push, or
+  PR (`AGENTS.md` branch naming).
+- **PR target** — agent PRs go to `Mika3578/habitv` only, never
+  `ikfon10/habitv`.
+- **Default validation** — `mvn -B -ntp -DskipTests validate` for code
+  changes; `git diff --check` for docs-only.
+- **Hooks** — never use `--no-verify`.
 
-## Build and tests
+## Do not duplicate
 
-- Prefer deterministic Maven commands. Default validation:
-  `mvn -B -ntp -DskipTests validate`.
-- Do not run live provider/network tests in the default lifecycle.
-  Network or provider live tests must be opt-in via an explicit
-  profile or tracker item.
-- Do not change Maven module topology, plugin versions, or dependency
-  versions outside a scoped tracker item.
-
-## Branching and PRs
-
-- Follow `AGENTS.md` as the source of truth for PR target policy,
-  branch naming, duplicate branch/PR prevention, commit style, PR
-  structure, validation, and linear history.
-- Never create branches with tool prefixes (`claude/`, `anthropic/`,
-  `ai/`, `assistant/`, `cursor/`, `codex/`, `temp/`, `wip/`) or
-  generated, poetic, random, or session-based names.
-- Use only `feat/`, `fix/`, `docs/`, `chore/`, `test/`, `refactor/`,
-  or `ci/` plus a short lowercase kebab-case scope.
-- Propose the branch name before `git checkout -b`; if already on an
-  invalid branch, rename and fix the remote before opening a PR.
-- Use small PRs scoped to a single descriptive scope (see `docs/dev-tracker.md`).
-- Use English for branches, commits, comments, docs, and PR text.
-
-## Documentation discipline
-
-- Update `docs/dev-tracker.md` AND `docs/dev-tracker.json` for every
-  meaningful change so machine and human views stay aligned.
-- Update `docs/risk-register.md` when a risk is added, mitigated, or
-  realized.
-- Record cross-cutting decisions in `docs/decision-log.md` (ADR format).
-
-## Forbidden in this restart phase
-
-- No provider rewrites, no JavaFX migration, no JAXB regeneration,
-  no Maven deploy or distribution changes, and no runtime updater
-  changes unless an explicit dedicated tracker item covers them.
-- Never commit secrets, tokens, local absolute paths, or build outputs.
+Java baseline, JavaFX/JAXB, security, Maven topology, provider rewrites,
+and tracker/ADR requirements are defined once in `AGENTS.md` Section 2
+and Governance levels. Do not restate them here.

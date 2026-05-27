@@ -59,14 +59,41 @@ French TV catch-up content via pluggable provider plugins.
 | Bump Java baseline beyond **Java 8** | JavaFX 2.x and `javax.xml.bind` 2.0 assume JDK 8 |
 | Migrate JavaFX (`jfxrt`) to OpenJFX | Tracked under `javafx-modernization` |
 | Regenerate JAXB classes or move to `jakarta.*` | Risk `jaxb-mismatch` |
-| Replace `youtube-dl` plugin behavior with `yt-dlp` | Tracked under `ytdlp-migration` |
+| Change download behavior or default downloader selection | Unless covered by `ytdlp-migration` or a dedicated PR scope; wiring-only, behavior-preserving prep allowed when tracked |
 | Change runtime updater URLs or layout | Tracked under `static-repo-publish` |
-| Migrate FTP/HTTP repositories | Tracked under `legacy-url-migration` |
+| Reintroduce obsolete HTTP/FTP hosts as runtime or build dependencies | Tracked under `legacy-url-migration`; docs may mention historical hosts as archived context only |
 | Remove or rename provider/plugin modules | Tracked under `provider-inventory` |
-| Add OWASP / SBOM / static-analysis plugins | Out of restart phase |
+| Add blocking security / SBOM / static-analysis gates | Requires dedicated tracker item and CI policy ADR; non-blocking exploratory jobs may be proposed in a dedicated CI PR |
 | Commit secrets, tokens, local paths, IDE files | 🚨 never, period |
 | Write non-English content (branches, code, docs) | English-only policy |
-| Create branches with `claude/**`, `cursor/**`, `ai/**`, or random names | Violates §4; rename before any PR |
+| Create branches with `claude/**`, `cursor/**`, `ai/**`, `codex/**`, or random names | See branch naming; rename before commit, push, or PR |
+
+---
+
+## 📊 Governance levels (L0 / L1 / L2)
+
+Use this matrix to decide tracker and ADR requirements. Hard rules in
+Section 2 always apply regardless of level.
+
+| Level | Tracker | ADR | Examples |
+|:-----:|:-------:|:---:|----------|
+| **L0** | No | No | Typo fixes; comment-only fixes; small documentation cleanup; Markdown formatting that does not change scope or acceptance criteria; PR/template wording that does not weaken rules |
+| **L1** | Yes | No | Scoped bug fix; offline test add/update; minor CI tied to an existing item; small docs that advance an existing tracker item; behavior-preserving cleanup required for a fix |
+| **L2** | Yes | Yes | Java baseline change; JavaFX/OpenJFX strategy; JAXB/Jakarta strategy; Maven reactor structure; plugin update policy; external repo or artifact publishing policy; removal of legacy compatibility; broad refactor; runtime architecture change |
+
+L0 work still follows commit, branch, PR, validation, and English
+conventions. L1/L2 work must name the tracker slug in the PR body.
+
+---
+
+## 🔀 Agent operating modes
+
+| Mode | When | Expectations |
+|------|------|----------------|
+| **Audit / discussion** | User asks for review, explanation, or exploration only | Read and analyze freely; no code changes unless explicitly requested; no approval required to inspect files |
+| **Delivery** | User requests implementation, fixes, or a PR | Keep scope small; run appropriate validation; provide commit message, PR summary, validation, risk, and rollback notes |
+
+Default to audit mode when the request is ambiguous.
 
 ---
 
@@ -133,6 +160,7 @@ AI agents (Claude Code, Cursor, Codex, Copilot, or any assistant) must
 - `codex/`
 - `temp/`
 - `wip/`
+- `feature/` (use `feat/` instead)
 
 AI agents must **never** use generated, poetic, random, or session-based
 branch names (for example auto-suffixed hashes, adjective-noun pairs, or
@@ -179,14 +207,21 @@ Examples:
    invalid (forbidden prefix or wrong shape), recover first (see below).
 2. Propose the final branch name and confirm it matches an allowed
    prefix and kebab-case scope.
-3. Run duplicate-prevention checks, then create the branch:
+3. Create the branch when the name is valid:
+
+```bash
+git check-ref-format --branch "<branch-name>"
+git checkout -b "<prefix>/<short-scope>"
+```
+
+**Duplicate branch and open PR checks** — required before creating a
+**new PR branch**; optional for local WIP or when continuing an existing
+branch:
 
 ```bash
 git fetch --all --prune
 git branch -a --list "*<short-scope>*"
 gh pr list --repo Mika3578/habitv --state open --search "<short-scope>"
-git check-ref-format --branch "<branch-name>"
-git checkout -b "<prefix>/<short-scope>"
 ```
 
 If an existing branch or open PR already covers the same scope, do not
@@ -202,8 +237,9 @@ If the agent is already on an invalid branch (for example `claude/**`):
    branch if it was pushed, then continue only from the corrected branch:
 
 ```bash
-git branch -m chore/enforce-agent-branch-naming
-git push -u origin chore/enforce-agent-branch-naming
+git branch --show-current
+git branch -m chore/clean-agent-rules
+git push -u origin chore/clean-agent-rules
 git push origin --delete <invalid-branch-name>
 ```
 
@@ -217,9 +253,9 @@ Keep history linear on work branches (no merge commits).
 |------|--------|
 | Related issue / scope | Optionally reference a real GitHub issue (e.g. `#123`) and include a clear descriptive scope |
 | Template | Fill every section of `.github/pull_request_template.md` |
-| Diff size | Keep small and focused; reject opportunistic refactors |
+| Diff size | Keep small and focused; see limited boy-scout cleanup below |
 | History | Linear inside work branches; no merge commits |
-| Doc sync | Update tracker, risk register, decision log on meaningful changes |
+| Doc sync | At PR readiness or before merge — see Section 12 |
 | Plugin version bump | A `plugins/*/pom.xml` `<version>` override must match a `plugin-versioning-policy` trigger (downloader/parser, user-facing endpoint, user-facing configuration). Name the trigger in the PR body. Internal reactor deps in a bumped plugin MUST use `${project.parent.version}`. |
 
 AI-agent PR target policy:
@@ -285,6 +321,28 @@ If tracking is needed, use GitHub-native tracking:
 
 Do not invent local tracker IDs.
 
+### Limited boy-scout cleanup
+
+A PR may include limited neighboring cleanup only when required to
+compile, test, or make the scoped fix coherent:
+
+- at most **one** neighboring file, **or**
+- at most **10 lines** outside the main scope.
+
+Anything larger must be split into a separate PR.
+
+### PR body sections and justified N/A
+
+Required sections (`Related issue`, `Scope`, `Summary`, `Changes`,
+`Validation`, `Risk / rollback`, `Notes`) must be honest. Use
+justified **N/A** when a section does not apply — avoid ritual filler.
+
+Examples:
+
+- **Validation:** `N/A — docs-only change; reviewed Markdown diff and ran git diff --check.`
+- **Risk:** `Low — rules/documentation-only change.`
+- **Rollback:** `Revert this documentation commit.`
+
 ---
 
 ## 🧪 6. Validation policy
@@ -326,7 +384,8 @@ command + output** in the PR body.
 ## 🛠️ 7. How to maintain trackers
 
 `docs/dev-tracker.md` and `docs/dev-tracker.json` are **mirrors**.
-Always update both in the same commit. Fields per item:
+When a tracker update is required (L1/L2), update both in the same PR
+before merge. Fields per item:
 
 - `id` — descriptive kebab-case slug (e.g. `legacy-url-migration`)
 - `legacyCode` — old opaque code preserved for compat (`HBTV-XXX`)
@@ -389,6 +448,14 @@ You **must**:
   exact command outputs, file paths, and line numbers.
 - Disagree with the user when their suggestion would break a hard
   rule above; surface the conflict instead of complying silently.
+- **Planning** — required for broad, ambiguous, risky, or multi-step
+  changes. Small obvious multi-file fixes may proceed when scoped and
+  validated.
+- **TODOs** — no TODO or placeholder in production code at PR readiness
+  unless linked to a tracker item. Temporary TODOs during local work
+  must be removed before opening a PR.
+- **Responses** — avoid noisy postambles; include only useful summary,
+  validation, risk, commit, and PR information when delivering work.
 
 ---
 
@@ -404,14 +471,21 @@ Last refresh: see the latest commit touching this file.
 
 ---
 
-## 🔄 12. Doc sync protocol (after every step)
+## 🔄 12. Doc sync protocol (at PR readiness)
 
-**Rule** — every commit that changes meaningful state must keep the
-documentation set in lockstep. A "meaningful state change" is any
-commit that creates, advances, completes, mitigates, supersedes, or
-contradicts an item that is already documented.
+**Rule** — documentation synchronization is required at **PR
+readiness or before merge**, not after every local commit.
 
-### 12.1 What to update, by commit type
+A **meaningful change** is one that:
+
+- advances a tracker item;
+- modifies acceptance criteria;
+- alters documented behavior, validation, compatibility, packaging, or risk.
+
+L0 changes (see Governance levels) usually need no tracker update.
+L1/L2 changes must update the docs required by their level before merge.
+
+### 12.1 What to update, by change type (at PR readiness)
 
 | Type | `CHANGELOG.md` | `dev-tracker.{md,json}` | `risk-register.md` | `decision-log.md` |
 |------|:---:|:---:|:---:|:---:|
@@ -492,7 +566,7 @@ the rules in this very section.
 
 Every rule is uniquely identified by its **section heading + index**:
 
-- `2.5` — "Replace `youtube-dl` plugin behavior with `yt-dlp`"
+- `2` — download behavior / default downloader selection
   (a hard rule from Section 2's table)
 - `3` — "Conventional Commits …" (a process rule from Section 3)
 - `13.3` — "Modify a rule" (a meta-rule, this section)

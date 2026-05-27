@@ -17,7 +17,7 @@ Follow `AGENTS.md` as the source of truth for:
 - PR structure
 - validation commands
 - linear Git history
-- documentation sync requirements
+- documentation sync at PR readiness (L0/L1/L2 governance levels)
 
 ## Compatibility constraints
 
@@ -59,13 +59,15 @@ yet stabilized (see `docs/audit-master-baseline.md`).
 ## Things to avoid suggesting
 
 - Replacing `javax.xml.bind` with `jakarta.xml.bind`.
-- Replacing `youtube-dl` with `yt-dlp` (tracked under `ytdlp-migration`).
+- Changing download behavior or default downloader selection without
+  `ytdlp-migration` or a dedicated PR scope.
 - Upgrading or replacing JavaFX dependencies (tracked under
   `javafx-modernization`).
 - Adding network-dependent tests to the default lifecycle.
-- Adding OWASP, SBOM, or static-analysis plugins in this phase.
-- Reformatting files, renaming variables outside a change, or moving
-  packages.
+- Adding blocking security, SBOM, or static-analysis gates without a
+  tracker item and CI policy decision.
+- Reformatting files or drive-by refactors beyond the boy-scout limits
+  in `AGENTS.md`.
 - Bumping a `plugins/*/pom.xml` `<version>` for changes that do not
   match a `plugin-versioning-policy` trigger (downloader/parser
   behaviour, user-facing endpoint, user-facing configuration). See
@@ -80,6 +82,5 @@ yet stabilized (see `docs/audit-master-baseline.md`).
 - English-only comments and identifiers in new code.
 - Explicit error handling at meaningful boundaries (no swallow,
   no broad catch).
-- Updating `docs/dev-tracker.md`, `docs/dev-tracker.json`,
-  `docs/risk-register.md`, and `docs/decision-log.md` when the
-  change is meaningful.
+- Updating tracker, risk register, and decision log at PR readiness
+  when the change is meaningful (per `AGENTS.md` Section 12).
