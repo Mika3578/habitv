@@ -30,13 +30,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Set up Temurin JDK 8
-        uses: actions/setup-java@v5
+        uses: ./.github/actions/setup-build-jdk
         with:
           distribution: temurin
           java-version: '8'
-          cache: maven
 
       - name: Maven validate
         run: mvn -B -ntp -DskipTests validate

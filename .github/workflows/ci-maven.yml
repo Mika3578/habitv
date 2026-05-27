@@ -33,34 +33,24 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Set up Liberica JDK 8 with JavaFX
-        uses: actions/setup-java@v5
+        uses: ./.github/actions/setup-build-jdk
         with:
           distribution: liberica
           java-version: "8"
           java-package: jdk+fx
-          cache: maven
-
-      - name: Build tooling info
-        run: |
-          java -version
-          mvn -version
-          git status --short
 
       - name: Maven validate (Java 8 baseline)
         run: mvn -B -ntp -DskipTests validate
 
       - name: Upload Maven artifacts
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: ./.github/actions/upload-maven-artifacts
         with:
           name: validate-java8-artifacts
-          path: |
-            **/target/surefire-reports/**
-            **/target/*.jar
-          if-no-files-found: ignore
-          retention-days: 7
 
   deterministic-tests-java8:
     name: deterministic-tests-java8
@@ -71,34 +61,24 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Set up Liberica JDK 8 with JavaFX
-        uses: actions/setup-java@v5
+        uses: ./.github/actions/setup-build-jdk
         with:
           distribution: liberica
           java-version: "8"
           java-package: jdk+fx
-          cache: maven
-
-      - name: Build tooling info
-        run: |
-          java -version
-          mvn -version
-          git status --short
 
       - name: Deterministic test subset
         run: mvn -B -ntp -pl fwk/api,fwk/framework,application/core,plugins/plugin-tester -am test
 
       - name: Upload Maven artifacts
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: ./.github/actions/upload-maven-artifacts
         with:
           name: deterministic-tests-java8-artifacts
-          path: |
-            **/target/surefire-reports/**
-            **/target/*.jar
-          if-no-files-found: ignore
-          retention-days: 7
 
   compile-and-package-java8:
     name: compile-and-package-java8
@@ -109,34 +89,51 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Set up Liberica JDK 8 with JavaFX
-        uses: actions/setup-java@v5
+        uses: ./.github/actions/setup-build-jdk
         with:
           distribution: liberica
           java-version: "8"
           java-package: jdk+fx
-          cache: maven
-
-      - name: Build tooling info
-        run: |
-          java -version
-          mvn -version
-          git status --short
 
       - name: Maven package (Java 8 baseline)
         run: mvn -B -ntp -DskipTests package
 
       - name: Upload Maven artifacts
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: ./.github/actions/upload-maven-artifacts
         with:
           name: compile-and-package-java8-artifacts
-          path: |
-            **/target/surefire-reports/**
-            **/target/*.jar
-          if-no-files-found: ignore
-          retention-days: 7
+
+  # Cross-platform validate signal (non-required, diagnostic). Mirrors the
+  # Windows signal in build.yml so macOS regressions surface on develop PRs.
+  # Uses Liberica JDK 8 (the project's trusted distribution; it ships macOS
+  # aarch64 JDK 8, which macos-latest runners need). validate needs no JavaFX,
+  # so the plain jdk package is enough. Not part of the develop merge baseline;
+  # do not add to branch protection.
+  validate-macos:
+    name: validate-macos
+    needs: validate-java8
+    if: github.event_name != 'schedule'
+    runs-on: macos-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Liberica JDK 8
+        uses: ./.github/actions/setup-build-jdk
+        with:
+          distribution: liberica
+          java-version: "8"
+
+      - name: Maven validate (macOS, Java 8)
+        run: mvn -B -ntp -DskipTests validate
 
   # Resolve the compatibility matrix per event: PR/push stay on the LTS subset
   # to keep routine CI cheap; the full sweep runs only on schedule and manual
@@ -188,19 +185,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Set up Temurin JDK ${{ matrix.java }}
-        uses: actions/setup-java@v5
+        uses: ./.github/actions/setup-build-jdk
         with:
           distribution: temurin
           java-version: ${{ matrix.java }}
-          cache: maven
-
-      - name: Build tooling info
-        run: |
-          java -version
-          mvn -version
-          git status --short
 
       # Java 11+ remains diagnostic only until JAXB and JavaFX migration is complete.
       - name: Maven validate diagnostic
@@ -214,14 +206,9 @@ jobs:
 
       - name: Upload Maven artifacts
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: ./.github/actions/upload-maven-artifacts
         with:
           name: compatibility-java${{ matrix.java }}-artifacts
-          path: |
-            **/target/surefire-reports/**
-            **/target/*.jar
-          if-no-files-found: ignore
-          retention-days: 7
 
   full-test-suite:
     name: full-test-suite
@@ -232,20 +219,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Set up Liberica JDK 8 with JavaFX
-        uses: actions/setup-java@v5
+        uses: ./.github/actions/setup-build-jdk
         with:
           distribution: liberica
           java-version: "8"
           java-package: jdk+fx
-          cache: maven
-
-      - name: Build tooling info
-        run: |
-          java -version
-          mvn -version
-          git status --short
 
       # Non-blocking until provider tests are migrated to offline fixtures.
       - name: Run full legacy test suite
@@ -253,11 +235,6 @@ jobs:
 
       - name: Upload Maven artifacts
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: ./.github/actions/upload-maven-artifacts
         with:
           name: full-test-suite-artifacts
-          path: |
-            **/target/surefire-reports/**
-            **/target/*.jar
-          if-no-files-found: ignore
-          retention-days: 7

@@ -1,0 +1,34 @@
+name: Set up build JDK
+description: >-
+  Configure a JDK with the Maven dependency cache and print build tooling
+  info. Centralises the setup block shared by every Maven CI job.
+
+inputs:
+  distribution:
+    description: setup-java distribution (for example liberica or temurin).
+    required: true
+  java-version:
+    description: JDK major version (for example 8, 17, 21).
+    required: true
+  java-package:
+    description: JDK package to install (jdk or jdk+fx).
+    required: false
+    default: jdk
+
+runs:
+  using: composite
+  steps:
+    - name: Set up ${{ inputs.distribution }} JDK ${{ inputs.java-version }} (${{ inputs.java-package }})
+      uses: actions/setup-java@v5
+      with:
+        distribution: ${{ inputs.distribution }}
+        java-version: ${{ inputs.java-version }}
+        java-package: ${{ inputs.java-package }}
+        cache: maven
+
+    - name: Build tooling info
+      shell: bash
+      run: |
+        java -version
+        mvn -version
+        git status --short
