@@ -15,7 +15,6 @@
 
 | Workflow | File | Role |
 |----------|------|------|
-| CI | `.github/workflows/ci.yml` | Legacy required check for `develop`: `CI / validate (zulu-8)` |
 | Maven CI | `.github/workflows/ci-maven.yml` | `develop` PR validation: validate, deterministic tests, package |
 | Build | `.github/workflows/build.yml` | Legacy `master` push/PR coverage only; not part of the `develop` merge baseline |
 | Dependency Review | `.github/workflows/dependency-review.yml` | Blocks new high/critical dependency issues on PRs |
@@ -25,23 +24,23 @@
 
 ### Required checks today
 
-Branch protection on `develop` currently requires:
+The live `protect-develop` ruleset requires these exact status check contexts:
 
-- `CI / validate (zulu-8)` from `.github/workflows/ci.yml`
+- `validate-java8`
+- `deterministic-tests-java8`
+- `compile-and-package-java8`
+- `dependency-review`
 
-### Planned required checks (after ruleset update)
-
-When governance catches up (`branch-protection` tracker item), require:
-
-- `Maven CI / validate-java8`
-- `Maven CI / deterministic-tests-java8`
-- `Maven CI / compile-and-package-java8`
-- `Dependency Review / dependency-review`
+The first three are Maven CI checks (`ci-maven.yml`). `dependency-review` is
+provided by Dependency Review (`dependency-review.yml`). Do not use
+workflow-prefixed check names (for example `Maven CI / validate-java8`) unless
+GitHub Settings later displays them that way. The removed legacy check was
+`validate (zulu-8)` / `CI / validate (zulu-8)`.
 
 ### Diagnostic checks (do not require)
 
-- `Maven CI / compatibility-java11` (and 17, 21, 25)
-- `Maven CI / full-test-suite` (workflow_dispatch / schedule only)
+- `compatibility-java11` (and 17, 21, 25)
+- `full-test-suite` (workflow_dispatch / schedule only)
 
 ## Live network tests
 

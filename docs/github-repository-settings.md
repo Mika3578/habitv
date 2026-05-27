@@ -61,18 +61,33 @@ Under **Settings -> Branches -> Branch protection rules** for
 
 Apply the same rule set to `develop` once it is created.
 
+## Live required checks for `develop`
+
+The live `protect-develop` ruleset requires these exact status check contexts:
+
+- `validate-java8`
+- `deterministic-tests-java8`
+- `compile-and-package-java8`
+- `dependency-review`
+
+The first three are Maven CI checks. `dependency-review` is already part of
+the live required checks. The removed legacy check was `validate (zulu-8)` /
+`CI / validate (zulu-8)`. Do not use workflow-prefixed names (for example
+`Maven CI / validate-java8`) unless GitHub Settings later displays them that
+way.
+
 ## Recommended initial required checks
 
 Once the `build` workflow has run at least once on a PR, mark the
-following checks as required for `master`:
+following check as required for `master`:
 
-- `build / validate (ubuntu-latest, java8)`
-- `build / validate (windows-latest, java8)`
+- `build / validate (windows, java8)`
 
-These check names come from `.github/workflows/build.yml` job name
-`validate` with the matrix `os` values. If the actual rendered
-check names differ in the GitHub UI, use the names as displayed
-there.
+This check name comes from `.github/workflows/build.yml` job name
+`validate (windows, java8)`. The workflow is now Windows-only — the
+Ubuntu Java 8 validation is covered by `Maven CI` (`ci-maven.yml`). If
+the actual rendered check name differs in the GitHub UI, use the name as
+displayed there.
 
 ## After bootstrap merge — recommended sequence
 
