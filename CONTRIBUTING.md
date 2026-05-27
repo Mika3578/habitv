@@ -30,6 +30,13 @@ Before creating a new branch, follow the duplicate-prevention checks
 defined in `AGENTS.md` (`git fetch --all --prune`, matching branch/PR
 search, and `git check-ref-format --branch`).
 
+**AI agents** must not use tool-specific or session-generated branch
+names (`claude/**`, `anthropic/**`, `ai/**`, `cursor/**`, `codex/**`,
+`wip/**`, and similar). Use only `feat/`, `fix/`, `docs/`, `chore/`,
+`test/`, `refactor/`, or `ci/` plus a short kebab-case scope — see
+`AGENTS.md` §4 for valid/invalid examples and recovery when already on
+an invalid branch.
+
 For AI-agent workflow, PR target policy is defined in `AGENTS.md`:
 agent-created PRs target `Mika3578/habitv` (not `ikfon10/habitv`).
 

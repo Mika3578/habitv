@@ -13,6 +13,11 @@ Follow `AGENTS.md` as the source of truth for PR target policy, branch
 naming, duplicate branch/PR prevention, commit style, PR structure,
 validation, and linear history.
 
+Branch names for agent-created PRs must use allowed Habitv prefixes only
+(`feat/`, `fix/`, `docs/`, `chore/`, `test/`, `refactor/`, `ci/`).
+Never open a PR from `claude/**`, `cursor/**`, or other forbidden
+prefixes — rename per `AGENTS.md` §4 first.
+
 ## Pull requests
 
 - Use English for PR titles, bodies, review comments, and merge metadata.

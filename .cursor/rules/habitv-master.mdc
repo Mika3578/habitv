@@ -39,6 +39,13 @@ They exist to keep modernization safe, incremental, and reviewable.
 - Follow `AGENTS.md` as the source of truth for PR target policy,
   branch naming, duplicate branch/PR prevention, commit style, PR
   structure, validation, and linear history.
+- Never create branches with tool prefixes (`claude/`, `anthropic/`,
+  `ai/`, `assistant/`, `cursor/`, `codex/`, `temp/`, `wip/`) or
+  generated, poetic, random, or session-based names.
+- Use only `feat/`, `fix/`, `docs/`, `chore/`, `test/`, `refactor/`,
+  or `ci/` plus a short lowercase kebab-case scope.
+- Propose the branch name before `git checkout -b`; if already on an
+  invalid branch, rename and fix the remote before opening a PR.
 - Use small PRs scoped to a single descriptive scope (see `docs/dev-tracker.md`).
 - Use English for branches, commits, comments, docs, and PR text.
 

@@ -40,6 +40,7 @@
 ## Checklist
 
 - [ ] Branch was created from `develop`
+- [ ] Branch name uses an allowed prefix (`feat/`, `fix/`, `docs/`, `chore/`, `test/`, `refactor/`, `ci/`) — not `claude/**`, `cursor/**`, `ai/**`, `wip/**`, or other tool/session names (see `AGENTS.md` §4)
 - [ ] Duplicate-prevention checks completed before branch creation (see `AGENTS.md`)
 - [ ] No open PR already covered the same scope before opening this PR
 - [ ] No unrelated source changes

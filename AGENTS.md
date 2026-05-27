@@ -66,6 +66,7 @@ French TV catch-up content via pluggable provider plugins.
 | Add OWASP / SBOM / static-analysis plugins | Out of restart phase |
 | Commit secrets, tokens, local paths, IDE files | 🚨 never, period |
 | Write non-English content (branches, code, docs) | English-only policy |
+| Create branches with `claude/**`, `cursor/**`, `ai/**`, or random names | Violates §4; rename before any PR |
 
 ---
 
@@ -88,31 +89,69 @@ Conventional Commits, English, imperative, lowercase, ≤ 72 chars.
 
 ## 🌿 4. Branch naming and duplicate prevention
 
-Allowed work branch prefixes (only):
-- `fix/`
+### Allowed prefixes (only)
+
+AI agents and human contributors must use **one** of these prefixes:
+
 - `feat/`
-- `chore/`
+- `fix/`
 - `docs/`
+- `chore/`
 - `test/`
-- `ci/`
 - `refactor/`
+- `ci/`
+
+Branch format: `<prefix>/<short-scope>` — lowercase, kebab-case, short and
+descriptive. No camelCase, no spaces, no bare names without a prefix.
+
+✅ Valid examples:
+
+- `feat/ytdlp-runtime-diagnostics`
+- `fix/canalplus-endpoint-warning`
+- `docs/javafx-runtime-baseline`
+- `chore/rules-branch-naming`
+- `ci/maven-validation-matrix`
+
+❌ Invalid examples:
+
+- `claude/youthful-albattani-rH19M` — tool-generated prefix
+- `claude/fix-thing`, `anthropic/session-123`, `cursor/quick-fix`
+- `ai/generated-patch`, `wip/test` — forbidden prefixes (see below)
+- `feature/some-change` — use `feat/` instead
+- `fixStuff`, `my-branch` — wrong shape (no prefix or not kebab-case)
+
+### Forbidden prefixes for AI agents
+
+AI agents (Claude Code, Cursor, Codex, Copilot, or any assistant) must
+**never** create, push, or open PRs from branches with these prefixes:
+
+- `claude/`
+- `anthropic/`
+- `ai/`
+- `assistant/`
+- `cursor/`
+- `codex/`
+- `temp/`
+- `wip/`
+
+AI agents must **never** use generated, poetic, random, or session-based
+branch names (for example auto-suffixed hashes, adjective-noun pairs, or
+IDE session IDs).
 
 Deprecated prefixes (do not create new branches with these):
+
 - `feature/` → `feat/`
 - `build/` → `ci/` for CI/build automation, or `chore/` for maintenance
 - `runtime/` → `fix/`, `feat/`, or `refactor/` depending on scope
 - `provider/` → `fix/provider-...`, `feat/provider-...`,
   `refactor/provider-...`, `docs/provider-...`, or `test/provider-...`
 
-Branch format:
-`<type>/<short-scope>`
+Additional examples (allowed prefix + scope):
 
-Examples:
 - `fix/provider-youtube-ytdlp`
 - `feat/provider-francetv-metadata`
 - `docs/provider-inventory-update`
 - `test/provider-offline-fixtures`
-- `ci/maven-pr-validation`
 - `refactor/provider-canalplus-cleanup`
 
 HBTV-style tracker IDs are deprecated.
@@ -134,17 +173,39 @@ Examples:
 - `test(providers): add offline fixtures`
 - `ci(maven): harden PR validation`
 
-Before creating any branch, run:
+### Before creating a branch
+
+1. Inspect the current branch (`git branch --show-current`). If it is
+   invalid (forbidden prefix or wrong shape), recover first (see below).
+2. Propose the final branch name and confirm it matches an allowed
+   prefix and kebab-case scope.
+3. Run duplicate-prevention checks, then create the branch:
+
 ```bash
 git fetch --all --prune
 git branch -a --list "*<short-scope>*"
 gh pr list --repo Mika3578/habitv --state open --search "<short-scope>"
 git check-ref-format --branch "<branch-name>"
+git checkout -b "<prefix>/<short-scope>"
 ```
 
 If an existing branch or open PR already covers the same scope, do not
 create a duplicate. Reuse the existing branch/PR, or create a clearly
 scoped follow-up branch.
+
+### Recover from an invalid branch
+
+If the agent is already on an invalid branch (for example `claude/**`):
+
+1. Do **not** open a PR from it.
+2. Rename locally, push the corrected name, delete the invalid remote
+   branch if it was pushed, then continue only from the corrected branch:
+
+```bash
+git branch -m chore/enforce-agent-branch-naming
+git push -u origin chore/enforce-agent-branch-naming
+git push origin --delete <invalid-branch-name>
+```
 
 Keep history linear on work branches (no merge commits).
 
