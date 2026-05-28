@@ -24,7 +24,6 @@ try {
         Remove-Item -Recurse -Force (Join-Path $repoRoot "target/package-staging")
     }
     New-Item -ItemType Directory -Force -Path $libDir, $pluginsDir, $binDir | Out-Null
-    New-Item -ItemType Directory -Force -Path (Join-Path $repoRoot "target/packages") | Out-Null
 
     $mainJar = Join-Path $repoRoot "application/habiTv/target/habiTv-$version.jar"
     if (-not (Test-Path -Path $mainJar)) {

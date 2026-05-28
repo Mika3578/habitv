@@ -1,14 +1,29 @@
-# Habitv cross-platform packaging
+# Habitv packaging assets
 
-This directory holds launcher templates, installer metadata, and platform-specific
-packaging assets used by the scripts under `scripts/`.
+This directory holds shared packaging assets for Habitv distributions.
 
-Build flow:
+## Shared staging
 
-1. `mvn -B -ntp -DskipTests package`
-2. `scripts/stage-package.sh` (Linux/macOS) or `scripts/stage-package.ps1` (Windows)
-   — collect JARs into `target/package-staging/Habitv/`
-3. `scripts/package-<platform>.{sh,ps1}` — produce native artifacts under
-   `target/packages/`
+After a Maven package build:
 
-See [`docs/packaging.md`](../docs/packaging.md) for full documentation.
+```bash
+mvn -B -ntp -DskipTests package
+```
+
+Stage built JARs with:
+
+- Linux/macOS: `bash scripts/stage-package.sh`
+- Windows: `powershell -ExecutionPolicy Bypass -File scripts/stage-package.ps1`
+
+Output layout:
+
+```text
+target/package-staging/Habitv/
+  lib/
+    habiTv-<version>.jar
+    plugins/
+  bin/          reserved for platform launchers in follow-up PRs
+  README.txt
+```
+
+Platform-specific installers and CI artifact upload are tracked in separate PRs.

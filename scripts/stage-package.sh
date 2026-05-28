@@ -45,7 +45,6 @@ if [[ -f "$REPO_ROOT/packaging/common/README.txt" ]]; then
   cp "$REPO_ROOT/packaging/common/README.txt" "$STAGING/README.txt"
 fi
 
-mkdir -p "$REPO_ROOT/target/packages"
 printf 'VERSION=%s\nSTAGING=%s\n' "$VERSION" "$STAGING" > "$REPO_ROOT/target/package-staging/.env"
 
 plugin_count="$(find "$PLUGINS_DIR" -maxdepth 1 -name '*.jar' | wc -l | tr -d ' ')"

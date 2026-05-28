@@ -10,13 +10,9 @@ Requirements
 
 Layout
 ------
-  bin/     OS launchers (habitv, habitv.bat, Habitv.exe)
-  lib/     Main application JAR and bundled runtime libraries
+  lib/          Main application JAR
   lib/plugins/  Provider, downloader, and exporter plugin JARs
 
-Portable use
-------------
-Extract the archive anywhere and run the launcher from bin/.
 Configuration and downloads are stored under your user profile unless
 configuration.xml is placed next to the application JAR directory.
 
