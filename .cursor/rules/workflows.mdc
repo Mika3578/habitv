@@ -1,0 +1,47 @@
+---
+description: GitHub Actions, CI, CodeQL, and workflow security rules
+globs:
+  - ".github/workflows/**"
+  - ".github/dependabot.yml"
+  - "docs/ci.md"
+---
+
+# Habitv workflow and CI rules
+
+Canonical source: `AGENTS.md` Sections 16.6–16.9; `.github/AGENTS.md`;
+`docs/dev-workflow.md`.
+
+## Least privilege
+
+Default workflow permissions: `contents: read`. Add write only when required.
+
+## Before changing workflows
+
+Provide **Workflow safety checklist** (Section 16.8). Ask developer
+approval before broadening permissions or adding `pull_request_target`.
+
+## Existing workflows
+
+- `ci-maven.yml` — primary Java 8 Maven CI
+- `dependency-review.yml` — high-severity dependency gate on PRs
+- `build.yml`, `stale.yml`, `labeler.yml` — supporting automation
+
+## CodeQL and Dependency Review
+
+Do not remove CodeQL without approval. Fix Java 8 JDK setup instead of
+disabling analysis. Document if Dependency Review unavailable on plan.
+
+## CI speed and workflow tiers
+
+See `AGENTS.md` Section 18.13. Tiers: PR fast validation; targeted module;
+security (CodeQL, dependency review, OWASP, SBOM); packaging; scheduled
+maintenance.
+
+## Forbidden workflow patterns
+
+- executing untrusted PR body text as shell commands
+- echoing secrets/tokens
+- exposing secrets to fork PRs
+- auto-merge for dependency updates
+
+Never chain workflow-triggered publish actions without explicit approval.

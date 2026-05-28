@@ -10,11 +10,9 @@ They exist to keep modernization safe, incremental, and reviewable.
 
 ## Java baseline
 
+- See `.cursor/rules/java8-compatibility.mdc` and `AGENTS.md` Section 2.
 - Always keep Java 8 compatibility unless an explicit tracked migration
   item says otherwise and is referenced in the PR.
-- Do not introduce Java 9+ language features or JDK 11/17/21-only APIs.
-- Any Java baseline migration must happen in a dedicated migration PR
-  with an ADR in `docs/decision-log.md`.
 
 ## Architecture and scope
 
@@ -26,8 +24,9 @@ They exist to keep modernization safe, incremental, and reviewable.
 
 ## Build and tests
 
-- Prefer deterministic Maven commands. Default validation:
-  `mvn -B -ntp -DskipTests validate`.
+- Pre-commit validation gate: `AGENTS.md` Section 14.2 and
+  `.cursor/rules/maven-validation.mdc`.
+- CI-safe baseline: `mvn -B -ntp -DskipTests validate`.
 - Do not run live provider/network tests in the default lifecycle.
   Network or provider live tests must be opt-in via an explicit
   profile or tracker item.
@@ -36,9 +35,30 @@ They exist to keep modernization safe, incremental, and reviewable.
 
 ## Branching and PRs
 
-- Follow `AGENTS.md` as the source of truth for PR target policy,
-  branch naming, duplicate branch/PR prevention, commit style, PR
-  structure, validation, and linear history.
+- Follow `AGENTS.md` as the canonical source for all AI workflow policy.
+- At task start, report **Agent startup checklist** (Section 16.17).
+- Prefer small focused PRs; stop and split if scope grows (Section 16.1).
+- Security and dependency work: see `.cursor/rules/dependencies.mdc` and
+  `docs/dependency-policy.md`.
+- CI/workflow work: see `.cursor/rules/workflows.mdc` and Section 16.8.
+- Cursor/VS Code config: see `.cursor/rules/cursor-ide.mdc`.
+- Provider/plugin work: see `.cursor/rules/habitv-providers.mdc` and
+  `docs/provider-policy.md` (Section 18).
+- Behavior/build/config work: see `.cursor/rules/habitv-maintainability.mdc`
+  and `docs/maintainability-policy.md` (Section 19).
+- Follow `.cursor/rules/git-safety.mdc` for Git workflow and approval
+  gates; `.cursor/rules/pr-review.mdc` for PR and Copilot review rules.
+- When AI rules change, run drift audit (Section 17.6), update
+  `docs/agent-rules-changelog.md`, and bump metadata version.
+- Never chain approval-gated Git/GitHub commands (Section 15.8).
+- Stage only intentional files; no blind `git add -A` (Section 15.20).
+- Record tool versions when changing build/deps/packaging (Section 15.22).
+- Inspect diffs for secrets; no AI attribution (Sections 15.9–15.10);
+  leave artifacts unstaged (Section 15.23); use `agent_space/` for scratch
+  work (Section 15.21).
+- No silent unrelated auto-fixes; classify commits (Sections 15.27–15.28).
+- Never commit, push, create PRs, merge PRs, or resolve review threads
+  without explicit developer approval in the current conversation.
 - Use small PRs scoped to a single descriptive scope (see `docs/dev-tracker.md`).
 - Use English for branches, commits, comments, docs, and PR text.
 

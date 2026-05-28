@@ -9,28 +9,69 @@ narrowly-scoped suggestions over rewrites.
 
 ## Workflow policy source of truth
 
-Follow `AGENTS.md` as the source of truth for:
-- PR target policy
-- branch naming
-- duplicate branch and PR prevention
-- commit style
-- PR structure
-- validation commands
-- linear Git history
-- documentation sync requirements
+`AGENTS.md` is the canonical source for all AI agent behavior. These
+companion files mirror or point to the same mandatory rules:
+
+- `.cursor/rules/git-safety.mdc` — Git workflow and approval gates
+- `.cursor/rules/maven-validation.mdc` — pre-commit Maven validation
+- `.cursor/rules/pr-review.mdc` — PR policy and Copilot review handling
+- `.cursor/rules/java8-compatibility.mdc` — Java 8 and dependency rules
+- `.github/instructions/maven-java.instructions.md` — Java/POM path rules
+- `.github/instructions/plugins.instructions.md` — plugin path rules
+- `.github/instructions/github-actions.instructions.md` — GitHub Actions
+- `.github/instructions/github-pr.instructions.md` — PR/GitHub path rules
+- `.github/instructions/packaging.instructions.md` — packaging path rules
+- nested `AGENTS.md` files — path-specific extensions (Section 15.2)
+- `docs/dev-workflow.md`, `docs/dependency-policy.md`, `docs/security-policy.md`
+- `docs/provider-policy.md`, `docs/release-policy.md`, `docs/modernization-backlog.md`
+- `.cursor/rules/habitv-providers.mdc`, `90-rule-evolution.mdc`
+
+When any file conflicts with `AGENTS.md`, `AGENTS.md` wins.
+
+At task start, report **Instruction files loaded** (Section 15.1).
+
+When changing AI rules, run drift audit (Section 17.6), update changelog,
+and bump `AGENTS.md` metadata version (Section 17).
+
+Never chain approval-gated commands (Section 15.8). Stage only intentional
+files by path (Section 15.20). Inspect diffs for secrets (Section 15.9).
+No AI attribution (Section 15.10). Provide exact validation evidence
+(Section 15.15). Verify status checks before PR merge readiness (15.18).
+Ask approval before PR comment actions (Section 15.25).
+
+## Fast safe modernization
+
+See `AGENTS.md` Section 16 and `docs/dev-workflow.md`. Classify tasks
+before editing (16.2). Prefer small focused PRs. Security fixes outrank
+cosmetic work (16.19). Dependency updates need focused PRs and the
+Dependency update report (16.3).
+
+## Rule evolution
+
+See Section 17. AI rules change through dedicated PRs with changelog entry.
+Automation maturity: Level 1 — Assisted.
+
+## Habitv-specific modernization
+
+See Section 18 and `docs/provider-policy.md`. Declare phase before work.
+Provider status, metadata, offline tests, external tools, Java/JavaFX,
+release readiness — see companion docs in metadata block.
+
+## Maintainability
+
+See Section 19 and `docs/maintainability-policy.md`. Declare Definition of
+Done; classify PR risk; document ADRs for durable decisions; manual test
+evidence before commit on behavior changes.
+
+AI agents must never commit, push, create PRs, merge PRs, or resolve
+review threads without explicit developer approval in the current
+conversation. See `AGENTS.md` Section 14. Never resolve GitHub review
+conversations silently (Section 15.7).
 
 ## Compatibility constraints
 
-- Target Java 8 only. Do not suggest Java 9+ language features
-  (e.g. `var`, records, switch expressions, sealed types, pattern
-  matching), Java 9+ APIs (e.g. `List.of`, `Optional.orPrimitive`,
-  `HttpClient`, `Stream.toList`), or module-system constructs.
-- Preserve the existing Maven multi-module layout. Do not propose
-  reactor restructures, parent POM rewrites, or aggregator merges
-  unless an explicit tracker item is referenced in the prompt.
-- Do not propose provider rewrites (e.g. canalPlus, arte, pluzz,
-  6play, youtube). Provider changes go through dedicated scoped work
-  tracked in repository docs.
+See `.github/instructions/maven-java.instructions.md` and
+`.cursor/rules/java8-compatibility.mdc` for Java 8 and Maven constraints.
 
 ## Key modules
 
@@ -46,15 +87,24 @@ Follow `AGENTS.md` as the source of truth for:
 
 ## Default validation
 
-Use this command as the default sanity check before opening a PR:
+Pre-commit validation for AI agents is defined in `AGENTS.md` Section
+14.2. Default for code changes:
+
+```
+mvn -B -ntp -DskipTests clean package
+mvn -B -ntp test
+```
+
+For a quick CI-safe sanity check (not sufficient alone before commit
+approval unless the developer explicitly relaxes Section 14.2):
 
 ```
 mvn -B -ntp -DskipTests validate
 ```
 
-Do not invent richer commands (e.g. `verify`, `install`, `package`)
-unless a tracker item explicitly requires them — the reactor is not
-yet stabilized (see `docs/audit-master-baseline.md`).
+Do not invent richer commands (e.g. `verify`, `install`) unless a
+tracker item explicitly requires them — the reactor is not yet
+stabilized (see `docs/audit-master-baseline.md`).
 
 ## Things to avoid suggesting
 

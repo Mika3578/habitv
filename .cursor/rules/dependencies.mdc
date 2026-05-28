@@ -1,0 +1,41 @@
+---
+description: Dependency and security update rules for Habitv
+globs:
+  - "**/pom.xml"
+  - ".github/dependabot.yml"
+  - "docs/dependency-policy.md"
+  - "docs/security-policy.md"
+---
+
+# Habitv dependency and security rules
+
+Canonical source: `AGENTS.md` Sections 14.9, 16.3–16.6, 16.19;
+`docs/dependency-policy.md`; `docs/security-policy.md`.
+
+## Dependency PRs
+
+- One topic per PR; do not mix with feature work.
+- Preserve Java 8 compatibility unless dedicated migration task says otherwise.
+- Run full Maven validation after any dependency change.
+- Provide **Dependency update report** before commit approval.
+- Check release notes for non-trivial updates (Section 16.22).
+
+## Security priority
+
+Security alerts outrank cosmetic work (Section 16.19). Prefer compatible
+upgrades; document if no Java 8 fix exists. Never silence alerts without
+reason.
+
+## Dependabot
+
+Inspect `.github/dependabot.yml` before dependency automation changes.
+Never enable auto-merge unless developer explicitly asks.
+
+## Forbidden
+
+- batching unrelated dependency updates
+- disabling Dependabot or dependency review
+- weakening branch protection for green CI
+- dependency changes without validation evidence
+
+Ask developer approval before dependency **major** updates.

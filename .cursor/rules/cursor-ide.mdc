@@ -1,0 +1,41 @@
+---
+description: Cursor and VS Code project configuration rules
+globs:
+  - ".vscode/**"
+  - ".cursor/**"
+  - "docs/dev-workflow.md"
+---
+
+# Habitv Cursor / VS Code rules
+
+Canonical source: `AGENTS.md` Sections 16.13–16.16; `docs/dev-workflow.md`.
+
+## Repository rules first
+
+`AGENTS.md` and `.cursor/rules/` define repository-critical behavior.
+Never assume user-level Cursor settings are correct.
+
+## Project files
+
+- `.vscode/extensions.json` — recommended extensions (not forced)
+- `.vscode/settings.example.json` — safe examples only
+- `.cursor/rules/*.mdc` — topic-split agent rules
+
+## Forbidden in committed settings
+
+Machine-specific `JAVA_HOME`, absolute paths, usernames, tokens, private
+tool paths.
+
+## Formatting
+
+Do not enable broad format-on-save that reformats legacy files (Section
+16.23). Dedicated formatting PRs only.
+
+## Tasks
+
+Do not add `.vscode/tasks.json` in feature PRs. Use dedicated tooling PR.
+Tasks must never commit, push, merge, or resolve PR comments.
+
+## Scratch space
+
+Use `agent_space/` for temporary work; never commit from it (Section 15.21).

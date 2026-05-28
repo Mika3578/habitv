@@ -1,0 +1,38 @@
+---
+description: Rule evolution, drift audit, changelog, and backlog
+globs:
+  - "AGENTS.md"
+  - ".cursor/rules/**"
+  - ".github/copilot-instructions.md"
+  - ".github/instructions/**"
+  - "docs/agent-rules-*.md"
+  - "docs/dev-workflow.md"
+  - "CLAUDE.md"
+  - "GEMINI.md"
+---
+
+# Rule evolution
+
+**Purpose:** Keep AI rules maintainable, versioned, auditable, and
+retireable over time.
+
+**When it applies:** Any PR that changes AI agent rules or instruction
+files.
+
+**Mandatory rules:**
+
+- Change rules through dedicated reviewable PRs — not silently during
+  unrelated work (Section 17.1).
+- Update `AGENTS.md` metadata version and `docs/agent-rules-changelog.md`.
+- Run **Rule drift audit** (Section 17.6) before finishing.
+- End with **Agent rules update report** (Section 17.14).
+- Score new mandatory rules (Section 17.11); use backlog for candidates.
+- Habitv automation maturity: **Level 1 — Assisted** (Section 17.10).
+
+**Suggested rule improvement:** use when the same agent mistake happens
+twice (Section 17.4).
+
+**Canonical reference:** [`AGENTS.md`](../../AGENTS.md) Section 17;
+[`docs/agent-rules-backlog.md`](../../docs/agent-rules-backlog.md).
+
+**Lifecycle:** mandatory for AI-rule PRs.

@@ -1,0 +1,80 @@
+---
+description: PR policy, Copilot review handling, and PR target gates
+globs:
+  - ".github/**"
+  - "AGENTS.md"
+  - "CONTRIBUTING.md"
+  - "docs/**"
+---
+
+# Habitv PR review rules
+
+Canonical source: `AGENTS.md` Sections 5, 14.4, 14.10–14.12, 15.7,
+15.10, 15.15–15.19, 15.25–15.26.
+
+## PR target (mandatory)
+
+- Repository: `Mika3578/habitv`
+- Base branch: `develop`
+- Never open PRs against `ikfon10/habitv` or other forks
+
+Before `gh pr create`, show source branch, target repo, base branch,
+PR title, PR body, and validation result. Ask for explicit approval.
+
+## PR readiness
+
+- Fill every required section of `.github/pull_request_template.md`
+- Keep diffs small and scoped; no opportunistic refactors
+- Linear history only (rebase, not merge commits)
+- English-only titles, bodies, and review comments
+- Conventional Commits for titles; no `hbtv-*` or `HBTV*` IDs
+
+## Copilot review comments
+
+Before a PR is ready:
+
+1. Inspect all Copilot review comments and unresolved conversations.
+2. Classify each as: accepted and fixed; intentionally rejected with
+   reason; not applicable; outside current PR scope; needs developer
+   decision.
+3. Implement accepted recommendations.
+4. Reply to each comment in English with what was done or why not applied.
+5. Resolve only after review, handling, reply, and commit/push (if
+   applicable).
+6. Never resolve just to silence the review.
+
+If resolution needs a GitHub command or UI action, ask for developer
+approval first.
+
+Never resolve conversations silently (root `AGENTS.md` Section 15.7).
+
+## Review readiness
+
+A PR is not review-ready until Section 15.16 criteria are met, including
+branch protection alignment (15.17), status checks (15.18), and
+CODEOWNERS review (15.19). Do not say "CI is green" without verifying
+current PR checks.
+
+Final status must include **Not ready to merge** when checks are pending
+or failing, or code-owner review is missing.
+
+No AI attribution (Section 15.10). Provide exact validation evidence
+(Section 15.15). List **Follow-up candidates** for out-of-scope work
+(Section 15.26).
+
+## PR comment actions
+
+Ask explicit approval before any PR comment, Copilot reply, review
+request, label change, title/body edit, or conversation resolution
+(Section 15.25). Show the exact English comment before posting.
+
+## Instruction alignment
+
+When changing AI rules, run the drift check in root `AGENTS.md`
+Section 15.3 and keep this file aligned with root `AGENTS.md`.
+
+## Doc sync
+
+Update `docs/dev-tracker.{md,json}`, `docs/risk-register.md`, and
+`docs/decision-log.md` when the change is meaningful (see `AGENTS.md`
+Section 12).
