@@ -1,9 +1,12 @@
 package com.dabi.habitv.provider.tf1plus;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -20,6 +23,8 @@ import com.dabi.habitv.framework.plugin.api.BasePluginWithProxy;
 public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginProviderInterface { // NO_UCD
 
 	private static final Logger LOG = Logger.getLogger(Tf1PlusPluginManager.class);
+	private static final Pattern DURATION_HHMMSS_PATTERN = Pattern.compile("^(\\d{1,2}):(\\d{2}):(\\d{2})$");
+	private static final Pattern DURATION_TEXT_PATTERN = Pattern.compile("(\\d+)\\s*(h|mn|min|s)");
 
 	private static final List<Channel> CHANNELS = Arrays.asList(new Channel("TF1", Tf1PlusConf.TF1_REPLAY_URL),
 			new Channel("TMC", Tf1PlusConf.TMC_REPLAY_URL), new Channel("TFX", Tf1PlusConf.TFX_REPLAY_URL),
@@ -92,13 +97,20 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 				String description = entry.select("p, [class*=description], [class*=summary]").text();
 				String date = entry.select("time").attr("datetime");
 				String duration = entry.select("[class*=duration], time[aria-label*=dur]").text();
-				StringBuilder label = new StringBuilder(title);
-				appendMetadata(label, description);
-				appendMetadata(label, date);
-				appendMetadata(label, duration);
-				appendMetadata(label, thumbnail);
 				if (StringUtils.isNotEmpty(url)) {
-					episodes.add(new EpisodeDTO(category, label.toString(), url));
+					EpisodeDTO episode = new EpisodeDTO(category, title, url);
+					Date episodeDate = parseEpisodeDate(date);
+					if (episodeDate != null) {
+						episode.setEpisodeDate(episodeDate);
+					}
+					Long durationSeconds = parseDurationSeconds(duration);
+					if (durationSeconds != null) {
+						episode.setDurationSeconds(durationSeconds);
+					}
+					if (StringUtils.isNotEmpty(description) || StringUtils.isNotEmpty(thumbnail)) {
+						LOG.debug("TF1+ metadata ignored for filename generation, url=" + url);
+					}
+					episodes.add(episode);
 				}
 			}
 		} catch (RuntimeException e) {
@@ -107,10 +119,66 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 		return episodes;
 	}
 
-	private void appendMetadata(StringBuilder label, String value) {
-		if (StringUtils.isNotEmpty(value)) {
-			label.append(" | ").append(value.trim());
+	private Date parseEpisodeDate(String rawDate) {
+		if (StringUtils.isEmpty(rawDate)) {
+			return null;
 		}
+		String normalized = rawDate.trim();
+		if (normalized.length() >= 10) {
+			normalized = normalized.substring(0, 10);
+		}
+		String[] parts = normalized.split("-");
+		if (parts.length != 3) {
+			return null;
+		}
+		try {
+			int year = Integer.parseInt(parts[0]);
+			int month = Integer.parseInt(parts[1]);
+			int day = Integer.parseInt(parts[2]);
+			java.util.Calendar calendar = java.util.Calendar.getInstance();
+			calendar.setLenient(false);
+			calendar.set(java.util.Calendar.YEAR, year);
+			calendar.set(java.util.Calendar.MONTH, month - 1);
+			calendar.set(java.util.Calendar.DAY_OF_MONTH, day);
+			calendar.set(java.util.Calendar.HOUR_OF_DAY, 0);
+			calendar.set(java.util.Calendar.MINUTE, 0);
+			calendar.set(java.util.Calendar.SECOND, 0);
+			calendar.set(java.util.Calendar.MILLISECOND, 0);
+			return calendar.getTime();
+		} catch (RuntimeException e) {
+			LOG.debug("TF1+ unable to parse episode date: " + rawDate);
+			return null;
+		}
+	}
+
+	private Long parseDurationSeconds(String rawDuration) {
+		if (StringUtils.isEmpty(rawDuration)) {
+			return null;
+		}
+		String normalized = rawDuration.trim().toLowerCase();
+		Matcher hhmmssMatcher = DURATION_HHMMSS_PATTERN.matcher(normalized);
+		if (hhmmssMatcher.matches()) {
+			long hours = Long.parseLong(hhmmssMatcher.group(1));
+			long minutes = Long.parseLong(hhmmssMatcher.group(2));
+			long seconds = Long.parseLong(hhmmssMatcher.group(3));
+			return Long.valueOf(hours * 3600L + minutes * 60L + seconds);
+		}
+		Matcher textMatcher = DURATION_TEXT_PATTERN.matcher(normalized);
+		long total = 0L;
+		boolean found = false;
+		while (textMatcher.find()) {
+			found = true;
+			long value = Long.parseLong(textMatcher.group(1));
+			String unit = textMatcher.group(2);
+			if ("h".equals(unit)) {
+				total += value * 3600L;
+			} else if ("mn".equals(unit) || "min".equals(unit)) {
+				total += value * 60L;
+			} else if ("s".equals(unit)) {
+				total += value;
+			}
+		}
+		return found ? Long.valueOf(total) : null;
 	}
 
 	private String extractEpisodeLabel(Element node) {
