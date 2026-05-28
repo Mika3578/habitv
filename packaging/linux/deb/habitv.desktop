@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Habitv
+Comment=Automatic French TV replay downloader
+Exec=/opt/habitv/bin/habitv
+Terminal=false
+Categories=AudioVideo;Network;
+Keywords=tv;replay;download;

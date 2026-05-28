@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = "configure" ]; then
+  ln -sf /opt/habitv/bin/habitv /usr/bin/habitv
+  chmod 755 /opt/habitv/bin/habitv
+fi
+
+exit 0

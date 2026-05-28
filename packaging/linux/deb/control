@@ -1,0 +1,13 @@
+Package: habitv
+Version: @VERSION@
+Section: utils
+Priority: optional
+Architecture: all
+Maintainer: Habitv Maintainers <https://github.com/Mika3578/habitv>
+Homepage: https://github.com/Mika3578/habitv
+Description: Automatic French TV replay downloader
+ Habitv watches selected replay categories and downloads new episodes.
+ .
+ This package installs Habitv under /opt/habitv and provides a habitv
+ launcher on PATH. A Java 8 runtime with JavaFX support is required and
+ is not bundled with this package.
