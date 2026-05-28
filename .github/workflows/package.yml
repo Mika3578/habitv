@@ -1,0 +1,142 @@
+name: Package
+
+on:
+  pull_request:
+    branches:
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: package-${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package:
+    name: package-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            script: bash scripts/package-linux.sh
+            artifact_name: habitv-linux
+            artifact_path: |
+              target/packages/habitv-linux.tar.gz
+              target/packages/habitv.deb
+              target/packages/bin/habitv
+          - os: windows-latest
+            script: powershell -ExecutionPolicy Bypass -File scripts/package-windows.ps1
+            artifact_name: habitv-windows
+            artifact_path: |
+              target/packages/habitv-windows.zip
+              target/packages/bin/Habitv.exe
+              target/packages/bin/habitv.bat
+              target/packages/HabitvSetup.exe
+          - os: macos-latest
+            script: bash scripts/package-macos.sh
+            artifact_name: habitv-macos
+            artifact_path: |
+              target/packages/habitv-macos.tar.gz
+              target/packages/Habitv.app/**/*
+              target/packages/Habitv.dmg
+              target/packages/bin/habitv
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Liberica JDK 8 with JavaFX
+        uses: actions/setup-java@v5
+        with:
+          distribution: liberica
+          java-version: "8"
+          java-package: jdk+fx
+          cache: maven
+
+      - name: Install Linux packaging tools
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y dpkg-dev
+
+      - name: Install Launch4j
+        if: runner.os == 'Windows'
+        run: choco install launch4j -y --no-progress
+
+      - name: Install Inno Setup
+        if: runner.os == 'Windows'
+        run: choco install innosetup -y --no-progress
+
+      - name: Build tooling info
+        shell: bash
+        run: |
+          java -version
+          mvn -version
+          git status --short
+
+      - name: Maven package (Java 8 baseline)
+        shell: bash
+        run: mvn -B -ntp -DskipTests package
+
+      - name: Build platform packages
+        run: ${{ matrix.script }}
+
+      - name: Verify required artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r path; do
+            [[ -z "$path" ]] && continue
+            if [[ ! -e "$path" ]]; then
+              echo "Missing required artifact: $path" >&2
+              exit 1
+            fi
+            if [[ -f "$path" && ! -s "$path" ]]; then
+              echo "Empty artifact: $path" >&2
+              exit 1
+            fi
+            echo "OK: $path"
+          done <<'PATHS'
+          ${{ matrix.artifact_path }}
+          PATHS
+
+      - name: Verify launchers contain no absolute developer paths
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -RInE '/home/|/Users/|C:\\\\Users' target/package-staging/Habitv/bin; then
+            echo "Launcher contains machine-specific absolute paths." >&2
+            exit 1
+          fi
+          test -x target/package-staging/Habitv/bin/habitv
+
+      - name: Verify Windows launchers contain no absolute developer paths
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $patterns = @('/home/', '/Users/', 'C:\Users\')
+          $files = @(
+            'target/package-staging/Habitv/bin/habitv.bat',
+            'target/packages/bin/habitv.bat'
+          )
+          foreach ($file in $files) {
+            if (-not (Test-Path $file)) { throw "Missing launcher: $file" }
+            $content = Get-Content -Raw -Path $file
+            foreach ($pattern in $patterns) {
+              if ($content -like "*$pattern*") {
+                throw "Launcher $file contains machine-specific path: $pattern"
+              }
+            }
+          }
+
+      - name: Upload platform packages
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_path }}
+          if-no-files-found: error
+          retention-days: 14
