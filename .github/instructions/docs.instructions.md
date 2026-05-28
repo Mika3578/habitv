@@ -15,6 +15,8 @@ guides.
 
 - Section 16.21 — documentation freshness; verify claims against repo state.
 - Section 17 — rule changes need changelog + version bump.
+- Section 20 — docs-only speed mode; no Maven unless build/runtime docs
+  change; prefer backlog over new mandatory rules.
 - Section 15.20 — no blind staging; explicit paths only.
 
 ## Validation expected

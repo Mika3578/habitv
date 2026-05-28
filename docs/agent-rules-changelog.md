@@ -2,6 +2,38 @@
 
 Version history for Habitv AI agent rules. Canonical source: [`AGENTS.md`](../AGENTS.md).
 
+## 2026-05-28 — v1.4.0
+
+### Added
+
+* Section 20 — Productivity and anti-bloat guardrails (minimum viable
+  ruleset, rule profiles, docs-only lightweight path, heavy-gate scope,
+  conflict precedence, rule budget, archive policy, speed/deep mode, stop
+  condition, cleanup cadence, enforcement-over-expansion).
+* `docs/agent-rule-profiles.md` — profile matrix and speed/deep mode detail.
+* `docs/archived-agent-rules.md` — retired rules archive.
+* `.cursor/rules/agent-productivity.mdc` — always-on profile guidance.
+
+### Changed
+
+* Section 16.2 — cross-reference to rule profiles (Section 20.2).
+
+### Removed
+
+* None (anti-bloat policy defers demotion to future cleanup PRs).
+
+### Reason
+
+* Rule surface grew across Sections 14–19; agents need scope control so
+  docs-only work stays fast and detail stays in companion docs.
+
+### Follow-up
+
+* Propose `docs/cleanup-agent-rules` after ~10 merged PRs (Section 20.11).
+* Shift effort to enforcement (CI, branch protection) per Section 20.12.
+
+---
+
 ## 2026-05-28 — v1.3.0
 
 ### Added

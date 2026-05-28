@@ -19,6 +19,11 @@ on Habitv modernization.
 At task start, agents report the **Agent startup checklist** (Section
 16.17) and **Instruction files loaded** (Section 15.1).
 
+Pick a **rule profile** before editing (Sections 16.2 and **20.2**). Use
+**speed mode** for docs-only and other low-risk work (Section 20.8); use
+**deep mode** for provider, dependency, packaging, and migration work
+(Section 20.9).
+
 Classify work before editing (Section 16.2 and **18.1** for Habitv phases):
 quick fix, provider/plugin, dependency/security, CI, IDE/tooling, docs-only,
 refactor, packaging, migration preparation, or investigation only.
@@ -86,6 +91,8 @@ for required checks and branch protection.
 - [`docs/modernization-backlog.md`](modernization-backlog.md) — fast modernization queue
 - [`docs/maintenance-dashboard.md`](maintenance-dashboard.md) — planning dashboard
 - [`docs/maintainability-policy.md`](maintainability-policy.md) — DoD, tests, config
+- [`docs/agent-rule-profiles.md`](agent-rule-profiles.md) — profiles, speed/deep mode
+- [`docs/archived-agent-rules.md`](archived-agent-rules.md) — retired rules
 - [`docs/adr/README.md`](adr/README.md) — ADR workflow (see also `decision-log.md`)
 - [`docs/dependency-policy.md`](dependency-policy.md) — dependency updates
 - [`docs/security-policy.md`](security-policy.md) — security fixes
@@ -98,4 +105,4 @@ for required checks and branch protection.
 
 Agents end tasks with the **Final report** (Sections 16.25, **18.19**, and
 **19.25** for maintainability fields) and ask **Approve commit?** before
-any commit.
+any commit. Apply Section 20 profiles for validation scope.

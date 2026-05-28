@@ -6,7 +6,7 @@ complement, but do not replace, the human review process.
 
 ## Agent rules metadata
 
-* **Version:** 1.3.0
+* **Version:** 1.4.0
 * **Last updated:** 2026-05-28
 * **Maintainer:** repository maintainer
 * **Scope:** Habitv AI-assisted development workflow
@@ -18,7 +18,8 @@ complement, but do not replace, the human review process.
   `docs/agent-rules-changelog.md`, `docs/agent-rules-backlog.md`,
   `docs/modernization-backlog.md`, `docs/obsolescence-register.md`,
   `docs/maintainability-policy.md`, `docs/maintenance-dashboard.md`,
-  `docs/adr/`, `docs/decision-log.md`
+  `docs/adr/`, `docs/decision-log.md`, `docs/agent-rule-profiles.md`,
+  `docs/archived-agent-rules.md`
 
 When rules change, update **Version** and **Last updated**, and add an
 entry to [`docs/agent-rules-changelog.md`](docs/agent-rules-changelog.md).
@@ -101,6 +102,9 @@ conflict with `AGENTS.md`, `AGENTS.md` wins.
 | [`docs/agent-rules-changelog.md`](docs/agent-rules-changelog.md) | AI rules version history |
 | [`docs/agent-rules-backlog.md`](docs/agent-rules-backlog.md) | Future rule improvements |
 | [`.github/instructions/docs.instructions.md`](.github/instructions/docs.instructions.md) | Path-specific Copilot rules for docs |
+| [`.cursor/rules/agent-productivity.mdc`](.cursor/rules/agent-productivity.mdc) | Anti-bloat, profiles, speed/deep mode |
+| [`docs/agent-rule-profiles.md`](docs/agent-rule-profiles.md) | Rule profiles and validation matrix |
+| [`docs/archived-agent-rules.md`](docs/archived-agent-rules.md) | Retired agent rules |
 
 ### AI agent workflow index
 
@@ -124,6 +128,7 @@ Use this map to find the canonical rule for each workflow area:
 | Evolutionary rules governance | §17 |
 | Habitv-specific modernization | §18 |
 | Habitv maintainability guardrails | §19 |
+| Productivity and anti-bloat | §20 |
 | Documentation sync | §12 |
 | Hard-rule ADR lifecycle | §13 |
 
@@ -1756,7 +1761,8 @@ Before editing, classify the task as exactly one:
 - migration preparation;
 - investigation only.
 
-Then apply the matching validation plan from Sections 6, 14.2, and 16.11.
+Then apply the matching **rule profile** (Section 20.2) and validation
+plan from Sections 6, 14.2, and 16.11.
 
 ### 16.3 Dependency update policy
 
@@ -2858,3 +2864,91 @@ Extend the final report (Section 18.19) with:
 * Manual evidence needed:
 * Maintenance dashboard update needed:
 ```
+
+---
+
+## ⚡ 20. Productivity and anti-bloat guardrails
+
+Keep AI rules **useful, fast, and maintainable**. Detail:
+[`docs/agent-rule-profiles.md`](docs/agent-rule-profiles.md).
+
+Sections 14–19 still apply; this section controls **how much** applies per task.
+
+### 20.1 Minimum viable ruleset rule
+
+`AGENTS.md` = mandatory safety, workflow, validation commands, Java/Maven,
+Git/PR gates, and links — not long examples or edge cases. See file list in
+[`docs/agent-rule-profiles.md`](docs/agent-rule-profiles.md#minimum-viable-ruleset).
+
+### 20.2 Rule profile system
+
+Pick one profile at task start (extends Section 16.2). Profiles, validation,
+risk, allowed files, and report sections:
+[`docs/agent-rule-profiles.md`](docs/agent-rule-profiles.md#profile-matrix).
+
+Do not apply release or migration rules to docs-only tasks.
+
+### 20.3 Lightweight path for docs-only changes
+
+No Maven unless build/runtime docs change; verify Markdown and scope; drift
+audit if AI rules changed (Section 17.6). May reach **Ready for commit
+approval** after review. Details:
+[`docs/agent-rule-profiles.md`](docs/agent-rule-profiles.md#docs-only-lightweight-path).
+
+### 20.4 Heavy gate only when needed
+
+Heavy validation for code, build, providers, packaging, tools, Java/JavaFX,
+config/XML/JAXB, and security — not unrelated docs. Scope list in
+[`docs/agent-rule-profiles.md`](docs/agent-rule-profiles.md#heavy-gate-scope).
+
+### 20.5 Rule conflict resolver
+
+Precedence order in
+[`docs/agent-rule-profiles.md`](docs/agent-rule-profiles.md#conflict-precedence).
+If unresolved: **Needs developer decision**.
+
+### 20.6 Rule budget
+
+Before adding a mandatory rule: replace, merge, or simplify an existing one.
+Avoid duplicates and unverifiable rules. Prefer one short rule + linked doc +
+backlog item. Checklist in
+[`docs/agent-rule-profiles.md`](docs/agent-rule-profiles.md#rule-budget).
+
+### 20.7 Rule archive policy
+
+Retire inactive rules to changelog, backlog, or
+[`docs/archived-agent-rules.md`](docs/archived-agent-rules.md) — not active
+mandatory sections.
+
+### 20.8 Agent speed mode
+
+Low-risk docs-only, typo, narrow test fix, isolated config documentation.
+Still: `git status`, changed-files summary, final report, **Approve commit?**,
+approval gates. Skips heavy Maven/release/dep/provider/packaging checks.
+Details: [`docs/agent-rule-profiles.md`](docs/agent-rule-profiles.md#speed-mode-vs-deep-mode).
+
+### 20.9 Deep mode
+
+Provider/dependency/Maven/CI/packaging/migration/release/downloaders/config
+work. Requires full validation plan, risk, rollback, manual testing, and
+impact reports. Details: same link as 20.8.
+
+### 20.10 Stop condition rule
+
+Do not add mandatory rules that duplicate CI, document one-time issues, or
+slow common tasks. When unsure, use
+[`docs/agent-rules-backlog.md`](docs/agent-rules-backlog.md). Criteria in
+[`docs/agent-rule-profiles.md`](docs/agent-rule-profiles.md#stop-conditions).
+
+### 20.11 Rule cleanup PR cadence
+
+Every ~10 merged PRs, propose `docs/cleanup-agent-rules` with
+`docs(ai-rules): clean up obsolete agent guidance`. See
+[`docs/agent-rule-profiles.md`](docs/agent-rule-profiles.md#rule-cleanup-cadence).
+
+### 20.12 Enforcement over expansion
+
+Prefer enforcing rules via branch protection, CI, CODEOWNERS, Dependabot,
+Dependency Review, CodeQL, Maven validation, small PRs, and provider tests —
+not endless mandatory text. Track gaps in
+[`docs/agent-rules-backlog.md`](docs/agent-rules-backlog.md#enforcement-over-expansion-section-2012).

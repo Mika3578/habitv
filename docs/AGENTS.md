@@ -22,6 +22,9 @@ changes (Markdown, tracker JSON mirrors, ADRs, audit baselines).
   `docs/maintainability-policy.md` for Habitv-specific agent topics
   (Sections 18–19).
 - AI rule changes require version bump and changelog entry (Section 17).
+- For docs-only AI-rule work, use speed mode (Section 20.8); run drift
+  audit when rules change (Section 17.6).
+- Prefer backlog over new mandatory rules (Section 20.10).
 - Do not use deprecated `hbtv-*` or `HBTV*` IDs in new headings or
   active tracker slugs.
 - No runtime behavior claims without citing source code or tracker items.

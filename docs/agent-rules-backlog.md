@@ -1,7 +1,23 @@
 # Agent rules backlog
 
 Future AI rule improvements. Do not bloat `AGENTS.md` — track candidates
-here. Canonical source: [`AGENTS.md`](../AGENTS.md) Section 17.
+here. Canonical source: [`AGENTS.md`](../AGENTS.md) Sections 17 and 20.
+
+When unsure about a new rule, add here instead of making it mandatory
+(Section 20.10).
+
+## Enforcement over expansion (Section 20.12)
+
+Prefer implementing guardrails through tooling rather than new text:
+
+| Gap | Enforcement target | Status |
+|-----|-------------------|--------|
+| Commit/push without approval | branch protection, human review | partial |
+| Maven validate on code PRs | CI required check | exists |
+| Dependency security | Dependabot + Dependency Review | exists |
+| CodeQL Java 8 | workflow (see candidate below) | proposed |
+| Small PR size | review convention | partial |
+| Provider offline fixtures | CI policy (future) | proposed |
 
 ## Candidate rules
 
@@ -63,5 +79,6 @@ here. Canonical source: [`AGENTS.md`](../AGENTS.md) Section 17.
 
 ## Recently completed
 
+* v1.4.0 productivity and anti-bloat guardrails — see changelog
 * v1.3.0 maintainability guardrails — see changelog
 * v1.1.0 evolutionary governance — see [`agent-rules-changelog.md`](agent-rules-changelog.md)

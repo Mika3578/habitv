@@ -1,0 +1,27 @@
+---
+description: Productivity and anti-bloat — profiles, speed/deep mode, rule budget
+alwaysApply: true
+---
+
+# Agent productivity and scope control
+
+**Purpose:** Keep AI rules useful and fast. Avoid oversized rulebooks that
+slow every task.
+
+**When it applies:** Every task — pick a rule profile before editing.
+
+**Mandatory highlights (`AGENTS.md` Section 20):**
+
+- **Minimum viable ruleset** — mandatory rules in `AGENTS.md`; details in
+  `docs/dev-workflow.md`, path-specific `AGENTS.md`, `.github/instructions/`.
+- **Rule profile** — classify task; do not apply heavy gates to docs-only
+  work (Section 20.2).
+- **Speed mode** vs **deep mode** — match validation to risk (20.8–20.9).
+- **Rule budget** — merge/replace duplicates before adding rules (20.6).
+- **Stop condition** — prefer backlog over new mandatory rules (20.10).
+- **Conflict precedence** — developer instruction → safety → approval →
+  `AGENTS.md` (20.5).
+
+**Canonical reference:** [`docs/agent-rule-profiles.md`](../../docs/agent-rule-profiles.md)
+
+**Lifecycle:** always on; complements Sections 16–19 without replacing them.

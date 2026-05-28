@@ -46,6 +46,9 @@ They exist to keep modernization safe, incremental, and reviewable.
   `docs/provider-policy.md` (Section 18).
 - Behavior/build/config work: see `.cursor/rules/habitv-maintainability.mdc`
   and `docs/maintainability-policy.md` (Section 19).
+- Every task: see `.cursor/rules/agent-productivity.mdc` and
+  `docs/agent-rule-profiles.md` (Section 20) — pick profile; avoid
+  applying heavy gates to docs-only work.
 - Follow `.cursor/rules/git-safety.mdc` for Git workflow and approval
   gates; `.cursor/rules/pr-review.mdc` for PR and Copilot review rules.
 - When AI rules change, run drift audit (Section 17.6), update

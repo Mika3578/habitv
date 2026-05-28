@@ -22,6 +22,7 @@ AI-rules PRs with changelog entry (Section 17).
 | `dependencies.mdc` | 50 | POM/deps | §16.3–16.6 |
 | `workflows.mdc` | 60 | `.github/workflows` | §16.8–16.9 |
 | `cursor-ide.mdc` | — | `.vscode`, `.cursor` | §16.13–16.16 |
+| `agent-productivity.mdc` | — | always | §20 |
 | `habitv-maintainability.mdc` | — | code/build/config | §19 |
 | `habitv-providers.mdc` | 70 | `plugins/**` | §18 |
 | `90-rule-evolution.mdc` | 90 | AI-rule PRs | §17 |

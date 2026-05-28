@@ -63,6 +63,12 @@ See Section 19 and `docs/maintainability-policy.md`. Declare Definition of
 Done; classify PR risk; document ADRs for durable decisions; manual test
 evidence before commit on behavior changes.
 
+## Productivity and anti-bloat
+
+See Section 20 and `docs/agent-rule-profiles.md`. Pick a rule profile at
+task start; use speed mode for low-risk docs-only work; prefer backlog
+over new mandatory rules.
+
 AI agents must never commit, push, create PRs, merge PRs, or resolve
 review threads without explicit developer approval in the current
 conversation. See `AGENTS.md` Section 14. Never resolve GitHub review

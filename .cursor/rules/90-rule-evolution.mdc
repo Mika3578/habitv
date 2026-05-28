@@ -27,6 +27,7 @@ files.
 - Run **Rule drift audit** (Section 17.6) before finishing.
 - End with **Agent rules update report** (Section 17.14).
 - Score new mandatory rules (Section 17.11); use backlog for candidates.
+- Apply rule budget and stop condition (Section 20.6, 20.10).
 - Habitv automation maturity: **Level 1 — Assisted** (Section 17.10).
 
 **Suggested rule improvement:** use when the same agent mistake happens
