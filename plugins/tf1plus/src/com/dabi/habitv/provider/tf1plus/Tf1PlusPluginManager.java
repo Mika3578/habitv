@@ -1,9 +1,14 @@
 package com.dabi.habitv.provider.tf1plus;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,6 +30,10 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 	private static final Logger LOG = Logger.getLogger(Tf1PlusPluginManager.class);
 	private static final Pattern DURATION_HHMMSS_PATTERN = Pattern.compile("^(\\d{1,2}):(\\d{2}):(\\d{2})$");
 	private static final Pattern DURATION_TEXT_PATTERN = Pattern.compile("(\\d+)\\s*(h|mn|min|s)");
+	private static final Pattern TITLE_DATE_PATTERN = Pattern.compile("\\bdu\\s+(?:[a-zéû]+\\s+)?(\\d{1,2})\\s+([a-zéû]+)\\s+(\\d{4})\\b", Pattern.CASE_INSENSITIVE);
+	private static final Set<String> EXCLUDED_PROGRAM_SLUGS = new HashSet<>(Arrays.asList("replay", "videos", "news", "direct", "programme-tv", "recherche", "compte", "mentions-legales", "conditions-generales", "abonnement"));
+	private static final Set<String> EXCLUDED_EPISODE_LABELS = new HashSet<>(Arrays.asList("regarder", "voir plus", "se connecter", "mon compte", "s'abonner"));
+	private static final Map<String, Integer> FRENCH_MONTHS = createFrenchMonths();
 
 	private static final List<Channel> CHANNELS = Arrays.asList(new Channel("TF1", Tf1PlusConf.TF1_REPLAY_URL),
 			new Channel("TMC", Tf1PlusConf.TMC_REPLAY_URL), new Channel("TFX", Tf1PlusConf.TFX_REPLAY_URL),
@@ -59,15 +68,27 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 			return subCategories;
 		}
 		Document doc = Jsoup.parse(content, channel.replayUrl);
-		Elements anchors = doc.select("a[href*=/replay/], a[data-testid*=replay], article a[href]");
+		Elements anchors = doc.select("a[href]");
+		int scannedAnchors = 0;
+		String channelSlug = extractChannelSlug(channel.replayUrl);
+		Set<String> seenUrls = new HashSet<>();
 		for (Element anchor : anchors) {
-			String url = fullUrl(anchor.absUrl("href"));
-			String label = extractEpisodeLabel(anchor);
-			if (StringUtils.isNotEmpty(url) && StringUtils.isNotEmpty(label)) {
+			scannedAnchors++;
+			String url = normalizeProgramUrl(anchor.absUrl("href"));
+			if (!isProgramUrlForChannel(url, channelSlug) || seenUrls.contains(url)) {
+				continue;
+			}
+			String label = extractProgramLabel(anchor);
+			if (StringUtils.isNotEmpty(label)) {
+				seenUrls.add(url);
 				CategoryDTO showCategory = new CategoryDTO(Tf1PlusConf.NAME, label, url, Tf1PlusConf.EXTENSION);
 				showCategory.setDownloadable(true);
 				subCategories.add(showCategory);
 			}
+		}
+		LOG.debug("TF1+ channel " + channel.label + " scanned anchors=" + scannedAnchors + ", programs=" + subCategories.size());
+		if (subCategories.isEmpty()) {
+			LOG.debug("TF1+ no program categories found for channel url: " + channel.replayUrl);
 		}
 		return subCategories;
 	}
@@ -82,33 +103,57 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 				return episodes;
 			}
 			Document doc = Jsoup.parse(content, category.getId());
-			Elements entries = doc.select("article, li, div[class*=card], a[href*=/videos/], a[href*=/replay/]");
-			for (Element entry : entries) {
-				String url = fullUrl(entry.absUrl("href"));
+			Elements anchors = doc.select("a[href*=/videos/]");
+			for (Element anchor : anchors) {
+				String url = normalizeEpisodeUrl(anchor.absUrl("href"));
 				if (StringUtils.isEmpty(url)) {
-					Element link = entry.selectFirst("a[href]");
-					url = link == null ? "" : fullUrl(link.absUrl("href"));
-				}
-				String title = extractEpisodeLabel(entry);
-				if (StringUtils.isEmpty(title)) {
 					continue;
 				}
-				String thumbnail = entry.select("img[src]").attr("abs:src");
-				String description = entry.select("p, [class*=description], [class*=summary]").text();
-				String date = entry.select("time").attr("datetime");
-				String duration = entry.select("[class*=duration], time[aria-label*=dur]").text();
-				if (StringUtils.isNotEmpty(url)) {
+				Element entry = findEpisodeContainer(anchor);
+				String title = extractEpisodeLabel(anchor);
+				if (StringUtils.isEmpty(title)) {
+					title = extractEpisodeLabel(entry);
+				}
+				if (!isValidEpisodeLabel(title)) {
+					continue;
+				}
+				String date = extractEpisodeDateValue(entry);
+				String duration = extractEpisodeDurationValue(entry);
+				EpisodeDTO episode = new EpisodeDTO(category, title, url);
+				Date episodeDate = parseEpisodeDate(date);
+				if (episodeDate == null) {
+					episodeDate = parseEpisodeDateFromTitle(title);
+				}
+				if (episodeDate != null) {
+					episode.setEpisodeDate(episodeDate);
+				}
+				Long durationSeconds = parseDurationSeconds(duration);
+				if (durationSeconds != null) {
+					episode.setDurationSeconds(durationSeconds);
+				}
+				episodes.add(episode);
+			}
+			LOG.debug("TF1+ parsed episodes for " + category.getId() + ": " + episodes.size());
+			if (episodes.isEmpty()) {
+				Elements entries = doc.select("article, li, div[class*=card]");
+				for (Element entry : entries) {
+					Element link = entry.selectFirst("a[href*=/videos/]");
+					String url = link == null ? "" : normalizeEpisodeUrl(link.absUrl("href"));
+					String title = extractEpisodeLabel(entry);
+					if (StringUtils.isEmpty(url) || !isValidEpisodeLabel(title)) {
+						continue;
+					}
 					EpisodeDTO episode = new EpisodeDTO(category, title, url);
-					Date episodeDate = parseEpisodeDate(date);
+					Date episodeDate = parseEpisodeDate(extractEpisodeDateValue(entry));
+					if (episodeDate == null) {
+						episodeDate = parseEpisodeDateFromTitle(title);
+					}
 					if (episodeDate != null) {
 						episode.setEpisodeDate(episodeDate);
 					}
-					Long durationSeconds = parseDurationSeconds(duration);
+					Long durationSeconds = parseDurationSeconds(extractEpisodeDurationValue(entry));
 					if (durationSeconds != null) {
 						episode.setDurationSeconds(durationSeconds);
-					}
-					if (StringUtils.isNotEmpty(description) || StringUtils.isNotEmpty(thumbnail)) {
-						LOG.debug("TF1+ metadata ignored for filename generation, url=" + url);
 					}
 					episodes.add(episode);
 				}
@@ -117,6 +162,109 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 			LOG.warn("TF1+ replay parsing warning for " + category.getId() + ": " + e.getMessage());
 		}
 		return episodes;
+	}
+
+	private String extractChannelSlug(String channelUrl) {
+		if (StringUtils.isEmpty(channelUrl)) {
+			return "";
+		}
+		String normalized = channelUrl.toLowerCase(Locale.ROOT);
+		if (normalized.startsWith(Tf1PlusConf.HOME_URL)) {
+			normalized = normalized.substring(Tf1PlusConf.HOME_URL.length());
+		}
+		String[] parts = normalized.split("/");
+		for (String part : parts) {
+			if (StringUtils.isNotEmpty(part)) {
+				return part;
+			}
+		}
+		return "";
+	}
+
+	private String normalizeProgramUrl(String href) {
+		if (StringUtils.isEmpty(href) || !href.startsWith(Tf1PlusConf.HOME_URL)) {
+			return "";
+		}
+		String clean = href.split("\\?")[0].split("#")[0];
+		return clean.endsWith("/") ? clean.substring(0, clean.length() - 1) : clean;
+	}
+
+	private boolean isProgramUrlForChannel(String url, String channelSlug) {
+		if (StringUtils.isEmpty(url) || StringUtils.isEmpty(channelSlug) || !url.startsWith(Tf1PlusConf.HOME_URL + "/" + channelSlug + "/")) {
+			return false;
+		}
+		String path = url.substring((Tf1PlusConf.HOME_URL + "/" + channelSlug + "/").length());
+		if (StringUtils.isEmpty(path) || path.contains("/")) {
+			return false;
+		}
+		String slug = path.toLowerCase(Locale.ROOT);
+		return !EXCLUDED_PROGRAM_SLUGS.contains(slug);
+	}
+
+	private String extractProgramLabel(Element anchor) {
+		String label = extractEpisodeLabel(anchor);
+		if (StringUtils.isEmpty(label)) {
+			label = anchor.attr("title");
+		}
+		if (StringUtils.isEmpty(label)) {
+			label = anchor.attr("aria-label");
+		}
+		if (StringUtils.isEmpty(label)) {
+			Element img = anchor.selectFirst("img[alt], img[title]");
+			if (img != null) {
+				label = StringUtils.isNotEmpty(img.attr("alt")) ? img.attr("alt") : img.attr("title");
+			}
+		}
+		return normalizeLabel(label);
+	}
+
+	private String normalizeLabel(String value) {
+		if (StringUtils.isEmpty(value)) {
+			return "";
+		}
+		String normalized = value.replaceAll("\\s+", " ").trim();
+		return normalized.length() > 120 ? normalized.substring(0, 120) : normalized;
+	}
+
+	private String normalizeEpisodeUrl(String href) {
+		if (StringUtils.isEmpty(href) || !href.startsWith(Tf1PlusConf.HOME_URL) || !href.contains("/videos/")) {
+			return "";
+		}
+		String clean = href.split("\\?")[0].split("#")[0];
+		String lower = clean.toLowerCase(Locale.ROOT);
+		if (lower.contains("/compte/") || lower.contains("/recherche") || lower.endsWith("/videos")) {
+			return "";
+		}
+		return clean.endsWith("/") ? clean.substring(0, clean.length() - 1) : clean;
+	}
+
+	private Element findEpisodeContainer(Element anchor) {
+		Element container = anchor.closest("article, li, div[class*=card]");
+		return container == null ? anchor : container;
+	}
+
+	private String extractEpisodeDateValue(Element entry) {
+		String date = entry.select("time[datetime]").attr("datetime");
+		if (StringUtils.isNotEmpty(date)) {
+			return date;
+		}
+		return entry.select("[data-date], [datetime]").attr("data-date");
+	}
+
+	private String extractEpisodeDurationValue(Element entry) {
+		String duration = entry.select("[class*=duration], time[aria-label*=dur]").text();
+		if (StringUtils.isNotEmpty(duration)) {
+			return duration;
+		}
+		return entry.select("[data-duration]").attr("data-duration");
+	}
+
+	private boolean isValidEpisodeLabel(String title) {
+		if (StringUtils.isEmpty(title)) {
+			return false;
+		}
+		String normalized = title.toLowerCase(Locale.ROOT).trim();
+		return !EXCLUDED_EPISODE_LABELS.contains(normalized);
 	}
 
 	private Date parseEpisodeDate(String rawDate) {
@@ -147,6 +295,37 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 			return calendar.getTime();
 		} catch (RuntimeException e) {
 			LOG.debug("TF1+ unable to parse episode date: " + rawDate);
+			return null;
+		}
+	}
+
+	private Date parseEpisodeDateFromTitle(String title) {
+		if (StringUtils.isEmpty(title)) {
+			return null;
+		}
+		Matcher matcher = TITLE_DATE_PATTERN.matcher(title.toLowerCase(Locale.ROOT));
+		if (!matcher.find()) {
+			return null;
+		}
+		try {
+			int day = Integer.parseInt(matcher.group(1));
+			Integer month = FRENCH_MONTHS.get(matcher.group(2));
+			int year = Integer.parseInt(matcher.group(3));
+			if (month == null) {
+				return null;
+			}
+			Calendar calendar = Calendar.getInstance();
+			calendar.setLenient(false);
+			calendar.set(Calendar.YEAR, year);
+			calendar.set(Calendar.MONTH, month.intValue() - 1);
+			calendar.set(Calendar.DAY_OF_MONTH, day);
+			calendar.set(Calendar.HOUR_OF_DAY, 0);
+			calendar.set(Calendar.MINUTE, 0);
+			calendar.set(Calendar.SECOND, 0);
+			calendar.set(Calendar.MILLISECOND, 0);
+			return calendar.getTime();
+		} catch (RuntimeException e) {
+			LOG.debug("TF1+ unable to parse date from title: " + title);
 			return null;
 		}
 	}
@@ -182,18 +361,17 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 	}
 
 	private String extractEpisodeLabel(Element node) {
-		String title = node.select("h1, h2, h3, [class*=title], [data-testid*=title]").text();
+		String title = node.select("h1, h2, h3, h4, [class*=title], [data-testid*=title]").text();
+		if (StringUtils.isEmpty(title)) {
+			title = node.attr("title");
+		}
+		if (StringUtils.isEmpty(title)) {
+			title = node.attr("aria-label");
+		}
 		if (StringUtils.isEmpty(title)) {
 			title = node.ownText();
 		}
-		return title == null ? "" : title.trim();
-	}
-
-	private String fullUrl(String url) {
-		if (StringUtils.isEmpty(url)) {
-			return "";
-		}
-		return url.startsWith("/") ? Tf1PlusConf.HOME_URL + url : url;
+		return normalizeLabel(title);
 	}
 
 	private static class Channel {
@@ -204,5 +382,25 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 			this.label = label;
 			this.replayUrl = replayUrl;
 		}
+	}
+
+	private static Map<String, Integer> createFrenchMonths() {
+		Map<String, Integer> months = new HashMap<>();
+		months.put("janvier", Integer.valueOf(1));
+		months.put("fevrier", Integer.valueOf(2));
+		months.put("février", Integer.valueOf(2));
+		months.put("mars", Integer.valueOf(3));
+		months.put("avril", Integer.valueOf(4));
+		months.put("mai", Integer.valueOf(5));
+		months.put("juin", Integer.valueOf(6));
+		months.put("juillet", Integer.valueOf(7));
+		months.put("aout", Integer.valueOf(8));
+		months.put("août", Integer.valueOf(8));
+		months.put("septembre", Integer.valueOf(9));
+		months.put("octobre", Integer.valueOf(10));
+		months.put("novembre", Integer.valueOf(11));
+		months.put("decembre", Integer.valueOf(12));
+		months.put("décembre", Integer.valueOf(12));
+		return months;
 	}
 }

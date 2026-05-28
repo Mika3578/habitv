@@ -2,10 +2,13 @@ package com.dabi.habitv.provider.tf1plus;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
 
 import org.junit.Test;
@@ -36,16 +39,49 @@ public class Tf1PlusOfflineParsingTest {
 	}
 
 	@Test
-	public void shouldParseReplayItemFromOfflineFixture() {
+	public void shouldDiscoverProgramCategoriesFromTf1ReplayChannelPage() {
 		Tf1PlusPluginManager plugin = new FixtureTf1PlusPluginManager();
-		CategoryDTO category = new CategoryDTO(Tf1PlusConf.NAME, "TF1", Tf1PlusConf.TF1_REPLAY_URL, Tf1PlusConf.EXTENSION);
+		Set<CategoryDTO> categories = plugin.findCategory();
+		CategoryDTO tf1 = findByName(categories, "TF1");
+		assertNotNull(tf1);
+		Set<CategoryDTO> subCategories = tf1.getSubCategories();
+		assertEquals(3, subCategories.size());
+		Set<String> programNames = new HashSet<String>();
+		for (CategoryDTO subCategory : subCategories) {
+			programNames.add(subCategory.getName());
+			assertTrue(subCategory.isDownloadable());
+		}
+		assertEquals(new HashSet<String>(java.util.Arrays.asList("Demain nous appartient", "Ici tout commence", "Koh-Lanta")), programNames);
+	}
+
+	@Test
+	public void shouldIgnoreFooterNavigationReplayAndExternalLinks() {
+		Tf1PlusPluginManager plugin = new FixtureTf1PlusPluginManager();
+		CategoryDTO tf1 = findByName(plugin.findCategory(), "TF1");
+		assertNotNull(tf1);
+		Map<String, String> urlsByName = new HashMap<String, String>();
+		for (CategoryDTO subCategory : tf1.getSubCategories()) {
+			urlsByName.put(subCategory.getName(), subCategory.getId());
+		}
+		assertNull(urlsByName.get("Replay"));
+		assertNull(urlsByName.get("Videos"));
+		assertNull(urlsByName.get("Direct"));
+		assertNull(urlsByName.get("Account"));
+		assertNull(urlsByName.get("External"));
+	}
+
+	@Test
+	public void shouldParseEpisodeRowsFromProgramPageWithShortNamesOnly() {
+		Tf1PlusPluginManager plugin = new FixtureTf1PlusPluginManager();
+		CategoryDTO category = new CategoryDTO(Tf1PlusConf.NAME, "Demain nous appartient", "https://www.tf1.fr/tf1/demain-nous-appartient", Tf1PlusConf.EXTENSION);
 		Set<EpisodeDTO> episodes = plugin.findEpisode(category);
 		assertEquals(1, episodes.size());
 		EpisodeDTO episode = episodes.iterator().next();
-		assertEquals("https://www.tf1.fr/tf1/replay/journal-20h/videos/jt-20h-edition-du-15-mai-2026.html", episode.getId());
-		assertEquals("JT 20H - Edition du 15 mai", episode.getName());
+		assertEquals("https://www.tf1.fr/tf1/demain-nous-appartient/videos/demain-nous-appartient-du-mercredi-27-mai-2026-episode-2213.html", episode.getId());
+		assertEquals("Demain nous appartient du mercredi 27 mai 2026 - episode 2213", episode.getName());
+		assertFalse(episode.getName().contains("thumbnail.example"));
 		assertNotNull(episode.getEpisodeDate());
-		assertEquals(Long.valueOf(2100L), episode.getDurationSeconds());
+		assertEquals(Long.valueOf(1560L), episode.getDurationSeconds());
 	}
 
 	@Test
@@ -59,5 +95,14 @@ public class Tf1PlusOfflineParsingTest {
 		CategoryDTO category = new CategoryDTO(Tf1PlusConf.NAME, "TF1", Tf1PlusConf.TF1_REPLAY_URL, Tf1PlusConf.EXTENSION);
 		Set<EpisodeDTO> episodes = plugin.findEpisode(category);
 		assertTrue(episodes.isEmpty());
+	}
+
+	private CategoryDTO findByName(Set<CategoryDTO> categories, String name) {
+		for (CategoryDTO category : categories) {
+			if (name.equals(category.getName())) {
+				return category;
+			}
+		}
+		return null;
 	}
 }
