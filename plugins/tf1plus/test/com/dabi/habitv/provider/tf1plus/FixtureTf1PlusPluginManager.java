@@ -16,6 +16,9 @@ public class FixtureTf1PlusPluginManager extends Tf1PlusPluginManager {
 			if (url.contains("/tf1/demain-nous-appartient")) {
 				return new String(Files.readAllBytes(Paths.get("test/resources/fixtures/tf1plus/tf1-program-page.html")), StandardCharsets.UTF_8);
 			}
+			if (url.contains("/tf1/miraculous")) {
+				return new String(Files.readAllBytes(Paths.get("test/resources/fixtures/tf1plus/tf1-program-miraculous-page.html")), StandardCharsets.UTF_8);
+			}
 			return "";
 		} catch (IOException e) {
 			throw new IllegalStateException("unable to read tf1plus fixture", e);
