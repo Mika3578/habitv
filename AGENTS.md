@@ -337,7 +337,7 @@ Before opening a PR:
    Section 14.5).
 3. Complete Section 14 pre-commit and pre-push gates, including
    Copilot review handling (Section 14.4).
-4. Run validation per Section 14.2 (full gate) or document why it was
+4. Run validation per Section 14.2 (tiered gate) or document why it was
    skipped for docs-only work.
 5. Include exact validation results in the PR body.
 6. Ask for explicit developer approval before `gh pr create`
@@ -726,23 +726,36 @@ exactly:
 
 > Approve force-with-lease push?
 
-### 14.2 Full build and test validation gate
+### 14.2 Maven validation gate (tiered)
 
-Before asking for commit approval, the agent must run the complete
-validation gate unless explicitly told otherwise by the developer.
+Before asking for commit approval, run the validation tier that matches the
+change unless the developer explicitly relaxes this gate.
 
-Default validation for code changes:
+| Tier | When | Commands |
+|------|------|----------|
+| **Docs-only** | Markdown/rules only; no Java, POM, workflow, or runtime files | Maven **may be skipped** with a clear note |
+| **Standard code** | Typical module or narrow code changes | `mvn -B -ntp validate` plus targeted module tests when relevant |
+| **Risky / code-wide** | Multi-module, core framework, or broad behavior changes | `mvn -B -ntp test` (add `-pl <module> -am` when scoped) |
+| **Packaging / release / JavaFX / full app** | Packaging, release prep, or full-app validation | `mvn -B -ntp -DskipTests clean package` **only** when the environment supports it (JavaFX/`jdk.home`) and scope requires it |
+
+**Standard code** example:
 
 ```bash
-mvn -B -ntp -DskipTests clean package
+mvn -B -ntp validate
+mvn -B -ntp -pl <module> -am test   # when module-specific
+```
+
+**Risky / code-wide** example:
+
+```bash
+mvn -B -ntp validate
 mvn -B -ntp test
 ```
 
-When a specific Maven module is changed, also run the relevant targeted
-module validation, for example:
+**Packaging / full-app** example (when in scope and environment supports it):
 
 ```bash
-mvn -B -ntp -pl <module> -am test
+mvn -B -ntp -DskipTests clean package
 ```
 
 For documentation-only changes, the agent may skip Maven validation only
@@ -750,17 +763,16 @@ if it clearly states:
 
 - this is documentation-only;
 - no Java source, POM, workflow, or runtime file was changed;
-- full Maven validation was not run;
+- Maven validation was not run;
 - the branch is not validated for runtime behavior.
 
-If full build or full tests are skipped for any code-impacting change,
-the agent must mark the work as:
+If the required tier for a code-impacting change was skipped without
+developer approval, mark the work as:
 
 > Not ready to commit.
 
 Section 6 documents CI-safe baselines; this subsection is the
-**pre-commit** gate and is stricter unless the developer explicitly
-relaxes it.
+**pre-commit** gate unless the developer explicitly relaxes it.
 
 ### 14.3 Real functional testing gate
 
@@ -984,7 +996,6 @@ Branch names must use allowed conventional prefixes such as:
 - `refactor/`
 - `chore/`
 - `ci/`
-- `build/`
 
 The agent must not create random Claude/Cursor-style branch names.
 
@@ -1172,13 +1183,22 @@ Document the drift check result in the pre-commit checklist.
 Before asking for commit approval, the agent must run or document the
 relevant repository health checks.
 
-**For code changes:**
+**For code changes:** run the tier from Section 14.2 (docs-only skip,
+standard `validate` + targeted tests, risky `test`, packaging `clean package`
+when in scope).
+
+Example **standard code** tier:
 
 ```bash
-mvn -B -ntp -DskipTests clean package
+mvn -B -ntp validate
+mvn -B -ntp -pl <module> -am test   # when module-specific
+```
+
+Example **risky / code-wide** tier:
+
+```bash
+mvn -B -ntp validate
 mvn -B -ntp test
-# plus targeted module tests when relevant:
-mvn -B -ntp -pl <module> -am test
 ```
 
 **For documentation-only AI-rule changes:**
@@ -1948,15 +1968,27 @@ yet validated**.
 
 ### 16.11 Maven quality gate
 
-For Maven changes, prefer explicit validation.
+For Maven changes, prefer explicit validation per Section 14.2 tiers.
 
-Default commands:
+**Standard code** (typical module or POM change):
 
 ```bash
 mvn -B -ntp validate
-mvn -B -ntp -DskipTests clean package
-mvn -B -ntp test
 mvn -B -ntp -pl <module> -am test   # when module-specific
+```
+
+**Risky / code-wide** changes:
+
+```bash
+mvn -B -ntp validate
+mvn -B -ntp test
+```
+
+**Packaging / release / full-app** (only when in scope and JavaFX/`jdk.home`
+environment supports it):
+
+```bash
+mvn -B -ntp -DskipTests clean package
 ```
 
 For dependency analysis:
@@ -2118,7 +2150,7 @@ PR separate from behavior changes.
 ### 16.24 Branch naming for fast work
 
 Use predictable branch names: `fix/`, `feat/`, `docs/`, `test/`, `ci/`,
-`chore/`, `build/`, `refactor/` + short topic.
+`chore/`, `refactor/` + short topic.
 
 Avoid: `claude/*`, `cursor/*`, random generated names, ticket/style IDs,
 vague names like `update-stuff`. See Section 4.
@@ -2514,12 +2546,34 @@ See [`docs/dependency-policy.md`](docs/dependency-policy.md).
 SBOM generation (e.g. CycloneDX Maven plugin) belongs in a **dedicated
 security/tooling PR** — not unrelated work.
 
+**Prerequisites before enablement or CI changes:**
+
+- a dedicated tracker item;
+- a dedicated security/tooling PR;
+- an ADR when the change affects repository policy or CI behavior;
+- no enablement in unrelated PRs.
+
+Section 2 still forbids adding OWASP/SBOM/static-analysis plugins without
+an explicit tracker item and ADR.
+
 Document where SBOM is generated. Do not commit generated SBOM files unless
 required. Prefer CI artifact upload.
 
 ### 18.10 OWASP Dependency-Check rule
 
 If OWASP Dependency-Check is used:
+
+**Prerequisites before enablement or CI changes:**
+
+- a dedicated tracker item;
+- a dedicated security/tooling PR;
+- an ADR when the change affects repository policy or CI behavior;
+- no enablement in unrelated PRs.
+
+Section 2 still forbids adding OWASP/SBOM/static-analysis plugins without
+an explicit tracker item and ADR.
+
+Operational rules:
 
 - do not disable it to green CI;
 - do not cache corrupted vulnerability databases;

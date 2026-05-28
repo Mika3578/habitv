@@ -28,7 +28,7 @@ Long explanations, examples, and templates belong in:
 | dependency/security | medium–high | full | §16.3–16.4, §19.5–19.6 | dependency + security |
 | CI/workflow | medium | validate | §15, workflows | CI impact |
 | IDE/tooling | low–medium | skip unless POM touched | §16.16 | tooling notes |
-| packaging | high | package when in scope | §18.12, §19.3 | release + rollback |
+| packaging | high | package when in scope | §18.13, §19.3, `release-policy.md` | release + rollback |
 | Java migration | critical | dedicated plan | §2, §18.7, §19.4 | migration report |
 | release preparation | high–critical | full + manual | §18.13, §19 | release readiness |
 | investigation only | low | skip | — | findings only |

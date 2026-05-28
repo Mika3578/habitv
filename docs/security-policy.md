@@ -20,7 +20,7 @@ documented CVEs, the agent must:
    transitive.
 2. Prefer upgrading to a **Java 8-compatible** safe version.
 3. Document if no Java 8-compatible fix exists and propose alternatives.
-4. Run full Maven validation after the fix.
+4. Run the appropriate Maven validation tier (Section 14.2) after the fix.
 5. Avoid suppressing alerts without a clear written reason.
 
 ## Agent must not
@@ -80,12 +80,26 @@ Security PRs should be focused:
 ## SBOM (Section 18.9)
 
 Propose CycloneDX or equivalent in a **dedicated security/tooling PR**.
+Do not enable in unrelated PRs.
+
+**Prerequisites:**
+
+- a dedicated tracker item;
+- a dedicated security/tooling PR;
+- an ADR when the change affects repository policy or CI behavior.
+
+`AGENTS.md` Section 2 still forbids adding SBOM plugins without an
+explicit tracker item and ADR.
+
 Document generation location. Do not commit generated SBOM unless required.
 Prefer CI artifacts.
 
 ## OWASP Dependency-Check (Section 18.10)
 
-If used:
+If used, same prerequisites as SBOM (tracker item, dedicated security PR,
+ADR when policy/CI changes; no unrelated PR enablement; Section 2 hard rule).
+
+Operational rules:
 
 - do not disable to green CI;
 - stable cache; no corrupted DB cache;

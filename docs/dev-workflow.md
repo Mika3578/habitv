@@ -33,7 +33,7 @@ refactor, packaging, migration preparation, or investigation only.
 1. Create a work branch from latest `origin/develop` (never work on
    `develop` directly).
 2. Use conventional branch prefixes: `fix/`, `feat/`, `docs/`, `test/`,
-   `ci/`, `chore/`, `build/`, `refactor/`.
+   `ci/`, `chore/`, `refactor/`.
 3. Keep PRs small when possible (under 10 files preferred).
 4. Rebase on `origin/develop` to update; never merge `develop` into the
    PR branch.
@@ -41,16 +41,30 @@ refactor, packaging, migration preparation, or investigation only.
 
 ## Validation
 
-**Code changes** (pre-commit):
+Validation tiers (`AGENTS.md` Section 14.2):
+
+**Docs-only:** `git diff --check`; Maven may be skipped with a clear note.
+
+**Standard code changes:**
 
 ```bash
-mvn -B -ntp -DskipTests clean package
-mvn -B -ntp test
+mvn -B -ntp validate
 mvn -B -ntp -pl <module> -am test   # when module-specific
 ```
 
-**Docs-only changes:** `git diff --check`; no Maven unless POM/workflow
-files changed.
+**Risky / code-wide changes:**
+
+```bash
+mvn -B -ntp validate
+mvn -B -ntp test
+```
+
+**Packaging / release / full-app** (when in scope and JavaFX/`jdk.home`
+environment supports it):
+
+```bash
+mvn -B -ntp -DskipTests clean package
+```
 
 Provide exact command output — not vague "build ok" claims (Section 15.15).
 
@@ -70,8 +84,9 @@ Recommended extensions: [`.vscode/extensions.json`](../.vscode/extensions.json).
 Repository rules live in `.cursor/rules/` and `AGENTS.md`. User-level
 Cursor settings are personal preferences only.
 
-Use `agent_space/` for temporary agent scratch work (gitignored per
-`.gitignore`).
+Use `agent_space/` for temporary agent scratch work. If `agent_space/` is
+missing from `.gitignore`, propose adding it in a dedicated tooling PR
+(per `AGENTS.md` Section 15.21).
 
 ## CI overview
 

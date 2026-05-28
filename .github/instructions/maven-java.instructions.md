@@ -14,20 +14,31 @@ Canonical workflow policy: `AGENTS.md`. Do not contradict it.
 
 ## Pre-commit validation
 
-Before commit approval, default validation for code changes:
+Before commit approval, use the tier from `AGENTS.md` Section 14.2. Do
+**not** require root `clean package` for every code change.
+
+**Standard code:**
 
 ```
-mvn -B -ntp -DskipTests clean package
-mvn -B -ntp test
-```
-
-Targeted module validation when relevant:
-
-```
+mvn -B -ntp validate
 mvn -B -ntp -pl <module> -am test
 ```
 
-If validation is skipped for a code-impacting change, mark:
+**Risky / code-wide:**
+
+```
+mvn -B -ntp validate
+mvn -B -ntp test
+```
+
+**Packaging / full-app** (when in scope and environment supports JavaFX):
+
+```
+mvn -B -ntp -DskipTests clean package
+```
+
+If the required tier was skipped for a code-impacting change without
+developer approval, mark:
 
 > Not ready to commit.
 

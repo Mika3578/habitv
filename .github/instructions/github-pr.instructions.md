@@ -64,4 +64,4 @@ comments, labels, review requests, or resolution (Section 15.25).
 ## Branch naming
 
 Allowed prefixes: `feat/`, `fix/`, `docs/`, `test/`, `refactor/`,
-`chore/`, `ci/`, `build/`. No random tool-generated branch names.
+`chore/`, `ci/`. No random tool-generated branch names.

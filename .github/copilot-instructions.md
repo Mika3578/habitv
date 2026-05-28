@@ -94,15 +94,33 @@ See `.github/instructions/maven-java.instructions.md` and
 ## Default validation
 
 Pre-commit validation for AI agents is defined in `AGENTS.md` Section
-14.2. Default for code changes:
+14.2 (tiered). Do **not** require root `clean package` for every code change.
+
+**Standard code** tier:
 
 ```
-mvn -B -ntp -DskipTests clean package
+mvn -B -ntp validate
+mvn -B -ntp -pl <module> -am test   # when module-specific
+```
+
+**Risky / code-wide** tier:
+
+```
+mvn -B -ntp validate
 mvn -B -ntp test
 ```
 
-For a quick CI-safe sanity check (not sufficient alone before commit
-approval unless the developer explicitly relaxes Section 14.2):
+**Packaging / full-app** tier (only when in scope and JavaFX/`jdk.home`
+environment supports it):
+
+```
+mvn -B -ntp -DskipTests clean package
+```
+
+**Docs-only:** Maven may be skipped with a clear note.
+
+CI-safe sanity check (not sufficient alone before commit approval unless
+the developer explicitly relaxes Section 14.2):
 
 ```
 mvn -B -ntp -DskipTests validate

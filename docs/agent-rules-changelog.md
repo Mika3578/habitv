@@ -153,7 +153,8 @@ Version history for Habitv AI agent rules. Canonical source: [`AGENTS.md`](../AG
 * Companion docs: `dev-workflow.md`, `dependency-policy.md`,
   `security-policy.md`.
 * VS Code extension recommendations and `settings.example.json`.
-* `agent_space/` gitignore entry.
+* Guidance to propose `agent_space/` gitignore entry in a tooling PR (not
+  committed in the initial rules rollout).
 
 ### Changed
 

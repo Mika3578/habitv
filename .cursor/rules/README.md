@@ -1,6 +1,6 @@
 # Cursor rules index
 
-Canonical source: [`AGENTS.md`](../AGENTS.md). Cursor rules **extend** it;
+Canonical source: [`AGENTS.md`](../../AGENTS.md). Cursor rules **extend** it;
 they must not contradict it or hold unique critical policy.
 
 ## Purpose

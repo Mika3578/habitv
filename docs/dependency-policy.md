@@ -14,8 +14,9 @@ and tooling dependencies managed through the repository.
 - **No mixing** — do not combine dependency updates with feature work.
 - **Java 8 first** — preserve Java 8 compatibility unless a dedicated
   migration task and ADR authorize otherwise.
-- **Full validation** — run full Maven validation after any dependency
-  change.
+- **Tiered validation** — run the Section 14.2 tier for the change scope;
+  full root `clean package` only for packaging/release/full-app work when
+  the environment supports it.
 
 ## Update categories
 
@@ -58,8 +59,9 @@ report** (Section 16.3):
 mvn -B -ntp dependency:tree
 mvn -B -ntp versions:display-dependency-updates
 mvn -B -ntp versions:display-plugin-updates
-mvn -B -ntp -DskipTests clean package
-mvn -B -ntp test
+mvn -B -ntp validate
+mvn -B -ntp -pl <module> -am test   # standard dependency scope
+mvn -B -ntp test                    # risky or wide dependency impact
 ```
 
 ## Forbidden without tracker + ADR

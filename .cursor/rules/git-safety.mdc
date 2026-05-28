@@ -113,7 +113,7 @@ validation after `git rebase --continue`.
 ## Branch naming
 
 Use conventional prefixes only: `feat/`, `fix/`, `docs/`, `test/`,
-`refactor/`, `chore/`, `ci/`, `build/`. No random tool-generated names.
+`refactor/`, `chore/`, `ci/`. No random tool-generated names.
 English only. No `hbtv-*` or `HBTV*` IDs.
 
 ## Destructive commands
