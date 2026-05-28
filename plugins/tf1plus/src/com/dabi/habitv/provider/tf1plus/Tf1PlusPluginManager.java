@@ -70,12 +70,20 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 		Document doc = Jsoup.parse(content, channel.replayUrl);
 		Elements anchors = doc.select("a[href]");
 		int scannedAnchors = 0;
+		int candidateProgramLinks = 0;
+		int rejectedLinks = 0;
 		String channelSlug = extractChannelSlug(channel.replayUrl);
 		Set<String> seenUrls = new HashSet<>();
 		for (Element anchor : anchors) {
 			scannedAnchors++;
 			String url = normalizeProgramUrl(anchor.absUrl("href"));
+			if (StringUtils.isEmpty(url)) {
+				rejectedLinks++;
+				continue;
+			}
+			candidateProgramLinks++;
 			if (!isProgramUrlForChannel(url, channelSlug) || seenUrls.contains(url)) {
+				rejectedLinks++;
 				continue;
 			}
 			String label = extractProgramLabel(anchor);
@@ -84,9 +92,11 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 				CategoryDTO showCategory = new CategoryDTO(Tf1PlusConf.NAME, label, url, Tf1PlusConf.EXTENSION);
 				showCategory.setDownloadable(true);
 				subCategories.add(showCategory);
+			} else {
+				rejectedLinks++;
 			}
 		}
-		LOG.debug("TF1+ channel " + channel.label + " scanned anchors=" + scannedAnchors + ", programs=" + subCategories.size());
+		LOG.debug("TF1+ channel " + channel.label + " scanned anchors=" + scannedAnchors + ", candidates=" + candidateProgramLinks + ", rejected=" + rejectedLinks + ", programs=" + subCategories.size());
 		if (subCategories.isEmpty()) {
 			LOG.debug("TF1+ no program categories found for channel url: " + channel.replayUrl);
 		}
