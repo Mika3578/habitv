@@ -16,6 +16,8 @@ public class YtDlpCmdExecutor extends CmdExecutor {
 
 	private static final Pattern PROGRESS_PATTERN = Pattern
 			.compile(".*\\s(\\d+.\\d+)%.*");
+	private static final String DRM_PROTECTED_SIGNATURE = "this video is drm protected";
+	private static final String DRM_PROTECTED_MESSAGE = "This TF1+ video is DRM protected and cannot be downloaded by yt-dlp.";
 
 	private final String executablePath;
 
@@ -49,7 +51,14 @@ public class YtDlpCmdExecutor extends CmdExecutor {
 			return new ExecutorFailedException(failedCmd, fullOutput,
 					YtDlpRuntimeDiagnostics.buildBootstrapFailureUserMessage(pathForMessage), cause);
 		}
+		if (containsDrmProtectedSignature(fullOutput) || containsDrmProtectedSignature(lastLine)) {
+			return new ExecutorFailedException(failedCmd, fullOutput, DRM_PROTECTED_MESSAGE, cause);
+		}
 		return super.buildFailureException(failedCmd, fullOutput, lastLine, cause);
+	}
+
+	private boolean containsDrmProtectedSignature(final String output) {
+		return output != null && output.toLowerCase().contains(DRM_PROTECTED_SIGNATURE);
 	}
 
 	@Override

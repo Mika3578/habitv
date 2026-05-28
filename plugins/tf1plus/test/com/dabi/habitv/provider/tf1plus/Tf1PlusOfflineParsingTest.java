@@ -78,10 +78,23 @@ public class Tf1PlusOfflineParsingTest {
 		assertEquals(1, episodes.size());
 		EpisodeDTO episode = episodes.iterator().next();
 		assertEquals("https://www.tf1.fr/tf1/demain-nous-appartient/videos/demain-nous-appartient-du-mercredi-27-mai-2026-episode-2213.html", episode.getId());
-		assertEquals("Demain nous appartient du mercredi 27 mai 2026 - episode 2213", episode.getName());
+		assertEquals("Saison 13 Episode 38 du 27 mai 2026", episode.getName());
 		assertFalse(episode.getName().contains("thumbnail.example"));
 		assertNotNull(episode.getEpisodeDate());
 		assertEquals(Long.valueOf(1560L), episode.getDurationSeconds());
+	}
+
+	@Test
+	public void shouldKeepNaturalEpisodeTitleUnchanged() {
+		Tf1PlusPluginManager plugin = new FixtureTf1PlusPluginManager();
+		CategoryDTO category = new CategoryDTO(Tf1PlusConf.NAME, "Miraculous", "https://www.tf1.fr/tf1/miraculous", Tf1PlusConf.EXTENSION);
+		Set<EpisodeDTO> episodes = plugin.findEpisode(category);
+		assertEquals(1, episodes.size());
+		EpisodeDTO episode = episodes.iterator().next();
+		assertEquals("Miraculous : Les Aventures de Ladybug et Chat Noir - Renverse-Coeurs", episode.getName());
+		assertFalse(episode.getName().contains("thumbnail.example"));
+		assertNotNull(episode.getEpisodeDate());
+		assertEquals(Long.valueOf(1320L), episode.getDurationSeconds());
 	}
 
 	@Test

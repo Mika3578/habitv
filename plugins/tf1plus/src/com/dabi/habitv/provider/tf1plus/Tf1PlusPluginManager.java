@@ -31,6 +31,7 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 	private static final Pattern DURATION_HHMMSS_PATTERN = Pattern.compile("^(\\d{1,2}):(\\d{2}):(\\d{2})$");
 	private static final Pattern DURATION_TEXT_PATTERN = Pattern.compile("(\\d+)\\s*(h|mn|min|s)");
 	private static final Pattern TITLE_DATE_PATTERN = Pattern.compile("\\bdu\\s+(?:[a-zéû]+\\s+)?(\\d{1,2})\\s+([a-zéû]+)\\s+(\\d{4})\\b", Pattern.CASE_INSENSITIVE);
+	private static final Pattern EPISODE_CTA_PREFIX_PATTERN = Pattern.compile("^(regarder la vid[ée]o|voir la vid[ée]o|lecture|play)\\s+", Pattern.CASE_INSENSITIVE);
 	private static final Set<String> EXCLUDED_PROGRAM_SLUGS = new HashSet<>(Arrays.asList("replay", "videos", "news", "direct", "programme-tv", "recherche", "compte", "mentions-legales", "conditions-generales", "abonnement"));
 	private static final Set<String> EXCLUDED_EPISODE_LABELS = new HashSet<>(Arrays.asList("regarder", "voir plus", "se connecter", "mon compte", "s'abonner"));
 	private static final Map<String, Integer> FRENCH_MONTHS = createFrenchMonths();
@@ -124,6 +125,7 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 				if (StringUtils.isEmpty(title)) {
 					title = extractEpisodeLabel(entry);
 				}
+				title = cleanEpisodeTitle(title);
 				if (!isValidEpisodeLabel(title)) {
 					continue;
 				}
@@ -149,7 +151,7 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 				for (Element entry : entries) {
 					Element link = entry.selectFirst("a[href*=/videos/]");
 					String url = link == null ? "" : normalizeEpisodeUrl(link.absUrl("href"));
-					String title = extractEpisodeLabel(entry);
+					String title = cleanEpisodeTitle(extractEpisodeLabel(entry));
 					if (StringUtils.isEmpty(url) || !isValidEpisodeLabel(title)) {
 						continue;
 					}
@@ -275,6 +277,19 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 		}
 		String normalized = title.toLowerCase(Locale.ROOT).trim();
 		return !EXCLUDED_EPISODE_LABELS.contains(normalized);
+	}
+
+	private String cleanEpisodeTitle(String rawTitle) {
+		if (StringUtils.isEmpty(rawTitle)) {
+			return "";
+		}
+		String cleaned = normalizeLabel(rawTitle);
+		Matcher matcher = EPISODE_CTA_PREFIX_PATTERN.matcher(cleaned);
+		while (matcher.find()) {
+			cleaned = cleaned.substring(matcher.end()).trim();
+			matcher = EPISODE_CTA_PREFIX_PATTERN.matcher(cleaned);
+		}
+		return normalizeLabel(cleaned);
 	}
 
 	private Date parseEpisodeDate(String rawDate) {
