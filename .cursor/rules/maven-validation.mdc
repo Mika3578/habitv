@@ -1,0 +1,69 @@
+---
+description: Pre-commit Maven build and test validation gates
+globs:
+  - "**/*.java"
+  - "**/pom.xml"
+  - "fwk/**"
+  - "application/**"
+  - "plugins/**"
+---
+
+# Habitv Maven validation rules
+
+Canonical source: `AGENTS.md` Sections 6 and 14.2–14.3, 15.11, 15.15.
+
+## Pre-commit validation (code changes)
+
+Before asking **Approve commit?**, run the tier from `AGENTS.md` Section
+14.2 unless the developer explicitly relaxes this gate:
+
+| Tier | Commands |
+|------|----------|
+| Standard code | `mvn -B -ntp validate` + targeted `-pl <module> -am test` when relevant |
+| Risky / code-wide | `mvn -B -ntp validate` + `mvn -B -ntp test` |
+| Packaging / full-app | `mvn -B -ntp -DskipTests clean package` only when in scope and JavaFX/`jdk.home` environment supports it |
+
+If the required tier was skipped for a code-impacting change without
+developer approval, mark the work:
+
+> Not ready to commit.
+
+If tests fail, list the failing command, summarize the failure, identify
+relation to the change, and propose the next fix (Section 15.11). Do not
+ask for commit approval unless status is **Not ready to commit** and
+developer explicitly approves committing despite failures.
+
+## Validation evidence
+
+Provide exact command lines and pass/fail results (Section 15.15). Do
+not write vague validation such as "tests pass" or "build ok".
+
+## Docs-only skip
+
+Skip Maven only when all are true:
+
+- documentation-only change;
+- no Java source, POM, workflow, or runtime file changed;
+- full Maven validation was not run;
+- branch is not validated for runtime behavior.
+
+## CI-safe baseline (not sufficient alone for commit approval)
+
+```bash
+mvn -B -ntp -DskipTests validate
+```
+
+Do not run live provider/network tests in the default lifecycle.
+
+Do not change Maven module topology, plugin versions, or dependency
+versions outside a scoped tracker item.
+
+## Real application testing
+
+Before commit approval, include exactly:
+
+> Please test the real application behavior affected by this change
+> before approving the commit.
+
+Include the repo health / review readiness status from root `AGENTS.md`
+Sections 15.4 and 15.16.

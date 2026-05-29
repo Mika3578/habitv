@@ -1,0 +1,34 @@
+---
+description: Habitv maintainability guardrails — DoD, tests, config, user data
+alwaysApply: false
+globs:
+  - "**/*.java"
+  - "**/pom.xml"
+  - "application/**"
+  - "plugins/**"
+  - "scripts/**"
+  - "docs/**"
+---
+
+# Habitv maintainability rules
+
+**Purpose:** Long-term maintainability, reproducible builds, dependency
+safety, config compatibility, test reliability, decision tracking.
+
+**When it applies:** Code, build, config, script, or docs changes affecting
+runtime, packaging, providers, or dependencies.
+
+**Mandatory highlights (`AGENTS.md` Section 19):**
+
+- Declare **Definition of Done** before work (19.2).
+- Document decisions via ADR when durable (19.1).
+- Classify **PR risk** and scale validation (19.16).
+- **Manual test evidence** before commit on behavior changes (19.15).
+- Protect **XML config** and **user data** (19.10–19.11).
+- **Windows-first** path/script validation (19.13–19.14).
+- Provide **rollback plan** for medium+ risk (19.17).
+- End with **Maintainability report** (19.25).
+
+**Canonical reference:** [`docs/maintainability-policy.md`](../../docs/maintainability-policy.md)
+
+**Lifecycle:** mandatory for behavior/build/config PRs; recommended for docs.

@@ -1,0 +1,30 @@
+---
+description: Habitv provider and plugin modernization rules
+globs:
+  - "plugins/**"
+  - "docs/provider-inventory.md"
+  - "docs/provider-policy.md"
+  - "docs/obsolescence-register.md"
+---
+
+# Habitv provider rules
+
+**Purpose:** Safe, fast provider/plugin modernization with offline tests
+and clear status tracking.
+
+**When it applies:** Work under `plugins/` or provider documentation.
+
+**Mandatory rules (see `AGENTS.md` Section 18):**
+
+- Declare project **phase** before editing (18.1).
+- Update provider **status** in inventory/obsolescence register (18.2).
+- Preserve/improve **metadata** where validated (18.3).
+- Prefer **offline fixture tests**; live checks supplementary (18.4).
+- **External tool** updates in dedicated PRs with report (18.5).
+- No DRM bypass; no cookies/tokens/sessions in repo (18.4).
+- End tasks with **Habitv final report** (18.19).
+
+**Canonical reference:** [`docs/provider-policy.md`](../../docs/provider-policy.md),
+[`plugins/AGENTS.md`](../../plugins/AGENTS.md).
+
+**Lifecycle:** mandatory for provider/plugin PRs.

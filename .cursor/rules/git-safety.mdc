@@ -1,0 +1,145 @@
+---
+description: Git workflow, workspace safety, and commit/push approval gates
+alwaysApply: true
+---
+
+# Habitv Git safety rules
+
+Canonical source: `AGENTS.md` Sections 3, 4, 14.1, 14.5, 14.6, 14.8,
+14.11–14.14, 15.1, 15.5, 15.6, 15.8–15.10, 15.13, 15.17, 15.20–15.23,
+15.27–15.28.
+
+At task start, report **Instruction files loaded** per `AGENTS.md`
+Section 15.1 before editing files.
+
+## Workspace safety (before any edit, commit, rebase, push, or PR action)
+
+Run:
+
+```bash
+git status --short
+git branch --show-current
+git remote -v
+git log --oneline --decorate -n 10
+```
+
+Do not work directly on `develop`, `main`, or `master`.
+
+Do not overwrite, delete, stage, or commit uncommitted developer changes
+without explicit approval. Distinguish agent changes from pre-existing
+local changes.
+
+## Never automatic
+
+Never run without explicit developer approval in the **current**
+conversation:
+
+- `git commit`
+- `git push`
+- `git push --force`
+- `git push --force-with-lease`
+- `gh pr create`, `gh pr merge`, `gh pr review`, `gh pr comment`
+- any command that publishes, merges, comments, or changes remote state
+
+Previous session approval is never valid.
+
+## Chained commands
+
+Never chain approval-gated actions without separate approval for each
+(Section 15.8). Forbidden without approval:
+
+```bash
+git add -A
+git add .
+git add --all
+git add -A && git commit -m "..."
+git commit -m "..." && git push
+```
+
+## Explicit staging
+
+Stage only intentional files by explicit path (Section 15.20). Before
+**Approve commit?**, run:
+
+```bash
+git diff --stat
+git diff --check
+git diff --cached --stat
+git diff --cached --check
+```
+
+If nothing is staged, say so and list exact files planned to stage.
+
+## Secrets, artifacts, and attribution
+
+Inspect diffs for secrets before commit approval (Section 15.9). No AI
+attribution in commits or PRs (Section 15.10). Leave build outputs,
+binaries, logs, and IDE caches unstaged (Section 15.23). Use `agent_space/`
+for scratch work; never commit from it (Section 15.21).
+
+## Commit classification
+
+Classify each commit as exactly one type per Section 15.28. No silent
+unrelated auto-fixes (Section 15.27).
+
+## Approval prompts
+
+Ask exactly:
+
+- **Approve commit?** — before any commit
+- **Approve push?** — before any normal push
+- **Approve force-with-lease push?** — after rebase or rewritten history
+
+## Branch updates (linear history)
+
+Allowed:
+
+```bash
+git fetch origin --prune
+git rebase origin/develop
+git push --force-with-lease   # only after rebase, with approval
+```
+
+Disallowed:
+
+- `git merge origin/develop`
+- plain `git pull` or `git pull` without `--rebase`
+- GitHub **Update branch** if it creates a merge commit
+- `git push --force` (never)
+
+On rebase conflicts: stop, list files, explain resolution, rerun
+validation after `git rebase --continue`.
+
+## Branch naming
+
+Use conventional prefixes only: `feat/`, `fix/`, `docs/`, `test/`,
+`refactor/`, `chore/`, `ci/`. No random tool-generated names.
+English only. No `hbtv-*` or `HBTV*` IDs.
+
+## Destructive commands
+
+Require explicit approval with explanation before:
+
+- `git reset --hard`, `git clean -fd`, `git checkout -- <file>`,
+  `git restore <file>`, `git branch -D`
+- deleting files outside requested scope
+- force-pushing without `--force-with-lease`
+
+## Checklists
+
+Provide `AGENTS.md` Section 14.13 pre-commit checklist before
+**Approve commit?**
+
+Provide `AGENTS.md` Section 14.14 pre-push checklist before
+**Approve push?** or **Approve force-with-lease push?**
+
+## No intermediate commits
+
+Do not create WIP commits. Keep working locally until the change is
+complete, validated, and developer-approved. Push only when coherent and
+explicitly approved (root `AGENTS.md` Section 15.5).
+
+## Session handoff
+
+When stopping before commit/push/PR, provide the **Handoff** block from
+root `AGENTS.md` Section 15.6.

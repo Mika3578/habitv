@@ -1,0 +1,24 @@
+---
+description: Canonical AGENTS.md pointer — always apply first
+alwaysApply: true
+---
+
+# Canonical source
+
+**Purpose:** Ensure every Cursor session treats `AGENTS.md` as the single
+source of truth for repository-wide AI agent behavior.
+
+**When it applies:** Every task.
+
+**Mandatory rules:**
+
+- Read `AGENTS.md` metadata and relevant sections before editing.
+- Report **Agent startup checklist** (Section 16.17) and **Instruction
+  files loaded** (Section 15.1).
+- Tool-specific files may reference, summarize, or extend `AGENTS.md` only.
+- On conflict, `AGENTS.md` wins.
+
+**Canonical reference:** [`AGENTS.md`](../../AGENTS.md) — current version
+in metadata block at top.
+
+**Lifecycle:** mandatory (Section 17.2).
