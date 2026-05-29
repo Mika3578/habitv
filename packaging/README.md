@@ -27,4 +27,12 @@ target/package-staging/Habitv/
   README.txt
 ```
 
-Platform-specific installers and CI artifact upload are tracked in separate PRs.
+## Windows packages
+
+See [`windows/README.md`](windows/README.md). After staging:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/package-windows.ps1
+```
+
+Linux `.deb` and macOS app/DMG packaging are tracked in separate PRs.
