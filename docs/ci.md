@@ -18,6 +18,7 @@
 | Maven CI | `.github/workflows/ci-maven.yml` | `develop` PR validation: validate, deterministic tests, package |
 | Build | `.github/workflows/build.yml` | Legacy `master` push/PR coverage only; not part of the `develop` merge baseline |
 | Dependency Review | `.github/workflows/dependency-review.yml` | Blocks new high/critical dependency issues on PRs |
+| Maven Dependency Submission | `.github/workflows/maven-dependency-submission.yml` | Submits the resolved Maven dependency tree to the dependency graph (diagnostic / security metadata; not required for merge) |
 | CodeQL | (repository default setup) | Code scanning alerts |
 | Labeler | `.github/workflows/labeler.yml` | Path-based PR labels (not required) |
 | Stale | `.github/workflows/stale.yml` | Inactivity labels (no auto-close) |
@@ -43,6 +44,13 @@ GitHub Settings later displays them that way. The removed legacy check was
 - `full-test-suite` (workflow_dispatch / schedule only)
 - `validate-macos` (cross-platform Java 8 validate signal; complements the
   Windows `build.yml` signal — informational only, not in `protect-develop`)
+- `submit-maven` (`maven-dependency-submission.yml`) — populates transitive
+  Maven dependencies for Dependency Review and Dependabot; non-merge-blocking.
+  Uses `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` while
+  `actions/maven-dependency-submission-action` still targets the Node 20 action
+  runtime. After merge, disable **Automatic dependency submission** under
+  repository Settings → Advanced Security → Dependency graph so this workflow
+  replaces the built-in dynamic submission and duplicate runs are avoided.
 
 ## Reusable composite actions
 
