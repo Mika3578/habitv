@@ -1,0 +1,36 @@
+{
+  "label": "L'info s'eclaire",
+  "type": "taxonomy",
+  "items": [
+    {
+      "id": 8472138,
+      "type": "integrale",
+      "title": "Émission du vendredi 29 mai 2026",
+      "episode_title": "Émission du vendredi 29 mai 2026",
+      "season": null,
+      "duration": 5209,
+      "broadcast_begin_date": 1780039704,
+      "begin_date": 1780045512
+    },
+    {
+      "id": 8468991,
+      "type": "integrale",
+      "title": "Émission du jeudi 28 mai 2026",
+      "episode_title": "Émission du jeudi 28 mai 2026",
+      "season": null,
+      "duration": 5215,
+      "broadcast_begin_date": 1779953297,
+      "begin_date": 1779970913
+    },
+    {
+      "id": 8465586,
+      "type": "integrale",
+      "title": "Émission du mercredi 27 mai 2026",
+      "episode_title": "Émission du mercredi 27 mai 2026",
+      "season": null,
+      "duration": 5181,
+      "broadcast_begin_date": 1779866936,
+      "begin_date": 1779888354
+    }
+  ]
+}

@@ -75,6 +75,34 @@ public class FranceTvUrlsTest {
 	}
 
 	@Test
+	public void programPathFromCategoryUrlExtractsPublicHubTaxonomyPaths() {
+		assertEquals("sport_tennis_roland-garros",
+				FranceTvUrls.programPathFromCategoryUrl(
+						"https://www.france.tv/sport/tennis/roland-garros/"));
+		assertEquals("franceinfo_l-info-s-eclaire",
+				FranceTvUrls.programPathFromCategoryUrl(
+						"https://www.france.tv/franceinfo/l-info-s-eclaire/"));
+	}
+
+	@Test
+	public void programPageUrlFromTaxonomySlugBuildsBrowseUrls() {
+		assertEquals("https://www.france.tv/sport/tennis/roland-garros/",
+				FranceTvUrls.programPageUrlFromTaxonomySlug("sport_tennis_roland-garros"));
+		assertEquals("https://www.france.tv/franceinfo/l-info-s-eclaire/",
+				FranceTvUrls.programPageUrlFromTaxonomySlug("franceinfo_l-info-s-eclaire"));
+	}
+
+	@Test
+	public void episodePageUrlUsesExplicitTaxonomyPathWhenProgramNodeMissing() {
+		final Map<String, Object> item = new LinkedHashMap<String, Object>();
+		item.put("id", 8533820L);
+		item.put("title", "3e tour : Peyton Stearns vs Belinda Bencic");
+		final String url = FranceTvUrls.episodePageUrl(item, "sport_tennis_roland-garros");
+		assertTrue(url.startsWith("https://www.france.tv/sport/tennis/roland-garros/8533820-"));
+		assertTrue(url.endsWith(".html"));
+	}
+
+	@Test
 	public void episodePageUrlReturnsNullWhenItemIsIncomplete() {
 		assertNull("missing program node", FranceTvUrls.episodePageUrl(new HashMap<String, Object>()));
 
@@ -120,8 +148,97 @@ public class FranceTvUrlsTest {
 
 	@Test
 	public void channelLabelEchoesUnknownSlug() {
-		assertEquals("franceinfo", FranceTvUrls.channelLabel("franceinfo"));
+		assertEquals("Franceinfo", FranceTvUrls.channelLabel("franceinfo"));
+		assertEquals("unknown-slug", FranceTvUrls.channelLabel("unknown-slug"));
 		assertEquals("", FranceTvUrls.channelLabel(""));
+	}
+
+	@Test
+	public void publicCollectionPageUrlDetectsSportLandingPages() {
+		assertTrue(FranceTvUrls.isPublicCollectionPageUrl(
+				"https://www.france.tv/sport/tennis/roland-garros/"));
+		assertTrue(FranceTvUrls.isPublicCollectionPageUrl(
+				"https://www.france.tv/sport/tennis/roland-garros/#section-en-direct"));
+		assertFalse(FranceTvUrls.isPublicCollectionPageUrl("https://www.france.tv/france-2/enchaines/"));
+		assertFalse(FranceTvUrls.isPublicCollectionPageUrl("https://www.france.tv/france-2/"));
+	}
+
+	@Test
+	public void publicCollectionPageUrlDetectsCategoryLandingPages() {
+		assertTrue(FranceTvUrls.isPublicCollectionPageUrl("https://www.france.tv/series-et-fictions/"));
+		assertTrue(FranceTvUrls.isPublicCollectionPageUrl("https://www.france.tv/documentaires/"));
+		assertTrue(FranceTvUrls.isPublicCollectionPageUrl("https://www.france.tv/films/"));
+		assertTrue(FranceTvUrls.isPublicCollectionPageUrl("https://www.france.tv/societe/"));
+		assertTrue(FranceTvUrls.isPublicCollectionPageUrl("https://www.france.tv/info/"));
+		assertTrue(FranceTvUrls.isPublicCollectionPageUrl("https://www.france.tv/spectacles-et-culture/"));
+		assertTrue(FranceTvUrls.isPublicCollectionPageUrl("https://www.france.tv/sport/"));
+		assertTrue(FranceTvUrls.isPublicCollectionPageUrl("https://www.france.tv/jeux-et-divertissements/"));
+		assertTrue(FranceTvUrls.isPublicCollectionPageUrl("https://www.france.tv/enfants/"));
+		assertTrue(FranceTvUrls.isPublicCollectionPageUrl("https://www.france.tv/podcasts/"));
+		assertEquals("Séries & fictions", FranceTvUrls.channelLabel("series-et-fictions"));
+		assertEquals("Cinéma", FranceTvUrls.channelLabel("films"));
+		assertEquals("Société", FranceTvUrls.channelLabel("societe"));
+	}
+
+	@Test
+	public void publicCollectionPageUrlDetectsPartnerChannelHubs() {
+		assertTrue(FranceTvUrls.isPublicCollectionPageUrl("https://www.france.tv/arte/"));
+		assertTrue(FranceTvUrls.isPublicCollectionPageUrl("https://www.france.tv/tv5-monde/"));
+		assertTrue(FranceTvUrls.isPublicCollectionPageUrl("https://www.france.tv/france-24/"));
+		assertTrue(FranceTvUrls.isPublicCollectionPageUrl("https://www.france.tv/ina/"));
+		assertTrue(FranceTvUrls.isPublicCollectionPageUrl("https://www.france.tv/lcp/"));
+		assertTrue(FranceTvUrls.isPublicCollectionPageUrl("https://www.france.tv/public-senat/"));
+		assertTrue(FranceTvUrls.isPublicCollectionPageUrl("https://www.france.tv/mieux/"));
+		assertFalse(FranceTvUrls.isPublicCollectionPageUrl("https://www.france.tv/mieux/direct.html"));
+		assertEquals("Arte", FranceTvUrls.channelLabel("arte"));
+		assertEquals("TV5 Monde Plus", FranceTvUrls.channelLabel("tv5-monde"));
+		assertEquals("Public Sénat", FranceTvUrls.channelLabel("public-senat"));
+	}
+
+	@Test
+	public void publicHubContainerUrlDetectsCuratedHubLandingPagesOnly() {
+		assertTrue(FranceTvUrls.isPublicHubContainerUrl("https://www.france.tv/ina/"));
+		assertTrue(FranceTvUrls.isPublicHubContainerUrl("https://www.france.tv/sport/"));
+		assertTrue(FranceTvUrls.isPublicHubContainerUrl("https://www.france.tv/mieux/"));
+		assertFalse(FranceTvUrls.isPublicHubContainerUrl("https://www.france.tv/ina/l-ina-eclaire-l-actu/"));
+		assertFalse(FranceTvUrls.isPublicHubContainerUrl("https://www.france.tv/france-2/enchaines/"));
+		assertFalse(FranceTvUrls.isPublicHubContainerUrl("https://www.france.tv/mieux/direct.html"));
+	}
+
+	@Test
+	public void publicCollectionPageUrlDetectsFranceinfoHubAndProgramPages() {
+		assertTrue(FranceTvUrls.isPublicCollectionPageUrl("https://www.france.tv/franceinfo/"));
+		assertTrue(FranceTvUrls.isPublicCollectionPageUrl("https://www.france.tv/franceinfo/l-info-s-eclaire/"));
+		assertTrue(FranceTvUrls.isPublicCollectionPageUrl(
+				"https://www.france.tv/franceinfo/l-info-s-eclaire/#section-les-editions"));
+		assertFalse(FranceTvUrls.isPublicCollectionPageUrl(
+				"https://www.france.tv/franceinfo/l-info-s-eclaire/8472138-emission-du-vendredi-29-mai-2026.html"));
+	}
+
+	@Test
+	public void sectionCategoryIdUsesStableFragment() {
+		final String collection = "https://www.france.tv/sport/tennis/roland-garros/";
+		assertEquals(collection + "#section-en-direct",
+				FranceTvUrls.sectionCategoryId(collection, "en-direct"));
+		assertEquals("en-direct",
+				FranceTvUrls.sectionSlugFromCategoryId(collection + "#section-en-direct"));
+		assertEquals(collection, FranceTvUrls.collectionUrlFromCategoryId(collection + "#section-en-direct"));
+	}
+
+	@Test
+	public void videoReplayUrlDetectsNumericHtmlPaths() {
+		assertTrue(FranceTvUrls.isVideoReplayUrl(
+				"https://www.france.tv/sport/tennis/roland-garros/8533859-3e-tour.html"));
+		assertFalse(FranceTvUrls.isVideoReplayUrl("https://www.france.tv/sport/direct.html"));
+		assertFalse(FranceTvUrls.isVideoReplayUrl("https://www.franceinfo.fr/roland-garros/"));
+	}
+
+	@Test
+	public void absoluteFranceTvUrlResolvesRelativePaths() {
+		assertEquals("https://www.france.tv/sport/direct.html",
+				FranceTvUrls.absoluteFranceTvUrl("/sport/direct.html"));
+		assertEquals("https://www.france.tv/sport/tennis/roland-garros/8533859-x.html",
+				FranceTvUrls.absoluteFranceTvUrl("/sport/tennis/roland-garros/8533859-x.html"));
 	}
 
 	private static Map<String, Object> sampleEpisode(final long id, final String title,

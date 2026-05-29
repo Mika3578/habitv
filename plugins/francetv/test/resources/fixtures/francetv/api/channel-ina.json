@@ -1,0 +1,17 @@
+{
+  "label": "INA",
+  "collections": [
+    {
+      "type": "playlist_mixed",
+      "label": "C'est dans l'actu",
+      "items": [
+        {
+          "type": "program",
+          "label": "L'INA éclaire l'actu",
+          "program_path": "ina_l-ina-eclaire-l-actu",
+          "id": 22001
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "label": "France 24",
+  "collections": [
+    {
+      "type": "playlist_mixed",
+      "label": "Programmes",
+      "items": [
+        {
+          "type": "program",
+          "label": "L'invité de l'économie",
+          "program_path": "france-24_l-invite-de-l-economie",
+          "id": 26001
+        }
+      ]
+    }
+  ]
+}

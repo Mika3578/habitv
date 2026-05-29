@@ -1,0 +1,19 @@
+{
+  "label": "Franceinfo",
+  "collections": [
+    {
+      "type": "playlist_mixed",
+      "label": "Programs",
+      "items": [
+        {
+          "type": "program",
+          "label": "L'info s'éclaire",
+          "url_complete": null,
+          "program_path": "franceinfo_l-info-s-eclaire",
+          "collection_path": null,
+          "id": 21047
+        }
+      ]
+    }
+  ]
+}

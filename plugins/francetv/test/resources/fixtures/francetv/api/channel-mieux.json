@@ -1,0 +1,17 @@
+{
+  "label": "Mieux",
+  "collections": [
+    {
+      "type": "playlist_mixed",
+      "label": "Programmes",
+      "items": [
+        {
+          "type": "program",
+          "label": "Mieux consommer",
+          "program_path": "mieux_mieux-consommer",
+          "id": 27001
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "label": "Sport",
+  "collections": [
+    {
+      "type": "playlist_mixed",
+      "label": "Events",
+      "items": [
+        {
+          "type": "event",
+          "label": "Roland-Garros",
+          "url_complete": "sport_tennis_roland-garros",
+          "program_path": null,
+          "collection_path": null,
+          "id": 18089
+        }
+      ]
+    }
+  ]
+}

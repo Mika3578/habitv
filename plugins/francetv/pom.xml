@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>francetv</artifactId>
 	<name>francetv</name>
-	<version>4.1.2-SNAPSHOT</version>
+	<version>4.1.3-SNAPSHOT</version>
 
 	<dependencies>
 		<dependency>

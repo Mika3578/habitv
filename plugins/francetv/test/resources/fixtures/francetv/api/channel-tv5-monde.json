@@ -1,0 +1,17 @@
+{
+  "label": "TV5 Monde Plus",
+  "collections": [
+    {
+      "type": "playlist_mixed",
+      "label": "Programmes",
+      "items": [
+        {
+          "type": "program",
+          "label": "Le journal de TV5MONDE",
+          "program_path": "tv5-monde_le-journal-de-tv5monde",
+          "id": 25001
+        }
+      ]
+    }
+  ]
+}

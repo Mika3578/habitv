@@ -1,0 +1,17 @@
+{
+  "label": "Arte",
+  "collections": [
+    {
+      "type": "playlist_mixed",
+      "label": "Programmes",
+      "items": [
+        {
+          "type": "program",
+          "label": "Arte Journal",
+          "program_path": "arte_arte-journal",
+          "id": 28001
+        }
+      ]
+    }
+  ]
+}

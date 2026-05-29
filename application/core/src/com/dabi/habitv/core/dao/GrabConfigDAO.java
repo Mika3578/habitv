@@ -7,10 +7,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,6 +48,12 @@ public class GrabConfigDAO {
 
 	private static final String GRAB_CONF_XSD = "grab-config.xsd";
 
+	/**
+	 * Optional category parameter used by the france.tv plugin to preserve public
+	 * hub order across grabconfig refresh merges.
+	 */
+	static final String CATEGORY_ORDER_PARAMETER = "publicHubOrder";
+
 	private final String grabConfigFile;
 
 	public GrabConfigDAO(final String grabConfigFile) {
@@ -80,7 +88,10 @@ public class GrabConfigDAO {
 			for (final CategoryDTO categoryDTO : categoryPlugin
 					.getSubCategories()) {
 				if (categoryDTO.check()) {
-					categories.getCategory().add(buildCategory(categoryDTO));
+					final CategoryType builtCategory = buildCategory(categoryDTO);
+					if (builtCategory != null) {
+						categories.getCategory().add(builtCategory);
+					}
 				}
 			}
 			config.getPlugins().getPlugin().add(plugin);
@@ -88,6 +99,9 @@ public class GrabConfigDAO {
 	}
 
 	private CategoryType buildCategory(final CategoryDTO categoryDTO) {
+		if (!hasText(categoryDTO.getId()) || !hasText(categoryDTO.getName())) {
+			return null;
+		}
 		final CategoryType category = new CategoryType();
 		category.setId(categoryDTO.getId());
 		category.setName(categoryDTO.getName());
@@ -143,10 +157,12 @@ public class GrabConfigDAO {
 								entry.getValue()));
 			}
 		}
+		ensureCategoryDefaults(category);
 		return category;
 	}
 
 	public void marshal(final GrabConfig config) {
+		prepareGrabConfigForMarshal(config);
 		final JAXBContext jaxbContext;
 		FileOutputStream outputFile = null;
 		try {
@@ -431,7 +447,7 @@ public class GrabConfigDAO {
 
 	private void updateCategory(final List<CategoryType> categoryList,
 			final Collection<CategoryDTO> categoryDTOList) {
-		final Map<String, CategoryDTO> catNameToCat = new HashMap<>();
+		final Map<String, CategoryDTO> catNameToCat = new LinkedHashMap<>();
 		for (final CategoryDTO categoryDTO : categoryDTOList) {
 			catNameToCat.put(categoryDTO.getName(), categoryDTO);
 		}
@@ -441,15 +457,15 @@ public class GrabConfigDAO {
 					.getName());
 			if (associatedCatDTO != null) {
 				catNameToCat.remove(category.getName());
-				
-				category.setId(associatedCatDTO.getId());
+
+				if (hasText(associatedCatDTO.getId())) {
+					category.setId(associatedCatDTO.getId());
+				}
 				category.setExtension(associatedCatDTO.getExtension());
 				category.setDownloadable(associatedCatDTO.isDownloadable());
-				
-				if (category.getSubcategories() != null) {
-					updateCategory(category.getSubcategories().getCategory(),
-							associatedCatDTO.getSubCategories());
-				}
+				syncConfiguration(category, associatedCatDTO);
+				syncSubcategories(category, associatedCatDTO);
+				ensureCategoryDefaults(category);
 				statusEnum = StatusEnum.EXIST;
 				category.setDownloadable(associatedCatDTO.isDownloadable());
 			} else {
@@ -461,8 +477,78 @@ public class GrabConfigDAO {
 			}
 		}
 		for (final CategoryDTO categoryDTO : catNameToCat.values()) {
-			categoryList.add(buildCategory(categoryDTO));
+			if (!categoryDTO.check()) {
+				continue;
+			}
+			final CategoryType builtCategory = buildCategory(categoryDTO);
+			if (builtCategory != null) {
+				categoryList.add(builtCategory);
+			}
 		}
+		reorderCategoriesToMatchPlugin(categoryList, categoryDTOList);
+	}
+
+	private void syncSubcategories(final CategoryType category, final CategoryDTO associatedCatDTO) {
+		final Set<CategoryDTO> pluginSubs = associatedCatDTO.getSubCategories();
+		if (pluginSubs == null || pluginSubs.isEmpty()) {
+			return;
+		}
+		if (category.getSubcategories() == null) {
+			category.setSubcategories(new Subcategories());
+		}
+		updateCategory(category.getSubcategories().getCategory(), pluginSubs);
+	}
+
+	private static void syncConfiguration(final CategoryType category, final CategoryDTO associatedCatDTO) {
+		if (associatedCatDTO.getParameters() == null || associatedCatDTO.getParameters().isEmpty()) {
+			return;
+		}
+		Configuration configuration = category.getConfiguration();
+		if (configuration == null) {
+			configuration = new Configuration();
+			category.setConfiguration(configuration);
+		}
+		configuration.getAny().clear();
+		for (final Entry<String, String> entry : associatedCatDTO.getParameters().entrySet()) {
+			configuration.getAny().add(
+					XMLUtils.buildAnyElement(entry.getKey(), entry.getValue()));
+		}
+	}
+
+	private static void reorderCategoriesToMatchPlugin(final List<CategoryType> categoryList,
+			final Collection<CategoryDTO> categoryDTOList) {
+		if (!shouldReorderToMatchPlugin(categoryDTOList)) {
+			return;
+		}
+		final Map<String, CategoryType> xmlByName = new HashMap<>();
+		for (final CategoryType category : categoryList) {
+			xmlByName.put(category.getName(), category);
+		}
+		final List<CategoryType> reordered = new ArrayList<>();
+		final Set<String> placed = new LinkedHashSet<>();
+		for (final CategoryDTO pluginCategory : categoryDTOList) {
+			final CategoryType xmlCategory = xmlByName.get(pluginCategory.getName());
+			if (xmlCategory != null) {
+				reordered.add(xmlCategory);
+				placed.add(pluginCategory.getName());
+			}
+		}
+		for (final CategoryType category : categoryList) {
+			if (!placed.contains(category.getName())) {
+				reordered.add(category);
+			}
+		}
+		categoryList.clear();
+		categoryList.addAll(reordered);
+	}
+
+	private static boolean shouldReorderToMatchPlugin(final Collection<CategoryDTO> categoryDTOList) {
+		for (final CategoryDTO category : categoryDTOList) {
+			if (category.getParameter(CATEGORY_ORDER_PARAMETER) != null) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void clean() {
@@ -489,6 +575,45 @@ public class GrabConfigDAO {
 				cleanCategories(category.getSubcategories().getCategory());
 			}
 		}
+	}
+
+	private static void prepareGrabConfigForMarshal(final GrabConfig grabConfig) {
+		if (grabConfig.getPlugins() == null) {
+			return;
+		}
+		for (final Plugin plugin : grabConfig.getPlugins().getPlugin()) {
+			if (plugin.getCategories() != null) {
+				normalizeCategories(plugin.getCategories().getCategory());
+			}
+		}
+	}
+
+	private static void normalizeCategories(final List<CategoryType> categories) {
+		final Iterator<CategoryType> it = categories.iterator();
+		while (it.hasNext()) {
+			final CategoryType category = it.next();
+			if (!hasText(category.getName()) || !hasText(category.getId())) {
+				it.remove();
+				continue;
+			}
+			ensureCategoryDefaults(category);
+			if (category.getSubcategories() != null) {
+				normalizeCategories(category.getSubcategories().getCategory());
+			}
+		}
+	}
+
+	private static void ensureCategoryDefaults(final CategoryType category) {
+		if (category.getSubcategories() == null) {
+			category.setSubcategories(new Subcategories());
+		}
+		if (category.getStatus() == null) {
+			category.setStatus(StatusEnum.EXIST.name());
+		}
+	}
+
+	private static boolean hasText(final String value) {
+		return value != null && !value.isEmpty();
 	}
 
 }
