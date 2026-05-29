@@ -54,6 +54,15 @@ See [`pull-request-style-guide.md`](pull-request-style-guide.md).
 Live provider tests must not become required checks until replaced or reliably
 quarantined — see [`ci.md`](ci.md).
 
+### CodeQL-only compiler warnings (Lombok `Permit`)
+
+The Habitv reactor does not use Lombok. If CodeQL logs mention
+`lombok.permit.Permit` or `--enable-final-field-mutation` during the manual
+Maven verify step, treat that as an **accepted, CodeQL-tracer warning**—not a
+project dependency or compiler-plugin defect. Maven CI on Java 8 does not
+emit it. Do not add Maven `-q`, log filtering, or JVM flags in application POMs
+to silence it. See the audit notes in [`ci.md`](ci.md#accepted-codeql-build-warnings-lombok--final-field-mutation).
+
 ## Documentation sync
 
 When process, scope, or status changes, keep aligned in the **same commit**:
