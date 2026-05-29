@@ -1,0 +1,17 @@
+{
+  "label": "Public Sénat",
+  "collections": [
+    {
+      "type": "playlist_mixed",
+      "label": "Programmes",
+      "items": [
+        {
+          "type": "program",
+          "label": "Public Sénat L'invité",
+          "program_path": "public-senat_l-invite",
+          "id": 24001
+        }
+      ]
+    }
+  ]
+}

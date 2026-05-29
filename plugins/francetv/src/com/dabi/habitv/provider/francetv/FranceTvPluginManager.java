@@ -32,32 +32,16 @@ public class FranceTvPluginManager extends BasePluginWithProxy implements Plugin
 	@Override
 	public Set<EpisodeDTO> findEpisode(final CategoryDTO category) {
 		final Set<EpisodeDTO> episodes = new LinkedHashSet<>();
-		final String programPath = FranceTvUrls.programPathFromCategoryUrl(category.getId());
-		if (programPath == null) {
+		if (FranceTvUrls.isPublicHubContainerUrl(category.getId())) {
+			logHubContainerEpisodeSkip(category.getId());
 			return episodes;
 		}
-
-		try {
-			final List<Map<String, Object>> items = apiClient.fetchEpisodes(programPath);
-			for (final Map<String, Object> item : items) {
-				final Object type = item.get("type");
-				if (type == null || !FranceTvUrls.isReplayVideoType(String.valueOf(type))) {
-					continue;
-				}
-				final String pageUrl = FranceTvUrls.episodePageUrl(item);
-				if (StringUtils.isEmpty(pageUrl)) {
-					continue;
-				}
-				final String name = episodeDisplayName(item);
-				if (StringUtils.isEmpty(name)) {
-					continue;
-				}
-				final EpisodeDTO episode = new EpisodeDTO(category, name, pageUrl);
-				FranceTvEpisodeMetadata.apply(item, episode);
-				episodes.add(episode);
-			}
-		} catch (IOException e) {
-			getLog().error("Failed to fetch france.tv episodes for " + programPath, e);
+		final String programPath = FranceTvUrls.programPathFromCategoryUrl(category.getId());
+		if (programPath != null) {
+			return findApiEpisodes(category, programPath, episodes);
+		}
+		if (FranceTvUrls.isPublicCollectionPageUrl(category.getId())) {
+			return findPublicCollectionEpisodesFallback(category);
 		}
 		return episodes;
 	}
@@ -73,7 +57,153 @@ public class FranceTvPluginManager extends BasePluginWithProxy implements Plugin
 			channel.addSubCategories(findPrograms(slug));
 			categories.add(channel);
 		}
+		addPublicPageRoots(categories);
 		return categories;
+	}
+
+	/**
+	 * HTML fallback for pasted public collection URLs only; not used during normal
+	 * public tree construction.
+	 */
+	FranceTvDiscoveryResult discoverPublicCollectionPage(final String sourceUrl, final String html) {
+		final FranceTvDiscoveryResult result = FranceTvPublicPageDiscovery.discover(sourceUrl, html);
+		logHtmlDiscoveryDiagnostics(result, sourceUrl);
+		return result;
+	}
+
+	private Set<EpisodeDTO> findApiEpisodes(final CategoryDTO category, final String programPath,
+			final Set<EpisodeDTO> episodes) {
+		final FranceTvTaxonomyDiagnostics diagnostics = new FranceTvTaxonomyDiagnostics(programPath);
+		final String sourceUrl = apiClient.taxonomySourceUrl(programPath, 0);
+		try {
+			final List<Map<String, Object>> items = apiClient.fetchEpisodes(programPath);
+			for (final Map<String, Object> item : items) {
+				final Object type = item.get("type");
+				if (type == null || !FranceTvUrls.isReplayVideoType(String.valueOf(type))) {
+					continue;
+				}
+				final String pageUrl = FranceTvUrls.episodePageUrl(item, programPath);
+				if (StringUtils.isEmpty(pageUrl)) {
+					continue;
+				}
+				final String name = episodeDisplayName(item);
+				if (StringUtils.isEmpty(name)) {
+					continue;
+				}
+				final EpisodeDTO episode = new EpisodeDTO(category, name, pageUrl);
+				FranceTvEpisodeMetadata.apply(item, episode);
+				episodes.add(episode);
+				diagnostics.incrementCreatedReplayItems();
+			}
+			diagnostics.setPage(0);
+			logTaxonomyDiagnostics(diagnostics, sourceUrl);
+		} catch (IOException e) {
+			diagnostics.setRootCauseSummary("io-error:" + e.getClass().getSimpleName());
+			logTaxonomyDiagnostics(diagnostics, sourceUrl);
+			getLog().error("Failed to fetch france.tv episodes for " + programPath, e);
+		}
+		return episodes;
+	}
+
+	private Set<EpisodeDTO> findPublicCollectionEpisodesFallback(final CategoryDTO category) {
+		final String collectionUrl = FranceTvUrls.collectionUrlFromCategoryId(category.getId());
+		try {
+			final FranceTvDiscoveryResult result = discoverPublicCollectionPage(collectionUrl,
+					getUrlContent(collectionUrl));
+			return FranceTvDiscoveryMapper.toEpisodes(result, category);
+		} catch (RuntimeException e) {
+			getLog().warn("France.tv HTML fallback discovery failed safely for " + collectionUrl + ": "
+					+ e.getMessage());
+			return new LinkedHashSet<>();
+		}
+	}
+
+	private void addPublicPageRoots(final Set<CategoryDTO> categories) {
+		final FranceTvPublicCategoryTreeBuilder builder = new FranceTvPublicCategoryTreeBuilder(
+				new FranceTvPublicCategoryTreeBuilder.ChannelHubLoader() {
+					@Override
+					public Map<String, Object> loadChannelHub(final String hubSlug) throws IOException {
+						return apiClient.fetchChannelHub(hubSlug);
+					}
+				}, new FranceTvPublicCategoryTreeBuilder.HubDiagnosticsListener() {
+					@Override
+					public void onHubDiscovery(final FranceTvPublicHubDiagnostics diagnostics,
+							final String sourceUrl) {
+						logHubDiscoveryDiagnostics(diagnostics, sourceUrl);
+					}
+				}, getLog());
+		final CategoryDTO publicRoot = builder.buildPublicRootCategory();
+		if (getLog().isDebugEnabled()) {
+			getLog().debug("France.tv public hub tree before grabconfig merge:\n"
+					+ FranceTvPublicCategoryTreeBuilder.formatPublicHubDebugReport(publicRoot));
+		}
+		if (!publicRoot.getSubCategories().isEmpty()) {
+			categories.add(publicRoot);
+		}
+	}
+
+	private void logHubDiscoveryDiagnostics(final FranceTvPublicHubDiagnostics diagnostics,
+			final String sourceUrl) {
+		if (diagnostics == null) {
+			return;
+		}
+		final String line = diagnostics.formatLogLine(sourceUrl);
+		if ("ok".equals(diagnostics.getRootCauseSummary())
+				|| "configured-seed-fallback".equals(diagnostics.getRootCauseSummary())) {
+			getLog().info(line);
+		} else {
+			getLog().warn(line);
+		}
+	}
+
+	private void logHubContainerEpisodeSkip(final String hubUrl) {
+		final String hubSlug = hubSlugFromContainerUrl(hubUrl);
+		final FranceTvPublicHubDiagnostics diagnostics = new FranceTvPublicHubDiagnostics(
+				hubSlug == null ? "unknown" : hubSlug);
+		diagnostics.setRootCauseSummary("hub-container-no-episodes");
+		logHubDiscoveryDiagnostics(diagnostics, hubUrl);
+	}
+
+	private static String hubSlugFromContainerUrl(final String hubUrl) {
+		if (StringUtils.isEmpty(hubUrl) || !hubUrl.startsWith(FranceTvConf.HOME_URL)) {
+			return null;
+		}
+		String path = hubUrl.substring(FranceTvConf.HOME_URL.length());
+		if (path.startsWith("/")) {
+			path = path.substring(1);
+		}
+		if (path.endsWith("/")) {
+			path = path.substring(0, path.length() - 1);
+		}
+		final int slash = path.indexOf('/');
+		if (slash >= 0) {
+			return null;
+		}
+		return path;
+	}
+
+	private void logHtmlDiscoveryDiagnostics(final FranceTvDiscoveryResult result, final String sourceUrl) {
+		if (result == null || result.getDiagnostics() == null) {
+			return;
+		}
+		final String line = result.getDiagnostics().formatLogLine(sourceUrl);
+		if (result.isSuccessful()) {
+			getLog().info(line);
+		} else {
+			getLog().warn(line);
+		}
+	}
+
+	private void logTaxonomyDiagnostics(final FranceTvTaxonomyDiagnostics diagnostics, final String sourceUrl) {
+		if (diagnostics == null) {
+			return;
+		}
+		final String line = diagnostics.formatLogLine(sourceUrl);
+		if ("ok".equals(diagnostics.getRootCauseSummary())) {
+			getLog().info(line);
+		} else {
+			getLog().warn(line);
+		}
 	}
 
 	private Collection<CategoryDTO> findPrograms(final String channelSlug) {

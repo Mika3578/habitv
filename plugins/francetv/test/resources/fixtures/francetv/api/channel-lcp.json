@@ -1,0 +1,17 @@
+{
+  "label": "LCP",
+  "collections": [
+    {
+      "type": "playlist_mixed",
+      "label": "Programmes",
+      "items": [
+        {
+          "type": "program",
+          "label": "Questions au Gouvernement",
+          "program_path": "lcp_questions-au-gouvernement",
+          "id": 23001
+        }
+      ]
+    }
+  ]
+}

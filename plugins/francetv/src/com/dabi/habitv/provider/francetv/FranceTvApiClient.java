@@ -54,12 +54,26 @@ final class FranceTvApiClient {
 		return programs;
 	}
 
+	Map<String, Object> fetchChannelHub(final String hubSlug) throws IOException {
+		final String url = FranceTvConf.API_MOBILE_URL + "/apps/channels/" + hubSlug + "?platform="
+				+ FranceTvConf.API_PLATFORM;
+		return fetchJson(url);
+	}
+
+	String channelHubSourceUrl(final String hubSlug) {
+		return FranceTvConf.API_MOBILE_URL + "/apps/channels/" + hubSlug + "?platform=" + FranceTvConf.API_PLATFORM;
+	}
+
+	String taxonomySourceUrl(final String taxonomyPath, final int page) {
+		return FranceTvConf.API_MOBILE_URL + "/generic/taxonomy/" + taxonomyPath + "/contents?platform="
+				+ FranceTvConf.API_PLATFORM + "&page=" + page;
+	}
+
 	List<Map<String, Object>> fetchEpisodes(final String programPath) throws IOException {
 		final List<Map<String, Object>> episodes = new ArrayList<>();
 		boolean exhausted = false;
 		for (int page = 0; page < MAX_PAGES; page++) {
-			final String url = FranceTvConf.API_MOBILE_URL + "/generic/taxonomy/" + programPath + "/contents"
-					+ "?platform=" + FranceTvConf.API_PLATFORM + "&page=" + page;
+			final String url = taxonomySourceUrl(programPath, page);
 			final Map<String, Object> body = fetchJson(url);
 			final List<Map<String, Object>> items = castItemList(body.get("items"));
 			if (items.isEmpty()) {
@@ -84,12 +98,12 @@ final class FranceTvApiClient {
 				+ "; some entries may be missing.");
 	}
 
-	private Map<String, Object> fetchJson(final String url) throws IOException {
+	Map<String, Object> fetchJson(final String url) throws IOException {
 		return MAPPER.readValue(plugin.getInputStreamFromUrl(url), MAP_TYPE);
 	}
 
 	@SuppressWarnings("unchecked")
-	private static List<Map<String, Object>> castItemList(final Object raw) {
+	static List<Map<String, Object>> castItemList(final Object raw) {
 		if (!(raw instanceof List)) {
 			return Collections.emptyList();
 		}
