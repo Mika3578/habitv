@@ -35,4 +35,12 @@ See [`windows/README.md`](windows/README.md). After staging:
 powershell -ExecutionPolicy Bypass -File scripts/package-windows.ps1
 ```
 
-Linux `.deb` and macOS app/DMG packaging are tracked in separate PRs.
+## Linux packages
+
+See [`linux/README.md`](linux/README.md). After staging:
+
+```bash
+bash scripts/package-linux.sh
+```
+
+macOS app/DMG packaging is tracked in a separate PR.
