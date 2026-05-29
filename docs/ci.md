@@ -18,7 +18,7 @@
 | Maven CI | `.github/workflows/ci-maven.yml` | `develop` PR validation: validate, deterministic tests, package |
 | Build | `.github/workflows/build.yml` | Legacy `master` push/PR coverage only; not part of the `develop` merge baseline |
 | Dependency Review | `.github/workflows/dependency-review.yml` | Blocks new high/critical dependency issues on PRs |
-| CodeQL | (repository default setup) | Code scanning alerts |
+| CodeQL | `.github/workflows/codeql.yml` | Java static analysis via manual Maven reactor build (`build-mode: manual`) |
 | Labeler | `.github/workflows/labeler.yml` | Path-based PR labels (not required) |
 | Stale | `.github/workflows/stale.yml` | Inactivity labels (no auto-close) |
 
@@ -79,7 +79,12 @@ tests over time (`provider-inventory`, `live-tests-flaky` risk).
   update PRs; semver-major ignored; no auto-merge.
 - **Dependency Review** — fails PRs that introduce new high/critical vulns in
   dependencies.
-- **CodeQL** — separate from Maven CI.
+- **CodeQL** — `.github/workflows/codeql.yml`; triggers on `pull_request` and
+  `push` to `develop` plus a weekly schedule. Uses advanced setup with
+  `build-mode: manual` and `mvn -B -ntp -DskipTests verify` so extraction
+  follows the Maven reactor instead of default setup `build-mode: none`.
+  Separate from Maven CI; not a required merge check until the workflow is
+  green on a PR and on `develop` after merge.
 
 Details: [`repository-maintenance.md`](repository-maintenance.md).
 
