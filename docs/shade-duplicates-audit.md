@@ -82,6 +82,8 @@ core
 
 **Not recommended in audit PR:** Removing `jaxb-api` or `jaxb-runtime` without a dedicated tracker item, ADR touchpoint, and full `mvn test` / config XML regression.
 
+**Planning doc (no POM changes):** [`docs/jaxb-activation-dedup-plan.md`](jaxb-activation-dedup-plan.md) — strategies A/B/C, Activation notes, validation matrix, and PR sequence before any dedup implementation.
+
 ### 4. Activation duplicate (three stacks)
 
 ```
@@ -144,8 +146,9 @@ Do **not** globally silence Shade warnings with `-q`, log filters, or blanket `<
 
 ## Proposed follow-up PRs (safe sequencing)
 
-1. **`fix/shade-jaxb-api-dedup`** — Analyze whether `jaxb-api` can be dropped in favor of `jaxb-runtime`’s API only (or vice versa) on Java 8; run `mvn -B -ntp -pl application/core,application/consoleView,application/habiTv -am test`; document decision in `docs/decision-log.md` if behavior changes.
-2. **`fix/shade-activation-dedup`** — Map `javax.mail` usage; exclude `activation:1.1` or align `mail` only after email plugin / MIME tests.
+0. **`docs/jaxb-activation-dedup-plan`** — Planning-only PR: compare strategies, validation matrix, sequencing ([`jaxb-activation-dedup-plan.md`](jaxb-activation-dedup-plan.md)).
+1. **`fix/shade-jaxb-api-dedup`** — Implement Strategy A or B from the plan; run validation matrix; document decision in `docs/decision-log.md` if behavior changes.
+2. **`fix/shade-activation-dedup`** — Map `javax.mail` usage; exclude `activation:1.1` or align `mail` only after email plugin / MIME tests (see plan Activation notes).
 3. **`refactor/habitv-shade-layout`** — Design doc + minimal POM change for single fat JAR boundary; re-run Shade grep from this audit.
 4. **`build/shade-meta-filters`** — Metadata/module-info filters only after (1)–(3) stabilize runtime tests.
 
@@ -167,5 +170,6 @@ mvn -B -ntp dependency:tree -pl application/core
 
 - Shade plugin: https://maven.apache.org/plugins/maven-shade-plugin/
 - POMs: `application/consoleView/pom.xml`, `application/habiTv/pom.xml`, `application/core/pom.xml`, root `pom.xml` (JAXB + `mail` BOM)
+- Plan: [`docs/jaxb-activation-dedup-plan.md`](jaxb-activation-dedup-plan.md)
 - Risk: `jaxb-mismatch` in `docs/risk-register.md`
 - Policy: Java 8 / no Jakarta migration in `AGENTS.md` Section 2

@@ -26,6 +26,7 @@ older ones rather than rewriting them in place.
 | `legacy-dabiboo-svn-removal` | Remove active legacy DabiBoo/SVN wiring from build and runtime paths | ✅ Accepted |
 | `ai-policy-source-of-truth` | Align AI workflow policy around AGENTS.md source of truth | ✅ Accepted |
 | `plugin-versioning-policy` | When to bump a plugin `<version>` independently of the parent POM | 🟡 Proposed |
+| `jaxb-activation-dedup-defer` | Plan JAXB/Activation dedup before POM changes; defer namespace migration | 🟡 Proposed |
 
 ---
 
@@ -564,6 +565,38 @@ GitHub-native tracking through issues, labels, projects, and milestones.
 
 Existing historical tracker references may remain only when needed to
 preserve context.
+
+---
+
+## 🟡 `jaxb-activation-dedup-defer` — Plan JAXB/Activation dedup before POM changes
+
+| | |
+|---|---|
+| **Status** | 🟡 Proposed |
+| **Date** | 2026-05-29 |
+| **Risks** | `jaxb-mismatch` |
+| **Touches** | `docs/jaxb-activation-dedup-plan.md`, `docs/shade-duplicates-audit.md` |
+
+**Context** — PR #134 documented Maven Shade duplicate warnings. Overlapping
+`jaxb-api` / `jakarta.xml.bind-api` and three Activation artifacts are
+P1 runtime risks in shaded `consoleView` and `habiTv` JARs. Habitv still
+targets Java 8; true Jakarta EE 9+ migration is out of scope for the restart
+phase (`keep-java8-baseline`).
+
+**Decision** — Require a docs-only plan
+([`docs/jaxb-activation-dedup-plan.md`](jaxb-activation-dedup-plan.md))
+before any POM exclusion or version change. Compare Strategy A (keep
+`jaxb-api`, exclude transitive API from `jaxb-runtime`), Strategy B (drop
+explicit `jaxb-api`), and Strategy C (defer until Java 21/25 migration).
+Implement JAXB API dedup and Activation dedup in **separate** follow-up
+PRs with the plan validation matrix. Do not upgrade `javax.mail` or exclude
+`activation:1.1` without email/MIME tests.
+
+**Consequences**
+- ✅ Reduces risk of silent uber-JAR behavior changes.
+- ⚠️ Shade warnings remain until `fix/shade-jaxb-api-dedup` merges.
+- 🔁 Accept or supersede this ADR when an implementation PR records the
+  chosen strategy in the decision log.
 
 ---
 

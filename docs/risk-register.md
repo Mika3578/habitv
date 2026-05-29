@@ -191,11 +191,17 @@ migrate in this restart phase; keep Java 8 baseline first.
 
 **Description** — `application/core` generates JAXB classes via
 the unmaintained `com.sun.tools.xjc.maven2:maven-jaxb-plugin` and
-depends on `javax.xml.bind:jaxb-api:2.0`. On JDK 9+,
-`javax.xml.bind` is not on the default classpath.
+depends on `javax.xml.bind:jaxb-api` (BOM 2.3.1) plus
+`jaxb-runtime:2.3.9`, which also pulls `jakarta.xml.bind-api:2.3.3`.
+Maven Shade merges both API JARs into uber JARs with arbitrary
+duplicate resolution (see [`docs/shade-duplicates-audit.md`](shade-duplicates-audit.md)).
+On JDK 9+, `javax.xml.bind` is not on the default classpath.
 
-**Mitigation** — Keep Java 8 baseline; revisit when migrating off
-Java 8.
+**Mitigation** — Keep Java 8 baseline; follow
+[`docs/jaxb-activation-dedup-plan.md`](jaxb-activation-dedup-plan.md)
+before POM dedup; implement `fix/shade-jaxb-api-dedup` then
+`fix/shade-activation-dedup` with the plan validation matrix; revisit
+modular JDK / Java 21+ when migrating off Java 8.
 
 ---
 
