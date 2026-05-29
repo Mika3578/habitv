@@ -23,6 +23,15 @@ fi
 
 cp "$MAIN_JAR" "$LIB_DIR/"
 
+# Valid minimal grabconfig beside the JAR: enables local mode (DirUtils) and
+# unmarshals to an empty plugin list (GrabConfigDAO).
+cat > "$LIB_DIR/grabconfig.xml" <<'EOF'
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:grabConfig xmlns:ns2="http://www.dabi.com/habitv/grabconfig/entities">
+    <plugins/>
+</ns2:grabConfig>
+EOF
+
 shopt -s nullglob
 for module_dir in "$REPO_ROOT"/plugins/*/; do
   module_name="$(basename "$module_dir")"

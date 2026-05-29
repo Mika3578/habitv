@@ -31,6 +31,15 @@ try {
     }
     Copy-Item -Path $mainJar -Destination $libDir -Force
 
+    $grabConfigMarker = @'
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:grabConfig xmlns:ns2="http://www.dabi.com/habitv/grabconfig/entities">
+    <plugins/>
+</ns2:grabConfig>
+'@
+    $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+    [System.IO.File]::WriteAllText((Join-Path $libDir "grabconfig.xml"), $grabConfigMarker, $utf8NoBom)
+
     $pluginCount = 0
     Get-ChildItem -Path (Join-Path $repoRoot "plugins") -Directory | ForEach-Object {
         if ($_.Name -eq "plugin-tester") {

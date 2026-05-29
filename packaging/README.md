@@ -21,6 +21,7 @@ Output layout:
 target/package-staging/Habitv/
   lib/
     habiTv-<version>.jar
+    grabconfig.xml   minimal valid grab config (local mode + empty plugins)
     plugins/
   bin/          reserved for platform launchers in follow-up PRs
   README.txt
