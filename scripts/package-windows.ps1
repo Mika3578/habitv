@@ -93,16 +93,19 @@ try {
     }
 
     $launch4jXml = Join-Path $repoRoot "target/packages/launch4j.xml"
-    $launch4jOutExe = Join-Path $packagesDir "Habitv.exe"
+    $launch4jOutExe = Join-Path $stagingBinDir "Habitv.exe"
+    $packagesExe = Join-Path $packagesDir "Habitv.exe"
+    $iconPath = (Join-Path $repoRoot "packaging/windows/installer/habitv.ico").Replace("\", "/")
+    $launch4jOutPath = $launch4jOutExe.Replace("\", "/")
     $launch4jContent = @"
 <?xml version="1.0" encoding="UTF-8"?>
 <launch4jConfig>
   <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
-  <jar></jar>
-  <outfile>$($launch4jOutExe.Replace('\', '/'))</outfile>
+  <jar>lib/$mainJarName</jar>
+  <outfile>$launch4jOutPath</outfile>
   <errTitle>Habitv</errTitle>
-  <cmdLine>-jar lib/$mainJarName</cmdLine>
+  <cmdLine></cmdLine>
   <chdir>`$EXEDIR/..</chdir>
   <priority>normal</priority>
   <downloadUrl>https://bell-sw.com/pages/downloads/</downloadUrl>
@@ -110,13 +113,15 @@ try {
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
-  <icon>$(Join-Path $repoRoot 'packaging/windows/installer/habitv.ico').Replace('\', '/')</icon>
+  <icon>$iconPath</icon>
   <jre>
     <path></path>
-    <requiresJdk>false</requiresJdk>
-    <requires64Bit>false</requires64Bit>
+    <bundledJre64Bit>false</bundledJre64Bit>
+    <bundledJreAsFallback>false</bundledJreAsFallback>
     <minVersion>1.8.0</minVersion>
     <maxVersion></maxVersion>
+    <jdkPreference>preferJre</jdkPreference>
+    <runtimeBits>64/32</runtimeBits>
   </jre>
   <messages>
     <startupErr>Failed to start Habitv.</startupErr>
@@ -133,11 +138,15 @@ try {
         if (-not $launch4j) {
             throw "Launch4j was not found. Install Launch4j or pass -SkipLaunch4j for staging-only validation."
         }
-        & $launch4j $launch4jXml
-        if ($LASTEXITCODE -ne 0) {
-            throw "Launch4j failed with exit code $LASTEXITCODE"
+        & $launch4j $launch4jXml | Out-Host
+        $deadline = (Get-Date).AddSeconds(30)
+        while (-not (Test-Path -LiteralPath $launch4jOutExe) -and (Get-Date) -lt $deadline) {
+            Start-Sleep -Milliseconds 200
         }
-        Copy-Item -Path $launch4jOutExe -Destination (Join-Path $stagingBinDir "Habitv.exe") -Force
+        if (-not (Test-Path -LiteralPath $launch4jOutExe)) {
+            throw "Launch4j did not produce $launch4jOutExe (exit code $LASTEXITCODE)"
+        }
+        Copy-Item -Path $launch4jOutExe -Destination $packagesExe -Force
     }
 
     $zipPath = Join-Path $packagesDir "habitv-windows.zip"
