@@ -7,7 +7,7 @@ Builds on the shared staging scripts in `scripts/stage-package.ps1`.
 - Maven build: `mvn -B -ntp -DskipTests package`
 - **Java 8 with JavaFX** on `PATH` (for example Liberica JDK 8 Full or Zulu 8 FX).  
   Windows packages do **not** bundle a JDK/JRE.
-- **Launch4j 3.14+** (optional) — required to generate `Habitv.exe` (Chocolatey: `choco install launch4j -y`)
+- **Launch4j** (optional) — required to generate `Habitv.exe`
 - **Inno Setup 6** (`ISCC.exe` on `PATH` or default install location) — required to generate `HabitvSetup.exe`
 
 ## Commands
