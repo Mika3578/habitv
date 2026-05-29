@@ -88,6 +88,46 @@ tests over time (`provider-inventory`, `live-tests-flaky` risk).
 
 Details: [`repository-maintenance.md`](repository-maintenance.md).
 
+## Accepted CodeQL build warnings (Lombok / final-field mutation)
+
+During the **CodeQL** manual Maven build (`Build Maven reactor` step), logs
+may emit warnings such as:
+
+```text
+WARNING: Final field fileManager in class javac_extend.com.sun.tools.javac.jvm.ClassWriter
+  has been mutated reflectively by class lombok.permit.Permit in unnamed module @…
+WARNING: Use --enable-final-field-mutation=ALL-UNNAMED to avoid a warning
+WARNING: Mutating final fields will be blocked in a future release unless
+  final field mutation is enabled
+```
+
+**Audit result:** Habitv does **not** declare or use Lombok. A full reactor
+`dependency:tree` filter for `org.projectlombok:lombok` is empty, and no
+module source uses Lombok annotations. The warning is **not** reproduced by
+local or Maven CI builds on Java 8 (for example `mvn -B -ntp -DskipTests
+verify` on Zulu/Liberica 8).
+
+**Root cause:** After `codeql database init --begin-tracing`, CodeQL wraps
+the manual Maven build with its Java extractor environment (`LD_PRELOAD`,
+`CODEQL_JAVA_HOME`, and related tracing variables). That toolchain uses
+Lombok’s `Permit` helper to patch `javac` internals for extraction. The
+warnings come from JDK **final-field mutation** restrictions (JEP 500 and
+related `--enable-final-field-mutation` guidance) interacting with CodeQL’s
+bundled tooling—not from Habitv application code or Maven dependencies.
+
+**Status today:** Non-blocking. CodeQL analysis completes successfully; Maven
+CI required jobs do not show this warning.
+
+**Why not suppressed:** Adding `--enable-final-field-mutation=ALL-UNNAMED` (or
+similar JVM flags) to Maven or CI would hide the message without removing the
+underlying CodeQL/JDK interaction and is out of scope for application POM
+changes. This PR does not modify `.github/workflows/codeql.yml`.
+
+**Follow-up:** Revisit when the Java baseline moves beyond Java 8 and CodeQL
+runner/JDK tooling is upgraded as part of the Java 21/25 modernization track
+(`java-runtime-policy`, `javafx-modernization`). A durable fix likely belongs
+in CodeQL workflow or extractor configuration, not in Habitv source.
+
 ## Local command parity
 
 Before opening a PR:
