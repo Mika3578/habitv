@@ -575,7 +575,7 @@ preserve context.
 | **Status** | 🟡 Proposed |
 | **Date** | 2026-05-29 |
 | **Risks** | `jaxb-mismatch` |
-| **Touches** | `docs/jaxb-activation-dedup-plan.md`, `docs/shade-duplicates-audit.md` |
+| **Touches** | `docs/jaxb-activation-dedup-plan.md`, `docs/shade-duplicates-audit.md`, `docs/risk-register.md` |
 
 **Context** — PR #134 documented Maven Shade duplicate warnings. Overlapping
 `jaxb-api` / `jakarta.xml.bind-api` and three Activation artifacts are
