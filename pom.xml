@@ -16,6 +16,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<!-- Local Maven staging only; runtime uses FrameworkConf.UPDATE_URL (GitHub Pages). -->
 		<habitv.static.repo.path>${user.home}/dev/habitv-repo/repository</habitv.static.repo.path>
 	</properties>
@@ -146,6 +147,19 @@
 			</resource>			
 		</resources>	
 		<sourceDirectory>src</sourceDirectory>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>3.4.0</version>
+					<configuration>
+						<encoding>${project.build.sourceEncoding}</encoding>
+						<propertiesEncoding>${project.build.sourceEncoding}</propertiesEncoding>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
