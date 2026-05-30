@@ -13,13 +13,13 @@ import com.dabi.habitv.api.plugin.dto.ProxyDTO;
 import com.dabi.habitv.api.plugin.dto.ProxyDTO.ProtocolEnum;
 import com.dabi.habitv.core.config.HabitTvConf;
 import com.dabi.habitv.core.config.UserConfig;
+import com.dabi.habitv.core.config.YoutubeApiKeySystemProperty;
 import com.dabi.habitv.core.token.TokenReplacer;
 import com.dabi.habitv.framework.FWKProperties;
 import com.dabi.habitv.framework.plugin.utils.RetrieverUtils;
 import com.dabi.habitv.utils.DirUtils;
 
 public final class CoreManager {
-	private static final String YOUTUBE_API_KEY_PROPERTY = "habitv.youtube.apiKey";
 
 	private final CategoryManager categoryManager;
 
@@ -87,9 +87,7 @@ public final class CoreManager {
 	}
 
 	private void applyYoutubeApiKey(String youtubeApiKey) {
-		if (youtubeApiKey != null && !youtubeApiKey.trim().isEmpty()) {
-			System.setProperty(YOUTUBE_API_KEY_PROPERTY, youtubeApiKey.trim());
-		}
+		YoutubeApiKeySystemProperty.applyFromUserConfig(youtubeApiKey);
 	}
 
 	public CategoryManager getCategoryManager() {

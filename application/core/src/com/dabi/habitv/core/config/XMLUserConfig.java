@@ -404,14 +404,18 @@ public class XMLUserConfig implements UserConfig {
 		final Map<String, String> downloaderName2BinPath = new HashMap<>();
 		if (downloaders != null) {
 			for (final Object downloader : downloaders.getAny()) {
-				String binPath = XMLUtils.getTagValue(downloader);
-				if (!binPath.isEmpty() && !binPath.startsWith("/")
-						&& !binPath.matches("[a-zA-Z]:.*")) {
-					binPath = getAppDir() + "/" + binPath;
+				final String tagName = XMLUtils.getTagName(downloader);
+				String value = XMLUtils.getTagValue(downloader);
+				if (YOUTUBE_API_KEY.equals(tagName) || EMBED_SUBTITLES.equals(tagName)) {
+					downloaderName2BinPath.put(tagName, value.replace("\\", "/"));
+					continue;
 				}
-				binPath = binPath.replace("\\", "/");
-				downloaderName2BinPath.put(XMLUtils.getTagName(downloader),
-						binPath);
+				if (!value.isEmpty() && !value.startsWith("/")
+						&& !value.matches("[a-zA-Z]:.*")) {
+					value = getAppDir() + "/" + value;
+				}
+				value = value.replace("\\", "/");
+				downloaderName2BinPath.put(tagName, value);
 			}
 		}
 		return downloaderName2BinPath;
@@ -526,7 +530,7 @@ public class XMLUserConfig implements UserConfig {
 
 	@Override
 	public String getYoutubeApiKey() {
-		return normalizeValue(getDownloader().get(YOUTUBE_API_KEY));
+		return YoutubeApiKeyConfig.sanitizePlainConfigValue(getDownloader().get(YOUTUBE_API_KEY));
 	}
 
 	@Override
@@ -589,7 +593,7 @@ public class XMLUserConfig implements UserConfig {
 
 	@Override
 	public void setYoutubeApiKey(String youtubeApiKey) {
-		String normalizedValue = normalizeValue(youtubeApiKey);
+		String normalizedValue = YoutubeApiKeyConfig.sanitizePlainConfigValue(youtubeApiKey);
 		Downloaders downloaders = loadDownloaders();
 		Iterator<Object> iterator = downloaders.getAny().iterator();
 		while (iterator.hasNext()) {

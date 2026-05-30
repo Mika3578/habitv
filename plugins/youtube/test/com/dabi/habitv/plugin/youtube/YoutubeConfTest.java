@@ -55,7 +55,29 @@ public class YoutubeConfTest {
 	}
 
 	@Test
-	public void normalizeApiKeyTrimsWhitespace() {
-		assertEquals("api-key-value", YoutubeConf.normalizeApiKey("  api-key-value  "));
+	public void normalizeApiKeyTrimsWhitespaceAroundGoogleKey() {
+		final String key = YoutubeTestSecrets.googleApiKeyPlaceholder();
+		assertEquals(key, YoutubeConf.normalizeApiKey("  " + key + "  "));
+	}
+
+	@Test
+	public void normalizeApiKeyExtractsEmbeddedGoogleKeyFromPathPrefix() {
+		final String key = YoutubeTestSecrets.googleApiKeyPlaceholder();
+		assertEquals(key, YoutubeConf.normalizeApiKey("C:/Users/example/habitv/" + key));
+	}
+
+	@Test
+	public void normalizeApiKeyReturnsNullForPathWithoutGoogleKey() {
+		assertNull(YoutubeConf.normalizeApiKey("C:/Users/example/habitv/"));
+	}
+
+	@Test
+	public void apiKeySkipReasonReportsInvalidKeyWhenPathOnlyConfigured() {
+		System.setProperty("habitv.youtube.apiKey", "C:/Users/example/habitv/");
+		try {
+			assertEquals(YoutubeDataApiSupport.INVALID_API_KEY_MESSAGE, YoutubeConf.apiKeySkipReason());
+		} finally {
+			System.clearProperty("habitv.youtube.apiKey");
+		}
 	}
 }
