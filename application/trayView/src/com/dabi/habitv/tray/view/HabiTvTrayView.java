@@ -20,6 +20,7 @@ import com.dabi.habitv.core.event.RetreiveEvent;
 import com.dabi.habitv.core.event.SearchCategoryEvent;
 import com.dabi.habitv.core.event.SearchEvent;
 import com.dabi.habitv.core.event.UpdatePluginEvent;
+import com.dabi.habitv.framework.plugin.utils.DownloadFailureDiagnostics;
 import com.dabi.habitv.tray.controller.ViewController;
 import com.dabi.habitv.tray.subscriber.CoreSubscriber;
 
@@ -173,7 +174,10 @@ public final class HabiTvTrayView implements CoreSubscriber {
 			break;
 		case DOWNLOAD_FAILED:
 			trayIcon.displayMessage(
-					Messages.getString("HabiTvTrayView.19"), Messages.getString("HabiTvTrayView.20") + event.getEpisode().getCategory() + " " + event.getEpisode().getName(), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					Messages.getString("HabiTvTrayView.19"),
+					Messages.getString("HabiTvTrayView.20") + event.getEpisode().getCategory() + " "
+							+ event.getEpisode().getName() + " "
+							+ buildLocalizedDownloadFailureDetail(event),
 					TrayIcon.MessageType.WARNING);
 			break;
 		case DOWNLOADED:
@@ -290,6 +294,20 @@ public final class HabiTvTrayView implements CoreSubscriber {
 		default:
 			break;
 		}
+	}
+
+	private static String buildLocalizedDownloadFailureDetail(final RetreiveEvent event) {
+		if (event.getException() == null) {
+			return Messages.getString("HabiTvTrayView.downloadFailure.generic");
+		}
+		final String classificationKey = DownloadFailureDiagnostics.getClassificationKey(event.getException());
+		if (classificationKey != null) {
+			final String localized = Messages.getString("HabiTvTrayView.downloadFailure." + classificationKey);
+			if (!localized.startsWith("!")) {
+				return localized;
+			}
+		}
+		return Messages.getString("HabiTvTrayView.downloadFailure.generic");
 	}
 
 }

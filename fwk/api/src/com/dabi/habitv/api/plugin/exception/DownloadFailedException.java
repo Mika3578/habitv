@@ -15,4 +15,8 @@ public class DownloadFailedException extends RuntimeException {
 		super(message);
 	}
 
+	public DownloadFailedException(final String message, final Throwable cause) {
+		super(message, cause);
+	}
+
 }
