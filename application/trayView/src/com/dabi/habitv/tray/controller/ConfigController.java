@@ -10,6 +10,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import com.dabi.habitv.core.config.UserConfig;
+import com.dabi.habitv.core.config.YoutubeApiKeyConfig;
 import com.dabi.habitv.tray.Popin;
 
 public class ConfigController extends BaseController {
@@ -157,7 +158,7 @@ public class ConfigController extends BaseController {
 			public void run() {
 				UserConfig userConfig = getController().loadUserConfig();
 				String currentValue = userConfig.getYoutubeApiKey();
-				String newValue = normalize(youtubeApiKey.getText());
+				String newValue = YoutubeApiKeyConfig.sanitizePlainConfigValue(normalize(youtubeApiKey.getText()));
 				if (currentValue == null ? newValue != null
 						: !currentValue.equals(newValue)) {
 					userConfig.setYoutubeApiKey(newValue);

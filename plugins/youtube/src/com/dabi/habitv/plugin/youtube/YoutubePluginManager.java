@@ -8,7 +8,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 import com.dabi.habitv.api.plugin.api.PluginProviderInterface;
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
@@ -22,7 +23,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 
 public class YoutubePluginManager extends BasePluginWithProxy implements PluginProviderInterface {
-	private static final String KEY = "key";
+
+	private static final Logger LOG = Logger.getLogger(YoutubePluginManager.class);
+
 	private static final String PLAYLIST_ID = "playlistId";
 	private static final String PUBLISHED_AFTER = "publishedAfter";
 
@@ -44,22 +47,93 @@ public class YoutubePluginManager extends BasePluginWithProxy implements PluginP
 
 	@Override
 	public Set<EpisodeDTO> findEpisode(CategoryDTO category) {
-		if (PLAYLIST.equals(category.getFatherCategory().getName())) {
-			return findEpisodePlaylist(category, TemplateUtils.getParamValues(category.getId()));
-		} else if (TOP.equals(category.getFatherCategory().getName())) {
-			return findEpisodeTop(category, TemplateUtils.getParamValues(category.getId()));
-		} else {
-			throw new TechnicalException(category.getFatherCategory().getId() + " unknow");
+		if (category == null) {
+			logSkip(null, "category is null");
+			return new LinkedHashSet<>();
 		}
+		if (category.isTemplate()) {
+			logSkip(category, "template category");
+			return new LinkedHashSet<>();
+		}
+		if (!category.isDownloadable()) {
+			logSkip(category, "non-downloadable category");
+			return new LinkedHashSet<>();
+		}
+		if (category.getFatherCategory() == null) {
+			logSkip(category, "father category is null");
+			return new LinkedHashSet<>();
+		}
+		final Map<String, String> params = TemplateUtils.getParamValues(category.getId());
+		if (params.containsKey(PLAYLIST_ID) || hasAncestorNamed(category, PLAYLIST)) {
+			return findEpisodePlaylist(category, params);
+		}
+		if (hasAncestorNamed(category, TOP)) {
+			return findEpisodeTop(category, params);
+		}
+		logSkip(category, "unknown category hierarchy");
+		return new LinkedHashSet<>();
+	}
+
+	private boolean hasAncestorNamed(final CategoryDTO category, final String expectedName) {
+		CategoryDTO current = category.getFatherCategory();
+		while (current != null) {
+			if (expectedName.equals(current.getName())) {
+				return true;
+			}
+			current = current.getFatherCategory();
+		}
+		return false;
+	}
+
+	private void logSkip(final CategoryDTO category, final String reason) {
+		final String categoryName = category == null ? "n/a" : category.getName();
+		final String fatherName = category == null || category.getFatherCategory() == null ? "n/a"
+				: category.getFatherCategory().getName();
+		LOG.info("provider=YouTube, category=" + categoryName + ", father=" + fatherName + ", reason=" + reason);
 	}
 
 	private Set<EpisodeDTO> findEpisodeTop(CategoryDTO category, Map<String, String> params) {
+		final String apiKey = YoutubeConf.resolveApiKey();
+		if (apiKey == null) {
+			logSkip(category, YoutubeConf.apiKeySkipReason());
+			return new LinkedHashSet<>();
+		}
+		final String days = params.get(DAYS);
+		final String publishedAfter = YoutubeDataApiSupport.resolvePublishedAfterForSearch(days, dateFormat, new Date());
+		if (shouldUseMostPopularChart(params, publishedAfter)) {
+			return findEpisodeMostPopular(category, params, apiKey);
+		}
+		return findEpisodeTopFromSearch(category, params, apiKey, days, publishedAfter);
+	}
+
+	private boolean shouldUseMostPopularChart(final Map<String, String> params, final String publishedAfter) {
+		if (publishedAfter != null) {
+			return false;
+		}
+		return StringUtils.isBlank(params.get(QUERY))
+				&& StringUtils.isBlank(params.get(CHANNEL_ID))
+				&& StringUtils.isBlank(params.get(TOPIC_ID))
+				&& StringUtils.isBlank(params.get(VIDEO_CATEGORY_ID));
+	}
+
+	private Set<EpisodeDTO> findEpisodeMostPopular(final CategoryDTO category, final Map<String, String> params,
+			final String apiKey) {
+		String url = "https://www.googleapis.com/youtube/v3/videos?part=snippet&chart="
+				+ YoutubeDataApiSupport.CHART_MOST_POPULAR;
+		url = YoutubeDataApiSupport.appendApiKeyParam(url, apiKey);
+		url = addParam(url, params, MAX_RESULTS, "50");
+		return findEpisodesFromUrl(category, url);
+	}
+
+	private Set<EpisodeDTO> findEpisodeTopFromSearch(final CategoryDTO category, final Map<String, String> params,
+			final String apiKey, final String days, final String publishedAfter) {
 		String url = "https://www.googleapis.com/youtube/v3/search?part=snippet&order=viewCount&type=video";
-		url = addParam(url, params, KEY, YoutubeConf.resolveApiKey());
-		String days = params.get(DAYS);
-		if (days != null) {
-			String publishedAfter = dateFormat.format(DateUtils.addDays(new Date(), -Integer.valueOf(days)));
+		url = YoutubeDataApiSupport.appendApiKeyParam(url, apiKey);
+		if (publishedAfter != null) {
 			url = addParam(url, PUBLISHED_AFTER, publishedAfter);
+		} else if (days != null && !days.trim().isEmpty()) {
+			logYoutubeApiDiagnostic(category, "search", "skipped",
+					"publishedAfter omitted (all-time window; days=" + days.trim() + ")", url);
 		}
 		url = addParam(url, params, MAX_RESULTS);
 		url = addParam(url, params, QUERY);
@@ -87,8 +161,18 @@ public class YoutubePluginManager extends BasePluginWithProxy implements PluginP
 	}
 
 	private Set<EpisodeDTO> findEpisodePlaylist(CategoryDTO category, Map<String, String> params) {
+		final String playlistId = params.get(PLAYLIST_ID);
+		if (StringUtils.isBlank(playlistId)) {
+			logSkip(category, "Skipping YouTube playlist category because playlistId is missing.");
+			return new LinkedHashSet<>();
+		}
+		final String apiKey = YoutubeConf.resolveApiKey();
+		if (apiKey == null) {
+			logSkip(category, YoutubeConf.apiKeySkipReason());
+			return new LinkedHashSet<>();
+		}
 		String url = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet";
-		url = addParam(url, params, KEY, YoutubeConf.resolveApiKey());
+		url = YoutubeDataApiSupport.appendApiKeyParam(url, apiKey);
 		url = addParam(url, params, PLAYLIST_ID);
 		url = addParam(url, params, MAX_RESULTS, "50");
 		return findEpisodesFromUrl(category, url);
@@ -97,44 +181,95 @@ public class YoutubePluginManager extends BasePluginWithProxy implements PluginP
 
 	private Set<EpisodeDTO> findEpisodesFromUrl(CategoryDTO category, String url) {
 		final Set<EpisodeDTO> episodeList = new LinkedHashSet<>();
+		if (YoutubeDataApiSupport.isDataApiUrl(url) && !YoutubeDataApiSupport.urlHasApiKey(url)) {
+			logSkip(category, YoutubeDataApiSupport.MISSING_API_KEY_MESSAGE);
+			return episodeList;
+		}
 
 		JsonNode jsonNode;
 		try {
 			jsonNode = objectMapper.readTree(getInputStreamFromUrl(url));
-			for (JsonNode item : jsonNode.get("items")) {
+			final JsonNode items = jsonNode.get("items");
+			if (items == null || !items.iterator().hasNext()) {
+				if (YoutubeDataApiSupport.isSearchApiUrl(url)) {
+					logYoutubeApiDiagnostic(category, "search", "empty", YoutubeDataApiSupport.SEARCH_EMPTY_MESSAGE, url);
+				} else if (YoutubeDataApiSupport.isVideosApiUrl(url)) {
+					logYoutubeApiDiagnostic(category, "videos", "empty", YoutubeDataApiSupport.VIDEOS_EMPTY_MESSAGE, url);
+				}
+				return episodeList;
+			}
+			for (JsonNode item : items) {
 				JsonNode snippet = item.get("snippet");
-				String id;
-				if (snippet.has("resourceId")) {
-					id = snippet.get("resourceId").get("videoId").asText();
-				} else {
-					id = item.get("id").get("videoId").asText();
+				final String id = resolveVideoId(item, snippet);
+				if (id == null) {
+					continue;
 				}
 				String href = YoutubeConf.BASE_URL + "/watch?v=" + id;
 				String name = snippet.get("title").textValue();
 				episodeList.add(new EpisodeDTO(category, name, href));
 			}
+		} catch (TechnicalException e) {
+			final String summary = YoutubeDataApiSupport.summarizeRecoverableApiError(e);
+			if (summary != null) {
+				logApiFailure(category, url, summary);
+				return episodeList;
+			}
+			throw new TechnicalException(YoutubeDataApiSupport.buildSafeApiFailureMessage(url), e);
 		} catch (IOException e) {
-			throw new TechnicalException("youtube api request failed: " + sanitizeUrl(url), e);
+			final String summary = YoutubeDataApiSupport.summarizeRecoverableApiError(e);
+			if (summary != null) {
+				logApiFailure(category, url, summary);
+				return episodeList;
+			}
+			throw new TechnicalException(YoutubeDataApiSupport.buildSafeApiFailureMessage(url), e);
 		}
 		return episodeList;
 	}
 
-	private String sanitizeUrl(String url) {
-		return url.replaceAll("([?&]key=)[^&]+", "$1***");
+	private void logApiFailure(final CategoryDTO category, final String url, final String reason) {
+		final String categoryName = category == null ? "n/a" : category.getName();
+		final String fatherName = category == null || category.getFatherCategory() == null ? "n/a"
+				: category.getFatherCategory().getName();
+		LOG.warn("provider=YouTube, category=" + categoryName + ", father=" + fatherName + ", reason=" + reason
+				+ ", url=" + YoutubeDataApiSupport.redactUrl(url));
+	}
+
+	private String resolveVideoId(final JsonNode item, final JsonNode snippet) {
+		if (snippet != null && snippet.has("resourceId")) {
+			return snippet.get("resourceId").get("videoId").asText();
+		}
+		final JsonNode idNode = item.get("id");
+		if (idNode == null) {
+			return null;
+		}
+		if (idNode.isTextual()) {
+			return idNode.asText();
+		}
+		if (idNode.has("videoId")) {
+			return idNode.get("videoId").asText();
+		}
+		return null;
+	}
+
+	private void logYoutubeApiDiagnostic(final CategoryDTO category, final String endpoint, final String status,
+			final String reason, final String url) {
+		final String categoryName = category == null ? "n/a" : category.getName();
+		LOG.info("provider=YouTube, category=" + categoryName + ", endpoint=" + endpoint + ", status=" + status
+				+ ", reason=" + reason + ", url=" + YoutubeDataApiSupport.redactUrl(url));
 	}
 
 	@Override
 	public Set<CategoryDTO> findCategory() {
 		final Set<CategoryDTO> categoryList = new LinkedHashSet<>();
-		
+
 		CategoryDTO playListCat = TemplateUtils.buildCategoryTemplate(getName(), PLAYLIST, buildPlaylistTemplateID());
 		playListCat.addSubCategory(buildFrance24LiveCat());
 		categoryList.add(playListCat);
-		
+
 		CategoryDTO topTemplate = TemplateUtils.buildCategoryTemplate(getName(), TOP, buildTopTemplateID());
 		topTemplate.addSubCategory(buildTop100AllTimes());
 		categoryList.add(topTemplate);
-		
+
 		return categoryList;
 	}
 
@@ -163,7 +298,7 @@ public class YoutubePluginManager extends BasePluginWithProxy implements PluginP
 	}
 
 	private CategoryDTO buildTop100AllTimes() {
-		return TemplateUtils.buildSampleCat(getName(), "Top 50 All Times", ImmutableMap.of(DAYS, "36500", MAX_RESULTS, "50"));
+		return TemplateUtils.buildSampleCat(getName(), "Top 50 All Times", ImmutableMap.of(MAX_RESULTS, "50"));
 	}
 
 	private CategoryDTO buildFrance24LiveCat() {

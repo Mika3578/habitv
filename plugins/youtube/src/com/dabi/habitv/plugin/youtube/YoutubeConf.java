@@ -1,8 +1,14 @@
 package com.dabi.habitv.plugin.youtube;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public final class YoutubeConf {
 	private static final String API_KEY_PROPERTY = "habitv.youtube.apiKey";
 	private static final String API_KEY_ENV = "HABITV_YOUTUBE_API_KEY";
+
+	/** Google API keys for YouTube Data API v3 typically start with {@code AIza}. */
+	private static final Pattern GOOGLE_API_KEY_TOKEN = Pattern.compile("AIza[0-9A-Za-z_-]+");
 
 	private YoutubeConf() {
 
@@ -29,11 +35,26 @@ public final class YoutubeConf {
 	public static final String BASE_URL = "https://www.youtube.com";
 
 	public static String resolveApiKey() {
-		String value = normalizeApiKey(System.getProperty(API_KEY_PROPERTY));
-		if (value != null) {
-			return value;
+		return normalizeApiKey(readRawApiKeyCandidate());
+	}
+
+	static String apiKeySkipReason() {
+		final String raw = readRawApiKeyCandidate();
+		if (raw == null || raw.trim().isEmpty()) {
+			return YoutubeDataApiSupport.MISSING_API_KEY_MESSAGE;
 		}
-		return normalizeApiKey(System.getenv(API_KEY_ENV));
+		if (normalizeApiKey(raw) == null) {
+			return YoutubeDataApiSupport.INVALID_API_KEY_MESSAGE;
+		}
+		return YoutubeDataApiSupport.MISSING_API_KEY_MESSAGE;
+	}
+
+	static String readRawApiKeyCandidate() {
+		final String propertyValue = System.getProperty(API_KEY_PROPERTY);
+		if (propertyValue != null && !propertyValue.trim().isEmpty()) {
+			return propertyValue;
+		}
+		return System.getenv(API_KEY_ENV);
 	}
 
 	static String normalizeApiKey(String candidate) {
@@ -41,7 +62,18 @@ public final class YoutubeConf {
 			return null;
 		}
 		String trimmed = candidate.trim();
-		return trimmed.isEmpty() ? null : trimmed;
+		if (trimmed.length() >= 2
+				&& ((trimmed.startsWith("\"") && trimmed.endsWith("\""))
+						|| (trimmed.startsWith("'") && trimmed.endsWith("'")))) {
+			trimmed = trimmed.substring(1, trimmed.length() - 1).trim();
+		}
+		if (trimmed.isEmpty()) {
+			return null;
+		}
+		final Matcher matcher = GOOGLE_API_KEY_TOKEN.matcher(trimmed);
+		if (matcher.find()) {
+			return matcher.group();
+		}
+		return null;
 	}
-
 }

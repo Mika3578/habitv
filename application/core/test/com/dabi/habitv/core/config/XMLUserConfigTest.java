@@ -66,6 +66,25 @@ public class XMLUserConfigTest {
 	}
 
 	@Test
+	public void youtubeApiKeyIsNotPrefixedWithAppDirectory() throws Exception {
+		final File file = File.createTempFile("habitv-config-", ".xml");
+		file.deleteOnExit();
+		final String fakeKey = ConfigTestValues.YOUTUBE_API_KEY_PLAIN;
+		Files.write(file.toPath(), ("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+				+ "<ns2:configuration xmlns:ns2=\"http://www.dabi.com/habitv/configuration/entities\">\n"
+				+ "    <proxies/>\n"
+				+ "    <osConfig/>\n"
+				+ "    <downloadConfig>\n"
+				+ "        <downloaders>\n"
+				+ "            <youtubeApiKey>" + fakeKey + "</youtubeApiKey>\n"
+				+ "        </downloaders>\n"
+				+ "        <downloadOuput>/tmp/#EPISODE#.mp4</downloadOuput>\n"
+				+ "    </downloadConfig>\n"
+				+ "</ns2:configuration>\n").getBytes(StandardCharsets.UTF_8));
+		assertEquals(fakeKey, XMLUserConfig.readConfigForTest(file).getYoutubeApiKey());
+	}
+
+	@Test
 	public void maxConcurrentDownloadsRoundTrip() throws Exception {
 		final File file = File.createTempFile("habitv-config-", ".xml");
 		file.deleteOnExit();

@@ -367,6 +367,16 @@ public final class EpisodeManager extends AbstractManager implements TaskAdder {
 		if (category == null || category.getPlugin() == null) {
 			return Collections.emptySet();
 		}
+		if (category.isTemplate()) {
+			LOG.info("Skipping episode lookup for template category: " + category.getName()
+					+ " (plugin=" + category.getPlugin() + ")");
+			return Collections.emptySet();
+		}
+		if (!category.isDownloadable()) {
+			LOG.info("Skipping episode lookup for non-downloadable category: " + category.getName()
+					+ " (plugin=" + category.getPlugin() + ")");
+			return Collections.emptySet();
+		}
 		return getProviderPluginHolder().getPlugin(category.getPlugin()).findEpisode(category);
 	}
 
