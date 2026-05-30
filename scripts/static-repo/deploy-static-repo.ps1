@@ -1,6 +1,7 @@
 param(
     [Parameter(Mandatory = $false)]
-    [string]$StaticRepoPath
+    [string]$StaticRepoPath,
+    [switch]$SkipTests
 )
 
 Set-StrictMode -Version Latest
@@ -36,4 +37,9 @@ if (-not [string]::IsNullOrWhiteSpace($StaticRepoPath)) {
     $env:HABITV_REPO_DIR = Resolve-HabitvRepoDirFromStaticRepoPath -StaticRepoPath $StaticRepoPath
 }
 
-& (Join-Path $PSScriptRoot "publish-static-repository.ps1") -SkipTests
+$publishArgs = @()
+if ($SkipTests) {
+    $publishArgs += "-SkipTests"
+}
+
+& (Join-Path $PSScriptRoot "publish-static-repository.ps1") @publishArgs
