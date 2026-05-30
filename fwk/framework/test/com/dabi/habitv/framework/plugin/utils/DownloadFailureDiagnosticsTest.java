@@ -14,6 +14,14 @@ import com.dabi.habitv.api.plugin.exception.ExecutorFailedException;
 public class DownloadFailureDiagnosticsTest {
 
 	@Test
+	public void getClassificationKeyReturnsStableIdentifierForDrmFailure() {
+		final ExecutorFailedException failure = new ExecutorFailedException("yt-dlp \"url\"",
+				"ERROR: Content is DRM protected by Widevine", "ERROR: Content is DRM protected by Widevine", null);
+		assertEquals(DownloadFailureDiagnostics.CLASSIFICATION_DRM_PROTECTED,
+				DownloadFailureDiagnostics.getClassificationKey(failure));
+	}
+
+	@Test
 	public void buildUserMessageClassifiesDrmFailures() {
 		final ExecutorFailedException failure = new ExecutorFailedException("yt-dlp \"url\"",
 				"ERROR: Content is DRM protected by Widevine", "ERROR: Content is DRM protected by Widevine", null);

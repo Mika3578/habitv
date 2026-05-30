@@ -9,15 +9,22 @@ public final class ExecutorOutputSanitizer {
 
 	private static final int OUTPUT_SNIPPET_MAX_LENGTH = 300;
 
-	private static final Pattern SENSITIVE_QUERY_PARAM = Pattern
-			.compile("(?i)([?&](key|apiKey|access_token|token|oauth_token|authorization)=)([^&\\s\"']*)");
+	private static final Pattern COMMAND_SECRET_FLAG = Pattern.compile(
+			"(?i)(--(?:cookies(?:-from-browser)?|profile-directory|browser-profile)\\s+)"
+					+ "(\"(?:[^\"\\\\]|\\\\.)*\"|'(?:[^'\\\\]|\\\\.)*'|\\S+)");
+
+	private static final Pattern URL_SENSITIVE_QUERY_PARAM = Pattern.compile(
+			"(?i)([?&](?:key|apikey|api_key|access_token|token|oauth_token|authorization|session|sessionid|auth)=)"
+					+ "([^&\\s\"']*)");
+
+	private static final Pattern BARE_SENSITIVE_PARAM = Pattern.compile(
+			"(?i)(^|\\s)((?:key|apikey|api_key|access_token|token|oauth_token|session|sessionid|auth)=)"
+					+ "([^\\s&\"']*)");
+
+	private static final Pattern AUTHORIZATION_PARAM = Pattern
+			.compile("(?i)(authorization=)(?:Bearer\\s+)?\\S+");
 
 	private static final Pattern EMBEDDED_GOOGLE_API_KEY = Pattern.compile("AIza[0-9A-Za-z_-]+");
-
-	private static final Pattern COOKIES_FLAG = Pattern.compile("(?i)(--cookies(?:-from-browser)?\\s+)(\\S+)");
-
-	private static final Pattern BROWSER_PROFILE_FLAG = Pattern
-			.compile("(?i)(--(?:cookies-from-browser|profile-directory)\\s+)(\\S+)");
 
 	private ExecutorOutputSanitizer() {
 	}
@@ -40,9 +47,10 @@ public final class ExecutorOutputSanitizer {
 		if (text == null) {
 			return "";
 		}
-		String sanitized = SENSITIVE_QUERY_PARAM.matcher(text).replaceAll("$1***");
-		sanitized = COOKIES_FLAG.matcher(sanitized).replaceAll("$1***");
-		sanitized = BROWSER_PROFILE_FLAG.matcher(sanitized).replaceAll("$1***");
+		String sanitized = COMMAND_SECRET_FLAG.matcher(text).replaceAll("$1***");
+		sanitized = URL_SENSITIVE_QUERY_PARAM.matcher(sanitized).replaceAll("$1***");
+		sanitized = BARE_SENSITIVE_PARAM.matcher(sanitized).replaceAll("$1$2***");
+		sanitized = AUTHORIZATION_PARAM.matcher(sanitized).replaceAll("$1***");
 		return EMBEDDED_GOOGLE_API_KEY.matcher(sanitized).replaceAll("AIza***");
 	}
 
