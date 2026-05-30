@@ -217,8 +217,11 @@
 		<profile>
 			<id>static-repo-deploy</id>
 			<properties>
-				<habitv.deploy.repository.url>file:///${user.home}/dev/habitv-repo/repository</habitv.deploy.repository.url>
+				<habitv.deploy.repository.url>file:///${habitv.static.repo.path}</habitv.deploy.repository.url>
 			</properties>
+			<modules>
+				<module>build/static-repo-publisher</module>
+			</modules>
 			<distributionManagement>
 				<repository>
 					<id>habitv-static-deploy</id>
@@ -231,6 +234,17 @@
 					<url>${habitv.deploy.repository.url}</url>
 				</snapshotRepository>
 			</distributionManagement>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-deploy-plugin</artifactId>
+						<configuration>
+							<deployAtEnd combine.self="override">false</deployAtEnd>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 		<profile>
 			<id>live-provider-tests</id>

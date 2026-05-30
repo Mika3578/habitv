@@ -8,6 +8,13 @@ import re
 import sys
 
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+if SCRIPT_DIR not in sys.path:
+    sys.path.insert(0, SCRIPT_DIR)
+
+from validate_manifest_freshness import newest_jar_in_directory  # noqa: E402
+
+
 def read_plugin_ids(plugins_pom):
     with open(plugins_pom, "r") as handle:
         content = handle.read()
@@ -16,16 +23,7 @@ def read_plugin_ids(plugins_pom):
 
 
 def latest_jar(version_dir):
-    jars = [
-        name
-        for name in os.listdir(version_dir)
-        if name.endswith(".jar")
-        and not name.endswith("-sources.jar")
-        and not name.endswith("-javadoc.jar")
-    ]
-    if not jars:
-        return None
-    return sorted(jars)[-1]
+    return newest_jar_in_directory(version_dir)
 
 
 def build_manifest_lines(repository_root, plugin_ids):

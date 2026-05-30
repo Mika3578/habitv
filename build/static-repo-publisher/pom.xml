@@ -13,12 +13,14 @@
 	<artifactId>static-repo-publisher</artifactId>
 	<packaging>pom</packaging>
 	<name>static repository publisher</name>
-	<description>Final reactor step: publish plugins.txt, manifest, index.html, and tool zips.</description>
+	<description>Final reactor step: publish plugins.txt, manifest, index.html, tool zips, and validate freshness.</description>
 
 	<properties>
 		<habitv.repo.root>${session.executionRootDirectory}</habitv.repo.root>
 		<static.repo.publish.script>${habitv.repo.root}/scripts/static-repo/publish-repository-extras.ps1</static.repo.publish.script>
 		<static.repo.metadata.script>${habitv.repo.root}/scripts/static-repo/generate_repository_metadata.py</static.repo.metadata.script>
+		<static.repo.freshness.script>${habitv.repo.root}/scripts/static-repo/validate_manifest_freshness.py</static.repo.freshness.script>
+		<static.repo.layout.script>${habitv.repo.root}/scripts/static-repo/validate_repository_layout.py</static.repo.layout.script>
 	</properties>
 
 	<build>
@@ -30,6 +32,20 @@
 				<executions>
 					<execution>
 						<id>publish-static-repository-extras</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>validate-static-repository-layout</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>validate-manifest-freshness</id>
 						<phase>deploy</phase>
 						<goals>
 							<goal>exec</goal>
@@ -53,17 +69,42 @@
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>exec-maven-plugin</artifactId>
-						<configuration>
-							<executable>powershell.exe</executable>
-							<arguments>
-								<argument>-ExecutionPolicy</argument>
-								<argument>Bypass</argument>
-								<argument>-File</argument>
-								<argument>${static.repo.publish.script}</argument>
-								<argument>-RepositoryPath</argument>
-								<argument>${habitv.static.repo.path}</argument>
-							</arguments>
-						</configuration>
+						<executions>
+							<execution>
+								<id>publish-static-repository-extras</id>
+								<configuration>
+									<executable>powershell.exe</executable>
+									<arguments>
+										<argument>-ExecutionPolicy</argument>
+										<argument>Bypass</argument>
+										<argument>-File</argument>
+										<argument>${static.repo.publish.script}</argument>
+										<argument>-RepositoryPath</argument>
+										<argument>${habitv.static.repo.path}</argument>
+									</arguments>
+								</configuration>
+							</execution>
+							<execution>
+								<id>validate-static-repository-layout</id>
+								<configuration>
+									<executable>python</executable>
+									<arguments>
+										<argument>${static.repo.layout.script}</argument>
+										<argument>${habitv.static.repo.path}</argument>
+									</arguments>
+								</configuration>
+							</execution>
+							<execution>
+								<id>validate-manifest-freshness</id>
+								<configuration>
+									<executable>python</executable>
+									<arguments>
+										<argument>${static.repo.freshness.script}</argument>
+										<argument>${habitv.static.repo.path}</argument>
+									</arguments>
+								</configuration>
+							</execution>
+						</executions>
 					</plugin>
 				</plugins>
 			</build>
@@ -80,13 +121,38 @@
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>exec-maven-plugin</artifactId>
-						<configuration>
-							<executable>python3</executable>
-							<arguments>
-								<argument>${static.repo.metadata.script}</argument>
-								<argument>${habitv.static.repo.path}</argument>
-							</arguments>
-						</configuration>
+						<executions>
+							<execution>
+								<id>publish-static-repository-extras</id>
+								<configuration>
+									<executable>python3</executable>
+									<arguments>
+										<argument>${static.repo.metadata.script}</argument>
+										<argument>${habitv.static.repo.path}</argument>
+									</arguments>
+								</configuration>
+							</execution>
+							<execution>
+								<id>validate-static-repository-layout</id>
+								<configuration>
+									<executable>python3</executable>
+									<arguments>
+										<argument>${static.repo.layout.script}</argument>
+										<argument>${habitv.static.repo.path}</argument>
+									</arguments>
+								</configuration>
+							</execution>
+							<execution>
+								<id>validate-manifest-freshness</id>
+								<configuration>
+									<executable>python3</executable>
+									<arguments>
+										<argument>${static.repo.freshness.script}</argument>
+										<argument>${habitv.static.repo.path}</argument>
+									</arguments>
+								</configuration>
+							</execution>
+						</executions>
 					</plugin>
 				</plugins>
 			</build>

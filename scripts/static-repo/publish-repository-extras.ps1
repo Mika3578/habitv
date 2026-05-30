@@ -117,16 +117,38 @@ function Write-PluginsTxt {
     Write-Host "Wrote $path ($($PluginIds.Count) plugins)"
 }
 
+function Get-BuildSortKeyFromFileName {
+    param([string]$FileName)
+
+    if ($FileName -match '-(\d{8}\.\d{6}-\d+)(?:-all)?\.jar$') {
+        $buildId = $Matches[1]
+        $parts = $buildId.Split('-', 2)
+        if ($parts.Length -eq 2) {
+            $dateTimeParts = $parts[0].Split('.', 2)
+            if ($dateTimeParts.Length -eq 2) {
+                $datePart = $dateTimeParts[0]
+                $timePart = [int]$dateTimeParts[1]
+                $buildNumber = [long]$parts[1]
+                $allPenalty = if ($FileName.EndsWith('-all.jar')) { 1 } else { 0 }
+                return "1:{0}.{1:D6}-{2:D10}:{3}:{4}" -f $datePart, $timePart, $buildNumber, (-1 * $allPenalty), $FileName
+            }
+        }
+        return "0:{0}" -f $FileName
+    }
+
+    return "0:{0}" -f $FileName
+}
+
 function Get-LatestSnapshotJar {
     param([string]$VersionDir)
 
     $jars = @(Get-ChildItem -Path $VersionDir -Filter "*.jar" -File |
-        Where-Object { $_.Name -notmatch '(-sources|-javadoc)\.jar$' } |
-        Sort-Object Name)
+        Where-Object { $_.Name -notmatch '(-sources|-javadoc)\.jar$' })
     if ($jars.Count -eq 0) {
         return $null
     }
-    return $jars[$jars.Count - 1]
+
+    return ($jars | Sort-Object { Get-BuildSortKeyFromFileName $_.Name } | Select-Object -Last 1)
 }
 
 function Build-ManifestLines {
