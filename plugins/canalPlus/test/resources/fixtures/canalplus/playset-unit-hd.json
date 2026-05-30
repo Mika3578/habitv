@@ -1,0 +1,18 @@
+{
+  "available": [
+    {
+      "drmType": "DRM_MKPC_PLAYREADY_DASH_DOWNLOAD",
+      "quality": "HD",
+      "idKey": "d17_1287846_1_D17",
+      "hash": "31338503_50017|dbeebfcefb88613e07b09017398b9e8f",
+      "functionalType": "MOVIE"
+    },
+    {
+      "drmType": "DRM_MKPC_PLAYREADY_DASH_STREAM",
+      "quality": "HD",
+      "idKey": "d17_1287846_1_D17",
+      "hash": "31338503_50017|dbeebfcefb88613e07b09017398b9e8f",
+      "functionalType": "MOVIE"
+    }
+  ]
+}

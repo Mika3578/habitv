@@ -1,11 +1,12 @@
 package com.dabi.habitv.provider.canalplus;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.lang.StringUtils;
 
 import com.dabi.habitv.api.plugin.api.PluginDownloaderInterface;
 import com.dabi.habitv.api.plugin.api.PluginProviderInterface;
@@ -26,12 +27,21 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 	@Override
 	@SuppressWarnings("unchecked")
 	public Set<EpisodeDTO> findEpisode(final CategoryDTO category) {
+		if (CanalPlusEndpointAvailability.isUnavailablePlaceholder(category)) {
+			return new LinkedHashSet<>();
+		}
 		final ObjectMapper mapper = new ObjectMapper();
 		try {
 			final Map<String, Object> catData = mapper.readValue(getInputStreamFromUrl(category.getId()), Map.class);
 
-			List<Object> strates = (List<Object>) catData.get("strates");
-			Set<EpisodeDTO> epList = new HashSet<>();
+			List<Object> strates = CanalPlusHodorParser.extractStrates(catData);
+			if (strates == null) {
+				strates = (List<Object>) catData.get("strates");
+			}
+			Set<EpisodeDTO> epList = new LinkedHashSet<>();
+			if (strates == null) {
+				return epList;
+			}
 			for (Object strateObject : strates) {
 				Map<String, Object> strateMap = (Map<String, Object>) strateObject;
 				String type = (String) strateMap.get("type");
@@ -40,6 +50,12 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 				}
 			}
 			return epList;
+		} catch (RuntimeException e) {
+			if (CanalPlusEndpointAvailability.isUnavailable(e)) {
+				getLog().warn(CanalPlusEndpointAvailability.buildEpisodeUnavailableMessage(getName(), category, e));
+				return new LinkedHashSet<>();
+			}
+			throw e;
 		} catch (IOException e) {
 			throw new DownloadFailedException(e);
 		}
@@ -62,7 +78,18 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 	private EpisodeDTO buildEpisode(CategoryDTO category, Map<String, Object> mapEpisode) {
 		String title = (String) mapEpisode.get("title");
 		String subTitle = (String) mapEpisode.get("subtitle");
-		String url = CanalUtils.findUrl(this, (String) ((Map<String, Object>) mapEpisode.get("onClick")).get("URLPage"));
+		Map<String, Object> onClick = (Map<String, Object>) mapEpisode.get("onClick");
+		if (onClick == null) {
+			return null;
+		}
+		String urlPage = (String) onClick.get("URLPage");
+		if (StringUtils.isEmpty(urlPage)) {
+			return null;
+		}
+		if (CanalPlusContentIdParser.isModernCanalPlusUrl(urlPage)) {
+			return new EpisodeDTO(category, title + (subTitle == null ? "" : (" " + subTitle)), urlPage);
+		}
+		String url = CanalUtils.findUrl(this, urlPage);
 		return url == null ? null : new EpisodeDTO(category, title + (subTitle == null ? "" : (" " + subTitle)), url);
 	}
 
@@ -73,11 +100,17 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 		try {
 			final Map<String, Object> mainData = mapper.readValue(getInputStreamFromUrl(CanalPlusConf.URL_HOME), Map.class);
 			String urlMainPage = getUrlMainPage(mainData);
-			return findCategoriesFromUrl(null, urlMainPage);
+			if (urlMainPage != null) {
+				return findCategoriesFromUrl(null, urlMainPage);
+			}
+			getLog().warn("Canal+ legacy OnDemand entry missing; exposing protected-endpoint placeholder.");
+			return CanalPlusEndpointAvailability.buildUnavailablePlaceholderCategories(CanalPlusConf.NAME,
+					CanalPlusEndpointAvailability.CANAL_PLUS_UNAVAILABLE_LABEL);
 		} catch (RuntimeException e) {
 			if (CanalPlusEndpointAvailability.isUnavailable(e)) {
 				getLog().warn(CanalPlusEndpointAvailability.buildCategoryUnavailableMessage(getName(), e));
-				return new LinkedHashSet<>();
+				return CanalPlusEndpointAvailability.buildUnavailablePlaceholderCategories(CanalPlusConf.NAME,
+						CanalPlusEndpointAvailability.CANAL_PLUS_UNAVAILABLE_LABEL);
 			}
 			throw e;
 		} catch (IOException e) {
@@ -97,7 +130,10 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 	private Set<CategoryDTO> findCategories(CategoryDTO fatherCat, Map<String, Object> catData) throws JsonParseException,
 			JsonMappingException, IOException {
 		final Set<CategoryDTO> categories = new LinkedHashSet<>();
-		List<Object> strates = (List<Object>) catData.get("strates");
+		List<Object> strates = CanalPlusHodorParser.extractStrates(catData);
+		if (strates == null) {
+			strates = (List<Object>) catData.get("strates");
+		}
 		if (strates != null) {
 			for (Object data : strates) {
 				Map<String, Object> dataMap = (Map<String, Object>) data;
@@ -185,16 +221,51 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 
 	@Override
 	public DownloadableState canDownload(String downloadInput) {
+		if (CanalPlusModernStreamSupport.isModernInput(downloadInput)) {
+			return DownloadableState.SPECIFIC;
+		}
 		if (downloadInput.contains("canalplus.")) {
 			return DownloadableState.SPECIFIC;
-		} else {
-			return DownloadableState.IMPOSSIBLE;
 		}
+		return DownloadableState.IMPOSSIBLE;
 	}
 
 	@Override
 	public ProcessHolder download(DownloadParamDTO downloadInput, DownloaderPluginHolder downloaders) throws DownloadFailedException {
+		if (CanalPlusModernStreamSupport.isModernInput(downloadInput.getDownloadInput())) {
+			return downloadModernStream(downloadInput);
+		}
 		return CanalUtils.doDownload(downloadInput, downloaders, this, CanalPlusConf.VIDEO_INFO_URL, getName().toLowerCase());
+	}
+
+	private ProcessHolder downloadModernStream(final DownloadParamDTO downloadInput) {
+		final String input = downloadInput.getDownloadInput();
+		final String contentId = CanalPlusContentIdParser.fromInput(input);
+		try {
+			final CanalPlusHodorParser.CanalPlusUnitMetadata metadata = CanalPlusModernStreamSupport.loadUnitMetadata(this, input);
+			if (metadata != null && metadata.getDisplayName() != null) {
+				getLog().info("Canal+ modern unit metadata: " + metadata.getDisplayName()
+						+ (contentId == null ? "" : " (contentId=" + contentId + ")"));
+			}
+			final String resolvedContentId = metadata != null && metadata.getContentId() != null ? metadata.getContentId() : contentId;
+			final CanalPlusPlaysetParser.CanalPlusPlaysetItem playsetItem = CanalPlusModernStreamSupport
+					.loadSelectedPlaysetItem(this, resolvedContentId);
+			if (playsetItem == null) {
+				throw new DownloadFailedException("Canal+ playset did not expose a PlayReady download item for contentId="
+						+ resolvedContentId);
+			}
+			getLog().info("Canal+ selected playset: drmType=" + playsetItem.getDrmType() + " quality=" + playsetItem.getQuality());
+		} catch (IOException e) {
+			if (input.contains(CanalPlusModernConf.PAGE_HOST)) {
+				throw new DownloadFailedException(
+						"Canal+ page fetch failed (HTTP 403 is expected without protected network access). "
+								+ "Pass a hodor detail API URL as the episode id, or retry after page-access support is added.",
+						e);
+			}
+			throw new DownloadFailedException(e);
+		}
+		CanalPlusModernStreamSupport.assertDrmDownloadSupported();
+		return null;
 	}
 
 }

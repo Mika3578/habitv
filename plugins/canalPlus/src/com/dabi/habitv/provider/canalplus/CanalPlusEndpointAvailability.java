@@ -2,13 +2,48 @@ package com.dabi.habitv.provider.canalplus;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import com.dabi.habitv.api.plugin.dto.CategoryDTO;
+import com.dabi.habitv.framework.FrameworkConf;
 
 final class CanalPlusEndpointAvailability {
 
 	static final String ENDPOINT_UNAVAILABLE_MESSAGE =
 			"Canal+ provider endpoint is no longer reachable or requires protected access.";
 
+	static final String PROTECTED_ACCESS_DETAIL =
+			"Hodor/canalplus.com APIs require protected access or an authenticated Canal+ session. "
+					+ "Browser cookies are not enabled for this provider.";
+
+	static final String CANAL_PLUS_UNAVAILABLE_LABEL =
+			"Unavailable - Canal+ catalogue requires protected access or is no longer publicly reachable";
+
+	static final String CSTAR_UNAVAILABLE_LABEL =
+			"Unavailable - CStar endpoint requires protected access or is no longer publicly reachable";
+
+	static final String UNAVAILABLE_CATEGORY_ID_SUFFIX = "#unavailable-protected-endpoint";
+
 	private CanalPlusEndpointAvailability() {
+	}
+
+	static Set<CategoryDTO> buildUnavailablePlaceholderCategories(final String pluginName, final String label) {
+		final CategoryDTO placeholder = new CategoryDTO(pluginName, label, unavailableCategoryId(pluginName),
+				FrameworkConf.MP4);
+		placeholder.setDownloadable(false);
+		final Set<CategoryDTO> categories = new LinkedHashSet<>();
+		categories.add(placeholder);
+		return categories;
+	}
+
+	static boolean isUnavailablePlaceholder(final CategoryDTO category) {
+		return category != null && category.getId() != null
+				&& category.getId().endsWith(UNAVAILABLE_CATEGORY_ID_SUFFIX);
+	}
+
+	static String unavailableCategoryId(final String pluginName) {
+		return pluginName + UNAVAILABLE_CATEGORY_ID_SUFFIX;
 	}
 
 	static boolean isUnavailable(final Throwable error) {
@@ -30,7 +65,16 @@ final class CanalPlusEndpointAvailability {
 	}
 
 	static String buildCategoryUnavailableMessage(final String providerName, final Throwable throwable) {
-		return buildCategoryUnavailableMessage(providerName) + " Cause: " + shortCauseMessage(throwable);
+		return buildCategoryUnavailableMessage(providerName) + " " + PROTECTED_ACCESS_DETAIL + " Cause: "
+				+ shortCauseMessage(throwable);
+	}
+
+	static String buildEpisodeUnavailableMessage(final String providerName, final CategoryDTO category,
+			final Throwable throwable) {
+		final String categoryLabel = category == null || category.getName() == null ? "category" : category.getName();
+		return providerName + ": Cannot list episodes for \"" + categoryLabel + "\". "
+				+ ENDPOINT_UNAVAILABLE_MESSAGE + " " + PROTECTED_ACCESS_DETAIL + " Cause: "
+				+ shortCauseMessage(throwable);
 	}
 
 	static String shortCauseMessage(final Throwable throwable) {
