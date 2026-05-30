@@ -21,6 +21,7 @@ import com.dabi.habitv.core.event.EpisodeStateEnum;
 import com.dabi.habitv.core.event.RetreiveEvent;
 import com.dabi.habitv.core.token.TokenReplacer;
 import com.dabi.habitv.framework.FrameworkConf;
+import com.dabi.habitv.framework.plugin.utils.DownloadFailureDiagnostics;
 import com.dabi.habitv.framework.plugin.utils.DownloadUtils;
 
 public class DownloadTask extends AbstractEpisodeTask {
@@ -57,13 +58,17 @@ public class DownloadTask extends AbstractEpisodeTask {
 
 	@Override
 	protected void failed(final Throwable e) {
-		LOG.error("Download failed for " + getEpisode(), e);
+		final String providerName = provider == null ? "unknown" : provider.getName();
+		LOG.error(DownloadFailureDiagnostics.formatLogLine(getEpisode(), providerName, e));
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Download failure detail for " + getEpisode(), e);
+		}
 		if (e instanceof ExecutorStoppedException) {
 			publisher.addNews(new RetreiveEvent(getEpisode(),
 					EpisodeStateEnum.STOPPED, e, "download"));
 		} else {
-			publisher.addNews(new RetreiveEvent(getEpisode(),
-					EpisodeStateEnum.DOWNLOAD_FAILED, e, "download"));
+			publisher.addNews(new RetreiveEvent(getEpisode(), EpisodeStateEnum.DOWNLOAD_FAILED,
+					DownloadFailureDiagnostics.toUserFacingFailure(e, getEpisode()), "download"));
 		}
 	}
 

@@ -21,8 +21,11 @@ public class ExecutorFailedException extends RuntimeException {
 		this.fullOuput = fullOuput;
 		this.cmd = cmd;
 		this.lastLine = lastLine;
-		LOG.error("Cmd was " + cmd);
-		LOG.error(fullOuput);
+		LOG.error("External command failed: " + ExecutorOutputSanitizer.sanitizeCommand(cmd));
+		final String sanitizedOutput = ExecutorOutputSanitizer.sanitizeOutput(fullOuput);
+		if (sanitizedOutput != null && !sanitizedOutput.isEmpty()) {
+			LOG.error("External command output snippet: " + sanitizedOutput);
+		}
 	}
 
 	public String getFullOuput() {

@@ -173,7 +173,10 @@ public final class HabiTvTrayView implements CoreSubscriber {
 			break;
 		case DOWNLOAD_FAILED:
 			trayIcon.displayMessage(
-					Messages.getString("HabiTvTrayView.19"), Messages.getString("HabiTvTrayView.20") + event.getEpisode().getCategory() + " " + event.getEpisode().getName(), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					Messages.getString("HabiTvTrayView.19"),
+					Messages.getString("HabiTvTrayView.20") + event.getEpisode().getCategory() + " "
+							+ event.getEpisode().getName() + " "
+							+ (event.getException() == null ? "" : event.getException().getMessage()), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					TrayIcon.MessageType.WARNING);
 			break;
 		case DOWNLOADED:

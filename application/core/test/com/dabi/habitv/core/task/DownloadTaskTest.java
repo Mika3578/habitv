@@ -153,9 +153,11 @@ public class DownloadTaskTest {
 					break;
 				case 1:
 					if (toFail) {
-						assertEquals(new RetreiveEvent(episode,
-								EpisodeStateEnum.DOWNLOAD_FAILED,
-								downloadFailedException, "download"), event);
+						assertEquals(episode, event.getEpisode());
+						assertEquals(EpisodeStateEnum.DOWNLOAD_FAILED, event.getState());
+						assertEquals("download", event.getOperation());
+						assertNotNull(event.getException());
+						assertEquals("lastline", event.getException().getMessage());
 					} else {
 						assertEquals(new RetreiveEvent(episode,
 								EpisodeStateEnum.DOWNLOADED), event);
