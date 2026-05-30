@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.time.DateUtils;
 
+import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.exception.TechnicalException;
 
 /**
@@ -153,6 +154,24 @@ public final class YoutubeDataApiSupport {
 	}
 
 	static String buildSafeApiFailureMessage(final String url) {
-		return "youtube api request failed: " + redactUrl(url);
+		return buildSafeApiFailureMessage(null, url);
+	}
+
+	static String buildSafeApiFailureMessage(final CategoryDTO category, final String url) {
+		final String categoryName = category == null ? "n/a" : category.getName();
+		final String endpoint;
+		if (isSearchApiUrl(url)) {
+			endpoint = "search";
+		} else if (isVideosApiUrl(url)) {
+			endpoint = "videos";
+		} else {
+			endpoint = "data";
+		}
+		return "provider=YouTube, category=" + categoryName + ", endpoint=" + endpoint + ", url="
+				+ redactUrl(url);
+	}
+
+	static TechnicalException newNonRecoverableApiFailure(final CategoryDTO category, final String url) {
+		return new TechnicalException(buildSafeApiFailureMessage(category, url));
 	}
 }

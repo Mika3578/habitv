@@ -92,24 +92,73 @@ public class YoutubePluginManagerApiDiagnosticsTest {
 	}
 
 	@Test
-	public void nonRecoverableApiErrorMessageIsRedacted() {
+	public void nonRecoverableTechnicalExceptionMessageIsRedactedWithoutUnsafeCause() {
+		assertNonRecoverableApiFailureDoesNotLeakSecret(unsafeHttp500TechnicalExceptionWithSecret());
+	}
+
+	@Test
+	public void nonRecoverableIOExceptionMessageIsRedactedWithoutUnsafeCause() {
+		final String secret = YoutubeTestSecrets.urlQuerySecret();
 		final YoutubePluginManager manager = new YoutubePluginManager() {
 			@Override
 			public InputStream getInputStreamFromUrl(final String url) {
-				final String secret = YoutubeTestSecrets.urlQuerySecret();
-				throw new TechnicalException(new java.io.IOException(
-						"Server returned HTTP response code: 500 for URL: "
+				return new InputStream() {
+					@Override
+					public int read() throws java.io.IOException {
+						throw new java.io.IOException("Server returned HTTP response code: 500 for URL: "
 								+ YoutubeDataApiSupport.appendApiKeyParam(
-										"https://www.googleapis.com/youtube/v3/search?part=snippet",
-										secret)));
+										"https://www.googleapis.com/youtube/v3/search?part=snippet", secret));
+					}
+				};
 			}
 		};
 		try {
 			manager.findEpisode(downloadablePlaylistLeaf());
 			fail("expected TechnicalException");
 		} catch (TechnicalException e) {
-			assertFalse(e.getMessage().contains(YoutubeTestSecrets.urlQuerySecret()));
-			assertTrue(e.getMessage().contains("key=***"));
+			assertSafeNonRecoverableApiFailure(e, secret);
+		}
+	}
+
+	private static TechnicalException unsafeHttp500TechnicalExceptionWithSecret() {
+		return new TechnicalException(unsafeHttp500WithSecret());
+	}
+
+	private static java.io.IOException unsafeHttp500WithSecret() {
+		final String secret = YoutubeTestSecrets.urlQuerySecret();
+		return new java.io.IOException("Server returned HTTP response code: 500 for URL: "
+				+ YoutubeDataApiSupport.appendApiKeyParam(
+						"https://www.googleapis.com/youtube/v3/search?part=snippet", secret));
+	}
+
+	private void assertNonRecoverableApiFailureDoesNotLeakSecret(final TechnicalException failure) {
+		final String secret = YoutubeTestSecrets.urlQuerySecret();
+		final YoutubePluginManager manager = new YoutubePluginManager() {
+			@Override
+			public InputStream getInputStreamFromUrl(final String url) {
+				throw failure;
+			}
+		};
+		try {
+			manager.findEpisode(downloadablePlaylistLeaf());
+			fail("expected TechnicalException");
+		} catch (TechnicalException e) {
+			assertSafeNonRecoverableApiFailure(e, secret);
+		}
+	}
+
+	private static void assertSafeNonRecoverableApiFailure(final TechnicalException e, final String secret) {
+		assertTrue(e.getMessage().contains("key=***"));
+		assertTrue(e.getMessage().contains("provider=YouTube"));
+		assertFalse(e.getMessage().contains(secret));
+		assertNoRawSecretInCauseChain(e, secret);
+	}
+
+	private static void assertNoRawSecretInCauseChain(final Throwable throwable, final String secret) {
+		for (Throwable current = throwable; current != null; current = current.getCause()) {
+			if (current.getMessage() != null) {
+				assertFalse(current.getMessage().contains(secret));
+			}
 		}
 	}
 

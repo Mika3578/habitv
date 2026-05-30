@@ -75,6 +75,18 @@ public class YoutubeDataApiSupportTest {
 				"https://www.googleapis.com/youtube/v3/search?key=" + secret);
 		assertFalse(message.contains(secret));
 		assertTrue(message.contains("key=***"));
+		assertTrue(message.contains("provider=YouTube"));
+		assertTrue(message.contains("endpoint=search"));
+	}
+
+	@Test
+	public void newNonRecoverableApiFailureHasNoUnsafeCause() {
+		final String secret = YoutubeTestSecrets.urlQuerySecret();
+		final TechnicalException failure = YoutubeDataApiSupport.newNonRecoverableApiFailure(null,
+				"https://www.googleapis.com/youtube/v3/search?key=" + secret);
+		assertNull(failure.getCause());
+		assertFalse(failure.getMessage().contains(secret));
+		assertTrue(failure.getMessage().contains("key=***"));
 	}
 
 	@Test

@@ -214,14 +214,14 @@ public class YoutubePluginManager extends BasePluginWithProxy implements PluginP
 				logApiFailure(category, url, summary);
 				return episodeList;
 			}
-			throw new TechnicalException(YoutubeDataApiSupport.buildSafeApiFailureMessage(url), e);
+			throw YoutubeDataApiSupport.newNonRecoverableApiFailure(category, url);
 		} catch (IOException e) {
 			final String summary = YoutubeDataApiSupport.summarizeRecoverableApiError(e);
 			if (summary != null) {
 				logApiFailure(category, url, summary);
 				return episodeList;
 			}
-			throw new TechnicalException(YoutubeDataApiSupport.buildSafeApiFailureMessage(url), e);
+			throw YoutubeDataApiSupport.newNonRecoverableApiFailure(category, url);
 		}
 		return episodeList;
 	}
