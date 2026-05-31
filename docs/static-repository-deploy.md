@@ -26,8 +26,14 @@ script is required after Maven succeeds.
 ```powershell
 $env:HABITV_REPO_DIR = "D:\path\to\habitv-repo"
 
-mvn -B -ntp -Pstatic-repo-deploy deploy "-Dhabitv.static.repo.path=$env:HABITV_REPO_DIR/repository"
+mvn -B -ntp -Pstatic-repo-deploy deploy `
+  "-Dhabitv.static.repo.path=$env:HABITV_REPO_DIR/repository" `
+  "-pl=!application/habiTv"
 ```
+
+`application/habiTv` is excluded with `-pl=!application/habiTv` because of the
+existing JDK/`utils4j` compile blocker, which is unrelated to static repository
+deployment.
 
 What this single Maven command publishes:
 
@@ -67,11 +73,15 @@ $env:HABITV_REPO_DIR = "D:\path\to\habitv-repo"
 .\scripts\static-repo\publish-static-repository.ps1 -SkipTests
 ```
 
-### Legacy `static-repo-publish` profile
+### Legacy `static-repo-publish` profile (deprecated)
 
-The older `static-repo-publish` profile remains for compatibility. New
-publications should use `-Pstatic-repo-deploy`, which now includes the same final
-publisher module and `${habitv.static.repo.path}` routing.
+The older `-Pstatic-repo-publish` profile remains only as a legacy compatibility
+fallback for older runbooks. **New publications must use `-Pstatic-repo-deploy`.**
+
+Do not treat the legacy profile as equivalent to `-Pstatic-repo-deploy`. It is a
+best-effort fallback only and is **not** the validated workflow for deploy
+ordering, manifest freshness validation, or `${habitv.static.repo.path}` routing.
+Use it only when an exceptional compatibility case requires it:
 
 ```powershell
 mvn -B -ntp -DskipTests clean deploy -Pstatic-repo-publish `
@@ -96,10 +106,6 @@ host-provided autoindex. The generated tree must include:
 No GitHub Packages endpoint is used, and runtime update checks must never require a
 token.
 
-`application/habiTv` remains excluded (`-pl=!application/habiTv`) because of the
-existing JDK/`utils4j` compile blocker, which is unrelated to static repository
-deployment.
-
 Inspect the resolved staging path:
 
 ```powershell
@@ -110,7 +116,9 @@ Override the staging path:
 
 ```powershell
 $env:HABITV_REPO_DIR = "D:\path\to\habitv-repo"
-mvn -B -ntp -Pstatic-repo-deploy deploy "-Dhabitv.static.repo.path=$env:HABITV_REPO_DIR/repository"
+mvn -B -ntp -Pstatic-repo-deploy deploy `
+  "-Dhabitv.static.repo.path=$env:HABITV_REPO_DIR/repository" `
+  "-pl=!application/habiTv"
 ```
 
 Nothing is written under the `habitv` source tree; output goes only to
