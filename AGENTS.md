@@ -6,8 +6,8 @@ complement, but do not replace, the human review process.
 
 ## Agent rules metadata
 
-* **Version:** 1.4.0
-* **Last updated:** 2026-05-28
+* **Version:** 1.4.1
+* **Last updated:** 2026-05-31
 * **Maintainer:** repository maintainer
 * **Scope:** Habitv AI-assisted development workflow
 * **Canonical source:** `AGENTS.md`

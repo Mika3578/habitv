@@ -2,6 +2,34 @@
 
 Version history for Habitv AI agent rules. Canonical source: [`AGENTS.md`](../AGENTS.md).
 
+## 2026-05-31 — v1.4.1
+
+### Added
+
+* None.
+
+### Changed
+
+* Refreshed the repository at-a-glance modernization/tracker state and Copilot
+  instruction pointer as part of PR #141, with no workflow or rule behavior
+  changes.
+
+### Removed
+
+* None.
+
+### Reason
+
+* Tracker synchronization PR #141 edited `AGENTS.md` and
+  `.github/copilot-instructions.md`; metadata and changelog audit trail
+  required per Section 17.
+
+### Follow-up
+
+* None.
+
+---
+
 ## 2026-05-28 — v1.4.0
 
 ### Added
