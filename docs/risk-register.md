@@ -218,18 +218,17 @@ modular JDK / Java 21+ when migrating off Java 8.
 at runtime. A dev build can pull whatever is on that host (or
 fail noisily if it is down).
 
-**Mitigation** — Updates are disabled by default; explicit opt-in
-required before any runtime fetch (`habitv.update.enabled=true`,
-optional `habitv.update.url`).
+**Mitigation** — Runtime updates use HTTPS `habitv-repo` by default;
+set `habitv.update.enabled=false` to disable startup checks. Optional
+`habitv.update.url` override. SNAPSHOT consumption for developers uses
+`-Dhabitv.update.autoriseSnapshot=true`.
 
 **Status update (`legacy-url-migration` / `static-repo-publish`)** —
-`UpdateManager` returns immediately unless
-`habitv.update.enabled=true`. The default target base URL constant is
-`https://mika3578.github.io/habitv-repo/repository` (legacy DabiBoo
-removed). Publication cutover and live Pages layout validation are now
-complete (habitv-repo PR #2 merged), and updates remain disabled by
-default. Remaining follow-up: one dedicated opt-in runtime update
-smoke test against the live Pages URL.
+Default `UPDATE_URL` is `https://mika3578.github.io/habitv-repo/repository`.
+Publication cutover is live (habitv-repo PR #2). Manifest-first resolution
+with `maven-metadata.xml` fallback. PR [#140](https://github.com/Mika3578/habitv/pull/140)
+refreshes `habitv-update-manifest.properties` after deploy. Remaining follow-up:
+one dedicated opt-in runtime update smoke test against the live Pages URL.
 
 ---
 
@@ -250,7 +249,12 @@ remote availability and HTML/JSON changes.
 
 **Mitigation** — Keep tests excluded from the default lifecycle
 in `java8-baseline`; quarantine network tests behind an opt-in
-profile.
+profile (`-Plive-provider-tests`).
+
+**Status update** — PR [#135](https://github.com/Mika3578/habitv/pull/135)
+removed live URL dependency from a deterministic test. Offline fixture
+baselines exist for priority providers; default Surefire still excludes
+`*PluginManagerTest`.
 
 ---
 

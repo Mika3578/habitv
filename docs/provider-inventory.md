@@ -2,8 +2,8 @@
 
 **Tracker item**: `provider-inventory`  
 **Legacy code**: `HBTV-006` (historical reference only)  
-**Status:** in progress (~55%) — inventory and offline fixtures; rewrites are
-separate PRs per module.
+**Status:** in progress (~65%) — inventory and offline fixtures; rewrites are
+separate PRs per module. **Last refresh:** 2026-05-31.
 
 ---
 
@@ -12,7 +12,7 @@ separate PRs per module.
 | Area | Status | Next steps |
 |------|--------|------------|
 | Reactor / build | All listed modules compile in the Maven reactor | Keep `mvn validate` green |
-| `francetv` (ex Pluzz) | **Keep** — France.tv mobile API + yt-dlp download | Migrate user grab-config `pluzz` → `francetv` |
+| `francetv` (ex Pluzz) | **Keep** — France.tv mobile API + public hub discovery (PR #137) + yt-dlp download | Migrate user grab-config `pluzz` → `francetv`; refresh hubs after upgrade |
 | `youtube` | **Keep** — yt-dlp binary contract (see `ytdlp-migration`) | Publish `yt-dlp` tool zip to `habitv-repo` |
 | `arte`, `6play`, `lequipe`, … | **Needs rewrite** or live drift | Fixture-first parser PRs |
 | `canalPlus` (+ embedded CStar) | **Obsolete** Canal-era endpoints | Dedicated canal-family rewrite |
@@ -77,7 +77,7 @@ no provider rewrite, no runtime behavior change in inventory-only work.
 | `plugins/lequipe` | `lequipe` | provider | needs live endpoint rewrite | Provider/downloader plugin uses HTML scraping; tests include historical Kewego stream-init references | rewrite provider |
 | `plugins/mlssoccer` | `mlssoccer` | provider | unknown / needs fixture | `MLSSoccerPluginManager` provider/downloader with HTTPS URLs; live endpoint compatibility not validated offline | add fixture tests |
 | `plugins/plugin-tester` | `plugin-tester` | test harness | infrastructure-only | `BasePluginProviderTester` / `BasePluginUpdateTester` provide shared live-style harness utilities | keep as-is |
-| `plugins/francetv` | `francetv` | provider | keep | `FranceTvPluginManager` queries `api-mobile.yatta.francetv.fr` catalogue; download delegated to `youtube` (yt-dlp); offline `FranceTvUrlsTest` + live `FranceTvPluginManagerTest`; replaces former `plugins/pluzz` (legacy `pluzz.` URLs still recognised by `canDownload`, but existing grab-config entries still need the plugin id renamed to `francetv`) | keep |
+| `plugins/francetv` | `francetv` | provider | keep | `FranceTvPluginManager` queries `api-mobile.yatta.francetv.fr` catalogue and public hubs via `/apps/channels/{hubSlug}?platform=apps` (PR #137, plugin `4.1.3-SNAPSHOT`); download delegated to `youtube` (yt-dlp); offline `FranceTvUrlsTest` + fixture baseline; live `FranceTvPluginManagerTest` opt-in only; replaces former `plugins/pluzz` (legacy `pluzz.` URLs still recognised by `canDownload`; grab-config plugin id must be `francetv`) | keep |
 | `plugins/rtmpDump` | `rtmpDump` | downloader | keep | `RtmpDumpPluginDownloader` is binary wrapper with updater version pattern; dedicated test exists | keep as-is |
 | `plugins/sfr` | `sfr` | provider | unknown / needs fixture | `SFRConf` uses `sport.sfr.fr` API path; provider tests are live-network style only | add fixture tests |
 | `plugins/wat` | `wat` | provider | obsolete endpoint | `WatConf` points to TF1/WAT-era URLs; plugin naming and endpoint model reflect legacy provider branding | rewrite provider |

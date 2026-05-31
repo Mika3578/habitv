@@ -1,6 +1,8 @@
 # 🧰 External tools — recommendations and obsolescence analysis
 
 **Tracker item**: `external-tools-recommendations`
+**Last refresh:** 2026-05-31 (tracker sync; content unchanged since initial analysis PR #104)
+
 **Scope in this PR**: documentation, classification, and recommended
 follow-up PR queue. **No** plugin module is added or removed, **no**
 `configuration.xml` change, **no** `tool-sources.properties` change,

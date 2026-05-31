@@ -16,7 +16,7 @@ later phase.
 ## 🎯 Phase progress
 
 ```
-███████████████▋░░░░  79%   (tracker-aligned overall progress)
+████████████████░░░░  80%   (tracker-aligned overall progress)
 ```
 
 | Phase | Title | Status | Progress | Tracker items |
@@ -27,8 +27,13 @@ later phase.
 | 3 | 🔗 Remove legacy free.fr / SVN / FTP | ✅ Done | `████████████████████` 100% | `legacy-url-migration`, `youtube-apikey` |
 | 4 | 📦 Publish artifacts via `habitv-repo` | ✅ Done | `████████████████████` 100% | `static-repo-publish` |
 | 5 | 🎬 Replace `youtube-dl` with `yt-dlp` | 🟡 In progress | `███████████████░░░░░` 75% | `ytdlp-migration` |
-| 6 | 🔌 Audit / deprecate obsolete providers | 🟡 In progress | `███████████░░░░░░░░░` 55% | `provider-inventory` |
-| 7 | 🖼️ Modernize UI / runtime packaging | 🔵 Proposed | `█░░░░░░░░░░░░░░░░░░░` 5% | `javafx-modernization` |
+| 6 | 🔌 Audit / deprecate obsolete providers | 🟡 In progress | `█████████████░░░░░░░` 65% | `provider-inventory` |
+| 7 | 🖼️ Modernize UI / runtime packaging | 🔵 Proposed | `███░░░░░░░░░░░░░░░░░` 15% | `javafx-modernization` |
+
+**Current execution focus (2026-05-31):** Phase 5–6 — modern replay downloading
+(`ytdlp-migration`, `provider-inventory`, France.tv hub work). Java runtime
+migration (17 → **21** LTS target, **25** later) stays in
+[`java-runtime-policy.md`](java-runtime-policy.md); not mixed into tracker-only PRs.
 
 ---
 
@@ -135,7 +140,7 @@ Remaining: live fixture validation, `habitv-repo` `yt-dlp` tool zip publication.
 
 ## 🔌 Phase 6 — Audit / deprecate obsolete providers
 
-🟡 **In progress** · `███████████░░░░░░░░░` 55%
+🟡 **In progress** · `█████████████░░░░░░░` 65%
 
 - Inventory all provider plugins and verify endpoints are reachable
   and parsable (offline against captured fixtures, not live).
@@ -151,7 +156,7 @@ Remaining: live fixture validation, `habitv-repo` `yt-dlp` tool zip publication.
 
 ## 🖼️ Phase 7 — Modernize UI / runtime packaging
 
-🔵 **Proposed** · `█░░░░░░░░░░░░░░░░░░░` 5%
+🔵 **Proposed** · `███░░░░░░░░░░░░░░░░░` 15%
 
 - Migrate JavaFX 2.x (`jfxrt.jar` on Java 8; optional provided OpenJFX at
   compile on JDK 11+ per PR #100) to **shipped** OpenJFX runtime packaging

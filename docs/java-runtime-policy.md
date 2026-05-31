@@ -17,6 +17,7 @@ supersedes informal README wording where they conflict.
 | **Compiler `source` / `target`** | **1.8** across the in-reactor modules |
 | **End-user GUI runtime** | JDK/JRE 8 with a **JavaFX-capable** distribution (see below) |
 | **JDK 11+ on developer/CI machines** | Allowed for **build** (`validate`, `compile`, and scoped `package`) via the `javafx-openjfx-compile` Maven profile; **not** a supported end-user runtime yet |
+| **Planned runtime LTS target** | **Java 21** (after Java 17 milestone); **Java 25** evaluated later — not supported yet |
 | **Runtime migration to Java 11/17/21** | **Not complete** — documentation and CI diagnostics only where noted |
 
 ---
@@ -159,8 +160,8 @@ High-level steps (documentation-only sequencing; tracker items own delivery):
 | **1** | Keep **Java 8** baseline stable (`validate` / `compile` / required CI on 8) | In progress — baseline done; maintenance ongoing |
 | **2** | Make **build** compatible with **JDK 11+** hosts (compile/package bridge) | **Partial** — PR #100 (`javafx-openjfx-compile` profile) |
 | **3** | Prepare **Java 17** runtime compatibility (JAXB, OpenJFX packaging, launcher) | Not started for runtime |
-| **4** | Prepare **Java 21** runtime target (LTS stable deployment) | Future |
-| **5** | Evaluate **Java 25** later (experimental CI only until blockers clear) | Diagnostic only |
+| **4** | Prepare **Java 21** runtime target (LTS stable deployment — primary long-term target) | Future |
+| **5** | Evaluate **Java 25** after 21 is proven (experimental CI until blockers clear) | Diagnostic only |
 
 Step 2 does **not** imply Step 3 is complete. Steps 3–4 require ADR
 superseding `keep-java8-baseline`, green required CI on the target JDK, and
