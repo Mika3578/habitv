@@ -30,15 +30,24 @@ only (never `--force`).
 
 ## Copilot review comments
 
-Before PR readiness:
+Before PR readiness (`AGENTS.md` Sections 14.4, 20.15):
 
 1. Inspect all Copilot review comments and unresolved conversations.
 2. Classify each: accepted and fixed; intentionally rejected with reason;
    not applicable; outside current PR scope; needs developer decision.
 3. Implement accepted items; reply in English to each comment.
-4. Resolve only after handling and reply. Never resolve to silence review.
-5. Ask developer approval before GitHub commands that resolve threads.
-6. Never resolve conversations silently (`AGENTS.md` Section 15.7).
+4. Resolve only after handling and reply — not to silence review; not twice
+   without a new commit or explicit developer decision.
+5. Ask developer approval before GitHub commands that resolve threads or
+   re-request review.
+
+Details: [`docs/dev-workflow.md`](../docs/dev-workflow.md#copilot-review-loop).
+Never resolve conversations silently (Section 15.7).
+
+## Concise communication
+
+PR/commit/review text: English, scoped, reviewer-friendly (Section 20.13).
+Details: [`docs/dev-workflow.md`](../docs/dev-workflow.md#concise-communication).
 
 ## Instruction alignment
 

@@ -39,6 +39,57 @@ refactor, packaging, migration preparation, or investigation only.
    PR branch.
 5. Target PRs at `Mika3578/habitv` → `develop`.
 
+## Agent vs developer Git actions
+
+**Level 1 — Assisted:** Cursor/agents prepare commits, diffs, PR bodies,
+and checklists. The **developer executes** Git and GitHub write actions
+(`git commit`, `git push`, `gh pr create`, review replies, merge) manually
+after explicit approval in the current conversation (`AGENTS.md` Section 14).
+
+## Planning sources
+
+| Document | Purpose |
+|----------|---------|
+| [`dev-tracker.md`](dev-tracker.md) + [`dev-tracker.json`](dev-tracker.json) | Canonical planned work and tracker state |
+| [`maintenance-dashboard.md`](maintenance-dashboard.md) | Short operational view — not a second roadmap |
+| [`agent-rules-backlog.md`](agent-rules-backlog.md) | Future **AI rule** candidates only |
+| [`modernization-backlog.md`](modernization-backlog.md) | Larger modernization queue |
+
+Follow-up work discovered during a task belongs in the appropriate tracker
+or backlog (Section 15.26), not only in PR comments.
+
+## Concise communication
+
+PR titles and commit subjects: Conventional Commits, English, imperative,
+≤ 72 characters (`AGENTS.md` Section 3).
+
+PR bodies should cover: **intent**, **scope**, **validation** (exact commands
+and results), **risk / rollback**, and **follow-up** (if any). Skip long
+file lists when `git diff --stat` suffices; skip implementation walkthroughs
+when the diff is self-explanatory.
+
+Review replies: one short English paragraph — what changed or why not applied,
+plus validation reference when relevant.
+
+Final agent reports (Sections 16.25, 18.19, 19.25): include branch, files,
+validation, risks, and next approval gate — omit repeated policy quotes.
+
+## Copilot review loop
+
+Before PR readiness (`AGENTS.md` Sections 14.4, 20.15):
+
+1. Inspect all Copilot and unresolved review threads.
+2. Classify each recommendation (accepted, rejected with reason, N/A, out of
+   scope, needs decision).
+3. Implement accepted items; reply in English before resolving.
+4. Ask developer approval before GitHub actions that post, resolve, or
+   re-request review (Section 15.25).
+5. Do not resolve threads to silence review or re-resolve without a new commit
+   or explicit developer direction.
+
+Loop is complete when every thread is handled **and** replies are posted or
+deferred with documented developer decision.
+
 ## Validation
 
 Validation tiers (`AGENTS.md` Section 14.2):

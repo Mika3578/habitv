@@ -24,7 +24,8 @@ files.
 - Change rules through dedicated reviewable PRs — not silently during
   unrelated work (Section 17.1).
 - Update `AGENTS.md` metadata version and `docs/agent-rules-changelog.md`.
-- Run **Rule drift audit** (Section 17.6) before finishing.
+- Run **Rule drift audit v2** (Section 17.6, 20.16) before finishing —
+  template in [`docs/agent-rule-profiles.md`](../../docs/agent-rule-profiles.md#rule-drift-audit-v2).
 - End with **Agent rules update report** (Section 17.14).
 - Score new mandatory rules (Section 17.11); use backlog for candidates.
 - Apply rule budget and stop condition (Section 20.6, 20.10).
@@ -34,6 +35,7 @@ files.
 twice (Section 17.4).
 
 **Canonical reference:** [`AGENTS.md`](../../AGENTS.md) Section 17;
-[`docs/agent-rules-backlog.md`](../../docs/agent-rules-backlog.md).
+[`docs/agent-rule-profiles.md`](../../docs/agent-rule-profiles.md) (ownership,
+drift audit v2); [`docs/agent-rules-backlog.md`](../../docs/agent-rules-backlog.md).
 
 **Lifecycle:** mandatory for AI-rule PRs.

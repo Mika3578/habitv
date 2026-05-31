@@ -2,6 +2,130 @@
 
 Version history for Habitv AI agent rules. Canonical source: [`AGENTS.md`](../AGENTS.md).
 
+## 2026-05-31 — v1.5.1
+
+### Added
+
+* Disabled-by-default auth/protected-replay paths in scoped provider PRs
+  (`AGENTS.md` §16.20, §18.4).
+* Plugin helper scripts (logic only, no secrets) allowed under
+  `plugins/<name>/scripts/` (`docs/provider-policy.md`).
+* Public provider API identifiers vs account secrets distinction (§18.4).
+
+### Changed
+
+* Relaxed opt-in gate: maintainer request in **current conversation** **or**
+  **scoped provider PR** with documented maintainer direction (ADR rev. 3).
+* Site authentication may ship in the same provider PR as public catalog.
+* ADR `provider-drm-tiered-policy` → revision 3.
+
+### Removed
+
+* Requirement that opt-in applies only to the current conversation.
+
+### Reason
+
+* Unblock TF1+ / Stremio-equivalent provider work without agents refusing
+  optional gated features that stay inactive until user-local config.
+
+### Follow-up
+
+* Document user-local env setup in provider README (high-level, no secrets).
+
+## 2026-05-31 — v1.5.0
+
+### Added
+
+* Concise public communication rule (`AGENTS.md` §20.13).
+* Provider communication safety rule (`AGENTS.md` §20.14;
+  `docs/provider-policy.md#public-communication-safety`).
+* Site authentication guidance (`docs/provider-policy.md#site-authentication-for-download`).
+* Copilot review loop guard (`AGENTS.md` §20.15;
+  `docs/dev-workflow.md#copilot-review-loop`).
+* Rule ownership and drift-control guidance (`AGENTS.md` §20.16–§20.17).
+* Rule ownership table and drift audit v2 in `docs/agent-rule-profiles.md`.
+* Planning source guidance in `docs/dev-workflow.md`.
+
+### Changed
+
+* Clarified that `AGENTS.md` remains the canonical source; Cursor, Copilot,
+  Claude, Gemini, and nested `AGENTS.md` files are short mirrors.
+* Shortened `.github/copilot-instructions.md` validation section (delegates to
+  `AGENTS.md` §14.2 and `docs/dev-workflow.md`).
+* Mirrors defer protected content policy implicitly via Section 18.4 and
+  `docs/provider-policy.md` — no explicit keyword in instruction mirrors.
+
+### Removed
+
+* None.
+
+### Reason
+
+* Post–PR #125 rationalization: clarify ownership, reduce duplication, add
+  targeted safeguards without expanding mandatory rule bulk.
+
+### Follow-up
+
+* See `docs/agent-rules-backlog.md` for deferred items (local git/gh wrappers,
+  PR template alignment, rule cleanup PR, CODEOWNERS hardening).
+
+## 2026-05-31 — v1.4.3
+
+### Added
+
+* Maintainer opt-in circumvention path in `AGENTS.md` §18.4 (revision 2).
+
+### Changed
+
+* Relaxed tier-2 gates: no mandatory separate PR or Accepted ADR before
+  maintainer-requested circumvention; scoped provider PR plus docs batch OK.
+* ADR `provider-drm-tiered-policy` status → Accepted (rev. 2).
+* Aligned `docs/provider-policy.md`, `.cursor/rules/habitv-providers.mdc`,
+  `.github/instructions/plugins.instructions.md`, `plugins/AGENTS.md`,
+  `docs/risk-register.md`.
+
+### Removed
+
+* Requirement for separate governance-only PR before circumvention work.
+
+### Reason
+
+* Maintainer request to further relax agent blocking while keeping secrets out
+  of the repository.
+
+### Follow-up
+
+* Document circumvention scope and validation in any provider PR that uses this
+  opt-in path.
+
+## 2026-05-31 — v1.4.2
+
+### Added
+
+* Tiered DRM policy in `AGENTS.md` §18.4 (default catalog work vs opt-in
+  circumvention PR).
+* ADR `provider-drm-tiered-policy` (Proposed) in `docs/decision-log.md`.
+* Residual risk `provider-drm-circumvention` in `docs/risk-register.md`.
+
+### Changed
+
+* Replaced absolute “do not bypass DRM” wording in `AGENTS.md` §16.20,
+  `docs/provider-policy.md`, `.cursor/rules/habitv-providers.mdc`,
+  `.github/instructions/plugins.instructions.md`, and `plugins/AGENTS.md`.
+
+### Removed
+
+* None.
+
+### Reason
+
+* Maintainer request to relax agent blocking while keeping secrets and default
+  catalog PRs free of in-repo circumvention (`provider-drm-tiered-policy`).
+
+### Follow-up
+
+* Accept ADR after review; add tracker item before any circumvention PR.
+
 ## 2026-05-31 — v1.4.1
 
 ### Added

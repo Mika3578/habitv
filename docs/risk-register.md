@@ -19,9 +19,9 @@ added, mitigated, realized, or accepted.
 | 🟢 **Mitigated** | 7 |
 | 🔴 **Open / Critical (P0)** | 1 |
 | 🟠 **Open / High (P1)** | 5 |
-| 🟡 **Open / Medium (P2)** | 2 |
+| 🟡 **Open / Medium (P2)** | 3 |
 | 🟢 **Open / Low (P3)** | 0 |
-| **Total tracked** | **15** |
+| **Total tracked** | **16** |
 
 ---
 
@@ -44,6 +44,7 @@ added, mitigated, realized, or accepted.
 | `youtube-key-hardcoded` | Med | Med | 🟡 P2 | 🟢 Mitigated |
 | `pages-autoindex-gap` | Med | Med | 🟡 P2 | 🟢 Mitigated |
 | `silent-stat-ping` | Med | Med | 🟡 P2 | 🟡 Open |
+| `provider-drm-circumvention` | Med | Med | 🟡 P2 | 🟡 Accepted (residual) |
 
 ---
 
@@ -383,6 +384,27 @@ legacy host.
 **Mitigation** — Plan a quarantine flag (`habitv.stat.enabled`,
 default `false`) under `legacy-url-migration`; remove the legacy
 host once the flag ships.
+
+---
+
+### `provider-drm-circumvention` — Provider DRM circumvention residual risk
+
+| | |
+|---|---|
+| **Status** | 🟡 Accepted (residual) |
+| **Likelihood** | Medium · **Impact** Medium · **Priority** 🟡 P2 |
+
+**Description** — Optional user-local protected-replay handling (license
+proxies, external helper tools) may be requested for providers such as TF1+.
+Even when implemented outside default catalog PRs, this creates legal/ToS
+exposure, credential-handling risk, and high maintenance cost when providers
+rotate protection.
+
+**Mitigation** — `provider-drm-tiered-policy` ADR (Accepted, rev. 3): default
+work stays on public discovery plus yt-dlp; maintainer-directed scoped provider
+PRs may include optional auth/protected-replay delegation (disabled until
+user-local config); never commit license material, account passwords, or shared
+credentials.
 
 ---
 

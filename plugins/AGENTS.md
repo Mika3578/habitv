@@ -26,8 +26,13 @@ Full policy: [`docs/provider-policy.md`](../docs/provider-policy.md) and
 - Do not rely on live-network-only validation as proof of correctness.
 - Distinguish offline unit tests, live/network tests, and manual tests
   (Section 15.24).
-- If live tests are skipped (geoblocking, auth, DRM, rate limits), state
+- If live tests are skipped (geoblocking, auth, rate limits), state
   why clearly.
+- Protected content work: Section 18.4 and
+  [`docs/provider-policy.md`](../docs/provider-policy.md) (including
+  [site authentication for download](../docs/provider-policy.md#site-authentication-for-download)).
+- Keep provider **public text** high-level (Section 20.14); see
+  [`docs/provider-policy.md`](../docs/provider-policy.md#public-communication-safety).
 - Keep changes scoped to one provider or plugin module when possible.
 - No secrets, binaries, or manual JAXB/XML generated-file edits unless
   explicitly required (root `AGENTS.md` Sections 15.9, 15.12–15.13).

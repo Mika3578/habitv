@@ -6,7 +6,7 @@ complement, but do not replace, the human review process.
 
 ## Agent rules metadata
 
-* **Version:** 1.4.1
+* **Version:** 1.5.1
 * **Last updated:** 2026-05-31
 * **Maintainer:** repository maintainer
 * **Scope:** Habitv AI-assisted development workflow
@@ -456,6 +456,8 @@ You **must**:
 
 - Always reply in **English** in code, commits, comments, docs, and PR
   text — regardless of the user's prompt language.
+- Keep **public PR, commit, and review text concise and scoped** (Section
+  20.13); provider/plugin public text must stay high-level (Section 20.14).
 - Be precise about what you ran vs. what you reasoned about. Cite
   exact command outputs, file paths, and line numbers.
 - Disagree with the user when their suggestion would break a hard
@@ -1640,7 +1642,7 @@ When changing plugins or replay providers, the agent should prefer:
 - manual live verification only as an additional check.
 
 If live tests are skipped because of network instability, geoblocking,
-authentication, DRM, or provider rate limits, the agent must say so
+authentication, geoblocking, or provider rate limits, the agent must say so
 clearly.
 
 ### 15.25 PR comment action gate
@@ -2116,10 +2118,13 @@ For replay provider work:
 
 - prefer deterministic parser tests with offline fixtures;
 - avoid relying only on live network tests;
-- document authentication, cookies, DRM, geoblocking, or browser session
-  requirements;
-- do not bypass DRM;
-- do not commit cookies, tokens, or browser profiles;
+- document site authentication, geoblocking, anti-bot, or browser session
+  requirements when replay is login-gated;
+- follow the protected content policy (Section 18.4); details in
+  [`docs/provider-policy.md`](docs/provider-policy.md);
+- in a **scoped provider PR** with maintainer direction, optional auth and
+  protected-replay paths may ship **disabled until user-local config** is set;
+- do not commit tokens, browser profiles, or credential files;
 - use yt-dlp behavior as integration inspiration only when legally and
   technically appropriate;
 - keep each provider change isolated.
@@ -2453,7 +2458,7 @@ Replay providers/plugins must have a clear status in
 |--------|---------|
 | **working** | validated with tests and real behavior when possible |
 | **degraded** | partial function; known metadata or endpoint gaps |
-| **protected** | auth, cookies, DRM, geoblocking, or anti-bot |
+| **protected** | auth, encryption, geoblocking, or anti-bot |
 | **obsolete** | dead or replaced endpoint/platform |
 | **removed** | intentionally removed from active UI/plugin list |
 | **unknown** | not recently validated |
@@ -2478,10 +2483,64 @@ Prefer deterministic offline tests: fixtures; parser tests; URL extraction;
 command-building; targeted `mvn -pl plugins/<module> -am test`.
 
 Live/network checks are supplementary — not the only proof. If skipped, state
-why (network, geoblocking, auth, DRM, rate limits, downtime).
+why (network, geoblocking, auth, rate limits, downtime).
 
-Do not bypass DRM. Do not commit cookies, browser profiles, sessions, tokens,
-or auth headers. See also Section 15.24.
+#### Protected content (tiered)
+
+Policy detail: [`docs/provider-policy.md`](docs/provider-policy.md).
+
+**Default (when maintainer has not requested protected-replay handling):**
+
+- use public discovery (HTML, GraphQL, fixtures) and delegate download to
+  existing external tools (for example yt-dlp through the youtube plugin);
+- mark protected, auth-gated, or encryption-restricted content as
+  `protected` or `degraded`;
+- fail gracefully with sanitized diagnostics when download is unavailable.
+
+When a provider requires **site login** before a replay URL is available,
+see [`docs/provider-policy.md`](docs/provider-policy.md#site-authentication-for-download).
+Habitv does not ship browser session import or an embedded browser by default.
+
+**Maintainer-directed protected replay (opt-in):**
+
+Agents **may** implement Stremio-equivalent protected replay (for example
+TF1+ auth plus external tool delegation) when **any** of:
+
+- the maintainer **explicitly requests** it in the **current conversation**; or
+- a **scoped provider PR** documents maintainer direction in its scope/body and
+  links the relevant tracker item (for example `provider-inventory` / TF1+ work).
+
+Requirements:
+
+- PR scope limited to that provider or downloader path;
+- PR body states legal/ToS residual risk and points to the
+  [residual risk entry](docs/risk-register.md#provider-drm-circumvention--provider-drm-circumvention-residual-risk)
+  in `docs/risk-register.md`;
+- user credentials, keys, and user-local license material remain **outside the
+  repo** (environment variables, local config paths, user-supplied files only);
+- prefer **delegation** — yt-dlp, ffmpeg, optional plugin-bundled helper scripts
+  that read env at runtime, or user-local services — over reimplementing
+  protected-replay handling in Java;
+- **disabled-by-default** is OK: public catalog and yt-dlp remain the default
+  path until the user configures local credentials and helpers;
+- no hardcoded account passwords, shared throwaway accounts, or committed
+  sessions;
+- provider-published public API identifiers may appear in source when required
+  for login flows; treat account secrets and license material as always forbidden
+  in git.
+
+An ADR update or Proposed ADR in the same docs batch is sufficient; a separate
+governance-only PR is recommended but not mandatory when the maintainer directs
+combined provider plus policy work.
+
+**Always forbidden in the repository:**
+
+- committing license material, key material, browser profiles, sessions,
+  tokens, auth headers, or shared credentials;
+- silently adding protected-replay handling to unrelated docs, CI, dependency,
+  or refactor PRs without maintainer request.
+
+See also Section 15.24 and [`docs/provider-policy.md`](docs/provider-policy.md).
 
 ### 18.5 External tools policy
 
@@ -2791,7 +2850,7 @@ without developer approval.
 Provider tests must not depend only on live network (see Section 18.4).
 
 Live tests clearly labeled; CI must not fail randomly on provider downtime,
-geoblocking, DRM, auth, or rate limits. Prefer offline fixtures; live
+geoblocking, auth, or rate limits. Prefer offline fixtures; live
 checks optional, manual, or scheduled.
 
 ### 19.10 XML configuration compatibility rule
@@ -2855,7 +2914,7 @@ If manual testing not done: **Ready for developer manual testing** — not
 Classify risk: **low** (docs/narrow fix); **medium** (provider, Maven, CI,
 dep patch/minor); **high** (dep major, Java migration, packaging, config
 migration, external tools); **critical** (security, release, destructive
-migration, DRM/auth/cookies).
+migration, protected content/auth/cookies).
 
 Validation scales with risk (Section 19.2, 14.2).
 
@@ -3007,3 +3066,54 @@ Prefer enforcing rules via branch protection, CI, CODEOWNERS, Dependabot,
 Dependency Review, CodeQL, Maven validation, small PRs, and provider tests —
 not endless mandatory text. Track gaps in
 [`docs/agent-rules-backlog.md`](docs/agent-rules-backlog.md#enforcement-over-expansion-section-2012).
+
+### 20.13 Concise public communication
+
+PR titles, commit subjects, PR bodies, and review replies must be **English**,
+**scoped**, and **reviewer-friendly**. Summarize intent, scope, validation,
+risk, rollback, and follow-up — not step-by-step implementation noise.
+
+Final reports and handoffs (Sections 16.25, 15.6) must be **useful but not
+overly verbose**. Details:
+[`docs/dev-workflow.md`](docs/dev-workflow.md#concise-communication).
+
+### 20.14 Provider communication safety
+
+Provider/plugin **public text** (PRs, commits, comments, user-facing docs)
+must avoid exposing unnecessary operational detail. Use high-level wording;
+see [`docs/provider-policy.md`](docs/provider-policy.md#public-communication-safety).
+
+### 20.15 Copilot review loop guard
+
+Do not mark a PR ready while Copilot or other review threads remain
+unhandled. Loop: **inspect → classify → fix or reject with reason → reply →
+resolve only with developer approval** (Sections 14.4, 15.7, 15.25).
+
+Do not resolve the same thread twice without a new commit or explicit
+developer decision. Do not request re-review without approval.
+
+Details: [`docs/dev-workflow.md`](docs/dev-workflow.md#copilot-review-loop).
+
+### 20.16 Rule ownership and drift control
+
+`AGENTS.md` owns **mandatory cross-tool rules**. Companion files (Cursor,
+Copilot, Claude, Gemini, nested `AGENTS.md`) are **mirrors only** — they
+must not introduce unique mandatory rules.
+
+**Ownership table** and **drift audit v2** live in
+[`docs/agent-rule-profiles.md`](docs/agent-rule-profiles.md). On AI-rule
+changes: bump metadata version, update
+[`docs/agent-rules-changelog.md`](docs/agent-rules-changelog.md), run drift
+audit v2 (Sections 17.6, 20.6).
+
+### 20.17 Planning and follow-up ownership
+
+| Source | Role |
+|--------|------|
+| `docs/dev-tracker.md` + `docs/dev-tracker.json` | Planned work and tracker state |
+| `docs/maintenance-dashboard.md` | Short operational planning view |
+| `docs/agent-rules-backlog.md` | Future **rule** ideas only — not product roadmap |
+| `docs/modernization-backlog.md` | Larger modernization candidates |
+
+When a task surfaces follow-up work, record it in the appropriate tracker
+or backlog — not only in PR comments (Section 15.26).
