@@ -44,8 +44,8 @@ Document why metadata is missing. Do not claim support without validation.
 ## Protected content (tiered)
 
 Full rule: `AGENTS.md` Section 18.4. Governance:
-[tiered policy ADR](decision-log.md#-provider-drm-tiered-policy--tiered-drm-policy-for-providers),
-[residual risk](risk-register.md#provider-drm-circumvention--provider-drm-circumvention-residual-risk).
+[tiered policy ADR](decision-log.md#-provider-protected-content-tiered-policy--tiered-protected-content-policy-for-providers),
+[residual risk](risk-register.md#provider-protected-replay-residual--provider-protected-replay-residual-risk).
 
 **Default (maintainer has not requested protected-replay handling):**
 

@@ -45,7 +45,7 @@ added, mitigated, realized, or accepted.
 | `youtube-key-hardcoded` | Med | Med | 🟡 P2 | 🟢 Mitigated |
 | `pages-autoindex-gap` | Med | Med | 🟡 P2 | 🟢 Mitigated |
 | `silent-stat-ping` | Med | Med | 🟡 P2 | 🟡 Open |
-| `provider-drm-circumvention` | Med | Med | 🟡 P2 | 🟡 Accepted (residual) |
+| `provider-protected-replay-residual` | Med | Med | 🟡 P2 | 🟡 Accepted (residual) |
 
 ---
 
@@ -388,7 +388,7 @@ host once the flag ships.
 
 ---
 
-### `provider-drm-circumvention` — Provider DRM circumvention residual risk
+### `provider-protected-replay-residual` — Provider protected replay residual risk
 
 | | |
 |---|---|
@@ -401,7 +401,7 @@ Even when implemented outside default catalog PRs, this creates legal/ToS
 exposure, credential-handling risk, and high maintenance cost when providers
 rotate protection.
 
-**Mitigation** — `provider-drm-tiered-policy` ADR (Accepted, rev. 3): default
+**Mitigation** — `provider-protected-content-tiered-policy` ADR (Accepted, rev. 3): default
 work stays on public discovery plus yt-dlp; maintainer-directed scoped provider
 PRs may include optional auth/protected-replay delegation (disabled until
 user-local config); never commit license material, account passwords, or shared

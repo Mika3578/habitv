@@ -27,7 +27,7 @@ older ones rather than rewriting them in place.
 | `ai-policy-source-of-truth` | Align AI workflow policy around AGENTS.md source of truth | ✅ Accepted |
 | `plugin-versioning-policy` | When to bump a plugin `<version>` independently of the parent POM | 🟡 Proposed |
 | `jaxb-activation-dedup-defer` | Plan JAXB/Activation dedup before POM changes; defer namespace migration | 🟡 Proposed |
-| `provider-drm-tiered-policy` | Tiered DRM policy for provider and agent work | ✅ Accepted |
+| `provider-protected-content-tiered-policy` | Tiered protected content policy for provider and agent work | ✅ Accepted |
 
 ---
 
@@ -601,20 +601,20 @@ PRs with the plan validation matrix. Do not upgrade `javax.mail` or exclude
 
 ---
 
-## ✅ `provider-drm-tiered-policy` — Tiered DRM policy for providers
+## ✅ `provider-protected-content-tiered-policy` — Tiered protected content policy for providers
 
 | | |
 |---|---|
 | **Status** | ✅ Accepted |
 | **Date** | 2026-05-31 |
 | **Last revised** | 2026-05-31 (rev. 3) |
-| **Risks** | `provider-drm-circumvention` |
+| **Risks** | `provider-protected-replay-residual` |
 | **Touches** | `AGENTS.md` §16.20, §18.4; `docs/provider-policy.md`; `.cursor/rules/habitv-providers.mdc`; `.github/instructions/plugins.instructions.md`; `plugins/AGENTS.md` |
-| **Supersedes** | implicit absolute “never bypass DRM” wording in provider/agent rules |
+| **Supersedes** | implicit absolute “never bypass protected content” wording in provider/agent rules |
 
 **Context** — TF1+ and other replay providers expose a mixed catalog: some
 episodes are reachable through public discovery and yt-dlp, while others are
-DRM-protected. Maintainers need Stremio-equivalent catalog **and** optional
+encryption-restricted. Maintainers need Stremio-equivalent catalog **and** optional
 protected replay support without agents refusing by default.
 
 **Decision** — Adopt a **tiered** protected-content policy (revision 3):
@@ -638,7 +638,7 @@ protected replay support without agents refusing by default.
 - Default agent work remains safe and catalog-focused.
 - Maintainer-directed TF1+/Stremio-style protected replay work is allowed.
 - Residual legal, ToS, and maintenance risk stays under
-  `provider-drm-circumvention`.
+  `provider-protected-replay-residual`.
 
 ---
 

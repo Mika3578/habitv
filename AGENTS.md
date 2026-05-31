@@ -2514,7 +2514,7 @@ Requirements:
 
 - PR scope limited to that provider or downloader path;
 - PR body states legal/ToS residual risk and points to the
-  [residual risk entry](docs/risk-register.md#provider-drm-circumvention--provider-drm-circumvention-residual-risk)
+  [residual risk entry](docs/risk-register.md#provider-protected-replay-residual--provider-protected-replay-residual-risk)
   in `docs/risk-register.md`;
 - user credentials, keys, and user-local license material remain **outside the
   repo** (environment variables, local config paths, user-supplied files only);

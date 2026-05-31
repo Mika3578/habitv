@@ -17,7 +17,7 @@ Version history for Habitv AI agent rules. Canonical source: [`AGENTS.md`](../AG
 * Relaxed opt-in gate: maintainer request in **current conversation** **or**
   **scoped provider PR** with documented maintainer direction (ADR rev. 3).
 * Site authentication may ship in the same provider PR as public catalog.
-* ADR `provider-drm-tiered-policy` → revision 3.
+* ADR `provider-protected-content-tiered-policy` → revision 3.
 
 ### Removed
 
@@ -79,7 +79,7 @@ Version history for Habitv AI agent rules. Canonical source: [`AGENTS.md`](../AG
 
 * Relaxed tier-2 gates: no mandatory separate PR or Accepted ADR before
   maintainer-requested circumvention; scoped provider PR plus docs batch OK.
-* ADR `provider-drm-tiered-policy` status → Accepted (rev. 2).
+* ADR `provider-protected-content-tiered-policy` status → Accepted (rev. 2).
 * Aligned `docs/provider-policy.md`, `.cursor/rules/habitv-providers.mdc`,
   `.github/instructions/plugins.instructions.md`, `plugins/AGENTS.md`,
   `docs/risk-register.md`.
@@ -102,14 +102,14 @@ Version history for Habitv AI agent rules. Canonical source: [`AGENTS.md`](../AG
 
 ### Added
 
-* Tiered DRM policy in `AGENTS.md` §18.4 (default catalog work vs opt-in
+* Tiered protected content policy in `AGENTS.md` §18.4 (default catalog work vs opt-in
   circumvention PR).
-* ADR `provider-drm-tiered-policy` (Proposed) in `docs/decision-log.md`.
-* Residual risk `provider-drm-circumvention` in `docs/risk-register.md`.
+* ADR `provider-protected-content-tiered-policy` (Proposed) in `docs/decision-log.md`.
+* Residual risk `provider-protected-replay-residual` in `docs/risk-register.md`.
 
 ### Changed
 
-* Replaced absolute “do not bypass DRM” wording in `AGENTS.md` §16.20,
+* Replaced absolute “do not bypass protected content” wording in `AGENTS.md` §16.20,
   `docs/provider-policy.md`, `.cursor/rules/habitv-providers.mdc`,
   `.github/instructions/plugins.instructions.md`, and `plugins/AGENTS.md`.
 
@@ -120,7 +120,7 @@ Version history for Habitv AI agent rules. Canonical source: [`AGENTS.md`](../AG
 ### Reason
 
 * Maintainer request to relax agent blocking while keeping secrets and default
-  catalog PRs free of in-repo circumvention (`provider-drm-tiered-policy`).
+  catalog PRs free of in-repo circumvention (`provider-protected-content-tiered-policy`).
 
 ### Follow-up
 
