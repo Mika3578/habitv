@@ -6,6 +6,10 @@ agent behavior.
 Before making changes, read and follow `AGENTS.md`. At task start, report
 the **Instruction files loaded** checklist (`AGENTS.md` Section 15.1).
 
+Mirrors only — do not introduce unique mandatory rules (Section 20.16).
+Ownership table and drift audit v2:
+[`docs/agent-rule-profiles.md`](docs/agent-rule-profiles.md).
+
 Tool-specific mirrors:
 
 - `.cursor/rules/git-safety.mdc`

@@ -21,7 +21,10 @@ and clear status tracking.
 - Preserve/improve **metadata** where validated (18.3).
 - Prefer **offline fixture tests**; live checks supplementary (18.4).
 - **External tool** updates in dedicated PRs with report (18.5).
-- No DRM bypass; no cookies/tokens/sessions in repo (18.4).
+- Protected content: Section 18.4 → [`docs/provider-policy.md`](../../docs/provider-policy.md)
+  (site authentication, protected replay — no secrets in repo).
+- Provider **public communication safety** (20.14): high-level PR/commit text;
+  see [`docs/provider-policy.md`](../../docs/provider-policy.md#public-communication-safety).
 - End tasks with **Habitv final report** (18.19).
 
 **Canonical reference:** [`docs/provider-policy.md`](../../docs/provider-policy.md),

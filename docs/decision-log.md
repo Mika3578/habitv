@@ -27,6 +27,7 @@ older ones rather than rewriting them in place.
 | `ai-policy-source-of-truth` | Align AI workflow policy around AGENTS.md source of truth | ✅ Accepted |
 | `plugin-versioning-policy` | When to bump a plugin `<version>` independently of the parent POM | 🟡 Proposed |
 | `jaxb-activation-dedup-defer` | Plan JAXB/Activation dedup before POM changes; defer namespace migration | 🟡 Proposed |
+| `provider-protected-content-tiered-policy` | Tiered protected content policy for provider and agent work | ✅ Accepted |
 
 ---
 
@@ -597,6 +598,47 @@ PRs with the plan validation matrix. Do not upgrade `javax.mail` or exclude
 - ⚠️ Shade warnings remain until `fix/shade-jaxb-api-dedup` merges.
 - 🔁 Accept or supersede this ADR when an implementation PR records the
   chosen strategy in the decision log.
+
+---
+
+## ✅ `provider-protected-content-tiered-policy` — Tiered protected content policy for providers
+
+| | |
+|---|---|
+| **Status** | ✅ Accepted |
+| **Date** | 2026-05-31 |
+| **Last revised** | 2026-05-31 (rev. 3) |
+| **Risks** | `provider-protected-replay-residual` |
+| **Touches** | `AGENTS.md` §15.24, §16.20, §18.2, §18.4, §19.9, §19.16; `docs/provider-policy.md`; `docs/maintainability-policy.md`; `docs/ytdlp-cli-compatibility.md`; `.cursor/rules/habitv-providers.mdc`; `.github/instructions/plugins.instructions.md`; `plugins/AGENTS.md` |
+| **Supersedes** | implicit absolute “never bypass protected content” wording in provider/agent rules |
+
+**Context** — TF1+ and other replay providers expose a mixed catalog: some
+episodes are reachable through public discovery and yt-dlp, while others are
+encryption-restricted. Maintainers need Stremio-equivalent catalog **and** optional
+protected replay support without agents refusing by default.
+
+**Decision** — Adopt a **tiered** protected-content policy (revision 3):
+
+1. **Default:** public discovery, external downloaders, `protected`/`degraded`
+   status, sanitized failures. Optional auth/protected paths may exist but stay
+   inactive until user-local config is set.
+2. **Maintainer opt-in:** when the maintainer **explicitly requests** work in
+   the **current conversation** **or** directs a **scoped provider PR** (tracker
+   + PR scope), agents may implement provider-scoped auth hooks and external
+   tool delegation in that PR. User license material, account passwords, and
+   sessions stay **outside the repo**. Prefer delegation (yt-dlp, ffmpeg,
+   plugin helper scripts, user-local services) over Java reimplementation.
+3. **Governance:** document residual risk in the PR; update ADR/risk register
+   in the same batch. A separate governance-only PR is not required.
+4. **Always forbidden in git:** license material, account passwords, sessions,
+   tokens, shared credentials, committed browser profiles.
+
+**Consequences**
+
+- Default agent work remains safe and catalog-focused.
+- Maintainer-directed TF1+/Stremio-style protected replay work is allowed.
+- Residual legal, ToS, and maintenance risk stays under
+  `provider-protected-replay-residual`.
 
 ---
 

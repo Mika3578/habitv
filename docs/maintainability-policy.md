@@ -50,7 +50,7 @@ If not done: **Ready for developer manual testing** (not commit approval).
 | low | docs, narrow isolated fix | focused validation |
 | medium | provider, Maven config, CI, dep patch/minor | targeted + full Maven |
 | high | dep major, Java migration, packaging, config migration | full + manual + review |
-| critical | security, release, DRM/auth, destructive migration | dedicated plan + decision |
+| critical | security, release, protected content/auth, destructive migration | dedicated plan + decision |
 
 ## Rollback plan (medium+)
 

@@ -20,8 +20,9 @@ added, mitigated, realized, or accepted.
 | 🔴 **Open / Critical (P0)** | 1 |
 | 🟠 **Open / High (P1)** | 5 |
 | 🟡 **Open / Medium (P2)** | 2 |
+| 🟡 **Accepted (residual)** | 1 |
 | 🟢 **Open / Low (P3)** | 0 |
-| **Total tracked** | **15** |
+| **Total tracked** | **16** |
 
 ---
 
@@ -44,6 +45,7 @@ added, mitigated, realized, or accepted.
 | `youtube-key-hardcoded` | Med | Med | 🟡 P2 | 🟢 Mitigated |
 | `pages-autoindex-gap` | Med | Med | 🟡 P2 | 🟢 Mitigated |
 | `silent-stat-ping` | Med | Med | 🟡 P2 | 🟡 Open |
+| `provider-protected-replay-residual` | Med | Med | 🟡 P2 | 🟡 Accepted (residual) |
 
 ---
 
@@ -386,6 +388,27 @@ host once the flag ships.
 
 ---
 
+### `provider-protected-replay-residual` — Provider protected replay residual risk
+
+| | |
+|---|---|
+| **Status** | 🟡 Accepted (residual) |
+| **Likelihood** | Medium · **Impact** Medium · **Priority** 🟡 P2 |
+
+**Description** — Optional user-local protected-replay handling (license
+proxies, external helper tools) may be requested for providers such as TF1+.
+Even when implemented outside default catalog PRs, this creates legal/ToS
+exposure, credential-handling risk, and high maintenance cost when providers
+rotate protection.
+
+**Mitigation** — `provider-protected-content-tiered-policy` ADR (Accepted, rev. 3): default
+work stays on public discovery plus yt-dlp; maintainer-directed scoped provider
+PRs may include optional auth/protected-replay delegation (disabled until
+user-local config); never commit license material, account passwords, or shared
+credentials.
+
+---
+
 ## 📜 Legend
 
 | Symbol | Meaning |
@@ -393,6 +416,7 @@ host once the flag ships.
 | 🟢 Mitigated | Cause removed, secondary safeguards in place |
 | 🟠 Open / High | P0 / P1 — active threat to the buildable or shippable baseline |
 | 🟡 Open / Medium | P2 — needs action but not blocking the baseline |
+| 🟡 Accepted (residual) | Documented residual risk with ADR mitigations; monitored |
 | 🟢 Open / Low | P3 — known, accepted, monitored |
 | 🔴 Open / Critical | Realized incident or imminent breakage |
 

@@ -143,6 +143,49 @@ Stop adding mandatory rules when:
 
 When unsure: add to [`docs/agent-rules-backlog.md`](agent-rules-backlog.md).
 
+## Rule ownership
+
+Mirrors must summarize or link — never introduce unique mandatory rules.
+Details: `AGENTS.md` Section 20.16.
+
+| Rule topic | Canonical owner | Mirrors/summaries | Detail doc | Status |
+|------------|-----------------|---------------|------------|--------|
+| Commit/push approval | AGENTS.md §14 | git-safety.mdc, github-pr.instructions.md | docs/dev-workflow.md | current |
+| Maven validation | AGENTS.md §14.2 | maven-validation.mdc, maven-java.instructions.md | docs/dev-workflow.md | current |
+| Copilot review handling | AGENTS.md §14.4 / §15.7 / §20.15 | pr-review.mdc, github-pr.instructions.md | docs/dev-workflow.md | current |
+| Provider communication safety | AGENTS.md §20.14 / docs/provider-policy.md | habitv-providers.mdc, plugins.instructions.md | docs/provider-policy.md | current |
+| Concise PR communication | AGENTS.md §20.13 / docs/dev-workflow.md | pr-review.mdc, github-pr.instructions.md | docs/dev-workflow.md | current |
+| Rule drift control | AGENTS.md §17 / §20.16 | 90-rule-evolution.mdc | docs/agent-rule-profiles.md | current |
+| Dev roadmap | docs/dev-tracker.md + docs/dev-tracker.json | maintenance-dashboard.md | docs/dev-workflow.md | current |
+
+## Rule drift audit v2
+
+Run when AI rules or instruction mirrors change (`AGENTS.md` Sections 17.6,
+20.16). Copy into PR body or pre-commit report:
+
+```markdown
+## Rule drift audit v2
+
+* Canonical owner table checked:
+* Mirrors checked:
+* Duplicate rules found:
+* Conflicting rules found:
+* Broken section references:
+* Broken file links:
+* Unique mandatory rules outside AGENTS.md:
+* Changelog/version aligned:
+* Backlog/archive aligned:
+* Actions taken:
+* Remaining risks:
+```
+
+**Checks:**
+
+- every mirror links to `AGENTS.md` and defers detail to the owner doc;
+- no mirror adds approval, validation, or safety rules missing from owners;
+- `AGENTS.md` metadata version matches latest changelog entry;
+- new candidates go to backlog, not new mandatory sections (Section 20.10).
+
 ## Rule cleanup cadence
 
 Every ~10 merged PRs, propose branch `docs/cleanup-agent-rules` with commit

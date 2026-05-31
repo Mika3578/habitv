@@ -31,7 +31,7 @@ PR title, PR body, and validation result. Ask for explicit approval.
 
 ## Copilot review comments
 
-Before a PR is ready:
+Before a PR is ready (`AGENTS.md` Sections 14.4, 20.15):
 
 1. Inspect all Copilot review comments and unresolved conversations.
 2. Classify each as: accepted and fixed; intentionally rejected with
@@ -40,13 +40,21 @@ Before a PR is ready:
 3. Implement accepted recommendations.
 4. Reply to each comment in English with what was done or why not applied.
 5. Resolve only after review, handling, reply, and commit/push (if
-   applicable).
+   applicable) — not to silence review; not twice without a new commit
+   or explicit developer decision.
 6. Never resolve just to silence the review.
 
 If resolution needs a GitHub command or UI action, ask for developer
-approval first.
+approval first. Details:
+[`docs/dev-workflow.md`](../../docs/dev-workflow.md#copilot-review-loop).
 
 Never resolve conversations silently (root `AGENTS.md` Section 15.7).
+
+## Concise communication
+
+Keep PR titles, bodies, and review replies scoped and reviewer-friendly
+(Section 20.13). Details:
+[`docs/dev-workflow.md`](../../docs/dev-workflow.md#concise-communication).
 
 ## Review readiness
 

@@ -25,3 +25,4 @@ slow every task.
 **Canonical reference:** [`docs/agent-rule-profiles.md`](../../docs/agent-rule-profiles.md)
 
 **Lifecycle:** always on; complements Sections 16–19 without replacing them.
+Rule ownership table and drift audit v2: same doc.

@@ -21,6 +21,71 @@ Prefer implementing guardrails through tooling rather than new text:
 
 ## Candidate rules
 
+### Embedded browser for provider login (CEF / JavaFX)
+
+* **Problem:** Some providers (TF1+, etc.) require a web login before replay
+  URLs are available; Habitv has no in-app browser today.
+* **Proposed rule:** Dedicated tracker + ADR before any JavaFX/CEF integration;
+  reference `habitv-references/captvty` (CefSharp) and
+  `habitv-references/TF1-Downloader` (Selenium) for patterns only.
+* **Priority:** P3
+* **Target file:** `application/trayView` or new tooling module
+* **Trigger:** maintainer request after `docs/provider-policy.md` auth section
+* **Status:** proposed
+
+### Optional local git/gh wrappers for Cursor automation
+
+* **Problem:** Agents prepare commits/PRs but developer runs Git/GitHub manually;
+  no shared safe wrapper scripts for common validate-then-diff flows.
+* **Proposed rule:** Optional `scripts/agent-git-*.ps1` / `.sh` helpers in a
+  dedicated tooling PR; never auto-commit or auto-push.
+* **Priority:** P3
+* **Target file:** `scripts/`
+* **Trigger:** developer request
+* **Status:** proposed
+
+### PR template alignment with concise communication
+
+* **Problem:** PR template sections may encourage verbose bodies inconsistent
+  with §20.13.
+* **Proposed rule:** Align `.github/pull_request_template.md` with
+  `docs/dev-workflow.md#concise-communication` in a dedicated docs PR.
+* **Priority:** P3
+* **Target file:** `.github/pull_request_template.md`
+* **Trigger:** after v1.5.0 merge
+* **Status:** proposed
+
+### Future rule cleanup PR (`docs/cleanup-agent-rules`)
+
+* **Problem:** Mirror files may accumulate duplicate bullets over time.
+* **Proposed rule:** Periodic cleanup per Section 20.11; archive retired wording
+  in `docs/archived-agent-rules.md`.
+* **Priority:** P3
+* **Target file:** `.cursor/rules/`, `.github/instructions/`, nested `AGENTS.md`
+* **Trigger:** ~10 merged PRs after v1.5.0
+* **Status:** proposed
+
+### Optional CODEOWNERS / rulesets / security hardening
+
+* **Problem:** Some gates documented in rules are not yet fully enforced in
+  GitHub UI.
+* **Proposed rule:** Dedicated governance PR for CODEOWNERS, rulesets, and
+  required checks — not mixed with provider or rule-text PRs.
+* **Priority:** P2
+* **Target file:** `.github/CODEOWNERS`, repository settings docs
+* **Trigger:** `branch-protection` tracker item
+* **Status:** proposed
+
+### Provider communication review checklist
+
+* **Problem:** v1.5.0 adds policy text but no optional PR checklist artifact.
+* **Proposed rule:** Add checklist to `docs/provider-policy.md` or PR template
+  if repeated review misses occur.
+* **Priority:** P3
+* **Target file:** `docs/provider-policy.md` or PR template
+* **Trigger:** after first provider PR using §20.14
+* **Status:** proposed
+
 ### Numbered Cursor rule module rename
 
 * **Problem:** Legacy Cursor rule filenames (`git-safety.mdc`, etc.) differ
@@ -79,6 +144,8 @@ Prefer implementing guardrails through tooling rather than new text:
 
 ## Recently completed
 
+* v1.5.1 protected-replay opt-in and slug cleanup — see changelog
+* v1.5.0 rule governance streamline — see changelog
 * v1.4.0 productivity and anti-bloat guardrails — see changelog
 * v1.3.0 maintainability guardrails — see changelog
 * v1.1.0 evolutionary governance — see [`agent-rules-changelog.md`](agent-rules-changelog.md)

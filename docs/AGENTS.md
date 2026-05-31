@@ -22,6 +22,11 @@ changes (Markdown, tracker JSON mirrors, ADRs, audit baselines).
   `docs/maintainability-policy.md` for Habitv-specific agent topics
   (Sections 18–19).
 - AI rule changes require version bump and changelog entry (Section 17).
+- Rule ownership and drift audit v2: Section 20.16,
+  [`agent-rule-profiles.md`](agent-rule-profiles.md).
+- Planned work lives in `dev-tracker.{md,json}`; short view in
+  [`maintenance-dashboard.md`](maintenance-dashboard.md); rule candidates in
+  [`agent-rules-backlog.md`](agent-rules-backlog.md) only.
 - For docs-only AI-rule work, use speed mode (Section 20.8); run drift
   audit when rules change (Section 17.6).
 - Prefer backlog over new mandatory rules (Section 20.10).

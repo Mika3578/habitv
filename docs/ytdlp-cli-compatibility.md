@@ -30,8 +30,10 @@ Resolved at download time (`#VIDEO_URL#` → URL, `#FILE_DEST#` → output path)
 ```
 
 These flags are the subset Habitv relied on with youtube-dl; yt-dlp accepts them
-for the supported sites. Habitv does **not** pass DRM bypass, cookie, browser
-profile, or authentication flags.
+for the supported sites. Habitv does **not** pass protected-content, browser
+profile, or authentication flags by default (user may configure yt-dlp locally
+when an extractor supports login — see
+[`docs/provider-policy.md`](provider-policy.md#site-authentication-for-download)).
 
 ## Progress output
 
