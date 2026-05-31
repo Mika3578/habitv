@@ -1642,7 +1642,7 @@ When changing plugins or replay providers, the agent should prefer:
 - manual live verification only as an additional check.
 
 If live tests are skipped because of network instability, geoblocking,
-authentication, geoblocking, or provider rate limits, the agent must say so
+authentication, or provider rate limits, the agent must say so
 clearly.
 
 ### 15.25 PR comment action gate

@@ -144,6 +144,7 @@ Prefer implementing guardrails through tooling rather than new text:
 
 ## Recently completed
 
+* v1.5.1 protected-replay opt-in and slug cleanup — see changelog
 * v1.5.0 rule governance streamline — see changelog
 * v1.4.0 productivity and anti-bloat guardrails — see changelog
 * v1.3.0 maintainability guardrails — see changelog

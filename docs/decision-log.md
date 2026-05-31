@@ -609,7 +609,7 @@ PRs with the plan validation matrix. Do not upgrade `javax.mail` or exclude
 | **Date** | 2026-05-31 |
 | **Last revised** | 2026-05-31 (rev. 3) |
 | **Risks** | `provider-protected-replay-residual` |
-| **Touches** | `AGENTS.md` §16.20, §18.4; `docs/provider-policy.md`; `.cursor/rules/habitv-providers.mdc`; `.github/instructions/plugins.instructions.md`; `plugins/AGENTS.md` |
+| **Touches** | `AGENTS.md` §15.24, §16.20, §18.2, §18.4, §19.9, §19.16; `docs/provider-policy.md`; `docs/maintainability-policy.md`; `docs/ytdlp-cli-compatibility.md`; `.cursor/rules/habitv-providers.mdc`; `.github/instructions/plugins.instructions.md`; `plugins/AGENTS.md` |
 | **Supersedes** | implicit absolute “never bypass protected content” wording in provider/agent rules |
 
 **Context** — TF1+ and other replay providers expose a mixed catalog: some
