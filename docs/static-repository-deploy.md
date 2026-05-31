@@ -16,37 +16,78 @@ repository and served publicly via GitHub Pages. This replaces the legacy
 build/deploy time. Habitv at runtime never reads that path; it downloads from the
 HTTPS URL in `FrameworkConf.UPDATE_URL`.
 
-## One-command workflow (preferred)
+## Maven publication workflow (required)
 
-The `static-repo-publish` profile adds a final reactor module,
-`build/static-repo-publisher`, and activates the local file
-`distributionManagement` used for the static repository deploy.
+The `-Pstatic-repo-deploy` profile is the single publication command. It deploys
+Maven artifacts and runs the final `build/static-repo-publisher` reactor module,
+which regenerates repository extras and validates the result. No second manual
+script is required after Maven succeeds.
 
-Windows PowerShell:
+```powershell
+$env:HABITV_REPO_DIR = "D:\path\to\habitv-repo"
+
+mvn -B -ntp -Pstatic-repo-deploy deploy `
+  "-Dhabitv.static.repo.path=$env:HABITV_REPO_DIR/repository" `
+  "-pl=!application/habiTv"
+```
+
+`application/habiTv` is excluded with `-pl=!application/habiTv` because of the
+existing JDK/`utils4j` compile blocker, which is unrelated to static repository
+deployment.
+
+What this single Maven command publishes:
+
+1. **Maven artifacts** — plugin and framework JARs/POMs under
+   `${habitv.static.repo.path}/com/dabi/habitv/`.
+2. **External tools** — `tools/<tool>/<version>/<tool>.zip` (Windows/PowerShell
+   via `publish-repository-extras.ps1`).
+3. **`plugins.txt`** — plugin id list for runtime discovery.
+4. **`habitv-update-manifest.properties`** — manifest entries for runtime discovery
+   (runtime prefers this over `maven-metadata.xml`):
+   - **plugin** entries point to the latest selected plugin JAR (timestamped Maven
+     SNAPSHOT builds when present);
+   - **tool** entries point to published tool ZIP files under `tools/`;
+   - the manifest can contain different packaging types (`jar`, `zip`, and others
+     as published).
+5. **`index.html`** — directory listings for static-host fallback discovery.
+6. **Validation** — layout and manifest freshness checks; Maven fails if the
+   manifest is stale or inconsistent.
+
+Publication-time requirements on Windows:
+
+- PowerShell (for tool zip publication and full repository extras)
+- Python 3 (for layout and manifest freshness validation invoked by Maven)
+
+The runtime updater resolves `habitv-update-manifest.properties` **before**
+falling back to `maven-metadata.xml`. If the manifest is not regenerated during
+deploy, startup downloads stale timestamped SNAPSHOT artifacts even when newer
+JARs were deployed.
+
+### Convenience wrapper (optional)
+
+`scripts/static-repo/publish-static-repository.ps1` is a thin alias around the
+Maven command above. It is not the authoritative workflow.
+
+```powershell
+$env:HABITV_REPO_DIR = "D:\path\to\habitv-repo"
+.\scripts\static-repo\publish-static-repository.ps1 -SkipTests
+```
+
+### Legacy `static-repo-publish` profile (deprecated)
+
+The older `-Pstatic-repo-publish` profile remains only as a legacy compatibility
+fallback for older runbooks. **New publications must use `-Pstatic-repo-deploy`.**
+
+Do not treat the legacy profile as equivalent to `-Pstatic-repo-deploy`. It is a
+best-effort fallback only and is **not** the validated workflow for deploy
+ordering, manifest freshness validation, or `${habitv.static.repo.path}` routing.
+Use it only when an exceptional compatibility case requires it:
 
 ```powershell
 mvn -B -ntp -DskipTests clean deploy -Pstatic-repo-publish `
   '-DaltDeploymentRepository=habitv-local::default::file:///${habitv.static.repo.path}' `
   "-pl=!application/habiTv"
 ```
-
-Linux/macOS (PowerShell when available; otherwise metadata and `index.html` only):
-
-```bash
-mvn -B -ntp -DskipTests clean deploy -Pstatic-repo-publish \
-  '-DaltDeploymentRepository=habitv-local::default::file:///${habitv.static.repo.path}' \
-  '-pl=!application/habiTv'
-```
-
-What this single command does:
-
-1. **Maven deploy** — publishes plugin and framework JARs under
-   `${habitv.static.repo.path}/com/dabi/habitv/`.
-2. **`static-repo-publisher`** (final module) — generates:
-   - `plugins.txt`
-   - `habitv-update-manifest.properties`
-   - `index.html` directory listings
-   - `tools/<tool>/<version>/<tool>.zip` (Windows/PowerShell only)
 
 ## Static repository contract
 
@@ -65,10 +106,6 @@ host-provided autoindex. The generated tree must include:
 No GitHub Packages endpoint is used, and runtime update checks must never require a
 token.
 
-`application/habiTv` remains excluded (`-pl=!application/habiTv`) because of the
-existing JDK/`utils4j` compile blocker, which is unrelated to static repository
-deployment.
-
 Inspect the resolved staging path:
 
 ```powershell
@@ -78,9 +115,9 @@ mvn help:evaluate "-Dexpression=habitv.static.repo.path" -q "-DforceStdout"
 Override the staging path:
 
 ```powershell
-mvn -B -ntp -DskipTests clean deploy -Pstatic-repo-publish `
-  "-Dhabitv.static.repo.path=$env:USERPROFILE/dev/habitv-repo/repository" `
-  '-DaltDeploymentRepository=habitv-local::default::file:///${habitv.static.repo.path}' `
+$env:HABITV_REPO_DIR = "D:\path\to\habitv-repo"
+mvn -B -ntp -Pstatic-repo-deploy deploy `
+  "-Dhabitv.static.repo.path=$env:HABITV_REPO_DIR/repository" `
   "-pl=!application/habiTv"
 ```
 
@@ -116,12 +153,13 @@ ${user.home}/dev/
       index.html
 ```
 
-## Manual fallback scripts
+## Internal helper scripts
 
-If you deploy without the profile, run the publisher script after `mvn deploy`:
+Maven invokes these automatically from `build/static-repo-publisher` during
+`-Pstatic-repo-deploy deploy`. Run them manually only when debugging:
 
 ```powershell
-.\scripts\static-repo\publish-repository-extras.ps1 -RepositoryPath (mvn help:evaluate "-Dexpression=habitv.static.repo.path" -q "-DforceStdout")
+.\scripts\static-repo\publish-repository-extras.ps1 -RepositoryPath "$env:HABITV_REPO_DIR/repository"
 ```
 
 ```bash
@@ -136,15 +174,25 @@ Skipped by default: `rtmpdump` (no reliable upstream Windows binary), `adobeHDS`
 
 ## Publish to GitHub Pages
 
-After the Maven command completes, commit the sibling `habitv-repo` checkout:
+After the publication workflow completes, commit the sibling `habitv-repo`
+checkout. Commit **only** `repository/`; do not commit `.trunk/` or local caches.
 
 ```powershell
-cd $env:USERPROFILE\dev\habitv-repo
-git status --short
+cd $env:HABITV_REPO_DIR
+git status --short --branch
+git diff --stat
 git add repository
-git commit -m "repo: publish habitv artifacts and tools"
+git commit -m "repo: update SNAPSHOT versions and refresh metadata"
 git push
 ```
+
+Wait for GitHub Pages propagation (typically 30–60 seconds), then verify:
+
+- https://mika3578.github.io/habitv-repo/repository/plugins.txt
+- https://mika3578.github.io/habitv-repo/repository/habitv-update-manifest.properties
+
+Run the isolated startup auto-update test (see project runbooks) and confirm the
+manifest points at the latest timestamped SNAPSHOT build ids.
 
 GitHub Pages serves `repository/` at
 `https://mika3578.github.io/habitv-repo/repository/`.
@@ -185,19 +233,22 @@ Supported values for `habitv.update.autoriseSnapshot` are `true` and `false`
 only. Invalid values are ignored and leave the XML setting in effect. The
 updater logs when the XML value is overridden.
 
-## Layout validation command
+## Manual validation commands
 
-After publishing metadata/index files, validate the generated repository layout:
+Maven runs these during deploy. Use the commands below only for ad hoc checks:
 
 ```bash
 python scripts/static-repo/validate_repository_layout.py "<path-to-repository>"
+python scripts/static-repo/validate_manifest_freshness.py "<path-to-repository>"
 ```
 
 Windows example:
 
 ```powershell
 python .\scripts\static-repo\validate_repository_layout.py `
-  "$env:USERPROFILE/dev/habitv-repo/repository"
+  "$env:HABITV_REPO_DIR/repository"
+python .\scripts\static-repo\validate_manifest_freshness.py `
+  "$env:HABITV_REPO_DIR/repository"
 ```
 
 ## Validation URLs
