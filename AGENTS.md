@@ -6,8 +6,8 @@ complement, but do not replace, the human review process.
 
 ## Agent rules metadata
 
-* **Version:** 1.4.0
-* **Last updated:** 2026-05-28
+* **Version:** 1.4.1
+* **Last updated:** 2026-05-31
 * **Maintainer:** repository maintainer
 * **Scope:** Habitv AI-assisted development workflow
 * **Canonical source:** `AGENTS.md`
@@ -167,10 +167,11 @@ French TV catch-up content via pluggable provider plugins.
 | `mvn validate` on Ubuntu + Windows (CI) | ✅ |
 | `mvn compile` from root | ✅ |
 | `mvn test` (offline) | 🟡 partial |
-| `mvn package` (full app) | ⛔ blocked on JavaFX / `jdk.home` |
-| Legacy `dabiboo.free.fr` / SVN / FTP removed | ⬜ |
-| `youtube-dl` → `yt-dlp` complete migration | 🟡 wiring only |
-| Provider plugin endpoints audited | ⬜ |
+| `mvn package` (full app / GUI) | 🟡 JavaFX-capable JDK 8 or scoped console package; Windows installer foundation on `develop` |
+| Legacy `dabiboo.free.fr` / SVN / FTP removed | ✅ active POM/runtime |
+| `youtube-dl` → `yt-dlp` complete migration | 🟡 wiring done; habitv-repo tool publish pending |
+| Provider plugin endpoints audited | 🟡 inventory + offline fixtures; rewrites ongoing |
+| `develop` branch protection / required CI | 🟡 `protect-develop` documented; owner UI confirm pending |
 
 ---
 

@@ -2,7 +2,10 @@
 
 Habitv is a legacy Java 8 Maven multi-module application for downloading
 French TV catch-up content via pluggable provider plugins. Modernization
-is staged through tracker items in `docs/dev-tracker.md`.
+is staged through tracker items in `docs/dev-tracker.md` (last refresh
+2026-05-31 on `develop`). Supported **runtime** remains Java 8; planned
+LTS **runtime target** is Java 21, then Java 25 — see
+`docs/java-runtime-policy.md`.
 
 Treat the codebase as production legacy: prefer conservative,
 narrowly-scoped suggestions over rewrites.

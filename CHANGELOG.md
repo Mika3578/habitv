@@ -18,6 +18,9 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-05-29 | PR [#132](https://github.com/Mika3578/habitv/pull/132) | Configure Maven resource encoding (`UTF-8`) |
+| 2026-05-29 | PR [#130](https://github.com/Mika3578/habitv/pull/130) | Add manual Maven CodeQL analysis workflow |
+| 2026-05-29 | PR [#131](https://github.com/Mika3578/habitv/pull/131) | Remove BOM from grabconfig XML |
 | 2026-05-27 | TBD | Harden and DRY the Maven CI workflows (inspired by Apache Commons, the `actions/starter-workflows` Maven template, and `spring-petclinic`): set `persist-credentials: false` on every `actions/checkout`, extract the shared JDK-setup and artifact-upload steps into `.github/actions/setup-build-jdk` and `.github/actions/upload-maven-artifacts` composite actions, and add a non-required `validate-macos` diagnostic job. No change to the four required `develop` checks |
 | 2026-05-26 | TBD | Match the live `protect-develop` ruleset required checks: remove the now-stale `validate (zulu-8)` / `CI / validate (zulu-8)` context (deleted with `ci.yml`) and require the four live contexts (`validate-java8`, `deterministic-tests-java8`, `compile-and-package-java8`, `dependency-review`), unblocking `develop` PRs stranded at "Expected — Waiting". Keep the ruleset payload aligned with GitHub Settings (bare contexts, plus squash-only, `code_scanning`, `code_quality`, `copilot_code_review`) and update the governance, required-checks-roadmap, and repository-settings docs |
 | 2026-05-26 | TBD | Relax Dependabot policy so it can actually open PRs: allow GitHub Actions major bumps (every action is pinned to a floating major tag, so majors were the only possible update and the blanket ignore suppressed all PRs) and allow Maven majors except for jakarta-crossing artifacts (`jaxb-api`, `jaxb-runtime`, `javax.mail:mail`) guarded by the Java 8 / no-jakarta hard rule |
@@ -36,6 +39,9 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-05-30 | `e38defdc` | Refresh static repository manifest after deploy (PR [#140](https://github.com/Mika3578/habitv/pull/140)) |
+| 2026-05-30 | `c9a4746d` | Improve sanitized download failure diagnostics (PR [#139](https://github.com/Mika3578/habitv/pull/139)) |
+| 2026-05-30 | PR [#138](https://github.com/Mika3578/habitv/pull/138) | Harden YouTube Data API lookup handling |
 | 2026-05-23 | TBD | Remove obsolete embedded `D8` sub-provider from `plugins/canalPlus` (dead `www.d8.tv` endpoints; channel rebranded to C8); drop `d8` from sample `grabconfig.xml`; update offline fixture baseline to `canalPlus,cstar` |
 | 2026-05-18 | TBD | Resolve JavaFX `jfxrt.jar` from common JDK 8 layouts in `HabitvLauncher` |
 
@@ -43,7 +49,7 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 | Date | Commit | Change |
 |------|--------|--------|
-| 2026-05-29 | TBD | France.tv public hubs: API-first discovery via `/apps/channels/{hubSlug}?platform=apps` for Sport, Franceinfo, Arte, TV5 Monde Plus, France 24, INA, LCP, Public Sénat, and Mieux; partner hub children from API; episodes via `/generic/taxonomy/{taxonomySlug}/contents`; grabconfig refresh preserves public hub order and partner children with schema-valid merge; bump `francetv` plugin to `4.1.3-SNAPSHOT` |
+| 2026-05-29 | PR [#137](https://github.com/Mika3578/habitv/pull/137) | France.tv public hubs: API-first discovery via `/apps/channels/{hubSlug}?platform=apps` for Sport, Franceinfo, Arte, TV5 Monde Plus, France 24, INA, LCP, Public Sénat, and Mieux; partner hub children from API; episodes via `/generic/taxonomy/{taxonomySlug}/contents`; grabconfig refresh preserves public hub order and partner children with schema-valid merge; bump `francetv` plugin to `4.1.3-SNAPSHOT` |
 | 2026-05-19 | PR [#64](https://github.com/Mika3578/habitv/pull/64) | `francetv` provider: replace dead `france-o` channel slug with `la1ere` (Outre-mer La 1ère), centralise channel labels in `FranceTvUrls`, accept `franceinfo.fr` / `francetvinfo.fr` URLs in `canDownload`, raise `MAX_PAGES` to 100 |
 | 2026-05-18 | `2311bbc` | Replace `pluzz` provider with `francetv` (france.tv + yt-dlp) — users must rename `<plugin name="pluzz">` to `<plugin name="francetv">` in their grab-config XML (legacy `pluzz.` URLs in `canDownload` remain accepted) |
 | 2026-05-18 | PR [#52](https://github.com/Mika3578/habitv/pull/52) | Migrate YouTube plugin downloader defaults to yt-dlp |
@@ -53,6 +59,7 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-05-29 | PR [#135](https://github.com/Mika3578/habitv/pull/135) | Remove live URL dependency from deterministic test |
 | 2026-05-18 | PR [#52](https://github.com/Mika3578/habitv/pull/52) | Expand offline yt-dlp defaults and command wiring tests |
 | 2026-05-17 | `0163d9a` | Cover yt-dlp command wiring (offline test) |
 
@@ -60,6 +67,11 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-05-31 | TBD | Refresh modernization tracker, plan, risks, provider inventory, and maintenance dashboard after merged May work |
+| 2026-05-29 | PR [#136](https://github.com/Mika3578/habitv/pull/136) | Plan JAXB and Activation deduplication (docs only) |
+| 2026-05-29 | PR [#134](https://github.com/Mika3578/habitv/pull/134) | Audit Maven Shade duplicate warnings |
+| 2026-05-29 | PR [#133](https://github.com/Mika3578/habitv/pull/133) | Document Lombok compiler warning (CodeQL context) |
+| 2026-05-28 | PR [#125](https://github.com/Mika3578/habitv/pull/125) | Centralize safe agent workflow rules (productivity profiles) |
 | 2026-05-20 | PR [#104](https://github.com/Mika3578/habitv/pull/104) | Add external tools recommendations and obsolescence analysis (`external-tools-recommendations`) |
 | 2026-05-18 | PR [#52](https://github.com/Mika3578/habitv/pull/52) | Document yt-dlp CLI compatibility and tracker progress |
 | 2026-05-17 | `750640d` | Update modernization status after console baseline |

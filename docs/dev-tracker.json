@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft-07/schema",
   "version": 3,
   "description": "Machine-readable mirror of docs/dev-tracker.md. Keep both files in sync. Identifiers use descriptive kebab-case slugs (see descriptive-slug-ids ADR). Legacy HBTV codes are historical-only and not for new workflow naming.",
-  "lastRefresh": "2026-05-26",
+  "lastRefresh": "2026-05-31",
   "statusValues": [
     "proposed",
     "in-progress",
@@ -18,12 +18,12 @@
   ],
   "summary": {
     "done": 13,
-    "inProgress": 6,
-    "proposed": 2,
+    "inProgress": 7,
+    "proposed": 1,
     "deferred": 0,
     "blocked": 0,
     "total": 21,
-    "overallProgressPercent": 78
+    "overallProgressPercent": 80
   },
   "items": [
     {
@@ -99,21 +99,22 @@
       "legacyCode": "HBTV-003",
       "displayTitle": "GitHub branch protection rules",
       "icon": "🛡️",
-      "status": "proposed",
+      "status": "in-progress",
       "priority": "P1",
-      "progressPercent": 0,
+      "progressPercent": 80,
       "scope": "Apply the GitHub settings documented in github-repository-settings.md: branch model, protection, merge strategy, required checks.",
       "acceptanceCriteria": [
         "master protected; linear history required.",
-        "develop protected; required CI: build workflow on Ubuntu + Windows.",
+        "develop protected; required CI matches live protect-develop contexts (validate-java8, deterministic-tests-java8, compile-and-package-java8, dependency-review).",
         "Squash merge enabled, merge commits disabled.",
         "Force-push disabled on protected branches."
       ],
       "validation": [
-        "Manual confirmation in the GitHub UI by the repo owner."
+        "Manual confirmation in the GitHub UI by the repo owner.",
+        "docs/github-rulesets/protect-develop.json matches live ruleset."
       ],
-      "pr": "N/A (settings change, not code)",
-      "notes": "Owner-only task; no code change."
+      "pr": "ci(governance): realign protect-develop required checks with Maven CI (#118)",
+      "notes": "Live protect-develop ruleset documented in docs/repository-governance.md and docs/required-checks-roadmap.md; payload in docs/github-rulesets/protect-develop.json. PR #118 aligned required contexts with ci-maven.yml. Owner should confirm GitHub UI still matches JSON (code_scanning, code_quality, copilot_code_review). Legacy ci.yml validate (zulu-8) context removed from docs."
     },
     {
       "id": "legacy-url-migration",
@@ -161,7 +162,7 @@
         "python scripts/static-repo/validate_repository_layout.py <repository-root>"
       ],
       "pr": "habitv-repo #2 (merged); habitv PR #49 (publication status + tracker refresh)",
-      "notes": "Runtime updates are enabled by default at startup. Publication cutover is live on GitHub Pages with token-free HTTPS access. Developer SNAPSHOT updates use -Dhabitv.update.autoriseSnapshot=true while configuration.xml keeps autoriseSnapshot false. Runtime artifact resolution now prioritizes explicit manifest download paths and falls back to maven-metadata.xml for timestamped SNAPSHOT JAR names. Local static-repo deploy uses static-repo-deploy profile and habitv.deploy.repository.url; deployAtEnd=true prevents partial habitv-repo updates on reactor failure. Default mvn test skips live *PluginManagerTest; use -Plive-provider-tests. Arte live test currently fails (empty categories) — provider drift, not deploy regression. Remaining follow-up: run one dedicated opt-in runtime update smoke test with habitv.update.autoriseSnapshot=true against the published URL."
+      "notes": "Runtime updates are enabled by default at startup. Publication cutover is live on GitHub Pages with token-free HTTPS access. Developer SNAPSHOT updates use -Dhabitv.update.autoriseSnapshot=true while configuration.xml keeps autoriseSnapshot false. Runtime artifact resolution now prioritizes explicit manifest download paths and falls back to maven-metadata.xml for timestamped SNAPSHOT JAR names. PR #140 (fix/update) refreshes habitv-update-manifest.properties after static-repo deploy so startup resolution matches published SNAPSHOT builds. Local static-repo deploy uses static-repo-deploy profile and habitv.deploy.repository.url; deployAtEnd=true prevents partial habitv-repo updates on reactor failure. Default mvn test skips live *PluginManagerTest; use -Plive-provider-tests. Arte live test currently fails (empty categories) — provider drift, not deploy regression. Remaining follow-up: run one dedicated opt-in runtime update smoke test with habitv.update.autoriseSnapshot=true against the published URL."
     },
     {
       "id": "provider-inventory",
@@ -170,7 +171,7 @@
       "icon": "🔌",
       "status": "in-progress",
       "priority": "P2",
-      "progressPercent": 60,
+      "progressPercent": 65,
       "scope": "Inventory every plugin in plugins/ (22 in aggregator + plugin-tester); record current status (working, obsolete endpoint, renamed, broken parser). No code removal in this item.",
       "acceptanceCriteria": [
         "Inventory table per plugin with last-known status.",
@@ -185,8 +186,8 @@
         "mvn -B -ntp -pl plugins/arte -am -Dtest=ArteOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test",
         "mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test"
       ],
-      "pr": "test/provider-offline-fixture-baseline (merged), fix(provider-canalplus): rename d17 to cstar and handle deprecated endpoints (PR #91), refactor(provider-canalplus): remove obsolete d8 sub-provider (PR #92)",
-      "notes": "Inventory baseline from PR #50 extended with offline fixture policy and tests for 6play, canalPlus, francetv (ex pluzz), arte, and youtube. docs/provider-inventory.md includes current-status table and legacy naming (Pluzz, CStar (ex D17), 6play). PR #91 preserves D17 -> CStar and adds graceful fallback for canalPlus/cstar category discovery when legacy or protected endpoints fail (service.mycanal.fr DNS failure, HTTP 403 on channel pages). PR #92 removes the obsolete embedded D8 sub-provider (dead www.d8.tv endpoints; channel rebranded to C8). Default Surefire excludes *PluginManagerTest. Arte live PluginManagerTest still fails (categorie liste vide) due to provider drift. See docs/automatic-category-download.md for runtime watch behavior."
+      "pr": "test/provider-offline-fixture-baseline (merged), fix(provider-canalplus): rename d17 to cstar (PR #91), refactor(provider-canalplus): remove obsolete d8 sub-provider (PR #92), feat(francetv): discover public hubs via API (PR #137)",
+      "notes": "Inventory baseline from PR #50 extended with offline fixture policy and tests for 6play, canalPlus, francetv (ex pluzz), arte, and youtube. docs/provider-inventory.md includes current-status table and legacy naming (Pluzz, CStar (ex D17), 6play). PR #137 adds API-first public hub discovery (Sport, Franceinfo, partner hubs) and bumps francetv to 4.1.3-SNAPSHOT. PR #91 preserves D17 -> CStar and adds graceful fallback for canalPlus/cstar category discovery when legacy or protected endpoints fail. PR #92 removes the obsolete embedded D8 sub-provider. Default Surefire excludes *PluginManagerTest; PR #135 removed live URL dependency from one deterministic test. Arte live PluginManagerTest still fails (categorie liste vide) due to provider drift. See docs/automatic-category-download.md for runtime watch behavior."
     },
     {
       "id": "ytdlp-migration",
@@ -243,7 +244,7 @@
       "icon": "🖼️",
       "status": "proposed",
       "priority": "P2",
-      "progressPercent": 10,
+      "progressPercent": 15,
       "scope": "Migrate JavaFX 2.x usage and ${jdk.home} packaging assumptions in application/trayView, application/habiTv-linux, application/habiTv-windows, zenjava/javafx-maven-plugin 2.0, and system-scope javafx:jfxrt.",
       "acceptanceCriteria": [
         "Surface inventory captured in audit doc (done in audit-master-baseline).",
@@ -256,7 +257,7 @@
         "mvn -B -ntp -pl application/habiTv -am -Dtest=JavaFxRuntimeLocatorTest -Dsurefire.failIfNoSpecifiedTests=false test -> BUILD SUCCESS"
       ],
       "pr": "TBD",
-      "notes": "Risk javafx-jdk8. HabitvLauncher now resolves jfxrt.jar from common JDK 8 layouts and supports -Dhabitv.jfxrt.path; GUI mode exits with diagnostics when JavaFX is missing. OpenJFX migration and platform packaging remain out of scope."
+      "notes": "Risk javafx-jdk8. HabitvLauncher now resolves jfxrt.jar from common JDK 8 layouts and supports -Dhabitv.jfxrt.path; GUI mode exits with diagnostics when JavaFX is missing. Windows packaging foundation landed (PR #124 staging, PR #126 launcher/installer, PR #128 native package verification); OpenJFX runtime migration and full cross-platform packaging remain out of scope for this item."
     },
     {
       "id": "plugin-tester-align",
@@ -343,7 +344,7 @@
         "mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeConfTest -Dsurefire.failIfNoSpecifiedTests=false test -> BUILD SUCCESS"
       ],
       "pr": "fix(youtube): externalize data api key and mask api errors (#29)",
-      "notes": "End users can set the key from the tray configuration tab. Runtime key lookup order: Java property habitv.youtube.apiKey, then environment variable HABITV_YOUTUBE_API_KEY. Risk youtube-key-hardcoded mitigated."
+      "notes": "End users can set the key from the tray configuration tab. Runtime key lookup order: Java property habitv.youtube.apiKey, then environment variable HABITV_YOUTUBE_API_KEY. PR #138 hardens Data API lookup error handling and diagnostics. Risk youtube-key-hardcoded mitigated."
     },
     {
       "id": "jaxb-launcher-recovery",
@@ -389,8 +390,8 @@
         "mvn -B -ntp -pl fwk/api,fwk/framework,application/core,plugins/plugin-tester -am test",
         "mvn -B -ntp -DskipTests package"
       ],
-      "pr": "ci: add Maven PR validation workflow (#65)",
-      "notes": "Java 8 remains the required baseline; Java 11+ stays diagnostic until JAXB and JavaFX modernization is complete."
+      "pr": "ci: add Maven PR validation workflow (#65); ci(workflows): harden checkout and dry maven jobs via composites (#120); ci: add manual Maven CodeQL analysis (#130)",
+      "notes": "Java 8 remains the required baseline; Java 11+ stays diagnostic until JAXB and JavaFX modernization is complete. CodeQL runs via .github/workflows/codeql.yml with manual Maven reactor build; see docs/ci.md for accepted Lombok tracer warnings."
     },
     {
       "id": "dependency-security-audit",
@@ -399,7 +400,7 @@
       "icon": "🔒",
       "status": "in-progress",
       "priority": "P1",
-      "progressPercent": 15,
+      "progressPercent": 20,
       "scope": "Establish a documentation-first Dependabot triage baseline for the Java 8 Maven reactor without mass dependency upgrades. Follow-up PRs upgrade build plugins, logging, HTTPS resolution, and runtime libraries in a safe order.",
       "acceptanceCriteria": [
         "docs/security-dependency-audit.md records GitHub vulnerability counts, scope, risks, remediation order, and first fix candidates.",
@@ -412,7 +413,7 @@
         "scripts/security/maven-dependency-inventory.ps1 (optional -DependencyTree)"
       ],
       "pr": "security: add dependency vulnerability audit baseline (this PR)",
-      "notes": "Baseline PR security/dependabot-audit-baseline. GitHub reports 294 vulnerabilities (87 critical, 90 high, 89 moderate, 28 low). Dependabot API export to target/dependabot-alerts.json is local-only (gitignored)."
+      "notes": "Baseline PR security/dependabot-audit-baseline. GitHub reports 294 vulnerabilities (87 critical, 90 high, 89 moderate, 28 low). Dependabot API export to target/dependabot-alerts.json is local-only (gitignored). Build hygiene docs added: PR #132 resource encoding, PR #133 Lombok compiler warning audit, PR #134 Maven Shade duplicate audit, PR #136 JAXB/Activation dedup plan (docs only)."
     },
     {
       "id": "critical-log4j-cve-remediation",

@@ -14,7 +14,7 @@
 > Legacy codes are historical-only and must not be used for new branch
 > names, PR titles, commit subjects, or workflow naming.
 
-**Last refresh:** 2026-05-26 · **Active branch:** `develop`
+**Last refresh:** 2026-05-31 · **Active branch:** `develop`
 
 **Documentation entry point:** [`README.md`](../README.md) (overview, build matrix,
 automatic category behavior, provider summary, doc map).
@@ -24,14 +24,14 @@ automatic category behavior, provider summary, doc map).
 ## 📊 Overall progress
 
 ```
-███████████████▊░░░░  78%
+████████████████░░░░  80%
 ```
 
 | Category | Count |
 |---------|------:|
 | ✅ Delivered | **13** |
-| 🟡 In progress | **6** |
-| 🔵 Proposed | **2** |
+| 🟡 In progress | **7** |
+| 🔵 Proposed | **1** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
 | **Total work items** | **21** |
@@ -45,20 +45,20 @@ automatic category behavior, provider summary, doc map).
 | 🏗️ `gov-bootstrap` — Governance bootstrap from master | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | ⚙️ `maven-reactor` — Maven reactor stabilization | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | ☕ `java8-baseline` — Java 8 compile baseline | ✅ Done | 🔴 P0 | `████████████████████` 100% |
-| 🛡️ `branch-protection` — GitHub branch protection rules | 🔵 Proposed | 🟠 P1 | `░░░░░░░░░░░░░░░░░░░░` 0% |
+| 🛡️ `branch-protection` — GitHub branch protection rules | 🟡 In progress | 🟠 P1 | `████████████████░░░░` 80% |
 | 🔗 `legacy-url-migration` — Legacy URL migration (free.fr / SVN / FTP) | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 📦 `static-repo-publish` — Static artifact repository publication | ✅ Done | 🟠 P1 | `████████████████████` 100% |
-| 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🟡 In progress | 🟡 P2 | `████████████░░░░░░░░` 60% |
+| 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🟡 In progress | 🟡 P2 | `█████████████░░░░░░░` 65% |
 | 🎬 `ytdlp-migration` — `youtube-dl` → `yt-dlp` migration | 🟡 In progress | 🟡 P2 | `███████████████░░░░░` 75% |
 | 🩺 `ytdlp-runtime-diagnostics` — yt-dlp Windows runtime diagnostics | 🟡 In progress | 🟡 P2 | `██████████████████░░` 90% |
-| 🖼️ `javafx-modernization` — JavaFX & runtime packaging modernization | 🔵 Proposed | 🟡 P2 | `██░░░░░░░░░░░░░░░░░░` 10% |
+| 🖼️ `javafx-modernization` — JavaFX & runtime packaging modernization | 🔵 Proposed | 🟡 P2 | `███░░░░░░░░░░░░░░░░░` 15% |
 | 🧪 `plugin-tester-align` — `plugin-tester` reactor alignment | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | ▶️ `console-runnable` — Runnable console baseline | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 🔗 `own-version-deps-align` — Own-version plugin dependency alignment | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 🔑 `youtube-apikey` — YouTube Data API key externalization | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🧩 `jaxb-launcher-recovery` — JAXB generated sources & launcher classpath recovery | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🧱 `maven-pr-validation` — Maven PR validation workflow | ✅ Done | 🟠 P1 | `████████████████████` 100% |
-| 🔒 `dependency-security-audit` — Dependency security audit & remediation | 🟡 In progress | 🟠 P1 | `███░░░░░░░░░░░░░░░░░` 15% |
+| 🔒 `dependency-security-audit` — Dependency security audit & remediation | 🟡 In progress | 🟠 P1 | `████░░░░░░░░░░░░░░░░` 20% |
 | 📝 `clean-squash-merge-policy` — Clean squash merge policy | 🟡 In progress | 🟢 P3 | `██████████░░░░░░░░░░` 50% |
 | 🔒 `critical-log4j-cve-remediation` — Critical Log4j 1.x CVE remediation | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 📥 `batch-episode-download-ui` — Batch episode download UI & queue controls | ✅ Done | 🟡 P2 | `████████████████████` 100% |
@@ -192,25 +192,33 @@ mvn -B -ntp -DskipTests compile      # BUILD SUCCESS (after plugin-tester-align 
 
 | | |
 |---|---|
-| **Status** | 🔵 Proposed |
+| **Status** | 🟡 In progress |
 | **Priority** | 🟠 P1 |
-| **Progress** | `░░░░░░░░░░░░░░░░░░░░` 0% |
+| **Progress** | `████████████████░░░░` 80% |
 | **Legacy code** | HBTV-003 |
 
 **Scope** — Apply the GitHub settings documented in
-[`github-repository-settings.md`](github-repository-settings.md):
-branch model, protection, merge strategy, required checks.
+[`github-repository-settings.md`](github-repository-settings.md) and
+[`repository-governance.md`](repository-governance.md): branch model,
+protection, merge strategy, required checks.
 
 **Acceptance criteria**
-- ⬜ `master` protected; linear history required
-- ⬜ `develop` protected; required CI: `build` workflow on Ubuntu + Windows
-- ⬜ Squash merge enabled, merge commits disabled
-- ⬜ Force-push disabled on protected branches
+- 🟡 `master` protected; linear history required *(confirm in GitHub UI)*
+- ✅ `develop` protected; required CI matches live `protect-develop` contexts
+  (`validate-java8`, `deterministic-tests-java8`,
+  `compile-and-package-java8`, `dependency-review`)
+- 🟡 Squash merge enabled, merge commits disabled *(confirm in GitHub UI)*
+- 🟡 Force-push disabled on protected branches *(confirm in GitHub UI)*
 
-**Validation** — Manual confirmation in the GitHub UI by the repo owner.
+**Validation** — Manual confirmation in the GitHub UI by the repo owner;
+compare with [`github-rulesets/protect-develop.json`](github-rulesets/protect-develop.json).
 
-**Notes** — Owner-only task; no code change. Currently blocking
-nothing technical but everyone has push access to `develop`.
+**Related PR** · `ci(governance): realign protect-develop required checks with Maven CI` ([#118](https://github.com/Mika3578/habitv/pull/118))
+
+**Notes** — Live ruleset payload and required-check names are documented in-repo.
+PR #118 removed stale `validate (zulu-8)` / legacy `ci.yml` context from
+governance docs. Remaining owner step: verify GitHub Settings still match JSON
+(`code_scanning`, `code_quality`, `copilot_code_review`).
 
 ---
 
@@ -299,6 +307,9 @@ run one dedicated opt-in runtime update smoke test with
 `-Dhabitv.update.autoriseSnapshot=true` against the published Pages URL.
 Runtime artifact resolution now prefers explicit manifest download paths and
 falls back to `maven-metadata.xml` for timestamped SNAPSHOT JAR filenames.
+PR [#140](https://github.com/Mika3578/habitv/pull/140) refreshes
+`habitv-update-manifest.properties` after static-repo deploy so startup
+resolution matches the latest published SNAPSHOT builds.
 
 ---
 
@@ -308,7 +319,7 @@ falls back to `maven-metadata.xml` for timestamped SNAPSHOT JAR filenames.
 |---|---|
 | **Status** | 🟡 In progress |
 | **Priority** | 🟡 P2 |
-| **Progress** | `████████████░░░░░░░░` 60% |
+| **Progress** | `█████████████░░░░░░░` 65% |
 | **Legacy code** | HBTV-006 |
 
 **Scope** — Inventory every plugin in `plugins/` (22 in the aggregator
@@ -331,14 +342,16 @@ mvn -B -ntp -pl plugins/arte -am -Dtest=ArteOfflineFixtureBaselineTest -Dsurefir
 mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test
 ```
 
-**Related PR** · `docs: capture provider offline fixture baseline` (merged), `fix(provider-canalplus): rename d17 to cstar and handle deprecated endpoints` (PR #91), `refactor(provider-canalplus): remove obsolete d8 sub-provider` (PR #92)
+**Related PRs** · offline fixture baseline (merged) · [#91](https://github.com/Mika3578/habitv/pull/91) · [#92](https://github.com/Mika3578/habitv/pull/92) · [#137](https://github.com/Mika3578/habitv/pull/137) (France.tv public hubs) · [#135](https://github.com/Mika3578/habitv/pull/135) (deterministic test quarantine)
 
 **Notes** — Inventory baseline is now documented in
 [`provider-inventory.md`](provider-inventory.md) for every plugin module
 plus historical references (`CStar` (ex `D17`), `nrj12`, FranceTV/Pluzz,
 Kewego). An offline fixture policy and first local fixture baseline are
 now documented for `6play`, `canalPlus`, `francetv` (ex `pluzz`), `arte`, and `youtube`
-without rewriting providers. Default `mvn test` skips live
+without rewriting providers. PR #137 adds API-first public hub discovery
+(Sport, Franceinfo, partner hubs); `francetv` plugin version `4.1.3-SNAPSHOT`.
+Default `mvn test` skips live
 `*PluginManagerTest`; use `-Plive-provider-tests`. PR #91 keeps the
 `D17` rename to `CStar` and adds graceful fallback in the Canal+ family:
 category discovery now returns an empty set with a provider-level
@@ -424,7 +437,7 @@ architecture rewrite.
 |---|---|
 | **Status** | 🔵 Proposed |
 | **Priority** | 🟡 P2 |
-| **Progress** | `██░░░░░░░░░░░░░░░░░░` 10% |
+| **Progress** | `███░░░░░░░░░░░░░░░░░` 15% |
 | **Legacy code** | HBTV-008 |
 
 **Scope** — Migrate JavaFX 2.x usage and `${jdk.home}` packaging
@@ -446,10 +459,11 @@ targeted unit tests.
 
 **Notes** — Risk `javafx-jdk8`. `HabitvLauncher` resolves `jfxrt.jar`
 from common JDK 8 layouts and supports `-Dhabitv.jfxrt.path`; GUI mode
-exits with diagnostics when JavaFX is missing. OpenJFX migration and
-platform packaging remain out of scope. Largest single piece of remaining
-work once `legacy-url-migration` + `static-repo-publish` +
-`provider-inventory` are clear.
+exits with diagnostics when JavaFX is missing. Windows packaging foundation:
+PR [#124](https://github.com/Mika3578/habitv/pull/124) staging,
+[#126](https://github.com/Mika3578/habitv/pull/126) launcher/installer,
+[#128](https://github.com/Mika3578/habitv/pull/128) native package verification.
+OpenJFX runtime migration and full cross-platform packaging remain out of scope.
 
 ---
 
@@ -583,7 +597,7 @@ mvn -B -ntp -DskipTests -pl application/trayView,plugins/youtube -am compile   #
 mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeConfTest -Dsurefire.failIfNoSpecifiedTests=false test  # BUILD SUCCESS
 ```
 
-**Related PR** · `fix(youtube): externalize data api key and mask api errors` (#29)
+**Related PRs** · [#29](https://github.com/Mika3578/habitv/pull/29) (externalize key) · [#138](https://github.com/Mika3578/habitv/pull/138) (harden Data API lookup diagnostics)
 
 **Notes** — Risk `youtube-key-hardcoded` mitigated. End users can set
 the key from the tray configuration tab. Runtime key lookup order:
@@ -675,10 +689,12 @@ mvn -B -ntp -pl fwk/api,fwk/framework,application/core,plugins/plugin-tester -am
 mvn -B -ntp -DskipTests package
 ```
 
-**Related PR** · `ci: add Maven PR validation workflow` (#65)
+**Related PRs** · [#65](https://github.com/Mika3578/habitv/pull/65) · [#120](https://github.com/Mika3578/habitv/pull/120) (composite actions) · [#130](https://github.com/Mika3578/habitv/pull/130) (manual CodeQL Maven analysis)
 
 **Notes** — Java 8 remains the required baseline; Java 11+ stays
-diagnostic until JAXB and JavaFX modernization work is complete.
+diagnostic until JAXB and JavaFX modernization work is complete. CodeQL:
+`.github/workflows/codeql.yml`; see [`ci.md`](ci.md) for accepted Lombok
+tracer warnings during analysis.
 
 ---
 
@@ -688,7 +704,7 @@ diagnostic until JAXB and JavaFX modernization work is complete.
 |---|---|
 | **Status** | 🟡 In progress |
 | **Priority** | 🟠 P1 |
-| **Progress** | `███░░░░░░░░░░░░░░░░░` 15% |
+| **Progress** | `████░░░░░░░░░░░░░░░░` 20% |
 | **Legacy code** | HBTV-016 |
 
 **Scope** — Establish a documentation-first Dependabot triage baseline
@@ -714,7 +730,7 @@ pwsh -File scripts/security/maven-dependency-inventory.ps1 -DependencyTree
 **Notes** — Baseline branch `security/dependabot-audit-baseline`. GitHub
 reports **294** vulnerabilities (87 critical, 90 high, 89 moderate,
 28 low). Dependabot API export to `target/dependabot-alerts.json` is
-local-only (gitignored).
+local-only (gitignored). Build hygiene documentation: PR [#132](https://github.com/Mika3578/habitv/pull/132) resource encoding, [#133](https://github.com/Mika3578/habitv/pull/133) Lombok warning audit, [#134](https://github.com/Mika3578/habitv/pull/134) Shade duplicates audit, [#136](https://github.com/Mika3578/habitv/pull/136) JAXB/Activation dedup plan.
 
 ---
 
@@ -722,9 +738,9 @@ local-only (gitignored).
 
 Recommended merge / start order (see `dev-plan.md` for phase reasoning):
 
-1. 🔵 **Apply branch protection** → close `branch-protection`
-2. 🟡 **Complete `provider-inventory` follow-up fixture/rewrite PRs**
-3. 🔵 Then in any order: `ytdlp-migration`, `javafx-modernization`
+1. 🟡 **Confirm branch protection in GitHub UI** → close `branch-protection`
+2. 🟡 **Complete `provider-inventory` follow-up fixture/rewrite PRs** (replay providers)
+3. 🟡 **`ytdlp-migration`** (habitv-repo `yt-dlp` tool publication) then **`javafx-modernization`**
 
 ---
 
