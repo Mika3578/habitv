@@ -19,7 +19,8 @@ added, mitigated, realized, or accepted.
 | 🟢 **Mitigated** | 7 |
 | 🔴 **Open / Critical (P0)** | 1 |
 | 🟠 **Open / High (P1)** | 5 |
-| 🟡 **Open / Medium (P2)** | 3 |
+| 🟡 **Open / Medium (P2)** | 2 |
+| 🟡 **Accepted (residual)** | 1 |
 | 🟢 **Open / Low (P3)** | 0 |
 | **Total tracked** | **16** |
 
@@ -415,6 +416,7 @@ credentials.
 | 🟢 Mitigated | Cause removed, secondary safeguards in place |
 | 🟠 Open / High | P0 / P1 — active threat to the buildable or shippable baseline |
 | 🟡 Open / Medium | P2 — needs action but not blocking the baseline |
+| 🟡 Accepted (residual) | Documented residual risk with ADR mitigations; monitored |
 | 🟢 Open / Low | P3 — known, accepted, monitored |
 | 🔴 Open / Critical | Realized incident or imminent breakage |
 

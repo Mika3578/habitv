@@ -3104,7 +3104,7 @@ must not introduce unique mandatory rules.
 [`docs/agent-rule-profiles.md`](docs/agent-rule-profiles.md). On AI-rule
 changes: bump metadata version, update
 [`docs/agent-rules-changelog.md`](docs/agent-rules-changelog.md), run drift
-audit v2 (Sections 17.6, 20.6).
+audit v2 (Sections 17.6, 20.16).
 
 ### 20.17 Planning and follow-up ownership
 

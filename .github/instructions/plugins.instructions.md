@@ -31,11 +31,11 @@ Provider, downloader, and export plugins under `plugins/`.
 - Offline-first testing (18.4); external tools in dedicated PRs (18.5).
 
 - Protected content and provider policy: Section 18.4 → `docs/provider-policy.md`
-  (includes [site authentication for download](docs/provider-policy.md#site-authentication-for-download)).
+  (includes [site authentication for download](../../docs/provider-policy.md#site-authentication-for-download)).
 
 - Provider public communication safety (20.14): high-level PR/commit text only;
 
-  see `docs/provider-policy.md#public-communication-safety`.
+  see [`docs/provider-policy.md#public-communication-safety`](../../docs/provider-policy.md#public-communication-safety).
 
 
 

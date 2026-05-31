@@ -41,13 +41,13 @@ Before PR readiness (`AGENTS.md` Sections 14.4, 20.15):
 5. Ask developer approval before GitHub commands that resolve threads or
    re-request review.
 
-Details: [`docs/dev-workflow.md`](../docs/dev-workflow.md#copilot-review-loop).
+Details: [`docs/dev-workflow.md`](../../docs/dev-workflow.md#copilot-review-loop).
 Never resolve conversations silently (Section 15.7).
 
 ## Concise communication
 
 PR/commit/review text: English, scoped, reviewer-friendly (Section 20.13).
-Details: [`docs/dev-workflow.md`](../docs/dev-workflow.md#concise-communication).
+Details: [`docs/dev-workflow.md`](../../docs/dev-workflow.md#concise-communication).
 
 ## Instruction alignment
 
