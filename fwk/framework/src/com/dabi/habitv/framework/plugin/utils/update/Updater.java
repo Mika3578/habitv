@@ -1,12 +1,14 @@
 package com.dabi.habitv.framework.plugin.utils.update;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.List;
 
@@ -54,6 +56,10 @@ public abstract class Updater {
 		for (final String fileToUpdate : filesToUpdate) {
 			try {
 				updateFile(currentFolder, fileToUpdate);
+			} catch (final InvalidUpdatePathException e) {
+				LOG.warn("Skipping unsafe update entry for artifactId="
+						+ UpdatePathValidator.sanitizeForLog(fileToUpdate) + " under root "
+						+ UpdatePathValidator.sanitizeForLog(folderToUpdate) + ": " + e.getMessage());
 			} catch (final Exception e) {
 				LOG.error("", e);
 			}
@@ -65,24 +71,28 @@ public abstract class Updater {
 
 	private void updateFile(final File currentFolder, final String fileToUpdate) {
 		onChecking(fileToUpdate);
-		LOG.info("Resolving update artifact: artifactId=" + fileToUpdate + ", extension=" + getServerExtension());
+		final Path trustedRoot = UpdatePathValidator.normalizeTrustedRoot(currentFolder);
+		final Path currentPath = UpdatePathValidator.resolveArtifactFile(currentFolder, fileToUpdate, getLocalExtension());
+		LOG.info("Resolving update artifact: artifactId=" + UpdatePathValidator.sanitizeForLog(fileToUpdate)
+				+ ", extension=" + getLocalExtension());
 		final ArtifactVersion artifactNewVersion = FindArtifactUtils.findLastVersionUrl(groupId, fileToUpdate, coreVersion,
 				autoriseSnapshot, getServerExtension());
 		if (artifactNewVersion == null) {
-			LOG.warn("Skipping artifact " + fileToUpdate + " because no downloadable URL could be resolved.");
+			LOG.warn("Skipping artifact " + UpdatePathValidator.sanitizeForLog(fileToUpdate)
+					+ " because no downloadable URL could be resolved.");
 			return;
 		}
-		LOG.info("Resolved artifact " + fileToUpdate + " from " + artifactNewVersion.getSource()
-				+ " with version " + artifactNewVersion.getVersion() + " at " + artifactNewVersion.getUrl());
-		final File currentFile = new File(folderToUpdate + "/" + fileToUpdate + "." + getLocalExtension());
+		LOG.info("Resolved artifact " + UpdatePathValidator.sanitizeForLog(fileToUpdate) + " from "
+				+ artifactNewVersion.getSource() + " with version " + artifactNewVersion.getVersion());
+		final File currentFile = currentPath.toFile();
 		if (currentFile.exists()) {
-			final String currentVersion = getCurrentVersion(currentFile);//
+			final String currentVersion = getCurrentVersion(currentFile);
 			if (currentVersion == null || currentVersion.contains("-SNAPSHOT")
 					|| AlphanumComparator.INSTANCE.compare(currentVersion, artifactNewVersion.getVersion()) < 0) {
-				updateFile(artifactNewVersion, currentFile);
+				updateFile(artifactNewVersion, currentPath, trustedRoot);
 			}
 		} else {
-			updateFile(artifactNewVersion, currentFile);
+			updateFile(artifactNewVersion, currentPath, trustedRoot);
 		}
 	}
 
@@ -94,18 +104,19 @@ public abstract class Updater {
 
 	protected abstract String getServerExtension();
 
-	private void updateFile(final ArtifactVersion artifactNewVersion, final File current) {
+	private void updateFile(final ArtifactVersion artifactNewVersion, final Path currentPath, final Path trustedRoot) {
+		final File current = currentPath.toFile();
 		if (performUpdate(current, artifactNewVersion)) {
 			onUpdate(current, artifactNewVersion);
-			File newVersion;
+			final Path tempPath = UpdatePathValidator.resolveDownloadTempFile(currentPath, trustedRoot);
 			try {
-				LOG.info("Downloading artifact from " + artifactNewVersion.getUrl() + " to " + current.getPath() + ".tmp");
-				newVersion = new File(downloadFile(artifactNewVersion.getUrl(), current.getPath() + ".tmp"));
+				LOG.info("Downloading artifact from " + artifactNewVersion.getUrl() + " to " + tempPath);
+				downloadFile(artifactNewVersion.getUrl(), tempPath);
 			} catch (final IOException e) {
 				onUpdateError(current, artifactNewVersion);
 				throw new TechnicalException(e);
 			}
-			updateFile(current, newVersion);
+			updateFile(currentPath, tempPath);
 
 			onUpdateDone(current, artifactNewVersion);
 		}
@@ -120,34 +131,43 @@ public abstract class Updater {
 	protected abstract boolean performUpdate(File current, ArtifactVersion artifactNewVersion);
 
 	protected void updateFile(final File current, final File newVersion) {
-		if (newVersion.exists()) {
-			if (current.exists()) {
+		updateFile(current.toPath(), newVersion.toPath());
+	}
+
+	protected void updateFile(final Path current, final Path newVersion) {
+		if (Files.exists(newVersion)) {
+			if (Files.exists(current)) {
 				try {
-					Files.delete(current.toPath());
+					Files.delete(current);
 				} catch (final IOException e) {
 					throw new TechnicalException(e);
 				}
 			}
-			newVersion.renameTo(current);
+			try {
+				Files.move(newVersion, current, StandardCopyOption.REPLACE_EXISTING);
+			} catch (final IOException e) {
+				throw new TechnicalException(e);
+			}
 		}
 	}
 
 	/**
 	 * Cette méthode télécharge un fichier sur internet et le stocke en local
-	 * 
+	 *
 	 * @param filePath
 	 *            , chemin du fichier à télécharger
 	 * @param destination
 	 *            , chemin du fichier en local
-	 * @return
 	 * @throws IOException
 	 */
-	private String downloadFile(final String filePath, final String destination) throws IOException {
+	private void downloadFile(final String filePath, final Path destination) throws IOException {
 		final URL website = new URL(filePath);
-		try (final ReadableByteChannel rbc = Channels.newChannel(website.openStream());) {
-			try (FileOutputStream fos = new FileOutputStream(destination);) {
-				fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-				return destination;
+		try (final InputStream inputStream = website.openStream();
+				final ReadableByteChannel rbc = Channels.newChannel(inputStream)) {
+			try (java.nio.channels.FileChannel destinationChannel = java.nio.channels.FileChannel.open(destination,
+					java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.WRITE,
+					java.nio.file.StandardOpenOption.TRUNCATE_EXISTING)) {
+				destinationChannel.transferFrom(rbc, 0, Long.MAX_VALUE);
 			}
 		}
 	}
