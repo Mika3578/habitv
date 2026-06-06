@@ -11,4 +11,8 @@ public class InvalidUpdatePathException extends RuntimeException {
 	public InvalidUpdatePathException(final String message) {
 		super(message);
 	}
+
+	public InvalidUpdatePathException(final String message, final Throwable cause) {
+		super(message, cause);
+	}
 }

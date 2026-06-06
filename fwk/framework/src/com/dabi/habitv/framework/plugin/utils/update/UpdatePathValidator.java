@@ -1,6 +1,7 @@
 package com.dabi.habitv.framework.plugin.utils.update;
 
 import java.io.File;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.regex.Pattern;
@@ -11,6 +12,8 @@ import java.util.regex.Pattern;
  * must pass through this boundary.
  */
 public final class UpdatePathValidator {
+
+	private static final String WINDOWS_FORBIDDEN_FILENAME_CHARS = "<>:\"|?*";
 
 	private static final Pattern WINDOWS_DRIVE_PATH = Pattern.compile("^[A-Za-z]:[/\\\\].*");
 
@@ -55,7 +58,7 @@ public final class UpdatePathValidator {
 		if (value.indexOf('/') >= 0 || value.indexOf('\\') >= 0) {
 			throw new InvalidUpdatePathException("Rejected " + fieldName + " containing path separators.");
 		}
-		rejectParentDirectorySegments(value, fieldName);
+		rejectWindowsForbiddenFilenameCharacters(value, fieldName);
 		if (value.startsWith("/") || value.startsWith("\\")) {
 			throw new InvalidUpdatePathException("Rejected absolute " + fieldName + " path.");
 		}
@@ -65,17 +68,14 @@ public final class UpdatePathValidator {
 		if (UNC_PATH.matcher(value).matches()) {
 			throw new InvalidUpdatePathException("Rejected UNC " + fieldName + " path.");
 		}
-		final Path candidate = Paths.get(value);
+		final Path candidate = parsePath(value, fieldName);
+		rejectParentDirectorySegments(candidate, fieldName);
 		if (candidate.isAbsolute()) {
 			throw new InvalidUpdatePathException("Rejected absolute " + fieldName + " path.");
 		}
 	}
 
-	private static void rejectParentDirectorySegments(final String value, final String fieldName) {
-		if (".".equals(value) || "..".equals(value)) {
-			throw new InvalidUpdatePathException("Rejected parent-directory " + fieldName + " value.");
-		}
-		final Path candidate = Paths.get(value);
+	private static void rejectParentDirectorySegments(final Path candidate, final String fieldName) {
 		for (int i = 0; i < candidate.getNameCount(); i++) {
 			final String segment = candidate.getName(i).toString();
 			if (".".equals(segment) || "..".equals(segment)) {
@@ -99,6 +99,23 @@ public final class UpdatePathValidator {
 			}
 		}
 		return sanitized.toString();
+	}
+
+	private static void rejectWindowsForbiddenFilenameCharacters(final String value, final String fieldName) {
+		for (int i = 0; i < value.length(); i++) {
+			if (WINDOWS_FORBIDDEN_FILENAME_CHARS.indexOf(value.charAt(i)) >= 0) {
+				throw new InvalidUpdatePathException(
+						"Rejected " + fieldName + " containing Windows-forbidden filename characters.");
+			}
+		}
+	}
+
+	private static Path parsePath(final String value, final String fieldName) {
+		try {
+			return Paths.get(value);
+		} catch (final InvalidPathException e) {
+			throw new InvalidUpdatePathException("Rejected invalid " + fieldName + " path.", e);
+		}
 	}
 
 	private static void ensureUnderTrustedRoot(final Path normalizedRoot, final Path resolved,

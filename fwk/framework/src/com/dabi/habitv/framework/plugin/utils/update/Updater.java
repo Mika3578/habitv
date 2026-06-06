@@ -116,7 +116,7 @@ public abstract class Updater {
 				onUpdateError(current, artifactNewVersion);
 				throw new TechnicalException(e);
 			}
-			updateFile(currentPath, tempPath);
+			updateFile(current, tempPath.toFile());
 
 			onUpdateDone(current, artifactNewVersion);
 		}
@@ -131,20 +131,9 @@ public abstract class Updater {
 	protected abstract boolean performUpdate(File current, ArtifactVersion artifactNewVersion);
 
 	protected void updateFile(final File current, final File newVersion) {
-		updateFile(current.toPath(), newVersion.toPath());
-	}
-
-	protected void updateFile(final Path current, final Path newVersion) {
-		if (Files.exists(newVersion)) {
-			if (Files.exists(current)) {
-				try {
-					Files.delete(current);
-				} catch (final IOException e) {
-					throw new TechnicalException(e);
-				}
-			}
+		if (newVersion.exists()) {
 			try {
-				Files.move(newVersion, current, StandardCopyOption.REPLACE_EXISTING);
+				Files.move(newVersion.toPath(), current.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			} catch (final IOException e) {
 				throw new TechnicalException(e);
 			}

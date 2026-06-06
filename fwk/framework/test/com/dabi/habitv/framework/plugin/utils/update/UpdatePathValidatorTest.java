@@ -43,6 +43,24 @@ public class UpdatePathValidatorTest {
 	}
 
 	@Test(expected = InvalidUpdatePathException.class)
+	public void rejectsColonInArtifactId() throws IOException {
+		final File root = temporaryFolder.newFolder("plugins");
+		UpdatePathValidator.resolveArtifactFile(root, "bad:name", "jar");
+	}
+
+	@Test(expected = InvalidUpdatePathException.class)
+	public void rejectsAsteriskInArtifactId() throws IOException {
+		final File root = temporaryFolder.newFolder("plugins");
+		UpdatePathValidator.resolveArtifactFile(root, "bad*name", "jar");
+	}
+
+	@Test(expected = InvalidUpdatePathException.class)
+	public void rejectsQuestionMarkInArtifactId() throws IOException {
+		final File root = temporaryFolder.newFolder("plugins");
+		UpdatePathValidator.resolveArtifactFile(root, "bad?name", "jar");
+	}
+
+	@Test(expected = InvalidUpdatePathException.class)
 	public void rejectsStandaloneParentDirectoryArtifactId() throws IOException {
 		final File root = temporaryFolder.newFolder("plugins");
 		UpdatePathValidator.resolveArtifactFile(root, "..", "jar");

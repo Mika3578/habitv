@@ -61,6 +61,18 @@ public class UpdaterPathValidationTest {
 	}
 
 	@Test
+	public void continuesWithValidEntryAfterWindowsForbiddenCharacter() throws IOException {
+		final File root = temporaryFolder.newFolder("plugins");
+		final TestUpdater updater = new TestUpdater(root.getAbsolutePath());
+		updater.update("bad:name", "arte");
+
+		assertEquals(2, updater.getCheckedArtifactIds().size());
+		assertEquals("bad:name", updater.getCheckedArtifactIds().get(0));
+		assertEquals("arte", updater.getCheckedArtifactIds().get(1));
+		assertTrue(containsSkippingUnsafeMessage());
+	}
+
+	@Test
 	public void continuesWithValidEntryAfterMalformedEntry() throws IOException {
 		final File root = temporaryFolder.newFolder("plugins");
 		final TestUpdater updater = new TestUpdater(root.getAbsolutePath());
