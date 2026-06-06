@@ -1,6 +1,6 @@
 # GitHub Copilot instructions for Habitv
 
-Habitv is a Java 8 Maven multi-module app for French TV catch-up via
+Habitv is a Java 21 Maven multi-module app for French TV catch-up via
 pluggable provider plugins. Treat the codebase as production legacy: prefer
 narrow, conservative suggestions over rewrites.
 

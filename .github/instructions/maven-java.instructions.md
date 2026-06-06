@@ -6,9 +6,10 @@ applyTo: "**/*.java,**/pom.xml,fwk/**,application/**,plugins/**"
 
 Canonical workflow policy: `AGENTS.md`. Do not contradict it.
 
-## Java 8
+## Java 21
 
-- Target Java 8 only. No Java 9+ language features or APIs.
+- Target Java 21 only (`maven.compiler.release=21`). No Java 22+ language features or APIs.
+- OpenJFX 21.0.7 is the required JavaFX dependency; do not reintroduce `system`-scope `javafx:jfxrt` or `${jdk.home}` references.
 - Preserve the existing Maven multi-module layout.
 - Do not propose reactor restructures without a referenced tracker item.
 
@@ -48,7 +49,7 @@ alone unless the developer explicitly relaxes `AGENTS.md` Section 14.2.
 ## Dependencies
 
 Do not add, remove, or upgrade dependencies unless the task explicitly
-requires it. Document Java 8 compatibility impact when a change is
+requires it. Document Java 21 compatibility impact when a change is
 required.
 
 ## Avoid suggesting

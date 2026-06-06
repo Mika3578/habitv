@@ -16,9 +16,9 @@ added, mitigated, realized, or accepted.
 
 | Status | Count |
 |---|---:|
-| 🟢 **Mitigated** | 7 |
+| 🟢 **Mitigated** | 8 |
 | 🔴 **Open / Critical (P0)** | 1 |
-| 🟠 **Open / High (P1)** | 5 |
+| 🟠 **Open / High (P1)** | 4 |
 | 🟡 **Open / Medium (P2)** | 2 |
 | 🟡 **Accepted (residual)** | 1 |
 | 🟢 **Open / Low (P3)** | 0 |
@@ -32,7 +32,7 @@ added, mitigated, realized, or accepted.
 |---|:--:|:--:|:--:|:--:|
 | `legacy-maven-repo` | High | High | 🔴 P0 | 🟢 Mitigated (compile-time) |
 | `ftp-deploy` | High | High | 🔴 P0 | 🟠 Open |
-| `javafx-jdk8` | High | High | 🟠 P1 | 🟠 Open |
+| `javafx-jdk8` | High | High | 🟠 P1 | 🟢 Mitigated |
 | `jaxb-mismatch` | Med | High | 🟠 P1 | 🟠 Open |
 | `live-tests-flaky` | High | Med | 🟠 P1 | 🟡 Open |
 | `provider-endpoints-dead` | High | Med | 🟠 P1 | 🟡 Open |
@@ -50,6 +50,32 @@ added, mitigated, realized, or accepted.
 ---
 
 ## 🟢 Mitigated risks
+
+### `javafx-jdk8` — JavaFX tied to JDK 8 assumptions
+
+| | |
+|---|---|
+| **Status** | 🟢 Mitigated |
+| **Likelihood** | High · **Impact** High · **Priority** 🟠 P1 |
+| **Legacy code** | R-003 |
+
+**Description** — `application/trayView` used
+`zenjava/javafx-maven-plugin 2.0` and JavaFX 2.x APIs;
+`habiTv-linux` / `habiTv-windows` declared `system`-scope
+`javafx:jfxrt` pointing at `${jdk.home}/jre/lib/ext/jfxrt.jar`
+with hardcoded `jdk.home`. JDK 11+ no longer bundles JavaFX.
+
+**Mitigation** — ADR `java21-openjfx-baseline` (2026-06-06): Java
+baseline raised to 21, OpenJFX 21.0.7 declared as an explicit
+`org.openjfx` dependency, `jfxrt` system-scope and `${jdk.home}`
+removed, `habiTv-linux` / `habiTv-windows` returned to the reactor.
+Tracked under `javafx-modernization`.
+
+**Status update (2026-06-06)** — OpenJFX migration PR merged; risk
+fully mitigated. Remaining work (`jpackage` distribution) is a
+follow-up under `javafx-modernization`.
+
+---
 
 ### `reactor-version-range` — Intra-reactor version range excludes SNAPSHOTs
 
@@ -164,24 +190,6 @@ distributionManagement blocks (PR #36 merged).
 
 ---
 
-### `javafx-jdk8` — JavaFX tied to JDK 8 assumptions
-
-| | |
-|---|---|
-| **Status** | 🟠 Open |
-| **Likelihood** | High · **Impact** High · **Priority** 🟠 P1 |
-| **Legacy code** | R-003 |
-
-**Description** — `application/trayView` uses
-`zenjava/javafx-maven-plugin 2.0` and JavaFX 2.x APIs;
-`habiTv-linux` / `habiTv-windows` declare `system`-scope
-`javafx:jfxrt` pointing at `${jdk.home}/jre/lib/ext/jfxrt.jar`
-with hardcoded `jdk.home`. JDK 11+ no longer bundles JavaFX.
-
-**Mitigation** — Tracked under `javafx-modernization`. Do not
-migrate in this restart phase; keep Java 8 baseline first.
-
----
 
 ### `jaxb-mismatch` — JAXB generation / runtime mismatch
 

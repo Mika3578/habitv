@@ -17,8 +17,9 @@ Packaging, installers, and platform bundling work.
 - No platform packaging (Windows/Linux installers) unless the task
   requires it.
 - Do not add `.exe`, `.zip`, `.dll`, or other binaries by default.
-- JavaFX packaging constraints apply (Java 8, JavaFX-capable JDK).
-- Document Java 8 and JavaFX assumptions in validation evidence.
+- JavaFX packaging uses OpenJFX 21.0.7 on Java 21; do not reference `jfxrt.jar` or `${jdk.home}`.
+- Use `jpackage` (bundled with JDK 14+) as the distribution direction; `javafx-maven-plugin 2.0` is retired.
+- Document Java 21 and OpenJFX assumptions in validation evidence.
 
 ## Validation
 

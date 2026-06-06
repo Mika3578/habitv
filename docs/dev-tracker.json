@@ -18,8 +18,8 @@
   ],
   "summary": {
     "done": 13,
-    "inProgress": 7,
-    "proposed": 1,
+    "inProgress": 8,
+    "proposed": 0,
     "deferred": 0,
     "blocked": 0,
     "total": 21,
@@ -242,22 +242,22 @@
       "legacyCode": "HBTV-008",
       "displayTitle": "JavaFX & runtime packaging modernization",
       "icon": "🖼️",
-      "status": "proposed",
+      "status": "in-progress",
       "priority": "P2",
-      "progressPercent": 15,
+      "progressPercent": 75,
       "scope": "Migrate JavaFX 2.x usage and ${jdk.home} packaging assumptions in application/trayView, application/habiTv-linux, application/habiTv-windows, zenjava/javafx-maven-plugin 2.0, and system-scope javafx:jfxrt.",
       "acceptanceCriteria": [
         "Surface inventory captured in audit doc (done in audit-master-baseline).",
         "OpenJFX migration options compared (jpackage, jlink, fat-jar).",
-        "Packaging blueprint accepted via dedicated ADR.",
-        "habiTv-linux + habiTv-windows re-enterable to the reactor."
+        "Packaging blueprint accepted via dedicated ADR (done: java21-openjfx-baseline).",
+        "habiTv-linux + habiTv-windows re-enterable to the reactor (done)."
       ],
       "validation": [
-        "Audit reviewed in PR; code changes implemented in application/habiTv for JDK 8 jfxrt.jar resolution.",
-        "mvn -B -ntp -pl application/habiTv -am -Dtest=JavaFxRuntimeLocatorTest -Dsurefire.failIfNoSpecifiedTests=false test -> BUILD SUCCESS"
+        "Audit reviewed in PR; jfxrt system-scope removed, ${jdk.home} bootstrap eliminated.",
+        "mvn -B -ntp -pl application/habiTv-linux,application/habiTv-windows -am -DskipTests validate -> BUILD SUCCESS"
       ],
       "pr": "TBD",
-      "notes": "Risk javafx-jdk8. HabitvLauncher now resolves jfxrt.jar from common JDK 8 layouts and supports -Dhabitv.jfxrt.path; GUI mode exits with diagnostics when JavaFX is missing. Windows packaging foundation landed (PR #124 staging, PR #126 launcher/installer, PR #128 native package verification); OpenJFX runtime migration and full cross-platform packaging remain out of scope for this item."
+      "notes": "OpenJFX 21.0.7 migration done: jfxrt system-scope removed, ${jdk.home} bootstrap eliminated, habiTv-linux / habiTv-windows returned to the reactor (ADR java21-openjfx-baseline). Risk javafx-jdk8 mitigated. Remaining work: jpackage-based end-user distribution pipeline."
     },
     {
       "id": "plugin-tester-align",

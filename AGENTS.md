@@ -6,8 +6,8 @@ complement, but do not replace, the human review process.
 
 ## Agent rules metadata
 
-* **Version:** 1.5.1
-* **Last updated:** 2026-05-31
+* **Version:** 2.0.0
+* **Last updated:** 2026-06-06
 * **Maintainer:** repository maintainer
 * **Scope:** Habitv AI-assisted development workflow
 * **Canonical source:** `AGENTS.md`
@@ -143,7 +143,7 @@ Use this map to find the canonical rule for each workflow area:
 
 ## 🧭 1. Repository context
 
-Habitv is a **Java 8 Maven multi-module** application that downloads
+Habitv is a **Java 21 Maven multi-module** application that downloads
 French TV catch-up content via pluggable provider plugins.
 
 ### Layout
@@ -153,8 +153,8 @@ French TV catch-up content via pluggable provider plugins.
 ├── pom.xml                # root parent POM (aggregates fwk/, application/, plugins/)
 ├── fwk/                   # api/, framework/
 ├── application/           # core/, consoleView/, trayView/, habiTv/
-│   ├── habiTv-linux/      # ❌ out of reactor — JavaFX 2.x, hardcoded ${jdk.home}
-│   └── habiTv-windows/    # ❌ out of reactor — JavaFX 2.x, hardcoded ${jdk.home}
+│   ├── habiTv-linux/      # ✅ in reactor — OpenJFX on Java 21
+│   └── habiTv-windows/    # ✅ in reactor — OpenJFX on Java 21
 ├── plugins/               # 22 provider/downloader/export plugins + plugin-tester
 └── docs/                  # tracker, plan, risks, decisions, audit baseline
 ```
@@ -167,7 +167,8 @@ French TV catch-up content via pluggable provider plugins.
 | `mvn validate` on Ubuntu + Windows (CI) | ✅ |
 | `mvn compile` from root | ✅ |
 | `mvn test` (offline) | 🟡 partial |
-| `mvn package` (full app / GUI) | 🟡 JavaFX-capable JDK 8 or scoped console package; Windows installer foundation on `develop` |
+| `mvn package` (full app / GUI) | 🟢 safe from `develop` |
+| `mvn verify` (integration) | 🟢 safe from `develop` |
 | Legacy `dabiboo.free.fr` / SVN / FTP removed | ✅ active POM/runtime |
 | `youtube-dl` → `yt-dlp` complete migration | 🟡 wiring done; habitv-repo tool publish pending |
 | Provider plugin endpoints audited | 🟡 inventory + offline fixtures; rewrites ongoing |
@@ -180,8 +181,8 @@ French TV catch-up content via pluggable provider plugins.
 | 🔴 Forbidden without explicit tracker item + ADR | Why |
 |---|---|
 | Restructure Maven reactor topology | High blast radius; tracked under `maven-reactor` |
-| Bump Java baseline beyond **Java 8** | JavaFX 2.x and `javax.xml.bind` 2.0 assume JDK 8 |
-| Migrate JavaFX (`jfxrt`) to OpenJFX | Tracked under `javafx-modernization` |
+| Bump Java baseline beyond **Java 21** | OpenJFX 21.0.7 and JAXB 2.x assume JDK 21+ |
+| Downgrade JavaFX to `jfxrt` system-scope | OpenJFX is now the standard dependency model |
 | Regenerate JAXB classes or move to `jakarta.*` | Risk `jaxb-mismatch` |
 | Replace `youtube-dl` plugin behavior with `yt-dlp` | Tracked under `ytdlp-migration` |
 | Change runtime updater URLs or layout | Tracked under `static-repo-publish` |

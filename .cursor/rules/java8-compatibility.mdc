@@ -1,31 +1,30 @@
 ---
-description: Java 8 baseline and dependency change constraints
+description: Java 21 baseline and dependency change constraints
 globs:
   - "**/*.java"
   - "**/pom.xml"
 ---
 
-# Habitv Java 8 compatibility rules
+# Habitv Java 21 compatibility rules
 
 Canonical source: `AGENTS.md` Sections 2, 14.9, 18.6–18.7.
+ADR: `java21-openjfx-baseline` (supersedes `keep-java8-baseline`).
 
 ## Java baseline
 
-- Target **Java 8 only** unless a dedicated migration tracker item and
-  ADR explicitly authorize a higher baseline.
-- Do not introduce Java 9+ language features (`var`, records, switch
-  expressions, sealed types, pattern matching).
-- Do not introduce Java 9+ APIs (`List.of`, `HttpClient`, `Stream.toList`,
-  module-system constructs).
+- Target **Java 21 only** (`maven.compiler.release=21`).
+- Do not introduce language features or APIs that require Java 22+.
+- OpenJFX 21.0.7 is the required JavaFX dependency; do not reintroduce
+  `system`-scope `javafx:jfxrt` or `${jdk.home}` references.
 
 ## Forbidden without tracker item + ADR
 
-- Bump Java baseline beyond Java 8
-- Migrate JavaFX (`jfxrt`) to OpenJFX
+- Downgrade below Java 21
+- Reintroduce `jfxrt` system-scope dependency
 - Regenerate JAXB or move to `jakarta.*`
 - Restructure Maven reactor topology
 - Replace `youtube-dl` with `yt-dlp` behavior
-- Provider rewrites, JavaFX migration, runtime updater URL changes
+- Provider rewrites, runtime updater URL changes
 
 ## Dependency changes
 
@@ -34,7 +33,7 @@ requires it. When required, document:
 
 - dependency name, old version, new version
 - reason for the change
-- Java 8 compatibility impact
+- Java 21 compatibility impact
 - validation performed
 
 Plugin version bumps must match `plugin-versioning-policy` triggers in
@@ -42,5 +41,6 @@ Plugin version bumps must match `plugin-versioning-policy` triggers in
 
 ## JavaFX (Section 18.7)
 
-Do not claim JavaFX is always bundled with Java. See
+OpenJFX 21.0.7 is declared as an explicit `org.openjfx` dependency.
+Do not claim JavaFX is bundled with Java. See
 [`docs/java-runtime-policy.md`](../../docs/java-runtime-policy.md).
