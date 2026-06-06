@@ -15,6 +15,7 @@
 	</modules>
 
 	<properties>
+		<jackson.version>2.22.0</jackson.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<!-- Local Maven staging only; runtime uses FrameworkConf.UPDATE_URL (GitHub Pages). -->
@@ -87,12 +88,12 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
-			<version>2.21.4</version>
+			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.22.0</version>
+			<version>${jackson.version}</version>
 		</dependency>			
 		
 		<dependency>
