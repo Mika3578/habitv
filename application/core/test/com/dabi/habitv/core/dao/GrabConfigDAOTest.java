@@ -150,6 +150,60 @@ public class GrabConfigDAOTest {
 	}
 
 	@Test
+	public final void updateGrabConfigPreservesOrderWhenNoCategoryOrderMetadata() {
+		Map<String, CategoryDTO> channel2Categories = buildChannelMap(true, false);
+		dao.saveGrabConfig(channel2Categories);
+		channel2Categories = buildChannelMap(false, true);
+		dao.updateGrabConfig(channel2Categories);
+
+		final List<String> orderAfterFirst = categoryNames(
+				dao.load(LoadModeEnum.ALL).get("channel1").getSubCategories());
+		assertEquals(Arrays.asList("cat1", "cat2"), orderAfterFirst);
+
+		dao.updateGrabConfig(channel2Categories);
+		final List<String> orderAfterSecond = categoryNames(
+				dao.load(LoadModeEnum.ALL).get("channel1").getSubCategories());
+		assertEquals(orderAfterFirst, orderAfterSecond);
+	}
+
+	@Test
+	public final void updateGrabConfigRepeatedFrancetvSyncIsIdempotent() throws IOException {
+		Files.copy(new File(STALE_FRANCETV_FIXTURE).toPath(), new File(XML_FILE).toPath(),
+				java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+		final Map<String, CategoryDTO> pluginTree = buildFreshFrancetvPluginTree();
+
+		dao.updateGrabConfig(pluginTree);
+		final List<String> orderAfterFirst = categoryNames(
+				findChild(dao.load(LoadModeEnum.ALL).get(FRANCETV_PLUGIN), PUBLIC_ROOT_NAME).getSubCategories());
+		assertEquals(EXPECTED_PUBLIC_HUB_ORDER, orderAfterFirst);
+
+		dao.updateGrabConfig(pluginTree);
+		final List<String> orderAfterSecond = categoryNames(
+				findChild(dao.load(LoadModeEnum.ALL).get(FRANCETV_PLUGIN), PUBLIC_ROOT_NAME).getSubCategories());
+		assertEquals(orderAfterFirst, orderAfterSecond);
+	}
+
+	@Test
+	public final void updateGrabConfigMarksRemovedHubDeletedAndAppendsAfterReorder() throws IOException {
+		Files.copy(new File(STALE_FRANCETV_FIXTURE).toPath(), new File(XML_FILE).toPath(),
+				java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+		dao.updateGrabConfig(buildFreshFrancetvPluginTree());
+
+		final Map<String, CategoryDTO> reducedTree = buildFreshFrancetvPluginTree();
+		final CategoryDTO publicRoot = findChild(reducedTree.get(FRANCETV_PLUGIN), PUBLIC_ROOT_NAME);
+		publicRoot.getSubCategories().remove(findChild(publicRoot, "Mieux"));
+		dao.updateGrabConfig(reducedTree);
+
+		final CategoryDTO mergedRoot = findChild(dao.load(LoadModeEnum.ALL).get(FRANCETV_PLUGIN), PUBLIC_ROOT_NAME);
+		final List<String> hubNames = categoryNames(mergedRoot.getSubCategories());
+		assertEquals(EXPECTED_PUBLIC_HUB_ORDER.size(), hubNames.size());
+		assertEquals(EXPECTED_PUBLIC_HUB_ORDER.subList(0, EXPECTED_PUBLIC_HUB_ORDER.size() - 1),
+				hubNames.subList(0, EXPECTED_PUBLIC_HUB_ORDER.size() - 1));
+		assertEquals("Mieux", hubNames.get(hubNames.size() - 1));
+		assertEquals(StatusEnum.DELETED, findChild(mergedRoot, "Mieux").getState());
+	}
+
+	@Test
 	public final void updateGrabConfigSkipsCategoriesWithoutIdAndRemainsSchemaValid() throws IOException {
 		Files.copy(new File(STALE_FRANCETV_FIXTURE).toPath(), new File(XML_FILE).toPath(),
 				java.nio.file.StandardCopyOption.REPLACE_EXISTING);
