@@ -2710,6 +2710,34 @@ instead of bloating `AGENTS.md`. Categories: build blockers; security;
 dependencies; CI; providers; metadata; external tools; packaging; Java
 migration; documentation; cleanup/removal.
 
+### 18.19 Habitv task final report
+
+Every completed Habitv task must end with:
+
+```markdown
+## Final report
+
+* Phase:
+* Task classification:
+* Branch:
+* Files changed:
+* Provider impact:
+* Dependency impact:
+* Security impact:
+* Java 8 compatibility:
+* JavaFX impact:
+* External tool impact:
+* Validation:
+* Manual tests requested:
+* Known limitations:
+* Follow-up candidates:
+* Proposed commit:
+* Next action requiring approval:
+```
+
+Section 16.25 is the generic minimum; Section 18.19 adds Habitv-specific
+fields; Section 19.25 adds maintainability fields.
+
 ### 18.20 Content-agnostic provider code rule
 
 Provider implementations must remain **content-agnostic**.
@@ -2795,34 +2823,6 @@ top-level section labels, live channel asset id) remain allowed under
 Section 18.20 when validated against the official service.
 
 See also [`docs/provider-policy.md`](docs/provider-policy.md#external-provider-references).
-
-### 18.19 Habitv task final report
-
-Every completed Habitv task must end with:
-
-```markdown
-## Final report
-
-* Phase:
-* Task classification:
-* Branch:
-* Files changed:
-* Provider impact:
-* Dependency impact:
-* Security impact:
-* Java 8 compatibility:
-* JavaFX impact:
-* External tool impact:
-* Validation:
-* Manual tests requested:
-* Known limitations:
-* Follow-up candidates:
-* Proposed commit:
-* Next action requiring approval:
-```
-
-Section 16.25 is the generic minimum; Section 18.19 adds Habitv-specific
-fields; Section 19.25 adds maintainability fields.
 
 ---
 
