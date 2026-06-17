@@ -198,7 +198,7 @@ public class Novo19PluginManager extends BasePluginWithProxy implements PluginPr
 	private List<Novo19Tile> loadEpisodeRailTiles(final Novo19BffPage page, final Novo19Diagnostics diagnostics) {
 		final Set<Novo19Tile> tiles = new LinkedHashSet<>();
 		for (final Novo19Rail rail : page.getRails()) {
-			if (StringUtils.isEmpty(rail.getSrc()) || Novo19PathRules.isRecommendationRailSrc(rail.getSrc())) {
+			if (Novo19PathRules.isRecommendationRail(rail) || StringUtils.isEmpty(rail.getSrc())) {
 				continue;
 			}
 			final Novo19Diagnostics railDiagnostics = new Novo19Diagnostics("episode-rail");

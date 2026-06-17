@@ -49,6 +49,8 @@ final class Novo19FixtureSupport {
 					readFixture("bff-page-inferno-film.json"));
 			responses.put(Novo19UrlBuilder.bffPageByPath("details/le-royaume-des-contes"),
 					readFixture("bff-page-podcast-royaume.json"));
+			responses.put(Novo19UrlBuilder.bffPageByPath("details/vos-objets-valent-de-l-or"),
+					readFixture("bff-page-vos-objets.json"));
 			responses.put(Novo19UrlBuilder.bffPageByPath("details/on-a-de-l-info"),
 					readFixture("bff-page-info-collection.json"));
 			responses.put(Novo19UrlBuilder.bffAbsolutePath(
@@ -58,8 +60,8 @@ final class Novo19FixtureSupport {
 					"/api/1/public/frontends/web/pages/BFF%7Casset-details-podcast,le-royaume-des-contes/sections/episodes/tiles"),
 					readFixture("bff-tiles-podcast-episodes.json"));
 			responses.put(Novo19UrlBuilder.bffAbsolutePath(
-					"/api/1/public/frontends/web/pages/BFF%7Casset-details,inferno/sections/reco/tiles"),
-					readFixture("bff-tiles-inferno-reco.json"));
+					"/api/1/public/frontends/web/pages/details/vos-objets-valent-de-l-or/sections/episodes/tiles"),
+					readFixture("bff-tiles-vos-objets-episodes.json"));
 			responses.put(Novo19UrlBuilder.bffPageByPath("voir-plus/rail/details/on-a-de-l-info/info-episodes"),
 					readFixture("bff-pagination-more.json"));
 		} catch (final IOException e) {

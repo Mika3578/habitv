@@ -25,6 +25,8 @@ public class Novo19PathRulesTest {
 		assertTrue(Novo19PathRules.isPodcastDetailRailSrc(
 				"/api/1/public/frontends/web/pages/BFF%7Casset-details-podcast,le-royaume-des-contes/sections/episodes/tiles"));
 		assertEquals("Nos podcasts", Novo19PathRules.normalizeSectionTitle("Nos podcasts"));
+		assertTrue(Novo19PathRules.isRecommendationRail(
+				new com.dabi.habitv.provider.novo19.dto.Novo19Rail("reco", "Recommendations", "/sections/reco/tiles", null)));
 		assertTrue(Novo19PathRules.isGenericCatalogueSectionTitle("Catalogue"));
 		assertFalse(Novo19PathRules.isGenericCatalogueSectionTitle("Nos films"));
 	}

@@ -2,6 +2,7 @@ package com.dabi.habitv.provider.novo19;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -32,23 +33,23 @@ final class Novo19PageParser {
 	}
 
 	static Novo19TilesResponse parseTilesEnvelope(final String json, final String sourceUrl) {
-		final JsonNode root = parseRoot(json, sourceUrl);
+		final JsonNode root = readRootOrNull(json);
 		if (root == null || root.isMissingNode()) {
-			return new Novo19TilesResponse(null, null);
+			return new Novo19TilesResponse(Collections.<Novo19Tile>emptyList(), null, false);
 		}
 		final JsonNode data = root.has("tiles") ? root : root;
 		final List<Novo19Tile> tiles = new ArrayList<>();
 		final JsonNode tilesNode = data.path("tiles");
 		if (tilesNode.isArray()) {
 			for (final JsonNode tileNode : tilesNode) {
-				final Novo19Tile tile = parseTile(tileNode);
+				final Novo19Tile tile = parseTileSafely(tileNode);
 				if (tile != null) {
 					tiles.add(tile);
 				}
 			}
 		}
 		final String moreHref = readMoreHref(data.path("more"));
-		return new Novo19TilesResponse(tiles, moreHref);
+		return new Novo19TilesResponse(tiles, moreHref, true);
 	}
 
 	private static Novo19BffPage parsePageNode(final JsonNode page) {
@@ -66,7 +67,7 @@ final class Novo19PageParser {
 			}
 		}
 		final List<Novo19Season> seasons = parseSeasons(page.path("seasons"));
-		final Novo19Tile content = parseTile(page.path("content"));
+		final Novo19Tile content = parseTileSafely(page.path("content"));
 		return new Novo19BffPage(textValue(page, "type"), textValue(page, "id"), textValue(page, "title"), rails,
 				seasons, content);
 	}
@@ -90,7 +91,7 @@ final class Novo19PageParser {
 			final JsonNode episodesNode = seasonNode.path("episodes");
 			if (episodesNode.isArray()) {
 				for (final JsonNode episodeNode : episodesNode) {
-					final Novo19Tile episode = parseTile(episodeNode);
+					final Novo19Tile episode = parseTileSafely(episodeNode);
 					if (episode != null) {
 						episodes.add(episode);
 					}
@@ -123,9 +124,12 @@ final class Novo19PageParser {
 		final String assetId = resolveAssetId(tileNode);
 		Long duration = null;
 		if (tileNode.has("duration")) {
-			duration = Long.valueOf(tileNode.path("duration").asLong(0L));
-			if (duration.longValue() <= 0L) {
-				duration = null;
+			final JsonNode durationNode = tileNode.get("duration");
+			if (durationNode != null && durationNode.isNumber()) {
+				final long value = durationNode.asLong(0L);
+				if (value > 0L) {
+					duration = Long.valueOf(value);
+				}
 			}
 		}
 		return new Novo19Tile(textValue(tileNode, "id"), type, textValue(tileNode, "title"),
@@ -160,15 +164,34 @@ final class Novo19PageParser {
 		return StringUtils.isEmpty(value) ? null : value.trim();
 	}
 
-	private static JsonNode parseRoot(final String json, final String sourceUrl) {
+	private static Novo19Tile parseTileSafely(final JsonNode tileNode) {
+		try {
+			return parseTile(tileNode);
+		} catch (final RuntimeException e) {
+			return null;
+		}
+	}
+
+	private static JsonNode readRootOrNull(final String json) {
 		if (StringUtils.isEmpty(json)) {
 			return null;
 		}
 		try {
 			return MAPPER.readTree(json);
 		} catch (final IOException e) {
-			throw new TechnicalException("Cannot parse NOVO19 BFF response from " + sourceUrl, e);
+			return null;
 		}
+	}
+
+	private static JsonNode parseRoot(final String json, final String sourceUrl) {
+		if (StringUtils.isEmpty(json)) {
+			return null;
+		}
+		final JsonNode root = readRootOrNull(json);
+		if (root == null) {
+			throw new TechnicalException("Cannot parse NOVO19 BFF response from " + sourceUrl);
+		}
+		return root;
 	}
 
 }

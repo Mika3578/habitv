@@ -1,0 +1,32 @@
+{
+  "tiles": [
+    {
+      "id": "ep-oie_565BFFb",
+      "type": "PODCAST",
+      "title": "L'Oie d'or",
+      "duration": 620,
+      "href": "/player/le-royaume-des-contes-loie-dor",
+      "source": { "id": "ep-oie_565BFFb" }
+    },
+    {
+      "id": "ep-cigale_565BFFb",
+      "type": "AUDIO",
+      "title": "La Cigale et la Fourmi",
+      "duration": 540,
+      "href": "/player/le-royaume-des-contes-cigale-fourmi",
+      "source": { "id": "ep-cigale_565BFFb" }
+    },
+    {
+      "id": "ep-peste_565BFFb",
+      "type": "PODCAST",
+      "title": "Les animaux malades de la peste",
+      "duration": 710,
+      "href": "/player/le-royaume-des-contes-animaux-peste",
+      "source": { "id": "ep-peste_565BFFb" }
+    }
+  ],
+  "more": {
+    "href": "/api/1/public/frontends/web/pages/BFF%7Casset-details-podcast,le-royaume-des-contes/sections/episodes/tiles-page-2"
+  },
+  "version": "0.9.1"
+}

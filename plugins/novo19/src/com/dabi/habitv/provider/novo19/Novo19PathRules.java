@@ -2,6 +2,7 @@ package com.dabi.habitv.provider.novo19;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.dabi.habitv.provider.novo19.dto.Novo19Rail;
 import com.dabi.habitv.provider.novo19.dto.Novo19Tile;
 
 final class Novo19PathRules {
@@ -57,6 +58,30 @@ final class Novo19PathRules {
 		}
 		return railSrc.contains("/sections/reco/") || railSrc.endsWith("/reco/tiles")
 				|| railSrc.contains("/sections/reco/tiles");
+	}
+
+	static boolean isRecommendationRailId(final String railId) {
+		return !StringUtils.isEmpty(railId) && "reco".equalsIgnoreCase(railId.trim());
+	}
+
+	static boolean isRecommendationRailTitle(final String title) {
+		if (StringUtils.isEmpty(title)) {
+			return false;
+		}
+		final String normalized = title.trim().toLowerCase();
+		return normalized.contains("recommend") || normalized.contains("recommand");
+	}
+
+	static boolean isRecommendationRail(final Novo19Rail rail) {
+		if (rail == null) {
+			return false;
+		}
+		return isRecommendationRailSrc(rail.getSrc()) || isRecommendationRailId(rail.getId())
+				|| isRecommendationRailTitle(rail.getTitle());
+	}
+
+	static boolean isRecommendationBffPath(final String bffPath) {
+		return isRecommendationRailSrc(bffPath);
 	}
 
 	static boolean isPodcastDetailRailSrc(final String railSrc) {
