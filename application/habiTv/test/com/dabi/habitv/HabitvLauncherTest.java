@@ -26,4 +26,17 @@ public class HabitvLauncherTest {
 	public void multipleArgsSelectsCliMode() {
 		assertFalse(HabitvLauncher.isGuiMode(new String[]{"--daemon", "--output", "/tmp"}));
 	}
+
+	@Test
+	public void javaFxAvailableReturnsTrueInBuildEnvironment() {
+		assertTrue(HabitvLauncher.isJavaFxAvailable());
+	}
+
+	@Test
+	public void javaFxMissingMessageContainsInstructions() {
+		String msg = HabitvLauncher.getJavaFxMissingMessage();
+		assertTrue(msg.contains("JavaFX"));
+		assertTrue(msg.contains("openjfx.io"));
+		assertTrue(msg.contains("CLI mode"));
+	}
 }
