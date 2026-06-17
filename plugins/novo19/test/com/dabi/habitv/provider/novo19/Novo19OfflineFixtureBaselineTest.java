@@ -2,6 +2,7 @@ package com.dabi.habitv.provider.novo19;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,13 +25,13 @@ public class Novo19OfflineFixtureBaselineTest {
 	}
 
 	private static String readUtf8(final InputStream input) throws IOException {
-		final StringBuilder builder = new StringBuilder();
+		final ByteArrayOutputStream output = new ByteArrayOutputStream();
 		final byte[] buffer = new byte[256];
 		int read;
 		while ((read = input.read(buffer)) != -1) {
-			builder.append(new String(buffer, 0, read, "UTF-8"));
+			output.write(buffer, 0, read);
 		}
-		return builder.toString();
+		return output.toString("UTF-8");
 	}
 
 }

@@ -64,6 +64,48 @@ public class Novo19CatalogHierarchyTest {
 	}
 
 	@Test
+	public void infernoFilmInfersContentKindFromDetailWhenGrabConfigOmitsParameter() throws Exception {
+		final java.util.Map<String, String> responses = new java.util.HashMap<String, String>();
+		responses.put(Novo19UrlBuilder.bffPageByPath("details/inferno"),
+				Novo19FixtureSupport.readFixture("bff-page-inferno-film-playback-infos.json"));
+		final Novo19PluginManager manager = new Novo19PluginManager(new Novo19CatalogClient(new MapLoader(responses)));
+		final CategoryDTO inferno = new CategoryDTO(Novo19Conf.NAME, "Inferno",
+				"https://novo19.ouest-france.fr/details/inferno", Novo19Conf.EXTENSION);
+		inferno.setDownloadable(true);
+		inferno.addParameter(Novo19Conf.PARAMETER_ASSET_ID, "OF-00000080-00-0000_565BFFb");
+		final Set<EpisodeDTO> episodes = manager.findEpisode(inferno);
+		assertEquals(1, episodes.size());
+		assertEquals("https://novo19.ouest-france.fr/player/inferno", episodes.iterator().next().getId());
+	}
+
+	@Test
+	public void infernoFilmUsesPlaybackInfosWhenContentHrefMissing() throws Exception {
+		final java.util.Map<String, String> responses = new java.util.HashMap<String, String>();
+		responses.put(Novo19UrlBuilder.bffPageByPath("details/inferno"),
+				Novo19FixtureSupport.readFixture("bff-page-inferno-film-playback-infos.json"));
+		final Novo19PluginManager manager = new Novo19PluginManager(new Novo19CatalogClient(new MapLoader(responses)));
+		final CategoryDTO inferno = Novo19CatalogMapper.buildProgramCategory(new Novo19Tile("film-inferno_565BFFb",
+				"VOD", "Inferno", null, null, 7005L, "/details/inferno", "OF-00000080-00-0000_565BFFb"));
+		final Set<EpisodeDTO> episodes = manager.findEpisode(inferno);
+		assertEquals(1, episodes.size());
+		final EpisodeDTO episode = episodes.iterator().next();
+		assertEquals("Inferno", episode.getName());
+		assertEquals("https://novo19.ouest-france.fr/player/inferno", episode.getId());
+	}
+
+	@Test
+	public void seriesWithSeasonRailsListsEpisodesAtProgramRoot() {
+		final Novo19PluginManager manager = new Novo19PluginManager(Novo19FixtureSupport.clientWithFixtures());
+		final CategoryDTO bucheron = Novo19CatalogMapper.buildProgramCategory(new Novo19Tile(
+				"18e2900d-e0fb-4282-8110-9505ab91e1e9_565BFFb", "SERIE", "Bûcheron, un métier à hauts risques", null,
+				null, null, "/details/bucheron-un-metier-a-hauts-risques",
+				"18e2900d-e0fb-4282-8110-9505ab91e1e9_565BFFb"));
+		final Set<EpisodeDTO> episodes = manager.findEpisode(bucheron);
+		assertEquals(2, episodes.size());
+		assertTrue(containsEpisodeName(episodes, "Au mépris du danger - S3E11"));
+	}
+
+	@Test
 	public void seriesContainsOnlyOwnSeasonEpisodes() {
 		final Novo19PluginManager manager = new Novo19PluginManager(Novo19FixtureSupport.clientWithFixtures());
 		final CategoryDTO series = Novo19CatalogMapper.buildProgramCategory(new Novo19Tile("serie-fbi_565BFFb", "SERIE",
@@ -117,6 +159,24 @@ public class Novo19CatalogHierarchyTest {
 			}
 		}
 		return false;
+	}
+
+	private static final class MapLoader implements Novo19CatalogClient.ContentLoader {
+
+		private final java.util.Map<String, String> responses;
+
+		private MapLoader(final java.util.Map<String, String> responses) {
+			this.responses = responses;
+		}
+
+		@Override
+		public String load(final String url) throws java.io.IOException {
+			if (!responses.containsKey(url)) {
+				throw new java.io.IOException("missing " + url);
+			}
+			return responses.get(url);
+		}
+
 	}
 
 }

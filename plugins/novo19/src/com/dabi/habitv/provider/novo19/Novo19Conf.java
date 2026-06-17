@@ -8,7 +8,11 @@ public final class Novo19Conf {
 
 	public static final String HOME_URL = "https://novo19.ouest-france.fr";
 
+	public static final String PUBLIC_HOST = "novo19.ouest-france.fr";
+
 	public static final String BFF_BASE_URL = "https://novo19-bff.ouest-france.fr";
+
+	public static final String BFF_HOST = "novo19-bff.ouest-france.fr";
 
 	public static final String CONFIG_PATH = "/api/1/public/config?family=web&width=1920&height=1080";
 
@@ -60,14 +64,34 @@ public final class Novo19Conf {
 
 	public static final String DOCUMENTARIES_PUBLIC_PATH = "documentaires-et-magazines";
 
+	public static final String FILMS_PUBLIC_PATH = "films";
+
+	public static final String SERIES_PUBLIC_PATH = "series";
+
+	public static final String PODCASTS_PUBLIC_PATH = "podcasts";
+
+	public static final String DIVERTISSEMENTS_PUBLIC_PATH = "divertissements";
+
+	public static final String SECTION_FILMS = "Nos films";
+
+	public static final String SECTION_SERIES = "Nos séries";
+
+	public static final String SECTION_PODCASTS = "Nos podcasts";
+
+	public static final String SECTION_DIVERTISSEMENTS = "Nos divertissements";
+
 	public static final String DOWNLOAD_UNAVAILABLE_MESSAGE = "This replay is currently unavailable or not supported. See logs for details.";
 
 	/**
 	 * yt-dlp audio-only flags for podcast episodes (delegated to the youtube downloader).
 	 */
-	public static final String PODCAST_YT_DLP_ARGS = " \"#VIDEO_URL#\" -o \"#FILE_DEST#\" --extract-audio --audio-format mp3 --no-check-certificate";
+	public static final String PODCAST_YT_DLP_ARGS = " \"#VIDEO_URL#\" -o \"#FILE_DEST#\" --extract-audio --audio-format mp3";
 
 	public static final int MAX_PAGINATION_PAGES = 25;
+
+	public static final int BFF_GET_MAX_ATTEMPTS = 3;
+
+	public static final long BFF_GET_RETRY_DELAY_MS = 250L;
 
 	private Novo19Conf() {
 	}

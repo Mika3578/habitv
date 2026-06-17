@@ -1,0 +1,9 @@
+{
+  "page": {
+    "type": "MOSAIC",
+    "id": "see-more/histoire",
+    "title": "Histoire",
+    "src": "/api/1/public/frontends/web/pages/BFF%7Crail-see-more,documentaires-et-magazines,histoire/sections/mosaic/tiles"
+  },
+  "version": "0.9.1"
+}

@@ -61,6 +61,26 @@ public class Novo19DownloadOfflineTest {
 	}
 
 	@Test(expected = DownloadFailedException.class)
+	public void blocksObjectDrmReplayDownload() throws Exception {
+		final Map<String, String> transport = new HashMap<String, String>();
+		transport.put(Novo19UrlBuilder.redBeeAnonymousAuthUrl(),
+				Novo19FixtureSupport.readFixture("redbee-auth-anonymous.json"));
+		transport.put(Novo19UrlBuilder.redBeePlayUrl("OF-00000661-03-0012_565BFFb"),
+				Novo19FixtureSupport.readFixture("redbee-play-replay-object-drm.json"));
+		final Map<String, String> catalogResponses = new HashMap<String, String>();
+		catalogResponses.put(Novo19UrlBuilder.bffPageByPath(
+				"player/bucheron-un-metier-a-hauts-risques-chantiers-risques-face-a-la-crise"),
+				Novo19FixtureSupport.readFixture("bff-page-player-episode-no-href.json"));
+		final Novo19PluginManager manager = new Novo19PluginManager(
+				new Novo19CatalogClient(new CatalogMapLoader(catalogResponses)),
+				new Novo19PlaybackClient(new MapTransport(transport)));
+		final DownloadParamDTO param = new DownloadParamDTO(
+				"https://novo19.ouest-france.fr/player/bucheron-un-metier-a-hauts-risques-chantiers-risques-face-a-la-crise",
+				"out.mp4", Novo19Conf.EXTENSION);
+		manager.download(param, buildHolder(new RecordingDownloader()));
+	}
+
+	@Test(expected = DownloadFailedException.class)
 	public void blocksLiveAssetDownload() throws Exception {
 		final Novo19PluginManager manager = new Novo19PluginManager(Novo19FixtureSupport.clientWithFixtures(),
 				new Novo19PlaybackClient(new MapTransport(new HashMap<String, String>())));

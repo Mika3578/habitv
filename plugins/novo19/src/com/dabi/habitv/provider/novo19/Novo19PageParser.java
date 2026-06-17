@@ -32,12 +32,21 @@ final class Novo19PageParser {
 		return parsePageNode(page);
 	}
 
+	static String resolveTilesSourcePath(final String json) {
+		final JsonNode root = readRootOrNull(json);
+		if (root == null || root.isMissingNode() || root.has("tiles")) {
+			return null;
+		}
+		final String src = textValue(root.path("page"), "src");
+		return StringUtils.isEmpty(src) ? null : src;
+	}
+
 	static Novo19TilesResponse parseTilesEnvelope(final String json, final String sourceUrl) {
 		final JsonNode root = readRootOrNull(json);
 		if (root == null || root.isMissingNode()) {
 			return new Novo19TilesResponse(Collections.<Novo19Tile>emptyList(), null, false);
 		}
-		final JsonNode data = root.has("tiles") ? root : root;
+		final JsonNode data = root.has("tiles") ? root : root.path("data");
 		final List<Novo19Tile> tiles = new ArrayList<>();
 		final JsonNode tilesNode = data.path("tiles");
 		if (tilesNode.isArray()) {
@@ -67,10 +76,40 @@ final class Novo19PageParser {
 			}
 		}
 		final List<Novo19Season> seasons = parseSeasons(page.path("seasons"));
-		final Novo19Tile content = parseTileSafely(page.path("content"));
+		Novo19Tile content = parseTileSafely(page.path("content"));
+		content = enrichContentFromPlaybackInfos(page, content);
 		final List<String> contentCategories = parseStringArray(page.path("content").path("category"));
 		return new Novo19BffPage(textValue(page, "type"), textValue(page, "id"), textValue(page, "title"), rails,
 				seasons, content, contentCategories);
+	}
+
+	private static Novo19Tile enrichContentFromPlaybackInfos(final JsonNode pageNode, final Novo19Tile content) {
+		if (content == null || pageNode == null || pageNode.isMissingNode()) {
+			return content;
+		}
+		final JsonNode playbackInfos = pageNode.path("playbackInfos");
+		if (!playbackInfos.isArray()) {
+			return content;
+		}
+		String href = content.getHref();
+		String assetId = content.getAssetId();
+		for (final JsonNode infoNode : playbackInfos) {
+			if (!"COMPLETE".equalsIgnoreCase(textValue(infoNode, "type"))) {
+				continue;
+			}
+			if (StringUtils.isEmpty(href)) {
+				href = textValue(infoNode, "player");
+			}
+			if (StringUtils.isEmpty(assetId)) {
+				assetId = textValue(infoNode, "assetId");
+			}
+			break;
+		}
+		if (href == content.getHref() && assetId == content.getAssetId()) {
+			return content;
+		}
+		return new Novo19Tile(content.getId(), content.getType(), content.getTitle(), content.getSubtitle(),
+				content.getDescription(), content.getDurationSeconds(), href, assetId, content.getPublishedAt());
 	}
 
 	private static List<String> parseStringArray(final JsonNode arrayNode) {

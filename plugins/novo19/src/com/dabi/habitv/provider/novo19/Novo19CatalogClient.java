@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.dabi.habitv.framework.plugin.api.BasePluginWithProxy;
 import com.dabi.habitv.provider.novo19.dto.Novo19BffPage;
 
 final class Novo19CatalogClient {
@@ -14,10 +13,6 @@ final class Novo19CatalogClient {
 	}
 
 	private final ContentLoader contentLoader;
-
-	Novo19CatalogClient(final BasePluginWithProxy plugin) {
-		this.contentLoader = new PluginContentLoader(plugin);
-	}
 
 	Novo19CatalogClient(final ContentLoader contentLoader) {
 		this.contentLoader = contentLoader;
@@ -45,27 +40,23 @@ final class Novo19CatalogClient {
 		return contentLoader.load(Novo19UrlBuilder.bffAbsolutePath(bffPath));
 	}
 
-	private static final class PluginContentLoader implements ContentLoader {
+	private static final class HttpContentLoader implements ContentLoader {
 
-		private final BasePluginWithProxy plugin;
+		private final Novo19HttpClient.Transport transport;
 
-		private PluginContentLoader(final BasePluginWithProxy plugin) {
-			this.plugin = plugin;
+		private HttpContentLoader(final Novo19HttpClient.Transport transport) {
+			this.transport = transport;
 		}
 
 		@Override
 		public String load(final String url) throws IOException {
-			try (java.io.InputStream input = plugin.getInputStreamFromUrl(url)) {
-				final java.io.ByteArrayOutputStream output = new java.io.ByteArrayOutputStream();
-				final byte[] buffer = new byte[256];
-				int read;
-				while ((read = input.read(buffer)) != -1) {
-					output.write(buffer, 0, read);
-				}
-				return output.toString("UTF-8");
-			}
+			return transport.get(url, null);
 		}
 
+	}
+
+	static ContentLoader httpContentLoader(final Novo19HttpClient.Transport transport) {
+		return new HttpContentLoader(transport);
 	}
 
 }

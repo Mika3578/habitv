@@ -1,0 +1,14 @@
+{
+  "tiles": [
+    {
+      "id": "france-mysteres_565BFFb",
+      "type": "SERIE",
+      "title": "La France secrète : au coeur des mystères",
+      "href": "/details/la-france-des-mysteres",
+      "source": {
+        "id": "france-mysteres_565BFFb"
+      }
+    }
+  ],
+  "version": "0.9.1"
+}

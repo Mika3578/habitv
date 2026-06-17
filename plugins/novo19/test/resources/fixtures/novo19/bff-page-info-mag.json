@@ -3,6 +3,18 @@
     "type": "DETAILS",
     "id": "on-a-de-l-info-le-mag",
     "title": "On a de l'info - Le mag",
+    "content": {
+      "id": "info-mag_565BFFb",
+      "type": "COLLECTION",
+      "title": "On a de l'info - Le mag",
+      "category": [
+        "Société"
+      ],
+      "href": "/details/on-a-de-l-info-le-mag",
+      "source": {
+        "id": "info-mag_565BFFb"
+      }
+    },
     "rails": [
       {
         "id": "info-mag-episodes",

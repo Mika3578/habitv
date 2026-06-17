@@ -58,11 +58,17 @@ final class Novo19PlaybackParser {
 		return otherCandidates.isEmpty() ? null : otherCandidates.get(0);
 	}
 
+	static boolean hasFormats(final String json, final String sourceUrl) {
+		final JsonNode root = parseRoot(json, sourceUrl);
+		final JsonNode formats = root.path("formats");
+		return formats.isArray() && formats.size() > 0;
+	}
+
 	static boolean hasOnlyProtectedFormats(final String json, final String sourceUrl) {
 		final JsonNode root = parseRoot(json, sourceUrl);
 		final JsonNode formats = root.path("formats");
 		if (!formats.isArray() || formats.size() == 0) {
-			return true;
+			return false;
 		}
 		for (final JsonNode formatNode : formats) {
 			if (isPublicReplayFormat(formatNode)) {
@@ -76,10 +82,29 @@ final class Novo19PlaybackParser {
 		if (formatNode == null || formatNode.isMissingNode()) {
 			return false;
 		}
-		if (formatNode.path("drm").asBoolean(false)) {
+		if (isProtectedDrm(formatNode.path("drm"))) {
 			return false;
 		}
 		return !StringUtils.isEmpty(textValue(formatNode, "mediaLocator"));
+	}
+
+	private static boolean isProtectedDrm(final JsonNode drmNode) {
+		if (drmNode == null || drmNode.isMissingNode() || drmNode.isNull()) {
+			return false;
+		}
+		if (drmNode.isBoolean()) {
+			return drmNode.asBoolean();
+		}
+		if (drmNode.isObject()) {
+			return drmNode.size() > 0;
+		}
+		if (drmNode.isArray()) {
+			return drmNode.size() > 0;
+		}
+		if (drmNode.isTextual()) {
+			return !StringUtils.isEmpty(drmNode.asText());
+		}
+		return true;
 	}
 
 	private static String textValue(final JsonNode node, final String field) {

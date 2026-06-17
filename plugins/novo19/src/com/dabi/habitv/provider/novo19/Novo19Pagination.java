@@ -14,6 +14,8 @@ import com.dabi.habitv.provider.novo19.dto.Novo19TilesResponse;
 
 final class Novo19Pagination {
 
+	static final String ROOT_CAUSE_PAGINATION_LIMIT = "pagination-limit";
+
 	interface TilesFetcher {
 		String fetchTilesJson(String bffPath) throws IOException;
 	}
@@ -23,25 +25,47 @@ final class Novo19Pagination {
 
 	static List<Novo19Tile> loadTiles(final String initialBffPath, final TilesFetcher fetcher,
 			final Novo19Diagnostics diagnostics) {
+		return loadTiles(initialBffPath, fetcher, diagnostics, Novo19Conf.MAX_PAGINATION_PAGES);
+	}
+
+	static List<Novo19Tile> loadTiles(final String initialBffPath, final TilesFetcher fetcher,
+			final Novo19Diagnostics diagnostics, final int maxPages) {
 		if (Novo19PathRules.isRecommendationBffPath(initialBffPath)) {
 			return Collections.emptyList();
 		}
-		final Set<String> visited = new LinkedHashSet<>();
-		final List<Novo19Tile> tiles = new ArrayList<>();
+		final Set<String> visited = new LinkedHashSet<String>();
+		final List<Novo19Tile> tiles = new ArrayList<Novo19Tile>();
 		String nextPath = initialBffPath;
 		int pageCount = 0;
-		while (!StringUtils.isEmpty(nextPath) && pageCount < Novo19Conf.MAX_PAGINATION_PAGES) {
+		boolean hitPaginationLimit = false;
+		while (!StringUtils.isEmpty(nextPath) && pageCount < maxPages) {
 			if (Novo19PathRules.isRecommendationBffPath(nextPath)) {
 				break;
 			}
-			final String absolute = Novo19UrlBuilder.bffAbsolutePath(nextPath);
+			String absolute;
+			try {
+				absolute = Novo19UrlBuilder.bffAbsolutePath(nextPath);
+			} catch (final IOException e) {
+				if (tiles.isEmpty()) {
+					diagnostics.setRootCauseSummary("io-error:" + e.getClass().getSimpleName());
+				} else {
+					diagnostics.setRootCauseSummary("partial-parse:io-error");
+				}
+				break;
+			}
 			if (!visited.add(absolute)) {
 				break;
 			}
 			pageCount++;
 			try {
-				final String json = fetcher.fetchTilesJson(nextPath);
-				final Novo19TilesResponse response = Novo19PageParser.parseTilesEnvelope(json, absolute);
+				String json = fetcher.fetchTilesJson(nextPath);
+				String parseSource = absolute;
+				final String tilesSourcePath = Novo19PageParser.resolveTilesSourcePath(json);
+				if (!StringUtils.isEmpty(tilesSourcePath)) {
+					json = fetcher.fetchTilesJson(tilesSourcePath);
+					parseSource = Novo19UrlBuilder.bffAbsolutePath(tilesSourcePath);
+				}
+				final Novo19TilesResponse response = Novo19PageParser.parseTilesEnvelope(json, parseSource);
 				tiles.addAll(response.getTiles());
 				if (!response.isEnvelopeParsed()) {
 					if (tiles.isEmpty()) {
@@ -68,7 +92,15 @@ final class Novo19Pagination {
 				break;
 			}
 		}
+		if (pageCount >= maxPages && !StringUtils.isEmpty(nextPath)) {
+			hitPaginationLimit = true;
+		}
 		diagnostics.setCreatedItems(tiles.size());
+		if (hitPaginationLimit) {
+			diagnostics.setRootCauseSummary(ROOT_CAUSE_PAGINATION_LIMIT);
+		} else if (StringUtils.isEmpty(diagnostics.getRootCauseSummary()) && !tiles.isEmpty()) {
+			diagnostics.setRootCauseSummary("ok");
+		}
 		return tiles;
 	}
 
@@ -83,8 +115,7 @@ final class Novo19Pagination {
 			return moreHref;
 		}
 		if (moreHref.startsWith("/voir-plus/")) {
-			final String publicPath = moreHref.substring("/voir-plus/".length());
-			final String resolved = Novo19Conf.SLUG_RESOLVER_PREFIX + publicPath;
+			final String resolved = Novo19Conf.SLUG_RESOLVER_PREFIX + moreHref.substring(1);
 			if (Novo19PathRules.isRecommendationBffPath(resolved)) {
 				return null;
 			}

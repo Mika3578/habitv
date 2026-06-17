@@ -29,8 +29,9 @@ public class Novo19PluginManager extends BasePluginWithProxy implements PluginPr
 	private final Novo19PlaybackClient playbackClient;
 
 	public Novo19PluginManager() {
-		this.catalogClient = new Novo19CatalogClient(this);
-		this.playbackClient = new Novo19PlaybackClient(Novo19HttpClient.pluginTransport(getHttpProxy()));
+		final Novo19HttpClient.Transport transport = Novo19HttpClient.pluginTransport(getHttpProxy());
+		this.catalogClient = new Novo19CatalogClient(Novo19CatalogClient.httpContentLoader(transport));
+		this.playbackClient = new Novo19PlaybackClient(transport);
 	}
 
 	Novo19PluginManager(final Novo19CatalogClient catalogClient) {
@@ -77,6 +78,14 @@ public class Novo19PluginManager extends BasePluginWithProxy implements PluginPr
 				}
 			}
 			if (!root.getSubCategories().isEmpty()) {
+				enrichSectionProgramsFromLandingPage(root, Novo19Conf.SECTION_FILMS, Novo19Conf.FILMS_PUBLIC_PATH,
+						diagnostics);
+				enrichSectionProgramsFromLandingPage(root, Novo19Conf.SECTION_SERIES, Novo19Conf.SERIES_PUBLIC_PATH,
+						diagnostics);
+				enrichSectionProgramsFromLandingPage(root, Novo19Conf.SECTION_PODCASTS, Novo19Conf.PODCASTS_PUBLIC_PATH,
+						diagnostics);
+				enrichSectionProgramsFromLandingPage(root, Novo19Conf.SECTION_DIVERTISSEMENTS,
+						Novo19Conf.DIVERTISSEMENTS_PUBLIC_PATH, diagnostics);
 				categories.add(root);
 			}
 			diagnostics.setCreatedItems(countCategories(root));
@@ -116,8 +125,10 @@ public class Novo19PluginManager extends BasePluginWithProxy implements PluginPr
 				logDiagnostics(diagnostics);
 				return episodes;
 			}
+			final boolean atProgramRoot = StringUtils.isEmpty(category.getParameter(Novo19Conf.PARAMETER_SEASON_INDEX));
 			final List<Novo19Tile> railTiles = shouldLoadEpisodeRails(category, page)
-					? loadEpisodeRailTiles(page, diagnostics) : java.util.Collections.<Novo19Tile>emptyList();
+					? loadEpisodeRailTiles(page, diagnostics, atProgramRoot)
+					: java.util.Collections.<Novo19Tile>emptyList();
 			final Set<EpisodeDTO> episodes = Novo19CatalogMapper.mapEpisodes(category, page, railTiles);
 			diagnostics.setCreatedItems(episodes.size());
 			logDiagnostics(diagnostics);
@@ -178,7 +189,7 @@ public class Novo19PluginManager extends BasePluginWithProxy implements PluginPr
 
 	@Override
 	public DownloadableState canDownload(final String downloadInput) {
-		if (downloadInput != null && downloadInput.contains("novo19.ouest-france.fr")) {
+		if (Novo19UrlBuilder.isApprovedPublicDownloadUrl(downloadInput)) {
 			return DownloadableState.SPECIFIC;
 		}
 		return DownloadableState.IMPOSSIBLE;
@@ -216,6 +227,18 @@ public class Novo19PluginManager extends BasePluginWithProxy implements PluginPr
 			final Novo19BffPage documentariesPage = catalogClient
 					.fetchPageByPublicPath(Novo19Conf.DOCUMENTARIES_PUBLIC_PATH);
 			for (final Novo19Rail themeRail : documentariesPage.getRails()) {
+				if (Novo19PathRules.isDocumentariesMasterCatalogRail(themeRail)) {
+					for (final Novo19Tile tile : loadRailTiles(themeRail, diagnostics)) {
+						registerThematicProgram(builder, tile, null);
+					}
+					continue;
+				}
+				if (Novo19PathRules.isPromotedBannerRail(themeRail)) {
+					for (final Novo19Tile tile : loadRailTiles(themeRail, diagnostics)) {
+						registerThematicProgram(builder, tile, null);
+					}
+					continue;
+				}
 				if (!Novo19PathRules.isDocumentariesThemeRail(themeRail)) {
 					continue;
 				}
@@ -265,6 +288,39 @@ public class Novo19PluginManager extends BasePluginWithProxy implements PluginPr
 				getLog().debug("NOVO19 editorial program skipped for " + tile.getHref() + ": " + e.getMessage());
 			}
 		}
+	}
+
+	private void enrichSectionProgramsFromLandingPage(final CategoryDTO root, final String sectionName,
+			final String publicPath, final Novo19Diagnostics diagnostics) {
+		final CategoryDTO section = findSectionByName(root, sectionName);
+		if (section == null) {
+			return;
+		}
+		try {
+			final Novo19BffPage landingPage = catalogClient.fetchPageByPublicPath(publicPath);
+			for (final Novo19Rail rail : landingPage.getRails()) {
+				if (Novo19PathRules.isRecommendationRail(rail) || StringUtils.isEmpty(rail.getSrc())) {
+					continue;
+				}
+				for (final Novo19Tile tile : loadRailTiles(rail, diagnostics)) {
+					addProgramTile(section, tile);
+				}
+			}
+		} catch (final IOException e) {
+			getLog().debug("NOVO19 landing page enrichment skipped for " + publicPath + ": " + e.getMessage());
+		}
+	}
+
+	private static CategoryDTO findSectionByName(final CategoryDTO root, final String sectionName) {
+		if (root == null || StringUtils.isEmpty(sectionName)) {
+			return null;
+		}
+		for (final CategoryDTO child : root.getSubCategories()) {
+			if (sectionName.equals(child.getName())) {
+				return child;
+			}
+		}
+		return null;
 	}
 
 	private void addProgramsFromRail(final CategoryDTO parent, final Novo19Rail rail,
@@ -389,7 +445,9 @@ public class Novo19PluginManager extends BasePluginWithProxy implements PluginPr
 		if (Novo19CatalogMapper.isPodcastDetailPage(page)) {
 			category.addParameter(Novo19Conf.PARAMETER_CONTENT_KIND, Novo19Conf.CONTENT_KIND_PODCAST);
 			category.addParameter(Novo19Conf.PARAMETER_AUDIO_CONTENT, "true");
+			return;
 		}
+		Novo19TaxonomyMapper.applyDetailContentKind(category, page);
 	}
 
 	private static boolean shouldLoadEpisodeRails(final CategoryDTO category, final Novo19BffPage page) {
@@ -402,11 +460,14 @@ public class Novo19PluginManager extends BasePluginWithProxy implements PluginPr
 				|| Novo19Conf.CONTENT_KIND_PROGRAM.equals(contentKind);
 	}
 
-	private List<Novo19Tile> loadEpisodeRailTiles(final Novo19BffPage page, final Novo19Diagnostics diagnostics) {
+	private List<Novo19Tile> loadEpisodeRailTiles(final Novo19BffPage page, final Novo19Diagnostics diagnostics,
+			final boolean includeSeasonRails) {
 		final Set<Novo19Tile> tiles = new LinkedHashSet<>();
 		for (final Novo19Rail rail : page.getRails()) {
-			if (Novo19PathRules.isRecommendationRail(rail) || Novo19PathRules.isSeasonRail(rail)
-					|| StringUtils.isEmpty(rail.getSrc())) {
+			if (Novo19PathRules.isRecommendationRail(rail) || StringUtils.isEmpty(rail.getSrc())) {
+				continue;
+			}
+			if (!includeSeasonRails && Novo19PathRules.isSeasonRail(rail)) {
 				continue;
 			}
 			final Novo19Diagnostics railDiagnostics = new Novo19Diagnostics("episode-rail");

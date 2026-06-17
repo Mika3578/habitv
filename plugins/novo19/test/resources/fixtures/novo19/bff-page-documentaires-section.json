@@ -5,6 +5,12 @@
     "title": "Documentaires et magazines",
     "rails": [
       {
+        "id": "rail-catalog-master",
+        "type": "CAROUSEL",
+        "title": "Nos documentaires et magazines",
+        "src": "/api/1/public/frontends/web/pages/documentaires-et-magazines/sections/rail-catalog-master/tiles"
+      },
+      {
         "id": "rail-histoire",
         "type": "CAROUSEL",
         "title": "Histoire",

@@ -79,6 +79,9 @@ final class Novo19FixtureSupport {
 			responses.put(Novo19UrlBuilder.bffPageByPath("documentaires-et-magazines"),
 					readFixture("bff-page-documentaires-section.json"));
 			responses.put(Novo19UrlBuilder.bffAbsolutePath(
+					"/api/1/public/frontends/web/pages/documentaires-et-magazines/sections/rail-catalog-master/tiles"),
+					readFixture("bff-tiles-doc-catalog-master.json"));
+			responses.put(Novo19UrlBuilder.bffAbsolutePath(
 					"/api/1/public/frontends/web/pages/documentaires-et-magazines/sections/rail-histoire/tiles"),
 					readFixture("bff-tiles-histoire-rail.json"));
 			responses.put(Novo19UrlBuilder.bffAbsolutePath(
@@ -97,6 +100,9 @@ final class Novo19FixtureSupport {
 					"/api/1/public/frontends/web/pages/BFF%7Casset-details-serie,bucheron-un-metier-a-hauts-risques/sections/bucheron-saison-3/tiles"),
 					readFixture("bff-tiles-bucheron-saison-3.json"));
 			responses.put(Novo19UrlBuilder.bffAbsolutePath(
+					"/api/1/public/frontends/web/pages/BFF%7Casset-details-serie,bucheron-un-metier-a-hauts-risques/sections/bucheron-saison-2/tiles"),
+					readFixture("bff-tiles-bucheron-saison-2.json"));
+			responses.put(Novo19UrlBuilder.bffAbsolutePath(
 					"/api/1/public/frontends/web/pages/details/on-a-de-l-info/sections/info-episodes/tiles"),
 					readFixture("bff-tiles-info-episodes.json"));
 			responses.put(Novo19UrlBuilder.bffAbsolutePath(
@@ -112,10 +118,10 @@ final class Novo19FixtureSupport {
 					"/api/1/public/frontends/web/pages/details/vos-objets-valent-de-l-or/sections/episodes/tiles"),
 					readFixture("bff-tiles-vos-objets-episodes.json"));
 			responses.put(Novo19UrlBuilder.bffAbsolutePath(
-					"/api/1/public/frontends/web/pages/by-path/rail/details/on-a-de-l-info/info-episodes"),
+					"/api/1/public/frontends/web/pages/by-path/voir-plus/rail/details/on-a-de-l-info/info-episodes"),
 					readFixture("bff-pagination-more.json"));
 			responses.put(Novo19UrlBuilder.bffAbsolutePath(
-					"/api/1/public/frontends/web/pages/by-path/rail/details/on-a-du-nouveau/talk-episodes"),
+					"/api/1/public/frontends/web/pages/by-path/voir-plus/rail/details/on-a-du-nouveau/talk-episodes"),
 					readFixture("bff-pagination-talk-more.json"));
 		} catch (final IOException e) {
 			throw new IllegalStateException(e);

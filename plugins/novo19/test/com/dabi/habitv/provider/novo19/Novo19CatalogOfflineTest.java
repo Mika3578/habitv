@@ -2,6 +2,7 @@ package com.dabi.habitv.provider.novo19;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Set;
@@ -14,6 +15,15 @@ import com.dabi.habitv.api.plugin.exception.DownloadFailedException;
 import com.dabi.habitv.provider.novo19.dto.Novo19Tile;
 
 public class Novo19CatalogOfflineTest {
+
+	@Test
+	public void masterDocumentaryCatalogIncludesProgramsOutsideThemeRails() {
+		final Novo19PluginManager manager = new Novo19PluginManager(Novo19FixtureSupport.clientWithFixtures());
+		final CategoryDTO root = manager.findCategory().iterator().next();
+		final CategoryDTO documentaries = findChildByName(root, Novo19Conf.SECTION_DOCUMENTARIES);
+		final CategoryDTO societe = findChildByName(documentaries, "Société");
+		assertNotNull(findChildByName(societe, "On a de l'info - Le mag"));
+	}
 
 	@Test
 	public void buildsCategoryTreeFromFixtures() {
@@ -70,6 +80,8 @@ public class Novo19CatalogOfflineTest {
 		assertEquals(Novo19PluginManager.DownloadableState.SPECIFIC,
 				manager.canDownload("https://novo19.ouest-france.fr/player/sample"));
 		assertEquals(Novo19PluginManager.DownloadableState.IMPOSSIBLE, manager.canDownload("https://example.com/video"));
+		assertEquals(Novo19PluginManager.DownloadableState.IMPOSSIBLE,
+				manager.canDownload("https://evil.com/novo19.ouest-france.fr/player/sample"));
 	}
 
 	private static final class FailingLoader implements Novo19CatalogClient.ContentLoader {
@@ -79,6 +91,22 @@ public class Novo19CatalogOfflineTest {
 			throw new java.io.IOException("fixture unavailable");
 		}
 
+	}
+
+	private static CategoryDTO findChildByName(final CategoryDTO parent, final String name) {
+		if (parent == null) {
+			return null;
+		}
+		for (final CategoryDTO child : parent.getSubCategories()) {
+			if (name.equals(child.getName())) {
+				return child;
+			}
+			final CategoryDTO nested = findChildByName(child, name);
+			if (nested != null) {
+				return nested;
+			}
+		}
+		return null;
 	}
 
 }

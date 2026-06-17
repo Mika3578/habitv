@@ -1,0 +1,36 @@
+{
+  "page": {
+    "type": "DETAILS",
+    "id": "inferno",
+    "title": "Inferno",
+    "content": {
+      "id": "OF-00000080-00-0000_565BFFb",
+      "type": "VOD",
+      "title": "Inferno",
+      "duration": 7005,
+      "source": {
+        "id": "OF-00000080-00-0000_565BFFb"
+      }
+    },
+    "playbackInfos": [
+      {
+        "type": "COMPLETE",
+        "assetId": "OF-00000080-00-0000_565BFFb",
+        "player": "/player/inferno"
+      },
+      {
+        "type": "TRAILER",
+        "assetId": "bande-annonce-inferno_565BFFb",
+        "player": "/player/bande-annonce-inferno"
+      }
+    ],
+    "rails": [
+      {
+        "id": "reco",
+        "title": "Recommendations",
+        "src": "/api/1/public/frontends/web/pages/BFF%7Casset-details,inferno/sections/reco/tiles"
+      }
+    ]
+  },
+  "version": "0.9.1"
+}

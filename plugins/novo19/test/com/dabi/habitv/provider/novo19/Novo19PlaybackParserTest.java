@@ -30,6 +30,14 @@ public class Novo19PlaybackParserTest {
 	}
 
 	@Test
+	public void rejectsObjectDrmPayload() throws Exception {
+		assertTrue(Novo19PlaybackParser.hasOnlyProtectedFormats(
+				Novo19FixtureSupport.readFixture("redbee-play-replay-object-drm.json"), "fixture"));
+		assertNull(Novo19PlaybackParser.selectReplayStreamUrl(
+				Novo19FixtureSupport.readFixture("redbee-play-replay-object-drm.json"), "fixture"));
+	}
+
+	@Test
 	public void parsesAnonymousSessionToken() throws Exception {
 		assertEquals("offline-session-token", Novo19PlaybackParser.parseSessionToken(
 				Novo19FixtureSupport.readFixture("redbee-auth-anonymous.json"), "fixture"));
@@ -37,8 +45,17 @@ public class Novo19PlaybackParserTest {
 
 	@Test
 	public void handlesEmptyPayloadSafely() {
-		assertTrue(Novo19PlaybackParser.hasOnlyProtectedFormats("", "fixture"));
+		assertFalse(Novo19PlaybackParser.hasFormats("", "fixture"));
+		assertFalse(Novo19PlaybackParser.hasOnlyProtectedFormats("", "fixture"));
 		assertNull(Novo19PlaybackParser.selectReplayStreamUrl("", "fixture"));
+	}
+
+	@Test
+	public void handlesEmptyFormatsArraySeparately() throws Exception {
+		assertFalse(Novo19PlaybackParser.hasFormats(
+				Novo19FixtureSupport.readFixture("redbee-play-empty-formats.json"), "fixture"));
+		assertFalse(Novo19PlaybackParser.hasOnlyProtectedFormats(
+				Novo19FixtureSupport.readFixture("redbee-play-empty-formats.json"), "fixture"));
 	}
 
 	@Test

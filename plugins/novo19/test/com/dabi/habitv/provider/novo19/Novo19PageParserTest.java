@@ -58,6 +58,15 @@ public class Novo19PageParserTest {
 	}
 
 	@Test
+	public void parsesNestedDataTilesEnvelope() throws Exception {
+		final Novo19TilesResponse response = Novo19PageParser.parseTilesEnvelope(
+				Novo19FixtureSupport.readFixture("bff-tiles-nested-data.json"), "fixture");
+		assertEquals(1, response.getTiles().size());
+		assertEquals("Sample episode", response.getTiles().get(0).getTitle());
+		assertEquals("/voir-plus/rail/details/sample/episodes", response.getMoreHref());
+	}
+
+	@Test
 	public void parsesPlayerContentWithoutHref() throws Exception {
 		final Novo19BffPage page = Novo19PageParser.parsePageEnvelope(
 				Novo19FixtureSupport.readFixture("bff-page-player-episode-no-href.json"), "fixture");

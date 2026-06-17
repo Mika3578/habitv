@@ -1,0 +1,15 @@
+{
+  "tiles": [
+    {
+      "id": "info-mag_565BFFb",
+      "type": "COLLECTION",
+      "title": "On a de l'info - Le mag",
+      "subtitle": "Société",
+      "href": "/details/on-a-de-l-info-le-mag",
+      "source": {
+        "id": "info-mag_565BFFb"
+      }
+    }
+  ],
+  "version": "0.9.1"
+}

@@ -239,6 +239,10 @@ final class Novo19PathRules {
 		if (query >= 0) {
 			path = path.substring(0, query);
 		}
+		final int fragment = path.indexOf('#');
+		if (fragment >= 0) {
+			path = path.substring(0, fragment);
+		}
 		return path;
 	}
 
