@@ -1,0 +1,10 @@
+{
+  "assetId": "news-episode_565BFFb",
+  "formats": [
+    {
+      "format": "DASH",
+      "drm": false,
+      "mediaLocator": "https://cdn.example.test/ouestfrance/novoplus/assets/news-episode_565BFFb/materials/replay.mpd"
+    }
+  ]
+}

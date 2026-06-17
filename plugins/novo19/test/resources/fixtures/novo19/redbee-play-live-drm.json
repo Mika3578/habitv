@@ -1,0 +1,10 @@
+{
+  "assetId": "novo19_565BFFb",
+  "formats": [
+    {
+      "format": "HLS",
+      "drm": true,
+      "mediaLocator": "https://cdn.example.test/ouestfrance/novoplus/assets/novo19_565BFFb/materials/live.m3u8"
+    }
+  ]
+}

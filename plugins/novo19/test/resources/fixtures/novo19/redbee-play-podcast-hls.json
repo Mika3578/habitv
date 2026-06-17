@@ -1,0 +1,10 @@
+{
+  "assetId": "podcast-episode_565BFFb",
+  "formats": [
+    {
+      "format": "HLS",
+      "drm": false,
+      "mediaLocator": "https://cdn.example.test/ouestfrance/novoplus/assets/podcast-episode_565BFFb/materials/replay.m3u8"
+    }
+  ]
+}

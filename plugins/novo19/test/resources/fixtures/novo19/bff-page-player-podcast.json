@@ -1,0 +1,17 @@
+{
+  "page": {
+    "type": "PLAYER",
+    "id": "le-royaume-episode-1",
+    "title": "Episode 1",
+    "content": {
+      "id": "podcast-episode_565BFFb",
+      "type": "PODCAST",
+      "title": "Episode 1",
+      "href": "/player/le-royaume-episode-1",
+      "source": {
+        "id": "podcast-episode_565BFFb"
+      }
+    }
+  },
+  "version": "0.9.1"
+}
