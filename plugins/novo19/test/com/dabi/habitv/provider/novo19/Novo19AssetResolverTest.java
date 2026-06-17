@@ -38,6 +38,20 @@ public class Novo19AssetResolverTest {
 	}
 
 	@Test
+	public void resolvesPlayerAssetWhenContentHasNoHref() throws Exception {
+		final DownloadParamDTO param = new DownloadParamDTO(
+				"https://novo19.ouest-france.fr/player/bucheron-un-metier-a-hauts-risques-chantiers-risques-face-a-la-crise",
+				"out.mp4", Novo19Conf.EXTENSION);
+		final java.util.Map<String, String> responses = new java.util.HashMap<String, String>();
+		responses.put(
+				Novo19UrlBuilder.bffPageByPath(
+						"player/bucheron-un-metier-a-hauts-risques-chantiers-risques-face-a-la-crise"),
+				Novo19FixtureSupport.readFixture("bff-page-player-episode-no-href.json"));
+		final String assetId = Novo19AssetResolver.resolveAssetId(param, new Novo19CatalogClient(new MapLoader(responses)));
+		assertEquals("OF-00000661-03-0012_565BFFb", assetId);
+	}
+
+	@Test
 	public void excludesLivePlayerPath() throws Exception {
 		final DownloadParamDTO param = new DownloadParamDTO("https://novo19.ouest-france.fr/player/novo19", "out.mp4",
 				Novo19Conf.EXTENSION);

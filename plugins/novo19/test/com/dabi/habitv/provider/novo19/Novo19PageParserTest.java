@@ -58,6 +58,14 @@ public class Novo19PageParserTest {
 	}
 
 	@Test
+	public void parsesPlayerContentWithoutHref() throws Exception {
+		final Novo19BffPage page = Novo19PageParser.parsePageEnvelope(
+				Novo19FixtureSupport.readFixture("bff-page-player-episode-no-href.json"), "fixture");
+		assertNotNull(page.getContent());
+		assertEquals("OF-00000661-03-0012_565BFFb", page.getContent().getAssetId());
+	}
+
+	@Test
 	public void excludesMesVideosPath() throws Exception {
 		final Novo19Tile tile = Novo19PageParser.parseTile(new com.fasterxml.jackson.databind.ObjectMapper()
 				.readTree("{\"type\":\"COLLECTION\",\"title\":\"Mes vidéos\",\"href\":\"/mes-videos\"}"));

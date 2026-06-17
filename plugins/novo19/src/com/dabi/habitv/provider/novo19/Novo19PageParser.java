@@ -135,7 +135,7 @@ final class Novo19PageParser {
 			return null;
 		}
 		final String href = textValue(tileNode, "href");
-		if (Novo19PathRules.isExcludedPublicPath(href)) {
+		if (!StringUtils.isEmpty(href) && Novo19PathRules.isExcludedPublicPath(href)) {
 			return null;
 		}
 		final String assetId = resolveAssetId(tileNode);
