@@ -1,0 +1,44 @@
+{
+  "tiles": [
+    {
+      "id": "cuisinons-lhistoire_565BFFb",
+      "type": "SERIE",
+      "title": "Cuisinons l'histoire",
+      "subtitle": "Histoire",
+      "href": "/details/cuisinons-l-histoire",
+      "source": {
+        "id": "cuisinons-lhistoire_565BFFb"
+      }
+    },
+    {
+      "id": "bucheron_565BFFb",
+      "type": "SERIE",
+      "title": "Bûcheron, un métier à hauts risques",
+      "subtitle": "Société",
+      "href": "/details/bucheron-un-metier-a-hauts-risques",
+      "source": {
+        "id": "bucheron_565BFFb"
+      }
+    },
+    {
+      "id": "immersion-multi_565BFFb",
+      "type": "SERIE",
+      "title": "Aux commandes des géants des mers",
+      "subtitle": "Immersion",
+      "href": "/details/aux-commandes-des-geants-des-mers",
+      "source": {
+        "id": "immersion-multi_565BFFb"
+      }
+    },
+    {
+      "id": "doc-standalone_565BFFb",
+      "type": "VOD",
+      "title": "Standalone documentary",
+      "href": "/details/standalone-documentary",
+      "source": {
+        "id": "doc-standalone_565BFFb"
+      }
+    }
+  ],
+  "version": "0.9.1"
+}

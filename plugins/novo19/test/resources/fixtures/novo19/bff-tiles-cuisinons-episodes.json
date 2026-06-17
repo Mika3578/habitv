@@ -1,0 +1,15 @@
+{
+  "tiles": [
+    {
+      "id": "cuisinons-episode_565BFFb",
+      "type": "EPISODE",
+      "title": "Le croissant",
+      "subtitle": "S1E1",
+      "href": "/player/cuisinons-le-croissant",
+      "source": {
+        "id": "cuisinons-episode_565BFFb"
+      }
+    }
+  ],
+  "version": "0.9.1"
+}

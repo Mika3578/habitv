@@ -1,0 +1,49 @@
+{
+  "tiles": [
+    {
+      "id": "info-shortcut_565BFFb",
+      "type": "COLLECTION",
+      "title": "Info",
+      "href": "/details/on-a-de-l-info",
+      "source": {
+        "id": "info-shortcut_565BFFb"
+      }
+    },
+    {
+      "id": "talk-shortcut_565BFFb",
+      "type": "COLLECTION",
+      "title": "Talk",
+      "href": "/details/on-a-du-nouveau",
+      "source": {
+        "id": "talk-shortcut_565BFFb"
+      }
+    },
+    {
+      "id": "nav-series_565BFFb",
+      "type": "COLLECTION",
+      "title": "Series",
+      "href": "/series",
+      "source": {
+        "id": "nav-series_565BFFb"
+      }
+    },
+    {
+      "id": "nav-films_565BFFb",
+      "type": "COLLECTION",
+      "title": "Films",
+      "href": "/films",
+      "source": {
+        "id": "nav-films_565BFFb"
+      }
+    },
+    {
+      "id": "nav-podcasts_565BFFb",
+      "type": "COLLECTION",
+      "href": "/podcasts",
+      "source": {
+        "id": "nav-podcasts_565BFFb"
+      }
+    }
+  ],
+  "version": "0.9.1"
+}

@@ -5,9 +5,9 @@
     "title": "Catégories",
     "rails": [
       {
-        "id": "rail-catalogue",
-        "title": "Catalogue",
-        "src": "/api/1/public/frontends/web/pages/categories/sections/rail-catalogue/tiles"
+        "id": "f6a789ee-7e88-49c4-89ff-d4ef6ab044ce",
+        "type": "CAROUSEL",
+        "src": "/api/1/public/frontends/web/pages/categories/sections/f6a789ee-7e88-49c4-89ff-d4ef6ab044ce/tiles"
       },
       {
         "id": "rail-series",
@@ -18,6 +18,23 @@
         "id": "rail-films",
         "title": "Nos films",
         "src": "/api/1/public/frontends/web/pages/categories/sections/rail-films/tiles"
+      },
+      {
+        "id": "rail-info-banner",
+        "type": "BANNER",
+        "title": "On a de l'info",
+        "src": "/api/1/public/frontends/web/pages/categories/sections/rail-info-banner/tiles"
+      },
+      {
+        "id": "rail-documentaries",
+        "title": "Nos documentaires et magazines",
+        "src": "/api/1/public/frontends/web/pages/categories/sections/rail-documentaries/tiles"
+      },
+      {
+        "id": "rail-talk-banner",
+        "type": "BANNER",
+        "title": "Notre talk",
+        "src": "/api/1/public/frontends/web/pages/categories/sections/rail-talk-banner/tiles"
       },
       {
         "id": "rail-podcasts",

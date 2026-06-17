@@ -29,6 +29,12 @@ public class Novo19PathRulesTest {
 				new com.dabi.habitv.provider.novo19.dto.Novo19Rail("reco", "Recommendations", "/sections/reco/tiles", null)));
 		assertTrue(Novo19PathRules.isGenericCatalogueSectionTitle("Catalogue"));
 		assertFalse(Novo19PathRules.isGenericCatalogueSectionTitle("Nos films"));
+		assertTrue(Novo19PathRules.isCatalogueCarouselRail(
+				new com.dabi.habitv.provider.novo19.dto.Novo19Rail("carousel", null, "/sections/carousel/tiles", null)));
+		assertTrue(Novo19PathRules.isInfoEditorialRail(
+				new com.dabi.habitv.provider.novo19.dto.Novo19Rail("info", "On a de l'info", "/sections/info/tiles", null)));
+		assertTrue(Novo19PathRules.isTalkEditorialRail(
+				new com.dabi.habitv.provider.novo19.dto.Novo19Rail("talk", "Notre talk", "/sections/talk/tiles", null)));
 	}
 
 }

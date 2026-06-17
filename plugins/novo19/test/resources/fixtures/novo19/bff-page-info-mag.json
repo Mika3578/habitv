@@ -1,0 +1,15 @@
+{
+  "page": {
+    "type": "DETAILS",
+    "id": "on-a-de-l-info-le-mag",
+    "title": "On a de l'info - Le mag",
+    "rails": [
+      {
+        "id": "info-mag-episodes",
+        "title": "Replays",
+        "src": "/api/1/public/frontends/web/pages/details/on-a-de-l-info-le-mag/sections/info-mag-episodes/tiles"
+      }
+    ]
+  },
+  "version": "0.9.1"
+}

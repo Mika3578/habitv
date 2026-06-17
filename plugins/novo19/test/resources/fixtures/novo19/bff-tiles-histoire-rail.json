@@ -1,0 +1,14 @@
+{
+  "tiles": [
+    {
+      "id": "cuisinons-lhistoire_565BFFb",
+      "type": "SERIE",
+      "title": "Cuisinons l'histoire",
+      "href": "/details/cuisinons-l-histoire",
+      "source": {
+        "id": "cuisinons-lhistoire_565BFFb"
+      }
+    }
+  ],
+  "version": "0.9.1"
+}

@@ -14,7 +14,7 @@ public class Novo19CatalogClientTest {
 		final Novo19CatalogClient client = Novo19FixtureSupport.clientWithFixtures();
 		final Novo19BffPage page = client.fetchPageByPublicPath("categories");
 		assertEquals("RAILS", page.getType());
-		assertEquals(4, page.getRails().size());
+		assertEquals(7, page.getRails().size());
 	}
 
 	@Test

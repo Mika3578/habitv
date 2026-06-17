@@ -31,7 +31,7 @@ public class Novo19CatalogOfflineTest {
 		final CategoryDTO collection = Novo19CatalogMapper.buildProgramCategory(new Novo19Tile("info", "COLLECTION",
 				"On a de l'info", null, null, null, "/details/on-a-de-l-info", "info-id"));
 		final Set<EpisodeDTO> episodes = manager.findEpisode(collection);
-		assertEquals(1, episodes.size());
+		assertEquals(2, episodes.size());
 	}
 
 	@Test

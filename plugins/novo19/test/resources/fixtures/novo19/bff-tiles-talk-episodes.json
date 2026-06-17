@@ -1,0 +1,28 @@
+{
+  "tiles": [
+    {
+      "id": "talk-rail-s1e186-dup_565BFFb",
+      "type": "EPISODE",
+      "title": "Emission du 22-05-26",
+      "subtitle": "S1E186",
+      "href": "/player/on-a-du-nouveau-emission-du-22-05-26",
+      "source": {
+        "id": "talk-rail-s1e186-dup_565BFFb"
+      }
+    },
+    {
+      "id": "talk-rail-s1e185_565BFFb",
+      "type": "EPISODE",
+      "title": "Emission du 21-05-26",
+      "subtitle": "S1E185",
+      "href": "/player/on-a-du-nouveau-emission-du-21-05-26",
+      "source": {
+        "id": "talk-rail-s1e185_565BFFb"
+      }
+    }
+  ],
+  "more": {
+    "href": "/voir-plus/rail/details/on-a-du-nouveau/talk-episodes"
+  },
+  "version": "0.9.1"
+}

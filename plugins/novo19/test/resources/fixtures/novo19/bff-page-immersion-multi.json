@@ -1,0 +1,22 @@
+{
+  "page": {
+    "type": "DETAILS",
+    "id": "immersion-multi_565BFFb",
+    "title": "Aux commandes des géants des mers",
+    "content": {
+      "id": "immersion-multi_565BFFb",
+      "type": "SERIE",
+      "title": "Aux commandes des géants des mers",
+      "category": [
+        "Immersion",
+        "Société",
+        "Documentaire"
+      ],
+      "source": {
+        "id": "immersion-multi_565BFFb"
+      }
+    },
+    "rails": []
+  },
+  "version": "0.9.1"
+}

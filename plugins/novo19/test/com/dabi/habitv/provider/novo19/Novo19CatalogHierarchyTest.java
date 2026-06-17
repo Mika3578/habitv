@@ -21,7 +21,11 @@ public class Novo19CatalogHierarchyTest {
 		final Novo19PluginManager manager = new Novo19PluginManager(Novo19FixtureSupport.clientWithFixtures());
 		final CategoryDTO root = manager.findCategory().iterator().next();
 		assertNull(findChildByName(root, "Catalogue"));
-		assertNotNull(findChildByName(root, "Standalone documentary"));
+		final CategoryDTO documentaries = findChildByName(root, Novo19Conf.SECTION_DOCUMENTARIES);
+		assertNotNull(documentaries);
+		assertNotNull(findChildByName(documentaries, "Histoire"));
+		assertNotNull(findChildByName(documentaries, "Société"));
+		assertNotNull(findChildByName(findChildByName(documentaries, "Sans thématique"), "Standalone documentary"));
 	}
 
 	@Test

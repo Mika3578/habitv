@@ -19,8 +19,8 @@ public class Novo19PageParserTest {
 		final Novo19BffPage page = Novo19PageParser.parsePageEnvelope(
 				Novo19FixtureSupport.readFixture("bff-page-categories.json"), "fixture");
 		assertEquals("RAILS", page.getType());
-		assertEquals(4, page.getRails().size());
-		assertEquals("Catalogue", page.getRails().get(0).getTitle());
+		assertEquals(7, page.getRails().size());
+		assertEquals("f6a789ee-7e88-49c4-89ff-d4ef6ab044ce", page.getRails().get(0).getId());
 		assertEquals("Nos séries", page.getRails().get(1).getTitle());
 	}
 
