@@ -56,4 +56,13 @@ final class Novo19UrlBuilder {
 		return path;
 	}
 
+	static String redBeeAnonymousAuthUrl() {
+		return Novo19Conf.REDBEE_BASE_URL + Novo19Conf.REDBEE_ANONYMOUS_AUTH_PATH;
+	}
+
+	static String redBeePlayUrl(final String assetId) {
+		return Novo19Conf.REDBEE_BASE_URL + Novo19Conf.REDBEE_PLAY_PATH_PREFIX + assetId
+				+ Novo19Conf.REDBEE_PLAY_PATH_SUFFIX;
+	}
+
 }

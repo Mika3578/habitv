@@ -61,6 +61,10 @@ final class Novo19Diagnostics {
 		return rootCauseSummary;
 	}
 
+	int getHttpStatus() {
+		return httpStatus;
+	}
+
 	String formatLogLine() {
 		final StringBuilder line = new StringBuilder("provider=NOVO19");
 		line.append(" strategy=").append(STRATEGY_BFF);

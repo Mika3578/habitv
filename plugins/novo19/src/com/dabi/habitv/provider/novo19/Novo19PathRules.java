@@ -147,6 +147,13 @@ final class Novo19PathRules {
 		return !StringUtils.isEmpty(railSrc) && railSrc.contains("asset-details-podcast");
 	}
 
+	static boolean isLiveReplayAsset(final String assetId) {
+		if (StringUtils.isEmpty(assetId)) {
+			return false;
+		}
+		return Novo19Conf.LIVE_ASSET_ID.equals(assetId) || assetId.startsWith("novo19_");
+	}
+
 	static boolean isGenericCatalogueSectionTitle(final String title) {
 		if (StringUtils.isEmpty(title)) {
 			return false;

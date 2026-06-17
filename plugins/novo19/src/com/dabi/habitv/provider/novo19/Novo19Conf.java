@@ -14,6 +14,15 @@ public final class Novo19Conf {
 
 	public static final String SLUG_RESOLVER_PREFIX = "/api/1/public/frontends/web/pages/by-path/";
 
+	public static final String REDBEE_BASE_URL = "https://exposure.api.redbee.live/v2/customer/OuestFrance/businessunit/novoplus";
+
+	public static final String REDBEE_ANONYMOUS_AUTH_PATH = "/auth/anonymous";
+
+	public static final String REDBEE_PLAY_PATH_PREFIX = "/entitlement/";
+
+	public static final String REDBEE_PLAY_PATH_SUFFIX = "/play";
+
+	public static final String LIVE_ASSET_ID = "novo19_565BFFb";
 
 	public static final String PARAMETER_ASSET_ID = "assetId";
 
@@ -52,6 +61,11 @@ public final class Novo19Conf {
 	public static final String DOCUMENTARIES_PUBLIC_PATH = "documentaires-et-magazines";
 
 	public static final String DOWNLOAD_UNAVAILABLE_MESSAGE = "This replay is currently unavailable or not supported. See logs for details.";
+
+	/**
+	 * yt-dlp audio-only flags for podcast episodes (delegated to the youtube downloader).
+	 */
+	public static final String PODCAST_YT_DLP_ARGS = " \"#VIDEO_URL#\" -o \"#FILE_DEST#\" --extract-audio --audio-format mp3 --no-check-certificate";
 
 	public static final int MAX_PAGINATION_PAGES = 25;
 

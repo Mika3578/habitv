@@ -15,7 +15,9 @@ import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
 import com.dabi.habitv.api.plugin.exception.DownloadFailedException;
 import com.dabi.habitv.api.plugin.holder.DownloaderPluginHolder;
 import com.dabi.habitv.api.plugin.holder.ProcessHolder;
+import com.dabi.habitv.framework.FrameworkConf;
 import com.dabi.habitv.framework.plugin.api.BasePluginWithProxy;
+import com.dabi.habitv.framework.plugin.utils.DownloadUtils;
 import com.dabi.habitv.provider.novo19.dto.Novo19BffPage;
 import com.dabi.habitv.provider.novo19.dto.Novo19Rail;
 import com.dabi.habitv.provider.novo19.dto.Novo19Tile;
@@ -24,12 +26,20 @@ public class Novo19PluginManager extends BasePluginWithProxy implements PluginPr
 
 	private final Novo19CatalogClient catalogClient;
 
+	private final Novo19PlaybackClient playbackClient;
+
 	public Novo19PluginManager() {
 		this.catalogClient = new Novo19CatalogClient(this);
+		this.playbackClient = new Novo19PlaybackClient(Novo19HttpClient.pluginTransport(getHttpProxy()));
 	}
 
 	Novo19PluginManager(final Novo19CatalogClient catalogClient) {
+		this(catalogClient, new Novo19PlaybackClient(Novo19HttpClient.pluginTransport(null)));
+	}
+
+	Novo19PluginManager(final Novo19CatalogClient catalogClient, final Novo19PlaybackClient playbackClient) {
 		this.catalogClient = catalogClient;
+		this.playbackClient = playbackClient;
 	}
 
 	@Override
@@ -128,7 +138,42 @@ public class Novo19PluginManager extends BasePluginWithProxy implements PluginPr
 	@Override
 	public ProcessHolder download(final DownloadParamDTO downloadParam, final DownloaderPluginHolder downloaders)
 			throws DownloadFailedException {
-		throw new DownloadFailedException(Novo19Conf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+		final Novo19Diagnostics diagnostics = new Novo19Diagnostics("download");
+		diagnostics.setSourcePath(downloadParam == null ? null : downloadParam.getDownloadInput());
+		try {
+			final String assetId = Novo19AssetResolver.resolveAssetId(downloadParam, catalogClient);
+			if (StringUtils.isEmpty(assetId) || Novo19PathRules.isLiveReplayAsset(assetId)) {
+				diagnostics.setRootCauseSummary("unsupported-asset");
+				logDiagnostics(diagnostics);
+				throw new DownloadFailedException(Novo19Conf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+			}
+			diagnostics.setAssetId(assetId);
+			final String streamUrl = playbackClient.resolveReplayStreamUrl(assetId, diagnostics);
+			if (StringUtils.isEmpty(streamUrl)) {
+				logDiagnostics(diagnostics);
+				throw new DownloadFailedException(Novo19Conf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+			}
+			logDiagnostics(diagnostics);
+			final DownloadParamDTO delegated = Novo19DownloadMapper.buildDelegatedDownload(downloadParam, streamUrl);
+			return DownloadUtils.download(delegated, downloaders, FrameworkConf.YOUTUBE);
+		} catch (final Novo19HttpException e) {
+			diagnostics.setHttpStatus(e.getStatus());
+			diagnostics.setRootCauseSummary(Novo19DownloadMapper.summarizeFailure(
+					Novo19HttpStatus.summarizeFailure(e.getStatus())));
+			logDiagnostics(diagnostics);
+			getLog().warn("NOVO19 download failed safely: " + e.getMessage());
+			throw new DownloadFailedException(Novo19Conf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+		} catch (final IOException e) {
+			diagnostics.setRootCauseSummary("io-error:" + e.getClass().getSimpleName());
+			logDiagnostics(diagnostics);
+			getLog().warn("NOVO19 download failed safely: " + e.getMessage());
+			throw new DownloadFailedException(Novo19Conf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+		} catch (final RuntimeException e) {
+			diagnostics.setRootCauseSummary("parse-error:" + e.getClass().getSimpleName());
+			logDiagnostics(diagnostics);
+			getLog().warn("NOVO19 download failed safely: " + e.getMessage());
+			throw new DownloadFailedException(Novo19Conf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+		}
 	}
 
 	@Override
