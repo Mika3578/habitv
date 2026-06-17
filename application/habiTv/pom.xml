@@ -29,62 +29,28 @@
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
-	<profiles>
-		<!--
-		  On JDK 11+, JavaFX is no longer bundled with the JDK. Supply the
-		  JavaFX API as compile-only ("provided") dependencies so this module
-		  compiles on JDK 11+ build hosts. HabitvLauncher does not import
-		  JavaFX directly, but trayView does; match trayView's
-		  javafx-openjfx-compile profile. Not a runtime migration: Java 8
-		  remains the baseline and runtime still uses jfxrt.jar classpath
-		  bootstrapping via HabitvLauncher.
-		-->
-		<profile>
-			<id>javafx-openjfx-compile</id>
-			<activation>
-				<jdk>[11,)</jdk>
-			</activation>
-			<properties>
-				<openjfx.version>26.0.1</openjfx.version>
-			</properties>
-			<dependencies>
-				<dependency>
-					<groupId>org.openjfx</groupId>
-					<artifactId>javafx-base</artifactId>
-					<version>${openjfx.version}</version>
-					<scope>provided</scope>
-				</dependency>
-				<dependency>
-					<groupId>org.openjfx</groupId>
-					<artifactId>javafx-graphics</artifactId>
-					<version>${openjfx.version}</version>
-					<scope>provided</scope>
-				</dependency>
-			</dependencies>
-		</profile>
-	</profiles>
 	<build>
-<plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>3.6.2</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <mainClass>com.dabi.habitv.HabitvLauncher</mainClass>
-                </transformer>
-              </transformers>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.6.2</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<transformers>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>com.dabi.habitv.HabitvLauncher</mainClass>
+								</transformer>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 	</build>
 </project>

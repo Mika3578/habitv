@@ -16,7 +16,8 @@ older ones rather than rewriting them in place.
 | ADR | Title | Status |
 |---|---|:--:|
 | `restart-from-master` | Restart modernization from `master` | ✅ Accepted |
-| `keep-java8-baseline` | Keep Java 8 as baseline until the build is stable | ✅ Accepted |
+| `keep-java8-baseline` | Keep Java 8 as baseline until the build is stable | 🔁 Superseded |
+| `java21-openjfx-baseline` | Java 21 and OpenJFX 21.0.7 as the new baseline | ✅ Accepted |
 | `small-prs-linear-history` | Small PRs with linear history | ✅ Accepted |
 | `habitv-repo-static-host` | `habitv-repo` as the public static artifact repository | ✅ Accepted |
 | `provider-cleanup-separate` | Provider cleanup is separate from build / governance bootstrap | ✅ Accepted |
@@ -70,11 +71,11 @@ baseline (or `develop` once created).
 
 ---
 
-## ✅ `keep-java8-baseline` — Keep Java 8 as baseline until the build is stable
+## 🔁 `keep-java8-baseline` — Keep Java 8 as baseline until the build is stable
 
 | | |
 |---|---|
-| **Status** | ✅ Accepted |
+| **Status** | 🔁 Superseded |
 | **Date** | 2026-05-16 |
 | **Trackers** | `maven-reactor`, `java8-baseline` |
 | **Risks** | `javafx-jdk8`, `jaxb-mismatch` |
@@ -639,6 +640,47 @@ protected replay support without agents refusing by default.
 - Maintainer-directed TF1+/Stremio-style protected replay work is allowed.
 - Residual legal, ToS, and maintenance risk stays under
   `provider-protected-replay-residual`.
+
+---
+
+## ✅ `java21-openjfx-baseline` — Java 21 and OpenJFX 21.0.7 as the new baseline
+
+| | |
+|---|---|
+| **Status** | ✅ Accepted |
+| **Date** | 2026-06-06 |
+| **Tracker** | `javafx-modernization` |
+| **Risks** | `javafx-jdk8` |
+| **Supersedes** | `keep-java8-baseline` |
+
+**Context** — The Java 8 baseline (enforced by `keep-java8-baseline`) was
+originally kept to avoid conflating reactor stabilization with language
+migration. By 2026-06-06 the reactor is stable, `habiTv-linux` and
+`habiTv-windows` were blocked out of the reactor by the `${jdk.home}`
+system-scope `jfxrt.jar` bootstrap, and JDK 11+ no longer bundles
+JavaFX. Continuing on Java 8 blocked: JavaFX modernization, reactor
+completeness for packaging modules, and adoption of modern JDK support.
+
+**Decision**
+- Set `maven.compiler.release=21` as the project-wide baseline in the
+  root POM.
+- Declare OpenJFX 21.0.7 as an explicit `org.openjfx` dependency;
+  remove the `system`-scope `javafx:jfxrt` artifact and the
+  `${jdk.home}` property entirely.
+- Return `habiTv-linux` and `habiTv-windows` to the reactor.
+- Remove the URLClassLoader / bootstrap hack that loaded `jfxrt.jar`
+  from a hardcoded JDK path.
+- Adopt `jpackage` (bundled with JDK 14+) as the end-user distribution
+  direction; `javafx-maven-plugin 2.0` is retired.
+
+**Consequences**
+- ✅ Java 8 is no longer supported; CI matrix drops Temurin 8.
+- ✅ OpenJFX is required on the class path; no longer bundled implicitly.
+- ✅ `habiTv-linux` and `habiTv-windows` participate in `mvn package`
+  from `develop`.
+- ✅ URLClassLoader / jfxrt.jar hack is removed.
+- ⚠️ Any downstream fork that required Java 8 must migrate.
+- 🔁 `keep-java8-baseline` is superseded by this ADR.
 
 ---
 

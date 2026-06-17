@@ -2,6 +2,39 @@
 
 Version history for Habitv AI agent rules. Canonical source: [`AGENTS.md`](../AGENTS.md).
 
+## 2026-06-06 — v2.0.0
+
+### Added
+
+* Java 21 as the project-wide baseline (`maven.compiler.release=21`).
+* OpenJFX 21.0.7 declared as an explicit `org.openjfx` dependency.
+* ADR `java21-openjfx-baseline` (supersedes `keep-java8-baseline`).
+* `habiTv-linux` / `habiTv-windows` returned to the Maven reactor.
+* Hard rule: "Downgrade JavaFX to `jfxrt` system-scope" replaces the former
+  "Migrate JavaFX to OpenJFX" rule.
+
+### Changed
+
+* AGENTS.md §1 description updated: "Java 8" → "Java 21 Maven multi-module".
+* Hard rule "Bump Java baseline beyond Java 8" → "Bump Java baseline beyond
+  Java 21" (ADR `java21-openjfx-baseline`).
+* `.cursor/rules/java8-compatibility.mdc` renamed conceptually and rewritten
+  as Java 21 compatibility rules.
+* `.github/copilot-instructions.md`, `maven-java.instructions.md`, and
+  `packaging.instructions.md` updated to reflect Java 21 / OpenJFX baseline.
+* Risk `javafx-jdk8` moved to Mitigated in `risk-register.md`.
+* Tracker item `javafx-modernization` advanced to In progress / 75%.
+
+### Removed
+
+* `jfxrt.jar` URLClassLoader bootstrap hack references from agent guidance.
+* Java 8 Temurin CI matrix references from instruction files.
+
+### Reason
+
+* Java 8 baseline was blocking JavaFX modernization, reactor completeness for
+  packaging modules, and adoption of modern JDK support.
+
 ## 2026-05-31 — v1.5.1
 
 ### Added

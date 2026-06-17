@@ -30,8 +30,8 @@ automatic category behavior, provider summary, doc map).
 | Category | Count |
 |---------|------:|
 | ✅ Delivered | **13** |
-| 🟡 In progress | **7** |
-| 🔵 Proposed | **1** |
+| 🟡 In progress | **8** |
+| 🔵 Proposed | **0** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
 | **Total work items** | **21** |
@@ -51,7 +51,7 @@ automatic category behavior, provider summary, doc map).
 | 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🟡 In progress | 🟡 P2 | `█████████████░░░░░░░` 65% |
 | 🎬 `ytdlp-migration` — `youtube-dl` → `yt-dlp` migration | 🟡 In progress | 🟡 P2 | `███████████████░░░░░` 75% |
 | 🩺 `ytdlp-runtime-diagnostics` — yt-dlp Windows runtime diagnostics | 🟡 In progress | 🟡 P2 | `██████████████████░░` 90% |
-| 🖼️ `javafx-modernization` — JavaFX & runtime packaging modernization | 🔵 Proposed | 🟡 P2 | `███░░░░░░░░░░░░░░░░░` 15% |
+| 🖼️ `javafx-modernization` — JavaFX & runtime packaging modernization | 🟡 In progress | 🟡 P2 | `███████████████░░░░░` 75% |
 | 🧪 `plugin-tester-align` — `plugin-tester` reactor alignment | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | ▶️ `console-runnable` — Runnable console baseline | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 🔗 `own-version-deps-align` — Own-version plugin dependency alignment | ✅ Done | 🔴 P0 | `████████████████████` 100% |
@@ -435,9 +435,9 @@ architecture rewrite.
 
 | | |
 |---|---|
-| **Status** | 🔵 Proposed |
+| **Status** | 🟡 In progress |
 | **Priority** | 🟡 P2 |
-| **Progress** | `███░░░░░░░░░░░░░░░░░` 15% |
+| **Progress** | `███████████████░░░░░` 75% |
 | **Legacy code** | HBTV-008 |
 
 **Scope** — Migrate JavaFX 2.x usage and `${jdk.home}` packaging
@@ -457,13 +457,10 @@ assumptions:
 `application/habiTv` for JDK 8 `jfxrt.jar` resolution and covered by
 targeted unit tests.
 
-**Notes** — Risk `javafx-jdk8`. `HabitvLauncher` resolves `jfxrt.jar`
-from common JDK 8 layouts and supports `-Dhabitv.jfxrt.path`; GUI mode
-exits with diagnostics when JavaFX is missing. Windows packaging foundation:
-PR [#124](https://github.com/Mika3578/habitv/pull/124) staging,
-[#126](https://github.com/Mika3578/habitv/pull/126) launcher/installer,
-[#128](https://github.com/Mika3578/habitv/pull/128) native package verification.
-OpenJFX runtime migration and full cross-platform packaging remain out of scope.
+**Notes** — OpenJFX 21.0.7 migration done: `jfxrt` system-scope removed,
+`${jdk.home}` bootstrap eliminated, `habiTv-linux` / `habiTv-windows`
+returned to the reactor (ADR `java21-openjfx-baseline`). Risk `javafx-jdk8`
+mitigated. Remaining work: `jpackage`-based end-user distribution pipeline.
 
 ---
 
