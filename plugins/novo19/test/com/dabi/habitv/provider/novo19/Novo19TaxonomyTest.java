@@ -22,6 +22,7 @@ public class Novo19TaxonomyTest {
 		assertNull(Novo19TaxonomyMapper.normalizeTheme("Documentaire"));
 		assertNull(Novo19TaxonomyMapper.normalizeTheme("Docs et Magazines"));
 		assertNull(Novo19TaxonomyMapper.normalizeTheme("Policiers / Thrillers"));
+		assertNull(Novo19TaxonomyMapper.normalizeTheme("La sélection Brut"));
 		assertEquals("Histoire", Novo19TaxonomyMapper.normalizeTheme("Histoire"));
 		assertEquals("Société", Novo19TaxonomyMapper.normalizeTheme("Société"));
 	}

@@ -32,9 +32,18 @@ public class Novo19PathRulesTest {
 		assertTrue(Novo19PathRules.isCatalogueCarouselRail(
 				new com.dabi.habitv.provider.novo19.dto.Novo19Rail("carousel", null, "/sections/carousel/tiles", null)));
 		assertTrue(Novo19PathRules.isInfoEditorialRail(
-				new com.dabi.habitv.provider.novo19.dto.Novo19Rail("info", "On a de l'info", "/sections/info/tiles", null)));
+				new com.dabi.habitv.provider.novo19.dto.Novo19Rail("info", "BANNER", "On a de l'info",
+						"/sections/info/tiles", null)));
 		assertTrue(Novo19PathRules.isTalkEditorialRail(
-				new com.dabi.habitv.provider.novo19.dto.Novo19Rail("talk", "Notre talk", "/sections/talk/tiles", null)));
+				new com.dabi.habitv.provider.novo19.dto.Novo19Rail("talk", "BANNER", "Notre talk",
+						"/sections/talk/tiles", null)));
+		assertTrue(Novo19PathRules.isCuratedSelectionRailTitle("La sélection Brut"));
+		assertFalse(Novo19PathRules.isDocumentariesThemeRail(new com.dabi.habitv.provider.novo19.dto.Novo19Rail(
+				"rail-brut", "CAROUSEL", "La sélection Brut", "/tiles", null)));
+		assertTrue(Novo19PathRules.isDocumentariesMasterCatalogRail(new com.dabi.habitv.provider.novo19.dto.Novo19Rail(
+				"rail-catalog", "CAROUSEL", Novo19Conf.SECTION_DOCUMENTARIES, "/tiles", null)));
+		assertFalse(Novo19PathRules.isDocumentariesThemeRail(new com.dabi.habitv.provider.novo19.dto.Novo19Rail(
+				"rail-catalog", "CAROUSEL", Novo19Conf.SECTION_DOCUMENTARIES, "/tiles", null)));
 	}
 
 }

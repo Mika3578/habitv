@@ -76,15 +76,23 @@ final class Novo19PathRules {
 	}
 
 	static boolean isInfoEditorialRail(final Novo19Rail rail) {
-		return railTitleContains(rail, "on a de l'info");
+		return isEditorialBannerRail(rail) && railTitleContains(rail, "info");
 	}
 
 	static boolean isTalkEditorialRail(final Novo19Rail rail) {
-		if (rail == null || StringUtils.isEmpty(rail.getTitle())) {
+		return isEditorialBannerRail(rail) && railTitleContains(rail, "talk");
+	}
+
+	static boolean isEditorialBannerRail(final Novo19Rail rail) {
+		return rail != null && "BANNER".equals(rail.getType()) && !StringUtils.isEmpty(rail.getSrc());
+	}
+
+	static boolean isCuratedSelectionRailTitle(final String title) {
+		if (StringUtils.isEmpty(title)) {
 			return false;
 		}
-		final String normalized = rail.getTitle().trim().toLowerCase();
-		return normalized.contains("talk") || normalized.contains("on a du nouveau");
+		final String normalized = title.trim().toLowerCase(Locale.FRENCH);
+		return normalized.contains("sélection") || normalized.contains("selection");
 	}
 
 	static String editorialBucketForArtworkTile(final Novo19Tile tile) {
@@ -166,6 +174,18 @@ final class Novo19PathRules {
 		return rail != null && Novo19Conf.SECTION_DOCUMENTARIES.equals(rail.getTitle());
 	}
 
+	static boolean isDocumentariesMasterCatalogRail(final Novo19Rail rail) {
+		if (rail == null || StringUtils.isEmpty(rail.getSrc()) || isRecommendationRail(rail)) {
+			return false;
+		}
+		return Novo19Conf.SECTION_DOCUMENTARIES.equals(rail.getTitle());
+	}
+
+	static boolean isPromotedBannerRail(final Novo19Rail rail) {
+		return rail != null && "BANNER".equals(rail.getType()) && !StringUtils.isEmpty(rail.getSrc())
+				&& !isRecommendationRail(rail);
+	}
+
 	static boolean isDocumentariesThemeRail(final Novo19Rail rail) {
 		if (rail == null || StringUtils.isEmpty(rail.getTitle()) || isRecommendationRail(rail)) {
 			return false;
@@ -177,7 +197,7 @@ final class Novo19PathRules {
 		if (title.contains(":")) {
 			return false;
 		}
-		if (Novo19Conf.SECTION_DOCUMENTARIES.equals(title) || "La sélection Brut".equalsIgnoreCase(title)) {
+		if (Novo19Conf.SECTION_DOCUMENTARIES.equals(title) || isCuratedSelectionRailTitle(title)) {
 			return false;
 		}
 		if (isInfoEditorialRail(rail) || isTalkEditorialRail(rail)) {

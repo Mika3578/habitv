@@ -18,10 +18,6 @@ final class Novo19TaxonomyMapper {
 	private static final String[] BOILERPLATE_THEMES = new String[] { "documentaire", "docs et magazines",
 			"docs & magazines", "novo19", "catégories", "categories", "catalogue" };
 
-	private static final String[] SECTION_TITLE_EXCLUSIONS = new String[] { "nos séries", "nos films",
-			"nos documentaires et magazines", "nos divertissements", "nos podcasts", "la sélection brut", "info", "talk",
-			"notre talk", "on a de l'info", "on a du nouveau" };
-
 	private Novo19TaxonomyMapper() {
 	}
 
@@ -128,13 +124,26 @@ final class Novo19TaxonomyMapper {
 	}
 
 	private static boolean isSectionTitleExclusion(final String value) {
-		final String normalized = value.trim().toLowerCase(Locale.FRENCH);
-		for (final String exclusion : SECTION_TITLE_EXCLUSIONS) {
-			if (normalized.equals(exclusion)) {
-				return true;
-			}
+		if (StringUtils.isEmpty(value)) {
+			return false;
 		}
-		return false;
+		final String normalized = value.trim().toLowerCase(Locale.FRENCH);
+		if (Novo19PathRules.isCuratedSelectionRailTitle(value)) {
+			return true;
+		}
+		if (normalized.equals(Novo19Conf.EDITORIAL_INFO.toLowerCase(Locale.FRENCH))
+				|| normalized.equals(Novo19Conf.EDITORIAL_TALK.toLowerCase(Locale.FRENCH))) {
+			return true;
+		}
+		return isConfiguredCatalogueSectionTitle(normalized);
+	}
+
+	private static boolean isConfiguredCatalogueSectionTitle(final String normalized) {
+		return normalized.equals(Novo19Conf.SECTION_DOCUMENTARIES.toLowerCase(Locale.FRENCH))
+				|| normalized.equals(Novo19Conf.SECTION_FILMS.toLowerCase(Locale.FRENCH))
+				|| normalized.equals(Novo19Conf.SECTION_SERIES.toLowerCase(Locale.FRENCH))
+				|| normalized.equals(Novo19Conf.SECTION_PODCASTS.toLowerCase(Locale.FRENCH))
+				|| normalized.equals(Novo19Conf.SECTION_DIVERTISSEMENTS.toLowerCase(Locale.FRENCH));
 	}
 
 	private static String slugify(final String value) {
