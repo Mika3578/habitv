@@ -1,0 +1,20 @@
+{
+  "page": {
+    "type": "RAILS",
+    "id": "categories",
+    "title": "Catégories",
+    "rails": [
+      {
+        "id": "rail-series",
+        "title": "Nos séries",
+        "src": "/api/1/public/frontends/web/pages/categories/sections/rail-series/tiles"
+      },
+      {
+        "id": "rail-films",
+        "title": "Nos films",
+        "src": "/api/1/public/frontends/web/pages/categories/sections/rail-films/tiles"
+      }
+    ]
+  },
+  "version": "0.9.1"
+}

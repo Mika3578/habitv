@@ -1,0 +1,14 @@
+{
+  "tiles": [
+    {
+      "id": "paginated-episode_565BFFb",
+      "type": "EPISODE",
+      "title": "Emission du 15-06-26",
+      "href": "/player/on-a-de-l-info-emission-du-15-06-26",
+      "source": {
+        "id": "paginated-episode_565BFFb"
+      }
+    }
+  ],
+  "version": "0.9.1"
+}

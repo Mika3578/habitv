@@ -1,0 +1,33 @@
+{
+  "page": {
+    "type": "DETAILS",
+    "id": "fbi-portes-disparus",
+    "title": "FBI : Portés disparus",
+    "seasons": [
+      {
+        "title": "Saison 1",
+        "episodes": [
+          {
+            "id": "ep-0011_565BFFb",
+            "type": "EPISODE",
+            "title": "Une petite ville bien tranquille",
+            "subtitle": "S1E11",
+            "duration": 2491,
+            "href": "/player/fbi-portes-disparus-une-petite-ville-bien-tranquille",
+            "source": {
+              "id": "ep-0011_565BFFb"
+            }
+          }
+        ]
+      }
+    ],
+    "rails": [
+      {
+        "id": "episodes-rail",
+        "title": "Episodes",
+        "src": "/api/1/public/frontends/web/pages/details/fbi-portes-disparus/sections/episodes-rail/tiles"
+      }
+    ]
+  },
+  "version": "0.9.1"
+}

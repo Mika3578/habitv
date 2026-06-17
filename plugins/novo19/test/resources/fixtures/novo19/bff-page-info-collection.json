@@ -1,0 +1,15 @@
+{
+  "page": {
+    "type": "DETAILS",
+    "id": "on-a-de-l-info",
+    "title": "On a de l'info",
+    "rails": [
+      {
+        "id": "info-episodes",
+        "title": "Replays",
+        "src": "/api/1/public/frontends/web/pages/details/on-a-de-l-info/sections/info-episodes/tiles"
+      }
+    ]
+  },
+  "version": "0.9.1"
+}
