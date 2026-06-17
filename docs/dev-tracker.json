@@ -196,20 +196,22 @@
       "icon": "📺",
       "status": "in-progress",
       "priority": "P2",
-      "progressPercent": 65,
-      "scope": "Add plugins/novo19 for public replay catalogue browsing via BFF JSON. Replay download is a follow-up commit on feat/provider-novo19 before PR merge. Live direct excluded.",
+      "progressPercent": 85,
+      "scope": "Add plugins/novo19 for public replay catalogue browsing and replay/podcast download via BFF JSON + RedBee anonymous entitlement. Live direct excluded. BFF catalogue search deferred.",
       "acceptanceCriteria": [
         "plugins/novo19 registered in reactor with offline fixtures and deterministic tests.",
         "Category tree built from BFF config and page payloads with pagination and duplicate suppression.",
-        "Replay download deferred to a follow-up commit; catalog attempts return unavailable safely.",
-        "docs/provider-inventory.md and tracker updated."
+        "Replay and podcast download via RedBee session + yt-dlp delegation; live novo19_* excluded.",
+        "docs/provider-inventory.md and tracker updated.",
+        "BFF catalogue search deferred until Habitv search UX is defined."
       ],
       "validation": [
         "mvn -B -ntp -pl plugins/novo19 -am test",
-        "mvn -B -ntp -DskipTests verify"
+        "mvn -B -ntp -DskipTests verify",
+        "mvn -B -ntp verify"
       ],
       "pr": "feat(novo19): add public replay provider (pending)",
-      "notes": "BFF catalogue on feat/provider-novo19; canonical public URLs; assetId on categories; live novo19_* excluded; replay download follow-up before PR."
+      "notes": "BFF catalogue + replay download on feat/provider-novo19; RedBee HLS/DASH + podcast audio mapping; follow-up feat(novo19): add BFF catalogue search after search UX audit."
     },
     {
       "id": "ytdlp-migration",

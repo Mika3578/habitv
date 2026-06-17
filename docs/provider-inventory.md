@@ -76,7 +76,7 @@ no provider rewrite, no runtime behavior change in inventory-only work.
 | `plugins/globalnews` | `globalnews` | provider | unknown / needs fixture | `GlobalNewsPluginManager` provider/downloader interface with HTTPS source URL; only live-style test evidence | add fixture tests |
 | `plugins/lequipe` | `lequipe` | provider | needs live endpoint rewrite | Provider/downloader plugin uses HTML scraping; tests include historical Kewego stream-init references | rewrite provider |
 | `plugins/mlssoccer` | `mlssoccer` | provider | unknown / needs fixture | `MLSSoccerPluginManager` provider/downloader with HTTPS URLs; live endpoint compatibility not validated offline | add fixture tests |
-| `plugins/novo19` | `novo19` | provider | degraded (catalog) | `Novo19PluginManager` discovers public replay via BFF JSON; replay download returns a safe unavailable message until a follow-up commit; live `novo19_*` assets excluded; offline fixtures under `fixtures/novo19/` | keep |
+| `plugins/novo19` | `novo19` | provider | degraded (catalog + replay download) | `Novo19PluginManager` discovers public replay via BFF JSON; replay/podcast download resolves RedBee anonymous entitlement (HLS with DASH fallback) and delegates to `youtube` (yt-dlp); live `novo19_*` assets excluded; offline fixtures under `fixtures/novo19/` | keep |
 | `plugins/plugin-tester` | `plugin-tester` | test harness | infrastructure-only | `BasePluginProviderTester` / `BasePluginUpdateTester` provide shared live-style harness utilities | keep as-is |
 | `plugins/francetv` | `francetv` | provider | keep | `FranceTvPluginManager` queries `api-mobile.yatta.francetv.fr` catalogue and public hubs via `/apps/channels/{hubSlug}?platform=apps` (PR #137, plugin `4.1.3-SNAPSHOT`); download delegated to `youtube` (yt-dlp); offline `FranceTvUrlsTest` + fixture baseline; live `FranceTvPluginManagerTest` opt-in only; replaces former `plugins/pluzz` (legacy `pluzz.` URLs still recognised by `canDownload`; grab-config plugin id must be `francetv`) | keep |
 | `plugins/rtmpDump` | `rtmpDump` | downloader | keep | `RtmpDumpPluginDownloader` is binary wrapper with updater version pattern; dedicated test exists | keep as-is |
@@ -138,20 +138,23 @@ no provider rewrite, no runtime behavior change in inventory-only work.
 | `francetv` (ex `pluzz`) | Local fixture metadata + offline `FranceTvUrlsTest` covering URL/slug builders | Replacement of the legacy `pluzz` module against `api-mobile.yatta.francetv.fr` |
 | `arte` | Local fixture metadata + offline baseline test | Legacy HTTP/RSS parsing assumptions need stable parser anchors |
 | `youtube` | Local fixture metadata + offline baseline test | Binary contract migrated to yt-dlp; live provider validation still separate |
-| `novo19` | Local BFF JSON fixtures + offline parser/mapper tests | New public replay provider; catalogue-only PR; BFF JSON primary source |
+| `novo19` | Local BFF JSON fixtures + offline parser/mapper/playback tests | Public replay provider; BFF catalogue + RedBee playback delegation to yt-dlp |
 
 ### NOVO19 provider strategy
 
 - **Catalogue discovery:** public BFF JSON at `https://novo19-bff.ouest-france.fr`
   (`/api/1/public/config`, `/pages/by-path/{path}`, section `tiles`, rail `more.href`).
-- **Replay download:** not implemented in the catalog PR; attempts return the
-  standard unavailable message without blocking the UI.
+- **Replay download:** resolves asset IDs from BFF player/detail pages, requests
+  anonymous RedBee session (memory only), selects public HLS (DASH fallback),
+  and delegates to the `youtube` downloader (yt-dlp). Podcast episodes use
+  audio-only yt-dlp flags. Live direct (`novo19_*`) remains excluded.
 - **Parsing:** Java Jackson envelopes mapped to Habitv `CategoryDTO` / `EpisodeDTO`.
 - **`__NEXT_DATA__`:** not required for catalogue browsing; reserved for future fallback only.
 - **Failure mode:** empty category/episode sets or user-facing unavailable download message;
   sanitized `provider=NOVO19` diagnostics; no startup or plugin-discovery breakage.
 - **Out of scope:** live direct (`/player/novo19`, `novo19_*` assets), login, cookies,
-  `/mes-videos`, favorites, podcasts.
+  `/mes-videos`, favorites, BFF full-text search (`/contents/search/16_9`) until
+  Habitv provider-search UX is defined.
 - **References:** patterns from `francetv`, `6play`, `arte`, `canalPlus`;
   external projects used as behavioral references only.
 

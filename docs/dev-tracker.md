@@ -49,7 +49,7 @@ automatic category behavior, provider summary, doc map).
 | 🔗 `legacy-url-migration` — Legacy URL migration (free.fr / SVN / FTP) | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 📦 `static-repo-publish` — Static artifact repository publication | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🟡 In progress | 🟡 P2 | `█████████████░░░░░░░` 65% |
-| 📺 `provider-novo19` — NOVO19 public replay provider | 🟡 In progress | 🟡 P2 | `████████████░░░░░░░░` 65% |
+| 📺 `provider-novo19` — NOVO19 public replay provider | 🟡 In progress | 🟡 P2 | `█████████████████░░░` 85% |
 | 🎬 `ytdlp-migration` — `youtube-dl` → `yt-dlp` migration | 🟡 In progress | 🟡 P2 | `███████████████░░░░░` 75% |
 | 🩺 `ytdlp-runtime-diagnostics` — yt-dlp Windows runtime diagnostics | 🟡 In progress | 🟡 P2 | `██████████████████░░` 90% |
 | 🖼️ `javafx-modernization` — JavaFX & runtime packaging modernization | 🔵 Proposed | 🟡 P2 | `███░░░░░░░░░░░░░░░░░` 15% |
@@ -373,35 +373,42 @@ Risks `live-tests-flaky`, `provider-endpoints-dead`.
 |---|---|
 | **Status** | 🟡 In progress |
 | **Priority** | 🟡 P2 |
-| **Progress** | `████████████░░░░░░░░` 65% |
+| **Progress** | `█████████████████░░░` 85% |
 | **Legacy code** | — |
 
-**Scope** — Add `plugins/novo19` for public replay catalogue browsing (series,
-films, news collections). Exclude live direct, login, cookies, and personal
-rails. Replay download is a follow-up on the same branch before PR merge.
+**Scope** — Add `plugins/novo19` for public replay catalogue browsing and
+replay/podcast download (series, films, news, talk, documentaries, podcasts).
+Exclude live direct, login, cookies, and personal rails. BFF catalogue search
+is a separate follow-up once Habitv search UX is defined.
 
 **Strategy**
 - BFF JSON at `https://novo19-bff.ouest-france.fr` for catalogue discovery.
-- Canonical public `novo19.ouest-france.fr` URLs as identifiers; `assetId` on categories.
+- Canonical public `novo19.ouest-france.fr` URLs as identifiers; fresh `assetId`
+  resolution from player/detail pages at download time.
+- RedBee anonymous session (memory only), HLS selection with DASH fallback,
+  delegation to yt-dlp via `FrameworkConf.YOUTUBE`.
 - Graceful empty results, sanitized diagnostics, and safe unavailable download response.
 
 **Acceptance criteria**
 - ✅ `plugins/novo19` registered in reactor with offline fixtures
 - ✅ Catalogue browsing (rails, seasons, pagination, duplicate suppression)
-- 🟡 Replay download (follow-up commit before PR)
+- ✅ Replay and podcast download via RedBee + yt-dlp delegation
 - ✅ Deterministic offline tests (no live network in default lifecycle)
 - 🟡 PR merged to `develop`
+- 🟡 BFF catalogue search (`feat(novo19): add BFF catalogue search`) deferred
 
 **Validation**
 ```bash
 mvn -B -ntp -pl plugins/novo19 -am test
 mvn -B -ntp -DskipTests verify
+mvn -B -ntp verify
 ```
 
 **Related PRs** · `feat/provider-novo19` (pending)
 
-**Notes** — Catalog-only commits on `feat/provider-novo19`; live direct
-(`/player/novo19`) and RedBee playback remain follow-up work.
+**Notes** — Catalog + replay download on `feat/provider-novo19`; live direct
+(`/player/novo19`) excluded. Follow-up: BFF search endpoint
+`/api/1/public/frontends/web/contents/search/16_9?query={term}` after search UX audit.
 See [`provider-inventory.md`](provider-inventory.md) NOVO19 section.
 
 ---
