@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -40,30 +41,68 @@ final class Novo19CatalogMapper {
 		return section;
 	}
 
+	static CategoryDTO buildEditorialSectionCategory(final String editorialName) {
+		final CategoryDTO section = new CategoryDTO(Novo19Conf.NAME, editorialName,
+				Novo19UrlBuilder.publicPageUrl("/categories#editorial-" + editorialName.toLowerCase()),
+				Novo19Conf.EXTENSION);
+		section.setDownloadable(false);
+		section.addParameter(Novo19Conf.PARAMETER_EDITORIAL_BUCKET, editorialName);
+		return section;
+	}
+
 	static CategoryDTO buildProgramCategory(final Novo19Tile tile) {
+		return buildProgramCategory(tile, programLabel(tile));
+	}
+
+	static CategoryDTO buildProgramCategory(final Novo19Tile tile, final String title) {
 		final String publicUrl = Novo19UrlBuilder.publicPageUrl(tile.getHref());
-		final CategoryDTO program = new CategoryDTO(Novo19Conf.NAME, programLabel(tile), publicUrl,
+		final CategoryDTO program = new CategoryDTO(Novo19Conf.NAME, title, publicUrl,
 				Novo19Conf.EXTENSION);
 		program.setDownloadable(true);
 		applyAssetParameter(program, tile.getAssetId());
 		applyDescriptionParameter(program, tile.getDescription());
-		if ("VOD".equals(tile.getType())) {
+		applyContentKindFromTileType(program, tile.getType());
+		return program;
+	}
+
+	static CategoryDTO cloneProgramCategory(final CategoryDTO source) {
+		if (source == null) {
+			return null;
+		}
+		final CategoryDTO clone = new CategoryDTO(source.getPlugin(), source.getName(), source.getId(),
+				source.getExtension());
+		clone.setDownloadable(source.isDownloadable());
+		for (final Map.Entry<String, String> entry : source.getParameters().entrySet()) {
+			clone.addParameter(entry.getKey(), entry.getValue());
+		}
+		for (final CategoryDTO subCategory : source.getSubCategories()) {
+			clone.addSubCategory(cloneProgramCategory(subCategory));
+		}
+		return clone;
+	}
+
+	private static void applyContentKindFromTileType(final CategoryDTO program, final String tileType) {
+		if ("VOD".equals(tileType)) {
 			program.addParameter(Novo19Conf.PARAMETER_CONTENT_KIND, Novo19Conf.CONTENT_KIND_FILM);
-		} else if ("SERIE".equals(tile.getType())) {
+		} else if ("SERIE".equals(tileType)) {
 			program.addParameter(Novo19Conf.PARAMETER_CONTENT_KIND, Novo19Conf.CONTENT_KIND_PROGRAM);
-		} else if ("COLLECTION".equals(tile.getType())) {
+		} else if ("COLLECTION".equals(tileType)) {
 			program.addParameter(Novo19Conf.PARAMETER_CONTENT_KIND, Novo19Conf.CONTENT_KIND_COLLECTION);
-		} else if ("PODCAST".equals(tile.getType())) {
+		} else if ("PODCAST".equals(tileType)) {
 			program.addParameter(Novo19Conf.PARAMETER_CONTENT_KIND, Novo19Conf.CONTENT_KIND_PODCAST);
 			program.addParameter(Novo19Conf.PARAMETER_AUDIO_CONTENT, "true");
 		}
-		return program;
 	}
 
 	static void appendSeasonSubcategories(final CategoryDTO program, final Novo19BffPage detailPage) {
 		if (program == null || detailPage == null) {
 			return;
 		}
+		appendEmbeddedSeasonSubcategories(program, detailPage);
+		appendSeasonRailSubcategories(program, detailPage);
+	}
+
+	private static void appendEmbeddedSeasonSubcategories(final CategoryDTO program, final Novo19BffPage detailPage) {
 		final List<Novo19Season> seasons = detailPage.getSeasons();
 		if (seasons.isEmpty()) {
 			return;
@@ -84,9 +123,29 @@ final class Novo19CatalogMapper {
 		}
 	}
 
+	private static void appendSeasonRailSubcategories(final CategoryDTO program, final Novo19BffPage detailPage) {
+		for (final com.dabi.habitv.provider.novo19.dto.Novo19Rail rail : detailPage.getRails()) {
+			if (!Novo19PathRules.isSeasonRail(rail)) {
+				continue;
+			}
+			final String seasonId = program.getId() + "#season-rail-" + rail.getId();
+			final CategoryDTO seasonCategory = new CategoryDTO(Novo19Conf.NAME, rail.getTitle(), seasonId,
+					Novo19Conf.EXTENSION);
+			seasonCategory.setDownloadable(true);
+			seasonCategory.addParameter(Novo19Conf.PARAMETER_CONTENT_KIND, Novo19Conf.CONTENT_KIND_SEASON);
+			seasonCategory.addParameter(Novo19Conf.PARAMETER_SEASON_RAIL_SRC, rail.getSrc());
+			program.addSubCategory(seasonCategory);
+		}
+	}
+
 	static Set<EpisodeDTO> mapEpisodes(final CategoryDTO category, final Novo19BffPage page,
 			final Collection<Novo19Tile> railTiles) {
-		final Set<EpisodeDTO> episodes = new LinkedHashSet<>();
+		final Set<EpisodeDTO> episodes = new LinkedHashSet<EpisodeDTO>();
+		final String seasonRailSrc = category.getParameter(Novo19Conf.PARAMETER_SEASON_RAIL_SRC);
+		if (!StringUtils.isEmpty(seasonRailSrc)) {
+			appendContentRailEpisodes(category, episodes, railTiles);
+			return episodes;
+		}
 		final String seasonIndexValue = category.getParameter(Novo19Conf.PARAMETER_SEASON_INDEX);
 		if (!StringUtils.isEmpty(seasonIndexValue)) {
 			appendSeasonEpisodes(category, page, episodes, parseSeasonIndex(seasonIndexValue));
@@ -109,6 +168,7 @@ final class Novo19CatalogMapper {
 					addEpisodeFromTile(category, episodes, tile);
 				}
 			}
+			appendContentRailEpisodes(category, episodes, railTiles);
 			return episodes;
 		}
 		if (Novo19Conf.CONTENT_KIND_COLLECTION.equals(contentKind)) {

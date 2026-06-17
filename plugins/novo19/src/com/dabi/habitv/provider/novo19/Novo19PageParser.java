@@ -68,16 +68,33 @@ final class Novo19PageParser {
 		}
 		final List<Novo19Season> seasons = parseSeasons(page.path("seasons"));
 		final Novo19Tile content = parseTileSafely(page.path("content"));
+		final List<String> contentCategories = parseStringArray(page.path("content").path("category"));
 		return new Novo19BffPage(textValue(page, "type"), textValue(page, "id"), textValue(page, "title"), rails,
-				seasons, content);
+				seasons, content, contentCategories);
+	}
+
+	private static List<String> parseStringArray(final JsonNode arrayNode) {
+		final List<String> values = new ArrayList<String>();
+		if (arrayNode == null || !arrayNode.isArray()) {
+			return values;
+		}
+		for (final JsonNode item : arrayNode) {
+			if (item != null && !item.isNull()) {
+				final String text = item.asText(null);
+				if (!StringUtils.isEmpty(text)) {
+					values.add(text.trim());
+				}
+			}
+		}
+		return values;
 	}
 
 	private static Novo19Rail parseRail(final JsonNode railNode) {
 		if (railNode == null || railNode.isMissingNode()) {
 			return null;
 		}
-		return new Novo19Rail(textValue(railNode, "id"), textValue(railNode, "title"), textValue(railNode, "src"),
-				readMoreHref(railNode.path("more")));
+		return new Novo19Rail(textValue(railNode, "id"), textValue(railNode, "type"), textValue(railNode, "title"),
+				textValue(railNode, "src"), readMoreHref(railNode.path("more")));
 	}
 
 	private static List<Novo19Season> parseSeasons(final JsonNode seasonsNode) {

@@ -1,5 +1,7 @@
 package com.dabi.habitv.provider.novo19;
 
+import java.util.Locale;
+
 import org.apache.commons.lang.StringUtils;
 
 import com.dabi.habitv.provider.novo19.dto.Novo19Rail;
@@ -52,6 +54,63 @@ final class Novo19PathRules {
 				&& tile.getHref().startsWith("/details/");
 	}
 
+	static boolean isProgramDetailTile(final Novo19Tile tile) {
+		if (tile == null || StringUtils.isEmpty(tile.getHref()) || isExcludedPublicPath(tile.getHref())) {
+			return false;
+		}
+		if (!tile.getHref().startsWith("/details/")) {
+			return false;
+		}
+		return isProgramTileType(tile.getType()) || isCollectionProgramTile(tile);
+	}
+
+	static boolean isProgramDiscoverableTile(final Novo19Tile tile) {
+		if (tile == null || isExcludedPublicPath(tile.getHref()) || isEditorialNavigationTile(tile)) {
+			return false;
+		}
+		return isProgramTileType(tile.getType()) || isCollectionProgramTile(tile);
+	}
+
+	static boolean isCatalogueCarouselRail(final Novo19Rail rail) {
+		return rail != null && !isRecommendationRail(rail) && StringUtils.isEmpty(rail.getTitle());
+	}
+
+	static boolean isInfoEditorialRail(final Novo19Rail rail) {
+		return railTitleContains(rail, "on a de l'info");
+	}
+
+	static boolean isTalkEditorialRail(final Novo19Rail rail) {
+		if (rail == null || StringUtils.isEmpty(rail.getTitle())) {
+			return false;
+		}
+		final String normalized = rail.getTitle().trim().toLowerCase();
+		return normalized.contains("talk") || normalized.contains("on a du nouveau");
+	}
+
+	static String editorialBucketForArtworkTile(final Novo19Tile tile) {
+		if (!isCollectionProgramTile(tile) || StringUtils.isEmpty(tile.getTitle())) {
+			return null;
+		}
+		final String label = tile.getTitle().trim();
+		if (Novo19Conf.EDITORIAL_INFO.equalsIgnoreCase(label)) {
+			return Novo19Conf.EDITORIAL_INFO;
+		}
+		if (Novo19Conf.EDITORIAL_TALK.equalsIgnoreCase(label)) {
+			return Novo19Conf.EDITORIAL_TALK;
+		}
+		return null;
+	}
+
+	static boolean isEditorialNavigationTile(final Novo19Tile tile) {
+		if (tile == null || StringUtils.isEmpty(tile.getHref())) {
+			return false;
+		}
+		final String path = normalizePath(tile.getHref());
+		return "/series".equals(path) || "/films".equals(path) || "/documentaires-et-magazines".equals(path)
+				|| "/sport".equals(path) || "/divertissements".equals(path) || "/podcasts".equals(path)
+				|| "/homepage".equals(path) || "/categories".equals(path) || "/recherche".equals(path);
+	}
+
 	static boolean isRecommendationRailSrc(final String railSrc) {
 		if (StringUtils.isEmpty(railSrc)) {
 			return false;
@@ -90,17 +149,54 @@ final class Novo19PathRules {
 
 	static boolean isGenericCatalogueSectionTitle(final String title) {
 		if (StringUtils.isEmpty(title)) {
-			return true;
+			return false;
 		}
 		return "catalogue".equalsIgnoreCase(title.trim()) || "catégories".equalsIgnoreCase(title.trim())
 				|| "categories".equalsIgnoreCase(title.trim());
 	}
 
+	static boolean isDocumentariesSectionRail(final Novo19Rail rail) {
+		return rail != null && Novo19Conf.SECTION_DOCUMENTARIES.equals(rail.getTitle());
+	}
+
+	static boolean isDocumentariesThemeRail(final Novo19Rail rail) {
+		if (rail == null || StringUtils.isEmpty(rail.getTitle()) || isRecommendationRail(rail)) {
+			return false;
+		}
+		if ("BANNER".equals(rail.getType())) {
+			return false;
+		}
+		final String title = rail.getTitle().trim();
+		if (title.contains(":")) {
+			return false;
+		}
+		if (Novo19Conf.SECTION_DOCUMENTARIES.equals(title) || "La sélection Brut".equalsIgnoreCase(title)) {
+			return false;
+		}
+		if (isInfoEditorialRail(rail) || isTalkEditorialRail(rail)) {
+			return false;
+		}
+		return !title.contains("?") && title.length() <= 80;
+	}
+
+	static boolean isSeasonRail(final Novo19Rail rail) {
+		if (rail == null || StringUtils.isEmpty(rail.getTitle()) || StringUtils.isEmpty(rail.getSrc())) {
+			return false;
+		}
+		final String title = rail.getTitle().trim().toLowerCase(Locale.FRENCH);
+		return title.startsWith("saison ") && rail.getSrc().contains("asset-details-serie");
+	}
+
 	static String normalizeSectionTitle(final String title) {
 		if (StringUtils.isEmpty(title)) {
-			return "Catalogue";
+			return "";
 		}
 		return title.trim();
+	}
+
+	private static boolean railTitleContains(final Novo19Rail rail, final String fragment) {
+		return rail != null && !StringUtils.isEmpty(rail.getTitle())
+				&& rail.getTitle().trim().toLowerCase().contains(fragment.toLowerCase());
 	}
 
 	private static String normalizePath(final String href) {

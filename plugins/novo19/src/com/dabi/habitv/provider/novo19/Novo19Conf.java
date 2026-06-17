@@ -31,11 +31,25 @@ public final class Novo19Conf {
 
 	public static final String CONTENT_KIND_PODCAST = "podcast";
 
+	public static final String EDITORIAL_INFO = "Info";
+
+	public static final String EDITORIAL_TALK = "Talk";
+
+	public static final String PARAMETER_EDITORIAL_BUCKET = "editorialBucket";
+
 	public static final String PARAMETER_AUDIO_CONTENT = "audioContent";
 
-	public static final String PARAMETER_PUBLISHED_AT = "publishedAt";
-
 	public static final String PARAMETER_DESCRIPTION = "description";
+
+	public static final String PARAMETER_CANONICAL_PROGRAM_ID = "canonicalProgramId";
+
+	public static final String PARAMETER_SEASON_RAIL_SRC = "seasonRailSrc";
+
+	public static final String SECTION_DOCUMENTARIES = "Nos documentaires et magazines";
+
+	public static final String THEME_UNCLASSIFIED = "Sans thématique";
+
+	public static final String DOCUMENTARIES_PUBLIC_PATH = "documentaires-et-magazines";
 
 	public static final String DOWNLOAD_UNAVAILABLE_MESSAGE = "This replay is currently unavailable or not supported. See logs for details.";
 
