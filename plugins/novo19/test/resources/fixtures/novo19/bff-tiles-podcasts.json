@@ -1,0 +1,17 @@
+{
+  "tiles": [
+    {
+      "id": "podcast-royaume_565BFFb",
+      "type": "PODCAST",
+      "title": "Le royaume des contes",
+      "description": "Des contes pour tous",
+      "href": "/details/le-royaume-des-contes",
+      "source": {
+        "provider": "redbee",
+        "type": "PODCAST",
+        "id": "podcast-royaume_565BFFb"
+      }
+    }
+  ],
+  "version": "0.9.1"
+}

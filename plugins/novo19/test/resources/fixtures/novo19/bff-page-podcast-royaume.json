@@ -1,0 +1,29 @@
+{
+  "page": {
+    "type": "DETAILS",
+    "id": "le-royaume-des-contes",
+    "title": "Le royaume des contes",
+    "content": {
+      "id": "podcast-royaume_565BFFb",
+      "type": "PODCAST",
+      "title": "Le royaume des contes",
+      "href": "/details/le-royaume-des-contes",
+      "source": {
+        "id": "podcast-royaume_565BFFb"
+      }
+    },
+    "rails": [
+      {
+        "id": "podcast-episodes",
+        "title": "Episodes",
+        "src": "/api/1/public/frontends/web/pages/BFF%7Casset-details-podcast,le-royaume-des-contes/sections/episodes/tiles"
+      },
+      {
+        "id": "reco",
+        "title": "Recommendations",
+        "src": "/api/1/public/frontends/web/pages/BFF%7Casset-details-podcast,le-royaume-des-contes/sections/reco/tiles"
+      }
+    ]
+  },
+  "version": "0.9.1"
+}

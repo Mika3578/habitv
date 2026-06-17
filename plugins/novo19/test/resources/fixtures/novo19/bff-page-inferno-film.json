@@ -1,0 +1,25 @@
+{
+  "page": {
+    "type": "DETAILS",
+    "id": "inferno",
+    "title": "Inferno",
+    "content": {
+      "id": "inferno_565BFFb",
+      "type": "VOD",
+      "title": "Inferno",
+      "duration": 7200,
+      "href": "/player/inferno",
+      "source": {
+        "id": "inferno_565BFFb"
+      }
+    },
+    "rails": [
+      {
+        "id": "reco",
+        "title": "Recommendations",
+        "src": "/api/1/public/frontends/web/pages/BFF%7Casset-details,inferno/sections/reco/tiles"
+      }
+    ]
+  },
+  "version": "0.9.1"
+}

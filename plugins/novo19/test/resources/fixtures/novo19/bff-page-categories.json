@@ -5,6 +5,11 @@
     "title": "Catégories",
     "rails": [
       {
+        "id": "rail-catalogue",
+        "title": "Catalogue",
+        "src": "/api/1/public/frontends/web/pages/categories/sections/rail-catalogue/tiles"
+      },
+      {
         "id": "rail-series",
         "title": "Nos séries",
         "src": "/api/1/public/frontends/web/pages/categories/sections/rail-series/tiles"
@@ -13,6 +18,11 @@
         "id": "rail-films",
         "title": "Nos films",
         "src": "/api/1/public/frontends/web/pages/categories/sections/rail-films/tiles"
+      },
+      {
+        "id": "rail-podcasts",
+        "title": "Nos podcasts",
+        "src": "/api/1/public/frontends/web/pages/categories/sections/rail-podcasts/tiles"
       }
     ]
   },

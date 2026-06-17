@@ -1,0 +1,25 @@
+{
+  "tiles": [
+    {
+      "id": "other-film",
+      "type": "VOD",
+      "title": "Anges et démons",
+      "subtitle": "Policiers / Thrillers",
+      "href": "/details/anges-et-demons",
+      "source": {
+        "id": "anges_565BFFb"
+      }
+    },
+    {
+      "id": "other-film-2",
+      "type": "VOD",
+      "title": "Da Vinci Code",
+      "subtitle": "Policiers / Thrillers",
+      "href": "/details/da-vinci-code",
+      "source": {
+        "id": "davinci_565BFFb"
+      }
+    }
+  ],
+  "version": "0.9.1"
+}

@@ -30,20 +30,36 @@ final class Novo19FixtureSupport {
 			responses.put(Novo19UrlBuilder.bffConfigUrl(), readFixture("bff-config.json"));
 			responses.put(Novo19UrlBuilder.bffPageByPath("categories"), readFixture("bff-page-categories.json"));
 			responses.put(Novo19UrlBuilder.bffAbsolutePath(
+					"/api/1/public/frontends/web/pages/categories/sections/rail-catalogue/tiles"),
+					readFixture("bff-tiles-catalogue.json"));
+			responses.put(Novo19UrlBuilder.bffAbsolutePath(
 					"/api/1/public/frontends/web/pages/categories/sections/rail-series/tiles"),
 					readFixture("bff-tiles-series.json"));
 			responses.put(Novo19UrlBuilder.bffAbsolutePath(
 					"/api/1/public/frontends/web/pages/categories/sections/rail-films/tiles"),
 					readFixture("bff-tiles-films.json"));
+			responses.put(Novo19UrlBuilder.bffAbsolutePath(
+					"/api/1/public/frontends/web/pages/categories/sections/rail-podcasts/tiles"),
+					readFixture("bff-tiles-podcasts.json"));
 			responses.put(Novo19UrlBuilder.bffPageByPath("details/fbi-portes-disparus"),
 					readFixture("bff-page-series-details.json"));
 			responses.put(Novo19UrlBuilder.bffPageByPath("details/un-plan-d-enfer"),
 					readFixture("bff-page-film-details.json"));
+			responses.put(Novo19UrlBuilder.bffPageByPath("details/inferno"),
+					readFixture("bff-page-inferno-film.json"));
+			responses.put(Novo19UrlBuilder.bffPageByPath("details/le-royaume-des-contes"),
+					readFixture("bff-page-podcast-royaume.json"));
 			responses.put(Novo19UrlBuilder.bffPageByPath("details/on-a-de-l-info"),
 					readFixture("bff-page-info-collection.json"));
 			responses.put(Novo19UrlBuilder.bffAbsolutePath(
 					"/api/1/public/frontends/web/pages/details/on-a-de-l-info/sections/info-episodes/tiles"),
 					readFixture("bff-tiles-info-episodes.json"));
+			responses.put(Novo19UrlBuilder.bffAbsolutePath(
+					"/api/1/public/frontends/web/pages/BFF%7Casset-details-podcast,le-royaume-des-contes/sections/episodes/tiles"),
+					readFixture("bff-tiles-podcast-episodes.json"));
+			responses.put(Novo19UrlBuilder.bffAbsolutePath(
+					"/api/1/public/frontends/web/pages/BFF%7Casset-details,inferno/sections/reco/tiles"),
+					readFixture("bff-tiles-inferno-reco.json"));
 			responses.put(Novo19UrlBuilder.bffPageByPath("voir-plus/rail/details/on-a-de-l-info/info-episodes"),
 					readFixture("bff-pagination-more.json"));
 		} catch (final IOException e) {

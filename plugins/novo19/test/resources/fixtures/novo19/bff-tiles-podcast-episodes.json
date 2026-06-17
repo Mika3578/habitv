@@ -1,0 +1,44 @@
+{
+  "tiles": [
+    {
+      "id": "ep-oie_565BFFb",
+      "type": "PODCAST",
+      "title": "L'Oie d'or",
+      "description": "La Fontaine",
+      "duration": 620,
+      "publishedAt": "2026-01-15T10:00:00Z",
+      "href": "/player/le-royaume-des-contes-loie-dor",
+      "source": {
+        "id": "ep-oie_565BFFb"
+      }
+    },
+    {
+      "id": "broken-tile",
+      "type": "UNSUPPORTED",
+      "href": "/player/broken"
+    },
+    {
+      "id": "ep-cigale_565BFFb",
+      "type": "AUDIO",
+      "title": "La Cigale et la Fourmi",
+      "duration": 540,
+      "publishedAt": "2026-01-22T10:00:00Z",
+      "href": "/player/le-royaume-des-contes-cigale-fourmi",
+      "source": {
+        "id": "ep-cigale_565BFFb"
+      }
+    },
+    {
+      "id": "ep-peste_565BFFb",
+      "type": "PODCAST",
+      "title": "Les animaux malades de la peste",
+      "duration": 710,
+      "publishedAt": "2026-01-29T10:00:00Z",
+      "href": "/player/le-royaume-des-contes-animaux-peste",
+      "source": {
+        "id": "ep-peste_565BFFb"
+      }
+    }
+  ],
+  "version": "0.9.1"
+}

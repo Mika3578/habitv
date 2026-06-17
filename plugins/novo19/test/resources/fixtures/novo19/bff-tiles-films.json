@@ -1,6 +1,16 @@
 {
   "tiles": [
     {
+      "id": "film-inferno_565BFFb",
+      "type": "VOD",
+      "title": "Inferno",
+      "duration": 7200,
+      "href": "/details/inferno",
+      "source": {
+        "id": "inferno_565BFFb"
+      }
+    },
+    {
       "id": "film-plan_565BFFb",
       "type": "VOD",
       "title": "Un plan d'enfer",

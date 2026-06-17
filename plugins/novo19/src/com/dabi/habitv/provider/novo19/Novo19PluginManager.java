@@ -24,7 +24,6 @@ public class Novo19PluginManager extends BasePluginWithProxy implements PluginPr
 
 	private final Novo19CatalogClient catalogClient;
 
-
 	public Novo19PluginManager() {
 		this.catalogClient = new Novo19CatalogClient(this);
 	}
@@ -47,9 +46,13 @@ public class Novo19PluginManager extends BasePluginWithProxy implements PluginPr
 			final Novo19BffPage categoriesPage = catalogClient.fetchPageByPublicPath("categories");
 			final CategoryDTO root = Novo19CatalogMapper.buildRootCategory();
 			for (final Novo19Rail rail : categoriesPage.getRails()) {
-				final CategoryDTO section = buildSectionFromRail(rail, diagnostics);
-				if (section != null && !section.getSubCategories().isEmpty()) {
-					root.addSubCategory(section);
+				if (Novo19PathRules.isGenericCatalogueSectionTitle(rail.getTitle())) {
+					addProgramsFromRail(root, rail, diagnostics);
+				} else {
+					final CategoryDTO section = buildSectionFromRail(rail, diagnostics);
+					if (section != null && !section.getSubCategories().isEmpty()) {
+						root.addSubCategory(section);
+					}
 				}
 			}
 			if (!root.getSubCategories().isEmpty()) {
@@ -79,7 +82,9 @@ public class Novo19PluginManager extends BasePluginWithProxy implements PluginPr
 		diagnostics.setAssetId(category.getParameter(Novo19Conf.PARAMETER_ASSET_ID));
 		try {
 			final Novo19BffPage page = catalogClient.fetchPageByPublicUrl(category.getId());
-			final List<Novo19Tile> railTiles = loadEpisodeRailTiles(page, diagnostics);
+			ensureContentKind(category, page);
+			final List<Novo19Tile> railTiles = shouldLoadEpisodeRails(category, page)
+					? loadEpisodeRailTiles(page, diagnostics) : java.util.Collections.<Novo19Tile>emptyList();
 			final Set<EpisodeDTO> episodes = Novo19CatalogMapper.mapEpisodes(category, page, railTiles);
 			diagnostics.setCreatedItems(episodes.size());
 			logDiagnostics(diagnostics);
@@ -111,6 +116,21 @@ public class Novo19PluginManager extends BasePluginWithProxy implements PluginPr
 		return DownloadableState.IMPOSSIBLE;
 	}
 
+	private void addProgramsFromRail(final CategoryDTO parent, final Novo19Rail rail,
+			final Novo19Diagnostics diagnostics) {
+		if (rail == null || StringUtils.isEmpty(rail.getSrc())) {
+			return;
+		}
+		final Novo19Diagnostics tileDiagnostics = new Novo19Diagnostics("rail-tiles");
+		tileDiagnostics.setSourcePath(rail.getSrc());
+		final List<Novo19Tile> tiles = Novo19Pagination.loadTiles(rail.getSrc(), catalogClient::fetchTilesJson,
+				tileDiagnostics);
+		for (final Novo19Tile tile : tiles) {
+			addProgramTile(parent, tile);
+		}
+		logDiagnostics(tileDiagnostics);
+	}
+
 	private CategoryDTO buildSectionFromRail(final Novo19Rail rail, final Novo19Diagnostics diagnostics) {
 		if (rail == null || StringUtils.isEmpty(rail.getSrc())) {
 			return null;
@@ -122,17 +142,20 @@ public class Novo19PluginManager extends BasePluginWithProxy implements PluginPr
 		final List<Novo19Tile> tiles = Novo19Pagination.loadTiles(rail.getSrc(), catalogClient::fetchTilesJson,
 				tileDiagnostics);
 		for (final Novo19Tile tile : tiles) {
-			if (Novo19PathRules.isProgramTileType(tile.getType())) {
-				final CategoryDTO program = Novo19CatalogMapper.buildProgramCategory(tile);
-				enrichProgramWithSeasons(program);
-				section.addSubCategory(program);
-			} else if ("COLLECTION".equals(tile.getType()) && !StringUtils.isEmpty(tile.getHref())
-					&& tile.getHref().startsWith("/details/")) {
-				section.addSubCategory(Novo19CatalogMapper.buildProgramCategory(tile));
-			}
+			addProgramTile(section, tile);
 		}
 		logDiagnostics(tileDiagnostics);
 		return section;
+	}
+
+	private void addProgramTile(final CategoryDTO parent, final Novo19Tile tile) {
+		if (Novo19PathRules.isProgramTileType(tile.getType())) {
+			final CategoryDTO program = Novo19CatalogMapper.buildProgramCategory(tile);
+			enrichProgramWithSeasons(program);
+			parent.addSubCategory(program);
+		} else if (Novo19PathRules.isCollectionProgramTile(tile)) {
+			parent.addSubCategory(Novo19CatalogMapper.buildProgramCategory(tile));
+		}
 	}
 
 	private void enrichProgramWithSeasons(final CategoryDTO program) {
@@ -149,10 +172,33 @@ public class Novo19PluginManager extends BasePluginWithProxy implements PluginPr
 		}
 	}
 
+	private static void ensureContentKind(final CategoryDTO category, final Novo19BffPage page) {
+		if (!StringUtils.isEmpty(category.getParameter(Novo19Conf.PARAMETER_CONTENT_KIND))) {
+			return;
+		}
+		if (Novo19CatalogMapper.isPodcastDetailPage(page)) {
+			category.addParameter(Novo19Conf.PARAMETER_CONTENT_KIND, Novo19Conf.CONTENT_KIND_PODCAST);
+			category.addParameter(Novo19Conf.PARAMETER_AUDIO_CONTENT, "true");
+		}
+	}
+
+	private static boolean shouldLoadEpisodeRails(final CategoryDTO category, final Novo19BffPage page) {
+		final String contentKind = category.getParameter(Novo19Conf.PARAMETER_CONTENT_KIND);
+		if (Novo19Conf.CONTENT_KIND_FILM.equals(contentKind)) {
+			return false;
+		}
+		if (Novo19Conf.CONTENT_KIND_PROGRAM.equals(contentKind) && !page.getSeasons().isEmpty()) {
+			return false;
+		}
+		return Novo19Conf.CONTENT_KIND_COLLECTION.equals(contentKind)
+				|| Novo19Conf.CONTENT_KIND_PODCAST.equals(contentKind)
+				|| (Novo19Conf.CONTENT_KIND_PROGRAM.equals(contentKind) && page.getSeasons().isEmpty());
+	}
+
 	private List<Novo19Tile> loadEpisodeRailTiles(final Novo19BffPage page, final Novo19Diagnostics diagnostics) {
 		final Set<Novo19Tile> tiles = new LinkedHashSet<>();
 		for (final Novo19Rail rail : page.getRails()) {
-			if (StringUtils.isEmpty(rail.getSrc())) {
+			if (StringUtils.isEmpty(rail.getSrc()) || Novo19PathRules.isRecommendationRailSrc(rail.getSrc())) {
 				continue;
 			}
 			final Novo19Diagnostics railDiagnostics = new Novo19Diagnostics("episode-rail");

@@ -18,8 +18,16 @@ public final class Novo19Tile {
 
 	private final String assetId;
 
+	private final String publishedAt;
+
 	public Novo19Tile(final String id, final String type, final String title, final String subtitle,
 			final String description, final Long durationSeconds, final String href, final String assetId) {
+		this(id, type, title, subtitle, description, durationSeconds, href, assetId, null);
+	}
+
+	public Novo19Tile(final String id, final String type, final String title, final String subtitle,
+			final String description, final Long durationSeconds, final String href, final String assetId,
+			final String publishedAt) {
 		this.id = id;
 		this.type = type;
 		this.title = title;
@@ -28,6 +36,7 @@ public final class Novo19Tile {
 		this.durationSeconds = durationSeconds;
 		this.href = href;
 		this.assetId = assetId;
+		this.publishedAt = publishedAt;
 	}
 
 	public String getId() {
@@ -60,6 +69,10 @@ public final class Novo19Tile {
 
 	public String getAssetId() {
 		return assetId;
+	}
+
+	public String getPublishedAt() {
+		return publishedAt;
 	}
 
 }

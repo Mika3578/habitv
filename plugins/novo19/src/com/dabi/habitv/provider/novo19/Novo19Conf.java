@@ -29,6 +29,14 @@ public final class Novo19Conf {
 
 	public static final String CONTENT_KIND_SEASON = "season";
 
+	public static final String CONTENT_KIND_PODCAST = "podcast";
+
+	public static final String PARAMETER_AUDIO_CONTENT = "audioContent";
+
+	public static final String PARAMETER_PUBLISHED_AT = "publishedAt";
+
+	public static final String PARAMETER_DESCRIPTION = "description";
+
 	public static final String DOWNLOAD_UNAVAILABLE_MESSAGE = "This replay is currently unavailable or not supported. See logs for details.";
 
 	public static final int MAX_PAGINATION_PAGES = 25;

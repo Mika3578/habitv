@@ -129,7 +129,8 @@ final class Novo19PageParser {
 			}
 		}
 		return new Novo19Tile(textValue(tileNode, "id"), type, textValue(tileNode, "title"),
-				textValue(tileNode, "subtitle"), textValue(tileNode, "description"), duration, href, assetId);
+				textValue(tileNode, "subtitle"), textValue(tileNode, "description"), duration, href, assetId,
+				textValue(tileNode, "publishedAt"));
 	}
 
 	private static String resolveAssetId(final JsonNode tileNode) {
