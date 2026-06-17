@@ -6,8 +6,8 @@ complement, but do not replace, the human review process.
 
 ## Agent rules metadata
 
-* **Version:** 1.5.1
-* **Last updated:** 2026-05-31
+* **Version:** 1.6.0
+* **Last updated:** 2026-06-17
 * **Maintainer:** repository maintainer
 * **Scope:** Habitv AI-assisted development workflow
 * **Canonical source:** `AGENTS.md`
@@ -2709,6 +2709,44 @@ Track future work in [`docs/modernization-backlog.md`](docs/modernization-backlo
 instead of bloating `AGENTS.md`. Categories: build blockers; security;
 dependencies; CI; providers; metadata; external tools; packaging; Java
 migration; documentation; cleanup/removal.
+
+### 18.20 Content-agnostic provider code rule
+
+Provider implementations must remain **content-agnostic**.
+
+Production code under `plugins/**/src/**` must **not** hardcode:
+
+- programme, series, film, episode, or podcast titles;
+- content slugs such as `/details/{specific-programme}`;
+- asset identifiers for individual catalogue items;
+- rail or section UUIDs for individual catalogue items;
+- programme-to-theme mappings for named content;
+- one-off conditions for individual catalogue items;
+- temporary media or pagination URLs tied to a single item.
+
+Named real-world content may appear only in **sanitized offline fixtures**,
+**regression tests**, and **research documentation** outside production
+source trees.
+
+Catalogue hierarchy and playback resolution must be derived from current
+provider metadata: page, rail, tile, and content types; canonical URLs;
+stable IDs returned by the provider; categories, genres, themes, and
+subtitles; seasons and episode metadata; rail `src`, pagination, and route
+templates.
+
+Structural exclusions must be generic — for example recommendation rails,
+personal libraries, live player routes, or curated-selection banners — not
+named programmes.
+
+Any unavoidable provider-wide constant must represent a **stable service
+contract** (section label, public landing path, live channel asset id), not
+an individual catalogue item.
+
+Add or maintain a guard test that fails when fixture-specific titles,
+slugs, asset ids, or section UUIDs appear in provider production code.
+
+See also [`docs/provider-policy.md`](docs/provider-policy.md#content-agnostic-provider-code)
+and [`plugins/AGENTS.md`](plugins/AGENTS.md).
 
 ### 18.19 Habitv task final report
 

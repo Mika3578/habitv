@@ -174,6 +174,31 @@ more detail in the current conversation.
 
 Canonical rule: `AGENTS.md` Section 20.14.
 
+## Content-agnostic provider code
+
+Provider production code must remain content-agnostic. See `AGENTS.md`
+Section 18.20.
+
+**Forbidden in `plugins/**/src/**`:**
+
+- hardcoded programme, episode, film, or podcast titles;
+- content slugs such as `/details/{specific-programme}`;
+- individual asset identifiers, rail ids, or section UUIDs;
+- one-off mappings or conditions for named catalogue items.
+
+**Allowed:**
+
+- stable service-contract constants (public landing paths, live channel
+  asset id, top-level section labels returned by the provider UI);
+- generic structural rules (recommendation rails, season rails, tile types,
+  pagination templates).
+
+Named real-world content belongs in offline fixtures, regression tests, and
+sanitized research notes — not in production provider logic.
+
+Guard tests should fail when fixture-specific identities leak into production
+source trees.
+
 ## Runtime diagnostics
 
 Short root-cause messages for expected provider failures; avoid noisy stack

@@ -25,6 +25,8 @@ and clear status tracking.
   (site authentication, protected replay — no secrets in repo).
 - Provider **public communication safety** (20.14): high-level PR/commit text;
   see [`docs/provider-policy.md`](../../docs/provider-policy.md#public-communication-safety).
+- **Content-agnostic provider code** (18.20): no hardcoded catalogue identities
+  in `plugins/**/src/**`; generic metadata-driven discovery only.
 - End tasks with **Habitv final report** (18.19).
 
 **Canonical reference:** [`docs/provider-policy.md`](../../docs/provider-policy.md),

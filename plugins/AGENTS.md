@@ -34,6 +34,10 @@ Full policy: [`docs/provider-policy.md`](../docs/provider-policy.md) and
 - Keep provider **public text** high-level (Section 20.14); see
   [`docs/provider-policy.md`](../docs/provider-policy.md#public-communication-safety).
 - Keep changes scoped to one provider or plugin module when possible.
+- **Content-agnostic production code** (root `AGENTS.md` §18.20): never
+  hardcode individual programme titles, slugs, asset ids, rail/section UUIDs,
+  or one-off mappings in `plugins/**/src/**`; use provider metadata and
+  generic structural rules; keep named content in fixtures/tests only.
 - No secrets, binaries, or manual JAXB/XML generated-file edits unless
   explicitly required (root `AGENTS.md` Sections 15.9, 15.12–15.13).
 
