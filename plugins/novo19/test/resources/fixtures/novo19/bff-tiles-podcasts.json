@@ -1,0 +1,26 @@
+{
+  "tiles": [
+    {
+      "id": "podcast-royaume_565BFFb",
+      "type": "PODCAST",
+      "title": "Le royaume des contes",
+      "description": "Des contes pour tous",
+      "href": "/details/le-royaume-des-contes",
+      "source": {
+        "provider": "redbee",
+        "type": "PODCAST",
+        "id": "podcast-royaume_565BFFb"
+      }
+    },
+    {
+      "id": "cuisinons-lhistoire_565BFFb",
+      "type": "SERIE",
+      "title": "Cuisinons l'histoire",
+      "href": "/details/cuisinons-l-histoire",
+      "source": {
+        "id": "cuisinons-lhistoire_565BFFb"
+      }
+    }
+  ],
+  "version": "0.9.1"
+}

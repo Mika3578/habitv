@@ -1,0 +1,28 @@
+{
+  "tiles": [
+    {
+      "id": "film-inferno_565BFFb",
+      "type": "VOD",
+      "title": "Inferno",
+      "duration": 7200,
+      "href": "/details/inferno",
+      "source": {
+        "id": "inferno_565BFFb"
+      }
+    },
+    {
+      "id": "film-plan_565BFFb",
+      "type": "VOD",
+      "title": "Un plan d'enfer",
+      "subtitle": "Policiers / Thrillers",
+      "duration": 5196,
+      "href": "/details/un-plan-d-enfer",
+      "source": {
+        "provider": "redbee",
+        "type": "MOVIE",
+        "id": "film-plan_565BFFb"
+      }
+    }
+  ],
+  "version": "0.9.1"
+}

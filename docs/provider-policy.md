@@ -174,6 +174,67 @@ more detail in the current conversation.
 
 Canonical rule: `AGENTS.md` Section 20.14.
 
+## Content-agnostic provider code
+
+Provider production code must remain content-agnostic. See `AGENTS.md`
+Section 18.20.
+
+**Forbidden in `plugins/**/src/**`:**
+
+- hardcoded programme, episode, film, or podcast titles;
+- content slugs such as `/details/{specific-programme}`;
+- individual asset identifiers, rail ids, or section UUIDs;
+- one-off mappings or conditions for named catalogue items.
+
+**Allowed:**
+
+- stable service-contract constants (public landing paths, live channel
+  asset id, top-level section labels returned by the provider UI);
+- generic structural rules (recommendation rails, season rails, tile types,
+  pagination templates).
+
+Named real-world content belongs in offline fixtures, regression tests, and
+sanitized research notes — not in production provider logic.
+
+Guard tests should fail when fixture-specific identities leak into production
+source trees.
+
+## External provider references
+
+External provider projects may be used only as **behavioral and protocol
+references** unless code reuse is explicitly approved after license and
+attribution review.
+
+**Use external modules to learn:**
+
+- site structure and navigation;
+- likely API or page endpoints;
+- pagination and playback delegation patterns;
+- common failure modes.
+
+**Do not treat external code as authoritative.** It may be incomplete, stale,
+content-specific, or target different runtime requirements.
+
+**Production rules:**
+
+- do not copy or translate external source into Habitv provider code;
+- do not hardcode catalogue items, programme names, slugs, asset ids, section
+  UUIDs, or temporary URLs from external projects;
+- verify every endpoint and structural assumption against the current official
+  provider service;
+- cover verified behavior with deterministic offline fixtures;
+- derive catalogue hierarchy from current provider metadata;
+- record external license and provenance when external work informs design;
+- **GPL code must not be copied** without an explicit compatibility and
+  attribution decision;
+- prefer official provider sources over third-party implementations.
+
+Named real-world content belongs in fixtures, tests, and sanitized research
+notes — not in `plugins/**/src/**`.
+
+Canonical rule: `AGENTS.md` Section 18.21 (content-agnostic baseline:
+Section 18.20).
+
 ## Runtime diagnostics
 
 Short root-cause messages for expected provider failures; avoid noisy stack

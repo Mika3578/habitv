@@ -1,0 +1,4 @@
+provider=novo19
+network=disabled
+site=https://novo19.ouest-france.fr
+catalogueSource=bff-json

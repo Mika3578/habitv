@@ -1,0 +1,18 @@
+{
+  "page": {
+    "type": "PLAYER",
+    "id": "bucheron-un-metier-a-hauts-risques-chantiers-risques-face-a-la-crise",
+    "title": "Chantiers risqués face à la crise",
+    "content": {
+      "id": "OF-00000661-03-0012_565BFFb",
+      "type": "EPISODE",
+      "title": "Chantiers risqués face à la crise",
+      "source": {
+        "provider": "redbee",
+        "type": "EPISODE",
+        "id": "OF-00000661-03-0012_565BFFb"
+      }
+    }
+  },
+  "version": "0.9.1"
+}

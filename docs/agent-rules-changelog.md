@@ -2,6 +2,38 @@
 
 Version history for Habitv AI agent rules. Canonical source: [`AGENTS.md`](../AGENTS.md).
 
+## 2026-06-17 — v1.6.1
+
+### Added
+
+* External provider reference rule (`AGENTS.md` §18.21).
+* Provider policy section
+  [`external-provider-references`](provider-policy.md#external-provider-references).
+* `plugins/AGENTS.md` and `.cursor/rules/habitv-providers.mdc` mirrors for
+  §18.21.
+
+### Reason
+
+* Govern use of third-party provider implementations (for example Catch-up TV &
+  More) as behavioral research only; forbid copy/translate; require official
+  verification, offline fixtures, license/provenance review, and explicit GPL
+  reuse approval.
+
+## 2026-06-17 — v1.6.0
+
+### Added
+
+* Content-agnostic provider code rule (`AGENTS.md` §18.20).
+* Provider policy section
+  [`content-agnostic-provider-code`](provider-policy.md#content-agnostic-provider-code).
+* `plugins/AGENTS.md` and `.cursor/rules/habitv-providers.mdc` mirrors for
+  §18.20.
+
+### Reason
+
+* Prevent provider plugins from embedding fixture-specific programme slugs,
+  asset ids, or one-off catalogue mappings in production code.
+
 ## 2026-05-31 — v1.5.1
 
 ### Added

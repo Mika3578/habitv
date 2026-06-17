@@ -1,0 +1,17 @@
+{
+  "tiles": [
+    {
+      "id": "cites-medievales_565BFFb",
+      "type": "SERIE",
+      "title": "Cités médiévales",
+      "href": "/details/cites-medievales",
+      "source": {
+        "id": "cites-medievales_565BFFb"
+      }
+    }
+  ],
+  "more": {
+    "href": "/voir-plus/rail/documentaires-et-magazines/histoire"
+  },
+  "version": "0.9.1"
+}

@@ -1,0 +1,23 @@
+{
+  "assetId": "OF-00000661-03-0012_565BFFb",
+  "formats": [
+    {
+      "format": "HLS",
+      "drm": {
+        "com.widevine.alpha": {
+          "licenseServerUrl": "https://exposure.api.redbee.live/v2/license/customer/OuestFrance/businessunit/novoplus/widevine"
+        }
+      },
+      "mediaLocator": "https://cdn.example.test/ouestfrance/novoplus/assets/OF-00000661-03-0012_565BFFb/materials/lwnDnboUFw_565BFFb/vod-idx.ism/.m3u8"
+    },
+    {
+      "format": "DASH",
+      "drm": {
+        "com.microsoft.playready": {
+          "licenseServerUrl": "https://exposure.api.redbee.live/v2/license/customer/OuestFrance/businessunit/novoplus/playready"
+        }
+      },
+      "mediaLocator": "https://cdn.example.test/ouestfrance/novoplus/assets/OF-00000661-03-0012_565BFFb/materials/lwnDnboUFw_565BFFb/vod-idx.ism/.mpd"
+    }
+  ]
+}

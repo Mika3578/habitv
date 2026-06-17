@@ -1,0 +1,19 @@
+{
+  "page": {
+    "type": "PLAYER",
+    "id": "on-a-de-l-info-emission-du-16-06-26",
+    "title": "Emission du 16-06-26",
+    "content": {
+      "id": "news-episode_565BFFb",
+      "type": "EPISODE",
+      "title": "Emission du 16-06-26",
+      "href": "/player/on-a-de-l-info-emission-du-16-06-26",
+      "source": {
+        "provider": "redbee",
+        "type": "EPISODE",
+        "id": "news-episode_565BFFb"
+      }
+    }
+  },
+  "version": "0.9.1"
+}

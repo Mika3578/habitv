@@ -1,0 +1,19 @@
+{
+  "page": {
+    "type": "DETAILS",
+    "id": "un-plan-d-enfer",
+    "title": "Un plan d'enfer",
+    "content": {
+      "id": "film-plan_565BFFb",
+      "type": "VOD",
+      "title": "Un plan d'enfer",
+      "duration": 5196,
+      "href": "/player/un-plan-d-enfer",
+      "source": {
+        "id": "film-plan_565BFFb"
+      }
+    },
+    "rails": []
+  },
+  "version": "0.9.1"
+}

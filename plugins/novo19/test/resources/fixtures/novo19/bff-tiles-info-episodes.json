@@ -1,0 +1,26 @@
+{
+  "tiles": [
+    {
+      "id": "news-episode_565BFFb",
+      "type": "EPISODE",
+      "title": "Emission du 16-06-26",
+      "href": "/player/on-a-de-l-info-emission-du-16-06-26",
+      "source": {
+        "id": "news-episode_565BFFb"
+      }
+    },
+    {
+      "id": "news-episode-dup_565BFFb",
+      "type": "EPISODE",
+      "title": "Emission du 16-06-26",
+      "href": "/player/on-a-de-l-info-emission-du-16-06-26",
+      "source": {
+        "id": "news-episode-dup_565BFFb"
+      }
+    }
+  ],
+  "more": {
+    "href": "/voir-plus/rail/details/on-a-de-l-info/info-episodes"
+  },
+  "version": "0.9.1"
+}

@@ -1,0 +1,17 @@
+{
+  "tiles": [
+    {
+      "id": "serie-fbi_565BFFb",
+      "type": "SERIE",
+      "title": "FBI : Portés disparus",
+      "subtitle": "Policiers / Thrillers",
+      "href": "/details/fbi-portes-disparus",
+      "source": {
+        "provider": "redbee",
+        "type": "TV_SHOW",
+        "id": "serie-fbi_565BFFb"
+      }
+    }
+  ],
+  "version": "0.9.1"
+}

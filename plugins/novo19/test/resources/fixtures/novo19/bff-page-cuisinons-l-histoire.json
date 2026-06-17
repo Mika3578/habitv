@@ -1,0 +1,28 @@
+{
+  "page": {
+    "type": "DETAILS",
+    "id": "cuisinons-lhistoire_565BFFb",
+    "title": "Cuisinons l'histoire",
+    "content": {
+      "id": "cuisinons-lhistoire_565BFFb",
+      "type": "SERIE",
+      "title": "Cuisinons l'histoire",
+      "source": {
+        "id": "cuisinons-lhistoire_565BFFb"
+      }
+    },
+    "rails": [
+      {
+        "id": "cuisinons-episodes",
+        "title": "Tous les épisodes",
+        "src": "/api/1/public/frontends/web/pages/details/cuisinons-l-histoire/sections/cuisinons-episodes/tiles"
+      },
+      {
+        "id": "reco",
+        "title": "Vous aimerez aussi",
+        "src": "/api/1/public/frontends/web/pages/details/cuisinons-l-histoire/sections/reco/tiles"
+      }
+    ]
+  },
+  "version": "0.9.1"
+}

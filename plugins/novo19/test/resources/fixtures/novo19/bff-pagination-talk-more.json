@@ -1,0 +1,15 @@
+{
+  "tiles": [
+    {
+      "id": "talk-paginated-s1e184_565BFFb",
+      "type": "EPISODE",
+      "title": "Emission du 20-05-26",
+      "subtitle": "S1E184",
+      "href": "/player/on-a-du-nouveau-emission-du-20-05-26",
+      "source": {
+        "id": "talk-paginated-s1e184_565BFFb"
+      }
+    }
+  ],
+  "version": "0.9.1"
+}

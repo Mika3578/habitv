@@ -1,0 +1,14 @@
+{
+  "tiles": [
+    {
+      "id": "info-mag-episode_565BFFb",
+      "type": "EPISODE",
+      "title": "Mag du 10-06-26",
+      "href": "/player/on-a-de-l-info-le-mag-mag-du-10-06-26",
+      "source": {
+        "id": "info-mag-episode_565BFFb"
+      }
+    }
+  ],
+  "version": "0.9.1"
+}

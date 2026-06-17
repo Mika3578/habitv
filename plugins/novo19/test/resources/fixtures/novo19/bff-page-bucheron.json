@@ -1,0 +1,38 @@
+{
+  "page": {
+    "type": "DETAILS",
+    "id": "18e2900d-e0fb-4282-8110-9505ab91e1e9_565BFFb",
+    "title": "Bûcheron, un métier à hauts risques",
+    "content": {
+      "id": "18e2900d-e0fb-4282-8110-9505ab91e1e9_565BFFb",
+      "type": "SERIE",
+      "title": "Bûcheron, un métier à hauts risques",
+      "category": [
+        "Société",
+        "Documentaire",
+        "Docs et Magazines"
+      ],
+      "source": {
+        "id": "18e2900d-e0fb-4282-8110-9505ab91e1e9_565BFFb"
+      }
+    },
+    "rails": [
+      {
+        "id": "bucheron-saison-3",
+        "title": "Saison 3",
+        "src": "/api/1/public/frontends/web/pages/BFF%7Casset-details-serie,bucheron-un-metier-a-hauts-risques/sections/bucheron-saison-3/tiles"
+      },
+      {
+        "id": "bucheron-saison-2",
+        "title": "Saison 2",
+        "src": "/api/1/public/frontends/web/pages/BFF%7Casset-details-serie,bucheron-un-metier-a-hauts-risques/sections/bucheron-saison-2/tiles"
+      },
+      {
+        "id": "reco",
+        "title": "Vous aimerez aussi",
+        "src": "/api/1/public/frontends/web/pages/BFF%7Casset-details-serie,bucheron-un-metier-a-hauts-risques/sections/reco/tiles"
+      }
+    ]
+  },
+  "version": "0.9.1"
+}

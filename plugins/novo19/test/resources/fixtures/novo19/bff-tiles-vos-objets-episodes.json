@@ -1,0 +1,50 @@
+{
+  "tiles": [
+    {
+      "id": "vo-ep-01_565BFFb",
+      "type": "EPISODE",
+      "title": "Episode 1",
+      "subtitle": "S1E1",
+      "duration": 2400,
+      "href": "/player/vos-objets-valent-de-l-or-episode-1",
+      "source": { "id": "vo-ep-01_565BFFb" }
+    },
+    {
+      "id": "vo-ep-02_565BFFb",
+      "type": "EPISODE",
+      "title": "Episode 2",
+      "subtitle": "S1E2",
+      "duration": 2380,
+      "href": "/player/vos-objets-valent-de-l-or-episode-2",
+      "source": { "id": "vo-ep-02_565BFFb" }
+    },
+    {
+      "id": "vo-ep-03_565BFFb",
+      "type": "EPISODE",
+      "title": "Episode 3",
+      "subtitle": "S1E3",
+      "duration": 2410,
+      "href": "/player/vos-objets-valent-de-l-or-episode-3",
+      "source": { "id": "vo-ep-03_565BFFb" }
+    },
+    {
+      "id": "vo-ep-04_565BFFb",
+      "type": "EPISODE",
+      "title": "Episode 4",
+      "subtitle": "S1E4",
+      "duration": 2395,
+      "href": "/player/vos-objets-valent-de-l-or-episode-4",
+      "source": { "id": "vo-ep-04_565BFFb" }
+    },
+    {
+      "id": "vo-ep-05_565BFFb",
+      "type": "EPISODE",
+      "title": "Episode 5",
+      "subtitle": "S1E5",
+      "duration": 2420,
+      "href": "/player/vos-objets-valent-de-l-or-episode-5",
+      "source": { "id": "vo-ep-05_565BFFb" }
+    }
+  ],
+  "version": "0.9.1"
+}

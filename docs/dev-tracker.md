@@ -30,11 +30,11 @@ automatic category behavior, provider summary, doc map).
 | Category | Count |
 |---------|------:|
 | ✅ Delivered | **13** |
-| 🟡 In progress | **7** |
+| 🟡 In progress | **8** |
 | 🔵 Proposed | **1** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
-| **Total work items** | **21** |
+| **Total work items** | **22** |
 
 ---
 
@@ -49,6 +49,7 @@ automatic category behavior, provider summary, doc map).
 | 🔗 `legacy-url-migration` — Legacy URL migration (free.fr / SVN / FTP) | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 📦 `static-repo-publish` — Static artifact repository publication | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🟡 In progress | 🟡 P2 | `█████████████░░░░░░░` 65% |
+| 📺 `provider-novo19` — NOVO19 public replay provider | 🟡 In progress | 🟡 P2 | `█████████████████░░░` 85% |
 | 🎬 `ytdlp-migration` — `youtube-dl` → `yt-dlp` migration | 🟡 In progress | 🟡 P2 | `███████████████░░░░░` 75% |
 | 🩺 `ytdlp-runtime-diagnostics` — yt-dlp Windows runtime diagnostics | 🟡 In progress | 🟡 P2 | `██████████████████░░` 90% |
 | 🖼️ `javafx-modernization` — JavaFX & runtime packaging modernization | 🔵 Proposed | 🟡 P2 | `███░░░░░░░░░░░░░░░░░` 15% |
@@ -322,7 +323,7 @@ resolution matches the latest published SNAPSHOT builds.
 | **Progress** | `█████████████░░░░░░░` 65% |
 | **Legacy code** | HBTV-006 |
 
-**Scope** — Inventory every plugin in `plugins/` (22 in the aggregator
+**Scope** — Inventory every plugin in `plugins/` (24 in the aggregator
 + `plugin-tester`); record current status (working, obsolete endpoint,
 renamed, broken parser). No code removal in this item.
 
@@ -348,7 +349,7 @@ mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Ds
 [`provider-inventory.md`](provider-inventory.md) for every plugin module
 plus historical references (`CStar` (ex `D17`), `nrj12`, FranceTV/Pluzz,
 Kewego). An offline fixture policy and first local fixture baseline are
-now documented for `6play`, `canalPlus`, `francetv` (ex `pluzz`), `arte`, and `youtube`
+now documented for `6play`, `canalPlus`, `francetv` (ex `pluzz`), `arte`, `youtube`, and `novo19`
 without rewriting providers. PR #137 adds API-first public hub discovery
 (Sport, Franceinfo, partner hubs); `francetv` plugin version `4.1.3-SNAPSHOT`.
 Default `mvn test` skips live
@@ -363,6 +364,52 @@ provider drift, documented in inventory. This item remains open for
 broader fixture capture and dedicated cleanup/rewrite PRs. See also
 [`automatic-category-download.md`](automatic-category-download.md).
 Risks `live-tests-flaky`, `provider-endpoints-dead`.
+
+---
+
+## 📺 `provider-novo19` — NOVO19 public replay provider
+
+| | |
+|---|---|
+| **Status** | 🟡 In progress |
+| **Priority** | 🟡 P2 |
+| **Progress** | `█████████████████░░░` 85% |
+| **Legacy code** | — |
+
+**Scope** — Add `plugins/novo19` for public replay catalogue browsing and
+replay/podcast download (series, films, news, talk, documentaries, podcasts).
+Exclude live direct, login, cookies, and personal rails. BFF catalogue search
+is a separate follow-up once Habitv search UX is defined.
+
+**Strategy**
+- BFF JSON at `https://novo19-bff.ouest-france.fr` for catalogue discovery.
+- Canonical public `novo19.ouest-france.fr` URLs as identifiers; fresh `assetId`
+  resolution from player/detail pages at download time.
+- RedBee anonymous session (memory only), HLS selection with DASH fallback,
+  delegation to yt-dlp via `FrameworkConf.YOUTUBE`.
+- Graceful empty results, sanitized diagnostics, and safe unavailable download response.
+
+**Acceptance criteria**
+- ✅ `plugins/novo19` registered in reactor with offline fixtures
+- ✅ Catalogue browsing (rails, seasons, pagination, duplicate suppression)
+- ✅ Replay and podcast download via RedBee + yt-dlp delegation
+- ✅ Deterministic offline tests (no live network in default lifecycle)
+- 🟡 PR merged to `develop`
+- 🟡 BFF catalogue search (`feat(novo19): add BFF catalogue search`) deferred
+
+**Validation**
+```bash
+mvn -B -ntp -pl plugins/novo19 -am test
+mvn -B -ntp -DskipTests verify
+mvn -B -ntp verify
+```
+
+**Related PRs** · `feat/provider-novo19` (pending)
+
+**Notes** — Catalog + replay download on `feat/provider-novo19`; live direct
+(`/player/novo19`) excluded. Follow-up: BFF search endpoint
+`/api/1/public/frontends/web/contents/search/16_9?query={term}` after search UX audit.
+See [`provider-inventory.md`](provider-inventory.md) NOVO19 section.
 
 ---
 

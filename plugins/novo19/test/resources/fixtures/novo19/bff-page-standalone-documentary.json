@@ -1,0 +1,17 @@
+{
+  "page": {
+    "type": "DETAILS",
+    "id": "standalone-documentary",
+    "title": "Standalone documentary",
+    "content": {
+      "id": "doc-standalone_565BFFb",
+      "type": "VOD",
+      "title": "Standalone documentary",
+      "href": "/player/standalone-documentary",
+      "source": {
+        "id": "doc-standalone_565BFFb"
+      }
+    }
+  },
+  "version": "0.9.1"
+}

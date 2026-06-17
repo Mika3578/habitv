@@ -1,0 +1,46 @@
+{
+  "page": {
+    "type": "RAILS",
+    "id": "documentaires-et-magazines",
+    "title": "Documentaires et magazines",
+    "rails": [
+      {
+        "id": "rail-catalog-master",
+        "type": "CAROUSEL",
+        "title": "Nos documentaires et magazines",
+        "src": "/api/1/public/frontends/web/pages/documentaires-et-magazines/sections/rail-catalog-master/tiles"
+      },
+      {
+        "id": "rail-histoire",
+        "type": "CAROUSEL",
+        "title": "Histoire",
+        "src": "/api/1/public/frontends/web/pages/documentaires-et-magazines/sections/rail-histoire/tiles"
+      },
+      {
+        "id": "rail-immersion",
+        "type": "CAROUSEL",
+        "title": "Immersion",
+        "src": "/api/1/public/frontends/web/pages/documentaires-et-magazines/sections/rail-immersion/tiles"
+      },
+      {
+        "id": "rail-societe",
+        "type": "CAROUSEL",
+        "title": "Société",
+        "src": "/api/1/public/frontends/web/pages/documentaires-et-magazines/sections/rail-societe/tiles"
+      },
+      {
+        "id": "rail-patrimoine",
+        "type": "CAROUSEL",
+        "title": "Patrimoine et découvertes",
+        "src": "/api/1/public/frontends/web/pages/documentaires-et-magazines/sections/rail-patrimoine/tiles"
+      },
+      {
+        "id": "rail-brut",
+        "type": "CAROUSEL",
+        "title": "La sélection Brut",
+        "src": "/api/1/public/frontends/web/pages/documentaires-et-magazines/sections/rail-brut/tiles"
+      }
+    ]
+  },
+  "version": "0.9.1"
+}

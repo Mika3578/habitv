@@ -1,0 +1,32 @@
+{
+  "page": {
+    "type": "DETAILS",
+    "id": "on-a-du-nouveau",
+    "title": "On a du nouveau",
+    "seasons": [
+      {
+        "title": "Saison 1",
+        "episodes": [
+          {
+            "id": "talk-s1e186_565BFFb",
+            "type": "EPISODE",
+            "title": "Emission du 22-05-26",
+            "subtitle": "S1E186",
+            "href": "/player/on-a-du-nouveau-emission-du-22-05-26",
+            "source": {
+              "id": "talk-s1e186_565BFFb"
+            }
+          }
+        ]
+      }
+    ],
+    "rails": [
+      {
+        "id": "talk-episodes",
+        "title": "Replays",
+        "src": "/api/1/public/frontends/web/pages/details/on-a-du-nouveau/sections/talk-episodes/tiles"
+      }
+    ]
+  },
+  "version": "0.9.1"
+}

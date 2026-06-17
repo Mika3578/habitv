@@ -1,0 +1,16 @@
+{
+  "data": {
+    "tiles": [
+      {
+        "id": "sample-episode_565BFFb",
+        "type": "VOD",
+        "title": "Sample episode",
+        "href": "/player/sample-episode",
+        "duration": 1800
+      }
+    ],
+    "more": {
+      "href": "/voir-plus/rail/details/sample/episodes"
+    }
+  }
+}

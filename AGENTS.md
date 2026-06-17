@@ -6,8 +6,8 @@ complement, but do not replace, the human review process.
 
 ## Agent rules metadata
 
-* **Version:** 1.5.1
-* **Last updated:** 2026-05-31
+* **Version:** 1.6.1
+* **Last updated:** 2026-06-17
 * **Maintainer:** repository maintainer
 * **Scope:** Habitv AI-assisted development workflow
 * **Canonical source:** `AGENTS.md`
@@ -2737,6 +2737,92 @@ Every completed Habitv task must end with:
 
 Section 16.25 is the generic minimum; Section 18.19 adds Habitv-specific
 fields; Section 19.25 adds maintainability fields.
+
+### 18.20 Content-agnostic provider code rule
+
+Provider implementations must remain **content-agnostic**.
+
+Production code under `plugins/**/src/**` must **not** hardcode:
+
+- programme, series, film, episode, or podcast titles;
+- content slugs such as `/details/{specific-programme}`;
+- asset identifiers for individual catalogue items;
+- rail or section UUIDs for individual catalogue items;
+- programme-to-theme mappings for named content;
+- one-off conditions for individual catalogue items;
+- temporary media or pagination URLs tied to a single item.
+
+Named real-world content may appear only in **sanitized offline fixtures**,
+**regression tests**, and **research documentation** outside production
+source trees.
+
+Catalogue hierarchy and playback resolution must be derived from current
+provider metadata: page, rail, tile, and content types; canonical URLs;
+stable IDs returned by the provider; categories, genres, themes, and
+subtitles; seasons and episode metadata; rail `src`, pagination, and route
+templates.
+
+Structural exclusions must be generic — for example recommendation rails,
+personal libraries, live player routes, or curated-selection banners — not
+named programmes.
+
+Any unavoidable provider-wide constant must represent a **stable service
+contract** (section label, public landing path, live channel asset id), not
+an individual catalogue item.
+
+Add or maintain a guard test that fails when fixture-specific titles,
+slugs, asset ids, or section UUIDs appear in provider production code.
+
+See also [`docs/provider-policy.md`](docs/provider-policy.md#content-agnostic-provider-code)
+and [`plugins/AGENTS.md`](plugins/AGENTS.md).
+
+### 18.21 External provider reference rule
+
+External provider projects — for example community Kodi add-ons such as
+[Catch-up TV & More](https://github.com/Catch-up-TV-and-More/plugin.video.catchuptvandmore)
+— may be used **only** as behavioral and protocol references unless code
+reuse is explicitly approved after license and attribution review.
+
+When researching NOVO19 or future French providers, inspect relevant channel
+modules only to understand:
+
+- public site structure;
+- catalogue and navigation flow;
+- page and API endpoints;
+- category, program, season, and episode relationships;
+- pagination;
+- playback delegation;
+- failure handling.
+
+Treat external implementations as **non-authoritative**. They may omit content,
+use stale ids or URLs, hardcode provider-specific assets, or target different
+product requirements (for example DRM playback).
+
+Provider production code must remain **content-agnostic** and must **not**
+copy, translate, or hardcode external catalogue items, programme names, slugs,
+asset ids, section identifiers, or temporary URLs.
+
+Every endpoint and structural assumption must be verified against the **current
+official provider service** and covered by **deterministic offline fixtures**.
+
+Additional requirements:
+
+- named real-world content is allowed only in fixtures, tests, and sanitized
+  research notes outside production source trees;
+- provider logic must derive hierarchy from current provider metadata;
+- external license and provenance must be recorded when external projects
+  inform design or validation;
+- **GPL code must not be copied into Habitv** without an explicit
+  compatibility and attribution decision;
+- official provider sources take priority over third-party implementations.
+
+For NOVO19 specifically, do not inherit external limitations such as skipping
+podcasts, omitting rail types, or driving production logic from individual
+catalogue items. Stable service-contract constants (public landing paths,
+top-level section labels, live channel asset id) remain allowed under
+Section 18.20 when validated against the official service.
+
+See also [`docs/provider-policy.md`](docs/provider-policy.md#external-provider-references).
 
 ---
 

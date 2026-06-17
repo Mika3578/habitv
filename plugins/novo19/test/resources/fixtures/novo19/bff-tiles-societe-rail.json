@@ -1,0 +1,14 @@
+{
+  "tiles": [
+    {
+      "id": "bucheron_565BFFb",
+      "type": "SERIE",
+      "title": "Bûcheron, un métier à hauts risques",
+      "href": "/details/bucheron-un-metier-a-hauts-risques",
+      "source": {
+        "id": "bucheron_565BFFb"
+      }
+    }
+  ],
+  "version": "0.9.1"
+}

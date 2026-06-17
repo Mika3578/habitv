@@ -1,0 +1,11 @@
+{
+  "config": {
+    "startPage": "/homepage",
+    "slugResolver": "/api/1/public/frontends/web/pages/by-path/",
+    "templates": {
+      "detailPage": "/details/{assetOrSlugId}",
+      "playerPage": "/player/{assetOrSlugId}"
+    }
+  },
+  "version": "0.9.1"
+}
