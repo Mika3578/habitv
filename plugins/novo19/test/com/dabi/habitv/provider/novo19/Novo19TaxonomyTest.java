@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
@@ -33,9 +32,63 @@ public class Novo19TaxonomyTest {
 				Novo19FixtureSupport.readFixture("bff-page-bucheron.json"), "fixture");
 		final Novo19Tile tile = new Novo19Tile("bucheron_565BFFb", "SERIE", "Bûcheron, un métier à hauts risques",
 				"Société", null, null, "/details/bucheron-un-metier-a-hauts-risques", "bucheron_565BFFb");
-		final Set<String> themes = Novo19TaxonomyMapper.resolveProgramThemes(tile, bucheron, null);
-		assertTrue(themes.contains("Société"));
-		assertFalse(themes.contains("Documentaire"));
+		final Set<String> carouselThemes = Novo19TaxonomyMapper.resolveProgramThemes(tile, bucheron, null);
+		assertTrue(carouselThemes.contains("Société"));
+		assertFalse(carouselThemes.contains("Documentaire"));
+		final Set<String> railThemes = Novo19TaxonomyMapper.resolveProgramThemes(tile, bucheron, "Société");
+		assertEquals(1, railThemes.size());
+		assertTrue(railThemes.contains("Société"));
+	}
+
+	@Test
+	public void themeRailDiscoveryDoesNotInheritUnrelatedContentCategories() throws Exception {
+		final Novo19BffPage elysee = Novo19PageParser.parsePageEnvelope(
+				Novo19FixtureSupport.readFixture("bff-page-elysee.json"), "fixture");
+		final Novo19Tile tile = new Novo19Tile("elysee-secrets_565BFFb", "VOD", "Elysée, les secrets d'un palais",
+				null, null, null, "/details/elysee-les-secrets-d-un-palais", "elysee-secrets_565BFFb");
+		final Set<String> immersionThemes = Novo19TaxonomyMapper.resolveProgramThemes(tile, elysee, "Immersion");
+		assertTrue(immersionThemes.contains("Immersion"));
+		assertFalse(immersionThemes.contains("Politique"));
+		assertFalse(immersionThemes.contains("Histoire"));
+	}
+
+	@Test
+	public void cuisinonsAppearsUnderPodcastsAndHistoireWithoutDuplicates() {
+		final Novo19PluginManager manager = new Novo19PluginManager(Novo19FixtureSupport.clientWithFixtures());
+		final CategoryDTO root = manager.findCategory().iterator().next();
+		final CategoryDTO podcasts = findChildByName(root, "Nos podcasts");
+		final CategoryDTO histoire = findChildByName(findChildByName(root, Novo19Conf.SECTION_DOCUMENTARIES),
+				"Histoire");
+		assertNotNull(podcasts);
+		assertNotNull(histoire);
+		assertNotNull(findChildByName(podcasts, "Cuisinons l'histoire"));
+		assertNotNull(findChildByName(histoire, "Cuisinons l'histoire"));
+		assertEquals(1, countProgramsNamed(podcasts, "Cuisinons l'histoire"));
+		assertEquals(1, countProgramsNamed(histoire, "Cuisinons l'histoire"));
+	}
+
+	@Test
+	public void cuisinonsAppearsUnderHistoire() {
+		cuisinonsAppearsUnderPodcastsAndHistoireWithoutDuplicates();
+	}
+
+	@Test
+	public void elyseeAppearsOnlyInEvidentifiedThemes() {
+		final Novo19PluginManager manager = new Novo19PluginManager(Novo19FixtureSupport.clientWithFixtures());
+		final CategoryDTO root = manager.findCategory().iterator().next();
+		final CategoryDTO documentaries = findChildByName(root, Novo19Conf.SECTION_DOCUMENTARIES);
+		assertNotNull(findChildByName(findChildByName(documentaries, "Histoire"),
+				"Elysée, les secrets d'un palais"));
+		assertNotNull(findChildByName(findChildByName(documentaries, "Politique"),
+				"Elysée, les secrets d'un palais"));
+		assertNotNull(findChildByName(findChildByName(documentaries, "Patrimoine et découvertes"),
+				"Elysée, les secrets d'un palais"));
+		assertNull(findChildByName(findChildByName(documentaries, "Immersion"),
+				"Elysée, les secrets d'un palais"));
+		assertNull(findChildByName(findChildByName(documentaries, "Société"),
+				"Elysée, les secrets d'un palais"));
+		assertEquals(1, countProgramsNamed(findChildByName(documentaries, "Histoire"),
+				"Elysée, les secrets d'un palais"));
 	}
 
 	@Test
@@ -46,16 +99,6 @@ public class Novo19TaxonomyTest {
 				new Novo19BffPage("DETAILS", "standalone", "Standalone documentary", null, null, null, null), null);
 		assertEquals(1, themes.size());
 		assertTrue(themes.contains(Novo19Conf.THEME_UNCLASSIFIED));
-	}
-
-	@Test
-	public void cuisinonsAppearsUnderHistoire() {
-		final Novo19PluginManager manager = new Novo19PluginManager(Novo19FixtureSupport.clientWithFixtures());
-		final CategoryDTO root = manager.findCategory().iterator().next();
-		final CategoryDTO histoire = findChildByName(findChildByName(root, Novo19Conf.SECTION_DOCUMENTARIES),
-				"Histoire");
-		assertNotNull(histoire);
-		assertNotNull(findChildByName(histoire, "Cuisinons l'histoire"));
 	}
 
 	@Test

@@ -23,6 +23,12 @@
         "src": "/api/1/public/frontends/web/pages/documentaires-et-magazines/sections/rail-societe/tiles"
       },
       {
+        "id": "rail-patrimoine",
+        "type": "CAROUSEL",
+        "title": "Patrimoine et découvertes",
+        "src": "/api/1/public/frontends/web/pages/documentaires-et-magazines/sections/rail-patrimoine/tiles"
+      },
+      {
         "id": "rail-brut",
         "type": "CAROUSEL",
         "title": "La sélection Brut",

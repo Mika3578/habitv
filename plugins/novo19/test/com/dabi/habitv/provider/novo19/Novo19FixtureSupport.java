@@ -68,6 +68,8 @@ final class Novo19FixtureSupport {
 					readFixture("bff-page-on-a-du-nouveau.json"));
 			responses.put(Novo19UrlBuilder.bffPageByPath("details/standalone-documentary"),
 					readFixture("bff-page-standalone-documentary.json"));
+			responses.put(Novo19UrlBuilder.bffPageByPath("details/elysee-les-secrets-d-un-palais"),
+					readFixture("bff-page-elysee.json"));
 			responses.put(Novo19UrlBuilder.bffPageByPath("details/cuisinons-l-histoire"),
 					readFixture("bff-page-cuisinons-l-histoire.json"));
 			responses.put(Novo19UrlBuilder.bffPageByPath("details/bucheron-un-metier-a-hauts-risques"),
@@ -85,6 +87,9 @@ final class Novo19FixtureSupport {
 			responses.put(Novo19UrlBuilder.bffAbsolutePath(
 					"/api/1/public/frontends/web/pages/documentaires-et-magazines/sections/rail-societe/tiles"),
 					readFixture("bff-tiles-societe-rail.json"));
+			responses.put(Novo19UrlBuilder.bffAbsolutePath(
+					"/api/1/public/frontends/web/pages/documentaires-et-magazines/sections/rail-patrimoine/tiles"),
+					readFixture("bff-tiles-patrimoine-rail.json"));
 			responses.put(Novo19UrlBuilder.bffAbsolutePath(
 					"/api/1/public/frontends/web/pages/details/cuisinons-l-histoire/sections/cuisinons-episodes/tiles"),
 					readFixture("bff-tiles-cuisinons-episodes.json"));

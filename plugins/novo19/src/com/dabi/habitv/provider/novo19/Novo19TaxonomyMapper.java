@@ -28,15 +28,21 @@ final class Novo19TaxonomyMapper {
 	static Set<String> resolveProgramThemes(final Novo19Tile discoveryTile, final Novo19BffPage detailPage,
 			final String railThemeHint) {
 		final Set<String> themes = new LinkedHashSet<String>();
-		if (detailPage != null) {
-			for (final String category : detailPage.getContentCategories()) {
-				addTheme(themes, category);
+		if (!StringUtils.isEmpty(railThemeHint)) {
+			addTheme(themes, railThemeHint);
+			if (discoveryTile != null) {
+				addTheme(themes, discoveryTile.getSubtitle());
+			}
+		} else {
+			if (detailPage != null) {
+				for (final String category : detailPage.getContentCategories()) {
+					addTheme(themes, category);
+				}
+			}
+			if (discoveryTile != null) {
+				addTheme(themes, discoveryTile.getSubtitle());
 			}
 		}
-		if (discoveryTile != null) {
-			addTheme(themes, discoveryTile.getSubtitle());
-		}
-		addTheme(themes, railThemeHint);
 		if (themes.isEmpty()) {
 			themes.add(Novo19Conf.THEME_UNCLASSIFIED);
 		}

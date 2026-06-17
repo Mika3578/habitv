@@ -1,0 +1,23 @@
+{
+  "page": {
+    "type": "DETAILS",
+    "id": "elysee-secrets_565BFFb",
+    "title": "Elysée, les secrets d'un palais",
+    "content": {
+      "id": "elysee-secrets_565BFFb",
+      "type": "VOD",
+      "title": "Elysée, les secrets d'un palais",
+      "category": [
+        "Histoire",
+        "Politique",
+        "Docs et Magazines",
+        "Documentaire"
+      ],
+      "source": {
+        "id": "elysee-secrets_565BFFb"
+      }
+    },
+    "rails": []
+  },
+  "version": "0.9.1"
+}

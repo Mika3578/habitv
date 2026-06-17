@@ -1,0 +1,14 @@
+{
+  "tiles": [
+    {
+      "id": "elysee-secrets_565BFFb",
+      "type": "VOD",
+      "title": "Elysée, les secrets d'un palais",
+      "href": "/details/elysee-les-secrets-d-un-palais",
+      "source": {
+        "id": "elysee-secrets_565BFFb"
+      }
+    }
+  ],
+  "version": "0.9.1"
+}
