@@ -18,11 +18,11 @@
   ],
   "summary": {
     "done": 13,
-    "inProgress": 7,
+    "inProgress": 8,
     "proposed": 1,
     "deferred": 0,
     "blocked": 0,
-    "total": 21,
+    "total": 22,
     "overallProgressPercent": 80
   },
   "items": [
@@ -172,7 +172,7 @@
       "status": "in-progress",
       "priority": "P2",
       "progressPercent": 65,
-      "scope": "Inventory every plugin in plugins/ (22 in aggregator + plugin-tester); record current status (working, obsolete endpoint, renamed, broken parser). No code removal in this item.",
+      "scope": "Inventory every plugin in plugins/ (24 in aggregator + plugin-tester); record current status (working, obsolete endpoint, renamed, broken parser). No code removal in this item.",
       "acceptanceCriteria": [
         "Inventory table per plugin with last-known status.",
         "For each obsolete/renamed plugin, a recommended dedicated removal/rename PR is named.",
@@ -187,7 +187,29 @@
         "mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test"
       ],
       "pr": "test/provider-offline-fixture-baseline (merged), fix(provider-canalplus): rename d17 to cstar (PR #91), refactor(provider-canalplus): remove obsolete d8 sub-provider (PR #92), feat(francetv): discover public hubs via API (PR #137)",
-      "notes": "Inventory baseline from PR #50 extended with offline fixture policy and tests for 6play, canalPlus, francetv (ex pluzz), arte, and youtube. docs/provider-inventory.md includes current-status table and legacy naming (Pluzz, CStar (ex D17), 6play). PR #137 adds API-first public hub discovery (Sport, Franceinfo, partner hubs) and bumps francetv to 4.1.3-SNAPSHOT. PR #91 preserves D17 -> CStar and adds graceful fallback for canalPlus/cstar category discovery when legacy or protected endpoints fail. PR #92 removes the obsolete embedded D8 sub-provider. Default Surefire excludes *PluginManagerTest; PR #135 removed live URL dependency from one deterministic test. Arte live PluginManagerTest still fails (categorie liste vide) due to provider drift. See docs/automatic-category-download.md for runtime watch behavior."
+      "notes": "Inventory baseline from PR #50 extended with offline fixture policy and tests for 6play, canalPlus, francetv (ex pluzz), arte, youtube, and novo19. docs/provider-inventory.md includes current-status table and legacy naming (Pluzz, CStar (ex D17), 6play). PR #137 adds API-first public hub discovery (Sport, Franceinfo, partner hubs) and bumps francetv to 4.1.3-SNAPSHOT. PR #91 preserves D17 -> CStar and adds graceful fallback for canalPlus/cstar category discovery when legacy or protected endpoints fail. PR #92 removes the obsolete embedded D8 sub-provider. Default Surefire excludes *PluginManagerTest; PR #135 removed live URL dependency from one deterministic test. Arte live PluginManagerTest still fails (categorie liste vide) due to provider drift. See docs/automatic-category-download.md for runtime watch behavior."
+    },
+    {
+      "id": "provider-novo19",
+      "legacyCode": null,
+      "displayTitle": "NOVO19 public replay provider",
+      "icon": "📺",
+      "status": "in-progress",
+      "priority": "P2",
+      "progressPercent": 65,
+      "scope": "Add plugins/novo19 for public replay catalogue browsing via BFF JSON. Replay download is a follow-up commit on feat/provider-novo19 before PR merge. Live direct excluded.",
+      "acceptanceCriteria": [
+        "plugins/novo19 registered in reactor with offline fixtures and deterministic tests.",
+        "Category tree built from BFF config and page payloads with pagination and duplicate suppression.",
+        "Replay download deferred to a follow-up commit; catalog attempts return unavailable safely.",
+        "docs/provider-inventory.md and tracker updated."
+      ],
+      "validation": [
+        "mvn -B -ntp -pl plugins/novo19 -am test",
+        "mvn -B -ntp -DskipTests verify"
+      ],
+      "pr": "feat(novo19): add public replay provider (pending)",
+      "notes": "BFF catalogue on feat/provider-novo19; canonical public URLs; assetId on categories; live novo19_* excluded; replay download follow-up before PR."
     },
     {
       "id": "ytdlp-migration",
