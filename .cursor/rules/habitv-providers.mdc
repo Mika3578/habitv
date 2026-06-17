@@ -27,6 +27,9 @@ and clear status tracking.
   see [`docs/provider-policy.md`](../../docs/provider-policy.md#public-communication-safety).
 - **Content-agnostic provider code** (18.20): no hardcoded catalogue identities
   in `plugins/**/src/**`; generic metadata-driven discovery only.
+- **External provider references** (18.21): third-party add-ons are research
+  only; no copy/translate; verify against official services; GPL reuse needs
+  explicit approval; offline fixtures required.
 - End tasks with **Habitv final report** (18.19).
 
 **Canonical reference:** [`docs/provider-policy.md`](../../docs/provider-policy.md),

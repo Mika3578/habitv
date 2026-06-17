@@ -38,6 +38,10 @@ Full policy: [`docs/provider-policy.md`](../docs/provider-policy.md) and
   hardcode individual programme titles, slugs, asset ids, rail/section UUIDs,
   or one-off mappings in `plugins/**/src/**`; use provider metadata and
   generic structural rules; keep named content in fixtures/tests only.
+- **External provider references** (root `AGENTS.md` §18.21): community add-ons
+  such as Catch-up TV & More are behavioral/protocol research only; do not
+  copy or translate external code; verify endpoints against the official
+  service; record license/provenance; GPL reuse requires explicit approval.
 - No secrets, binaries, or manual JAXB/XML generated-file edits unless
   explicitly required (root `AGENTS.md` Sections 15.9, 15.12–15.13).
 
