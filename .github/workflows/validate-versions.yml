@@ -88,10 +88,16 @@ jobs:
 
       - name: Extract versions
         id: version
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           CURRENT=$(grep -m1 '<version>' pom.xml | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
           echo "current=$CURRENT" >> "$GITHUB_OUTPUT"
-          if git rev-parse HEAD^ >/dev/null 2>&1; then
+
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            git fetch --no-tags --depth=1 origin "$BASE_SHA"
+            PREVIOUS=$(git show "${BASE_SHA}:pom.xml" | grep -m1 '<version>' | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
+          elif git rev-parse HEAD^ >/dev/null 2>&1; then
             PREVIOUS=$(git show HEAD^:pom.xml | grep -m1 '<version>' | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
           else
             PREVIOUS="$CURRENT"
