@@ -28,6 +28,7 @@ older ones rather than rewriting them in place.
 | `plugin-versioning-policy` | When to bump a plugin `<version>` independently of the parent POM | 🟡 Proposed |
 | `jaxb-activation-dedup-defer` | Plan JAXB/Activation dedup before POM changes; defer namespace migration | 🟡 Proposed |
 | `provider-protected-content-tiered-policy` | Tiered protected content policy for provider and agent work | ✅ Accepted |
+| `automated-semver-versioning` | Automated SemVer from Conventional Commits with advisory CI | 🟡 Proposed |
 
 ---
 
@@ -639,6 +640,43 @@ protected replay support without agents refusing by default.
 - Maintainer-directed TF1+/Stremio-style protected replay work is allowed.
 - Residual legal, ToS, and maintenance risk stays under
   `provider-protected-replay-residual`.
+
+---
+
+## 🟡 `automated-semver-versioning` — Automated SemVer from Conventional Commits
+
+| | |
+|---|---|
+| **Status** | 🟡 Proposed |
+| **Date** | 2026-06-18 |
+| **Tracker** | `automated-semver-versioning` |
+| **Touches** | `AGENTS.md` §3.1, `scripts/`, `tests/`, `.github/workflows/validate-versions.yml` |
+| **Legacy code** | ADR-007 (informal reference only) |
+
+**Context** — Parent POM version bumps (`4.1.0-SNAPSHOT`, etc.) are
+manual and easy to forget. Habitv already mandates Conventional Commits
+in `AGENTS.md` §3 but had no tooling to compute SemVer bumps or validate
+format in CI.
+
+**Decision** — Add bash scripts to validate commit messages and compute
+SemVer bumps; unit tests; and a GitHub Actions workflow that:
+
+- runs **advisory** (non-blocking) commit-format and version-consistency
+  checks on `develop` / `master` pushes and PRs;
+- runs **blocking** unit tests for the scripts.
+
+Agents **propose** parent POM version bumps using
+`scripts/calculate-version-bump.sh`, show the diff, and **wait for
+developer approval** before committing. Plugin version overrides remain
+under `plugin-versioning-policy`.
+
+**Consequences**
+
+- Parent version consistency becomes visible in CI before enforcement.
+- Format/consistency jobs may graduate to blocking after a soak period.
+- `style` and `revert` are accepted by the validator and workflow;
+  they map to NONE unless breaking (`!` or `BREAKING CHANGE:`), which
+  maps to MAJOR.
 
 ---
 

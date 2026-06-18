@@ -2,6 +2,21 @@
 
 Version history for Habitv AI agent rules. Canonical source: [`AGENTS.md`](../AGENTS.md).
 
+## 2026-06-18 — v1.6.0
+
+### Added
+
+* Automated SemVer versioning workflow (`AGENTS.md` §3.1).
+* Scripts: `validate-conventional-commit.sh`, `calculate-version-bump.sh`.
+* Unit tests: `tests/test-versioning.sh`.
+* Advisory CI workflow: `.github/workflows/validate-versions.yml`.
+* ADR `automated-semver-versioning` (Proposed).
+
+### Reason
+
+* Zero manual parent POM version management; agent proposes bumps, developer
+  approves before commit.
+
 ## 2026-05-31 — v1.5.1
 
 ### Added

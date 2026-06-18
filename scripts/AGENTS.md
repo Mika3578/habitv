@@ -6,7 +6,8 @@ root file wins.
 ## Scope
 
 This file applies to work under `scripts/` — maintenance, packaging
-helpers, static-repo tooling, and security inventory scripts.
+helpers, static-repo tooling, security inventory scripts, and versioning
+helpers (`validate-conventional-commit.sh`, `calculate-version-bump.sh`).
 
 ## Path-specific rules
 

@@ -6,8 +6,8 @@ complement, but do not replace, the human review process.
 
 ## Agent rules metadata
 
-* **Version:** 1.5.1
-* **Last updated:** 2026-05-31
+* **Version:** 1.6.0
+* **Last updated:** 2026-06-18
 * **Maintainer:** repository maintainer
 * **Scope:** Habitv AI-assisted development workflow
 * **Canonical source:** `AGENTS.md`
@@ -207,6 +207,90 @@ Conventional Commits, English, imperative, lowercase, ≤ 72 chars.
 `chore`, `build`, `ci`, `style`, `revert`.
 
 **One logical change per commit.** Split any subject containing "and".
+
+### 3.1 Automated versioning with Conventional Commits
+
+**Purpose:** Manage parent POM semantic versioning (SemVer) from commit
+types. See ADR `automated-semver-versioning` in
+[`docs/decision-log.md`](docs/decision-log.md).
+
+#### Conventional Commits format (mandatory for validated commits)
+
+All commits **must** follow Conventional Commits 1.0.0 with a **required
+scope**:
+
+```
+<type>(<scope>): <subject>
+
+[optional body]
+
+[optional footer: BREAKING CHANGE: ...]
+```
+
+**Types validated by CI scripts:** `feat`, `fix`, `docs`, `test`,
+`refactor`, `perf`, `chore`, `ci`, `build`, `style`, `revert`.
+
+`style` and `revert` map to **NONE** for parent POM bumps unless the
+commit is breaking (`type(scope)!:` or `BREAKING CHANGE:` footer), in
+which case pass `breaking-change` to the bump calculator.
+
+Validate locally:
+
+```bash
+bash scripts/validate-conventional-commit.sh "<commit message>"
+```
+
+#### SemVer bump rules (parent POM)
+
+Breaking-change signals **override** the normal type mapping. When any
+apply, pass `breaking-change` to `calculate-version-bump.sh`:
+
+| Trigger | Bump |
+|---------|------|
+| `type(scope)!: subject` | MAJOR |
+| `BREAKING CHANGE:` footer | MAJOR |
+| `breaking-change` type (agent/script input) | MAJOR |
+| `feat` | MINOR |
+| `fix`, `refactor`, `perf` | PATCH |
+| `chore`, `docs`, `test`, `ci`, `build`, `style`, `revert` | NONE |
+
+Calculate expected version:
+
+```bash
+bash scripts/calculate-version-bump.sh <type> <current-version>
+# Output: BUMP_TYPE|NEW_VERSION  (e.g. MINOR|4.2.0-SNAPSHOT)
+```
+
+Plugin module version overrides remain governed by
+`plugin-versioning-policy` (independent of parent bumps).
+
+#### Agent workflow (mandatory)
+
+When preparing a commit that may require a parent version bump:
+
+1. Draft the Conventional Commit message (`type(scope): subject` or
+   `type(scope)!: subject`).
+2. Read the current parent version from root `pom.xml`.
+3. Determine the bump input for `scripts/calculate-version-bump.sh`:
+   - If the header uses `type(scope)!: subject`, or the body contains
+     `BREAKING CHANGE:`, pass `breaking-change`.
+   - Otherwise pass the normal commit type (`feat`, `fix`, etc.).
+4. If the bump is `NONE`, do **not** change parent POM versions.
+5. If the bump is `MAJOR`, `MINOR`, or `PATCH`, update the root
+   `pom.xml` `<version>` and aligned reactor parent references to the
+   new version.
+6. Show `git status` and `git diff` for all version changes.
+7. **Wait for explicit developer approval** before committing.
+8. Never auto-commit or auto-push version bumps.
+
+CI workflow `.github/workflows/validate-versions.yml` runs advisory
+format/consistency checks and blocking unit tests for the scripts.
+
+Run unit tests locally:
+
+```bash
+bash tests/test-versioning.sh
+```
 
 ---
 
