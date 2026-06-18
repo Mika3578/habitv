@@ -15,6 +15,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 
 try:
     import requests
@@ -302,33 +303,71 @@ def resolve_device_path():
 
 
 def build_protection_request(delivery, token):
-    headers = {
+    """Return the first license request candidate (legacy helper)."""
+    return build_license_request_candidates(delivery, token)[0]
+
+
+def enrich_license_headers(headers):
+    enriched = dict(headers)
+    enriched.setdefault("Accept", "*/*")
+    enriched.setdefault("Accept-Language", "fr-FR,fr;q=0.9")
+    enriched.setdefault("Origin", "https://www.tf1.fr")
+    enriched.setdefault("Referer", "https://www.tf1.fr/")
+    enriched.setdefault("User-Agent", USER_AGENT)
+    return enriched
+
+
+def build_license_request_candidates(delivery, token):
+    """Build ordered Widevine license URL attempts from mediainfo delivery."""
+    candidates = []
+    seen_urls = set()
+    base_headers = {
         "Content-Type": "application/octet-stream",
         "User-Agent": USER_AGENT,
     }
-    protection_entries = delivery.get("drms") or []
-    request_url = ""
-    if protection_entries:
-        entry = protection_entries[0]
-        request_url = entry.get("url") or ""
+
+    def add_candidate(request_url, headers):
+        url = (request_url or "").strip()
+        if not url or url in seen_urls:
+            return
+        seen_urls.add(url)
+        candidates.append((url, enrich_license_headers(headers)))
+
+    for entry in delivery.get("drms") or []:
+        headers = dict(base_headers)
         auth_headers = entry.get("h") or []
         if auth_headers:
             headers["Authorization"] = auth_headers[0].get("v", "")
         else:
             headers["Authorization"] = "Bearer " + token
-    else:
-        headers["Authorization"] = "Bearer " + token
+        add_candidate(entry.get("url") or "", headers)
 
-    if not request_url:
-        delivery_id = delivery.get("id")
-        if not delivery_id:
-            fail_code(
-                "TF1_MISSING_DELIVERY_ID",
-                "Delivery response is missing required metadata",
-                "TF1 mediainfo payload may have changed.",
-            )
-        request_url = "https://drm-wide.tf1.fr/proxy?id=" + str(delivery_id)
-    return request_url, headers
+    delivery_id = delivery.get("id")
+    if delivery_id is not None:
+        fallback_headers = dict(base_headers)
+        fallback_headers["Authorization"] = "Bearer " + token
+        delivery_key = str(delivery_id)
+        add_candidate("https://drm-wide.tf1.fr/proxy?id=" + delivery_key, fallback_headers)
+        add_candidate(
+            "https://widevine-proxy-m.prod.p.tf1.fr/proxy?id=" + delivery_key,
+            fallback_headers,
+        )
+
+    if not candidates:
+        fail_code(
+            "TF1_MISSING_LICENSE_URL",
+            "No Widevine license URL could be derived from TF1 delivery metadata",
+            "TF1 mediainfo payload may have changed.",
+        )
+    return candidates
+
+
+class Tf1LicenseError(Exception):
+    def __init__(self, code, message, hint=""):
+        super(Tf1LicenseError, self).__init__(message)
+        self.code = code
+        self.message = message
+        self.hint = hint
 
 
 def extract_init_data_from_mpd(mpd_url, token):
@@ -375,7 +414,7 @@ def load_local_device(device_path):
         )
 
 
-def resolve_playback_material(device_path, init_data_b64, request_url, request_headers):
+def attempt_playback_material(device_path, init_data_b64, request_url, request_headers):
     try:
         from pywidevine.cdm import Cdm
         from pywidevine.pssh import PSSH
@@ -395,7 +434,7 @@ def resolve_playback_material(device_path, init_data_b64, request_url, request_h
         response = session.post(request_url, data=challenge, headers=request_headers, timeout=60)
         if response.status_code >= 400:
             body_preview = response.text[:500] if response.text else ""
-            fail_code(
+            raise Tf1LicenseError(
                 "TF1_SESSION_FAILED",
                 "TF1 playback session request failed with HTTP %d" % response.status_code,
                 body_preview or "No response body",
@@ -403,7 +442,7 @@ def resolve_playback_material(device_path, init_data_b64, request_url, request_h
         try:
             cdm.parse_license(session_id, response.content)
         except Exception as exc:
-            fail_code(
+            raise Tf1LicenseError(
                 "TF1_SESSION_PARSE_FAILED",
                 "Failed to parse the TF1 playback session response",
                 "%s: %s" % (exc.__class__.__name__, exc),
@@ -413,7 +452,7 @@ def resolve_playback_material(device_path, init_data_b64, request_url, request_h
             if entry.type == "CONTENT":
                 material.append({"kid": entry.kid.hex, "key": entry.key.hex()})
         if not material:
-            fail_code(
+            raise Tf1LicenseError(
                 "TF1_SESSION_EMPTY",
                 "Premium replay session returned no playback material",
                 "Check account entitlement and the local device file.",
@@ -421,6 +460,40 @@ def resolve_playback_material(device_path, init_data_b64, request_url, request_h
         return material
     finally:
         cdm.close(session_id)
+
+
+def resolve_playback_material(device_path, init_data_b64, license_candidates):
+    last_error = None
+    for request_url, request_headers in license_candidates:
+        try:
+            return attempt_playback_material(device_path, init_data_b64, request_url, request_headers)
+        except Tf1LicenseError as exc:
+            last_error = exc
+            sys.stderr.write(
+                "[license retry] %s failed for %s\n" % (exc.code, request_url)
+            )
+    if last_error is None:
+        fail_code(
+            "TF1_SESSION_FAILED",
+            "Premium replay session could not be established",
+            "No license URL candidates were available.",
+        )
+    fail_code(last_error.code, last_error.message, last_error.hint)
+
+
+def write_key_text_file(material):
+    handle, path = tempfile.mkstemp(suffix=".keys.txt", prefix="habitv-tf1plus-")
+    try:
+        with os.fdopen(handle, "w") as key_file:
+            for entry in material:
+                key_file.write("%s:%s\n" % (entry["kid"], entry["key"]))
+        return path
+    except Exception:
+        try:
+            os.close(handle)
+        except OSError:
+            pass
+        raise
 
 
 def download_with_n_m3u8dl(re_binary, mpd_url, material, output_path, mpd_headers):
@@ -441,9 +514,21 @@ def download_with_n_m3u8dl(re_binary, mpd_url, material, output_path, mpd_header
     ]
     for header_name, header_value in mpd_headers.items():
         cmd.extend(["--header", header_name + ": " + header_value])
-    for entry in material:
-        cmd.extend(["--key", entry["kid"] + ":" + entry["key"]])
-    run_command_with_progress(cmd, 30.0, 99.0)
+    key_file = None
+    try:
+        if len(material) > 1:
+            key_file = write_key_text_file(material)
+            cmd.extend(["--key-text-file", key_file])
+        elif len(material) == 1:
+            entry = material[0]
+            cmd.extend(["--key", entry["kid"] + ":" + entry["key"]])
+        run_command_with_progress(cmd, 30.0, 99.0)
+    finally:
+        if key_file and os.path.isfile(key_file):
+            try:
+                os.remove(key_file)
+            except OSError:
+                pass
     if not os.path.isfile(output_path):
         candidates = [
             os.path.join(output_dir, output_name + ".mp4"),
@@ -561,9 +646,9 @@ def main():
 
     mpd_url = normalize_mpd_url(delivery["url"])
     mpd_headers = build_mpd_headers(token)
-    request_url, request_headers = build_protection_request(delivery, token)
+    license_candidates = build_license_request_candidates(delivery, token)
     init_data = extract_init_data_from_mpd(mpd_url, token)
-    material = resolve_playback_material(device_path, init_data, request_url, request_headers)
+    material = resolve_playback_material(device_path, init_data, license_candidates)
     report_download_progress(30.0)
 
     if probe in ("keys", "session"):
