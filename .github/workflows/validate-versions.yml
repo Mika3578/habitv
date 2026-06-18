@@ -1,0 +1,135 @@
+name: Validate Versioning
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+  pull_request:
+    branches:
+      - develop
+      - master
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  validate-commit-format:
+    name: Validate Conventional Commit Format
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Get commit message
+        id: commit
+        run: |
+          COMMIT_MSG="$(git log -1 --pretty=%B)"
+          DELIMITER="COMMIT_MSG_$(date +%s%N)"
+          {
+            echo "message<<$DELIMITER"
+            echo "$COMMIT_MSG"
+            echo "$DELIMITER"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Validate format
+        run: |
+          bash scripts/validate-conventional-commit.sh "${{ steps.commit.outputs.message }}"
+
+  validate-version-consistency:
+    name: Validate Version Bump Consistency
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Get commit details
+        id: commit
+        run: |
+          COMMIT_MSG="$(git log -1 --pretty=%B)"
+          FIRST_LINE="$(printf '%s\n' "$COMMIT_MSG" | head -n 1)"
+          COMMIT_TYPE="$(printf '%s\n' "$FIRST_LINE" | sed -nE 's/^(feat|fix|docs|test|refactor|perf|chore|ci|build)\([a-zA-Z0-9._-]+\)!?: .+$/\1/p')"
+          if printf '%s\n' "$FIRST_LINE" | grep -qE '^(feat|fix|docs|test|refactor|perf|chore|ci|build)\([a-zA-Z0-9._-]+\)!:'; then
+            COMMIT_TYPE="breaking-change"
+          elif printf '%s\n' "$COMMIT_MSG" | grep -q "BREAKING CHANGE:"; then
+            COMMIT_TYPE="breaking-change"
+          fi
+          echo "type=$COMMIT_TYPE" >> "$GITHUB_OUTPUT"
+
+      - name: Extract versions
+        id: version
+        run: |
+          CURRENT=$(grep -m1 '<version>' pom.xml | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
+          echo "current=$CURRENT" >> "$GITHUB_OUTPUT"
+          if git rev-parse HEAD^ >/dev/null 2>&1; then
+            PREVIOUS=$(git show HEAD^:pom.xml | grep -m1 '<version>' | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
+          else
+            PREVIOUS="$CURRENT"
+          fi
+          echo "previous=$PREVIOUS" >> "$GITHUB_OUTPUT"
+
+      - name: Calculate expected bump
+        id: bump
+        run: |
+          COMMIT_TYPE="${{ steps.commit.outputs.type }}"
+          PREVIOUS="${{ steps.version.outputs.previous }}"
+          if [[ -z "$COMMIT_TYPE" ]]; then
+            echo "type=NONE" >> "$GITHUB_OUTPUT"
+            echo "expected=$PREVIOUS" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          OUTPUT=$(bash scripts/calculate-version-bump.sh "$COMMIT_TYPE" "$PREVIOUS")
+          BUMP_TYPE=$(echo "$OUTPUT" | cut -d'|' -f1)
+          EXPECTED_VERSION=$(echo "$OUTPUT" | cut -d'|' -f2)
+          echo "type=$BUMP_TYPE" >> "$GITHUB_OUTPUT"
+          echo "expected=$EXPECTED_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Report version consistency
+        run: |
+          echo "📋 Version Bump Report"
+          echo "─────────────────────"
+          echo "Commit type: ${{ steps.commit.outputs.type }}"
+          echo "Previous version: ${{ steps.version.outputs.previous }}"
+          echo "Current version in pom.xml: ${{ steps.version.outputs.current }}"
+          echo "Expected bump: ${{ steps.bump.outputs.type }} → ${{ steps.bump.outputs.expected }}"
+          echo ""
+
+          if [[ "${{ steps.bump.outputs.type }}" == "NONE" ]]; then
+            echo "ℹ️  No version bump required for this commit type"
+            exit 0
+          fi
+
+          if [[ "${{ steps.version.outputs.current }}" != "${{ steps.bump.outputs.expected }}" ]]; then
+            echo "⚠️  Version mismatch detected!"
+            echo "    Expected: ${{ steps.bump.outputs.expected }}"
+            echo "    Actual:   ${{ steps.version.outputs.current }}"
+            echo ""
+            echo "This is ADVISORY for now. Not blocking the build."
+            echo "Future: this will fail the build."
+          else
+            echo "✅ Version bump is consistent with commit type"
+          fi
+
+  run-unit-tests:
+    name: Run Versioning Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Run versioning tests
+        run: bash tests/test-versioning.sh
