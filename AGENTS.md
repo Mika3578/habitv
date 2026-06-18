@@ -241,12 +241,17 @@ bash scripts/validate-conventional-commit.sh "<commit message>"
 
 #### SemVer bump rules (parent POM)
 
+Breaking-change signals **override** the normal type mapping. When any
+apply, pass `breaking-change` to `calculate-version-bump.sh`:
+
 | Trigger | Bump |
 |---------|------|
-| `BREAKING CHANGE:` footer or `breaking-change` type | MAJOR |
+| `type(scope)!: subject` | MAJOR |
+| `BREAKING CHANGE:` footer | MAJOR |
+| `breaking-change` type (agent/script input) | MAJOR |
 | `feat` | MINOR |
 | `fix`, `refactor`, `perf` | PATCH |
-| `chore`, `docs`, `test`, `ci`, `build` | NONE |
+| `chore`, `docs`, `test`, `ci`, `build`, `style`, `revert` | NONE |
 
 Calculate expected version:
 
@@ -262,9 +267,13 @@ Plugin module version overrides remain governed by
 
 When preparing a commit that may require a parent version bump:
 
-1. Draft the Conventional Commit message (`type(scope): subject`).
+1. Draft the Conventional Commit message (`type(scope): subject` or
+   `type(scope)!: subject`).
 2. Read the current parent version from root `pom.xml`.
-3. Run `scripts/calculate-version-bump.sh` with the commit type.
+3. Determine the bump input for `scripts/calculate-version-bump.sh`:
+   - If the header uses `type(scope)!: subject`, or the body contains
+     `BREAKING CHANGE:`, pass `breaking-change`.
+   - Otherwise pass the normal commit type (`feat`, `fix`, etc.).
 4. If the bump is `NONE`, do **not** change parent POM versions.
 5. If the bump is `MAJOR`, `MINOR`, or `PATCH`, update the root
    `pom.xml` `<version>` and aligned reactor parent references to the

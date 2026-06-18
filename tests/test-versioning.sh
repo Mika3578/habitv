@@ -45,7 +45,17 @@ test_bump() {
 
     echo -n "Testing: $test_name ... "
 
-    output=$("$BUMP_SCRIPT" "$type" "$current")
+    set +e
+    output="$("$BUMP_SCRIPT" "$type" "$current" 2>&1)"
+    status=$?
+    set -e
+
+    if [[ $status -ne 0 ]]; then
+        echo "❌ (script exited $status)"
+        echo "   Output: $output"
+        TESTS_FAILED=$((TESTS_FAILED + 1))
+        return
+    fi
 
     if [[ "$output" == "$expected_output" ]]; then
         echo "✅"
@@ -54,6 +64,29 @@ test_bump() {
         echo "❌"
         echo "   Expected: $expected_output"
         echo "   Got:      $output"
+        TESTS_FAILED=$((TESTS_FAILED + 1))
+    fi
+}
+
+# Helper for bump calculator failures (invalid input must not abort suite)
+test_bump_failure() {
+    local test_name="$1"
+    local type="$2"
+    local current="$3"
+
+    echo -n "Testing: $test_name ... "
+
+    set +e
+    output="$("$BUMP_SCRIPT" "$type" "$current" 2>&1)"
+    status=$?
+    set -e
+
+    if [[ $status -ne 0 ]]; then
+        echo "✅"
+        TESTS_PASSED=$((TESTS_PASSED + 1))
+    else
+        echo "❌ (expected non-zero exit, got 0)"
+        echo "   Output: $output"
         TESTS_FAILED=$((TESTS_FAILED + 1))
     fi
 }
@@ -147,6 +180,17 @@ test_bump "NONE (chore): 4.2.0 stays 4.2.0" \
 test_bump "NONE (docs): 1.0.0 stays 1.0.0" \
     "docs" "1.0.0" \
     "NONE|1.0.0"
+
+test_bump "NONE (style): 4.2.0 stays 4.2.0" \
+    "style" "4.2.0" \
+    "NONE|4.2.0"
+
+test_bump "NONE (revert): 1.0.0 stays 1.0.0" \
+    "revert" "1.0.0" \
+    "NONE|1.0.0"
+
+test_bump_failure "Invalid type aborts calculator with non-zero exit" \
+    "unknown" "4.2.0"
 
 # Preserve -SNAPSHOT
 test_bump "PATCH with -SNAPSHOT: 4.2.0-SNAPSHOT → 4.2.1-SNAPSHOT" \

@@ -56,7 +56,7 @@ case "$COMMIT_TYPE" in
         NEW_MINOR=0
         NEW_PATCH=0
         ;;
-    chore|docs|test|ci|build)
+    chore|docs|test|ci|build|style|revert)
         BUMP_TYPE="NONE"
         NEW_MAJOR=$MAJOR
         NEW_MINOR=$MINOR

@@ -13,6 +13,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: validate-versioning-${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 defaults:
   run:
     shell: bash
@@ -26,15 +30,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
         with:
-          # PR workflows check out a merge commit by default; validate the PR head instead.
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
           persist-credentials: false
 
       - name: Get commit message
         id: commit
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
-          COMMIT_MSG="$(git log -1 --pretty=%B)"
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            COMMIT_MSG="$PR_TITLE"
+          else
+            COMMIT_MSG="$(git log -1 --pretty=%B)"
+          fi
           DELIMITER="COMMIT_MSG_$(date +%s%N)"
           {
             echo "message<<$DELIMITER"
@@ -60,11 +69,17 @@ jobs:
 
       - name: Get commit details
         id: commit
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
-          COMMIT_MSG="$(git log -1 --pretty=%B)"
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            COMMIT_MSG="$PR_TITLE"
+          else
+            COMMIT_MSG="$(git log -1 --pretty=%B)"
+          fi
           FIRST_LINE="$(printf '%s\n' "$COMMIT_MSG" | head -n 1)"
-          COMMIT_TYPE="$(printf '%s\n' "$FIRST_LINE" | sed -nE 's/^(feat|fix|docs|test|refactor|perf|chore|ci|build)\([a-zA-Z0-9._-]+\)!?: .+$/\1/p')"
-          if printf '%s\n' "$FIRST_LINE" | grep -qE '^(feat|fix|docs|test|refactor|perf|chore|ci|build)\([a-zA-Z0-9._-]+\)!:'; then
+          COMMIT_TYPE="$(printf '%s\n' "$FIRST_LINE" | sed -nE 's/^(feat|fix|docs|test|refactor|perf|chore|ci|build)\([a-z0-9\-]+\)!?: .+$/\1/p')"
+          if printf '%s\n' "$FIRST_LINE" | grep -qE '^(feat|fix|docs|test|refactor|perf|chore|ci|build)\([a-z0-9\-]+\)!:'; then
             COMMIT_TYPE="breaking-change"
           elif printf '%s\n' "$COMMIT_MSG" | grep -q "BREAKING CHANGE:"; then
             COMMIT_TYPE="breaking-change"
