@@ -58,6 +58,7 @@ automatic category behavior, provider summary, doc map).
 | 🔑 `youtube-apikey` — YouTube Data API key externalization | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🧩 `jaxb-launcher-recovery` — JAXB generated sources & launcher classpath recovery | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🧱 `maven-pr-validation` — Maven PR validation workflow | ✅ Done | 🟠 P1 | `████████████████████` 100% |
+| 🏷️ `automated-semver-versioning` — Automated SemVer from Conventional Commits | 🟡 In progress | 🟡 P2 | `█████████████████░░░` 85% |
 | 🔒 `dependency-security-audit` — Dependency security audit & remediation | 🟡 In progress | 🟠 P1 | `████░░░░░░░░░░░░░░░░` 20% |
 | 📝 `clean-squash-merge-policy` — Clean squash merge policy | 🟡 In progress | 🟢 P3 | `██████████░░░░░░░░░░` 50% |
 | 🔒 `critical-log4j-cve-remediation` — Critical Log4j 1.x CVE remediation | ✅ Done | 🔴 P0 | `████████████████████` 100% |
@@ -695,6 +696,45 @@ mvn -B -ntp -DskipTests package
 diagnostic until JAXB and JavaFX modernization work is complete. CodeQL:
 `.github/workflows/codeql.yml`; see [`ci.md`](ci.md) for accepted Lombok
 tracer warnings during analysis.
+
+---
+
+## 🏷️ `automated-semver-versioning` — Automated SemVer from Conventional Commits
+
+| | |
+|---|---|
+| **Status** | 🟡 In progress |
+| **Priority** | 🟡 P2 |
+| **Progress** | `█████████████████░░░` 85% |
+
+**Scope** — Add advisory Conventional Commit validation, SemVer bump
+calculation scripts, shell unit tests, and a GitHub Actions workflow for
+commit/version consistency visibility on `develop` and `master`.
+
+**Acceptance criteria**
+- ✅ `scripts/validate-conventional-commit.sh` validates
+  `type(scope): subject` and `type(scope)!: subject` for all repository
+  commit types including `style` and `revert`
+- ✅ `scripts/calculate-version-bump.sh` computes MAJOR/MINOR/PATCH/NONE
+  bumps without mutating POMs
+- ✅ `tests/test-versioning.sh` covers validator and bump edge cases
+- ✅ `.github/workflows/validate-versions.yml` runs advisory
+  format/consistency checks and blocking unit tests
+- ✅ `AGENTS.md` and `docs/decision-log.md` document the agent workflow
+  and ADR `automated-semver-versioning`
+
+**Validation**
+```bash
+bash tests/test-versioning.sh
+actionlint .github/workflows/validate-versions.yml
+git diff --check
+```
+
+**Related PR** · [#151](https://github.com/Mika3578/habitv/pull/151)
+
+**Notes** — Advisory commit-format and version-consistency checks plus
+blocking script unit tests. Parent POM bumps remain developer-approved;
+plugin bumps stay under `plugin-versioning-policy`.
 
 ---
 

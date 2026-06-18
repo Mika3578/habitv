@@ -12,12 +12,15 @@
 #
 #   [optional footer: BREAKING CHANGE: ...]
 #
-# Valid types: feat, fix, docs, test, refactor, perf, chore, ci, build
+# Valid types: feat, fix, docs, test, refactor, perf, chore, ci, build,
+#              style, revert
 # Valid scopes: core, framework, ffmpeg-exporter, francetv-provider, etc.
 
 set -e
 
 MSG="$1"
+
+COMMIT_TYPES='feat|fix|docs|test|refactor|perf|chore|ci|build|style|revert'
 
 # Check if message is empty
 if [[ -z "$MSG" ]]; then
@@ -30,7 +33,7 @@ FIRST_LINE=$(echo "$MSG" | head -1)
 
 # Check format: type(scope): subject or type(scope)!: subject
 # Pattern: type(scope)[!]: subject (non-empty)
-COMMIT_HEADER_RE='^(feat|fix|docs|test|refactor|perf|chore|ci|build)\([a-z0-9\-]+\)!?: .+'
+COMMIT_HEADER_RE="^(${COMMIT_TYPES})\([a-z0-9\-]+\)!?: .+"
 if ! echo "$FIRST_LINE" | grep -qE "$COMMIT_HEADER_RE"; then
     echo "❌ Invalid commit format"
     echo ""
@@ -40,15 +43,16 @@ if ! echo "$FIRST_LINE" | grep -qE "$COMMIT_HEADER_RE"; then
     echo "  type(scope): subject"
     echo "  type(scope)!: subject"
     echo ""
-    echo "Valid types: feat, fix, docs, test, refactor, perf, chore, ci, build"
+    echo "Valid types: feat, fix, docs, test, refactor, perf, chore, ci, build, style, revert"
     echo "Example: feat(francetv-provider): add series description extraction"
+    echo "Example: style(format): normalize shell script indentation"
     echo "Example: feat(core)!: rename provider API"
     echo ""
     exit 1
 fi
 
 # Warn if breaking change via ! syntax
-if echo "$FIRST_LINE" | grep -qE '^(feat|fix|docs|test|refactor|perf|chore|ci|build)\([a-z0-9\-]+\)!:'; then
+if echo "$FIRST_LINE" | grep -qE "^(${COMMIT_TYPES})\([a-z0-9\-]+\)!:"; then
     echo "⚠️  BREAKING CHANGE detected via ! syntax"
     echo "   → This commit will bump MAJOR version"
 fi

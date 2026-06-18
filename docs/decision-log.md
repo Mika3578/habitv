@@ -674,8 +674,9 @@ under `plugin-versioning-policy`.
 
 - Parent version consistency becomes visible in CI before enforcement.
 - Format/consistency jobs may graduate to blocking after a soak period.
-- `style` and `revert` commit types remain outside script validation until
-  explicitly added.
+- `style` and `revert` are accepted by the validator and workflow;
+  they map to NONE unless breaking (`!` or `BREAKING CHANGE:`), which
+  maps to MAJOR.
 
 ---
 

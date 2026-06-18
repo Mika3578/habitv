@@ -120,6 +120,22 @@ run_test "Valid: fix breaking via ! syntax" \
     "$VALIDATE_SCRIPT 'fix(download)!: change retry contract'" \
     0
 
+run_test "Valid: style(scope)" \
+    "$VALIDATE_SCRIPT 'style(format): normalize whitespace'" \
+    0
+
+run_test "Valid: revert(scope)" \
+    "$VALIDATE_SCRIPT 'revert(versioning): revert previous versioning change'" \
+    0
+
+run_test "Valid: style breaking via ! syntax" \
+    "$VALIDATE_SCRIPT 'style(format)!: change formatting contract'" \
+    0
+
+run_test "Valid: revert breaking via ! syntax" \
+    "$VALIDATE_SCRIPT 'revert(versioning)!: revert public behavior change'" \
+    0
+
 # Invalid commits
 run_test "Invalid: missing scope" \
     "$VALIDATE_SCRIPT 'feat: add feature'" \

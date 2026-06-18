@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft-07/schema",
   "version": 3,
   "description": "Machine-readable mirror of docs/dev-tracker.md. Keep both files in sync. Identifiers use descriptive kebab-case slugs (see descriptive-slug-ids ADR). Legacy HBTV codes are historical-only and not for new workflow naming.",
-  "lastRefresh": "2026-05-31",
+  "lastRefresh": "2026-06-18",
   "statusValues": [
     "proposed",
     "in-progress",
@@ -18,11 +18,11 @@
   ],
   "summary": {
     "done": 13,
-    "inProgress": 7,
+    "inProgress": 8,
     "proposed": 1,
     "deferred": 0,
     "blocked": 0,
-    "total": 21,
+    "total": 22,
     "overallProgressPercent": 80
   },
   "items": [
@@ -482,6 +482,30 @@
       ],
       "pr": "docs: add clean squash merge policy (this PR)",
       "notes": "Documentation and workflow only; no application code or CI behavior changes."
+    },
+    {
+      "id": "automated-semver-versioning",
+      "legacyCode": null,
+      "displayTitle": "Automated SemVer from Conventional Commits",
+      "icon": "🏷️",
+      "status": "in-progress",
+      "priority": "P2",
+      "progressPercent": 85,
+      "scope": "Add advisory Conventional Commit validation, SemVer bump calculation scripts, shell unit tests, and a GitHub Actions workflow for commit/version consistency visibility on develop and master.",
+      "acceptanceCriteria": [
+        "scripts/validate-conventional-commit.sh validates type(scope): subject and type(scope)!: subject for all repository commit types including style and revert.",
+        "scripts/calculate-version-bump.sh computes MAJOR/MINOR/PATCH/NONE bumps without mutating POMs.",
+        "tests/test-versioning.sh covers validator and bump edge cases.",
+        ".github/workflows/validate-versions.yml runs advisory format/consistency checks and blocking unit tests.",
+        "AGENTS.md and docs/decision-log.md document the agent workflow and ADR automated-semver-versioning."
+      ],
+      "validation": [
+        "bash tests/test-versioning.sh",
+        "actionlint .github/workflows/validate-versions.yml",
+        "git diff --check"
+      ],
+      "pr": "ci(versioning): add advisory semver validation (#151)",
+      "notes": "Advisory commit-format and version-consistency checks plus blocking script unit tests. Parent POM bumps remain developer-approved; plugin bumps stay under plugin-versioning-policy."
     },
     {
       "id": "external-tools-recommendations",

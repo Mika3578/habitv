@@ -228,10 +228,11 @@ scope**:
 ```
 
 **Types validated by CI scripts:** `feat`, `fix`, `docs`, `test`,
-`refactor`, `perf`, `chore`, `ci`, `build`.
+`refactor`, `perf`, `chore`, `ci`, `build`, `style`, `revert`.
 
-Section 3 also allows `style` and `revert` for repository policy; those
-types are not yet enforced by `scripts/validate-conventional-commit.sh`.
+`style` and `revert` map to **NONE** for parent POM bumps unless the
+commit is breaking (`type(scope)!:` or `BREAKING CHANGE:` footer), in
+which case pass `breaking-change` to the bump calculator.
 
 Validate locally:
 
