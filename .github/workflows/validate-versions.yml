@@ -26,6 +26,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
         with:
+          # PR workflows check out a merge commit by default; validate the PR head instead.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
           persist-credentials: false
 
@@ -52,6 +54,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
           persist-credentials: false
 
