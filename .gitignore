@@ -48,6 +48,10 @@ plugins/**/bin/
 # Static repository deploy tree
 repository/
 
+# Maintainer-local notes, setup traces, and machine-specific docs (never commit)
+/local/
+/agent_space/
+
 # OS junk
 .DS_Store
 Thumbs.db

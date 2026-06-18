@@ -31,9 +31,9 @@ still points at `youtube-dl`, switch it to yt-dlp.
 
 | Group | Modules |
 |-------|---------|
-| Recently worked | `francetv` (ex Pluzz), `youtube` (yt-dlp), `novo19` |
+| Recently worked | `francetv` (ex Pluzz), `youtube` (yt-dlp), `novo19`, `tf1plus` (ex `wat`) |
 | Needs rewrite / investigation | `arte`, `6play`, `lequipe`, `footyroom`, `sfr`, `globalnews`, `mlssoccer` |
-| Obsolete / degraded endpoints | `canalPlus` (CStar; D8 removed), `wat`, `beinsport`, `clubic` |
+| Obsolete / degraded endpoints | `canalPlus` (CStar; D8 removed), `beinsport`, `clubic` |
 | Tools / infrastructure | `curl`, `ffmpeg`, `aria2`, `cmd`, `file`, `RSS`, `rclone`, `rtmpDump`, `adobeHDS`, `email`, `plugin-tester` |
 | Historical names only | Pluzz → `francetv`; NRJ12 — no module |
 
@@ -41,8 +41,11 @@ Labels: **working** (validated), **degraded**, **protected** (auth/geo/DRM),
 **obsolete**, **removed**, **unknown**.
 
 France.tv and NOVO19 delegate download to the youtube/yt-dlp plugin when
-public URLs exist. Canal+ family and WAT/TF1+ are not treated as freely
-downloadable DRM catalogues.
+public URLs exist. Canal+ family is not treated as a freely downloadable
+DRM catalogue. `tf1plus` replaces obsolete `wat`: public catalogue
+discovery is GraphQL-based; protected replay stays optional and
+disabled until the user sets local credentials. Legacy grab-config
+plugin id `wat` is aliased to `tf1plus` at runtime.
 
 Full module list: `plugins/pom.xml`. Offline fixtures live under
 `plugins/<name>/test/resources/fixtures/<name>/`.

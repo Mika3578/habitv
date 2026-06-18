@@ -13,6 +13,7 @@ import com.dabi.habitv.api.plugin.dto.ProxyDTO;
 import com.dabi.habitv.api.plugin.dto.ProxyDTO.ProtocolEnum;
 import com.dabi.habitv.core.config.HabitTvConf;
 import com.dabi.habitv.core.config.UserConfig;
+import com.dabi.habitv.core.config.Tf1PlusPremiumReplaySystemProperty;
 import com.dabi.habitv.core.config.YoutubeApiKeySystemProperty;
 import com.dabi.habitv.core.token.TokenReplacer;
 import com.dabi.habitv.framework.FWKProperties;
@@ -37,6 +38,7 @@ public final class CoreManager {
 		taskName2PoolSizeMap = config.getTaskDefinition();
 		TokenReplacer.setCutSize(config.getFileNameCutSize());
 		applyYoutubeApiKey(config.getYoutubeApiKey());
+		applyTf1PlusPremiumReplay(config.getTf1PlusPremiumReplaySettings());
 		pluginManager = new PluginManager(config);
 		episodeManager = new EpisodeManager(pluginManager.getDownloadersHolder(), pluginManager.getExportersHolder(),
 		        pluginManager.getProvidersHolder(), taskName2PoolSizeMap, config.getMaxAttempts(),
@@ -88,6 +90,11 @@ public final class CoreManager {
 
 	private void applyYoutubeApiKey(String youtubeApiKey) {
 		YoutubeApiKeySystemProperty.applyFromUserConfig(youtubeApiKey);
+	}
+
+	private void applyTf1PlusPremiumReplay(
+			final com.dabi.habitv.core.config.Tf1PlusPremiumReplaySettings settings) {
+		Tf1PlusPremiumReplaySystemProperty.applyFromUserConfig(settings);
 	}
 
 	public CategoryManager getCategoryManager() {

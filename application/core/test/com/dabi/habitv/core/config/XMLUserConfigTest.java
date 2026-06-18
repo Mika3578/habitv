@@ -66,6 +66,58 @@ public class XMLUserConfigTest {
 	}
 
 	@Test
+	public void tf1PlusPremiumReplaySettingsAreReadFromDownloaders() throws Exception {
+		final File file = File.createTempFile("habitv-config-", ".xml");
+		file.deleteOnExit();
+		Files.write(file.toPath(), ("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+				+ "<ns2:configuration xmlns:ns2=\"http://www.dabi.com/habitv/configuration/entities\">\n"
+				+ "    <downloadConfig>\n"
+				+ "        <downloaders>\n"
+				+ "            <tf1plusEmail>tf1@example.com</tf1plusEmail>\n"
+				+ "            <tf1plusPassword>secret</tf1plusPassword>\n"
+				+ "            <tf1plusDevicePath>C:/Tools/tf1plus/device.bin</tf1plusDevicePath>\n"
+				+ "            <tf1plusNM3u8dlRe>C:/Tools/N_m3u8DL-RE.exe</tf1plusNM3u8dlRe>\n"
+				+ "        </downloaders>\n"
+				+ "        <downloadOuput>/tmp/#EPISODE#.mp4</downloadOuput>\n"
+				+ "    </downloadConfig>\n"
+				+ "</ns2:configuration>\n").getBytes(StandardCharsets.UTF_8));
+		final Tf1PlusPremiumReplaySettings settings = XMLUserConfig.readConfigForTest(file)
+				.getTf1PlusPremiumReplaySettings();
+		assertEquals("tf1@example.com", settings.getEmail());
+		assertEquals("secret", settings.getPassword());
+		assertEquals("C:/Tools/tf1plus/device.bin", settings.getDevicePath());
+		assertEquals("C:/Tools/N_m3u8DL-RE.exe", settings.getNM3u8DlRePath());
+	}
+
+	@Test
+	public void tf1PlusCredentialsRoundTripThroughSetters() throws Exception {
+		final File file = File.createTempFile("habitv-config-", ".xml");
+		file.deleteOnExit();
+		Files.write(file.toPath(), minimalConfigWithoutMaxConcurrent().getBytes(StandardCharsets.UTF_8));
+		final XMLUserConfig config = XMLUserConfig.readConfigForTest(file);
+		config.setTf1PlusEmail("user@tf1.example");
+		config.setTf1PlusPassword("secret-pass");
+		XMLUserConfig.saveConfig(file, config);
+		final XMLUserConfig reloaded = XMLUserConfig.readConfigForTest(file);
+		assertEquals("user@tf1.example", reloaded.getTf1PlusEmail());
+		assertEquals("secret-pass", reloaded.getTf1PlusPassword());
+	}
+
+	@Test
+	public void tf1PlusDevicePathAndDownloaderRoundTripThroughSetters() throws Exception {
+		final File file = File.createTempFile("habitv-config-", ".xml");
+		file.deleteOnExit();
+		Files.write(file.toPath(), minimalConfigWithoutMaxConcurrent().getBytes(StandardCharsets.UTF_8));
+		final XMLUserConfig config = XMLUserConfig.readConfigForTest(file);
+		config.setTf1PlusDevicePath("C:/Tools/tf1plus/device.bin");
+		config.setTf1PlusNM3u8dlRe("C:/Tools/N_m3u8DL-RE.exe");
+		XMLUserConfig.saveConfig(file, config);
+		final XMLUserConfig reloaded = XMLUserConfig.readConfigForTest(file);
+		assertEquals("C:/Tools/tf1plus/device.bin", reloaded.getTf1PlusDevicePath());
+		assertEquals("C:/Tools/N_m3u8DL-RE.exe", reloaded.getTf1PlusNM3u8dlRe());
+	}
+
+	@Test
 	public void youtubeApiKeyIsNotPrefixedWithAppDirectory() throws Exception {
 		final File file = File.createTempFile("habitv-config-", ".xml");
 		file.deleteOnExit();

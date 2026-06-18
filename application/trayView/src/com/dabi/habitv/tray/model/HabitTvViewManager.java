@@ -13,6 +13,7 @@ import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
 import com.dabi.habitv.api.plugin.exception.TechnicalException;
 import com.dabi.habitv.core.config.UserConfig;
+import com.dabi.habitv.core.config.Tf1PlusPremiumReplaySystemProperty;
 import com.dabi.habitv.core.config.XMLUserConfig;
 import com.dabi.habitv.core.dao.GrabConfigDAO;
 import com.dabi.habitv.core.dao.GrabConfigDAO.LoadModeEnum;
@@ -204,6 +205,7 @@ public class HabitTvViewManager extends Observable {
 	public void saveConfig(UserConfig userConfig) {
 		try {
 			XMLUserConfig.saveConfig(userConfig);
+			Tf1PlusPremiumReplaySystemProperty.applyFromUserConfig(userConfig.getTf1PlusPremiumReplaySettings());
 		} catch (JAXBException e) {
 			throw new TechnicalException(e);
 		}
