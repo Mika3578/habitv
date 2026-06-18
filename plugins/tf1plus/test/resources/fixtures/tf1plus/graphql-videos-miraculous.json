@@ -1,0 +1,21 @@
+{
+  "data": {
+    "programBySlug": {
+      "videos": {
+        "items": [
+          {
+            "slug": "miraculous-renverse-coeurs",
+            "rights": ["BASIC"],
+            "date": "2026-05-28T08:30:00.000Z",
+            "decoration": {
+              "label": "Miraculous : Les Aventures de Ladybug et Chat Noir - Renverse-Coeurs"
+            },
+            "playingInfos": {
+              "duration": 1320
+            }
+          }
+        ]
+      }
+    }
+  }
+}

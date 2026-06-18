@@ -1,0 +1,21 @@
+{
+  "data": {
+    "programBySlug": {
+      "videos": {
+        "items": [
+          {
+            "slug": "demain-nous-appartient-du-mercredi-27-mai-2026-episode-2213",
+            "rights": ["BASIC"],
+            "date": "2026-05-27T20:00:00.000Z",
+            "decoration": {
+              "label": "Saison 13 Episode 38 du 27 mai 2026"
+            },
+            "playingInfos": {
+              "duration": 1560
+            }
+          }
+        ]
+      }
+    }
+  }
+}

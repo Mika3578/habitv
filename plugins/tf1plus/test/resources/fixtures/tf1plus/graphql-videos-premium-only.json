@@ -1,0 +1,23 @@
+{
+  "data": {
+    "programBySlug": {
+      "videos": {
+        "items": [
+          {
+            "id": "fa698bd7-1328-467c-8cb3-4167b119973f",
+            "slug": "automoto-du-14-juin-2026-58289386",
+            "rights": ["MAX"],
+            "authEnabled": true,
+            "date": "2026-06-14T12:00:00.000Z",
+            "decoration": {
+              "label": "Automoto du 14 juin 2026"
+            },
+            "playingInfos": {
+              "duration": 2356
+            }
+          }
+        ]
+      }
+    }
+  }
+}
