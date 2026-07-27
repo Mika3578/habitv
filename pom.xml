@@ -15,7 +15,7 @@
 	</modules>
 
 	<properties>
-		<jackson.version>2.22.0</jackson.version>
+		<jackson.version>2.22.1</jackson.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<!-- Local Maven staging only; runtime uses FrameworkConf.UPDATE_URL (GitHub Pages). -->
@@ -174,7 +174,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.5.0</version>
+        <version>3.5.1</version>
         <configuration>
           <archive>
             <index>true</index>
