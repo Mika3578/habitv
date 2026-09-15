@@ -9,8 +9,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.junit.Test;
@@ -43,6 +46,20 @@ public class Novo19ModuleContentAgnosticTest {
 
 	private static final Pattern SYNTHETIC_PLAYER_SLUG = Pattern
 			.compile("/player/(?:programme|series|film|podcast|collection|talk-programme|documentary)-[a-z0-9-]+");
+
+	/**
+	 * Structural fixture filenames only — no real catalogue programme slugs.
+	 * New fixtures must use a shape-based name and be added here.
+	 */
+	private static final Set<String> ALLOWED_FIXTURE_FILENAMES = new HashSet<String>(Arrays.asList(
+			"bff-config.json",
+			"bff-section-catalogue-tiles.json",
+			"bff-section-detail-pages.json",
+			"bff-section-documentary.json",
+			"bff-section-episode-rails.json",
+			"bff-section-pagination-tiles.json",
+			"redbee-scenarios.json",
+			"fixture-baseline.txt"));
 
 	@Test
 	public void productionSourcesStayContentAgnostic() throws IOException {
@@ -123,11 +140,9 @@ public class Novo19ModuleContentAgnosticTest {
 
 	private static void scanFixtureFilename(final File file, final List<String> violations) {
 		final String name = file.getName().toLowerCase(Locale.ROOT);
-		if (name.contains("bucheron") || name.contains("inferno") || name.contains("elysee")
-				|| name.contains("cuisinons") || name.contains("on-a-de-l-info") || name.contains("on-a-du-nouveau")
-				|| name.contains("fbi-portes") || name.contains("royaume-des-contes")
-				|| name.contains("vos-objets")) {
-			violations.add(file.getPath().replace('\\', '/') + ": fixture filename embeds real catalogue identity");
+		if (!ALLOWED_FIXTURE_FILENAMES.contains(name)) {
+			violations.add(file.getPath().replace('\\', '/')
+					+ ": fixture filename is not in the structural allowlist (avoid real catalogue names)");
 		}
 	}
 
