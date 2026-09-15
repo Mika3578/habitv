@@ -58,7 +58,7 @@ no provider rewrite, no runtime behavior change in inventory-only work.
 
 | Module path | Maven artifactId | Plugin type | Current status | Evidence | Recommended follow-up PR |
 |---|---|---|---|---|---|
-| `plugins/pom.xml` | `plugins` | utility | infrastructure-only | Aggregator defines all 23 plugin modules and no runtime logic | keep as-is |
+| `plugins/pom.xml` | `plugins` | utility | infrastructure-only | Aggregator defines all 24 plugin modules and no runtime logic | keep as-is |
 | `plugins/6play` | `6play` | provider | needs live endpoint rewrite | `SixPlayPluginManager` is a provider; `SixPlayConf.HOME_URL` points to legacy HTTP `6play.fr`; live parser stability unknown | add fixture tests |
 | `plugins/RSS` | `RSS` | provider | keep | `RSSPluginManager` implements provider; test class exists; references generic RSS templates | add fixture tests |
 | `plugins/adobeHDS` | `adobeHDS` | downloader | keep | `AdobeHDSPluginDownloader` implements downloader/proxy interfaces; updater-style binary wrapper | keep as-is |
@@ -76,6 +76,7 @@ no provider rewrite, no runtime behavior change in inventory-only work.
 | `plugins/globalnews` | `globalnews` | provider | unknown / needs fixture | `GlobalNewsPluginManager` provider/downloader interface with HTTPS source URL; only live-style test evidence | add fixture tests |
 | `plugins/lequipe` | `lequipe` | provider | needs live endpoint rewrite | Provider/downloader plugin uses HTML scraping; tests include historical Kewego stream-init references | rewrite provider |
 | `plugins/mlssoccer` | `mlssoccer` | provider | unknown / needs fixture | `MLSSoccerPluginManager` provider/downloader with HTTPS URLs; live endpoint compatibility not validated offline | add fixture tests |
+| `plugins/novo19` | `novo19` | provider | degraded (catalog + replay download) | `Novo19PluginManager` discovers public replay via BFF JSON; replay/podcast download resolves RedBee anonymous entitlement (HLS with DASH fallback) and delegates to `youtube` (yt-dlp); live `novo19_*` assets excluded; offline fixtures under `fixtures/novo19/` | keep |
 | `plugins/plugin-tester` | `plugin-tester` | test harness | infrastructure-only | `BasePluginProviderTester` / `BasePluginUpdateTester` provide shared live-style harness utilities | keep as-is |
 | `plugins/francetv` | `francetv` | provider | keep | `FranceTvPluginManager` queries `api-mobile.yatta.francetv.fr` catalogue and public hubs via `/apps/channels/{hubSlug}?platform=apps` (PR #137, plugin `4.1.3-SNAPSHOT`); download delegated to `youtube` (yt-dlp); offline `FranceTvUrlsTest` + fixture baseline; live `FranceTvPluginManagerTest` opt-in only; replaces former `plugins/pluzz` (legacy `pluzz.` URLs still recognised by `canDownload`; grab-config plugin id must be `francetv`) | keep |
 | `plugins/rtmpDump` | `rtmpDump` | downloader | keep | `RtmpDumpPluginDownloader` is binary wrapper with updater version pattern; dedicated test exists | keep as-is |
@@ -137,6 +138,19 @@ no provider rewrite, no runtime behavior change in inventory-only work.
 | `francetv` (ex `pluzz`) | Local fixture metadata + offline `FranceTvUrlsTest` covering URL/slug builders | Replacement of the legacy `pluzz` module against `api-mobile.yatta.francetv.fr` |
 | `arte` | Local fixture metadata + offline baseline test | Legacy HTTP/RSS parsing assumptions need stable parser anchors |
 | `youtube` | Local fixture metadata + offline baseline test | Binary contract migrated to yt-dlp; live provider validation still separate |
+| `novo19` | Local BFF JSON fixtures + offline parser/mapper/playback tests | Public replay provider; BFF catalogue + RedBee playback delegation to yt-dlp |
+
+### NOVO19 provider strategy
+
+- **Catalogue:** public BFF JSON (`novo19-bff.ouest-france.fr`) for config, pages,
+  rails, seasons, and pagination.
+- **Download:** resolve asset IDs from public player/detail pages; RedBee anonymous
+  session (memory only); public HLS with DASH fallback; delegate to `youtube`
+  (yt-dlp). Podcasts use audio-only yt-dlp flags.
+- **Failure mode:** empty sets or unavailable download message; sanitized diagnostics;
+  no DRM/login/cookie bypass.
+- **Out of scope:** live direct (`novo19_*`), login, `/mes-videos`, BFF full-text search
+  until Habitv search UX is defined.
 
 ### Infrastructure-only modules not suitable for provider fixtures
 
@@ -157,6 +171,7 @@ provider endpoint fixtures.
 - `plugins/francetv/test/resources/fixtures/francetv/fixture-baseline.txt`
 - `plugins/arte/test/resources/fixtures/arte/fixture-baseline.txt`
 - `plugins/youtube/test/resources/fixtures/youtube/fixture-baseline.txt`
+- `plugins/novo19/test/resources/fixtures/novo19/fixture-baseline.txt`
 
 Baseline tests added (local fixture loading only):
 
@@ -165,6 +180,7 @@ Baseline tests added (local fixture loading only):
 - `FranceTvOfflineFixtureBaselineTest` (+ `FranceTvUrlsTest` unit coverage)
 - `ArteOfflineFixtureBaselineTest`
 - `YoutubeOfflineFixtureBaselineTest`
+- `Novo19CatalogOfflineTest` fixture baseline (+ parser/mapper/playback offline suite)
 
 ---
 
