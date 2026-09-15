@@ -76,6 +76,27 @@ public class FranceTvEpisodeMetadataTest {
 	}
 
 	@Test
+	public void applyMapsOptionalDescriptionAndThumbnailWhenPresent() {
+		final Map<String, Object> item = new LinkedHashMap<>();
+		item.put("broadcast_begin_date", Long.valueOf(1700000000L));
+		item.put("duration", Long.valueOf(100));
+		item.put("description", "Synopsis");
+		item.put("image_url", "https://example.test/thumb.jpg");
+
+		final CategoryDTO program = new CategoryDTO("francetv", "JT 20h",
+				"https://www.france.tv/france-2/journal-20-heures/", "mp4");
+		final EpisodeDTO episode = new EpisodeDTO(program, "Episode 1",
+				"https://www.france.tv/france-2/journal-20-heures/1-ep.html");
+
+		FranceTvEpisodeMetadata.apply(item, episode, "france-2_journal");
+
+		assertEquals("Synopsis", episode.getMetadata().getDescription());
+		assertEquals("https://example.test/thumb.jpg", episode.getMetadata().getThumbnailUrl());
+		assertNotNull(episode.getMetadata().getAirDate());
+		assertNull(episode.getMetadata().getPublicationDate());
+	}
+
+	@Test
 	public void fallsBackToBeginDateWhenBroadcastMissing() {
 		final Map<String, Object> item = new LinkedHashMap<>();
 		item.put("begin_date", Long.valueOf(1600000000L));

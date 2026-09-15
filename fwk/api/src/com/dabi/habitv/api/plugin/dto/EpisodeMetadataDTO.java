@@ -9,10 +9,17 @@ import java.util.Date;
  * Distinct from legacy {@link EpisodeDTO} display fields ({@code name},
  * {@code num}, category label). Providers populate only fields they know
  * reliably; core naming never invents missing season/episode numbers.
+ * <p>
+ * Date semantics:
+ * <ul>
+ * <li>{@link #airDate} — true broadcast / on-air date only</li>
+ * <li>{@link #publicationDate} — catalogue publication / upload / mise en ligne</li>
+ * </ul>
+ * Never map upload_date, publishedAt, or rights.begin to {@code airDate}.
  */
 public class EpisodeMetadataDTO implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	private String seriesTitle;
 
@@ -24,11 +31,17 @@ public class EpisodeMetadataDTO implements Serializable {
 
 	private Date airDate;
 
+	private Date publicationDate;
+
 	private Long durationSeconds;
 
 	private String description;
 
+	private String thumbnailUrl;
+
 	private String channel;
+
+	private String contentLanguage;
 
 	private String providerEpisodeId;
 
@@ -74,6 +87,14 @@ public class EpisodeMetadataDTO implements Serializable {
 		this.airDate = airDate == null ? null : new Date(airDate.getTime());
 	}
 
+	public Date getPublicationDate() {
+		return publicationDate == null ? null : new Date(publicationDate.getTime());
+	}
+
+	public void setPublicationDate(final Date publicationDate) {
+		this.publicationDate = publicationDate == null ? null : new Date(publicationDate.getTime());
+	}
+
 	public Long getDurationSeconds() {
 		return durationSeconds;
 	}
@@ -90,12 +111,28 @@ public class EpisodeMetadataDTO implements Serializable {
 		this.description = blankToNull(description);
 	}
 
+	public String getThumbnailUrl() {
+		return thumbnailUrl;
+	}
+
+	public void setThumbnailUrl(final String thumbnailUrl) {
+		this.thumbnailUrl = blankToNull(thumbnailUrl);
+	}
+
 	public String getChannel() {
 		return channel;
 	}
 
 	public void setChannel(final String channel) {
 		this.channel = blankToNull(channel);
+	}
+
+	public String getContentLanguage() {
+		return contentLanguage;
+	}
+
+	public void setContentLanguage(final String contentLanguage) {
+		this.contentLanguage = blankToNull(contentLanguage);
 	}
 
 	public String getProviderEpisodeId() {

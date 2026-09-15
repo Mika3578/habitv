@@ -12,6 +12,11 @@ import com.dabi.habitv.api.plugin.dto.EpisodeMetadataDTO;
  * legacy {@link EpisodeDTO} date/duration/title fields. Never maps
  * {@code category.name} to series title unless a provider already set
  * {@link EpisodeMetadataDTO#getSeriesTitle()}.
+ * <p>
+ * Legacy {@link EpisodeDTO#getEpisodeDate()} is only promoted to
+ * {@link EpisodeMetadataDTO#getAirDate()} when the provider did not already set
+ * a {@link EpisodeMetadataDTO#getPublicationDate()} (publication must not become
+ * a fake broadcast date for MEDIA_SERVER dated paths).
  */
 public final class EpisodeMetadataResolver {
 
@@ -33,7 +38,8 @@ public final class EpisodeMetadataResolver {
 				&& !episode.getName().trim().isEmpty()) {
 			resolved.setEpisodeTitle(episode.getName().trim());
 		}
-		if (resolved.getAirDate() == null && episode.getEpisodeDate() != null) {
+		if (resolved.getAirDate() == null && resolved.getPublicationDate() == null
+				&& episode.getEpisodeDate() != null) {
 			resolved.setAirDate(episode.getEpisodeDate());
 		}
 		if (resolved.getDurationSeconds() == null && episode.getDurationSeconds() != null) {
@@ -63,14 +69,24 @@ public final class EpisodeMetadataResolver {
 		if (airDate != null) {
 			to.setAirDate(airDate);
 		}
+		final Date publicationDate = from.getPublicationDate();
+		if (publicationDate != null) {
+			to.setPublicationDate(publicationDate);
+		}
 		if (from.getDurationSeconds() != null) {
 			to.setDurationSeconds(from.getDurationSeconds());
 		}
 		if (from.getDescription() != null) {
 			to.setDescription(from.getDescription());
 		}
+		if (from.getThumbnailUrl() != null) {
+			to.setThumbnailUrl(from.getThumbnailUrl());
+		}
 		if (from.getChannel() != null) {
 			to.setChannel(from.getChannel());
+		}
+		if (from.getContentLanguage() != null) {
+			to.setContentLanguage(from.getContentLanguage());
 		}
 		if (from.getProviderEpisodeId() != null) {
 			to.setProviderEpisodeId(from.getProviderEpisodeId());

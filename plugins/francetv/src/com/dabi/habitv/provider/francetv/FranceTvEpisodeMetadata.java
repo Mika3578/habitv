@@ -55,6 +55,14 @@ final class FranceTvEpisodeMetadata {
 		if (duration != null) {
 			metadata.setDurationSeconds(duration);
 		}
+		final String description = firstString(item, "description", "synopsis", "short_description");
+		if (description != null) {
+			metadata.setDescription(description);
+		}
+		final String thumbnail = firstString(item, "image_url", "image", "thumbnail", "thumb");
+		if (thumbnail != null) {
+			metadata.setThumbnailUrl(thumbnail);
+		}
 		final Integer season = parsePositiveNumber(item.get("season"));
 		if (season != null) {
 			metadata.setSeasonNumber(season);
@@ -131,6 +139,16 @@ final class FranceTvEpisodeMetadata {
 		}
 		final String value = String.valueOf(raw).trim();
 		return value.isEmpty() ? null : value;
+	}
+
+	private static String firstString(final Map<String, Object> item, final String... keys) {
+		for (final String key : keys) {
+			final String value = stringValue(item.get(key));
+			if (value != null) {
+				return value;
+			}
+		}
+		return null;
 	}
 
 	private static String channelFromProgramPath(final String programPath) {

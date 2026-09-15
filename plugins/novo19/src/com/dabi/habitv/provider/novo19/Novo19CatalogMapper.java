@@ -10,11 +10,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
+import com.dabi.habitv.api.plugin.dto.EpisodeMetadataDTO;
 import com.dabi.habitv.provider.novo19.dto.Novo19BffPage;
 import com.dabi.habitv.provider.novo19.dto.Novo19Season;
 import com.dabi.habitv.provider.novo19.dto.Novo19Tile;
@@ -23,6 +26,9 @@ final class Novo19CatalogMapper {
 
 	private static final String[] PUBLISHED_AT_PATTERNS = new String[] { "yyyy-MM-dd'T'HH:mm:ssX",
 			"yyyy-MM-dd'T'HH:mm:ss.SSSX", "yyyy-MM-dd" };
+
+	private static final Pattern SEASON_EPISODE_PATTERN = Pattern.compile("^S(\\d+)E(\\d+)$",
+			Pattern.CASE_INSENSITIVE);
 
 	private Novo19CatalogMapper() {
 	}
@@ -280,9 +286,82 @@ final class Novo19CatalogMapper {
 		}
 		final Date publishedAt = parsePublishedAt(tile.getPublishedAt());
 		if (publishedAt != null) {
+			// Keep legacy episodeDate for indexes; canonical airDate stays unset.
 			episode.setEpisodeDate(publishedAt);
 		}
+		episode.setMetadata(buildMetadata(category, tile, episodeUrl, publishedAt));
 		episodes.add(episode);
+	}
+
+	static EpisodeMetadataDTO buildMetadata(final CategoryDTO category, final Novo19Tile tile,
+			final String episodeUrl, final Date publishedAt) {
+		final EpisodeMetadataDTO metadata = new EpisodeMetadataDTO();
+		final String seriesTitle = seriesTitleFromCategory(category);
+		if (seriesTitle != null) {
+			metadata.setSeriesTitle(seriesTitle);
+		}
+		if (!StringUtils.isEmpty(tile.getTitle())) {
+			metadata.setEpisodeTitle(tile.getTitle().trim());
+		}
+		final int[] seasonEpisode = parseSeasonEpisodeCode(tile.getSubtitle());
+		if (seasonEpisode != null) {
+			metadata.setSeasonNumber(Integer.valueOf(seasonEpisode[0]));
+			metadata.setEpisodeNumber(Integer.valueOf(seasonEpisode[1]));
+		}
+		if (tile.getDurationSeconds() != null) {
+			metadata.setDurationSeconds(tile.getDurationSeconds());
+		}
+		if (!StringUtils.isEmpty(tile.getDescription())) {
+			metadata.setDescription(tile.getDescription().trim());
+		}
+		if (publishedAt != null) {
+			metadata.setPublicationDate(publishedAt);
+		}
+		if (!StringUtils.isEmpty(tile.getId())) {
+			metadata.setProviderEpisodeId(tile.getId().trim());
+		} else if (!StringUtils.isEmpty(tile.getAssetId())) {
+			metadata.setProviderEpisodeId(tile.getAssetId().trim());
+		}
+		if (!StringUtils.isEmpty(episodeUrl)) {
+			metadata.setSourceUrl(episodeUrl);
+		}
+		metadata.setChannel(Novo19Conf.NAME);
+		return metadata;
+	}
+
+	/**
+	 * Strict {@code S&lt;season&gt;E&lt;episode&gt;} only (e.g. {@code S1E11}). Genre
+	 * subtitles must not become season/episode numbers.
+	 */
+	static int[] parseSeasonEpisodeCode(final String subtitle) {
+		if (StringUtils.isEmpty(subtitle)) {
+			return null;
+		}
+		final Matcher matcher = SEASON_EPISODE_PATTERN.matcher(subtitle.trim());
+		if (!matcher.matches()) {
+			return null;
+		}
+		final int season = Integer.parseInt(matcher.group(1));
+		final int episode = Integer.parseInt(matcher.group(2));
+		if (season <= 0 || episode <= 0) {
+			return null;
+		}
+		return new int[] { season, episode };
+	}
+
+	private static String seriesTitleFromCategory(final CategoryDTO category) {
+		if (category == null) {
+			return null;
+		}
+		if (Novo19Conf.CONTENT_KIND_SEASON.equals(category.getParameter(Novo19Conf.PARAMETER_CONTENT_KIND))
+				&& category.getFatherCategory() != null
+				&& !StringUtils.isEmpty(category.getFatherCategory().getName())) {
+			return category.getFatherCategory().getName().trim();
+		}
+		if (!StringUtils.isEmpty(category.getName())) {
+			return category.getName().trim();
+		}
+		return null;
 	}
 
 	static String programLabel(final Novo19Tile tile) {
