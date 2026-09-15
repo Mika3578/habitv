@@ -1,0 +1,195 @@
+{
+  "sections": {
+    "carousel": {
+      "tiles": [
+        {
+          "id": "info-shortcut",
+          "type": "COLLECTION",
+          "title": "Info",
+          "href": "/details/collection-alpha",
+          "source": {
+            "id": "info-shortcut"
+          }
+        },
+        {
+          "id": "asset-talk-programme-alpha",
+          "type": "COLLECTION",
+          "title": "Talk",
+          "href": "/details/talk-programme-alpha",
+          "source": {
+            "id": "asset-talk-programme-alpha"
+          }
+        },
+        {
+          "id": "nav-series",
+          "type": "COLLECTION",
+          "title": "Series",
+          "href": "/series",
+          "source": {
+            "id": "nav-series"
+          }
+        },
+        {
+          "id": "nav-films",
+          "type": "COLLECTION",
+          "title": "Films",
+          "href": "/films",
+          "source": {
+            "id": "nav-films"
+          }
+        },
+        {
+          "id": "nav-podcasts",
+          "type": "COLLECTION",
+          "href": "/podcasts",
+          "source": {
+            "id": "nav-podcasts"
+          }
+        }
+      ],
+      "version": "0.9.1"
+    },
+    "series": {
+      "tiles": [
+        {
+          "id": "asset-series-alpha",
+          "type": "SERIE",
+          "title": "Series Alpha",
+          "subtitle": "Policiers / Thrillers",
+          "href": "/details/series-alpha",
+          "source": {
+            "provider": "redbee",
+            "type": "TV_SHOW",
+            "id": "asset-series-alpha"
+          }
+        }
+      ],
+      "version": "0.9.1"
+    },
+    "films": {
+      "tiles": [
+        {
+          "id": "tile-film-beta",
+          "type": "VOD",
+          "title": "Film Beta",
+          "duration": 7200,
+          "href": "/details/film-beta",
+          "source": {
+            "id": "asset-film-beta"
+          }
+        },
+        {
+          "id": "asset-film-alpha",
+          "type": "VOD",
+          "title": "Film Alpha",
+          "subtitle": "Policiers / Thrillers",
+          "duration": 5196,
+          "href": "/details/film-alpha",
+          "source": {
+            "provider": "redbee",
+            "type": "MOVIE",
+            "id": "asset-film-alpha"
+          }
+        }
+      ],
+      "version": "0.9.1"
+    },
+    "infoBanner": {
+      "tiles": [
+        {
+          "id": "asset-programme-beta",
+          "type": "COLLECTION",
+          "title": "Programme Beta",
+          "href": "/details/programme-beta",
+          "source": {
+            "id": "asset-programme-beta"
+          }
+        }
+      ],
+      "version": "0.9.1"
+    },
+    "documentaries": {
+      "tiles": [
+        {
+          "id": "asset-programme-alpha",
+          "type": "SERIE",
+          "title": "Programme Alpha",
+          "subtitle": "Histoire",
+          "href": "/details/programme-alpha",
+          "source": {
+            "id": "asset-programme-alpha"
+          }
+        },
+        {
+          "id": "asset-series-beta",
+          "type": "SERIE",
+          "title": "Series Beta",
+          "subtitle": "Société",
+          "href": "/details/series-beta",
+          "source": {
+            "id": "asset-series-beta"
+          }
+        },
+        {
+          "id": "asset-theme-alpha-programme",
+          "type": "SERIE",
+          "title": "Theme Alpha Programme",
+          "subtitle": "Immersion",
+          "href": "/details/theme-alpha-programme",
+          "source": {
+            "id": "asset-theme-alpha-programme"
+          }
+        },
+        {
+          "id": "asset-standalone-documentary",
+          "type": "VOD",
+          "title": "Standalone documentary",
+          "href": "/details/standalone-documentary",
+          "source": {
+            "id": "asset-standalone-documentary"
+          }
+        },
+        {
+          "id": "asset-film-gamma",
+          "type": "VOD",
+          "title": "Film Gamma",
+          "href": "/details/film-gamma",
+          "source": {
+            "id": "asset-film-gamma"
+          }
+        }
+      ],
+      "version": "0.9.1"
+    },
+    "talkBanner": {
+      "tiles": [],
+      "version": "0.9.1"
+    },
+    "podcasts": {
+      "tiles": [
+        {
+          "id": "asset-podcast-alpha",
+          "type": "PODCAST",
+          "title": "Podcast Alpha",
+          "description": "Synthetic podcast description",
+          "href": "/details/podcast-alpha",
+          "source": {
+            "provider": "redbee",
+            "type": "PODCAST",
+            "id": "asset-podcast-alpha"
+          }
+        },
+        {
+          "id": "asset-programme-alpha",
+          "type": "SERIE",
+          "title": "Programme Alpha",
+          "href": "/details/programme-alpha",
+          "source": {
+            "id": "asset-programme-alpha"
+          }
+        }
+      ],
+      "version": "0.9.1"
+    }
+  }
+}

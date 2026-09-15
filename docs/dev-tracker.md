@@ -30,11 +30,11 @@ automatic category behavior, provider summary, doc map).
 | Category | Count |
 |---------|------:|
 | ✅ Delivered | **13** |
-| 🟡 In progress | **7** |
+| 🟡 In progress | **9** |
 | 🔵 Proposed | **1** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
-| **Total work items** | **21** |
+| **Total work items** | **23** |
 
 ---
 
@@ -49,6 +49,7 @@ automatic category behavior, provider summary, doc map).
 | 🔗 `legacy-url-migration` — Legacy URL migration (free.fr / SVN / FTP) | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 📦 `static-repo-publish` — Static artifact repository publication | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🟡 In progress | 🟡 P2 | `█████████████░░░░░░░` 65% |
+| 📺 `provider-novo19` — NOVO19 public replay provider | 🟡 In progress | 🟡 P2 | `██████████████████░░` 90% |
 | 🎬 `ytdlp-migration` — `youtube-dl` → `yt-dlp` migration | 🟡 In progress | 🟡 P2 | `███████████████░░░░░` 75% |
 | 🩺 `ytdlp-runtime-diagnostics` — yt-dlp Windows runtime diagnostics | 🟡 In progress | 🟡 P2 | `██████████████████░░` 90% |
 | 🖼️ `javafx-modernization` — JavaFX & runtime packaging modernization | 🔵 Proposed | 🟡 P2 | `███░░░░░░░░░░░░░░░░░` 15% |
@@ -323,7 +324,7 @@ resolution matches the latest published SNAPSHOT builds.
 | **Progress** | `█████████████░░░░░░░` 65% |
 | **Legacy code** | HBTV-006 |
 
-**Scope** — Inventory every plugin in `plugins/` (22 in the aggregator
+**Scope** — Inventory every plugin in `plugins/` (24 in the aggregator
 + `plugin-tester`); record current status (working, obsolete endpoint,
 renamed, broken parser). No code removal in this item.
 
@@ -349,7 +350,7 @@ mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Ds
 [`provider-inventory.md`](provider-inventory.md) for every plugin module
 plus historical references (`CStar` (ex `D17`), `nrj12`, FranceTV/Pluzz,
 Kewego). An offline fixture policy and first local fixture baseline are
-now documented for `6play`, `canalPlus`, `francetv` (ex `pluzz`), `arte`, and `youtube`
+now documented for `6play`, `canalPlus`, `francetv` (ex `pluzz`), `arte`, `youtube`, and `novo19`
 without rewriting providers. PR #137 adds API-first public hub discovery
 (Sport, Franceinfo, partner hubs); `francetv` plugin version `4.1.3-SNAPSHOT`.
 Default `mvn test` skips live
@@ -364,6 +365,31 @@ provider drift, documented in inventory. This item remains open for
 broader fixture capture and dedicated cleanup/rewrite PRs. See also
 [`automatic-category-download.md`](automatic-category-download.md).
 Risks `live-tests-flaky`, `provider-endpoints-dead`.
+
+---
+
+## 📺 `provider-novo19` — NOVO19 public replay provider
+
+| | |
+|---|---|
+| **Status** | 🟡 In progress |
+| **Priority** | 🟡 P2 |
+| **Progress** | `██████████████████░░` 90% |
+| **Legacy code** | — |
+
+**Scope** — Add `plugins/novo19` for public catalogue browsing and
+replay/podcast download via BFF + RedBee anonymous entitlement, delegated to
+yt-dlp. Live direct, login, and personal rails remain out of scope.
+
+**Acceptance criteria**
+- ✅ Module registered with deterministic offline fixtures/tests
+- ✅ Catalogue + replay/podcast download path
+- 🟡 Squash-merge PR [#150](https://github.com/Mika3578/habitv/pull/150)
+- ⬜ Optional follow-up: BFF catalogue search after Habitv search UX is defined
+
+**Related PRs** · [#150](https://github.com/Mika3578/habitv/pull/150)
+
+**Notes** — Strategy details: [`provider-inventory.md`](provider-inventory.md).
 
 ---
 
