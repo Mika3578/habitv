@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft-07/schema",
   "version": 3,
   "description": "Machine-readable mirror of docs/dev-tracker.md. Keep both files in sync. Identifiers use descriptive kebab-case slugs (see descriptive-slug-ids ADR). Legacy HBTV codes are historical-only and not for new workflow naming.",
-  "lastRefresh": "2026-06-18",
+  "lastRefresh": "2026-09-15",
   "statusValues": [
     "proposed",
     "in-progress",
@@ -550,6 +550,29 @@
       ],
       "pr": "docs: add external tools recommendations and obsolescence analysis (this PR)",
       "notes": "Documentation only; no application code or CI behavior changes. No risk register or decision log update (no new risk surfaced, no architectural decision required for an analysis doc). Every follow-up PR derived from this analysis must carry its own ADR if it changes user-visible defaults."
+    },
+    {
+      "id": "media-metadata-naming",
+      "legacyCode": null,
+      "displayTitle": "Canonical media metadata and interoperable naming",
+      "icon": "🏷️",
+      "status": "in-progress",
+      "priority": "P2",
+      "progressPercent": 70,
+      "scope": "Additive EpisodeMetadataDTO, MEDIA_SERVER naming profile, semantic tokens, and FranceTV/Arte/6play mappings. Preserve legacy token semantics including #DATE# as download/current date. No embedded tags, NFO, or yt-dlp enrichment in this item.",
+      "acceptanceCriteria": [
+        "Canonical metadata DTO attached optionally to EpisodeDTO.",
+        "Semantic tokens and MEDIA_SERVER path builder with offline tests.",
+        "FranceTV / Arte / 6play mappings without global category-to-series fallback.",
+        "Merged PR on develop.",
+        "Follow-up yt-dlp metadata enrichment + embedded tags PR."
+      ],
+      "validation": [
+        "mvn -B -ntp -pl fwk/api,application/core,plugins/francetv,plugins/arte,plugins/6play -am test",
+        "mvn -B -ntp -DskipTests verify"
+      ],
+      "pr": null,
+      "notes": "See docs/media-metadata-naming.md. Java 8 DTO (no records). Existing installs stay on LEGACY templates; opt in via #MEDIA_SERVER_PATH#."
     }
   ]
 }

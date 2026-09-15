@@ -19,7 +19,7 @@ import com.dabi.habitv.api.plugin.pub.Publisher;
 import com.dabi.habitv.core.dao.DownloadedDAO;
 import com.dabi.habitv.core.event.EpisodeStateEnum;
 import com.dabi.habitv.core.event.RetreiveEvent;
-import com.dabi.habitv.core.token.TokenReplacer;
+import com.dabi.habitv.core.metadata.EpisodeOutputPathResolver;
 import com.dabi.habitv.framework.FrameworkConf;
 import com.dabi.habitv.framework.plugin.utils.DownloadFailureDiagnostics;
 import com.dabi.habitv.framework.plugin.utils.DownloadUtils;
@@ -94,15 +94,15 @@ public class DownloadTask extends AbstractEpisodeTask {
 
 	@Override
 	protected Object doCall() throws DownloadFailedException {
-		final String outputFilename = TokenReplacer.replaceAll(
+		final String outputFilename = EpisodeOutputPathResolver.resolve(
 				downloaders.getDownloadOutput(), getEpisode());
 		final String outputTmpFileName = outputFilename + TMP;
 		// delete to prevent resuming since most of the download can't resume
 		final File outputFile = new File(outputFilename);
-		// create download dir if doesn't exist
+		// create download dir if doesn't exist (nested MEDIA_SERVER paths need mkdirs)
 		if (outputFile.getParentFile() != null
 				&& !outputFile.getParentFile().exists()) {
-			outputFile.getParentFile().mkdir();
+			outputFile.getParentFile().mkdirs();
 		}
 		if (outputFile.exists()) {
 			if (!outputFile.delete()) {

@@ -8,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
+import com.dabi.habitv.api.plugin.dto.EpisodeMetadataDTO;
 
 /**
  * Maps public-page discovery results into Habitv category and episode DTOs.
@@ -57,6 +58,23 @@ final class FranceTvDiscoveryMapper {
 			if (item.getDurationSeconds() != null) {
 				episode.setDurationSeconds(item.getDurationSeconds());
 			}
+			final EpisodeMetadataDTO metadata = new EpisodeMetadataDTO();
+			if (category.getName() != null && !category.getName().trim().isEmpty()) {
+				metadata.setSeriesTitle(category.getName().trim());
+			}
+			if (item.getTitle() != null && !item.getTitle().trim().isEmpty()) {
+				metadata.setEpisodeTitle(item.getTitle().trim());
+			}
+			if (item.getPublicationDate() != null) {
+				metadata.setAirDate(item.getPublicationDate());
+			}
+			if (item.getDurationSeconds() != null) {
+				metadata.setDurationSeconds(item.getDurationSeconds());
+			}
+			if (item.getItemUrl() != null) {
+				metadata.setSourceUrl(item.getItemUrl());
+			}
+			episode.setMetadata(metadata);
 			episodes.add(episode);
 		}
 		return episodes;

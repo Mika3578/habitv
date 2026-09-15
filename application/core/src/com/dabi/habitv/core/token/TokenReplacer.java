@@ -15,6 +15,10 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
+import com.dabi.habitv.api.plugin.dto.EpisodeMetadataDTO;
+import com.dabi.habitv.core.metadata.EpisodeMetadataResolver;
+import com.dabi.habitv.core.metadata.MediaServerNamingPolicy;
+import com.dabi.habitv.core.metadata.NamingProfile;
 import com.dabi.habitv.utils.FileUtils;
 
 public final class TokenReplacer {
@@ -58,7 +62,7 @@ public final class TokenReplacer {
 		REF2REPLACER.put("#PROVIDER#", channelReplacer);
 		REF2REPLACER.put("#PROVIDER_NAME#", channelReplacer);
 
-		// TV SHOW
+		// TV SHOW (legacy: category display name — not necessarily series title)
 		final Replacer categoryProvider = new Replacer() {
 
 			@Override
@@ -70,7 +74,7 @@ public final class TokenReplacer {
 		REF2REPLACER.put("#CATEGORY_NAME#", categoryProvider);
 		REF2REPLACER.put("#CATEGORY#", categoryProvider);
 
-		// TV SHOW
+		// EXTENSION
 		REF2REPLACER.put("#EXTENSION#", new Replacer() {
 
 			@Override
@@ -78,7 +82,7 @@ public final class TokenReplacer {
 				return ensure(episode.getCategory().getExtension());
 			}
 		});
-		// DATE
+		// DATE — legacy: download/current date (NOT broadcast air date)
 		final Replacer dateTimeReplacer = new Replacer() {
 
 			@Override
@@ -89,7 +93,7 @@ public final class TokenReplacer {
 		REF2REPLACER.put("#DATE#", dateTimeReplacer);
 		REF2REPLACER.put("#DATETIME#", dateTimeReplacer);
 
-		// NUM
+		// NUM — legacy EpisodeDTO.num, not semantic TV episode number
 		final Replacer numReplacer = new Replacer() {
 
 			@Override
@@ -98,10 +102,87 @@ public final class TokenReplacer {
 			}
 		};
 		REF2REPLACER.put("#NUM#", numReplacer);
+
+		registerSemanticTokens();
+	}
+
+	private static void registerSemanticTokens() {
+		REF2REPLACER.put("#SERIES_NAME#", new Replacer() {
+			@Override
+			public String replace(final EpisodeDTO episode, final List<String> params) {
+				return cut(semantic(resolve(episode).getSeriesTitle()), params);
+			}
+		});
+		REF2REPLACER.put("#SHOW_NAME#", new Replacer() {
+			@Override
+			public String replace(final EpisodeDTO episode, final List<String> params) {
+				return cut(semantic(resolve(episode).getSeriesTitle()), params);
+			}
+		});
+		REF2REPLACER.put("#EPISODE_TITLE#", new Replacer() {
+			@Override
+			public String replace(final EpisodeDTO episode, final List<String> params) {
+				return cut(semantic(resolve(episode).getEpisodeTitle()), params);
+			}
+		});
+		REF2REPLACER.put("#SEASON_NUMBER#", new Replacer() {
+			@Override
+			public String replace(final EpisodeDTO episode, final List<String> params) {
+				final Integer season = resolve(episode).getSeasonNumber();
+				return season == null ? "" : String.valueOf(season.intValue());
+			}
+		});
+		REF2REPLACER.put("#EPISODE_NUMBER#", new Replacer() {
+			@Override
+			public String replace(final EpisodeDTO episode, final List<String> params) {
+				final Integer number = resolve(episode).getEpisodeNumber();
+				return number == null ? "" : String.valueOf(number.intValue());
+			}
+		});
+		REF2REPLACER.put("#SEASON_EPISODE#", new Replacer() {
+			@Override
+			public String replace(final EpisodeDTO episode, final List<String> params) {
+				return MediaServerNamingPolicy.formatSeasonEpisode(resolve(episode));
+			}
+		});
+		final Replacer airDateReplacer = new Replacer() {
+			@Override
+			public String replace(final EpisodeDTO episode, final List<String> params) {
+				final Date airDate = resolve(episode).getAirDate();
+				if (airDate == null) {
+					return "";
+				}
+				final String pattern = params.isEmpty() ? "yyyy-MM-dd" : params.get(0);
+				return new SimpleDateFormat(pattern).format(airDate);
+			}
+		};
+		REF2REPLACER.put("#AIR_DATE#", airDateReplacer);
+		REF2REPLACER.put("#EPISODE_DATE#", airDateReplacer);
+
+		REF2REPLACER.put(NamingProfile.MEDIA_SERVER_TOKEN, new Replacer() {
+			@Override
+			public String replace(final EpisodeDTO episode, final List<String> params) {
+				final EpisodeMetadataDTO metadata = resolve(episode);
+				final String extension = episode.getCategory() == null ? null
+						: episode.getCategory().getExtension();
+				return MediaServerNamingPolicy.buildRelativePath(metadata, extension);
+			}
+		});
+	}
+
+	private static EpisodeMetadataDTO resolve(final EpisodeDTO episode) {
+		return EpisodeMetadataResolver.resolve(episode);
 	}
 
 	private static String ensure(final String input) {
 		return FileUtils.sanitizeFilename(input);
+	}
+
+	private static String semantic(final String input) {
+		if (input == null) {
+			return "";
+		}
+		return FileUtils.sanitizePathSegment(input);
 	}
 
 	private static String cut(final String toCut, final List<String> params) {

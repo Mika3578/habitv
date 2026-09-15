@@ -14,7 +14,7 @@
 > Legacy codes are historical-only and must not be used for new branch
 > names, PR titles, commit subjects, or workflow naming.
 
-**Last refresh:** 2026-05-31 · **Active branch:** `develop`
+**Last refresh:** 2026-09-15 · **Active branch:** `feat/media-metadata-naming`
 
 **Documentation entry point:** [`README.md`](../README.md) (overview, build matrix,
 automatic category behavior, provider summary, doc map).
@@ -65,6 +65,7 @@ automatic category behavior, provider summary, doc map).
 | 🔒 `critical-log4j-cve-remediation` — Critical Log4j 1.x CVE remediation | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 📥 `batch-episode-download-ui` — Batch episode download UI & queue controls | ✅ Done | 🟡 P2 | `████████████████████` 100% |
 | 🧰 `external-tools-recommendations` — External tools recommendations & obsolescence analysis | 🟡 In progress | 🟢 P3 | `██████████░░░░░░░░░░` 50% |
+| 🏷️ `media-metadata-naming` — Canonical media metadata and interoperable naming | 🟡 In progress | 🟡 P2 | `██████████████░░░░░░` 70% |
 
 ---
 
@@ -949,6 +950,40 @@ changes. No risk register or decision log update (no new risk surfaced,
 no architectural decision required for an analysis doc). Every
 follow-up PR derived from this analysis must carry its own ADR if it
 changes user-visible defaults.
+
+---
+
+## 🏷️ `media-metadata-naming` — Canonical media metadata and interoperable naming
+
+| | |
+|---|---|
+| **Status** | 🟡 In progress |
+| **Priority** | 🟡 P2 |
+| **Progress** | `██████████████░░░░░░` 70% |
+| **Legacy code** | N/A (slug-only item) |
+
+**Scope** — Introduce additive `EpisodeMetadataDTO`, core naming resolver /
+`MEDIA_SERVER` profile, semantic tokens (`#SERIES_NAME#`, `#AIR_DATE#`,
+`#SEASON_EPISODE#`, `#MEDIA_SERVER_PATH#`, …), and provider mappings for
+FranceTV / Arte / 6play. Preserve legacy token semantics including
+`#DATE#` as download/current date. No embedded MP4/MKV tags, NFO, or
+yt-dlp enrichment in this item.
+
+**Acceptance criteria**
+- ✅ Canonical metadata DTO attached optionally to `EpisodeDTO`
+- ✅ Semantic tokens and MEDIA_SERVER path builder with offline tests
+- ✅ FranceTV / Arte / 6play mappings without global category→series fallback
+- ⬜ Merged PR on `develop`
+- ⬜ Follow-up yt-dlp metadata enrichment + embedded tags PR
+
+**Validation**
+```bash
+mvn -B -ntp -pl fwk/api,application/core,plugins/francetv,plugins/arte,plugins/6play -am test
+mvn -B -ntp -DskipTests verify
+```
+
+**Notes** — See [`docs/media-metadata-naming.md`](media-metadata-naming.md).
+Java 8 DTO (no records). Existing installs stay on LEGACY templates.
 
 ---
 
