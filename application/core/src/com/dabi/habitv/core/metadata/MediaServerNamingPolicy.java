@@ -23,6 +23,8 @@ import com.dabi.habitv.utils.FileUtils;
  * <li>series missing: episode-title filename only</li>
  * </ul>
  * Missing optional parts collapse cleanly. Never fabricates {@code S00E00}.
+ * Episode titles are cleaned by {@link EpisodeTitleNormalizer} so providers that
+ * embed {@code Sx Ey} in display strings do not produce duplicated markers.
  */
 public final class MediaServerNamingPolicy {
 
@@ -32,7 +34,7 @@ public final class MediaServerNamingPolicy {
 	public static String buildRelativePath(final EpisodeMetadataDTO metadata, final String extension) {
 		final EpisodeMetadataDTO meta = metadata == null ? new EpisodeMetadataDTO() : metadata;
 		final String series = sanitizeSegment(meta.getSeriesTitle());
-		final String title = sanitizeSegment(meta.getEpisodeTitle());
+		final String title = sanitizeSegment(EpisodeTitleNormalizer.forFilename(meta));
 		final String ext = normalizeExtension(extension);
 
 		if (isPresent(series) && meta.hasSeasonAndEpisode()) {

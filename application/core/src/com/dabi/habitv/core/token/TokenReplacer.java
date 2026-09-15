@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeMetadataDTO;
 import com.dabi.habitv.core.metadata.EpisodeMetadataResolver;
+import com.dabi.habitv.core.metadata.EpisodeTitleNormalizer;
 import com.dabi.habitv.core.metadata.MediaServerNamingPolicy;
 import com.dabi.habitv.core.metadata.NamingProfile;
 import com.dabi.habitv.utils.FileUtils;
@@ -122,7 +123,7 @@ public final class TokenReplacer {
 		REF2REPLACER.put("#EPISODE_TITLE#", new Replacer() {
 			@Override
 			public String replace(final EpisodeDTO episode, final List<String> params) {
-				return cut(semantic(resolve(episode).getEpisodeTitle()), params);
+				return cut(semantic(EpisodeTitleNormalizer.forFilename(resolve(episode))), params);
 			}
 		});
 		REF2REPLACER.put("#SEASON_NUMBER#", new Replacer() {

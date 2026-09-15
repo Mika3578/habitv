@@ -19,7 +19,7 @@ import com.dabi.habitv.api.plugin.pub.Publisher;
 import com.dabi.habitv.core.dao.DownloadedDAO;
 import com.dabi.habitv.core.event.EpisodeStateEnum;
 import com.dabi.habitv.core.event.RetreiveEvent;
-import com.dabi.habitv.core.metadata.EpisodeOutputPathResolver;
+import com.dabi.habitv.core.metadata.MediaNamingService;
 import com.dabi.habitv.framework.FrameworkConf;
 import com.dabi.habitv.framework.plugin.utils.DownloadFailureDiagnostics;
 import com.dabi.habitv.framework.plugin.utils.DownloadUtils;
@@ -94,7 +94,7 @@ public class DownloadTask extends AbstractEpisodeTask {
 
 	@Override
 	protected Object doCall() throws DownloadFailedException {
-		final String outputFilename = EpisodeOutputPathResolver.resolve(
+		final String outputFilename = MediaNamingService.resolveOutputPath(
 				downloaders.getDownloadOutput(), getEpisode());
 		final String outputTmpFileName = outputFilename + TMP;
 		// delete to prevent resuming since most of the download can't resume

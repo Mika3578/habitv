@@ -31,6 +31,18 @@ public class MediaServerNamingPolicyTest {
 	}
 
 	@Test
+	public void numberedEpisodeStripsRedundantSeasonEpisodePrefixFromTitle() {
+		final EpisodeMetadataDTO metadata = base("Un si grand soleil",
+				"S8 E2013 - Épisode du vendredi 18 septembre 2026");
+		metadata.setSeasonNumber(Integer.valueOf(8));
+		metadata.setEpisodeNumber(Integer.valueOf(2013));
+
+		assertEquals(
+				"Un si grand soleil/Season 08/Un si grand soleil - S08E2013 - Épisode du vendredi 18 septembre 2026.mp4",
+				MediaServerNamingPolicy.buildRelativePath(metadata, "mp4"));
+	}
+
+	@Test
 	public void datedEpisodeUsesYearFolder() {
 		final EpisodeMetadataDTO metadata = base("C dans l'air", "Titre de l'émission");
 		metadata.setAirDate(date(2026, Calendar.SEPTEMBER, 15));

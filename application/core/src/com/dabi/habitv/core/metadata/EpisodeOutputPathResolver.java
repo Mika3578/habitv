@@ -7,6 +7,9 @@ import com.dabi.habitv.core.token.TokenReplacer;
 /**
  * Resolves the final download output path from the configured template and
  * naming profile.
+ * <p>
+ * Prefer {@link MediaNamingService#resolveOutputPath(String, EpisodeDTO)} as the
+ * public entry point; this class remains the profile implementation detail.
  */
 public final class EpisodeOutputPathResolver {
 
