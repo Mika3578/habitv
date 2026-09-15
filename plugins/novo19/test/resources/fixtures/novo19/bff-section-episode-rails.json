@@ -1,0 +1,248 @@
+{
+  "sections": {
+    "programmeAlpha": {
+      "tiles": [
+        {
+          "id": "asset-programme-alpha-episode-alpha",
+          "type": "EPISODE",
+          "title": "Episode Alpha",
+          "subtitle": "S1E1",
+          "href": "/player/programme-alpha-episode-alpha",
+          "source": {
+            "id": "asset-programme-alpha-episode-alpha"
+          }
+        }
+      ],
+      "version": "0.9.1"
+    },
+    "programmeBeta": {
+      "tiles": [
+        {
+          "id": "asset-programme-beta-episode-alpha",
+          "type": "EPISODE",
+          "title": "Episode Alpha - 10-06-26",
+          "href": "/player/programme-beta-episode-alpha",
+          "source": {
+            "id": "asset-programme-beta-episode-alpha"
+          }
+        }
+      ],
+      "version": "0.9.1"
+    },
+    "collectionAlpha": {
+      "tiles": [
+        {
+          "id": "asset-collection-alpha-episode-alpha",
+          "type": "EPISODE",
+          "title": "Episode Alpha - 16-06-26",
+          "href": "/player/collection-alpha-episode-alpha",
+          "source": {
+            "id": "asset-collection-alpha-episode-alpha"
+          }
+        },
+        {
+          "id": "news-episode-dup",
+          "type": "EPISODE",
+          "title": "Episode Alpha - 16-06-26",
+          "href": "/player/collection-alpha-episode-alpha",
+          "source": {
+            "id": "news-episode-dup"
+          }
+        }
+      ],
+      "more": {
+        "href": "/voir-plus/rail/details/collection-alpha/collection-alpha-episodes"
+      },
+      "version": "0.9.1"
+    },
+    "collectionExtended": {
+      "tiles": [
+        {
+          "id": "asset-collection-alpha-episode-alpha",
+          "type": "EPISODE",
+          "title": "Episode 1",
+          "subtitle": "S1E1",
+          "duration": 2400,
+          "href": "/player/collection-alpha-episode-alpha",
+          "source": {
+            "id": "asset-collection-alpha-episode-alpha"
+          }
+        },
+        {
+          "id": "asset-collection-alpha-episode-beta",
+          "type": "EPISODE",
+          "title": "Episode 2",
+          "subtitle": "S1E2",
+          "duration": 2380,
+          "href": "/player/collection-alpha-episode-beta",
+          "source": {
+            "id": "asset-collection-alpha-episode-beta"
+          }
+        },
+        {
+          "id": "asset-collection-alpha-episode-gamma",
+          "type": "EPISODE",
+          "title": "Episode 3",
+          "subtitle": "S1E3",
+          "duration": 2410,
+          "href": "/player/collection-alpha-episode-gamma",
+          "source": {
+            "id": "asset-collection-alpha-episode-gamma"
+          }
+        },
+        {
+          "id": "asset-collection-alpha-episode-delta",
+          "type": "EPISODE",
+          "title": "Episode 4",
+          "subtitle": "S1E4",
+          "duration": 2395,
+          "href": "/player/collection-alpha-episode-delta",
+          "source": {
+            "id": "asset-collection-alpha-episode-delta"
+          }
+        },
+        {
+          "id": "asset-collection-alpha-episode-epsilon",
+          "type": "EPISODE",
+          "title": "Episode 5",
+          "subtitle": "S1E5",
+          "duration": 2420,
+          "href": "/player/collection-alpha-episode-epsilon",
+          "source": {
+            "id": "asset-collection-alpha-episode-epsilon"
+          }
+        }
+      ],
+      "version": "0.9.1"
+    },
+    "talkAlpha": {
+      "tiles": [
+        {
+          "id": "talk-rail-s1e186-dup",
+          "type": "EPISODE",
+          "title": "Episode Alpha - 22-05-26",
+          "subtitle": "S1E186",
+          "href": "/player/talk-programme-alpha-episode-alpha",
+          "source": {
+            "id": "talk-rail-s1e186-dup"
+          }
+        },
+        {
+          "id": "talk-rail-s1e185",
+          "type": "EPISODE",
+          "title": "Episode Beta - 21-05-26",
+          "subtitle": "S1E185",
+          "href": "/player/talk-programme-alpha-episode-beta",
+          "source": {
+            "id": "talk-rail-s1e185"
+          }
+        }
+      ],
+      "more": {
+        "href": "/voir-plus/rail/details/talk-programme-alpha/talk-programme-alpha-episodes"
+      },
+      "version": "0.9.1"
+    },
+    "podcastAlpha": {
+      "tiles": [
+        {
+          "id": "asset-podcast-alpha-episode-alpha",
+          "type": "PODCAST",
+          "title": "Episode Alpha",
+          "description": "Synthetic description",
+          "duration": 620,
+          "publishedAt": "2026-01-15T10:00:00Z",
+          "href": "/player/podcast-alpha-episode-alpha",
+          "source": {
+            "id": "asset-podcast-alpha-episode-alpha"
+          }
+        },
+        {
+          "id": "broken-tile",
+          "type": "UNSUPPORTED",
+          "href": "/player/broken"
+        },
+        {
+          "id": "asset-podcast-alpha-episode-beta",
+          "type": "AUDIO",
+          "title": "Episode Beta",
+          "duration": 540,
+          "publishedAt": "2026-01-22T10:00:00Z",
+          "href": "/player/podcast-alpha-episode-beta",
+          "source": {
+            "id": "asset-podcast-alpha-episode-beta"
+          }
+        },
+        {
+          "id": "asset-podcast-alpha-episode-gamma",
+          "type": "PODCAST",
+          "title": "Episode Gamma",
+          "duration": 710,
+          "publishedAt": "2026-01-29T10:00:00Z",
+          "href": "/player/podcast-alpha-episode-gamma",
+          "source": {
+            "id": "asset-podcast-alpha-episode-gamma"
+          }
+        }
+      ],
+      "more": {
+        "href": "/api/1/public/frontends/web/pages/BFF%7Casset-details-podcast,podcast-alpha/sections/episodes/tiles-page-2"
+      },
+      "version": "0.9.1"
+    },
+    "seriesBetaSeason2": {
+      "tiles": [],
+      "version": "0.9.1"
+    },
+    "seriesBetaSeason3": {
+      "tiles": [
+        {
+          "id": "asset-series-beta-episode-beta",
+          "type": "EPISODE",
+          "title": "Episode Beta",
+          "subtitle": "S3E11",
+          "href": "/player/series-beta-episode-beta",
+          "source": {
+            "id": "asset-series-beta-episode-beta"
+          }
+        },
+        {
+          "id": "asset-series-beta-episode-alpha",
+          "type": "EPISODE",
+          "title": "Episode Alpha",
+          "subtitle": "S3E10",
+          "href": "/player/series-beta-episode-alpha",
+          "source": {
+            "id": "asset-series-beta-episode-alpha"
+          }
+        }
+      ],
+      "version": "0.9.1"
+    },
+    "filmBetaReco": {
+      "tiles": [
+        {
+          "id": "asset-film-gamma",
+          "type": "VOD",
+          "title": "Film Gamma",
+          "subtitle": "Theme Alpha",
+          "href": "/details/film-gamma",
+          "source": {
+            "id": "asset-film-gamma"
+          }
+        },
+        {
+          "id": "asset-film-delta",
+          "type": "VOD",
+          "title": "Film Delta",
+          "subtitle": "Theme Alpha",
+          "href": "/details/film-delta",
+          "source": {
+            "id": "asset-film-delta"
+          }
+        }
+      ],
+      "version": "0.9.1"
+    }
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "sections": {
+    "authAnonymous": {
+      "sessionToken": "offline-session-token"
+    },
+    "publicHls": {
+      "assetId": "asset-collection-alpha-episode-alpha",
+      "formats": [
+        {
+          "format": "DASH",
+          "drm": false,
+          "mediaLocator": "https://cdn.example.test/ouestfrance/novoplus/assets/asset-collection-alpha-episode-alpha/materials/replay.mpd"
+        },
+        {
+          "format": "HLS",
+          "drm": false,
+          "mediaLocator": "https://cdn.example.test/ouestfrance/novoplus/assets/asset-collection-alpha-episode-alpha/materials/replay.m3u8"
+        }
+      ]
+    },
+    "publicDashOnly": {
+      "assetId": "asset-collection-alpha-episode-alpha",
+      "formats": [
+        {
+          "format": "DASH",
+          "drm": false,
+          "mediaLocator": "https://cdn.example.test/ouestfrance/novoplus/assets/asset-collection-alpha-episode-alpha/materials/replay.mpd"
+        }
+      ]
+    },
+    "protected": {
+      "assetId": "asset-series-beta-episode-beta",
+      "formats": [
+        {
+          "format": "HLS",
+          "drm": {
+            "com.widevine.alpha": {
+              "licenseServerUrl": "https://exposure.api.redbee.live/v2/license/customer/OuestFrance/businessunit/novoplus/widevine"
+            }
+          },
+          "mediaLocator": "https://cdn.example.test/ouestfrance/novoplus/assets/asset-series-beta-episode-beta/materials/lwnDnboUFw/vod-idx.ism/.m3u8"
+        },
+        {
+          "format": "DASH",
+          "drm": {
+            "com.microsoft.playready": {
+              "licenseServerUrl": "https://exposure.api.redbee.live/v2/license/customer/OuestFrance/businessunit/novoplus/playready"
+            }
+          },
+          "mediaLocator": "https://cdn.example.test/ouestfrance/novoplus/assets/asset-series-beta-episode-beta/materials/lwnDnboUFw/vod-idx.ism/.mpd"
+        }
+      ]
+    },
+    "liveProtected": {
+      "assetId": "asset-live",
+      "formats": [
+        {
+          "format": "HLS",
+          "drm": true,
+          "mediaLocator": "https://cdn.example.test/ouestfrance/novoplus/assets/asset-live/materials/live.m3u8"
+        }
+      ]
+    },
+    "podcastHls": {
+      "assetId": "asset-podcast-alpha-episode-alpha",
+      "formats": [
+        {
+          "format": "HLS",
+          "drm": false,
+          "mediaLocator": "https://cdn.example.test/ouestfrance/novoplus/assets/asset-podcast-alpha-episode-alpha/materials/replay.m3u8"
+        }
+      ]
+    },
+    "emptyFormats": {
+      "formats": []
+    }
+  }
+}

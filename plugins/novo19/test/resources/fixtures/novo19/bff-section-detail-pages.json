@@ -1,0 +1,380 @@
+{
+  "sections": {
+    "catalogueRoot": {
+      "page": {
+        "type": "RAILS",
+        "id": "categories",
+        "title": "Catégories",
+        "rails": [
+          {
+            "id": "f6a789ee-7e88-49c4-89ff-d4ef6ab044ce",
+            "type": "CAROUSEL",
+            "src": "/api/1/public/frontends/web/pages/categories/sections/f6a789ee-7e88-49c4-89ff-d4ef6ab044ce/tiles"
+          },
+          {
+            "id": "rail-series",
+            "title": "Nos séries",
+            "src": "/api/1/public/frontends/web/pages/categories/sections/rail-series/tiles"
+          },
+          {
+            "id": "rail-films",
+            "title": "Nos films",
+            "src": "/api/1/public/frontends/web/pages/categories/sections/rail-films/tiles"
+          },
+          {
+            "id": "rail-info-banner",
+            "type": "BANNER",
+            "title": "Info",
+            "src": "/api/1/public/frontends/web/pages/categories/sections/rail-info-banner/tiles"
+          },
+          {
+            "id": "rail-documentaries",
+            "title": "Nos documentaires et magazines",
+            "src": "/api/1/public/frontends/web/pages/categories/sections/rail-documentaries/tiles"
+          },
+          {
+            "id": "rail-talk-banner",
+            "type": "BANNER",
+            "title": "Notre talk",
+            "src": "/api/1/public/frontends/web/pages/categories/sections/rail-talk-banner/tiles"
+          },
+          {
+            "id": "rail-podcasts",
+            "title": "Nos podcasts",
+            "src": "/api/1/public/frontends/web/pages/categories/sections/rail-podcasts/tiles"
+          }
+        ]
+      },
+      "version": "0.9.1"
+    },
+    "seriesAlpha": {
+      "page": {
+        "type": "DETAILS",
+        "id": "series-alpha",
+        "title": "Series Alpha",
+        "seasons": [
+          {
+            "title": "Saison 1",
+            "episodes": [
+              {
+                "id": "asset-series-alpha-episode-alpha",
+                "type": "EPISODE",
+                "title": "Episode Alpha",
+                "subtitle": "S1E11",
+                "duration": 2491,
+                "href": "/player/series-alpha-episode-alpha",
+                "source": {
+                  "id": "asset-series-alpha-episode-alpha"
+                }
+              }
+            ]
+          }
+        ],
+        "rails": [
+          {
+            "id": "episodes-rail",
+            "title": "Episodes",
+            "src": "/api/1/public/frontends/web/pages/details/series-alpha/sections/episodes-rail/tiles"
+          }
+        ]
+      },
+      "version": "0.9.1"
+    },
+    "seriesBeta": {
+      "page": {
+        "type": "DETAILS",
+        "id": "asset-series-beta",
+        "title": "Series Beta",
+        "content": {
+          "id": "asset-series-beta",
+          "type": "SERIE",
+          "title": "Series Beta",
+          "category": [
+            "Société",
+            "Documentaire",
+            "Docs et Magazines"
+          ],
+          "source": {
+            "id": "asset-series-beta"
+          }
+        },
+        "rails": [
+          {
+            "id": "series-beta-season-3",
+            "title": "Saison 3",
+            "src": "/api/1/public/frontends/web/pages/BFF%7Casset-details-serie,series-beta/sections/series-beta-season-3/tiles"
+          },
+          {
+            "id": "series-beta-season-2",
+            "title": "Saison 2",
+            "src": "/api/1/public/frontends/web/pages/BFF%7Casset-details-serie,series-beta/sections/series-beta-season-2/tiles"
+          },
+          {
+            "id": "reco",
+            "title": "Vous aimerez aussi",
+            "src": "/api/1/public/frontends/web/pages/BFF%7Casset-details-serie,series-beta/sections/reco/tiles"
+          }
+        ]
+      },
+      "version": "0.9.1"
+    },
+    "filmAlpha": {
+      "page": {
+        "type": "DETAILS",
+        "id": "film-alpha",
+        "title": "Film Alpha",
+        "content": {
+          "id": "asset-film-alpha",
+          "type": "VOD",
+          "title": "Film Alpha",
+          "duration": 5196,
+          "href": "/player/film-alpha",
+          "source": {
+            "id": "asset-film-alpha"
+          }
+        },
+        "rails": []
+      },
+      "version": "0.9.1"
+    },
+    "filmBeta": {
+      "page": {
+        "type": "DETAILS",
+        "id": "film-beta",
+        "title": "Film Beta",
+        "content": {
+          "id": "asset-film-beta",
+          "type": "VOD",
+          "title": "Film Beta",
+          "duration": 7200,
+          "href": "/player/film-beta",
+          "source": {
+            "id": "asset-film-beta"
+          }
+        },
+        "rails": [
+          {
+            "id": "reco",
+            "title": "Recommendations",
+            "src": "/api/1/public/frontends/web/pages/BFF%7Casset-details,film-beta/sections/reco/tiles"
+          }
+        ]
+      },
+      "version": "0.9.1"
+    },
+    "filmGamma": {
+      "page": {
+        "type": "DETAILS",
+        "id": "asset-film-gamma",
+        "title": "Film Gamma",
+        "content": {
+          "id": "asset-film-gamma",
+          "type": "VOD",
+          "title": "Film Gamma",
+          "category": [
+            "Histoire",
+            "Politique",
+            "Docs et Magazines",
+            "Documentaire"
+          ],
+          "source": {
+            "id": "asset-film-gamma"
+          }
+        },
+        "rails": []
+      },
+      "version": "0.9.1"
+    },
+    "podcastAlpha": {
+      "page": {
+        "type": "DETAILS",
+        "id": "podcast-alpha",
+        "title": "Podcast Alpha",
+        "content": {
+          "id": "asset-podcast-alpha",
+          "type": "PODCAST",
+          "title": "Podcast Alpha",
+          "href": "/details/podcast-alpha",
+          "source": {
+            "id": "asset-podcast-alpha"
+          }
+        },
+        "rails": [
+          {
+            "id": "podcast-episodes",
+            "title": "Episodes",
+            "src": "/api/1/public/frontends/web/pages/BFF%7Casset-details-podcast,podcast-alpha/sections/episodes/tiles"
+          },
+          {
+            "id": "reco",
+            "title": "Recommendations",
+            "src": "/api/1/public/frontends/web/pages/BFF%7Casset-details-podcast,podcast-alpha/sections/reco/tiles"
+          }
+        ]
+      },
+      "version": "0.9.1"
+    },
+    "collectionAlpha": {
+      "page": {
+        "type": "DETAILS",
+        "id": "collection-alpha",
+        "title": "Collection Alpha",
+        "rails": [
+          {
+            "id": "collection-alpha-episodes",
+            "title": "Replays",
+            "src": "/api/1/public/frontends/web/pages/details/collection-alpha/sections/collection-alpha-episodes/tiles"
+          }
+        ]
+      },
+      "version": "0.9.1"
+    },
+    "collectionExtended": {
+      "page": {
+        "type": "DETAILS",
+        "id": "collection-alpha-extended",
+        "title": "Collection Alpha",
+        "seasons": [],
+        "rails": [
+          {
+            "id": "episodes",
+            "title": "Episodes",
+            "src": "/api/1/public/frontends/web/pages/details/collection-alpha-extended/sections/episodes/tiles"
+          },
+          {
+            "id": "reco",
+            "title": "Recommendations",
+            "src": "/api/1/public/frontends/web/pages/BFF%7Casset-details,collection-alpha/sections/reco/tiles"
+          }
+        ]
+      },
+      "version": "0.9.1"
+    },
+    "programmeAlpha": {
+      "page": {
+        "type": "DETAILS",
+        "id": "asset-programme-alpha",
+        "title": "Programme Alpha",
+        "content": {
+          "id": "asset-programme-alpha",
+          "type": "SERIE",
+          "title": "Programme Alpha",
+          "source": {
+            "id": "asset-programme-alpha"
+          }
+        },
+        "rails": [
+          {
+            "id": "programme-alpha-episodes",
+            "title": "Tous les épisodes",
+            "src": "/api/1/public/frontends/web/pages/details/programme-alpha/sections/programme-alpha-episodes/tiles"
+          },
+          {
+            "id": "reco",
+            "title": "Vous aimerez aussi",
+            "src": "/api/1/public/frontends/web/pages/details/programme-alpha/sections/reco/tiles"
+          }
+        ]
+      },
+      "version": "0.9.1"
+    },
+    "programmeBeta": {
+      "page": {
+        "type": "DETAILS",
+        "id": "programme-beta",
+        "title": "Programme Beta",
+        "content": {
+          "id": "asset-programme-beta",
+          "type": "COLLECTION",
+          "title": "Programme Beta",
+          "category": [
+            "Société"
+          ],
+          "href": "/details/programme-beta",
+          "source": {
+            "id": "asset-programme-beta"
+          }
+        },
+        "rails": [
+          {
+            "id": "programme-beta-episodes",
+            "title": "Replays",
+            "src": "/api/1/public/frontends/web/pages/details/programme-beta/sections/programme-beta-episodes/tiles"
+          }
+        ]
+      },
+      "version": "0.9.1"
+    },
+    "talkProgrammeAlpha": {
+      "page": {
+        "type": "DETAILS",
+        "id": "talk-programme-alpha",
+        "title": "Talk Programme Alpha",
+        "seasons": [
+          {
+            "title": "Saison 1",
+            "episodes": [
+              {
+                "id": "asset-talk-programme-alpha-episode-alpha",
+                "type": "EPISODE",
+                "title": "Episode Alpha - 22-05-26",
+                "subtitle": "S1E186",
+                "href": "/player/talk-programme-alpha-episode-alpha",
+                "source": {
+                  "id": "asset-talk-programme-alpha-episode-alpha"
+                }
+              }
+            ]
+          }
+        ],
+        "rails": [
+          {
+            "id": "talk-programme-alpha-episodes",
+            "title": "Replays",
+            "src": "/api/1/public/frontends/web/pages/details/talk-programme-alpha/sections/talk-programme-alpha-episodes/tiles"
+          }
+        ]
+      },
+      "version": "0.9.1"
+    },
+    "standaloneDocumentary": {
+      "page": {
+        "type": "DETAILS",
+        "id": "standalone-documentary",
+        "title": "Standalone documentary",
+        "content": {
+          "id": "asset-standalone-documentary",
+          "type": "VOD",
+          "title": "Standalone documentary",
+          "href": "/player/standalone-documentary",
+          "source": {
+            "id": "asset-standalone-documentary"
+          }
+        }
+      },
+      "version": "0.9.1"
+    },
+    "themeAlphaProgramme": {
+      "page": {
+        "type": "DETAILS",
+        "id": "asset-theme-alpha-programme",
+        "title": "Theme Alpha Programme",
+        "content": {
+          "id": "asset-theme-alpha-programme",
+          "type": "SERIE",
+          "title": "Theme Alpha Programme",
+          "category": [
+            "Immersion",
+            "Société",
+            "Documentaire"
+          ],
+          "source": {
+            "id": "asset-theme-alpha-programme"
+          }
+        },
+        "rails": []
+      },
+      "version": "0.9.1"
+    }
+  }
+}

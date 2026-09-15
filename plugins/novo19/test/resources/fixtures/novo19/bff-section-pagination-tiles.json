@@ -1,0 +1,33 @@
+{
+  "sections": {
+    "collectionPage2": {
+      "tiles": [
+        {
+          "id": "asset-collection-alpha-episode-beta",
+          "type": "EPISODE",
+          "title": "Episode Beta - 15-06-26",
+          "href": "/player/collection-alpha-episode-beta",
+          "source": {
+            "id": "asset-collection-alpha-episode-beta"
+          }
+        }
+      ],
+      "version": "0.9.1"
+    },
+    "talkPage2": {
+      "tiles": [
+        {
+          "id": "asset-talk-programme-alpha-episode-gamma",
+          "type": "EPISODE",
+          "title": "Episode Gamma - 20-05-26",
+          "subtitle": "S1E184",
+          "href": "/player/talk-programme-alpha-episode-gamma",
+          "source": {
+            "id": "asset-talk-programme-alpha-episode-gamma"
+          }
+        }
+      ],
+      "version": "0.9.1"
+    }
+  }
+}
