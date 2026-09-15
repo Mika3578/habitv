@@ -59,11 +59,12 @@ public class Novo19AssetResolverTest {
 	}
 
 	@Test
-	public void returnsNullForMissingPlayerFixture() throws Exception {
+	public void propagatesIoExceptionForMissingPlayerFixture() throws Exception {
 		final DownloadParamDTO param = new DownloadParamDTO("https://novo19.ouest-france.fr/player/missing-episode",
 				"out.mp4", Novo19Conf.EXTENSION);
 		try {
 			Novo19AssetResolver.resolveAssetId(param, playbackAwareClient());
+			throw new AssertionError("expected IOException");
 		} catch (final java.io.IOException e) {
 			assertTrue(e.getMessage().contains("missing"));
 		}

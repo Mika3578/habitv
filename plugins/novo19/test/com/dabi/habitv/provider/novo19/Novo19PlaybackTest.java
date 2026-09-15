@@ -65,6 +65,7 @@ public class Novo19PlaybackTest {
 	public void handlesMalformedPayloadSafely() {
 		try {
 			Novo19PlaybackParser.selectReplayStreamUrl("{not-json", "fixture");
+			throw new AssertionError("expected RuntimeException");
 		} catch (final RuntimeException e) {
 			assertTrue(e.getMessage().contains("Cannot parse NOVO19 playback response"));
 		}
@@ -79,6 +80,7 @@ public class Novo19PlaybackTest {
 		final Novo19Diagnostics diagnostics = new Novo19Diagnostics("playback");
 		try {
 			client.resolveReplayStreamUrl("asset-collection-alpha-episode-alpha", diagnostics);
+			throw new AssertionError("expected Novo19HttpException");
 		} catch (final Novo19HttpException e) {
 			assertEquals(403, e.getStatus());
 		}

@@ -30,11 +30,11 @@ automatic category behavior, provider summary, doc map).
 | Category | Count |
 |---------|------:|
 | ✅ Delivered | **13** |
-| 🟡 In progress | **8** |
+| 🟡 In progress | **9** |
 | 🔵 Proposed | **1** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
-| **Total work items** | **22** |
+| **Total work items** | **23** |
 
 ---
 
@@ -49,7 +49,7 @@ automatic category behavior, provider summary, doc map).
 | 🔗 `legacy-url-migration` — Legacy URL migration (free.fr / SVN / FTP) | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 📦 `static-repo-publish` — Static artifact repository publication | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🟡 In progress | 🟡 P2 | `█████████████░░░░░░░` 65% |
-| 📺 `provider-novo19` — NOVO19 public replay provider | 🟡 In progress | 🟡 P2 | `█████████████████░░░` 85% |
+| 📺 `provider-novo19` — NOVO19 public replay provider | 🟡 In progress | 🟡 P2 | `██████████████████░░` 90% |
 | 🎬 `ytdlp-migration` — `youtube-dl` → `yt-dlp` migration | 🟡 In progress | 🟡 P2 | `███████████████░░░░░` 75% |
 | 🩺 `ytdlp-runtime-diagnostics` — yt-dlp Windows runtime diagnostics | 🟡 In progress | 🟡 P2 | `██████████████████░░` 90% |
 | 🖼️ `javafx-modernization` — JavaFX & runtime packaging modernization | 🔵 Proposed | 🟡 P2 | `███░░░░░░░░░░░░░░░░░` 15% |
