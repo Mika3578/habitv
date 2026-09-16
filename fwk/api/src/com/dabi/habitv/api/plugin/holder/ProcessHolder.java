@@ -16,14 +16,27 @@ public interface ProcessHolder {
 
 		@Override
 		public void start() {
-			
+
 		}
 	};
 
 	void start();
-	
+
 	void stop();
-	
+
+	/**
+	 * Legacy percentage string (for example {@code "45.2"}), or {@code null} when unknown.
+	 */
 	String getProgression();
+
+	/**
+	 * Richer progress snapshot. Default implementation derives a snapshot from
+	 * {@link #getProgression()} so existing downloaders keep working unchanged.
+	 *
+	 * @return never {@code null}
+	 */
+	default DownloadProgressSnapshot getProgressSnapshot() {
+		return DownloadProgressSnapshot.fromProgressionString(getProgression());
+	}
 
 }

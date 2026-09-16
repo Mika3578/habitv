@@ -25,6 +25,7 @@ public class YoutubeConfTest {
 		assertTrue(YoutubeConf.DUMP_CMD.contains("#FILE_DEST#"));
 		assertTrue(YoutubeConf.DUMP_CMD.contains("-f \"bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/bv*+ba/b\""));
 		assertTrue(YoutubeConf.DUMP_CMD.contains("--merge-output-format mp4"));
+		assertTrue(YoutubeConf.DUMP_CMD.contains("--newline"));
 		assertTrue(YoutubeConf.DUMP_CMD.contains("--no-check-certificate"));
 		assertFalse(YoutubeConf.DUMP_CMD.contains("--audio-quality"));
 		assertFalse(YoutubeConf.DUMP_CMD.contains("--extract-audio"));
@@ -42,6 +43,7 @@ public class YoutubeConfTest {
 	public void defaultMp3CommandIncludesExtractAudioFlags() {
 		assertTrue(YoutubeConf.DUMP_CMD_MP3.contains("--extract-audio"));
 		assertTrue(YoutubeConf.DUMP_CMD_MP3.contains("--audio-format mp3"));
+		assertTrue(YoutubeConf.DUMP_CMD_MP3.contains("--newline"));
 	}
 
 	@Test

@@ -20,7 +20,7 @@ public class EtatColumn extends TableColumn<ActionProgress, Node> {
 
 	public EtatColumn(final ViewController viewController) {
 		super("Etat");
-		setPrefWidth(100);
+		setPrefWidth(160);
 		this.viewController = viewController;
 		setCellValueFactory(new Callback<CellDataFeatures<ActionProgress, Node>, ObservableValue<Node>>() {
 

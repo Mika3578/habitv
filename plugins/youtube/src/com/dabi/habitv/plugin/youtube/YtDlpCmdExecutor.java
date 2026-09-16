@@ -1,25 +1,24 @@
 package com.dabi.habitv.plugin.youtube;
 
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.dabi.habitv.api.plugin.exception.ExecutorFailedException;
+import com.dabi.habitv.api.plugin.holder.DownloadProgressSnapshot;
+import com.dabi.habitv.api.plugin.holder.DownloadStage;
 import com.dabi.habitv.framework.FrameworkConf;
 import com.dabi.habitv.framework.plugin.utils.CmdExecutor;
 
 /**
  * Runs yt-dlp (or a user-configured compatible binary) and parses download progress
- * from stdout/stderr lines such as {@code [download]  45.2% of ...}.
+ * from stdout/stderr into a {@link DownloadProgressSnapshot}.
  */
 public class YtDlpCmdExecutor extends CmdExecutor {
-
-	private static final Pattern PROGRESS_PATTERN = Pattern
-			.compile(".*\\s(\\d+.\\d+)%.*");
 
 	private final String executablePath;
 
 	private final String binDir;
+
+	private volatile DownloadProgressSnapshot progressSnapshot;
 
 	public YtDlpCmdExecutor(final String cmdProcessor, final String cmd) {
 		this(cmdProcessor, cmd, null, null);
@@ -30,6 +29,12 @@ public class YtDlpCmdExecutor extends CmdExecutor {
 		super(cmdProcessor, cmd, YoutubeConf.MAX_HUNG_TIME);
 		this.executablePath = executablePath;
 		this.binDir = binDir;
+	}
+
+	@Override
+	public void start() {
+		progressSnapshot = null;
+		super.start();
 	}
 
 	@Override
@@ -54,13 +59,43 @@ public class YtDlpCmdExecutor extends CmdExecutor {
 
 	@Override
 	protected String handleProgression(final String line) {
-		final Matcher matcher = PROGRESS_PATTERN.matcher(line);
-		final boolean hasMatched = matcher.find();
-		String ret = null;
-		if (hasMatched) {
-			ret = matcher.group(matcher.groupCount());
+		final DownloadProgressSnapshot previous = progressSnapshot;
+		final DownloadProgressSnapshot parsed = YtDlpProgressParser.parse(line, previous);
+		if (parsed == null) {
+			return null;
 		}
-		return ret;
+		progressSnapshot = parsed;
+		final String progression = YtDlpProgressParser.toProgressionString(parsed);
+		if (progression != null) {
+			return progression;
+		}
+		// Keep hung-process detection alive during post-processing without a percentage.
+		return "stage:" + parsed.getStage().name();
+	}
+
+	@Override
+	public String getProgression() {
+		final DownloadProgressSnapshot snapshot = progressSnapshot;
+		if (snapshot != null) {
+			if (snapshot.isIndeterminate() || snapshot.getStage().isPostProcessing()) {
+				return null;
+			}
+			return YtDlpProgressParser.toProgressionString(snapshot);
+		}
+		return super.getProgression();
+	}
+
+	@Override
+	public DownloadProgressSnapshot getProgressSnapshot() {
+		final DownloadProgressSnapshot snapshot = progressSnapshot;
+		if (snapshot != null) {
+			return snapshot;
+		}
+		final String progression = super.getProgression();
+		if (progression != null && progression.startsWith("stage:")) {
+			return DownloadProgressSnapshot.indeterminate(DownloadStage.POST_PROCESSING, null);
+		}
+		return DownloadProgressSnapshot.fromProgressionString(progression);
 	}
 
 	@Override
