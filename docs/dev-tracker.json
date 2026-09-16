@@ -568,8 +568,8 @@
         "Follow-up yt-dlp metadata enrichment + embedded tags PR."
       ],
       "validation": [
-        "mvn -B -ntp -pl fwk/api,application/core,plugins/francetv,plugins/arte,plugins/6play -am test",
-        "mvn -B -ntp -DskipTests verify"
+        "mvn -B -ntp -pl fwk/api,application/core,plugins/francetv,plugins/arte,plugins/6play,plugins/novo19 -am test",
+        "mvn -B -ntp validate"
       ],
       "pr": null,
       "notes": "See docs/media-metadata-naming.md. Java 8 DTO (no records). Existing installs stay on LEGACY templates; opt in via #MEDIA_SERVER_PATH#."

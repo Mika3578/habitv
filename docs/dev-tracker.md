@@ -14,7 +14,7 @@
 > Legacy codes are historical-only and must not be used for new branch
 > names, PR titles, commit subjects, or workflow naming.
 
-**Last refresh:** 2026-09-15 · **Active branch:** `feat/media-metadata-naming`
+**Last refresh:** 2026-09-16 · **Active branch:** `develop`
 
 **Documentation entry point:** [`README.md`](../README.md) (overview, build matrix,
 automatic category behavior, provider summary, doc map).
@@ -978,8 +978,8 @@ yt-dlp enrichment in this item.
 
 **Validation**
 ```bash
-mvn -B -ntp -pl fwk/api,application/core,plugins/francetv,plugins/arte,plugins/6play -am test
-mvn -B -ntp -DskipTests verify
+mvn -B -ntp -pl fwk/api,application/core,plugins/francetv,plugins/arte,plugins/6play,plugins/novo19 -am test
+mvn -B -ntp validate
 ```
 
 **Notes** — See [`docs/media-metadata-naming.md`](media-metadata-naming.md).

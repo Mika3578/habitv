@@ -100,8 +100,10 @@ public class ConfigController extends BaseController {
 				+ "#DATE§yyyyMMdd# : date de téléchargement avec format après §\n"
 				+ "\n"
 				+ "Options communes :\n"
-				+ "Tout token peut utiliser §longueur (ex. #EPISODE§40#) pour tronquer.\n"
-				+ "Suffixe _CUT (ex. #EPISODE_NAME_CUT#) : tronque à fileNameCutSize.";
+				+ "§longueur (ex. #EPISODE§40#) : tronque les tokens texte qui acceptent une longueur.\n"
+				+ "§format (ex. #AIR_DATE§yyyyMMdd#, #DATE§yyyyMMdd#) : format pour les tokens de date.\n"
+				+ "Suffixe _CUT (ex. #EPISODE_NAME_CUT#) : tronque à fileNameCutSize.\n"
+				+ "§ n'est pas toujours une longueur : son sens dépend du token.";
 	}
 
 	private void loadConfig() {
