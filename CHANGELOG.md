@@ -49,6 +49,7 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-09-16 | TBD | Show stage-aware download progress in the JavaFX Etat column (precise % with French decimals, bytes when known, indeterminate bar for yt-dlp merge/remux/post-processing); bump `youtube` plugin to `4.1.4-SNAPSHOT` |
 | TBD | PR [#150](https://github.com/Mika3578/habitv/pull/150) | Add `plugins/novo19`, a public NOVO19 replay provider using the NOVO19 BFF catalogue and RedBee anonymous entitlement, with podcast audio extraction and live assets excluded |
 | 2026-05-29 | PR [#137](https://github.com/Mika3578/habitv/pull/137) | France.tv public hubs: API-first discovery via `/apps/channels/{hubSlug}?platform=apps` for Sport, Franceinfo, Arte, TV5 Monde Plus, France 24, INA, LCP, Public Sénat, and Mieux; partner hub children from API; episodes via `/generic/taxonomy/{taxonomySlug}/contents`; grabconfig refresh preserves public hub order and partner children with schema-valid merge; bump `francetv` plugin to `4.1.3-SNAPSHOT` |
 | 2026-05-19 | PR [#64](https://github.com/Mika3578/habitv/pull/64) | `francetv` provider: replace dead `france-o` channel slug with `la1ere` (Outre-mer La 1ère), centralise channel labels in `FranceTvUrls`, accept `franceinfo.fr` / `francetvinfo.fr` URLs in `canDownload`, raise `MAX_PAGES` to 100 |
