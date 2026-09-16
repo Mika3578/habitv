@@ -106,7 +106,12 @@ public class DownloadBox extends Pane {
 		final DownloadProgressSnapshot snapshot = DownloadProgressFormatter.resolveSnapshot(actionProgress);
 		final String tooltip = DownloadProgressFormatter.formatTooltip(snapshot);
 		if (tooltip != null && !tooltip.isEmpty()) {
-			label.setTooltip(new Tooltip(tooltip));
+			Tooltip existing = label.getTooltip();
+			if (existing == null) {
+				existing = new Tooltip();
+				label.setTooltip(existing);
+			}
+			existing.setText(tooltip);
 		} else {
 			label.setTooltip(null);
 		}

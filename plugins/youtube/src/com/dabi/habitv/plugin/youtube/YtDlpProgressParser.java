@@ -58,15 +58,14 @@ public final class YtDlpProgressParser {
 		final Matcher destinationMatcher = DOWNLOAD_DESTINATION.matcher(trimmed);
 		if (destinationMatcher.find()) {
 			final String streamLabel = detectStreamLabel(destinationMatcher.group(1));
-			return DownloadProgressSnapshot.of(DownloadStage.DOWNLOADING, Double.valueOf(0.0d), null, null, null, null,
-					streamLabel);
+			// Destination announces the next transfer; no numeric progress yet.
+			return DownloadProgressSnapshot.indeterminate(DownloadStage.DOWNLOADING, streamLabel);
 		}
 
 		if (isPreparingLine(trimmed)) {
 			final String detail = shortDetail(trimmed);
-			if (previous != null && previous.getStage() == DownloadStage.DOWNLOADING
-					&& previous.getProgressRatio() != null) {
-				// Do not regress an active download to preparing on unrelated info lines.
+			if (previous != null && previous.getStage() == DownloadStage.DOWNLOADING) {
+				// Do not regress an active download (including Destination) to preparing.
 				return null;
 			}
 			return DownloadProgressSnapshot.indeterminate(DownloadStage.PREPARING, detail);

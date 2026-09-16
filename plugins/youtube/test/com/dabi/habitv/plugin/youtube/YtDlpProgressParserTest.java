@@ -117,6 +117,31 @@ public class YtDlpProgressParserTest {
 	}
 
 	@Test
+	public void destinationIsDownloadingWithIndeterminateProgress() {
+		final DownloadProgressSnapshot video = YtDlpProgressParser
+				.parse("[download] Destination: episode.f137.mp4", null);
+		assertNotNull(video);
+		assertEquals(DownloadStage.DOWNLOADING, video.getStage());
+		assertTrue(video.isIndeterminate());
+		assertNull(video.getProgressRatio());
+		assertNull(YtDlpProgressParser.toProgressionString(video));
+		assertEquals("Vidéo", video.getDetail());
+
+		final DownloadProgressSnapshot audio = YtDlpProgressParser
+				.parse("[download] Destination: episode.f140.m4a", null);
+		assertEquals(DownloadStage.DOWNLOADING, audio.getStage());
+		assertTrue(audio.isIndeterminate());
+		assertEquals("Audio", audio.getDetail());
+	}
+
+	@Test
+	public void preparingDoesNotOverrideDestination() {
+		final DownloadProgressSnapshot destination = YtDlpProgressParser
+				.parse("[download] Destination: episode.f137.mp4", null);
+		assertNull(YtDlpProgressParser.parse("[info] Downloading webpage", destination));
+	}
+
+	@Test
 	public void secondTransferCycleSwitchesToAudio() {
 		DownloadProgressSnapshot snapshot = YtDlpProgressParser.parse(
 				"[download] Destination: episode.f137.mp4", null);
