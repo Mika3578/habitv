@@ -113,23 +113,15 @@ ASCII-stripping sanitizer for compatibility.
 
 ## Naming profiles
 
-### `LEGACY` (default for existing installs)
+### `MEDIA_SERVER` (default for new configs)
 
-Configured `downloadOuput` templates are expanded exactly as before.
-
-Example (unchanged default style):
+Fresh installs and missing `downloadOuput` use:
 
 ```text
-Downloads/#TVSHOW_NAME#-#EPISODE_NAME_CUT#.#EXTENSION#
+{user.home}/Downloads/#MEDIA_SERVER_PATH#
 ```
 
-### `MEDIA_SERVER` (opt-in)
-
-Include `#MEDIA_SERVER_PATH#` in `downloadOuput`, for example:
-
-```text
-Downloads/#MEDIA_SERVER_PATH#
-```
+Include `#MEDIA_SERVER_PATH#` in `downloadOuput` to keep this profile.
 
 Rules:
 
@@ -145,6 +137,15 @@ Rules:
 
 Missing parts collapse cleanly (no duplicated ` - `, no empty folders, no fake
 `S00E00`). Publication dates do **not** drive rule 2.
+
+### `LEGACY` (existing installs / custom templates)
+
+Configured templates without `#MEDIA_SERVER_PATH#` keep historical expansion, for
+example:
+
+```text
+Downloads/#TVSHOW_NAME#-#EPISODE_NAME_CUT#.#EXTENSION#
+```
 
 ## Provider audit (active plugins)
 
@@ -169,6 +170,6 @@ Missing parts collapse cleanly (no duplicated ` - `, no empty folders, no fake
 
 ## Configuration note
 
-Existing user configs are **not** migrated. Opt into MEDIA_SERVER by changing
-`downloadOuput` to include `#MEDIA_SERVER_PATH#`. Fresh-install default may
-switch later in a dedicated change.
+Existing user configs are **not** migrated: if `downloadOuput` is already set
+to a LEGACY template, it stays unchanged. **New** configs (and null
+`downloadOuput`) default to `{user.home}/Downloads/#MEDIA_SERVER_PATH#`.

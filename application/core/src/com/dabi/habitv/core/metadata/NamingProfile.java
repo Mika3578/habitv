@@ -3,9 +3,10 @@ package com.dabi.habitv.core.metadata;
 /**
  * Output naming profile.
  * <p>
- * {@link #LEGACY} keeps the configured token template unchanged.
+ * {@link #LEGACY} keeps a free-form token template.
  * {@link #MEDIA_SERVER} builds Plex/Jellyfin/Kodi-friendly relative paths from
- * canonical {@link com.dabi.habitv.api.plugin.dto.EpisodeMetadataDTO}.
+ * canonical {@link com.dabi.habitv.api.plugin.dto.EpisodeMetadataDTO}. New user
+ * configs default to a template containing {@link #MEDIA_SERVER_TOKEN}.
  */
 public enum NamingProfile {
 	LEGACY,

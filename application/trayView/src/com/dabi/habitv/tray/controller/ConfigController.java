@@ -76,9 +76,9 @@ public class ConfigController extends BaseController {
 	static String buildDownloadOutputTokenHelp() {
 		return "Modèle de stockage des téléchargements. Tokens supportés :\n"
 				+ "\n"
-				+ "Profil MEDIA_SERVER (recommandé Plex/Jellyfin/Kodi) :\n"
+				+ "Profil MEDIA_SERVER (défaut nouvelles configs, Plex/Jellyfin/Kodi) :\n"
 				+ "#MEDIA_SERVER_PATH# : chemin relatif complet (dossiers + fichier)\n"
-				+ "  Exemple : C:/media/#MEDIA_SERVER_PATH#\n"
+				+ "  Défaut : {user.home}/Downloads/#MEDIA_SERVER_PATH#\n"
 				+ "\n"
 				+ "Métadonnées sémantiques (si le fournisseur les fournit) :\n"
 				+ "#SERIES_NAME# / #SHOW_NAME# : titre de série / émission\n"
