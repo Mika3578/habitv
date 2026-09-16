@@ -171,6 +171,18 @@ public class Novo19CatalogMapperTest {
 	}
 
 	@Test
+	public void seasonEpisodeOverflowReturnsNull() {
+		assertNull(Novo19CatalogMapper.parseSeasonEpisodeCode("S99999999999E1"));
+		assertNull(Novo19CatalogMapper.parseSeasonEpisodeCode("S1E99999999999"));
+	}
+
+	@Test
+	public void seasonEpisodeNonPositiveReturnsNull() {
+		assertNull(Novo19CatalogMapper.parseSeasonEpisodeCode("S0E1"));
+		assertNull(Novo19CatalogMapper.parseSeasonEpisodeCode("S1E0"));
+	}
+
+	@Test
 	public void mapsPodcastProgramWithAudioParameter() {
 		final Novo19Tile tile = new Novo19Tile("asset-podcast-alpha", "PODCAST", "Podcast Alpha", null,
 				"Synthetic subtitle", null, "/details/podcast-alpha", "asset-podcast-alpha");

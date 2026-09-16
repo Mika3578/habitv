@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import com.dabi.habitv.api.plugin.dto.EpisodeMetadataDTO;
 import com.dabi.habitv.utils.FileUtils;
@@ -118,8 +119,18 @@ public final class MediaServerNamingPolicy {
 		return trimmed.startsWith(".") ? trimmed : ("." + trimmed);
 	}
 
+	/**
+	 * Formats {@code date} with {@link Locale#ROOT} and UTC so MEDIA_SERVER paths
+	 * (and semantic air-date tokens) are host-independent.
+	 */
+	public static String formatUtc(final Date date, final String pattern) {
+		final SimpleDateFormat formatter = new SimpleDateFormat(pattern, Locale.ROOT);
+		formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+		return formatter.format(date);
+	}
+
 	private static String format(final Date date, final String pattern) {
-		return new SimpleDateFormat(pattern, Locale.ROOT).format(date);
+		return formatUtc(date, pattern);
 	}
 
 	private static boolean isPresent(final String value) {

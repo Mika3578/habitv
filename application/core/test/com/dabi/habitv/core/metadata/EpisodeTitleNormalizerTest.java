@@ -49,4 +49,31 @@ public class EpisodeTitleNormalizerTest {
 		assertNull(EpisodeTitleNormalizer.forFilename(null));
 		assertNull(EpisodeTitleNormalizer.forFilename(new EpisodeMetadataDTO()));
 	}
+
+	@Test
+	public void overflowSeasonMarkerIsLeftUntouched() {
+		final EpisodeMetadataDTO metadata = new EpisodeMetadataDTO();
+		metadata.setEpisodeTitle("S99999999999E1 - Overflow season");
+		metadata.setSeasonNumber(Integer.valueOf(8));
+		metadata.setEpisodeNumber(Integer.valueOf(1));
+		assertEquals("S99999999999E1 - Overflow season", EpisodeTitleNormalizer.forFilename(metadata));
+	}
+
+	@Test
+	public void overflowEpisodeMarkerIsLeftUntouched() {
+		final EpisodeMetadataDTO metadata = new EpisodeMetadataDTO();
+		metadata.setEpisodeTitle("S1 E99999999999 - Overflow episode");
+		metadata.setSeasonNumber(Integer.valueOf(1));
+		metadata.setEpisodeNumber(Integer.valueOf(2));
+		assertEquals("S1 E99999999999 - Overflow episode", EpisodeTitleNormalizer.forFilename(metadata));
+	}
+
+	@Test
+	public void matchingCompactPrefixStillStripsWithValidNumbers() {
+		final EpisodeMetadataDTO metadata = new EpisodeMetadataDTO();
+		metadata.setEpisodeTitle("S12E34 - Remaining");
+		metadata.setSeasonNumber(Integer.valueOf(12));
+		metadata.setEpisodeNumber(Integer.valueOf(34));
+		assertEquals("Remaining", EpisodeTitleNormalizer.forFilename(metadata));
+	}
 }

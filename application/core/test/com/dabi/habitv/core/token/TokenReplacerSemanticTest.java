@@ -86,6 +86,31 @@ public class TokenReplacerSemanticTest {
 		assertEquals("Émission spéciale", TokenReplacer.replaceAll("#EPISODE_TITLE#", episode));
 	}
 
+	@Test
+	public void airDateDefaultPatternIsStableAcrossDefaultTimezones() {
+		final TimeZone original = TimeZone.getDefault();
+		try {
+			final Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"), Locale.ROOT);
+			calendar.clear();
+			calendar.set(2026, Calendar.SEPTEMBER, 15, 0, 30, 0);
+			episode.getMetadata().setAirDate(calendar.getTime());
+
+			TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+			final String expected = TokenReplacer.replaceAll("#AIR_DATE#", episode);
+			assertEquals("2026-09-15", expected);
+
+			TimeZone.setDefault(TimeZone.getTimeZone("America/Los_Angeles"));
+			assertEquals(expected, TokenReplacer.replaceAll("#AIR_DATE#", episode));
+			assertEquals(expected, TokenReplacer.replaceAll("#EPISODE_DATE#", episode));
+
+			TimeZone.setDefault(TimeZone.getTimeZone("Pacific/Kiritimati"));
+			assertEquals("20260915", TokenReplacer.replaceAll("#AIR_DATE§yyyyMMdd#", episode));
+			assertEquals(expected, TokenReplacer.replaceAll("#AIR_DATE#", episode));
+		} finally {
+			TimeZone.setDefault(original);
+		}
+	}
+
 	private static Date airDate(final int year, final int month, final int day) {
 		final Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"), Locale.ROOT);
 		calendar.clear();

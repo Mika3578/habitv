@@ -154,7 +154,7 @@ public final class TokenReplacer {
 					return "";
 				}
 				final String pattern = params.isEmpty() ? "yyyy-MM-dd" : params.get(0);
-				return new SimpleDateFormat(pattern).format(airDate);
+				return MediaServerNamingPolicy.formatUtc(airDate, pattern);
 			}
 		};
 		REF2REPLACER.put("#AIR_DATE#", airDateReplacer);

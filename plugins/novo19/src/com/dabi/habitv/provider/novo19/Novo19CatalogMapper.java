@@ -341,12 +341,24 @@ final class Novo19CatalogMapper {
 		if (!matcher.matches()) {
 			return null;
 		}
-		final int season = Integer.parseInt(matcher.group(1));
-		final int episode = Integer.parseInt(matcher.group(2));
-		if (season <= 0 || episode <= 0) {
+		final Integer season = tryParsePositiveInt(matcher.group(1));
+		final Integer episode = tryParsePositiveInt(matcher.group(2));
+		if (season == null || episode == null) {
 			return null;
 		}
-		return new int[] { season, episode };
+		return new int[] { season.intValue(), episode.intValue() };
+	}
+
+	/**
+	 * @return positive int, or {@code null} when digits overflow {@code int} or are &lt;= 0
+	 */
+	private static Integer tryParsePositiveInt(final String raw) {
+		try {
+			final int value = Integer.parseInt(raw);
+			return value > 0 ? Integer.valueOf(value) : null;
+		} catch (final NumberFormatException e) {
+			return null;
+		}
 	}
 
 	private static String seriesTitleFromCategory(final CategoryDTO category) {

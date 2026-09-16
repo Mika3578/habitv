@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -121,6 +122,34 @@ public class MediaServerNamingPolicyTest {
 		final String path = EpisodeOutputPathResolver.resolve(
 				"D:/media/" + NamingProfile.MEDIA_SERVER_TOKEN, episode);
 		assertEquals("D:/media/C dans l'air/2026/C dans l'air - 2026-09-15 - Titre.mp4", path);
+	}
+
+	@Test
+	public void datedPathIsStableAcrossDefaultTimezones() {
+		final TimeZone original = TimeZone.getDefault();
+		try {
+			// Near the UTC day boundary: default TZ America/Los_Angeles would otherwise
+			// render the previous calendar day.
+			final Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"), Locale.ROOT);
+			calendar.clear();
+			calendar.set(2026, Calendar.SEPTEMBER, 15, 0, 30, 0);
+			final Date boundary = calendar.getTime();
+
+			final EpisodeMetadataDTO metadata = base("Show", "Title");
+			metadata.setAirDate(boundary);
+
+			TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+			final String expected = MediaServerNamingPolicy.buildRelativePath(metadata, "mp4");
+			assertEquals("Show/2026/Show - 2026-09-15 - Title.mp4", expected);
+
+			TimeZone.setDefault(TimeZone.getTimeZone("America/Los_Angeles"));
+			assertEquals(expected, MediaServerNamingPolicy.buildRelativePath(metadata, "mp4"));
+
+			TimeZone.setDefault(TimeZone.getTimeZone("Pacific/Kiritimati"));
+			assertEquals(expected, MediaServerNamingPolicy.buildRelativePath(metadata, "mp4"));
+		} finally {
+			TimeZone.setDefault(original);
+		}
 	}
 
 	private static EpisodeMetadataDTO base(final String series, final String title) {

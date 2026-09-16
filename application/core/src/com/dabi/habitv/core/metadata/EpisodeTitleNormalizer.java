@@ -64,11 +64,26 @@ public final class EpisodeTitleNormalizer {
 		if (!matcher.find()) {
 			return title;
 		}
-		final int foundSeason = Integer.parseInt(matcher.group(1));
-		final int foundEpisode = Integer.parseInt(matcher.group(2));
-		if (foundSeason == season && foundEpisode == episode) {
+		final Integer foundSeason = tryParseInt(matcher.group(1));
+		final Integer foundEpisode = tryParseInt(matcher.group(2));
+		if (foundSeason == null || foundEpisode == null) {
+			// Out-of-range digit sequences are treated as a non-match.
+			return title;
+		}
+		if (foundSeason.intValue() == season && foundEpisode.intValue() == episode) {
 			return title.substring(matcher.end());
 		}
 		return title;
+	}
+
+	/**
+	 * @return parsed int, or {@code null} when the digits are not a valid {@code int}
+	 */
+	private static Integer tryParseInt(final String raw) {
+		try {
+			return Integer.valueOf(Integer.parseInt(raw));
+		} catch (final NumberFormatException e) {
+			return null;
+		}
 	}
 }
