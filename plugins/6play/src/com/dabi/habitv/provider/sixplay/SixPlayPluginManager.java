@@ -13,6 +13,7 @@ import org.jsoup.select.Elements;
 import com.dabi.habitv.api.plugin.api.PluginProviderInterface;
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
+import com.dabi.habitv.api.plugin.dto.EpisodeMetadataDTO;
 import com.dabi.habitv.framework.plugin.api.BasePluginWithProxy;
 
 public class SixPlayPluginManager extends BasePluginWithProxy implements PluginProviderInterface { // NO_UCD
@@ -33,7 +34,21 @@ public class SixPlayPluginManager extends BasePluginWithProxy implements PluginP
 			if (!titles.isEmpty()) {
 				final String name = titles.first().text();
 				if (!StringUtils.isEmpty(name)) {
-					episodes.add(new EpisodeDTO(category, name, getFullUrl(href)));
+					final String episodeUrl = getFullUrl(href);
+					final EpisodeDTO episode = new EpisodeDTO(category, name, episodeUrl);
+					// 6play program categories map to show/program; tile__name is episode.
+					final EpisodeMetadataDTO metadata = new EpisodeMetadataDTO();
+					if (category.getName() != null && !category.getName().trim().isEmpty()) {
+						metadata.setSeriesTitle(category.getName().trim());
+					}
+					metadata.setEpisodeTitle(name.trim());
+					metadata.setSourceUrl(episodeUrl);
+					if (category.getFatherCategory() != null
+							&& StringUtils.isNotEmpty(category.getFatherCategory().getName())) {
+						metadata.setChannel(category.getFatherCategory().getName().trim());
+					}
+					episode.setMetadata(metadata);
+					episodes.add(episode);
 				}
 			}
 		}

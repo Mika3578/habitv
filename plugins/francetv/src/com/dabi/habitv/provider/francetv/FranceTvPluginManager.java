@@ -91,7 +91,7 @@ public class FranceTvPluginManager extends BasePluginWithProxy implements Plugin
 					continue;
 				}
 				final EpisodeDTO episode = new EpisodeDTO(category, name, pageUrl);
-				FranceTvEpisodeMetadata.apply(item, episode);
+				FranceTvEpisodeMetadata.apply(item, episode, programPath);
 				episodes.add(episode);
 				diagnostics.incrementCreatedReplayItems();
 			}

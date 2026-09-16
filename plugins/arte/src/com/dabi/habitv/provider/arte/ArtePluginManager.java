@@ -11,6 +11,7 @@ import com.dabi.habitv.api.plugin.api.PluginProviderDownloaderInterface;
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.DownloadParamDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
+import com.dabi.habitv.api.plugin.dto.EpisodeMetadataDTO;
 import com.dabi.habitv.api.plugin.exception.DownloadFailedException;
 import com.dabi.habitv.api.plugin.exception.TechnicalException;
 import com.dabi.habitv.api.plugin.holder.DownloaderPluginHolder;
@@ -127,7 +128,18 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 		if (StringUtils.isEmpty(title)) {
 			return;
 		}
-		episodes.add(new EpisodeDTO(category, title, url));
+		final EpisodeDTO episode = new EpisodeDTO(category, title, url);
+		// Arte categories are thematic/page hubs, not series titles — do not map
+		// category.name to seriesTitle.
+		final EpisodeMetadataDTO metadata = new EpisodeMetadataDTO();
+		metadata.setEpisodeTitle(title);
+		metadata.setSourceUrl(url);
+		final String subtitle = item.path("subtitle").asText(null);
+		if (StringUtils.isNotEmpty(subtitle) && !subtitle.equals(title)) {
+			metadata.setDescription(subtitle);
+		}
+		episode.setMetadata(metadata);
+		episodes.add(episode);
 	}
 
 	private String buildCategoryId(final String languageCode, final String pageCode) {

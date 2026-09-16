@@ -59,7 +59,7 @@ public class XMLUserConfig implements UserConfig {
 	private static final int DEFAULT_CUT_SIZE = 40;
 
 	private static final String DEFAULT_DL_OUTPUT = FrameworkConf.USER_HOME
-			+ "/" + "Downloads/#TVSHOW_NAME#-#EPISODE_NAME_CUT#.#EXTENSION#";
+			+ "/" + "Downloads/#MEDIA_SERVER_PATH#";
 
 	private static final String PLUGIN_DIR = "plugins";
 	private static final String BIN_DIR = "bin";

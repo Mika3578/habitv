@@ -155,6 +155,7 @@ Details: [`CONTRIBUTING.md`](CONTRIBUTING.md), [`AGENTS.md`](AGENTS.md),
 | [`docs/runtime-quickstart.md`](docs/runtime-quickstart.md) | Console runtime, flags, yt-dlp |
 | [`docs/static-repository-deploy.md`](docs/static-repository-deploy.md) | `habitv-repo` publish contract |
 | [`docs/provider-inventory.md`](docs/provider-inventory.md) | Plugin modules and status |
+| [`docs/media-metadata-naming.md`](docs/media-metadata-naming.md) | Canonical metadata, tokens, MEDIA_SERVER naming |
 | [`docs/ci.md`](docs/ci.md) | GitHub Actions required vs diagnostic checks |
 | [`docs/repository-maintenance.md`](docs/repository-maintenance.md) | Merge hygiene, Dependabot, doc sync |
 | [`docs/risk-register.md`](docs/risk-register.md) | Active risks |

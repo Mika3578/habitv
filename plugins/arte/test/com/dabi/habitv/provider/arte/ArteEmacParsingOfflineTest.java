@@ -2,6 +2,8 @@ package com.dabi.habitv.provider.arte;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
@@ -86,6 +88,13 @@ public class ArteEmacParsingOfflineTest {
 		assertEquals("duplicate URL collapses into a single episode",
 				new java.util.HashSet<>(ids).size(), ids.size());
 		assertEquals("expected episodes after filtering and dedup", 6, episodes.size());
+		for (final EpisodeDTO episode : episodes) {
+			assertNotNull("canonical metadata attached", episode.getMetadata());
+			assertNull("Arte thematic category must not become seriesTitle",
+					episode.getMetadata().getSeriesTitle());
+			assertNotNull(episode.getMetadata().getEpisodeTitle());
+			assertEquals(episode.getId(), episode.getMetadata().getSourceUrl());
+		}
 	}
 
 	@Test

@@ -22,6 +22,10 @@ public final class FileUtils {
 	/**
 	 * replace illegal characters in a filename with "_" illegal characters : :
 	 * \ / * ? | < >
+	 * <p>
+	 * Legacy behavior: also strips accents / non-ASCII. Prefer
+	 * {@link #sanitizePathSegment(String)} for MEDIA_SERVER naming so French
+	 * titles keep their accents.
 	 * 
 	 * @param name
 	 * @return
@@ -29,6 +33,47 @@ public final class FileUtils {
 	public static String sanitizeFilename(final String name) {
 		return removeNonASCII(name.replaceAll("[%\\s,:\\\\/*?!|<>&«»()\"\'\\$]",
 				"_").replaceAll("__", "_"));
+	}
+
+	/**
+	 * Filesystem-safe path segment that preserves Unicode (including French
+	 * accents). Replaces only Windows-illegal and control characters, then
+	 * collapses whitespace.
+	 *
+	 * @param name raw segment
+	 * @return sanitized segment, never null
+	 */
+	public static String sanitizePathSegment(final String name) {
+		if (name == null) {
+			return "";
+		}
+		final StringBuilder builder = new StringBuilder(name.length());
+		boolean lastWasSpace = false;
+		for (int i = 0; i < name.length(); i++) {
+			final char c = name.charAt(i);
+			if (c < 32 || c == 127 || c == '<' || c == '>' || c == ':' || c == '"' || c == '/'
+					|| c == '\\' || c == '|' || c == '?' || c == '*') {
+				if (!lastWasSpace && builder.length() > 0) {
+					builder.append(' ');
+					lastWasSpace = true;
+				}
+				continue;
+			}
+			if (Character.isWhitespace(c)) {
+				if (!lastWasSpace && builder.length() > 0) {
+					builder.append(' ');
+					lastWasSpace = true;
+				}
+				continue;
+			}
+			builder.append(c);
+			lastWasSpace = false;
+		}
+		String result = builder.toString().trim();
+		while (result.endsWith(".")) {
+			result = result.substring(0, result.length() - 1).trim();
+		}
+		return result;
 	}
 
 	private static String removeNonASCII(final String string) {

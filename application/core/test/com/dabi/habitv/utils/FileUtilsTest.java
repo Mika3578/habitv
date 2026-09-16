@@ -31,4 +31,11 @@ public class FileUtilsTest {
 		assertEquals("eecaeaii_", FileUtils.sanitizeFilename("éèçàêâîï$%"));
 	}
 
+	@Test
+	public final void sanitizePathSegmentPreservesAccentsAndRemovesIllegalChars() {
+		assertEquals("éèçàêâîï$%", FileUtils.sanitizePathSegment("éèçàêâîï$%"));
+		assertEquals("C dans l'air", FileUtils.sanitizePathSegment("C dans l'air?"));
+		assertEquals("Émission spéciale", FileUtils.sanitizePathSegment("Émission : spéciale"));
+		assertEquals("", FileUtils.sanitizePathSegment("???"));
+	}
 }

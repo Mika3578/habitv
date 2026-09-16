@@ -50,15 +50,9 @@ public class ConfigController extends BaseController {
 	}
 
 	private void addTooltips() {
-		downloadOuput
-				.setTooltip(new Tooltip(
-						"Modèle de stockage des téléchargements, vous pouvez utiliser les tokens suivant : \n"
-								+ "#EPISODE# : nom de l'épisode\n"
-								+ "#CHANNEL# : nom du fournisseur\n"
-								+ "#CATEGORY# : nom de la catégorie\n"
-								+ "#EXTENSION# : extension du fichier\n"
-								+ "#NUM# : le numéro d'épisode pour le fournisseur\n"
-								+ "#DATE§yyyyMMdd# : la date de téléchargement de l'épisode, le paramètre après § peut être modifié suivant : Format de date"));
+		final Tooltip downloadOutputTooltip = new Tooltip(buildDownloadOutputTokenHelp());
+		downloadOutputTooltip.setMaxWidth(520);
+		downloadOuput.setTooltip(downloadOutputTooltip);
 
 		nbrMaxAttempts
 				.setTooltip(new Tooltip(
@@ -74,6 +68,41 @@ public class ConfigController extends BaseController {
 				"Nombre maximum de téléchargements d'épisodes exécutés en même temps (minimum 1)."));
 		embedSubtitles.setTooltip(new Tooltip(
 				"Intègre les sous-titres dans la vidéo téléchargée lorsqu'ils sont disponibles. Nécessite ffmpeg via le post-traitement yt-dlp."));
+	}
+
+	/**
+	 * Help text for {@code downloadOuput} tokens (legacy + semantic + MEDIA_SERVER).
+	 */
+	static String buildDownloadOutputTokenHelp() {
+		return "Modèle de stockage des téléchargements. Tokens supportés :\n"
+				+ "\n"
+				+ "Profil MEDIA_SERVER (défaut nouvelles configs, Plex/Jellyfin/Kodi) :\n"
+				+ "#MEDIA_SERVER_PATH# : chemin relatif complet (dossiers + fichier)\n"
+				+ "  Défaut : {user.home}/Downloads/#MEDIA_SERVER_PATH#\n"
+				+ "\n"
+				+ "Métadonnées sémantiques (si le fournisseur les fournit) :\n"
+				+ "#SERIES_NAME# / #SHOW_NAME# : titre de série / émission\n"
+				+ "#EPISODE_TITLE# : titre d'épisode (normalisé)\n"
+				+ "#SEASON_NUMBER# : numéro de saison\n"
+				+ "#EPISODE_NUMBER# : numéro d'épisode TV\n"
+				+ "#SEASON_EPISODE# : S01E03 (seulement si saison ET épisode connus)\n"
+				+ "#AIR_DATE# / #EPISODE_DATE# : date de diffusion (défaut yyyy-MM-dd)\n"
+				+ "#AIR_DATE§yyyyMMdd# : même date avec format personnalisé après §\n"
+				+ "\n"
+				+ "Tokens historiques (compatibilité) :\n"
+				+ "#EPISODE# / #EPISODE_NAME# : nom d'épisode (affichage fournisseur)\n"
+				+ "#EPISODE_UNTOUCHED# : nom d'épisode sans sanitization\n"
+				+ "#CHANNEL# / #PLUGIN# / #PROVIDER# : nom du fournisseur\n"
+				+ "#CATEGORY# / #TVSHOW_NAME# : nom de la catégorie Habitv\n"
+				+ "#EXTENSION# : extension du fichier\n"
+				+ "#NUM# : compteur legacy (pas le numéro d'épisode TV)\n"
+				+ "#DATE§pattern# / #DATETIME§pattern# : date de téléchargement (pas la diffusion); §pattern obligatoire (ex. #DATE§yyyyMMdd#)\n"
+				+ "\n"
+				+ "Options communes :\n"
+				+ "§longueur (ex. #EPISODE§40#) : tronque les tokens texte qui acceptent une longueur.\n"
+				+ "§format (ex. #AIR_DATE§yyyyMMdd#, #DATE§yyyyMMdd#) : format pour les tokens de date.\n"
+				+ "Suffixe _CUT (ex. #EPISODE_NAME_CUT#) : tronque à fileNameCutSize.\n"
+				+ "§ n'est pas toujours une longueur : son sens dépend du token.";
 	}
 
 	private void loadConfig() {

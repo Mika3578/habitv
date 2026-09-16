@@ -2,6 +2,8 @@ package com.dabi.habitv.provider.novo19;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -14,6 +16,7 @@ import org.junit.Test;
 
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
+import com.dabi.habitv.api.plugin.dto.EpisodeMetadataDTO;
 import com.dabi.habitv.provider.novo19.dto.Novo19BffPage;
 import com.dabi.habitv.provider.novo19.dto.Novo19Rail;
 import com.dabi.habitv.provider.novo19.dto.Novo19Season;
@@ -112,6 +115,71 @@ public class Novo19CatalogMapperTest {
 		Novo19CatalogMapper.addEpisodeFromTile(category, episodes,
 				new Novo19Tile("ep", "EPISODE", "Title only", null, null, null, "/player/title-only", "ep-id"));
 		assertEquals(1, episodes.size());
+		assertNotNull(episodes.iterator().next().getMetadata());
+		assertEquals("Title only", episodes.iterator().next().getMetadata().getEpisodeTitle());
+		assertNull(episodes.iterator().next().getMetadata().getAirDate());
+	}
+
+	@Test
+	public void mapsCanonicalMetadataFromSeasonEpisodeSubtitle() {
+		final CategoryDTO program = new CategoryDTO(Novo19Conf.NAME, "Series Alpha",
+				"https://novo19.ouest-france.fr/details/series-alpha", Novo19Conf.EXTENSION);
+		program.addParameter(Novo19Conf.PARAMETER_CONTENT_KIND, Novo19Conf.CONTENT_KIND_PROGRAM);
+		final Set<EpisodeDTO> episodes = new LinkedHashSet<>();
+		Novo19CatalogMapper.addEpisodeFromTile(program, episodes,
+				new Novo19Tile("ep-1", "EPISODE", "Episode Alpha", "S1E11", "Synopsis text", 2491L,
+						"/player/series-alpha-episode-alpha", "asset-series-alpha-episode-alpha"));
+		final EpisodeDTO episode = episodes.iterator().next();
+		final EpisodeMetadataDTO metadata = episode.getMetadata();
+		assertNotNull(metadata);
+		assertEquals("Series Alpha", metadata.getSeriesTitle());
+		assertEquals("Episode Alpha", metadata.getEpisodeTitle());
+		assertEquals(Integer.valueOf(1), metadata.getSeasonNumber());
+		assertEquals(Integer.valueOf(11), metadata.getEpisodeNumber());
+		assertEquals(Long.valueOf(2491L), metadata.getDurationSeconds());
+		assertEquals("Synopsis text", metadata.getDescription());
+		assertEquals("ep-1", metadata.getProviderEpisodeId());
+		assertEquals("https://novo19.ouest-france.fr/player/series-alpha-episode-alpha", metadata.getSourceUrl());
+		assertNull(metadata.getAirDate());
+		assertNull(metadata.getPublicationDate());
+		assertNull(metadata.getThumbnailUrl());
+	}
+
+	@Test
+	public void publishedAtMapsToPublicationDateNotAirDate() {
+		final CategoryDTO category = new CategoryDTO(Novo19Conf.NAME, "Podcast Alpha",
+				"https://novo19.ouest-france.fr/details/podcast-alpha", Novo19Conf.PODCAST_EXTENSION);
+		category.addParameter(Novo19Conf.PARAMETER_CONTENT_KIND, Novo19Conf.CONTENT_KIND_PODCAST);
+		final Set<EpisodeDTO> episodes = new LinkedHashSet<>();
+		Novo19CatalogMapper.addEpisodeFromTile(category, episodes,
+				new Novo19Tile("pod-1", "AUDIO", "Episode 1", null, "Desc", 600L, "/player/pod-1", "pod-1",
+						"2026-01-15T10:00:00Z"));
+		final EpisodeMetadataDTO metadata = episodes.iterator().next().getMetadata();
+		assertNotNull(metadata.getPublicationDate());
+		assertNull(metadata.getAirDate());
+		assertEquals(episodes.iterator().next().getEpisodeDate(), metadata.getPublicationDate());
+	}
+
+	@Test
+	public void genreSubtitleIsNotSeasonEpisode() {
+		assertNull(Novo19CatalogMapper.parseSeasonEpisodeCode("Société"));
+		assertNull(Novo19CatalogMapper.parseSeasonEpisodeCode("Histoire"));
+		final int[] parsed = Novo19CatalogMapper.parseSeasonEpisodeCode("S3E10");
+		assertNotNull(parsed);
+		assertEquals(3, parsed[0]);
+		assertEquals(10, parsed[1]);
+	}
+
+	@Test
+	public void seasonEpisodeOverflowReturnsNull() {
+		assertNull(Novo19CatalogMapper.parseSeasonEpisodeCode("S99999999999E1"));
+		assertNull(Novo19CatalogMapper.parseSeasonEpisodeCode("S1E99999999999"));
+	}
+
+	@Test
+	public void seasonEpisodeNonPositiveReturnsNull() {
+		assertNull(Novo19CatalogMapper.parseSeasonEpisodeCode("S0E1"));
+		assertNull(Novo19CatalogMapper.parseSeasonEpisodeCode("S1E0"));
 	}
 
 	@Test

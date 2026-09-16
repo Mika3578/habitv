@@ -23,6 +23,12 @@ public class EpisodeDTO implements Comparable<EpisodeDTO>, Serializable {
 
 	private Long sizeBytes;
 
+	/**
+	 * Optional canonical media metadata. Additive; legacy fields remain the
+	 * source of truth for existing tokens and indexes.
+	 */
+	private EpisodeMetadataDTO metadata;
+
 	public EpisodeDTO(final CategoryDTO category, final String name,
 			final String id) {
 		this.category = category;
@@ -150,6 +156,14 @@ public class EpisodeDTO implements Comparable<EpisodeDTO>, Serializable {
 
 	public void setSizeBytes(final Long sizeBytes) {
 		this.sizeBytes = sizeBytes;
+	}
+
+	public EpisodeMetadataDTO getMetadata() {
+		return metadata;
+	}
+
+	public void setMetadata(final EpisodeMetadataDTO metadata) {
+		this.metadata = metadata;
 	}
 
 }
