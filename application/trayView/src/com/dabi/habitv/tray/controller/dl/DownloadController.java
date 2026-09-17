@@ -26,6 +26,7 @@ import com.dabi.habitv.core.event.UpdatePluginEvent;
 import com.dabi.habitv.tray.controller.BaseController;
 import com.dabi.habitv.tray.model.ActionProgress;
 import com.dabi.habitv.tray.subscriber.CoreSubscriber;
+import com.dabi.habitv.tray.utils.FxBackgroundRunner;
 
 public class DownloadController extends BaseController implements
 		CoreSubscriber {
@@ -253,14 +254,14 @@ public class DownloadController extends BaseController implements
 
 			@Override
 			public void handle(ActionEvent event) {
-				new Thread(new Runnable() {
+				FxBackgroundRunner.start(new Runnable() {
 
 					@Override
 					public void run() {
 						getController().start();
 					}
 
-				}).run();
+				});
 			}
 		});
 

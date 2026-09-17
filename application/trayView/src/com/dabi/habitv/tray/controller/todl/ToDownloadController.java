@@ -39,6 +39,7 @@ import com.dabi.habitv.tray.PopinController.ButtonHandler;
 import com.dabi.habitv.tray.controller.BaseController;
 import com.dabi.habitv.tray.controller.todl.CategoryTreeItem.SelectionChangeHandler;
 import com.dabi.habitv.tray.subscriber.CoreSubscriber;
+import com.dabi.habitv.tray.utils.FxBackgroundRunner;
 import com.dabi.habitv.utils.FilterUtils;
 
 import javafx.application.Platform;
@@ -976,7 +977,7 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 
 			@Override
 			public void handle(ActionEvent event) {
-				new Thread(new Runnable() {
+				FxBackgroundRunner.start(new Runnable() {
 
 			        @Override
 			        public void run() {
@@ -989,15 +990,27 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 			                }
 		                });
 			        }
-		        }).start();
+		        });
 			}
 		});
 		cleanCategoryButton.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent event) {
-				getController().getManager().cleanCategories();
-				loadTree();
+				FxBackgroundRunner.start(new Runnable() {
+
+					@Override
+					public void run() {
+						getController().getManager().cleanCategories();
+						Platform.runLater(new Runnable() {
+
+							@Override
+							public void run() {
+								loadTree();
+							}
+						});
+					}
+				});
 			}
 		});
 	}
