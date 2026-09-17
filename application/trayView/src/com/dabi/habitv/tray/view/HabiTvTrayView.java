@@ -23,6 +23,7 @@ import com.dabi.habitv.core.event.UpdatePluginEvent;
 import com.dabi.habitv.framework.plugin.utils.DownloadFailureDiagnostics;
 import com.dabi.habitv.tray.controller.ViewController;
 import com.dabi.habitv.tray.subscriber.CoreSubscriber;
+import com.dabi.habitv.tray.utils.AwtUiRunner;
 
 public final class HabiTvTrayView implements CoreSubscriber {
 
@@ -47,8 +48,14 @@ public final class HabiTvTrayView implements CoreSubscriber {
 		@Override
 		public void handle(WindowEvent event) {
 			if (firstClose) {
-				trayIcon.displayMessage("habiTv", "habiTv est encore en cours d'exécution.", TrayIcon.MessageType.INFO);
 				firstClose = false;
+				AwtUiRunner.runLater(new Runnable() {
+
+					@Override
+					public void run() {
+						trayIcon.displayMessage("habiTv", "habiTv est encore en cours d'exécution.", TrayIcon.MessageType.INFO);
+					}
+				});
 			}
 		}
 	};
@@ -117,6 +124,10 @@ public final class HabiTvTrayView implements CoreSubscriber {
 
 	@Override
 	public void update(final SearchEvent event) {
+		AwtUiRunner.runLater(new Runnable() {
+
+			@Override
+			public void run() {
 		switch (event.getState()) {
 		case ALL_RETREIVE_DONE:
 			retreiveInProgress = false;
@@ -156,6 +167,9 @@ public final class HabiTvTrayView implements CoreSubscriber {
 		default:
 			break;
 		}
+	
+			}
+		});
 	}
 
 	private void changeAnimation() {
@@ -168,6 +182,10 @@ public final class HabiTvTrayView implements CoreSubscriber {
 
 	@Override
 	public void update(final RetreiveEvent event) {
+		AwtUiRunner.runLater(new Runnable() {
+
+			@Override
+			public void run() {
 		switch (event.getState()) {
 		case BUILD_INDEX:
 
@@ -219,10 +237,17 @@ public final class HabiTvTrayView implements CoreSubscriber {
 			break;
 		}
 		changeAnimation();
+	
+			}
+		});
 	}
 
 	@Override
 	public void update(final SearchCategoryEvent event) {
+		AwtUiRunner.runLater(new Runnable() {
+
+			@Override
+			public void run() {
 		switch (event.getState()) {
 		case BUILDING_CATEGORIES:
 			trayIcon.displayMessage(
@@ -243,10 +268,17 @@ public final class HabiTvTrayView implements CoreSubscriber {
 		default:
 			break;
 		}
+	
+			}
+		});
 	}
 
 	@Override
 	public void update(final UpdatePluginEvent event) {
+		AwtUiRunner.runLater(new Runnable() {
+
+			@Override
+			public void run() {
 		switch (event.getState()) {
 		case STARTING_ALL:
 			updateInProgress = true;
@@ -269,10 +301,17 @@ public final class HabiTvTrayView implements CoreSubscriber {
 		default:
 			break;
 		}
+	
+			}
+		});
 	}
 
 	@Override
 	public void update(UpdatablePluginEvent event) {
+		AwtUiRunner.runLater(new Runnable() {
+
+			@Override
+			public void run() {
 		UpdatablePluginStateEnum state = event.getState();
 		switch (state) {
 		case CHECKING:
@@ -294,6 +333,9 @@ public final class HabiTvTrayView implements CoreSubscriber {
 		default:
 			break;
 		}
+	
+			}
+		});
 	}
 
 	private static String buildLocalizedDownloadFailureDetail(final RetreiveEvent event) {
