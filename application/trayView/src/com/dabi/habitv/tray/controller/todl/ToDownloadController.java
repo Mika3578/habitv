@@ -1142,7 +1142,21 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 				case DONE:
 					refreshCategoryButton.setDisable(false);
 					searchCategoryProgress.setProgress(1);
-					loadTree();
+					FxBackgroundRunner.start(new Runnable() {
+
+						@Override
+						public void run() {
+							final Map<String, CategoryDTO> loaded = new TreeMap<>(getController().loadCategories());
+							Platform.runLater(new Runnable() {
+
+								@Override
+								public void run() {
+									plugins = loaded;
+									loadTree(plugins);
+								}
+							});
+						}
+					});
 					break;
 				default:
 					break;
