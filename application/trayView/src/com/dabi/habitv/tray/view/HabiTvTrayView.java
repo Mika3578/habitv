@@ -158,8 +158,13 @@ public final class HabiTvTrayView implements CoreSubscriber {
 			checkInProgress = false;
 			changeAnimation();
 			LOG.error("", event.getException());
+			final String errorDetail = event.getException() == null ? ""
+					: event.getException().getMessage();
+			final String errorMessage = event.getChannel() == null
+					? Messages.getString("HabiTvTrayView.18") + " " + errorDetail
+					: Messages.getString("HabiTvTrayView.18") + " " + event.getChannel() + " : " + errorDetail;
 			trayIcon.displayMessage(
-					Messages.getString("HabiTvTrayView.17"), Messages.getString("HabiTvTrayView.18") + " " + event.getChannel() + " : " + event.getException().getMessage(), TrayIcon.MessageType.ERROR); //$NON-NLS-1$ //$NON-NLS-2$
+					Messages.getString("HabiTvTrayView.17"), errorMessage, TrayIcon.MessageType.ERROR); //$NON-NLS-1$ //$NON-NLS-2$
 			break;
 		case IDLE:
 

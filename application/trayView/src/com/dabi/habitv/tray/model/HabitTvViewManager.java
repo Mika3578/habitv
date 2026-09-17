@@ -39,6 +39,8 @@ public class HabitTvViewManager extends Observable {
 
 	private Thread demonThread;
 
+	private volatile boolean demonRunning;
+
 	private final GrabConfigDAO grabConfigDAO;
 
 	public HabitTvViewManager() {
@@ -82,57 +84,50 @@ public class HabitTvViewManager extends Observable {
 	}
 
 	public void startDownloadCheckDemon() {
-
-		demonThread = new Thread() {
+		demonRunning = true;
+		final long demonTime = userConfig.getDemonCheckTime() * 1000L;
+		final DownloadCheckDaemonRunner runner = new DownloadCheckDaemonRunner(demonTime);
+		demonThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				boolean interrupted = false;
-				final long confDemonTime;
-				confDemonTime = userConfig.getDemonCheckTime();
-				final long demonTime = confDemonTime * 1000L;
-				boolean still = true;
-				// demon mode
-				while (still) {
-					if (interrupted) {
-						interrupted = false;
-					} else {
-						try {
-							if (grabConfigDAO.exist()) {
-								coreManager.retreiveEpisode(grabConfigDAO
-										.load());
-							} else {
-								grabConfigDAO.saveGrabConfig(findCategories());
-							}
-						} catch (final Exception e) {
-							LOG.error("", e);
-							coreManager
-									.getEpisodeManager()
-									.getSearchPublisher()
-									.addNews(
-											new SearchEvent(
-													SearchStateEnum.ERROR, e));
-							still = false;
+				runner.run(new DownloadCheckDaemonRunner.Hooks() {
+					@Override
+					public boolean isRunning() {
+						return demonRunning;
+					}
+
+					@Override
+					public void runCheck() throws Exception {
+						if (grabConfigDAO.exist()) {
+							coreManager.retreiveEpisode(grabConfigDAO.load());
+						} else {
+							grabConfigDAO.saveGrabConfig(findCategories());
 						}
 					}
-					if (still) {
-						try {
-							Thread.sleep(demonTime);
-						} catch (final InterruptedException e) {
-							// may have been interrupted by a manually start
-							interrupted = true;
-						}
+
+					@Override
+					public void onError(final Exception error) {
+						LOG.error("download-check daemon cycle failed; will retry", error);
+						coreManager.getEpisodeManager().getSearchPublisher()
+								.addNews(new SearchEvent(SearchStateEnum.ERROR, error));
 					}
-				}
+
+					@Override
+					public void sleep(final long millis) throws InterruptedException {
+						Thread.sleep(millis);
+					}
+				});
 			}
-
-		};
-
+		}, "habitv-download-check-daemon");
+		demonThread.setDaemon(true);
 		demonThread.start();
 	}
 
 	public void startDownloadCheck() {
 
-		demonThread.interrupt();
+		if (demonThread != null) {
+			demonThread.interrupt();
+		}
 		(new Thread() {
 			@Override
 			public void run() {
@@ -143,6 +138,10 @@ public class HabitTvViewManager extends Observable {
 	}
 
 	public void forceEnd() {
+		demonRunning = false;
+		if (demonThread != null) {
+			demonThread.interrupt();
+		}
 		coreManager.forceEnd();
 	}
 

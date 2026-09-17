@@ -366,6 +366,9 @@ public class DownloadController extends BaseController implements
 					searchButton.setDisable(false);
 					mainProgress.setProgress(1);
 					break;
+				case ERROR:
+					searchButton.setDisable(false);
+					break;
 				default:
 					break;
 				}
