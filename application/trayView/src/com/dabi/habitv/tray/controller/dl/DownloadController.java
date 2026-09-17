@@ -318,7 +318,6 @@ public class DownloadController extends BaseController implements
 
 	@Override
 	public void update(final RetreiveEvent event) {
-		getController().update(event);
 		Platform.runLater(new Runnable() {
 
 			@Override
