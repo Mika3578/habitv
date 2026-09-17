@@ -39,6 +39,7 @@ import com.dabi.habitv.tray.PopinController.ButtonHandler;
 import com.dabi.habitv.tray.controller.BaseController;
 import com.dabi.habitv.tray.controller.todl.CategoryTreeItem.SelectionChangeHandler;
 import com.dabi.habitv.tray.subscriber.CoreSubscriber;
+import com.dabi.habitv.tray.utils.FxBackgroundRunner;
 import com.dabi.habitv.utils.FilterUtils;
 
 import javafx.application.Platform;
@@ -971,33 +972,78 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 				&& DownloadUtils.isHttpUrl(episode.getId());
 	}
 
+	private void setCategoryMaintenanceButtonsDisabled(final boolean disabled) {
+		refreshCategoryButton.setDisable(disabled);
+		cleanCategoryButton.setDisable(disabled);
+	}
+
 	private void addButtonsActions() {
 		refreshCategoryButton.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent event) {
-				new Thread(new Runnable() {
+				setCategoryMaintenanceButtonsDisabled(true);
+				FxBackgroundRunner.start(new Runnable() {
 
 			        @Override
 			        public void run() {
-				        getController().getManager().updateGrabConfig();
-				        Platform.runLater(new Runnable() {
+				        Map<String, CategoryDTO> loaded = null;
+				        try {
+					        getController().getManager().updateGrabConfig();
+					        loaded = new TreeMap<>(getController().loadCategories());
+				        } finally {
+					        final Map<String, CategoryDTO> toDisplay = loaded;
+					        Platform.runLater(new Runnable() {
 
-			                @Override
-			                public void run() {
-				                loadTree();
-			                }
-		                });
+				                @Override
+				                public void run() {
+					                try {
+						                if (toDisplay != null) {
+							                plugins = toDisplay;
+							                loadTree(plugins);
+						                }
+					                } finally {
+						                setCategoryMaintenanceButtonsDisabled(false);
+					                }
+				                }
+			                });
+				        }
 			        }
-		        }).start();
+		        });
 			}
 		});
 		cleanCategoryButton.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent event) {
-				getController().getManager().cleanCategories();
-				loadTree();
+				setCategoryMaintenanceButtonsDisabled(true);
+				FxBackgroundRunner.start(new Runnable() {
+
+					@Override
+					public void run() {
+						Map<String, CategoryDTO> loaded = null;
+						try {
+							getController().getManager().cleanCategories();
+							loaded = new TreeMap<>(getController().loadCategories());
+						} finally {
+							final Map<String, CategoryDTO> toDisplay = loaded;
+							Platform.runLater(new Runnable() {
+
+								@Override
+								public void run() {
+									try {
+										if (toDisplay != null) {
+											plugins = toDisplay;
+											loadTree(plugins);
+										}
+									} finally {
+										setCategoryMaintenanceButtonsDisabled(false);
+									}
+								}
+							});
+						}
+					}
+				});
 			}
 		});
 	}
@@ -1125,7 +1171,21 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 				case DONE:
 					refreshCategoryButton.setDisable(false);
 					searchCategoryProgress.setProgress(1);
-					loadTree();
+					FxBackgroundRunner.start(new Runnable() {
+
+						@Override
+						public void run() {
+							final Map<String, CategoryDTO> loaded = new TreeMap<>(getController().loadCategories());
+							Platform.runLater(new Runnable() {
+
+								@Override
+								public void run() {
+									plugins = loaded;
+									loadTree(plugins);
+								}
+							});
+						}
+					});
 					break;
 				default:
 					break;
