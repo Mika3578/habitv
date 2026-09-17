@@ -254,11 +254,23 @@ public class DownloadController extends BaseController implements
 
 			@Override
 			public void handle(ActionEvent event) {
+				searchButton.setDisable(true);
 				FxBackgroundRunner.start(new Runnable() {
 
 					@Override
 					public void run() {
-						getController().start();
+						try {
+							getController().start();
+						} catch (final RuntimeException e) {
+							Platform.runLater(new Runnable() {
+
+								@Override
+								public void run() {
+									searchButton.setDisable(false);
+								}
+							});
+							throw e;
+						}
 					}
 
 				});
