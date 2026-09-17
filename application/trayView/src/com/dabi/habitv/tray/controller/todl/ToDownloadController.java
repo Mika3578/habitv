@@ -982,11 +982,13 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 			        @Override
 			        public void run() {
 				        getController().getManager().updateGrabConfig();
+				        final Map<String, CategoryDTO> loaded = new TreeMap<>(getController().loadCategories());
 				        Platform.runLater(new Runnable() {
 
 			                @Override
 			                public void run() {
-				                loadTree();
+				                plugins = loaded;
+				                loadTree(plugins);
 			                }
 		                });
 			        }
@@ -1002,11 +1004,13 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 					@Override
 					public void run() {
 						getController().getManager().cleanCategories();
+						final Map<String, CategoryDTO> loaded = new TreeMap<>(getController().loadCategories());
 						Platform.runLater(new Runnable() {
 
 							@Override
 							public void run() {
-								loadTree();
+								plugins = loaded;
+								loadTree(plugins);
 							}
 						});
 					}
