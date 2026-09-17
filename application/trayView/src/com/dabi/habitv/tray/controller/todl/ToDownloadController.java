@@ -972,25 +972,42 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 				&& DownloadUtils.isHttpUrl(episode.getId());
 	}
 
+	private void setCategoryMaintenanceButtonsDisabled(final boolean disabled) {
+		refreshCategoryButton.setDisable(disabled);
+		cleanCategoryButton.setDisable(disabled);
+	}
+
 	private void addButtonsActions() {
 		refreshCategoryButton.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent event) {
+				setCategoryMaintenanceButtonsDisabled(true);
 				FxBackgroundRunner.start(new Runnable() {
 
 			        @Override
 			        public void run() {
-				        getController().getManager().updateGrabConfig();
-				        final Map<String, CategoryDTO> loaded = new TreeMap<>(getController().loadCategories());
-				        Platform.runLater(new Runnable() {
+				        Map<String, CategoryDTO> loaded = null;
+				        try {
+					        getController().getManager().updateGrabConfig();
+					        loaded = new TreeMap<>(getController().loadCategories());
+				        } finally {
+					        final Map<String, CategoryDTO> toDisplay = loaded;
+					        Platform.runLater(new Runnable() {
 
-			                @Override
-			                public void run() {
-				                plugins = loaded;
-				                loadTree(plugins);
-			                }
-		                });
+				                @Override
+				                public void run() {
+					                try {
+						                if (toDisplay != null) {
+							                plugins = toDisplay;
+							                loadTree(plugins);
+						                }
+					                } finally {
+						                setCategoryMaintenanceButtonsDisabled(false);
+					                }
+				                }
+			                });
+				        }
 			        }
 		        });
 			}
@@ -999,20 +1016,32 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 
 			@Override
 			public void handle(ActionEvent event) {
+				setCategoryMaintenanceButtonsDisabled(true);
 				FxBackgroundRunner.start(new Runnable() {
 
 					@Override
 					public void run() {
-						getController().getManager().cleanCategories();
-						final Map<String, CategoryDTO> loaded = new TreeMap<>(getController().loadCategories());
-						Platform.runLater(new Runnable() {
+						Map<String, CategoryDTO> loaded = null;
+						try {
+							getController().getManager().cleanCategories();
+							loaded = new TreeMap<>(getController().loadCategories());
+						} finally {
+							final Map<String, CategoryDTO> toDisplay = loaded;
+							Platform.runLater(new Runnable() {
 
-							@Override
-							public void run() {
-								plugins = loaded;
-								loadTree(plugins);
-							}
-						});
+								@Override
+								public void run() {
+									try {
+										if (toDisplay != null) {
+											plugins = toDisplay;
+											loadTree(plugins);
+										}
+									} finally {
+										setCategoryMaintenanceButtonsDisabled(false);
+									}
+								}
+							});
+						}
 					}
 				});
 			}
