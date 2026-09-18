@@ -1,0 +1,36 @@
+{
+  "data": {
+    "programs": {
+      "items": [
+        {
+          "id": "program-alpha",
+          "slug": "evening-magazine",
+          "name": "Evening Magazine",
+          "mainChannel": { "slug": "tf1", "label": "TF1" },
+          "categories": [
+            {
+              "id": "GT_INFOS_MAG_AND_SPORT",
+              "label": "News magazines and sport",
+              "main": true,
+              "slug": "infos-mag-et-sport"
+            }
+          ]
+        },
+        {
+          "id": "program-beta",
+          "slug": "sample-series",
+          "name": "Sample Series",
+          "mainChannel": { "slug": "tf1", "label": "TF1" },
+          "categories": [
+            {
+              "id": "GT_SERIES_AND_FICTIONS",
+              "label": "Series and fiction",
+              "main": true,
+              "slug": "series-et-fictions"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

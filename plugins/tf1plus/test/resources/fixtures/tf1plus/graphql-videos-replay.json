@@ -1,0 +1,42 @@
+{
+  "data": {
+    "programBySlug": {
+      "videos": {
+        "items": [
+          {
+            "id": "video-alpha",
+            "slug": "evening-magazine-episode-1",
+            "type": "REPLAY",
+            "date": "2026-09-18T18:00:00Z",
+            "published": "2026-09-18T18:05:00Z",
+            "episode": 1,
+            "season": 2,
+            "url": "https://www.tf1.fr/tf1/evening-magazine/videos/evening-magazine-episode-1.html",
+            "broadcastChannel": { "slug": "tf1", "label": "TF1" },
+            "playingInfos": { "duration": 2400 },
+            "decoration": {
+              "label": "Evening Magazine episode 1",
+              "programLabel": "Evening Magazine",
+              "description": "Sanitized sample replay description.",
+              "images": [
+                {
+                  "type": "THUMBNAIL",
+                  "sources": [
+                    { "url": "https://photos.tf1.fr/sample-thumb.jpg", "type": "jpg" }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "id": "video-extract",
+            "slug": "evening-magazine-clip",
+            "type": "EXTRACT",
+            "url": "https://www.tf1.fr/tf1/evening-magazine/videos/evening-magazine-clip.html",
+            "decoration": { "label": "Clip" }
+          }
+        ]
+      }
+    }
+  }
+}

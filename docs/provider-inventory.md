@@ -3,7 +3,7 @@
 **Tracker item**: `provider-inventory`  
 **Legacy code**: `HBTV-006` (historical reference only)  
 **Status:** in progress (~65%) — inventory and offline fixtures; rewrites are
-separate PRs per module. **Last refresh:** 2026-05-31.
+separate PRs per module. **Last refresh:** 2026-09-18.
 
 ---
 
@@ -15,6 +15,8 @@ separate PRs per module. **Last refresh:** 2026-05-31.
 | `francetv` (ex Pluzz) | **Keep** — France.tv mobile API + public hub discovery (PR #137) + yt-dlp download | Migrate user grab-config `pluzz` → `francetv`; refresh hubs after upgrade |
 | `youtube` | **Keep** — yt-dlp binary contract (see `ytdlp-migration`) | Publish `yt-dlp` tool zip to `habitv-repo` |
 | `arte`, `6play`, `lequipe`, … | **Needs rewrite** or live drift | Fixture-first parser PRs |
+| `tf1plus` | **New** — TF1+ public GraphQL catalog + yt-dlp download | Keep; many streams are DRM/auth and fail at download |
+| `bfmtv` | **New** — BFMTV/BFM Business public replay clips + yt-dlp | Keep; RMC+ full-channel replay stays out of scope |
 | `canalPlus` (+ embedded CStar) | **Obsolete** Canal-era endpoints | Dedicated canal-family rewrite |
 | `wat`, `beinsport`, `clubic`, `footyroom` | **Obsolete** branding/URLs | Deprecation or rewrite PRs |
 | `nrj12` | **Not in reactor** | Historical README name only |
@@ -29,6 +31,12 @@ separate PRs per module. **Last refresh:** 2026-05-31.
   rebranded to C8; dead `www.d8.tv` endpoints).
 - **6play** → legacy M6 branding; module `plugins/6play` targets old `6play.fr`
   (modern M6+ replay is a future rewrite target).
+- **TF1+** → current TF1 group replay (`tf1.fr`); module `plugins/tf1plus`.
+  Legacy `wat` stays in the reactor until a dedicated deprecation PR.
+- **BFMTV.com** → news/show replay clips; module `plugins/bfmtv`. Full BFM/RMC
+  channel replay on RMC+ is protected and not implemented.
+
+Unsupported or obsolete providers stay **documented** here until a dedicated
 
 Unsupported or obsolete providers stay **documented** here until a dedicated
 deprecation PR removes them (tracker + risk register), never silently dropped.
@@ -58,8 +66,9 @@ no provider rewrite, no runtime behavior change in inventory-only work.
 
 | Module path | Maven artifactId | Plugin type | Current status | Evidence | Recommended follow-up PR |
 |---|---|---|---|---|---|
-| `plugins/pom.xml` | `plugins` | utility | infrastructure-only | Aggregator defines all 24 plugin modules and no runtime logic | keep as-is |
+| `plugins/pom.xml` | `plugins` | utility | infrastructure-only | Aggregator defines plugin modules and no runtime logic | keep as-is |
 | `plugins/6play` | `6play` | provider | needs live endpoint rewrite | `SixPlayPluginManager` is a provider; `SixPlayConf.HOME_URL` points to legacy HTTP `6play.fr`; live parser stability unknown | add fixture tests |
+| `plugins/bfmtv` | `bfmtv` | provider | degraded (catalog + yt-dlp download) | `BfmTvPluginManager` lists public BFMTV / BFM Business replay via NextRadioTV JSON; download delegates to `youtube` (yt-dlp) on public `bfmtv.com` replay pages; RMC+ live/full-channel replay excluded; offline fixtures under `fixtures/bfmtv/` | keep |
 | `plugins/RSS` | `RSS` | provider | keep | `RSSPluginManager` implements provider; test class exists; references generic RSS templates | add fixture tests |
 | `plugins/adobeHDS` | `adobeHDS` | downloader | keep | `AdobeHDSPluginDownloader` implements downloader/proxy interfaces; updater-style binary wrapper | keep as-is |
 | `plugins/aria2` | `aria2` | downloader | keep | `Aria2PluginDownloader` wraps `aria2c`; dedicated test exists | keep as-is |
@@ -81,7 +90,8 @@ no provider rewrite, no runtime behavior change in inventory-only work.
 | `plugins/francetv` | `francetv` | provider | keep | `FranceTvPluginManager` queries `api-mobile.yatta.francetv.fr` catalogue and public hubs via `/apps/channels/{hubSlug}?platform=apps` (PR #137, plugin `4.1.3-SNAPSHOT`); download delegated to `youtube` (yt-dlp); offline `FranceTvUrlsTest` + fixture baseline; live `FranceTvPluginManagerTest` opt-in only; replaces former `plugins/pluzz` (legacy `pluzz.` URLs still recognised by `canDownload`; grab-config plugin id must be `francetv`) | keep |
 | `plugins/rtmpDump` | `rtmpDump` | downloader | keep | `RtmpDumpPluginDownloader` is binary wrapper with updater version pattern; dedicated test exists | keep as-is |
 | `plugins/sfr` | `sfr` | provider | unknown / needs fixture | `SFRConf` uses `sport.sfr.fr` API path; provider tests are live-network style only | add fixture tests |
-| `plugins/wat` | `wat` | provider | obsolete endpoint | `WatConf` points to TF1/WAT-era URLs; plugin naming and endpoint model reflect legacy provider branding | rewrite provider |
+| `plugins/tf1plus` | `tf1plus` | provider | degraded (catalog + yt-dlp download) | `Tf1PlusPluginManager` discovers TF1, TMC, TFX, TF1 Series Films, and LCI via public GraphQL; replay download delegated to `youtube` (yt-dlp); DRM/auth items fail at download; offline fixtures under `fixtures/tf1plus/` | keep |
+| `plugins/wat` | `wat` | provider | obsolete endpoint | `WatConf` points to TF1/WAT-era URLs; plugin naming and endpoint model reflect legacy provider branding; replacement is `plugins/tf1plus` (do not remove `wat` until a deprecation PR) | deprecate provider |
 | `plugins/youtube` | `youtube` | provider | keep | `YoutubePluginManager` provider; offline tests; binary contract migrated to yt-dlp (`YtDlpCmdExecutor`, defaults `yt-dlp` / `yt-dlp.exe`) | keep (yt-dlp binary) |
 
 ---
@@ -139,6 +149,8 @@ no provider rewrite, no runtime behavior change in inventory-only work.
 | `arte` | Local fixture metadata + offline baseline test | Legacy HTTP/RSS parsing assumptions need stable parser anchors |
 | `youtube` | Local fixture metadata + offline baseline test | Binary contract migrated to yt-dlp; live provider validation still separate |
 | `novo19` | Local BFF JSON fixtures + offline parser/mapper/playback tests | Public replay provider; BFF catalogue + RedBee playback delegation to yt-dlp |
+| `tf1plus` | Local GraphQL fixtures + offline mapper/manager tests | TF1+ public catalog; yt-dlp download; DRM items fail at download |
+| `bfmtv` | Local NextRadioTV JSON fixtures + offline mapper/manager tests | BFMTV.com public replay clips; yt-dlp download; RMC+ excluded |
 
 ### NOVO19 provider strategy
 
@@ -151,6 +163,25 @@ no provider rewrite, no runtime behavior change in inventory-only work.
   no DRM/login/cookie bypass.
 - **Out of scope:** live direct (`novo19_*`), login, `/mes-videos`, BFF full-text search
   until Habitv search UX is defined.
+
+### TF1+ provider strategy
+
+- **Catalogue:** public GraphQL (`www.tf1.fr/graphql/web`) for TF1, TMC, TFX,
+  TF1 Series Films, and LCI programs and REPLAY videos.
+- **Download:** public episode page URL delegated to `youtube` (yt-dlp).
+- **Failure mode:** empty catalog/episode sets on API errors; download fails with a
+  short unavailable message when the URL is not a public TF1 replay page.
+- **Out of scope:** account login, Widevine/license handling, live channels.
+
+### BFMTV provider strategy
+
+- **Catalogue:** anonymous NextRadioTV session token (memory only) plus replay
+  program/video JSON for BFMTV and BFM Business.
+- **Download:** public `bfmtv.com` replay page URL delegated to `youtube` (yt-dlp).
+- **Failure mode:** empty sets on API errors; host-checked download URLs only.
+- **Out of scope:** RMC+ full-channel replay, live streams, DRM.
+
+French platform research: [`french-replay-providers.md`](french-replay-providers.md).
 
 ### Infrastructure-only modules not suitable for provider fixtures
 
@@ -172,6 +203,8 @@ provider endpoint fixtures.
 - `plugins/arte/test/resources/fixtures/arte/fixture-baseline.txt`
 - `plugins/youtube/test/resources/fixtures/youtube/fixture-baseline.txt`
 - `plugins/novo19/test/resources/fixtures/novo19/fixture-baseline.txt`
+- `plugins/tf1plus/test/resources/fixtures/tf1plus/fixture-baseline.txt`
+- `plugins/bfmtv/test/resources/fixtures/bfmtv/fixture-baseline.txt`
 
 Baseline tests added (local fixture loading only):
 
@@ -181,6 +214,8 @@ Baseline tests added (local fixture loading only):
 - `ArteOfflineFixtureBaselineTest`
 - `YoutubeOfflineFixtureBaselineTest`
 - `Novo19CatalogOfflineTest` fixture baseline (+ parser/mapper/playback offline suite)
+- `Tf1PlusOfflineFixtureBaselineTest` (+ mapper/manager offline suite)
+- `BfmTvOfflineFixtureBaselineTest` (+ mapper/manager offline suite)
 
 ---
 
@@ -219,8 +254,9 @@ provider/runtime drift, not a static-repository deploy regression.
    - Current state: PR #91 keeps `D17` renamed to `CStar` and adds graceful
      handling for deprecated/protected Canal+ endpoints without bypass logic.
 3. ✅ **fix(provider-francetv): replace pluzz provider with france.tv metadata flow** — delivered in PR #58 (`plugins/francetv`).
-4. **fix(provider-legacy-football): rewrite wat, beinsport, footyroom, lequipe**
+4. **fix(provider-legacy-football): rewrite beinsport, footyroom, lequipe**
    - Scope: endpoint/parser modernization with offline fixtures first.
+   - TF1/WAT replacement is `plugins/tf1plus` (see [`french-replay-providers.md`](french-replay-providers.md)); keep `wat` until a deprecation PR.
 5. **docs(provider-cleanup): propose dedicated deprecation PRs for non-recoverable providers**
    - Scope: doc + tracker + risk updates only, no silent removals.
 
@@ -228,8 +264,8 @@ provider/runtime drift, not a static-repository deploy regression.
 
 ## Out-of-scope confirmations
 
-- No plugin modules were removed.
-- No provider logic was rewritten.
+- No plugin modules were removed (`wat` remains until a deprecation PR).
+- Existing providers were not rewritten; new `tf1plus` and `bfmtv` modules were added.
 - No runtime updater behavior was changed.
 - yt-dlp binary migration is tracked under `ytdlp-migration` (separate PRs).
 - No JavaFX modernization work started in this inventory PR.

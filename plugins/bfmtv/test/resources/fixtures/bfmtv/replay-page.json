@@ -1,0 +1,28 @@
+{
+  "page": {
+    "contents": [
+      {
+        "title": "Replay",
+        "elements": [
+          {
+            "items": [
+              {
+                "title": "Morning News",
+                "categories": "1001",
+                "image_url": "https://images.bfmtv.com/sample-morning.jpg",
+                "presentateur": "Sample host"
+              },
+              {
+                "title": "Evening Brief",
+                "categories": "1002",
+                "image_url": "https://images.bfmtv.com/sample-evening.jpg"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "error": "",
+  "message": ""
+}

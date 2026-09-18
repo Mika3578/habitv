@@ -121,6 +121,8 @@ Replay sites change often. Treat README-era names as **legacy labels**:
 | Pluzz | France Télévisions / France.tv — module `plugins/francetv` (rename grab-config `pluzz` → `francetv`) |
 | CStar (ex D17) | Canal-era channel — embedded in `plugins/canalPlus` (obsolete endpoints; D8 removed, rebranded to C8) |
 | 6play | M6+ / M6 replay area — `plugins/6play` (needs rewrite) |
+| TF1+ | TF1, TMC, TFX, TF1 Series Films, LCI — module `plugins/tf1plus` (legacy `wat` still present) |
+| BFMTV | BFMTV / BFM Business public replay clips — module `plugins/bfmtv` (RMC+ not included) |
 | NRJ12 | Historical reference only — no module in reactor |
 
 Full table, fixture policy, and follow-up queue:
@@ -155,6 +157,7 @@ Details: [`CONTRIBUTING.md`](CONTRIBUTING.md), [`AGENTS.md`](AGENTS.md),
 | [`docs/runtime-quickstart.md`](docs/runtime-quickstart.md) | Console runtime, flags, yt-dlp |
 | [`docs/static-repository-deploy.md`](docs/static-repository-deploy.md) | `habitv-repo` publish contract |
 | [`docs/provider-inventory.md`](docs/provider-inventory.md) | Plugin modules and status |
+| [`docs/french-replay-providers.md`](docs/french-replay-providers.md) | French catch-up platform research vs Habitv plugins |
 | [`docs/media-metadata-naming.md`](docs/media-metadata-naming.md) | Canonical metadata, tokens, MEDIA_SERVER naming |
 | [`docs/ci.md`](docs/ci.md) | GitHub Actions required vs diagnostic checks |
 | [`docs/repository-maintenance.md`](docs/repository-maintenance.md) | Merge hygiene, Dependabot, doc sync |

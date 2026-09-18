@@ -1,0 +1,4 @@
+provider=bfmtv
+network=disabled
+site=https://www.bfmtv.com
+catalogueSource=nextradiotv-json

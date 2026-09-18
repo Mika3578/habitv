@@ -52,6 +52,8 @@ is **Java 21**, then **25** — see [`java-runtime-policy.md`](java-runtime-poli
 | Provider | Status | Notes |
 |----------|--------|-------|
 | `francetv` | working | Public hubs API (#137); yt-dlp download |
+| `tf1plus` | degraded | Public TF1+ GraphQL catalog; yt-dlp download; DRM/auth fails at download |
+| `bfmtv` | degraded | Public BFMTV / BFM Business replay clips; RMC+ excluded |
 | `youtube` | working | yt-dlp wiring; API key externalized; #138 diagnostics |
 | `canalPlus` / CStar | degraded | Graceful empty categories when protected/unreachable |
 | `arte`, `6play`, `lequipe` | needs rewrite | Live drift; offline fixtures started |
@@ -60,7 +62,8 @@ is **Java 21**, then **25** — see [`java-runtime-policy.md`](java-runtime-poli
 ### Broken / degraded summary
 
 - **Broken:** none classified as hard-fail in inventory (live tests quarantined)
-- **Degraded:** `canalPlus` family (protected/legacy endpoints)
+- **Degraded:** `canalPlus` family (protected/legacy endpoints); `tf1plus` and
+  `bfmtv` catalogs are public but many downloads are DRM/auth-limited
 - **Obsolete:** see [`obsolescence-register.md`](obsolescence-register.md)
 
 ---

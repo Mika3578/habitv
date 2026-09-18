@@ -1,0 +1,20 @@
+{
+  "error": "",
+  "message": "",
+  "videos": [
+    {
+      "contenu_id": "202609180001",
+      "video": "202609180001",
+      "id_ext": "123456789",
+      "title": "Morning News Friday 18 September 2026",
+      "description": "Sanitized sample BFMTV replay description.",
+      "begin_date": 1789705382,
+      "section_id": 1001,
+      "section": "Morning News",
+      "video_duration_ms": 3600000,
+      "long_url": "https://www.bfmtv.com/replay-emissions/morning-news/video-morning-news-friday-18-september-2026_VN-202609180001.html",
+      "short_url": "https://www.bfmtv.com/replay-emissions/morning-news/video-morning-news-friday-18-september-2026_VN-202609180001.html",
+      "image": "https://images.bfmtv.com/sample-thumb.jpg"
+    }
+  ]
+}

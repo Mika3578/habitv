@@ -33,6 +33,16 @@ Also see [`dev-tracker.md`](dev-tracker.md) for formal tracker items.
 
 ## Active candidates
 
+### M6+ rewrite of `6play`
+
+* **Priority:** P2
+* **Risk:** medium
+* **Estimated scope:** medium
+* **Suggested branch:** `fix/provider-6play-m6plus`
+* **Validation required:** offline fixtures + `mvn -B -ntp -pl plugins/6play -am test`
+* **Blocked by:** dedicated rewrite PR (do not add a second M6 plugin)
+* **Target phase:** provider/plugin restoration
+
 ### Provider metadata enrichment pass
 
 * **Priority:** P2

@@ -1,0 +1,18 @@
+{
+  "data": {
+    "seriesAndFictions": {
+      "id": "GT_SERIES_AND_FICTIONS",
+      "label": "Series and fiction",
+      "main": true,
+      "slug": "series-et-fictions",
+      "type": "MAIN_SERIES_AND_FICTIONS"
+    },
+    "infosMagazineSports": {
+      "id": "GT_INFOS_MAG_AND_SPORT",
+      "label": "News magazines and sport",
+      "main": true,
+      "slug": "infos-mag-et-sport",
+      "type": "MAIN_INFOS_MAG_AND_SPORT"
+    }
+  }
+}

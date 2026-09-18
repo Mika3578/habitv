@@ -14,7 +14,7 @@
 > Legacy codes are historical-only and must not be used for new branch
 > names, PR titles, commit subjects, or workflow naming.
 
-**Last refresh:** 2026-09-16 · **Active branch:** `develop`
+**Last refresh:** 2026-09-18 · **Active branch:** `develop`
 
 **Documentation entry point:** [`README.md`](../README.md) (overview, build matrix,
 automatic category behavior, provider summary, doc map).
@@ -24,17 +24,17 @@ automatic category behavior, provider summary, doc map).
 ## 📊 Overall progress
 
 ```
-████████████████░░░░  80%
+████████████████░░░░  82%
 ```
 
 | Category | Count |
 |---------|------:|
 | ✅ Delivered | **13** |
-| 🟡 In progress | **9** |
+| 🟡 In progress | **11** |
 | 🔵 Proposed | **1** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
-| **Total work items** | **23** |
+| **Total work items** | **25** |
 
 ---
 
@@ -50,6 +50,7 @@ automatic category behavior, provider summary, doc map).
 | 📦 `static-repo-publish` — Static artifact repository publication | ✅ Done | 🟠 P1 | `████████████████████` 100% |
 | 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🟡 In progress | 🟡 P2 | `█████████████░░░░░░░` 65% |
 | 📺 `provider-novo19` — NOVO19 public replay provider | 🟡 In progress | 🟡 P2 | `██████████████████░░` 90% |
+| 📺 `french-replay-providers` — French replay plugins (TF1+ / BFMTV) | 🟡 In progress | 🟡 P2 | `██████████████░░░░░░` 70% |
 | 🎬 `ytdlp-migration` — `youtube-dl` → `yt-dlp` migration | 🟡 In progress | 🟡 P2 | `███████████████░░░░░` 75% |
 | 🩺 `ytdlp-runtime-diagnostics` — yt-dlp Windows runtime diagnostics | 🟡 In progress | 🟡 P2 | `██████████████████░░` 90% |
 | 🖼️ `javafx-modernization` — JavaFX & runtime packaging modernization | 🔵 Proposed | 🟡 P2 | `███░░░░░░░░░░░░░░░░░` 15% |
@@ -325,7 +326,7 @@ resolution matches the latest published SNAPSHOT builds.
 | **Progress** | `█████████████░░░░░░░` 65% |
 | **Legacy code** | HBTV-006 |
 
-**Scope** — Inventory every plugin in `plugins/` (24 in the aggregator
+**Scope** — Inventory every plugin in `plugins/` (26 plugin modules
 + `plugin-tester`); record current status (working, obsolete endpoint,
 renamed, broken parser). No code removal in this item.
 
@@ -351,7 +352,7 @@ mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Ds
 [`provider-inventory.md`](provider-inventory.md) for every plugin module
 plus historical references (`CStar` (ex `D17`), `nrj12`, FranceTV/Pluzz,
 Kewego). An offline fixture policy and first local fixture baseline are
-now documented for `6play`, `canalPlus`, `francetv` (ex `pluzz`), `arte`, `youtube`, and `novo19`
+now documented for `6play`, `canalPlus`, `francetv` (ex `pluzz`), `arte`, `youtube`, `novo19`, `tf1plus`, and `bfmtv`
 without rewriting providers. PR #137 adds API-first public hub discovery
 (Sport, Franceinfo, partner hubs); `francetv` plugin version `4.1.3-SNAPSHOT`.
 Default `mvn test` skips live
@@ -391,6 +392,41 @@ yt-dlp. Live direct, login, and personal rails remain out of scope.
 **Related PRs** · [#150](https://github.com/Mika3578/habitv/pull/150)
 
 **Notes** — Strategy details: [`provider-inventory.md`](provider-inventory.md).
+
+---
+
+## 📺 `french-replay-providers` — French replay plugins (TF1+ / BFMTV)
+
+| | |
+|---|---|
+| **Status** | 🟡 In progress |
+| **Priority** | 🟡 P2 |
+| **Progress** | `██████████████░░░░░░` 70% |
+| **Legacy code** | — |
+
+**Scope** — Research current French catch-up platforms and add public-catalog
+plugins for the highest-value gaps: `plugins/tf1plus` (TF1, TMC, TFX,
+TF1 Series Films, LCI) and `plugins/bfmtv` (BFMTV / BFM Business clips).
+Download is delegated to `youtube` (yt-dlp). DRM/login/RMC+ stay out of
+scope. Legacy `wat` remains until a dedicated deprecation PR.
+
+**Acceptance criteria**
+- ✅ Research note [`french-replay-providers.md`](french-replay-providers.md)
+- ✅ `plugins/tf1plus` with offline GraphQL fixtures and tests
+- ✅ `plugins/bfmtv` with offline NextRadioTV fixtures and tests
+- ⬜ Squash-merge PR to `develop`
+- ⬜ Follow-up: M6+ rewrite of `6play`; Canal+/Arte/L'Equipe rewrites; RMC+ only with maintainer-directed protected-replay scope
+
+**Validation**
+```bash
+mvn -B -ntp -DskipTests validate
+mvn -B -ntp -pl plugins/tf1plus,plugins/bfmtv -am test
+```
+
+**Notes** — Public catalog plus yt-dlp only. Many TF1+ streams are
+DRM/auth and fail at download; catalog metadata still lists. See
+[`provider-inventory.md`](provider-inventory.md) and residual risk
+`provider-endpoints-dead`.
 
 ---
 

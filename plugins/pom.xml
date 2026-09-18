@@ -17,6 +17,7 @@
 		<module>aria2</module>
 		<module>arte</module>
 		<module>beinsport</module>
+		<module>bfmtv</module>
 		<module>canalPlus</module>
 		<module>clubic</module>
 		<module>cmd</module>
@@ -34,6 +35,7 @@
 		<module>RSS</module>
 		<module>rtmpDump</module>
 		<module>sfr</module>
+		<module>tf1plus</module>
 		<module>youtube</module>
 		<module>wat</module>
 	</modules>
