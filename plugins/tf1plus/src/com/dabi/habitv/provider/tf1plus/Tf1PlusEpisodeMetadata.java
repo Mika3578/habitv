@@ -47,7 +47,12 @@ final class Tf1PlusEpisodeMetadata {
 			metadata.setDurationSeconds(duration);
 			episode.setDurationSeconds(duration);
 		}
-		final Date published = parseIsoDate(Tf1PlusJson.firstString(video, "published", "date"));
+		final Date broadcast = parseIsoDate(Tf1PlusJson.firstString(video, "date"));
+		if (broadcast != null) {
+			metadata.setAirDate(broadcast);
+			episode.setEpisodeDate(broadcast);
+		}
+		final Date published = parseIsoDate(Tf1PlusJson.firstString(video, "published"));
 		if (published != null) {
 			metadata.setPublicationDate(published);
 		}

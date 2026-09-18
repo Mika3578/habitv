@@ -65,7 +65,11 @@ public class Tf1PlusCatalogMapperTest {
 		assertEquals(Integer.valueOf(1), episode.getMetadata().getEpisodeNumber());
 		assertEquals(Long.valueOf(2400L), episode.getMetadata().getDurationSeconds());
 		assertEquals("TF1", episode.getMetadata().getChannel());
-		assertNotNull(episode.getMetadata().getPublicationDate());
+		assertEquals(Tf1PlusEpisodeMetadata.parseIsoDate("2026-09-18T18:00:00Z"),
+				episode.getMetadata().getAirDate());
+		assertEquals(Tf1PlusEpisodeMetadata.parseIsoDate("2026-09-18T18:05:00Z"),
+				episode.getMetadata().getPublicationDate());
+		assertEquals(episode.getMetadata().getAirDate(), episode.getEpisodeDate());
 		assertNotNull(episode.getMetadata().getThumbnailUrl());
 	}
 

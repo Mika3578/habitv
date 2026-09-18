@@ -66,6 +66,8 @@ Public entry point: `MediaNamingService.resolveOutputPath(template, episode)`
 
 - FranceTV `broadcast_begin_date` / `broadcasted_at` → `airDate`
 - FranceTV HTML card text « Diffusé le … » → treated as broadcast → `airDate`
+- TF1+ GraphQL `date` → `airDate`; `published` → `publicationDate` (**not** `airDate`)
+- BFMTV `begin_date` → `airDate`
 - NOVO19 `publishedAt` → `publicationDate` (**not** `airDate`)
 - Arte `rights.begin` → neither (availability/rights, deferred)
 - yt-dlp `upload_date` → neither as `airDate`
@@ -155,6 +157,8 @@ Downloads/#TVSHOW_NAME#-#EPISODE_NAME_CUT#.#EXTENSION#
 | **arte** | episode title (+ subtitle as description); **no** seriesTitle from thematic category | Player API: language, multi-image, chapters, rights — later enrichment PR; never use `rights.begin` as airDate |
 | **6play** | program → seriesTitle, tile name → episodeTitle, channel from parent | Modern M6+ season/episode/duration/synopsis/artwork needs dedicated scraper/API — not this PR |
 | **novo19** | seriesTitle (program / parent of season), episodeTitle, S/E from strict `S#E#` subtitle, duration, description, **publicationDate** from `publishedAt`, id, URL, channel=`novo19` | No thumbnail in current BFF fixtures/parser; revalidate public surface vs TF1+ before larger rewrite; never map `publishedAt` → airDate |
+| **tf1plus** | seriesTitle, episode title, S/E, duration, description, thumbnail, channel, **airDate** from GraphQL `date`, **publicationDate** from `published`, id, URL | DRM/auth streams fail at yt-dlp download; never map `published` → airDate |
+| **bfmtv** | seriesTitle, episode title, duration, description, thumbnail, channel, **airDate** from `begin_date`, id, URL | Full-channel RMC+ replay remains out of scope |
 | **canalPlus** | legacy title/URL only | Plugin too legacy; do not modernize in naming PR |
 | youtube / RSS / file | display title only | category ≠ series |
 
