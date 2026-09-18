@@ -217,7 +217,7 @@ provider/runtime drift, not a static-repository deploy regression.
 2. 🟡 **fix(provider-canal-family): rewrite canalPlus + cstar provider endpoints**
    - Scope: `plugins/canalPlus` only, with fixture-backed parser behavior.
    - Current state: modern catalog parsing and protected-endpoint placeholders
-     land in this PR; DRM-protected catch-up download remains unavailable.
+     land in PR #180; DRM-protected catch-up download remains unavailable.
 3. ✅ **fix(provider-francetv): replace pluzz provider with france.tv metadata flow** — delivered in PR #58 (`plugins/francetv`).
 4. **fix(provider-legacy-football): rewrite wat, beinsport, footyroom, lequipe**
    - Scope: endpoint/parser modernization with offline fixtures first.

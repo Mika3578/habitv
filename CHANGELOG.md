@@ -51,7 +51,7 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 | Date | Commit | Change |
 |------|--------|--------|
-| 2026-09-18 | TBD | Canal+ modern catalog parsing (hodor/page fixtures), visible unavailable placeholders, canonical episode metadata, and honest DRM-blocked download; bump `canalPlus` to `4.1.1-SNAPSHOT` |
+| 2026-09-18 | PR [#180](https://github.com/Mika3578/habitv/pull/180) | Canal+ modern catalog parsing (hodor/page fixtures), visible unavailable placeholders, canonical episode metadata, and honest DRM-blocked download; bump `canalPlus` to `4.1.1-SNAPSHOT` |
 | 2026-09-16 | TBD | Show stage-aware download progress in the JavaFX Etat column (precise % with French decimals, bytes when known, indeterminate bar for yt-dlp merge/remux/post-processing); bump `youtube` plugin to `4.1.4-SNAPSHOT` |
 | 2026-09-15 | TBD | Canonical media metadata + MEDIA_SERVER naming (`media-metadata-naming`): additive `EpisodeMetadataDTO`, semantic tokens (`#SERIES_NAME#`, `#AIR_DATE#`, `#SEASON_EPISODE#`, `#MEDIA_SERVER_PATH#`), FranceTV/Arte/6play mappings; legacy `#DATE#` unchanged |
 | 2026-09-15 | TBD | Enrich canonical metadata: `publicationDate` / `thumbnailUrl` / `contentLanguage`; NOVO19 maps S/E + publication (not air); FranceTV optional description/image when present |
@@ -67,7 +67,7 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 | Date | Commit | Change |
 |------|--------|--------|
-| 2026-09-18 | TBD | Add Canal+ offline fixtures and parser tests for modern catalog payloads and DRM-blocked download |
+| 2026-09-18 | PR [#180](https://github.com/Mika3578/habitv/pull/180) | Add Canal+ offline fixtures and parser tests for modern catalog payloads and DRM-blocked download |
 | 2026-05-29 | PR [#135](https://github.com/Mika3578/habitv/pull/135) | Remove live URL dependency from deterministic test |
 | 2026-05-18 | PR [#52](https://github.com/Mika3578/habitv/pull/52) | Expand offline yt-dlp defaults and command wiring tests |
 | 2026-05-17 | `0163d9a` | Cover yt-dlp command wiring (offline test) |

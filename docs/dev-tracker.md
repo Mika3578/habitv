@@ -345,14 +345,14 @@ mvn -B -ntp -pl plugins/arte -am -Dtest=ArteOfflineFixtureBaselineTest -Dsurefir
 mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test
 ```
 
-**Related PRs** · offline fixture baseline (merged) · [#91](https://github.com/Mika3578/habitv/pull/91) · [#92](https://github.com/Mika3578/habitv/pull/92) · [#137](https://github.com/Mika3578/habitv/pull/137) (France.tv public hubs) · [#135](https://github.com/Mika3578/habitv/pull/135) (deterministic test quarantine) · Canal+ modern catalog parsers (this PR)
+**Related PRs** · offline fixture baseline (merged) · [#91](https://github.com/Mika3578/habitv/pull/91) · [#92](https://github.com/Mika3578/habitv/pull/92) · [#137](https://github.com/Mika3578/habitv/pull/137) (France.tv public hubs) · [#135](https://github.com/Mika3578/habitv/pull/135) (deterministic test quarantine) · [#180](https://github.com/Mika3578/habitv/pull/180) (Canal+ modern catalog parsers)
 
 **Notes** — Inventory baseline is now documented in
 [`provider-inventory.md`](provider-inventory.md) for every plugin module
 plus historical references (`CStar` (ex `D17`), `nrj12`, FranceTV/Pluzz,
 Kewego). An offline fixture policy and first local fixture baseline are
 now documented for `6play`, `canalPlus`, `francetv` (ex `pluzz`), `arte`, `youtube`, and `novo19`
-without rewriting providers. This PR adds Canal+ modern catalog parsers,
+without rewriting providers. This PR [#180](https://github.com/Mika3578/habitv/pull/180) adds Canal+ modern catalog parsers,
 protected-endpoint placeholders, and DRM-blocked download diagnostics;
 `canalPlus` plugin version `4.1.1-SNAPSHOT`. PR #137 adds API-first public hub discovery
 (Sport, Franceinfo, partner hubs); `francetv` plugin version `4.1.3-SNAPSHOT`.
