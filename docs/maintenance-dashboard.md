@@ -25,7 +25,7 @@ is **Java 21**, then **25** — see [`java-runtime-policy.md`](java-runtime-poli
 |----------|-------|-----------|--------|
 | P1 | Confirm `protect-develop` ruleset in GitHub UI | `branch-protection` | In progress (docs + #118 merged) |
 | P2 | `habitv-repo` publish `yt-dlp` tool zip | `ytdlp-migration` | Follow-up |
-| P2 | Provider fixture/rewrite PRs (6play, arte, lequipe, …) | per module | Queued |
+| P2 | Provider fixture/rewrite PRs (`canalPlus` modern catalog in flight; next `arte` / `6play` / TF1+) | per module | Queued |
 
 ---
 
@@ -53,14 +53,14 @@ is **Java 21**, then **25** — see [`java-runtime-policy.md`](java-runtime-poli
 |----------|--------|-------|
 | `francetv` | working | Public hubs API (#137); yt-dlp download |
 | `youtube` | working | yt-dlp wiring; API key externalized; #138 diagnostics |
-| `canalPlus` / CStar | degraded | Graceful empty categories when protected/unreachable |
+| `canalPlus` / CStar | degraded | Modern catalog parsers + unavailable placeholders; DRM catch-up download unavailable |
 | `arte`, `6play`, `lequipe` | needs rewrite | Live drift; offline fixtures started |
 | `wat`, `beinsport`, `clubic` | obsolete | Deprecation PRs TBD |
 
 ### Broken / degraded summary
 
 - **Broken:** none classified as hard-fail in inventory (live tests quarantined)
-- **Degraded:** `canalPlus` family (protected/legacy endpoints)
+- **Degraded:** `canalPlus` family (modern catalog; DRM download unavailable)
 - **Obsolete:** see [`obsolescence-register.md`](obsolescence-register.md)
 
 ---
@@ -95,11 +95,11 @@ package still needs JavaFX-capable JDK 8 or future OpenJFX runtime packaging
 ## Next 5 recommended PRs
 
 1. Owner-verify `protect-develop` → close `branch-protection`
-2. Publish `yt-dlp` to `habitv-repo` (`ytdlp-migration`)
-3. Offline fixture PR for next priority provider (e.g. `arte` or `6play`)
-4. Opt-in runtime update smoke test against live Pages manifest
-5. Dedicated provider rewrite or deprecation PR per inventory row
+2. Merge or review `fix/download-daemon-resilience` (#179)
+3. Finish Canal+ modern catalog PR (this work); DRM download remains out of scope
+4. Rebase/reopen TF1+ (`codex/replace-wat-plugin-with-tf1+-provider`, closed #101) now that metadata naming is on `develop`
+5. Offline fixture/rewrite PR for next public provider (`arte` or `6play`)
 
 ---
 
-Last reviewed: **2026-05-31**
+Last reviewed: **2026-09-18**

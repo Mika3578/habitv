@@ -22,6 +22,8 @@ public class CanalPlusOfflineFixtureBaselineTest {
 					content.contains("providerFamily=canalPlus,cstar"));
 			assertTrue("fixture metadata must document offline-only mode",
 					content.contains("network=disabled"));
+			assertTrue("fixture metadata must list modern stack fixtures",
+					content.contains("hodor-detail-unit.json"));
 		}
 	}
 

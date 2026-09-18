@@ -1,6 +1,7 @@
 package com.dabi.habitv.provider.canalplus;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.net.UnknownHostException;
 
 import org.junit.Test;
 
+import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.exception.TechnicalException;
 
 public class CanalPlusEndpointAvailabilityTest {
@@ -39,7 +41,7 @@ public class CanalPlusEndpointAvailabilityTest {
 	}
 
 	@Test
-	public void canalPlusCategoryDiscoveryReturnsEmptyWhenLegacyHostIsUnavailable() {
+	public void canalPlusCategoryDiscoveryReturnsUnavailablePlaceholderWhenLegacyHostIsUnavailable() {
 		CanalPlusPluginManager manager = new CanalPlusPluginManager() {
 			@Override
 			public InputStream getInputStreamFromUrl(final String url) {
@@ -47,11 +49,13 @@ public class CanalPlusEndpointAvailabilityTest {
 			}
 		};
 
-		assertTrue(manager.findCategory().isEmpty());
+		final CategoryDTO placeholder = manager.findCategory().iterator().next();
+		assertEquals(CanalPlusEndpointAvailability.CANAL_PLUS_UNAVAILABLE_LABEL, placeholder.getName());
+		assertFalse(placeholder.isDownloadable());
 	}
 
 	@Test
-	public void cStarCategoryDiscoveryReturnsEmptyWhenEndpointIsForbidden() {
+	public void cStarCategoryDiscoveryReturnsUnavailablePlaceholderWhenEndpointIsForbidden() {
 		CStarPluginManager manager = new CStarPluginManager() {
 			@Override
 			protected String getUrlContent(final String url, final String encoding) {
@@ -60,7 +64,9 @@ public class CanalPlusEndpointAvailabilityTest {
 			}
 		};
 
-		assertTrue(manager.findCategory().isEmpty());
+		final CategoryDTO placeholder = manager.findCategory().iterator().next();
+		assertEquals(CanalPlusEndpointAvailability.CSTAR_UNAVAILABLE_LABEL, placeholder.getName());
+		assertFalse(placeholder.isDownloadable());
 	}
 
 	@Test
@@ -71,11 +77,12 @@ public class CanalPlusEndpointAvailabilityTest {
 	}
 
 	@Test
-	public void unavailableMessageIncludesShortCause() {
-		assertEquals(
-				"cstar: Canal+ provider endpoint is no longer reachable or requires protected access. Cause: IOException: HTTP 403 for URL: https://www.canalplus.com/chaines/cstar",
-				CanalPlusEndpointAvailability.buildCategoryUnavailableMessage("cstar",
-						new TechnicalException(new IOException(
-								"Server returned HTTP response code: 403 for URL: https://www.canalplus.com/chaines/cstar"))));
+	public void unavailableMessageIncludesProtectedAccessDetailAndShortCause() {
+		final TechnicalException error = new TechnicalException(new IOException(
+				"Server returned HTTP response code: 403 for URL: https://www.canalplus.com/chaines/cstar"));
+		final String message = CanalPlusEndpointAvailability.buildCategoryUnavailableMessage("cstar", error);
+		assertTrue(message.contains(CanalPlusEndpointAvailability.PROTECTED_ACCESS_DETAIL));
+		assertTrue(message.contains("HTTP 403 for URL: https://www.canalplus.com/chaines/cstar"));
+		assertFalse(message.toLowerCase().contains("pass token"));
 	}
 }

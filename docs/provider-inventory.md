@@ -2,8 +2,8 @@
 
 **Tracker item**: `provider-inventory`  
 **Legacy code**: `HBTV-006` (historical reference only)  
-**Status:** in progress (~65%) — inventory and offline fixtures; rewrites are
-separate PRs per module. **Last refresh:** 2026-05-31.
+**Status:** in progress (~72%) — inventory and offline fixtures; rewrites are
+separate PRs per module. **Last refresh:** 2026-09-18.
 
 ---
 
@@ -15,7 +15,7 @@ separate PRs per module. **Last refresh:** 2026-05-31.
 | `francetv` (ex Pluzz) | **Keep** — France.tv mobile API + public hub discovery (PR #137) + yt-dlp download | Migrate user grab-config `pluzz` → `francetv`; refresh hubs after upgrade |
 | `youtube` | **Keep** — yt-dlp binary contract (see `ytdlp-migration`) | Publish `yt-dlp` tool zip to `habitv-repo` |
 | `arte`, `6play`, `lequipe`, … | **Needs rewrite** or live drift | Fixture-first parser PRs |
-| `canalPlus` (+ embedded CStar) | **Obsolete** Canal-era endpoints | Dedicated canal-family rewrite |
+| `canalPlus` (+ embedded CStar) | **Degraded** — modern catalog parsers + protected placeholders; DRM download unavailable | Keep fixtures; no DRM decrypt path |
 | `wat`, `beinsport`, `clubic`, `footyroom` | **Obsolete** branding/URLs | Deprecation or rewrite PRs |
 | `nrj12` | **Not in reactor** | Historical README name only |
 | Live `*PluginManagerTest` | Quarantined (`-Plive-provider-tests`) | Replace with offline fixtures over time |
@@ -65,7 +65,7 @@ no provider rewrite, no runtime behavior change in inventory-only work.
 | `plugins/aria2` | `aria2` | downloader | keep | `Aria2PluginDownloader` wraps `aria2c`; dedicated test exists | keep as-is |
 | `plugins/arte` | `arte` | provider | needs live endpoint rewrite | `ArteConf` uses legacy HTTP guide/rss URLs and scraping selectors; provider tests are live-network style | add fixture tests |
 | `plugins/beinsport` | `beinsport` | provider | obsolete endpoint | `BeinSportConf` uses legacy `beinsports.com/us/videos` and Dailymotion mapping; known candidate in tracker notes | rewrite provider |
-| `plugins/canalPlus` | `canalPlus` | provider | degraded (graceful unavailable handling) | `CanalPlusPluginManager` and `CStarPluginManager` return an empty category set with a provider-level diagnostic when Canal+ legacy/protected endpoints are unreachable (`service.mycanal.fr` DNS failure, HTTP 403 on channel pages); obsolete `D8` sub-provider removed | keep graceful handling; plan dedicated endpoint rewrite |
+| `plugins/canalPlus` | `canalPlus` | provider | degraded (modern catalog + DRM-blocked download) | Parses current Canal+ catalog payloads with offline fixtures; category discovery shows a non-downloadable placeholder when legacy/protected endpoints fail; modern catch-up download fails with a DRM-protected diagnostic (no decrypt path). Plugin version `4.1.1-SNAPSHOT`. | keep graceful handling; DRM download remains out of scope |
 | `plugins/clubic` | `clubic` | provider | obsolete endpoint | `ClubicConf` targets legacy Clubic video pages via HTML selectors; provider test is live-network | deprecate provider |
 | `plugins/cmd` | `cmd` | exporter | infrastructure-only | `CmdPluginExporterManager` and `CmdPluginDownloaderManager` are command wrappers, no provider endpoint logic | keep as-is |
 | `plugins/curl` | `curl` | exporter | infrastructure-only | `CurlPluginExporterManager` plus downloader wrapper; utility integration layer | keep as-is |
@@ -134,7 +134,7 @@ no provider rewrite, no runtime behavior change in inventory-only work.
 | Provider | Baseline status in this PR | Why first |
 |---|---|---|
 | `6play` | Local fixture metadata + offline baseline test | Legacy scraper targets static markup while current site is SPA-driven |
-| `canalPlus` (`CStar` family) | Local fixture metadata + offline baseline test | Multiple legacy endpoint families, highest rewrite risk |
+| `canalPlus` (`CStar` family) | Modern catalog JSON/HTML fixtures + unavailable-placeholder tests | Protected replay; DRM download remains unavailable |
 | `francetv` (ex `pluzz`) | Local fixture metadata + offline `FranceTvUrlsTest` covering URL/slug builders | Replacement of the legacy `pluzz` module against `api-mobile.yatta.francetv.fr` |
 | `arte` | Local fixture metadata + offline baseline test | Legacy HTTP/RSS parsing assumptions need stable parser anchors |
 | `youtube` | Local fixture metadata + offline baseline test | Binary contract migrated to yt-dlp; live provider validation still separate |
@@ -216,8 +216,8 @@ provider/runtime drift, not a static-repository deploy regression.
    - Scope: `globalnews`, `mlssoccer`, `sfr`, `email`, plus RSS regression fixtures.
 2. 🟡 **fix(provider-canal-family): rewrite canalPlus + cstar provider endpoints**
    - Scope: `plugins/canalPlus` only, with fixture-backed parser behavior.
-   - Current state: PR #91 keeps `D17` renamed to `CStar` and adds graceful
-     handling for deprecated/protected Canal+ endpoints without bypass logic.
+   - Current state: modern catalog parsing and protected-endpoint placeholders
+     land in this PR; DRM-protected catch-up download remains unavailable.
 3. ✅ **fix(provider-francetv): replace pluzz provider with france.tv metadata flow** — delivered in PR #58 (`plugins/francetv`).
 4. **fix(provider-legacy-football): rewrite wat, beinsport, footyroom, lequipe**
    - Scope: endpoint/parser modernization with offline fixtures first.

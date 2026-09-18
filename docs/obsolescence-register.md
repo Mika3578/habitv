@@ -9,7 +9,7 @@ current provider status table.
 Do not delete legacy providers silently. Mark, replace, deprecate, or remove
 in focused PRs.
 
-**Last refresh:** 2026-05-31
+**Last refresh:** 2026-09-18
 
 ## Register
 
@@ -17,7 +17,7 @@ in focused PRs.
 |--------------------|--------------------------|-------------|--------|--------------|------|------------|
 | `plugins/pluzz` | Pluzz module id and branding | `plugins/francetv` | removed | Users rename grab-config plugin to `francetv` | low | #58 |
 | Canal+ `D8` sub-provider | `www.d8.tv`, `service.canal-plus.com` D8 paths | C8 branding (no Habitv sub-provider) | removed | Removed from `canalPlus` module | low | #92 |
-| Canal+ `D17` | Legacy D17 channel naming | CStar sub-provider in `canalPlus` | obsolete | Graceful degrade; rewrite TBD | medium | #91 |
+| Canal+ `D17` | Legacy D17 channel naming | CStar sub-provider in `canalPlus` | obsolete | Graceful degrade + modern catalog parsers; DRM download unavailable | medium | #91, this PR |
 | `plugins/wat` | TF1/WAT-era URLs | Modern TF1+ replay (not implemented) | obsolete | Dedicated rewrite or deprecate PR | medium | — |
 | `plugins/beinsport` | Legacy beinsports.com video pages | Protected / platform-specific replay | obsolete | Deprecate or auth-aware rewrite | high | — |
 | `plugins/clubic` | Legacy Clubic HTML video pages | N/A (site model changed) | obsolete | Deprecate provider PR | low | — |

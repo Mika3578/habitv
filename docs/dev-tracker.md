@@ -14,7 +14,7 @@
 > Legacy codes are historical-only and must not be used for new branch
 > names, PR titles, commit subjects, or workflow naming.
 
-**Last refresh:** 2026-09-16 · **Active branch:** `develop`
+**Last refresh:** 2026-09-18 · **Active branch:** `develop`
 
 **Documentation entry point:** [`README.md`](../README.md) (overview, build matrix,
 automatic category behavior, provider summary, doc map).
@@ -30,11 +30,11 @@ automatic category behavior, provider summary, doc map).
 | Category | Count |
 |---------|------:|
 | ✅ Delivered | **13** |
-| 🟡 In progress | **9** |
+| 🟡 In progress | **10** |
 | 🔵 Proposed | **1** |
 | ⬜ Deferred | **0** |
 | ⛔ Blocked | **0** |
-| **Total work items** | **23** |
+| **Total work items** | **24** |
 
 ---
 
@@ -48,7 +48,7 @@ automatic category behavior, provider summary, doc map).
 | 🛡️ `branch-protection` — GitHub branch protection rules | 🟡 In progress | 🟠 P1 | `████████████████░░░░` 80% |
 | 🔗 `legacy-url-migration` — Legacy URL migration (free.fr / SVN / FTP) | ✅ Done | 🔴 P0 | `████████████████████` 100% |
 | 📦 `static-repo-publish` — Static artifact repository publication | ✅ Done | 🟠 P1 | `████████████████████` 100% |
-| 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🟡 In progress | 🟡 P2 | `█████████████░░░░░░░` 65% |
+| 🔌 `provider-inventory` — Provider plugin inventory & cleanup | 🟡 In progress | 🟡 P2 | `██████████████░░░░░░` 72% |
 | 📺 `provider-novo19` — NOVO19 public replay provider | 🟡 In progress | 🟡 P2 | `██████████████████░░` 90% |
 | 🎬 `ytdlp-migration` — `youtube-dl` → `yt-dlp` migration | 🟡 In progress | 🟡 P2 | `███████████████░░░░░` 75% |
 | 🩺 `ytdlp-runtime-diagnostics` — yt-dlp Windows runtime diagnostics | 🟡 In progress | 🟡 P2 | `██████████████████░░` 90% |
@@ -322,7 +322,7 @@ resolution matches the latest published SNAPSHOT builds.
 |---|---|
 | **Status** | 🟡 In progress |
 | **Priority** | 🟡 P2 |
-| **Progress** | `█████████████░░░░░░░` 65% |
+| **Progress** | `██████████████░░░░░░` 72% |
 | **Legacy code** | HBTV-006 |
 
 **Scope** — Inventory every plugin in `plugins/` (24 in the aggregator
@@ -345,21 +345,22 @@ mvn -B -ntp -pl plugins/arte -am -Dtest=ArteOfflineFixtureBaselineTest -Dsurefir
 mvn -B -ntp -pl plugins/youtube -am -Dtest=YoutubeOfflineFixtureBaselineTest -Dsurefire.failIfNoSpecifiedTests=false test
 ```
 
-**Related PRs** · offline fixture baseline (merged) · [#91](https://github.com/Mika3578/habitv/pull/91) · [#92](https://github.com/Mika3578/habitv/pull/92) · [#137](https://github.com/Mika3578/habitv/pull/137) (France.tv public hubs) · [#135](https://github.com/Mika3578/habitv/pull/135) (deterministic test quarantine)
+**Related PRs** · offline fixture baseline (merged) · [#91](https://github.com/Mika3578/habitv/pull/91) · [#92](https://github.com/Mika3578/habitv/pull/92) · [#137](https://github.com/Mika3578/habitv/pull/137) (France.tv public hubs) · [#135](https://github.com/Mika3578/habitv/pull/135) (deterministic test quarantine) · Canal+ modern catalog parsers (this PR)
 
 **Notes** — Inventory baseline is now documented in
 [`provider-inventory.md`](provider-inventory.md) for every plugin module
 plus historical references (`CStar` (ex `D17`), `nrj12`, FranceTV/Pluzz,
 Kewego). An offline fixture policy and first local fixture baseline are
 now documented for `6play`, `canalPlus`, `francetv` (ex `pluzz`), `arte`, `youtube`, and `novo19`
-without rewriting providers. PR #137 adds API-first public hub discovery
+without rewriting providers. This PR adds Canal+ modern catalog parsers,
+protected-endpoint placeholders, and DRM-blocked download diagnostics;
+`canalPlus` plugin version `4.1.1-SNAPSHOT`. PR #137 adds API-first public hub discovery
 (Sport, Franceinfo, partner hubs); `francetv` plugin version `4.1.3-SNAPSHOT`.
 Default `mvn test` skips live
 `*PluginManagerTest`; use `-Plive-provider-tests`. PR #91 keeps the
 `D17` rename to `CStar` and adds graceful fallback in the Canal+ family:
-category discovery now returns an empty set with a provider-level
-diagnostic when `service.mycanal.fr` is unreachable or channel pages
-return HTTP 403. PR #92 removes the obsolete embedded `D8` sub-provider
+category discovery now returns a non-downloadable placeholder when
+`service.mycanal.fr` is unreachable or channel pages return HTTP 403. PR #92 removes the obsolete embedded `D8` sub-provider
 (dead `www.d8.tv` endpoints; channel rebranded to C8). Arte live test
 currently fails (`categorie liste vide`) —
 provider drift, documented in inventory. This item remains open for

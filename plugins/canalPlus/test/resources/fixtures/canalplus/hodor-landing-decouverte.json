@@ -1,0 +1,28 @@
+{
+  "displayTemplate": "landingPage",
+  "currentPage": {
+    "title": "Découverte"
+  },
+  "strates": [
+    {
+      "type": "contentRow",
+      "contents": [
+        {
+          "title": "Les 10 hôtels les plus incroyables de France",
+          "subtitle": "",
+          "onClick": {
+            "URLPage": "https://hodor.canalplus.pro/api/v2/mycanal/detail/b63a43e7548cb1a6e7c7319084f48af8/okapi/31338503_50017.json?detailType=detailPage&objectType=unit",
+            "displayTemplate": "detailPage"
+          }
+        }
+      ]
+    },
+    {
+      "type": "landing",
+      "title": "Tous les documentaires",
+      "onClick": {
+        "URLPage": "https://hodor.canalplus.pro/api/v2/mycanal/detail/b63a43e7548cb1a6e7c7319084f48af8/okapi/documentaires-decouverte.json?detailType=landingPage&objectType=brand"
+      }
+    }
+  ]
+}

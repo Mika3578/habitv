@@ -9,20 +9,20 @@
 	</parent>
 	<artifactId>canalPlus</artifactId>
 	<name>canalPlus</name>
-	<version>4.1.0-SNAPSHOT</version>
+	<version>4.1.1-SNAPSHOT</version>
 
-<dependencies>
+	<dependencies>
 		<dependency>
 			<groupId>com.dabi.habitv</groupId>
 			<artifactId>plugin-tester</artifactId>
-			<version>${project.version}</version>
+			<version>${project.parent.version}</version>
 			<scope>test</scope>
-		</dependency>	
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
@@ -30,6 +30,7 @@
 		<dependency>
 			<groupId>com.dabi.habitv</groupId>
 			<artifactId>framework</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>
 	</dependencies>
 </project>

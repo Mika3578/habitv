@@ -29,6 +29,9 @@ public class CStarPluginManager extends BasePluginWithProxy implements PluginPro
 
 	@Override
 	public Set<EpisodeDTO> findEpisode(final CategoryDTO category) {
+		if (CanalPlusEndpointAvailability.isUnavailablePlaceholder(category)) {
+			return new LinkedHashSet<>();
+		}
 		final Set<EpisodeDTO> episodes = new LinkedHashSet<>();
 		final Set<String> episodesNames = new HashSet<>();
 
@@ -76,7 +79,8 @@ public class CStarPluginManager extends BasePluginWithProxy implements PluginPro
 		} catch (RuntimeException e) {
 			if (CanalPlusEndpointAvailability.isUnavailable(e)) {
 				getLog().warn(CanalPlusEndpointAvailability.buildCategoryUnavailableMessage(getName(), e));
-				return new LinkedHashSet<>();
+				return CanalPlusEndpointAvailability.buildUnavailablePlaceholderCategories(CStarConf.NAME,
+						CanalPlusEndpointAvailability.CSTAR_UNAVAILABLE_LABEL);
 			}
 			throw e;
 		}

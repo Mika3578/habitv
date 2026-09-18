@@ -1,3 +1,4 @@
 providerFamily=canalPlus,cstar
 network=disabled
-note=Fixture placeholder for split Canal+/CStar endpoint rewrite planning.
+fixtures=hodor-detail-unit.json,hodor-landing-decouverte.json,playset-unit-hd.json,page-detail-react-query.html
+note=Offline fixtures for modern canalplus.com / hodor / secure-gen-hapi stack (parsers + protected-endpoint placeholders).
