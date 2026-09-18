@@ -96,7 +96,7 @@ final class CanalPlusModernStreamSupport {
 				+ "Habitv can resolve public catalog metadata but cannot decrypt protected media.";
 	}
 
-	private static String readUtf8(final InputStream input) throws IOException {
+	static String readUtf8(final InputStream input) throws IOException {
 		final ByteArrayOutputStream output = new ByteArrayOutputStream();
 		final byte[] buffer = new byte[4096];
 		int read;

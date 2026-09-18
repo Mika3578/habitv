@@ -53,7 +53,7 @@ is **Java 21**, then **25** — see [`java-runtime-policy.md`](java-runtime-poli
 |----------|--------|-------|
 | `francetv` | working | Public hubs API (#137); yt-dlp download |
 | `youtube` | working | yt-dlp wiring; API key externalized; #138 diagnostics |
-| `canalPlus` / CStar | degraded | Modern catalog parsers + unavailable placeholders; DRM catch-up download unavailable |
+| `canalPlus` / CStar | degraded | Modern home/catalog parsers + unavailable placeholders; DRM catch-up download unavailable |
 | `arte`, `6play`, `lequipe` | needs rewrite | Live drift; offline fixtures started |
 | `wat`, `beinsport`, `clubic` | obsolete | Deprecation PRs TBD |
 

@@ -15,7 +15,7 @@ separate PRs per module. **Last refresh:** 2026-09-18.
 | `francetv` (ex Pluzz) | **Keep** — France.tv mobile API + public hub discovery (PR #137) + yt-dlp download | Migrate user grab-config `pluzz` → `francetv`; refresh hubs after upgrade |
 | `youtube` | **Keep** — yt-dlp binary contract (see `ytdlp-migration`) | Publish `yt-dlp` tool zip to `habitv-repo` |
 | `arte`, `6play`, `lequipe`, … | **Needs rewrite** or live drift | Fixture-first parser PRs |
-| `canalPlus` (+ embedded CStar) | **Degraded** — modern catalog parsers + protected placeholders; DRM download unavailable | Keep fixtures; no DRM decrypt path |
+| `canalPlus` (+ embedded CStar) | **Degraded** — modern home/catalog parsers + protected placeholders; DRM download unavailable | Keep fixtures; no DRM decrypt path |
 | `wat`, `beinsport`, `clubic`, `footyroom` | **Obsolete** branding/URLs | Deprecation or rewrite PRs |
 | `nrj12` | **Not in reactor** | Historical README name only |
 | Live `*PluginManagerTest` | Quarantined (`-Plive-provider-tests`) | Replace with offline fixtures over time |
@@ -65,7 +65,7 @@ no provider rewrite, no runtime behavior change in inventory-only work.
 | `plugins/aria2` | `aria2` | downloader | keep | `Aria2PluginDownloader` wraps `aria2c`; dedicated test exists | keep as-is |
 | `plugins/arte` | `arte` | provider | needs live endpoint rewrite | `ArteConf` uses legacy HTTP guide/rss URLs and scraping selectors; provider tests are live-network style | add fixture tests |
 | `plugins/beinsport` | `beinsport` | provider | obsolete endpoint | `BeinSportConf` uses legacy `beinsports.com/us/videos` and Dailymotion mapping; known candidate in tracker notes | rewrite provider |
-| `plugins/canalPlus` | `canalPlus` | provider | degraded (modern catalog + DRM-blocked download) | Parses current Canal+ catalog payloads with offline fixtures; category discovery shows a non-downloadable placeholder when legacy/protected endpoints fail; modern catch-up download fails with a DRM-protected diagnostic (no decrypt path). Plugin version `4.1.1-SNAPSHOT`. | keep graceful handling; DRM download remains out of scope |
+| `plugins/canalPlus` | `canalPlus` | provider | degraded (modern catalog + DRM-blocked download) | Parses current Canal+ catalog payloads with offline fixtures; category discovery bootstraps from the public Canal+ home page when available, then falls back to the legacy endpoint or a visible placeholder; modern catch-up download fails with a DRM-protected diagnostic (no decrypt path). Plugin version `4.1.1-SNAPSHOT`. | keep graceful handling; DRM download remains out of scope |
 | `plugins/clubic` | `clubic` | provider | obsolete endpoint | `ClubicConf` targets legacy Clubic video pages via HTML selectors; provider test is live-network | deprecate provider |
 | `plugins/cmd` | `cmd` | exporter | infrastructure-only | `CmdPluginExporterManager` and `CmdPluginDownloaderManager` are command wrappers, no provider endpoint logic | keep as-is |
 | `plugins/curl` | `curl` | exporter | infrastructure-only | `CurlPluginExporterManager` plus downloader wrapper; utility integration layer | keep as-is |

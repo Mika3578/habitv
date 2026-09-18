@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 import org.junit.Test;
@@ -46,6 +48,28 @@ public class CanalPlusEndpointAvailabilityTest {
 			@Override
 			public InputStream getInputStreamFromUrl(final String url) {
 				throw new TechnicalException(new UnknownHostException("service.mycanal.fr"));
+			}
+		};
+
+		final CategoryDTO placeholder = manager.findCategory().iterator().next();
+		assertEquals(CanalPlusEndpointAvailability.CANAL_PLUS_UNAVAILABLE_LABEL, placeholder.getName());
+		assertFalse(placeholder.isDownloadable());
+	}
+
+	@Test
+	public void isUnavailableTreatsConnectionRefusedAndTimeoutAsUnavailable() {
+		assertTrue(CanalPlusEndpointAvailability.isUnavailable(
+				new TechnicalException(new ConnectException("Connection refused"))));
+		assertTrue(CanalPlusEndpointAvailability.isUnavailable(
+				new TechnicalException(new SocketTimeoutException("Read timed out"))));
+	}
+
+	@Test
+	public void canalPlusCategoryDiscoveryReturnsUnavailablePlaceholderWhenConnectionIsRefused() {
+		CanalPlusPluginManager manager = new CanalPlusPluginManager() {
+			@Override
+			public InputStream getInputStreamFromUrl(final String url) {
+				throw new TechnicalException(new ConnectException("Connection refused"));
 			}
 		};
 

@@ -14,6 +14,9 @@ final class CanalPlusPageDataParser {
 	private static final Pattern REACT_DETAIL_PAGE = Pattern.compile(
 			"\"queryKey\"\\s*:\\s*\\[\\s*\"detailPage\"\\s*,\\s*\"([^\"]+)\"\\s*\\]");
 
+	private static final Pattern REACT_QUERY_HODOR = Pattern.compile(
+			"\"queryKey\"\\s*:\\s*\\[\\s*\"[^\"]+\"\\s*,\\s*\"(https://hodor\\.canalplus\\.pro[^\"]+)\"\\s*\\]");
+
 	private static final Pattern WINDOW_DATA_URL_PAGE = Pattern.compile(
 			"\"URLPage\"\\s*:\\s*\"(https://hodor\\.canalplus\\.pro[^\"]+)\"");
 
@@ -28,6 +31,21 @@ final class CanalPlusPageDataParser {
 		if (reactMatcher.find()) {
 			return unescapeJsonUrl(reactMatcher.group(1));
 		}
+		return firstHodorUrlPage(html);
+	}
+
+	static String extractCatalogPageUrl(final String html) {
+		if (StringUtils.isEmpty(html)) {
+			return null;
+		}
+		final Matcher reactMatcher = REACT_QUERY_HODOR.matcher(html);
+		if (reactMatcher.find()) {
+			return unescapeJsonUrl(reactMatcher.group(1));
+		}
+		return firstHodorUrlPage(html);
+	}
+
+	private static String firstHodorUrlPage(final String html) {
 		final Matcher dataMatcher = WINDOW_DATA_URL_PAGE.matcher(html);
 		if (dataMatcher.find()) {
 			return unescapeJsonUrl(dataMatcher.group(1));

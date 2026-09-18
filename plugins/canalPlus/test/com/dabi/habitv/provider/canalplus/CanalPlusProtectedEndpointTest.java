@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -18,7 +19,9 @@ import java.util.Set;
 import org.junit.Test;
 
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
+import com.dabi.habitv.api.plugin.dto.DownloadParamDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
+import com.dabi.habitv.api.plugin.exception.DownloadFailedException;
 import com.dabi.habitv.api.plugin.exception.TechnicalException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -106,6 +109,136 @@ public class CanalPlusProtectedEndpointTest {
 		assertNotNull(episode.getMetadata());
 		assertEquals("31338503_50017", episode.getMetadata().getProviderEpisodeId());
 		assertEquals("Decouverte", episode.getMetadata().getSeriesTitle());
+		assertEquals(
+				"https://hodor.canalplus.pro/api/v2/mycanal/detail/b63a43e7548cb1a6e7c7319084f48af8/okapi/31338503_50017.json?detailType=detailPage&objectType=unit",
+				episode.getMetadata().getSourceUrl());
+	}
+
+	@Test
+	public void catalogMetadataKeepsOriginalUrlPageWhenLegacyMediaUrlIsResolved() throws IOException {
+		final String listingUrl = "http://service.mycanal.fr/page/listing.json";
+		final String catalogUrl = "http://service.mycanal.fr/page/abc/123.json";
+		final String categoryJson = "{\"strates\":[{\"type\":\"contentGrid\",\"contents\":[{"
+				+ "\"title\":\"Legacy Show\",\"subtitle\":\"Ep 1\","
+				+ "\"onClick\":{\"URLPage\":\"" + catalogUrl + "\"}}]}]}";
+		final String mediaJson = "{\"detail\":{\"informations\":{\"VoD\":{\"videoURL\":\"https://cdn.example/master.m3u8\"}}}}";
+		final CanalPlusPluginManager manager = new CanalPlusPluginManager() {
+			@Override
+			public InputStream getInputStreamFromUrl(final String url) {
+				if (catalogUrl.equals(url)) {
+					return new ByteArrayInputStream(mediaJson.getBytes(StandardCharsets.UTF_8));
+				}
+				return new ByteArrayInputStream(categoryJson.getBytes(StandardCharsets.UTF_8));
+			}
+		};
+
+		final CategoryDTO category = new CategoryDTO(CanalPlusConf.NAME, "Legacy", listingUrl, "mp4");
+		final EpisodeDTO episode = manager.findEpisode(category).iterator().next();
+		assertEquals("https://cdn.example/master.m3u8", episode.getId());
+		assertEquals(catalogUrl, episode.getMetadata().getSourceUrl());
+	}
+
+	@Test
+	public void findCategoryUsesModernHomeCatalogWithoutLegacyAuthenticate() throws IOException {
+		final String homeHtml = readFixture("page-home-react-query.html");
+		final String homeLanding = readFixture("hodor-home-landing.json");
+		final CanalPlusPluginManager manager = new CanalPlusPluginManager() {
+			@Override
+			public InputStream getInputStreamFromUrl(final String url) {
+				if (CanalPlusConf.URL_HOME.equals(url)) {
+					throw new AssertionError("legacy authenticate endpoint must not be used when modern catalog succeeds");
+				}
+				if (CanalPlusModernConf.PAGE_BASE_URL.equals(url)) {
+					return new ByteArrayInputStream(homeHtml.getBytes(StandardCharsets.UTF_8));
+				}
+				if (url.contains("okapi/home.json")) {
+					return new ByteArrayInputStream(homeLanding.getBytes(StandardCharsets.UTF_8));
+				}
+				throw new TechnicalException("unexpected url " + url);
+			}
+		};
+
+		final Set<CategoryDTO> categories = manager.findCategory();
+		assertEquals(1, categories.size());
+		final CategoryDTO discovery = categories.iterator().next();
+		assertEquals("Découverte", discovery.getName());
+		assertTrue(discovery.isDownloadable());
+		assertTrue(discovery.getId().contains("okapi/decouverte.json"));
+	}
+
+	@Test
+	public void findCategoryThenFindEpisodeUsesModernCatalogFixtures() throws IOException {
+		final String homeHtml = readFixture("page-home-react-query.html");
+		final String homeLanding = readFixture("hodor-home-landing.json");
+		final String discoveryLanding = readFixture("hodor-landing-decouverte.json");
+		final CanalPlusPluginManager manager = new CanalPlusPluginManager() {
+			@Override
+			public InputStream getInputStreamFromUrl(final String url) {
+				if (CanalPlusModernConf.PAGE_BASE_URL.equals(url)) {
+					return new ByteArrayInputStream(homeHtml.getBytes(StandardCharsets.UTF_8));
+				}
+				if (url.contains("okapi/home.json")) {
+					return new ByteArrayInputStream(homeLanding.getBytes(StandardCharsets.UTF_8));
+				}
+				if (url.contains("okapi/decouverte.json")) {
+					return new ByteArrayInputStream(discoveryLanding.getBytes(StandardCharsets.UTF_8));
+				}
+				throw new TechnicalException("unexpected url " + url);
+			}
+		};
+
+		final CategoryDTO discovery = manager.findCategory().iterator().next();
+		final Set<EpisodeDTO> episodes = manager.findEpisode(discovery);
+		assertEquals(1, episodes.size());
+		assertTrue(episodes.iterator().next().getId().contains("31338503_50017"));
+	}
+
+	@Test
+	public void downloadModernStreamFailsWithDrmMessageWithoutPlaysetFetch() throws IOException {
+		final String hodorDetail = readFixture("hodor-detail-unit.json");
+		final CanalPlusPluginManager manager = new CanalPlusPluginManager() {
+			@Override
+			public InputStream getInputStreamFromUrl(final String url) {
+				if (url.contains("playset") || url.contains("secure-gen-hapi")) {
+					throw new AssertionError("playset must not be fetched before DRM fail");
+				}
+				if (url.contains("hodor.canalplus.pro")) {
+					return new ByteArrayInputStream(hodorDetail.getBytes(StandardCharsets.UTF_8));
+				}
+				throw new TechnicalException("unexpected url " + url);
+			}
+		};
+
+		try {
+			manager.download(new DownloadParamDTO(
+					"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/31338503_50017.json?detailType=detailPage&objectType=unit",
+					"out.mp4", "mp4"), null);
+			fail("expected DRM-protected download failure");
+		} catch (DownloadFailedException e) {
+			assertTrue(e.getMessage().contains("DRM-protected"));
+			assertFalse(e.getMessage().toLowerCase().contains("playset"));
+		}
+	}
+
+	@Test
+	public void downloadModernPageFetchFailureNormalizesTechnicalException() {
+		final CanalPlusPluginManager manager = new CanalPlusPluginManager() {
+			@Override
+			public InputStream getInputStreamFromUrl(final String url) {
+				throw new TechnicalException(new IOException(
+						"Server returned HTTP response code: 403 for URL: " + url));
+			}
+		};
+
+		try {
+			manager.download(new DownloadParamDTO(
+					"https://www.canalplus.com/decouverte/les-10-hotels/h/31338503_50017",
+					"out.mp4", "mp4"), null);
+			fail("expected page-fetch download failure");
+		} catch (DownloadFailedException e) {
+			assertTrue(e.getMessage().contains("page fetch failed"));
+			assertTrue(e.getCause() instanceof TechnicalException);
+		}
 	}
 
 	@Test

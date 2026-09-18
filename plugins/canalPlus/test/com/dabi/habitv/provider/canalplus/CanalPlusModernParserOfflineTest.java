@@ -30,6 +30,15 @@ public class CanalPlusModernParserOfflineTest {
 	}
 
 	@Test
+	public void parsesCatalogPageUrlFromHomeHtmlFixture() throws IOException {
+		final String html = readFixture("page-home-react-query.html");
+		final String catalogUrl = CanalPlusPageDataParser.extractCatalogPageUrl(html);
+		assertNotNull(catalogUrl);
+		assertTrue(catalogUrl.contains("hodor.canalplus.pro"));
+		assertTrue(catalogUrl.contains("okapi/home.json"));
+	}
+
+	@Test
 	public void parsesHodorUnitMetadataFixture() throws IOException {
 		@SuppressWarnings("unchecked")
 		final Map<String, Object> root = MAPPER.readValue(readFixture("hodor-detail-unit.json"), Map.class);

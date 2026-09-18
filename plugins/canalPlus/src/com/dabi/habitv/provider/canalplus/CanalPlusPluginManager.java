@@ -1,6 +1,7 @@
 package com.dabi.habitv.provider.canalplus;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -98,16 +99,16 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 			}
 			episode = new EpisodeDTO(category, displayName, url);
 		}
-		attachCatalogMetadata(episode, category, displayName);
+		attachCatalogMetadata(episode, category, displayName, urlPage);
 		return episode;
 	}
 
 	private static void attachCatalogMetadata(final EpisodeDTO episode, final CategoryDTO category,
-			final String displayName) {
+			final String displayName, final String catalogUrl) {
 		final EpisodeMetadataDTO metadata = new EpisodeMetadataDTO();
 		metadata.setEpisodeTitle(displayName);
-		metadata.setSourceUrl(episode.getId());
-		metadata.setProviderEpisodeId(CanalPlusContentIdParser.fromInput(episode.getId()));
+		metadata.setSourceUrl(catalogUrl);
+		metadata.setProviderEpisodeId(CanalPlusContentIdParser.fromInput(catalogUrl));
 		if (category != null) {
 			metadata.setSeriesTitle(category.getName());
 			metadata.setChannel(CanalPlusConf.NAME);
@@ -116,8 +117,37 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public Set<CategoryDTO> findCategory() {
+		try {
+			final Set<CategoryDTO> modernCategories = findModernCategories();
+			if (modernCategories != null && !modernCategories.isEmpty()) {
+				return modernCategories;
+			}
+		} catch (RuntimeException e) {
+			if (!CanalPlusEndpointAvailability.isUnavailable(e)) {
+				throw e;
+			}
+			getLog().warn(CanalPlusEndpointAvailability.buildCategoryUnavailableMessage(getName(), e));
+		} catch (IOException e) {
+			getLog().warn(CanalPlusEndpointAvailability.buildCategoryUnavailableMessage(getName(), e));
+		}
+		return findLegacyCategoriesOrPlaceholder();
+	}
+
+	private Set<CategoryDTO> findModernCategories() throws IOException {
+		final String html;
+		try (InputStream homePage = getInputStreamFromUrl(CanalPlusModernConf.PAGE_BASE_URL)) {
+			html = CanalPlusModernStreamSupport.readUtf8(homePage);
+		}
+		final String catalogUrl = CanalPlusPageDataParser.extractCatalogPageUrl(html);
+		if (StringUtils.isEmpty(catalogUrl)) {
+			return null;
+		}
+		return findCategoriesFromUrl(null, catalogUrl);
+	}
+
+	@SuppressWarnings("unchecked")
+	private Set<CategoryDTO> findLegacyCategoriesOrPlaceholder() {
 		final ObjectMapper mapper = new ObjectMapper();
 		try {
 			final Map<String, Object> mainData = mapper.readValue(getInputStreamFromUrl(CanalPlusConf.URL_HOME), Map.class);
@@ -265,32 +295,40 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 
 	private ProcessHolder downloadModernStream(final DownloadParamDTO downloadInput) {
 		final String input = downloadInput.getDownloadInput();
-		final String contentId = CanalPlusContentIdParser.fromInput(input);
 		try {
-			final CanalPlusHodorParser.CanalPlusUnitMetadata metadata = CanalPlusModernStreamSupport.loadUnitMetadata(this, input);
-			if (metadata != null && metadata.getDisplayName() != null) {
-				getLog().info("Canal+ modern unit metadata: " + metadata.getDisplayName()
-						+ (contentId == null ? "" : " (contentId=" + contentId + ")"));
-			}
-			final String resolvedContentId = metadata != null && metadata.getContentId() != null ? metadata.getContentId() : contentId;
-			final CanalPlusPlaysetParser.CanalPlusPlaysetItem playsetItem = CanalPlusModernStreamSupport
-					.loadSelectedPlaysetItem(this, resolvedContentId);
-			if (playsetItem == null) {
-				throw new DownloadFailedException("Canal+ playset did not expose a PlayReady download item for contentId="
-						+ resolvedContentId);
-			}
-			getLog().info("Canal+ selected playset: drmType=" + playsetItem.getDrmType() + " quality=" + playsetItem.getQuality());
+			logModernUnitMetadata(input);
 		} catch (IOException e) {
-			if (input.contains(CanalPlusModernConf.PAGE_HOST)) {
-				throw new DownloadFailedException(
-						"Canal+ page fetch failed (HTTP 403 is expected without protected network access). "
-								+ "Pass a hodor detail API URL as the episode id, or retry after page-access support is added.",
-						e);
-			}
-			throw new DownloadFailedException(e);
+			throw normalizeModernDownloadFailure(input, e);
+		} catch (RuntimeException e) {
+			throw normalizeModernDownloadFailure(input, e);
 		}
 		CanalPlusModernStreamSupport.assertDrmDownloadSupported();
 		return null;
+	}
+
+	private void logModernUnitMetadata(final String input) throws IOException {
+		final String contentId = CanalPlusContentIdParser.fromInput(input);
+		final CanalPlusHodorParser.CanalPlusUnitMetadata metadata = CanalPlusModernStreamSupport.loadUnitMetadata(this, input);
+		if (metadata != null && metadata.getDisplayName() != null) {
+			getLog().info("Canal+ modern unit metadata: " + metadata.getDisplayName()
+					+ (contentId == null ? "" : " (contentId=" + contentId + ")"));
+		}
+	}
+
+	private static DownloadFailedException normalizeModernDownloadFailure(final String input, final Throwable error) {
+		if (error instanceof DownloadFailedException) {
+			return (DownloadFailedException) error;
+		}
+		if (input != null && input.contains(CanalPlusModernConf.PAGE_HOST)) {
+			return new DownloadFailedException(
+					"Canal+ page fetch failed (HTTP 403 is expected without protected network access). "
+							+ "Pass a hodor detail API URL as the episode id, or retry after page-access support is added.",
+					error);
+		}
+		if (error instanceof Exception) {
+			return new DownloadFailedException((Exception) error);
+		}
+		return new DownloadFailedException(error == null ? "Canal+ modern download failed" : error.getMessage(), error);
 	}
 
 }

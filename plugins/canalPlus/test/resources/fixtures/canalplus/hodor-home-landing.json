@@ -1,0 +1,15 @@
+{
+  "displayTemplate": "landingPage",
+  "currentPage": {
+    "title": "Accueil"
+  },
+  "strates": [
+    {
+      "type": "landing",
+      "title": "Découverte",
+      "onClick": {
+        "URLPage": "https://hodor.canalplus.pro/api/v2/mycanal/detail/b63a43e7548cb1a6e7c7319084f48af8/okapi/decouverte.json?detailType=landingPage&objectType=brand"
+      }
+    }
+  ]
+}

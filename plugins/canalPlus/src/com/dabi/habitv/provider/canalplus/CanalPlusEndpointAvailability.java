@@ -1,6 +1,9 @@
 package com.dabi.habitv.provider.canalplus;
 
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -49,7 +52,10 @@ final class CanalPlusEndpointAvailability {
 	static boolean isUnavailable(final Throwable error) {
 		Throwable current = error;
 		while (current != null) {
-			if (current instanceof UnknownHostException) {
+			if (current instanceof UnknownHostException
+					|| current instanceof ConnectException
+					|| current instanceof SocketTimeoutException
+					|| current instanceof SocketException) {
 				return true;
 			}
 			if (current instanceof IOException && isForbiddenResponse(current.getMessage())) {

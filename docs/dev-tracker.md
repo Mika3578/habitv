@@ -353,7 +353,7 @@ plus historical references (`CStar` (ex `D17`), `nrj12`, FranceTV/Pluzz,
 Kewego). An offline fixture policy and first local fixture baseline are
 now documented for `6play`, `canalPlus`, `francetv` (ex `pluzz`), `arte`, `youtube`, and `novo19`
 without rewriting providers. This PR [#180](https://github.com/Mika3578/habitv/pull/180) adds Canal+ modern catalog parsers,
-protected-endpoint placeholders, and DRM-blocked download diagnostics;
+protected-endpoint placeholders, home-page category discovery, and DRM-blocked download diagnostics;
 `canalPlus` plugin version `4.1.1-SNAPSHOT`. PR #137 adds API-first public hub discovery
 (Sport, Franceinfo, partner hubs); `francetv` plugin version `4.1.3-SNAPSHOT`.
 Default `mvn test` skips live
