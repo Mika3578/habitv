@@ -34,16 +34,6 @@ final class CanalPlusPlaysetParser {
 				return toPlaysetItem(item);
 			}
 		}
-		for (final Object itemObject : (List<Object>) available) {
-			if (!(itemObject instanceof Map)) {
-				continue;
-			}
-			final Map<String, Object> item = (Map<String, Object>) itemObject;
-			final String quality = stringValue(item.get("quality"));
-			if ("HD".equalsIgnoreCase(quality)) {
-				return toPlaysetItem(item);
-			}
-		}
 		return null;
 	}
 

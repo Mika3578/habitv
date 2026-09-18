@@ -109,4 +109,15 @@ public class CanalPlusEndpointAvailabilityTest {
 		assertTrue(message.contains("HTTP 403 for URL: https://www.canalplus.com/chaines/cstar"));
 		assertFalse(message.toLowerCase().contains("pass token"));
 	}
+
+	@Test
+	public void unavailableNetworkFailureDoesNotBlameProtectedAccess() {
+		final TechnicalException error = new TechnicalException(new ConnectException("Connection refused"));
+		final String categoryMessage = CanalPlusEndpointAvailability.buildCategoryUnavailableMessage("canalPlus", error);
+		final String episodeMessage = CanalPlusEndpointAvailability.buildEpisodeUnavailableMessage("canalPlus",
+				new CategoryDTO("canalPlus", "Decouverte", "id", "mp4"), error);
+		assertFalse(categoryMessage.contains(CanalPlusEndpointAvailability.PROTECTED_ACCESS_DETAIL));
+		assertFalse(episodeMessage.contains(CanalPlusEndpointAvailability.PROTECTED_ACCESS_DETAIL));
+		assertTrue(categoryMessage.contains("ConnectException"));
+	}
 }

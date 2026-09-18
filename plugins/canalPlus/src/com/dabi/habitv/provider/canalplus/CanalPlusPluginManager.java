@@ -71,6 +71,9 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 	@SuppressWarnings("unchecked")
 	private Set<EpisodeDTO> findEpisodes(CategoryDTO category, List<Object> objectContent) {
 		Set<EpisodeDTO> episodes = new LinkedHashSet<>();
+		if (objectContent == null) {
+			return episodes;
+		}
 		for (Object objectEpisode : objectContent) {
 			EpisodeDTO episode = buildEpisode(category, (Map<String, Object>) objectEpisode);
 			if (episode != null) {
@@ -131,7 +134,6 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 		metadata.setSourceUrl(catalogUrl);
 		metadata.setProviderEpisodeId(CanalPlusContentIdParser.fromInput(catalogUrl));
 		if (category != null) {
-			metadata.setSeriesTitle(category.getName());
 			metadata.setChannel(CanalPlusConf.NAME);
 		}
 		episode.setMetadata(metadata);
@@ -347,10 +349,16 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 		if (error instanceof DownloadFailedException) {
 			return (DownloadFailedException) error;
 		}
-		if (input != null && input.contains(CanalPlusModernConf.PAGE_HOST)) {
+		if (CanalPlusContentIdParser.isModernCanalPlusUrl(input)
+				&& CanalPlusEndpointAvailability.isForbidden(error)) {
+			if (input.contains(CanalPlusModernConf.PAGE_HOST)) {
+				return new DownloadFailedException(
+						"Canal+ page fetch failed (HTTP 403 is expected without protected network access). "
+								+ "Pass a hodor detail API URL as the episode id, or retry after page-access support is added.",
+						error);
+			}
 			return new DownloadFailedException(
-					"Canal+ page fetch failed (HTTP 403 is expected without protected network access). "
-							+ "Pass a hodor detail API URL as the episode id, or retry after page-access support is added.",
+					"Canal+ catalog fetch failed. " + CanalPlusEndpointAvailability.PROTECTED_ACCESS_DETAIL,
 					error);
 		}
 		if (error instanceof Exception) {

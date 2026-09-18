@@ -2,6 +2,7 @@ package com.dabi.habitv.provider.canalplus;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
@@ -62,6 +63,15 @@ public class CanalPlusModernParserOfflineTest {
 		final Map<String, Object> viewBody = CanalPlusPlaysetParser.buildViewRequestBody(item);
 		assertEquals("CATCHUP_NOLIMIT", viewBody.get("comMode"));
 		assertEquals("DOWNLOAD", viewBody.get("distTechnology"));
+	}
+
+	@Test
+	public void selectDownloadItemIgnoresStreamOnlyPlayset() throws IOException {
+		@SuppressWarnings("unchecked")
+		final Map<String, Object> root = MAPPER.readValue(
+				"{\"available\":[{\"drmType\":\"DRM_MKPC_PLAYREADY_DASH_STREAM\",\"quality\":\"HD\"}]}",
+				Map.class);
+		assertNull(CanalPlusPlaysetParser.selectDownloadItem(root));
 	}
 
 	private String readFixture(final String name) throws IOException {

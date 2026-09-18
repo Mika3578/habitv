@@ -3,6 +3,7 @@ package com.dabi.habitv.provider.canalplus;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -108,7 +109,7 @@ public class CanalPlusProtectedEndpointTest {
 		assertTrue(episode.getName().contains("Les 10 hôtels"));
 		assertNotNull(episode.getMetadata());
 		assertEquals("31338503_50017", episode.getMetadata().getProviderEpisodeId());
-		assertEquals("Decouverte", episode.getMetadata().getSeriesTitle());
+		assertNull(episode.getMetadata().getSeriesTitle());
 		assertEquals(
 				"https://hodor.canalplus.pro/api/v2/mycanal/detail/b63a43e7548cb1a6e7c7319084f48af8/okapi/31338503_50017.json?detailType=detailPage&objectType=unit",
 				episode.getMetadata().getSourceUrl());
@@ -218,6 +219,7 @@ public class CanalPlusProtectedEndpointTest {
 		final EpisodeDTO episode = episodes.iterator().next();
 		assertEquals("31338503_50017", episode.getMetadata().getProviderEpisodeId());
 		assertTrue(episode.getName().contains("Les 10 hôtels"));
+		assertNull(episode.getMetadata().getSeriesTitle());
 	}
 
 	@Test
@@ -266,6 +268,46 @@ public class CanalPlusProtectedEndpointTest {
 			assertTrue(e.getMessage().contains("page fetch failed"));
 			assertTrue(e.getCause() instanceof TechnicalException);
 		}
+	}
+
+	@Test
+	public void downloadModernHodorForbiddenFailureKeepsProtectedAccessDiagnostic() {
+		final CanalPlusPluginManager manager = new CanalPlusPluginManager() {
+			@Override
+			public InputStream getInputStreamFromUrl(final String url) {
+				throw new TechnicalException(new IOException(
+						"Server returned HTTP response code: 403 for URL: " + url));
+			}
+		};
+
+		try {
+			manager.download(new DownloadParamDTO(
+					"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/31338503_50017.json?detailType=detailPage&objectType=unit",
+					"out.mp4", "mp4"), null);
+			fail("expected catalog-fetch download failure");
+		} catch (DownloadFailedException e) {
+			assertTrue(e.getMessage().contains(CanalPlusEndpointAvailability.PROTECTED_ACCESS_DETAIL));
+			assertFalse(e.getMessage().toLowerCase().contains("pass token"));
+		}
+	}
+
+	@Test
+	public void findEpisodeSkipsContentRowWithMissingContents() {
+		final String listingJson = "{\"strates\":[{\"type\":\"contentRow\"},{\"type\":\"contentGrid\",\"contents\":[{"
+				+ "\"title\":\"Unit\",\"subtitle\":\"\","
+				+ "\"onClick\":{\"URLPage\":\"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/31338503_50017.json\","
+				+ "\"displayTemplate\":\"detailPage\"}}]}]}";
+		final CanalPlusPluginManager manager = new CanalPlusPluginManager() {
+			@Override
+			public InputStream getInputStreamFromUrl(final String url) {
+				return new ByteArrayInputStream(listingJson.getBytes(StandardCharsets.UTF_8));
+			}
+		};
+		final CategoryDTO category = new CategoryDTO(CanalPlusConf.NAME, "Decouverte",
+				"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/decouverte.json", "mp4");
+		final Set<EpisodeDTO> episodes = manager.findEpisode(category);
+		assertEquals(1, episodes.size());
+		assertTrue(episodes.iterator().next().getId().contains("31338503_50017"));
 	}
 
 	@Test

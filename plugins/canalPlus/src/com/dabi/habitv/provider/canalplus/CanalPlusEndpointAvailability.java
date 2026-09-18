@@ -66,21 +66,39 @@ final class CanalPlusEndpointAvailability {
 		return false;
 	}
 
+	static boolean isForbidden(final Throwable error) {
+		Throwable current = error;
+		while (current != null) {
+			if (current instanceof IOException && isForbiddenResponse(current.getMessage())) {
+				return true;
+			}
+			current = current.getCause();
+		}
+		return false;
+	}
+
 	static String buildCategoryUnavailableMessage(final String providerName) {
 		return providerName + ": " + ENDPOINT_UNAVAILABLE_MESSAGE;
 	}
 
 	static String buildCategoryUnavailableMessage(final String providerName, final Throwable throwable) {
-		return buildCategoryUnavailableMessage(providerName) + " " + PROTECTED_ACCESS_DETAIL + " Cause: "
-				+ shortCauseMessage(throwable);
+		return appendCause(buildCategoryUnavailableMessage(providerName), throwable);
 	}
 
 	static String buildEpisodeUnavailableMessage(final String providerName, final CategoryDTO category,
 			final Throwable throwable) {
 		final String categoryLabel = category == null || category.getName() == null ? "category" : category.getName();
-		return providerName + ": Cannot list episodes for \"" + categoryLabel + "\". "
-				+ ENDPOINT_UNAVAILABLE_MESSAGE + " " + PROTECTED_ACCESS_DETAIL + " Cause: "
-				+ shortCauseMessage(throwable);
+		return appendCause(providerName + ": Cannot list episodes for \"" + categoryLabel + "\". "
+				+ ENDPOINT_UNAVAILABLE_MESSAGE, throwable);
+	}
+
+	private static String appendCause(final String prefix, final Throwable throwable) {
+		final StringBuilder message = new StringBuilder(prefix);
+		if (isForbidden(throwable)) {
+			message.append(' ').append(PROTECTED_ACCESS_DETAIL);
+		}
+		message.append(" Cause: ").append(shortCauseMessage(throwable));
+		return message.toString();
 	}
 
 	static String shortCauseMessage(final Throwable throwable) {
