@@ -41,14 +41,19 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 				strates = (List<Object>) catData.get("strates");
 			}
 			Set<EpisodeDTO> epList = new LinkedHashSet<>();
-			if (strates == null) {
-				return epList;
+			if (strates != null) {
+				for (Object strateObject : strates) {
+					Map<String, Object> strateMap = (Map<String, Object>) strateObject;
+					String type = (String) strateMap.get("type");
+					if ("contentGrid".equals(type) || "contentRow".equals(type)) {
+						epList.addAll(findEpisodes(category, (List<Object>) strateMap.get("contents")));
+					}
+				}
 			}
-			for (Object strateObject : strates) {
-				Map<String, Object> strateMap = (Map<String, Object>) strateObject;
-				String type = (String) strateMap.get("type");
-				if ("contentGrid".equals(type) || "contentRow".equals(type)) {
-					epList.addAll(findEpisodes(category, (List<Object>) strateMap.get("contents")));
+			if (epList.isEmpty()) {
+				final EpisodeDTO unitEpisode = buildEpisodeFromUnitDetail(category, catData);
+				if (unitEpisode != null) {
+					epList.add(unitEpisode);
 				}
 			}
 			return epList;
@@ -100,6 +105,22 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 			episode = new EpisodeDTO(category, displayName, url);
 		}
 		attachCatalogMetadata(episode, category, displayName, urlPage);
+		return episode;
+	}
+
+	private EpisodeDTO buildEpisodeFromUnitDetail(final CategoryDTO category, final Map<String, Object> catData) {
+		final CanalPlusHodorParser.CanalPlusUnitMetadata metadata = CanalPlusHodorParser.parseUnitDetail(catData);
+		if (metadata == null || StringUtils.isEmpty(metadata.getContentId())) {
+			return null;
+		}
+		final String catalogUrl = category == null ? null : category.getId();
+		if (!CanalPlusContentIdParser.isModernCanalPlusUrl(catalogUrl)) {
+			return null;
+		}
+		final String displayName = StringUtils.isEmpty(metadata.getDisplayName()) ? metadata.getContentId()
+				: metadata.getDisplayName();
+		final EpisodeDTO episode = new EpisodeDTO(category, displayName, catalogUrl);
+		attachCatalogMetadata(episode, category, displayName, catalogUrl);
 		return episode;
 	}
 
@@ -175,7 +196,16 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 		final ObjectMapper mapper = new ObjectMapper();
 		@SuppressWarnings("unchecked")
 		final Map<String, Object> catData = mapper.readValue(getInputStreamFromUrl(urlMainPage), Map.class);
-		return findCategories(fatherCat, catData);
+		final Set<CategoryDTO> categories = findCategories(fatherCat, catData);
+		if (categories.isEmpty() && CanalPlusHodorParser.hasUnitEpisodeContents(catData)) {
+			final CanalPlusHodorParser.CanalPlusUnitMetadata page = CanalPlusHodorParser.parseUnitDetail(catData);
+			final String title = page != null && !StringUtils.isEmpty(page.getDisplayName()) ? page.getDisplayName()
+					: CanalPlusConf.NAME;
+			final CategoryDTO featured = new CategoryDTO(CanalPlusConf.NAME, title, urlMainPage, FrameworkConf.MP4);
+			featured.setDownloadable(true);
+			categories.add(featured);
+		}
+		return categories;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -201,8 +231,6 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 		String type = (String) dataMap.get("type");
 		Map<String, Object> onClick = (Map<String, Object>) dataMap.get("onClick");
 		String urlPage = onClick == null ? null : (String) onClick.get("URLPage");
-		// String displayTemplate = onClick == null ? null : (String)
-		// onClick.get("displayTemplate");
 		if ("landing".equals(type)) {
 			CategoryDTO leafCategory = buildLeafCategory(fatherCat, dataMap);
 			if (leafCategory != null) {
@@ -216,7 +244,7 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 					addCategory(fatherCat, categories, subDataMap);
 				}
 			}
-		} else if (type == null && urlPage != null) {
+		} else if (type == null && urlPage != null && !CanalPlusHodorParser.isUnitDetailItem(dataMap)) {
 			CategoryDTO category = buildNodeCategory(dataMap);
 			category.setDownloadable(true);
 			category.addSubCategories(findCategoriesFromUrl(category, urlPage));

@@ -154,6 +154,9 @@ public class CanalPlusProtectedEndpointTest {
 				if (url.contains("okapi/home.json")) {
 					return new ByteArrayInputStream(homeLanding.getBytes(StandardCharsets.UTF_8));
 				}
+				if (url.contains("31338503_50017") || url.contains("objectType=unit")) {
+					throw new AssertionError("unit detail pages must not be fetched during category discovery: " + url);
+				}
 				throw new TechnicalException("unexpected url " + url);
 			}
 		};
@@ -164,6 +167,7 @@ public class CanalPlusProtectedEndpointTest {
 		assertEquals("Découverte", discovery.getName());
 		assertTrue(discovery.isDownloadable());
 		assertTrue(discovery.getId().contains("okapi/decouverte.json"));
+		assertFalse("Les 10 hôtels les plus incroyables de France".equals(discovery.getName()));
 	}
 
 	@Test
@@ -183,6 +187,9 @@ public class CanalPlusProtectedEndpointTest {
 				if (url.contains("okapi/decouverte.json")) {
 					return new ByteArrayInputStream(discoveryLanding.getBytes(StandardCharsets.UTF_8));
 				}
+				if (url.contains("31338503_50017") || url.contains("detailType=detailPage")) {
+					throw new AssertionError("unit detail pages must not be fetched during category discovery: " + url);
+				}
 				throw new TechnicalException("unexpected url " + url);
 			}
 		};
@@ -191,6 +198,26 @@ public class CanalPlusProtectedEndpointTest {
 		final Set<EpisodeDTO> episodes = manager.findEpisode(discovery);
 		assertEquals(1, episodes.size());
 		assertTrue(episodes.iterator().next().getId().contains("31338503_50017"));
+	}
+
+	@Test
+	public void findEpisodeMaterializesUnitDetailPayload() throws IOException {
+		final String unitJson = readFixture("hodor-detail-unit.json");
+		final CanalPlusPluginManager manager = new CanalPlusPluginManager() {
+			@Override
+			public InputStream getInputStreamFromUrl(final String url) {
+				return new ByteArrayInputStream(unitJson.getBytes(StandardCharsets.UTF_8));
+			}
+		};
+		final CategoryDTO category = new CategoryDTO(CanalPlusConf.NAME, "Unit",
+				"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/31338503_50017.json?detailType=detailPage&objectType=unit",
+				"mp4");
+		category.setDownloadable(true);
+		final Set<EpisodeDTO> episodes = manager.findEpisode(category);
+		assertEquals(1, episodes.size());
+		final EpisodeDTO episode = episodes.iterator().next();
+		assertEquals("31338503_50017", episode.getMetadata().getProviderEpisodeId());
+		assertTrue(episode.getName().contains("Les 10 hôtels"));
 	}
 
 	@Test
@@ -278,6 +305,14 @@ public class CanalPlusProtectedEndpointTest {
 		final List<Object> strates = CanalPlusHodorParser.extractStrates(landing);
 		assertNotNull(strates);
 		assertEquals(2, strates.size());
+		assertTrue(CanalPlusHodorParser.hasUnitEpisodeContents(landing));
+		@SuppressWarnings("unchecked")
+		final Map<String, Object> firstStrate = (Map<String, Object>) strates.get(0);
+		@SuppressWarnings("unchecked")
+		final List<Object> firstContents = (List<Object>) firstStrate.get("contents");
+		@SuppressWarnings("unchecked")
+		final Map<String, Object> firstItem = (Map<String, Object>) firstContents.get(0);
+		assertTrue(CanalPlusHodorParser.isUnitDetailItem(firstItem));
 
 		@SuppressWarnings("unchecked")
 		final Map<String, Object> nested = MAPPER.readValue(

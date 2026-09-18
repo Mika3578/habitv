@@ -61,6 +61,47 @@ final class CanalPlusHodorParser {
 		return new CanalPlusUnitMetadata(contentId, displayName, stringValue(resolvedPage.get("summary")));
 	}
 
+	static boolean isUnitDetailItem(final Map<String, Object> dataMap) {
+		if (dataMap == null) {
+			return false;
+		}
+		final Map<String, Object> onClick = asStringObjectMap(dataMap.get("onClick"));
+		if (onClick == null) {
+			return false;
+		}
+		if ("detailPage".equals(onClick.get("displayTemplate"))) {
+			return true;
+		}
+		return CanalPlusContentIdParser.fromInput(stringValue(onClick.get("URLPage"))) != null;
+	}
+
+	static boolean hasUnitEpisodeContents(final Map<String, Object> root) {
+		final List<Object> strates = extractStrates(root);
+		if (strates == null) {
+			return false;
+		}
+		for (final Object strateObject : strates) {
+			final Map<String, Object> strateMap = asStringObjectMap(strateObject);
+			if (strateMap == null) {
+				continue;
+			}
+			final String type = stringValue(strateMap.get("type"));
+			if (!"contentGrid".equals(type) && !"contentRow".equals(type)) {
+				continue;
+			}
+			final List<Object> contents = asObjectList(strateMap.get("contents"));
+			if (contents == null) {
+				continue;
+			}
+			for (final Object content : contents) {
+				if (isUnitDetailItem(asStringObjectMap(content))) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	@SuppressWarnings("unchecked")
 	private static Map<String, Object> asStringObjectMap(final Object value) {
 		return value instanceof Map ? (Map<String, Object>) value : null;
