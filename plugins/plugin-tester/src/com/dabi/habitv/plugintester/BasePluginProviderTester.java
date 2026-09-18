@@ -75,16 +75,24 @@ public class BasePluginProviderTester {
 
 		showCategoriesTree(categories, 0);
 
+		if (!hasDownloadableCategory(categories)) {
+			Assert.fail("no downloadable category for " + plugin.getName()
+					+ " (endpoint may be unavailable)");
+			return;
+		}
+
 		Set<EpisodeDTO> episodeList = Collections.emptySet();
 		int i = 0;
 		while (episodeList.isEmpty() && i < MAX_ATTEMPTS) {
 			LOG.error("no ep found, searching againg categories for " + plugin.getName());
 			final CategoryDTO category = findCategory(episodeOnlyOnLeaf, categories);
-			if (category.isDownloadable()) {
-				LOG.error("search episodes for " + plugin.getName() + "/" + category);
-				episodeList = plugin.findEpisode(category);
+			if (!category.isDownloadable()) {
 				i++;
+				continue;
 			}
+			LOG.error("search episodes for " + plugin.getName() + "/" + category);
+			episodeList = plugin.findEpisode(category);
+			i++;
 		}
 		if (i == MAX_ATTEMPTS) {
 			Assert.fail("no ep found in " + MAX_ATTEMPTS + " attempts");
@@ -111,6 +119,18 @@ public class BasePluginProviderTester {
 			final PluginDownloaderInterface pluginDownloader = (PluginDownloaderInterface) plugin;
 			pluginDownloader.download(buildDownloadersHolder(episode), downloaders);
 		}
+	}
+
+	protected boolean hasDownloadableCategory(final Collection<CategoryDTO> categories) {
+		if (categories == null || categories.isEmpty()) {
+			return false;
+		}
+		for (final CategoryDTO category : categories) {
+			if (category.isDownloadable() || hasDownloadableCategory(category.getSubCategories())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	protected void checkCategories(final Set<CategoryDTO> categories) {

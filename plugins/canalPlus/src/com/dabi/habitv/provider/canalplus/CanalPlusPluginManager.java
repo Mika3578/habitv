@@ -96,7 +96,10 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 		if (StringUtils.isEmpty(urlPage)) {
 			return null;
 		}
-		final String displayName = title + (subTitle == null ? "" : (" " + subTitle));
+		final String displayName = CanalPlusHodorParser.joinTitle(title, subTitle);
+		if (StringUtils.isEmpty(displayName)) {
+			return null;
+		}
 		final EpisodeDTO episode;
 		if (CanalPlusContentIdParser.isModernCanalPlusUrl(urlPage)) {
 			episode = new EpisodeDTO(category, displayName, urlPage);

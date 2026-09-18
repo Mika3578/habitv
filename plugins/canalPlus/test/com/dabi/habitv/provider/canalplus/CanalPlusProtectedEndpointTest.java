@@ -294,6 +294,31 @@ public class CanalPlusProtectedEndpointTest {
 	}
 
 	@Test
+	public void findEpisodeSkipsRowsWithBlankTitleAndSubtitle() {
+		final String listingJson = "{\"strates\":[{\"type\":\"contentGrid\",\"contents\":[{"
+				+ "\"title\":null,\"subtitle\":null,"
+				+ "\"onClick\":{\"URLPage\":\"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/1.json\","
+				+ "\"displayTemplate\":\"detailPage\"}},{"
+				+ "\"title\":\"\",\"subtitle\":\"\","
+				+ "\"onClick\":{\"URLPage\":\"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/2.json\","
+				+ "\"displayTemplate\":\"detailPage\"}},{"
+				+ "\"title\":null,\"subtitle\":\"Subtitle only\","
+				+ "\"onClick\":{\"URLPage\":\"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/31338503_50017.json\","
+				+ "\"displayTemplate\":\"detailPage\"}}]}]}";
+		final CanalPlusPluginManager manager = new CanalPlusPluginManager() {
+			@Override
+			public InputStream getInputStreamFromUrl(final String url) {
+				return new ByteArrayInputStream(listingJson.getBytes(StandardCharsets.UTF_8));
+			}
+		};
+		final CategoryDTO category = new CategoryDTO(CanalPlusConf.NAME, "Decouverte",
+				"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/decouverte.json", "mp4");
+		final Set<EpisodeDTO> episodes = manager.findEpisode(category);
+		assertEquals(1, episodes.size());
+		assertEquals("Subtitle only", episodes.iterator().next().getName());
+	}
+
+	@Test
 	public void findEpisodeSkipsContentRowWithMissingContents() {
 		final String listingJson = "{\"strates\":[{\"type\":\"contentRow\"},{\"type\":\"contentGrid\",\"contents\":[{"
 				+ "\"title\":\"Unit\",\"subtitle\":\"\","

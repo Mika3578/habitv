@@ -112,7 +112,7 @@ final class CanalPlusHodorParser {
 		return value instanceof List ? (List<Object>) value : null;
 	}
 
-	private static String joinTitle(final String title, final String subtitle) {
+	static String joinTitle(final String title, final String subtitle) {
 		if (StringUtils.isEmpty(title)) {
 			return subtitle;
 		}
