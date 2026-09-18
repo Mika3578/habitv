@@ -187,9 +187,14 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 			final Map<String, Object> mainData = mapper.readValue(getInputStreamFromUrl(CanalPlusConf.URL_HOME), Map.class);
 			String urlMainPage = getUrlMainPage(mainData);
 			if (urlMainPage != null) {
-				return findCategoriesFromUrl(null, urlMainPage);
+				final Set<CategoryDTO> categories = findCategoriesFromUrl(null, urlMainPage);
+				if (categories != null && !categories.isEmpty()) {
+					return categories;
+				}
+				getLog().warn("Canal+ legacy catalog empty; exposing protected-endpoint placeholder.");
+			} else {
+				getLog().warn("Canal+ legacy OnDemand entry missing; exposing protected-endpoint placeholder.");
 			}
-			getLog().warn("Canal+ legacy OnDemand entry missing; exposing protected-endpoint placeholder.");
 			return CanalPlusEndpointAvailability.buildUnavailablePlaceholderCategories(CanalPlusConf.NAME,
 					CanalPlusEndpointAvailability.CANAL_PLUS_UNAVAILABLE_LABEL);
 		} catch (RuntimeException e) {
@@ -202,6 +207,14 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 		} catch (IOException e) {
 			throw new DownloadFailedException(e);
 		}
+	}
+
+	private static boolean hasUsableCategoryTitle(final Map<String, Object> dataMap) {
+		if (dataMap == null) {
+			return false;
+		}
+		return !StringUtils.isEmpty(CanalPlusHodorParser.joinTitle(
+				(String) dataMap.get("title"), (String) dataMap.get("subtitle")));
 	}
 
 	private static boolean canUseCatalogUrl(final CategoryDTO fatherCat, final String url) {
@@ -260,8 +273,11 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 		String type = (String) dataMap.get("type");
 		Map<String, Object> onClick = (Map<String, Object>) dataMap.get("onClick");
 		String urlPage = onClick == null ? null : (String) onClick.get("URLPage");
+		if (CanalPlusHodorParser.isUnitDetailItem(dataMap)) {
+			return;
+		}
 		if ("landing".equals(type)) {
-			if (!canUseCatalogUrl(fatherCat, urlPage)) {
+			if (!canUseCatalogUrl(fatherCat, urlPage) || !hasUsableCategoryTitle(dataMap)) {
 				return;
 			}
 			CategoryDTO leafCategory = buildLeafCategory(fatherCat, dataMap);
@@ -276,8 +292,8 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 					addCategory(fatherCat, categories, subDataMap);
 				}
 			}
-		} else if (type == null && urlPage != null && !CanalPlusHodorParser.isUnitDetailItem(dataMap)) {
-			if (!canUseCatalogUrl(fatherCat, urlPage)) {
+		} else if (type == null && urlPage != null) {
+			if (!canUseCatalogUrl(fatherCat, urlPage) || !hasUsableCategoryTitle(dataMap)) {
 				return;
 			}
 			CategoryDTO category = buildNodeCategory(dataMap);

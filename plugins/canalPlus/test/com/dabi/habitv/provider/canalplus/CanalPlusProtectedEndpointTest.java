@@ -419,6 +419,99 @@ public class CanalPlusProtectedEndpointTest {
 	}
 
 	@Test
+	public void findCategoryReturnsPlaceholderWhenLegacyCatalogIsEmpty() {
+		final String authenticateJson = "{\"arborescence\":[{\"picto\":\"OnDemand\","
+				+ "\"onClick\":{\"URLPage\":\"http://service.mycanal.fr/page/ondemand.json\"}}]}";
+		final CanalPlusPluginManager manager = new CanalPlusPluginManager() {
+			@Override
+			public InputStream getInputStreamFromUrl(final String url) {
+				if (CanalPlusModernConf.PAGE_BASE_URL.equals(url)) {
+					throw new TechnicalException(new java.net.UnknownHostException("www.canalplus.com"));
+				}
+				if (CanalPlusConf.URL_HOME.equals(url)) {
+					return new ByteArrayInputStream(authenticateJson.getBytes(StandardCharsets.UTF_8));
+				}
+				if ("http://service.mycanal.fr/page/ondemand.json".equals(url)) {
+					return new ByteArrayInputStream("{\"strates\":[]}".getBytes(StandardCharsets.UTF_8));
+				}
+				throw new TechnicalException("unexpected url " + url);
+			}
+		};
+
+		final Set<CategoryDTO> categories = manager.findCategory();
+		assertEquals(1, categories.size());
+		final CategoryDTO placeholder = categories.iterator().next();
+		assertEquals(CanalPlusEndpointAvailability.CANAL_PLUS_UNAVAILABLE_LABEL, placeholder.getName());
+		assertFalse(placeholder.isDownloadable());
+		assertTrue(CanalPlusEndpointAvailability.isUnavailablePlaceholder(placeholder));
+	}
+
+	@Test
+	public void findCategorySkipsTypedLandingThatIsADetailRow() throws IOException {
+		final String homeHtml = readFixture("page-home-react-query.html");
+		final String homeLanding = "{\"strates\":[{\"type\":\"contentRow\",\"contents\":[{"
+				+ "\"type\":\"landing\",\"title\":\"Unit as category\","
+				+ "\"onClick\":{\"URLPage\":\"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/31338503_50017.json\","
+				+ "\"displayTemplate\":\"detailPage\"}},{"
+				+ "\"type\":\"landing\",\"title\":\"Découverte\","
+				+ "\"onClick\":{\"URLPage\":\"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/decouverte.json?detailType=landingPage&objectType=brand\"}}]}]}";
+		final CanalPlusPluginManager manager = new CanalPlusPluginManager() {
+			@Override
+			public InputStream getInputStreamFromUrl(final String url) {
+				if (url.contains("31338503_50017") || url.contains("detailType=detailPage")) {
+					throw new AssertionError("typed detail landing must not be fetched during category discovery: " + url);
+				}
+				if (CanalPlusConf.URL_HOME.equals(url)) {
+					throw new AssertionError("legacy authenticate endpoint must not be used when modern catalog succeeds");
+				}
+				if (CanalPlusModernConf.PAGE_BASE_URL.equals(url)) {
+					return new ByteArrayInputStream(homeHtml.getBytes(StandardCharsets.UTF_8));
+				}
+				if (url.contains("okapi/home.json")) {
+					return new ByteArrayInputStream(homeLanding.getBytes(StandardCharsets.UTF_8));
+				}
+				throw new TechnicalException("unexpected url " + url);
+			}
+		};
+
+		final Set<CategoryDTO> categories = manager.findCategory();
+		assertEquals(1, categories.size());
+		assertEquals("Découverte", categories.iterator().next().getName());
+	}
+
+	@Test
+	public void findCategorySkipsUntitledCatalogNodesWithoutFetch() throws IOException {
+		final String homeHtml = readFixture("page-home-react-query.html");
+		final String homeLanding = "{\"strates\":[{\"type\":\"contentRow\",\"contents\":[{"
+				+ "\"title\":\"   \","
+				+ "\"onClick\":{\"URLPage\":\"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/untitled.json\"}},{"
+				+ "\"type\":\"landing\",\"title\":\"Découverte\","
+				+ "\"onClick\":{\"URLPage\":\"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/decouverte.json?detailType=landingPage&objectType=brand\"}}]}]}";
+		final CanalPlusPluginManager manager = new CanalPlusPluginManager() {
+			@Override
+			public InputStream getInputStreamFromUrl(final String url) {
+				if (url.contains("untitled.json")) {
+					throw new AssertionError("untitled catalog node must not be fetched: " + url);
+				}
+				if (CanalPlusConf.URL_HOME.equals(url)) {
+					throw new AssertionError("legacy authenticate endpoint must not be used when modern catalog succeeds");
+				}
+				if (CanalPlusModernConf.PAGE_BASE_URL.equals(url)) {
+					return new ByteArrayInputStream(homeHtml.getBytes(StandardCharsets.UTF_8));
+				}
+				if (url.contains("okapi/home.json")) {
+					return new ByteArrayInputStream(homeLanding.getBytes(StandardCharsets.UTF_8));
+				}
+				throw new TechnicalException("unexpected url " + url);
+			}
+		};
+
+		final Set<CategoryDTO> categories = manager.findCategory();
+		assertEquals(1, categories.size());
+		assertEquals("Découverte", categories.iterator().next().getName());
+	}
+
+	@Test
 	public void findEpisodeSkipsContentRowWithMissingContents() {
 		final String listingJson = "{\"strates\":[{\"type\":\"contentRow\"},{\"type\":\"contentGrid\",\"contents\":[{"
 				+ "\"title\":\"Unit\",\"subtitle\":\"\","
