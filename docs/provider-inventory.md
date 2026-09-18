@@ -37,8 +37,6 @@ separate PRs per module. **Last refresh:** 2026-09-18.
   channel replay on RMC+ is protected and not implemented.
 
 Unsupported or obsolete providers stay **documented** here until a dedicated
-
-Unsupported or obsolete providers stay **documented** here until a dedicated
 deprecation PR removes them (tracker + risk register), never silently dropped.
 
 ---

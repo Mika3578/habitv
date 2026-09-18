@@ -35,7 +35,7 @@ final class Tf1PlusCatalogClient {
 			filter.put("channel", channelSlug);
 			variables.put("context", context);
 			variables.put("filter", filter);
-			variables.put("offset", Integer.valueOf(page));
+			variables.put("offset", Integer.valueOf(itemOffset(page, Tf1PlusConf.PROGRAM_PAGE_SIZE)));
 			variables.put("limit", Integer.valueOf(Tf1PlusConf.PROGRAM_PAGE_SIZE));
 			final Map<String, Object> body = fetchGraphql(Tf1PlusConf.QUERY_PROGRAMS, MAPPER.writeValueAsString(variables));
 			final List<Map<String, Object>> items = Tf1PlusJson.asMapList(Tf1PlusJson.nested(body, "data", "programs", "items"));
@@ -55,7 +55,7 @@ final class Tf1PlusCatalogClient {
 		for (int page = 0; page < Tf1PlusConf.MAX_VIDEO_PAGES; page++) {
 			final Map<String, Object> variables = new LinkedHashMap<String, Object>();
 			variables.put("programSlug", programSlug);
-			variables.put("offset", Integer.valueOf(page));
+			variables.put("offset", Integer.valueOf(itemOffset(page, Tf1PlusConf.VIDEO_PAGE_SIZE)));
 			variables.put("limit", Integer.valueOf(Tf1PlusConf.VIDEO_PAGE_SIZE));
 			final Map<String, Object> sort = new LinkedHashMap<String, Object>();
 			sort.put("type", "DATE");
@@ -85,6 +85,10 @@ final class Tf1PlusCatalogClient {
 			throw new IOException("empty-graphql");
 		}
 		return body;
+	}
+
+	static int itemOffset(final int page, final int pageSize) {
+		return page * pageSize;
 	}
 
 }

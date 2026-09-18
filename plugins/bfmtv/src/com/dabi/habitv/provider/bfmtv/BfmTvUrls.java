@@ -30,7 +30,7 @@ final class BfmTvUrls {
 		}
 		try {
 			final URL url = new URL(downloadInput);
-			if (!isBfmHost(url.getHost())) {
+			if (!"https".equalsIgnoreCase(url.getProtocol()) || !isBfmHost(url.getHost())) {
 				return false;
 			}
 			final String path = url.getPath() == null ? "" : url.getPath();

@@ -21,6 +21,10 @@ public class Tf1PlusUrlsTest {
 		assertFalse(Tf1PlusUrls.isApprovedPublicDownloadUrl("https://example.com/tf1.fr/videos/x.html"));
 		assertFalse(Tf1PlusUrls.isApprovedPublicDownloadUrl("https://www.tf1.fr/tf1/evening-magazine"));
 		assertFalse(Tf1PlusUrls.isApprovedPublicDownloadUrl("https://www.wat.tv/video/sample"));
+		assertFalse(Tf1PlusUrls.isApprovedPublicDownloadUrl(
+				"http://www.tf1.fr/tf1/evening-magazine/videos/evening-magazine-episode-1.html"));
+		assertFalse(Tf1PlusUrls.isApprovedPublicDownloadUrl(
+				"file://www.tf1.fr/tf1/evening-magazine/videos/evening-magazine-episode-1.html"));
 		assertFalse(Tf1PlusUrls.isApprovedPublicDownloadUrl(null));
 	}
 

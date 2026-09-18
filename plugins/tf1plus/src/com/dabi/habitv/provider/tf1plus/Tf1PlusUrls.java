@@ -30,7 +30,7 @@ final class Tf1PlusUrls {
 		}
 		try {
 			final URL url = new URL(downloadInput);
-			if (!isTf1Host(url.getHost())) {
+			if (!"https".equalsIgnoreCase(url.getProtocol()) || !isTf1Host(url.getHost())) {
 				return false;
 			}
 			final String path = url.getPath() == null ? "" : url.getPath();
