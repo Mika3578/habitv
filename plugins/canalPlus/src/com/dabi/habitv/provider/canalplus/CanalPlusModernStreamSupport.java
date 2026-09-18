@@ -44,10 +44,10 @@ final class CanalPlusModernStreamSupport {
 		if (StringUtils.isEmpty(downloadInput)) {
 			return null;
 		}
-		if (downloadInput.contains(CanalPlusModernConf.HODOR_HOST)) {
+		if (CanalPlusContentIdParser.isHodorUrl(downloadInput)) {
 			return downloadInput;
 		}
-		if (downloadInput.contains(CanalPlusModernConf.PAGE_HOST)) {
+		if (CanalPlusContentIdParser.isCanalPlusPageUrl(downloadInput)) {
 			try (InputStream input = plugin.getInputStreamFromUrl(downloadInput)) {
 				final String html = readUtf8(input);
 				return CanalPlusPageDataParser.extractDetailPageUrl(html);

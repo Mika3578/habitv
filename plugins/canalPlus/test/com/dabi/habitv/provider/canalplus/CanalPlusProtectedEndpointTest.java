@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import com.dabi.habitv.api.plugin.api.PluginDownloaderInterface.DownloadableState;
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.DownloadParamDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
@@ -29,6 +30,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class CanalPlusProtectedEndpointTest {
 
 	private static final ObjectMapper MAPPER = new ObjectMapper();
+
+	@Test
+	public void canDownloadRequiresExactApprovedHost() {
+		final CanalPlusPluginManager manager = new CanalPlusPluginManager();
+		assertEquals(DownloadableState.IMPOSSIBLE, manager.canDownload(
+				"https://evil.example/?next=https://www.canalplus.com/decouverte/h/31338503_50017"));
+		assertEquals(DownloadableState.SPECIFIC, manager.canDownload(
+				"https://www.canalplus.com/decouverte/h/31338503_50017"));
+		assertEquals(DownloadableState.SPECIFIC, manager.canDownload(
+				"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/31338503_50017.json"));
+	}
 
 	@Test
 	public void unavailablePlaceholderIsVisibleAndNotDownloadable() {

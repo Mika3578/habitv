@@ -318,9 +318,6 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 		if (CanalPlusModernStreamSupport.isModernInput(downloadInput)) {
 			return DownloadableState.SPECIFIC;
 		}
-		if (downloadInput.contains("canalplus.")) {
-			return DownloadableState.SPECIFIC;
-		}
 		return DownloadableState.IMPOSSIBLE;
 	}
 
@@ -360,7 +357,7 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 		}
 		if (CanalPlusContentIdParser.isModernCanalPlusUrl(input)
 				&& CanalPlusEndpointAvailability.isForbidden(error)) {
-			if (input.contains(CanalPlusModernConf.PAGE_HOST)) {
+			if (CanalPlusContentIdParser.isCanalPlusPageUrl(input)) {
 				return new DownloadFailedException(
 						"Canal+ page fetch failed (HTTP 403 is expected without protected network access). "
 								+ "Pass a hodor detail API URL as the episode id, or retry after page-access support is added.",

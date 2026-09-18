@@ -8,7 +8,11 @@ interface CanalPlusModernConf {
 
 	String PAGE_HOST = "canalplus.com";
 
+	String PAGE_WWW_HOST = "www.canalplus.com";
+
 	String HODOR_HOST = "hodor.canalplus.pro";
+
+	String SECURE_HAPI_HOST = "secure-gen-hapi.canal-plus.com";
 
 	String PLAYSET_URL_TEMPLATE = "https://secure-gen-hapi.canal-plus.com/conso/playset/unit/%s";
 

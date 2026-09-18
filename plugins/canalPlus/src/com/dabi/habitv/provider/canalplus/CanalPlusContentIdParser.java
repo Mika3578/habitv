@@ -1,5 +1,8 @@
 package com.dabi.habitv.provider.canalplus;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,14 +40,37 @@ final class CanalPlusContentIdParser {
 	}
 
 	static boolean isModernCanalPlusUrl(final String input) {
+		final String host = hostOf(input);
+		return isCanalPlusPageHost(host)
+				|| CanalPlusModernConf.HODOR_HOST.equals(host)
+				|| CanalPlusModernConf.SECURE_HAPI_HOST.equals(host)
+				|| CanalPlusModernConf.ROUTE_MEUP_HOST.equals(host);
+	}
+
+	static boolean isCanalPlusPageUrl(final String input) {
+		return isCanalPlusPageHost(hostOf(input));
+	}
+
+	static boolean isHodorUrl(final String input) {
+		return CanalPlusModernConf.HODOR_HOST.equals(hostOf(input));
+	}
+
+	private static boolean isCanalPlusPageHost(final String host) {
+		return CanalPlusModernConf.PAGE_HOST.equals(host)
+				|| CanalPlusModernConf.PAGE_WWW_HOST.equals(host);
+	}
+
+	static String hostOf(final String input) {
 		if (StringUtils.isEmpty(input)) {
-			return false;
+			return null;
 		}
-		final String lower = input.toLowerCase();
-		return lower.contains(CanalPlusModernConf.PAGE_HOST)
-				|| lower.contains(CanalPlusModernConf.HODOR_HOST)
-				|| lower.contains("secure-gen-hapi.canal-plus.com")
-				|| lower.contains(CanalPlusModernConf.ROUTE_MEUP_HOST);
+		try {
+			final URI uri = new URI(input);
+			final String host = uri.getHost();
+			return host == null ? null : host.toLowerCase(Locale.ROOT);
+		} catch (URISyntaxException e) {
+			return null;
+		}
 	}
 
 }
