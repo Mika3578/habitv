@@ -39,14 +39,13 @@ standalone plugins in this wave.
 Implemented in this wave (public catalog, offline fixtures, yt-dlp
 delegation, graceful empty results on failure):
 
-1. **`tf1plus`** — largest TNT gap after france.tv. Public GraphQL
-   catalog on `www.tf1.fr/graphql/web`. Episode pages are public URLs
-   that yt-dlp already classifies as TF1. Protected streams fail at
-   download time with sanitized errors; catalog still lists metadata.
-2. **`bfmtv`** — public NextRadioTV session token (anonymous, memory
-   only) plus replay program/video JSON. Download uses the public
-   `bfmtv.com` replay page URL via yt-dlp. Full-channel RMC+ replay
-   remains out of scope.
+1. **`tf1plus`** — largest TNT gap after france.tv. Public TF1+
+   catalog. Episode pages are public URLs that yt-dlp already
+   classifies as TF1. Protected streams fail at download time with
+   sanitized errors; catalog still lists metadata.
+2. **`bfmtv`** — public BFMTV.com news/show replay catalog (anonymous
+   in-memory session only). Download uses the public replay page URL
+   via yt-dlp. Full-channel RMC+ replay remains out of scope.
 
 ## Follow-up (not in this PR)
 
@@ -62,9 +61,9 @@ delegation, graceful empty results on failure):
 
 ## Validation notes
 
-- Live network probes on 2026-09-18 confirmed TF1+ GraphQL category /
-  program / replay-video queries and BFMTV NextRadioTV replay lists.
+- Live network probes on 2026-09-18 confirmed public TF1+ catalog
+  queries and BFMTV.com replay lists.
 - Default tests are **offline fixtures only**. Live provider tests stay
   opt-in (`-Plive-provider-tests`).
-- GraphQL persisted-query hashes and NextRadioTV paths can drift; treat
-  that as `provider-endpoints-dead` residual risk, not a new risk class.
+- Catalog query identifiers and provider paths can drift; treat that as
+  `provider-endpoints-dead` residual risk, not a new risk class.
