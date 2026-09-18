@@ -170,7 +170,8 @@ brands when endpoints change.
 - offline fixture coverage added;
 - command construction covered by tests.
 
-Use generic scopes (`plugins`, `catalog`, `ui`). If a module path is
+Use generic scopes (`plugins`, `catalog`, `ui`). Do not use AI-tool or
+agent scopes (`agents`, `cursor`, `claude`, `copilot`). If a module path is
 required for review, mention it once in Scope only — never expand into
 a brand or channel list.
 

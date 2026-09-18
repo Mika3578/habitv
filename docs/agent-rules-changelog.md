@@ -8,8 +8,9 @@ Version history for Habitv AI agent rules. Canonical source: [`AGENTS.md`](../AG
 
 * Public PR/commit wording must stay evasive (`AGENTS.md` §5, §10,
   §20.13–§20.14; `docs/provider-policy.md#public-communication-safety`).
-* Generic scopes only; no channel, brand, or provider product names in
-  titles or summaries.
+* Generic scopes only; no channel, brand, provider product, or AI-tool
+  names in titles or summaries.
+* Do not use an `agents` (or Cursor/Claude/Copilot) scope in public titles.
 * Do not use operational media-handling vocabulary in public text.
 
 ### Reason

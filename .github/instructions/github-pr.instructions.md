@@ -69,6 +69,7 @@ comments, labels, review requests, or resolution (Section 15.25).
 
 - English only for titles, bodies, and comments
 - Conventional Commits for PR titles, with generic scopes
+- No AI-tool or `agents` scopes in titles
 - No channel, brand, or provider product names in titles or summaries
 - Stay evasive about program behavior (Section 20.14)
 - No `hbtv-*` or `HBTV*` IDs in branch names, commits, or PR text

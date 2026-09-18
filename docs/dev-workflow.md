@@ -61,7 +61,8 @@ or backlog (Section 15.26), not only in PR comments.
 ## Concise communication
 
 PR titles and commit subjects: Conventional Commits, English, imperative,
-≤ 72 characters (`AGENTS.md` Section 3). Use generic scopes. Do not name
+≤ 72 characters (`AGENTS.md` Section 3). Use generic scopes. Do not use
+AI-tool or agent scopes. Do not name
 channels, brands, or provider products. Do not describe what the program
 retrieves or how media is handled (Section 20.14).
 

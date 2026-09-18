@@ -9,6 +9,7 @@ review comments, and squash merge metadata.
   for the eventual squash merge title.
 - Use generic scopes (`plugins`, `catalog`, `ui`). Do not name channels,
   brands, or provider products.
+- Do not use AI-tool or agent scopes (`agents`, `cursor`, `claude`, `copilot`).
 - Stay evasive about program behavior. Do not use operational
   media-handling vocabulary in titles or bodies (Section 20.14).
 - Keep the PR body focused on outcome, scope, validation, and risks.

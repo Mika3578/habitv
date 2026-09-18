@@ -17,6 +17,7 @@ validation, and linear history.
 
 - Use English for PR titles, bodies, review comments, and merge metadata.
 - Use generic scopes. Do not name channels, brands, or provider products.
+- Do not use AI-tool or agent scopes in titles (`agents`, `cursor`, `claude`, `copilot`).
 - Stay evasive about program behavior (Section 20.14).
 - Keep PRs scoped to one descriptive scope item when applicable.
 - Document validation commands actually run; default safe command is
