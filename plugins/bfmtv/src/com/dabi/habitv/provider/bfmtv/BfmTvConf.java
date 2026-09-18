@@ -14,6 +14,10 @@ final class BfmTvConf {
 
 	static final String PUBLIC_HOST_BARE = "bfmtv.com";
 
+	static final String PUBLIC_HOST_BUSINESS = "bfmbusiness.bfmtv.com";
+
+	static final String[] PUBLIC_DOWNLOAD_HOSTS = { PUBLIC_HOST, PUBLIC_HOST_BARE, PUBLIC_HOST_BUSINESS };
+
 	static final String API_BASE_URL = "https://api.nextradiotv.com";
 
 	static final String USER_AGENT = "Mozilla/5.0 (compatible; Habitv/bfmtv)";

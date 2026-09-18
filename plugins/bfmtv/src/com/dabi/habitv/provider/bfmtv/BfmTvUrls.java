@@ -45,8 +45,12 @@ final class BfmTvUrls {
 			return false;
 		}
 		final String normalized = host.toLowerCase(Locale.US);
-		return BfmTvConf.PUBLIC_HOST.equals(normalized) || BfmTvConf.PUBLIC_HOST_BARE.equals(normalized)
-				|| normalized.endsWith("." + BfmTvConf.PUBLIC_HOST_BARE);
+		for (final String allowed : BfmTvConf.PUBLIC_DOWNLOAD_HOSTS) {
+			if (allowed.equals(normalized)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

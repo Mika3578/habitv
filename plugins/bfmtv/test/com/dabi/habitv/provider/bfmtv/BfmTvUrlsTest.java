@@ -26,6 +26,10 @@ public class BfmTvUrlsTest {
 				"http://www.bfmtv.com/replay-emissions/morning-news/video-x.html"));
 		assertFalse(BfmTvUrls.isApprovedPublicDownloadUrl(
 				"file://www.bfmtv.com/replay-emissions/morning-news/video-x.html"));
+		assertFalse(BfmTvUrls.isApprovedPublicDownloadUrl(
+				"https://attacker.bfmtv.com/replay-emissions/morning-news/video-x.html"));
+		assertFalse(BfmTvUrls.isApprovedPublicDownloadUrl(
+				"https://images.bfmtv.com/replay-emissions/morning-news/video-x.html"));
 		assertFalse(BfmTvUrls.isApprovedPublicDownloadUrl(null));
 	}
 
