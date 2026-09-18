@@ -220,6 +220,8 @@ public class CanalPlusProtectedEndpointTest {
 		assertEquals("31338503_50017", episode.getMetadata().getProviderEpisodeId());
 		assertTrue(episode.getName().contains("Les 10 hôtels"));
 		assertNull(episode.getMetadata().getSeriesTitle());
+		assertEquals("Journaliste, animatrice télé, Caroline Ithurbide parcourt l'Hexagone.",
+				episode.getMetadata().getDescription());
 	}
 
 	@Test

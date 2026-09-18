@@ -358,9 +358,8 @@ protected-endpoint placeholders, home-page category discovery, and DRM-blocked d
 (Sport, Franceinfo, partner hubs); `francetv` plugin version `4.1.3-SNAPSHOT`.
 Default `mvn test` skips live
 `*PluginManagerTest`; use `-Plive-provider-tests`. PR #91 keeps the
-`D17` rename to `CStar` and adds graceful fallback in the Canal+ family:
-category discovery now returns a non-downloadable placeholder when
-`service.mycanal.fr` is unreachable or channel pages return HTTP 403. PR #92 removes the obsolete embedded `D8` sub-provider
+`D17` rename to `CStar`. PR #180 adds the non-downloadable placeholder when
+Canal+ or CStar endpoints are unreachable or return HTTP 403. PR #92 removes the obsolete embedded `D8` sub-provider
 (dead `www.d8.tv` endpoints; channel rebranded to C8). Arte live test
 currently fails (`categorie liste vide`) —
 provider drift, documented in inventory. This item remains open for

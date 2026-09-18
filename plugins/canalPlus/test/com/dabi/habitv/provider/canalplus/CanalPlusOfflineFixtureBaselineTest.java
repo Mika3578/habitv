@@ -26,6 +26,8 @@ public class CanalPlusOfflineFixtureBaselineTest {
 					content.contains("hodor-detail-unit.json"));
 			assertTrue("fixture metadata must list home catalog fixtures",
 					content.contains("page-home-react-query.html"));
+			assertTrue("fixture metadata must list mixed home catalog fixtures",
+					content.contains("page-home-mixed-react-query.html"));
 		}
 	}
 

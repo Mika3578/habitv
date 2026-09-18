@@ -1,6 +1,7 @@
 package com.dabi.habitv.provider.canalplus;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -40,6 +41,16 @@ public class CanalPlusModernParserOfflineTest {
 	}
 
 	@Test
+	public void extractCatalogPageUrlPrefersLandingPageWhenDetailPageAppearsFirst() throws IOException {
+		final String html = readFixture("page-home-mixed-react-query.html");
+		final String catalogUrl = CanalPlusPageDataParser.extractCatalogPageUrl(html);
+		assertNotNull(catalogUrl);
+		assertTrue(catalogUrl.contains("okapi/home.json"));
+		assertTrue(catalogUrl.contains("detailType=landingPage"));
+		assertFalse(catalogUrl.contains("31338503_50017"));
+	}
+
+	@Test
 	public void parsesHodorUnitMetadataFixture() throws IOException {
 		@SuppressWarnings("unchecked")
 		final Map<String, Object> root = MAPPER.readValue(readFixture("hodor-detail-unit.json"), Map.class);
@@ -47,6 +58,8 @@ public class CanalPlusModernParserOfflineTest {
 		assertNotNull(metadata);
 		assertEquals("31338503_50017", metadata.getContentId());
 		assertEquals("Les 10 hôtels les plus incroyables de France", metadata.getDisplayName());
+		assertEquals("Journaliste, animatrice télé, Caroline Ithurbide parcourt l'Hexagone.",
+				metadata.getSummary());
 	}
 
 	@Test

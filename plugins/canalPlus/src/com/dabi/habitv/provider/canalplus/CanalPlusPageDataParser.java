@@ -15,7 +15,7 @@ final class CanalPlusPageDataParser {
 			"\"queryKey\"\\s*:\\s*\\[\\s*\"detailPage\"\\s*,\\s*\"([^\"]+)\"\\s*\\]");
 
 	private static final Pattern REACT_QUERY_HODOR = Pattern.compile(
-			"\"queryKey\"\\s*:\\s*\\[\\s*\"[^\"]+\"\\s*,\\s*\"(https://hodor\\.canalplus\\.pro[^\"]+)\"\\s*\\]");
+			"\"queryKey\"\\s*:\\s*\\[\\s*\"([^\"]+)\"\\s*,\\s*\"(https://hodor\\.canalplus\\.pro[^\"]+)\"\\s*\\]");
 
 	private static final Pattern WINDOW_DATA_URL_PAGE = Pattern.compile(
 			"\"URLPage\"\\s*:\\s*\"(https://hodor\\.canalplus\\.pro[^\"]+)\"");
@@ -38,17 +38,46 @@ final class CanalPlusPageDataParser {
 		if (StringUtils.isEmpty(html)) {
 			return null;
 		}
-		final Matcher reactMatcher = REACT_QUERY_HODOR.matcher(html);
-		if (reactMatcher.find()) {
-			return unescapeJsonUrl(reactMatcher.group(1));
+		final String landingUrl = firstReactQueryUrl(html, "landingPage");
+		if (landingUrl != null) {
+			return landingUrl;
 		}
-		return firstHodorUrlPage(html);
+		final Matcher reactMatcher = REACT_QUERY_HODOR.matcher(html);
+		while (reactMatcher.find()) {
+			final String queryKey = reactMatcher.group(1);
+			final String url = unescapeJsonUrl(reactMatcher.group(2));
+			if (!"detailPage".equals(queryKey) && CanalPlusContentIdParser.fromInput(url) == null) {
+				return url;
+			}
+		}
+		return firstHodorCatalogUrlPage(html);
+	}
+
+	private static String firstReactQueryUrl(final String html, final String expectedKey) {
+		final Matcher reactMatcher = REACT_QUERY_HODOR.matcher(html);
+		while (reactMatcher.find()) {
+			if (expectedKey.equals(reactMatcher.group(1))) {
+				return unescapeJsonUrl(reactMatcher.group(2));
+			}
+		}
+		return null;
 	}
 
 	private static String firstHodorUrlPage(final String html) {
 		final Matcher dataMatcher = WINDOW_DATA_URL_PAGE.matcher(html);
 		if (dataMatcher.find()) {
 			return unescapeJsonUrl(dataMatcher.group(1));
+		}
+		return null;
+	}
+
+	private static String firstHodorCatalogUrlPage(final String html) {
+		final Matcher dataMatcher = WINDOW_DATA_URL_PAGE.matcher(html);
+		while (dataMatcher.find()) {
+			final String url = unescapeJsonUrl(dataMatcher.group(1));
+			if (CanalPlusContentIdParser.fromInput(url) == null) {
+				return url;
+			}
 		}
 		return null;
 	}

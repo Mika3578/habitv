@@ -155,7 +155,7 @@ Downloads/#TVSHOW_NAME#-#EPISODE_NAME_CUT#.#EXTENSION#
 | **arte** | episode title (+ subtitle as description); **no** seriesTitle from thematic category | Player API: language, multi-image, chapters, rights — later enrichment PR; never use `rights.begin` as airDate |
 | **6play** | program → seriesTitle, tile name → episodeTitle, channel from parent | Modern M6+ season/episode/duration/synopsis/artwork needs dedicated scraper/API — not this PR |
 | **novo19** | seriesTitle (program / parent of season), episodeTitle, S/E from strict `S#E#` subtitle, duration, description, **publicationDate** from `publishedAt`, id, URL, channel=`novo19` | No thumbnail in current BFF fixtures/parser; revalidate public surface vs TF1+ before larger rewrite; never map `publishedAt` → airDate |
-| **canalPlus** | episodeTitle, channel, sourceUrl, providerEpisodeId from modern catalog | **no** seriesTitle from thematic landing/category labels; DRM catch-up download still unavailable; no airDate/season/episode numbers in current fixtures |
+| **canalPlus** | episodeTitle, channel, sourceUrl, providerEpisodeId from modern catalog; description from unit summary when present | **no** seriesTitle from thematic landing/category labels; DRM catch-up download still unavailable; no airDate/season/episode numbers in current fixtures |
 | youtube / RSS / file | display title only | category ≠ series |
 
 ## Deferred work

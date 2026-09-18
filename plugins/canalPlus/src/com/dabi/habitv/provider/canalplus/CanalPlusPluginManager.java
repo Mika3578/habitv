@@ -123,16 +123,22 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 		final String displayName = StringUtils.isEmpty(metadata.getDisplayName()) ? metadata.getContentId()
 				: metadata.getDisplayName();
 		final EpisodeDTO episode = new EpisodeDTO(category, displayName, catalogUrl);
-		attachCatalogMetadata(episode, category, displayName, catalogUrl);
+		attachCatalogMetadata(episode, category, displayName, catalogUrl, metadata.getSummary());
 		return episode;
 	}
 
 	private static void attachCatalogMetadata(final EpisodeDTO episode, final CategoryDTO category,
 			final String displayName, final String catalogUrl) {
+		attachCatalogMetadata(episode, category, displayName, catalogUrl, null);
+	}
+
+	private static void attachCatalogMetadata(final EpisodeDTO episode, final CategoryDTO category,
+			final String displayName, final String catalogUrl, final String description) {
 		final EpisodeMetadataDTO metadata = new EpisodeMetadataDTO();
 		metadata.setEpisodeTitle(displayName);
 		metadata.setSourceUrl(catalogUrl);
 		metadata.setProviderEpisodeId(CanalPlusContentIdParser.fromInput(catalogUrl));
+		metadata.setDescription(description);
 		if (category != null) {
 			metadata.setChannel(CanalPlusConf.NAME);
 		}
