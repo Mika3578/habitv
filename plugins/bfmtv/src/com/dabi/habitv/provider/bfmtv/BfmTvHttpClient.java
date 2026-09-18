@@ -40,27 +40,31 @@ final class BfmTvHttpClient {
 			} else {
 				connection = (HttpURLConnection) new URL(url).openConnection();
 			}
-			connection.setConnectTimeout(FrameworkConf.TIME_OUT_MS);
-			connection.setReadTimeout(FrameworkConf.TIME_OUT_MS);
-			connection.setRequestMethod("GET");
-			connection.setRequestProperty("User-Agent", BfmTvConf.USER_AGENT);
-			connection.setRequestProperty("Accept", "application/json");
-			final int status = connection.getResponseCode();
-			final InputStream stream = status >= 400 ? connection.getErrorStream() : connection.getInputStream();
-			if (stream == null) {
-				throw new IOException("http-" + status);
-			}
 			try {
-				final String body = readUtf8(stream);
-				if (status >= 400) {
+				connection.setConnectTimeout(FrameworkConf.TIME_OUT_MS);
+				connection.setReadTimeout(FrameworkConf.TIME_OUT_MS);
+				connection.setRequestMethod("GET");
+				connection.setRequestProperty("User-Agent", BfmTvConf.USER_AGENT);
+				connection.setRequestProperty("Accept", "application/json");
+				final int status = connection.getResponseCode();
+				final InputStream stream = status >= 400 ? connection.getErrorStream() : connection.getInputStream();
+				if (stream == null) {
 					throw new IOException("http-" + status);
 				}
-				if (StringUtils.isEmpty(body)) {
-					throw new IOException("empty-body");
+				try {
+					final String body = readUtf8(stream);
+					if (status >= 400) {
+						throw new IOException("http-" + status);
+					}
+					if (StringUtils.isEmpty(body)) {
+						throw new IOException("empty-body");
+					}
+					return body;
+				} finally {
+					stream.close();
 				}
-				return body;
 			} finally {
-				stream.close();
+				connection.disconnect();
 			}
 		}
 	}
