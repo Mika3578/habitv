@@ -46,8 +46,11 @@ Never resolve conversations silently (Section 15.7).
 
 ## Concise communication
 
-PR/commit/review text: English, scoped, reviewer-friendly (Section 20.13).
-Details: [`docs/dev-workflow.md`](../../docs/dev-workflow.md#concise-communication).
+PR/commit/review text: English, scoped, reviewer-friendly, and evasive
+about program behavior (Sections 20.13–20.14). No channel, brand, or
+provider product names. No operational media-handling vocabulary.
+Details: [`docs/dev-workflow.md`](../../docs/dev-workflow.md#concise-communication)
+and [`docs/provider-policy.md#public-communication-safety`](../../docs/provider-policy.md#public-communication-safety).
 
 ## Instruction alignment
 
@@ -65,7 +68,9 @@ comments, labels, review requests, or resolution (Section 15.25).
 ## PR content
 
 - English only for titles, bodies, and comments
-- Conventional Commits for PR titles
+- Conventional Commits for PR titles, with generic scopes
+- No channel, brand, or provider product names in titles or summaries
+- Stay evasive about program behavior (Section 20.14)
 - No `hbtv-*` or `HBTV*` IDs in branch names, commits, or PR text
 - Fill required sections of `.github/pull_request_template.md`
 - Include exact validation results in the PR body

@@ -61,12 +61,14 @@ or backlog (Section 15.26), not only in PR comments.
 ## Concise communication
 
 PR titles and commit subjects: Conventional Commits, English, imperative,
-≤ 72 characters (`AGENTS.md` Section 3).
+≤ 72 characters (`AGENTS.md` Section 3). Use generic scopes. Do not name
+channels, brands, or provider products. Do not describe what the program
+retrieves or how media is handled (Section 20.14).
 
 PR bodies should cover: **intent**, **scope**, **validation** (exact commands
-and results), **risk / rollback**, and **follow-up** (if any). Skip long
-file lists when `git diff --stat` suffices; skip implementation walkthroughs
-when the diff is self-explanatory.
+and results), **risk / rollback**, and **follow-up** (if any). Stay evasive
+about program behavior. Skip long file lists when `git diff --stat`
+suffices; skip implementation walkthroughs when the diff is self-explanatory.
 
 Review replies: one short English paragraph — what changed or why not applied,
 plus validation reference when relevant.

@@ -6,8 +6,8 @@ complement, but do not replace, the human review process.
 
 ## Agent rules metadata
 
-* **Version:** 1.6.0
-* **Last updated:** 2026-06-18
+* **Version:** 1.6.1
+* **Last updated:** 2026-09-18
 * **Maintainer:** repository maintainer
 * **Scope:** Habitv AI-assisted development workflow
 * **Canonical source:** `AGENTS.md`
@@ -337,9 +337,9 @@ Do not use tracker IDs such as `hbtv-006`, `HBTV-015`, `hbtv-***`, or
 Use descriptive Conventional Commit scopes instead.
 
 Examples:
-- `fix(provider-youtube): switch downloader to yt-dlp`
+- `fix(plugins): update catalog parsing`
 - `docs(agents): align AI rules policy`
-- `test(providers): add offline fixtures`
+- `test(plugins): add offline fixtures`
 - `ci(maven): harden PR validation`
 
 Before creating any branch, run:
@@ -368,7 +368,7 @@ for the required rebase-only branch update flow.
 | Diff size | Keep small and focused; reject opportunistic refactors |
 | History | Linear inside work branches; no merge commits |
 | Doc sync | Update tracker, risk register, decision log on meaningful changes |
-| Plugin version bump | A `plugins/*/pom.xml` `<version>` override must match a `plugin-versioning-policy` trigger (downloader/parser, user-facing endpoint, user-facing configuration). Name the trigger in the PR body. Internal reactor deps in a bumped plugin MUST use `${project.parent.version}`. |
+| Plugin version bump | A `plugins/*/pom.xml` `<version>` override must match a `plugin-versioning-policy` trigger (parser, user-facing endpoint, or user-facing configuration). Name the trigger class in the PR body without describing media handling. Internal reactor deps in a bumped plugin MUST use `${project.parent.version}`. |
 
 AI-agent PR target policy:
 - Agent-created PRs must always target `Mika3578/habitv`.
@@ -400,16 +400,21 @@ gh pr create --repo ikfon10/habitv ...
 
 PR title policy:
 - PR titles must use Conventional Commits.
+- Use generic scopes (`plugins`, `catalog`, `ui`, `agents`, `maven`).
+- Do not name channels, brands, or provider products in titles.
+- Do not describe what the program retrieves or how media is handled.
 - Good: `docs(agents): align AI rules policy`
-- Good: `fix(provider-youtube): switch downloader to yt-dlp`
+- Good: `fix(plugins): update catalog parsing`
 - Good: `ci(maven): harden PR validation`
+- Bad: titles that name a channel, brand, or provider product
+- Bad: titles that use operational media-handling vocabulary
 - Bad: `HBTV-006 fix youtube provider`
 - Bad: `docs(HBTV-015): update agent rules`
 - Bad: `fix/hbtv-006-youtube-ytdlp`
 
 Required PR body sections:
 1. `Related issue` (optional `#<issue-number>`)
-2. `Scope` (short descriptive scope, e.g. `provider-youtube-ytdlp`)
+2. `Scope` (short generic scope, e.g. `catalog-modules`)
 3. `Summary`
 4. `Changes`
 5. `Validation`
@@ -540,8 +545,9 @@ You **must**:
 
 - Always reply in **English** in code, commits, comments, docs, and PR
   text — regardless of the user's prompt language.
-- Keep **public PR, commit, and review text concise and scoped** (Section
-  20.13); provider/plugin public text must stay high-level (Section 20.14).
+- Keep **public PR, commit, and review text concise, scoped, and evasive**
+  (Sections 20.13–20.14). Do not name channels or provider products, and
+  do not describe what the program retrieves or how media is handled.
 - Be precise about what you ran vs. what you reasoned about. Cite
   exact command outputs, file paths, and line numbers.
 - Disagree with the user when their suggestion would break a hard
@@ -3154,8 +3160,9 @@ not endless mandatory text. Track gaps in
 ### 20.13 Concise public communication
 
 PR titles, commit subjects, PR bodies, and review replies must be **English**,
-**scoped**, and **reviewer-friendly**. Summarize intent, scope, validation,
-risk, rollback, and follow-up — not step-by-step implementation noise.
+**scoped**, **reviewer-friendly**, and **evasive** about program behavior.
+Summarize intent, scope, validation, risk, rollback, and follow-up — not
+step-by-step implementation noise, brand lists, or media-handling detail.
 
 Final reports and handoffs (Sections 16.25, 15.6) must be **useful but not
 overly verbose**. Details:
@@ -3163,9 +3170,19 @@ overly verbose**. Details:
 
 ### 20.14 Provider communication safety
 
-Provider/plugin **public text** (PRs, commits, comments, user-facing docs)
-must avoid exposing unnecessary operational detail. Use high-level wording;
-see [`docs/provider-policy.md`](docs/provider-policy.md#public-communication-safety).
+Provider/plugin **public text** (PR titles, PR bodies, commit subjects,
+review comments, user-facing docs) must stay **evasive** about what the
+program does. Do not describe retrieval, protected media, or catalog
+sources in operational terms.
+
+Use generic scopes (`plugins`, `catalog`, `ui`). Do not repeat channel,
+brand, or provider product names in titles or summaries.
+
+Do not use public wording such as DRM, download, replay, catch-up,
+stream, decrypt, or equivalent. Prefer: catalog update, metadata
+parsing, diagnostics, unavailable items, fixture coverage.
+
+Details: [`docs/provider-policy.md`](docs/provider-policy.md#public-communication-safety).
 
 ### 20.15 Copilot review loop guard
 

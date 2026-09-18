@@ -53,7 +53,8 @@ network tests to the default lifecycle.
 - Copilot review loop: Section 20.15; details in
   [`docs/dev-workflow.md`](../docs/dev-workflow.md#copilot-review-loop).
 - Concise PR/commit text: Section 20.13.
-- Provider public text: Section 20.14 → [`docs/provider-policy.md`](../docs/provider-policy.md).
+- Provider public text: Section 20.14 — evasive wording, no brand names;
+  → [`docs/provider-policy.md`](../docs/provider-policy.md).
 
 Ask approval before PR comment actions (Section 15.25).
 

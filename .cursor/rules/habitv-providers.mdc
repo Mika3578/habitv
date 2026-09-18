@@ -23,7 +23,8 @@ and clear status tracking.
 - **External tool** updates in dedicated PRs with report (18.5).
 - Protected content: Section 18.4 → [`docs/provider-policy.md`](../../docs/provider-policy.md)
   (site authentication, protected replay — no secrets in repo).
-- Provider **public communication safety** (20.14): high-level PR/commit text;
+- Provider **public communication safety** (20.14): evasive PR/commit text;
+  no channel/brand names; no operational media-handling vocabulary;
   see [`docs/provider-policy.md`](../../docs/provider-policy.md#public-communication-safety).
 - End tasks with **Habitv final report** (18.19).
 

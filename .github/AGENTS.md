@@ -28,6 +28,7 @@ docs, PR templates, Copilot instructions, and repository governance.
 - Ask approval before PR comments, labels, review requests, or resolution
   (Section 15.25).
 - Fill every required section of `.github/pull_request_template.md`.
+- Public PR text must stay evasive (root `AGENTS.md` Sections 20.13–20.14).
 - No chained approval-gated commands (Section 15.8).
 
 ## Instruction loading

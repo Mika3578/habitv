@@ -7,9 +7,13 @@ review comments, and squash merge metadata.
 
 - Use a clear summary in the PR title; Conventional Commit style is preferred
   for the eventual squash merge title.
+- Use generic scopes (`plugins`, `catalog`, `ui`). Do not name channels,
+  brands, or provider products.
+- Stay evasive about program behavior. Do not use operational
+  media-handling vocabulary in titles or bodies (Section 20.14).
 - Keep the PR body focused on outcome, scope, validation, and risks.
 - Reference one descriptive scope slug from `docs/dev-tracker.md` when
-  applicable.
+  applicable, without expanding it into a brand list.
 - Fill every required (non-optional) section of
   `.github/pull_request_template.md`.
 

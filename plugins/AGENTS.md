@@ -31,7 +31,8 @@ Full policy: [`docs/provider-policy.md`](../docs/provider-policy.md) and
 - Protected content work: Section 18.4 and
   [`docs/provider-policy.md`](../docs/provider-policy.md) (including
   [site authentication for download](../docs/provider-policy.md#site-authentication-for-download)).
-- Keep provider **public text** high-level (Section 20.14); see
+- Keep provider **public text** evasive (Section 20.14): no channel or
+  brand names, no operational media-handling vocabulary; see
   [`docs/provider-policy.md`](../docs/provider-policy.md#public-communication-safety).
 - Keep changes scoped to one provider or plugin module when possible.
 - No secrets, binaries, or manual JAXB/XML generated-file edits unless

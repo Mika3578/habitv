@@ -16,11 +16,14 @@ validation, and linear history.
 ## Pull requests
 
 - Use English for PR titles, bodies, review comments, and merge metadata.
+- Use generic scopes. Do not name channels, brands, or provider products.
+- Stay evasive about program behavior (Section 20.14).
 - Keep PRs scoped to one descriptive scope item when applicable.
 - Document validation commands actually run; default safe command is
   `mvn -B -ntp -DskipTests validate`.
 - Fill every required (non-optional) section of
-  `.github/pull_request_template.md` honestly.
+  `.github/pull_request_template.md` honestly, without operational
+  media-handling narrative.
 
 ## Squash merge instructions
 

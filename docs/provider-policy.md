@@ -146,31 +146,38 @@ unrelated provider behavior with dependency or CI changes.
 ## Public communication safety
 
 Provider/plugin **public text** (PR titles and bodies, commit messages,
-review comments, user-facing docs) must **not** expose unnecessary
-operational detail. Keep wording high-level so reviews stay safe and
-maintainers retain flexibility when endpoints change.
+review comments, user-facing docs) must stay **evasive** about what the
+program does. Do not describe retrieval, protected media, or catalog
+sources in operational terms. Keep reviews safe and avoid repeating
+brands when endpoints change.
 
 **Avoid in public text:**
 
-- exact replay endpoints or undocumented API paths;
+- channel, brand, or provider product names (do not list what a module covers);
+- words such as DRM, download, replay, catch-up, stream, decrypt, or equivalent;
+- exact endpoints or undocumented API paths;
 - request headers, auth/session mechanics;
 - browser profile paths, token names, sensitive URL parameters;
 - selector chains, step-by-step extraction flows, bypass-like mechanics;
-- full provider-specific downloader command lines with auth or protected-content flags.
+- helper-tool names or command lines in titles and summaries.
 
 **Prefer high-level wording:**
 
-- provider routing updated;
+- catalog routing updated;
 - metadata parsing improved;
 - diagnostics clarified;
-- protected or auth-gated content fails gracefully;
+- unavailable items fail gracefully;
 - offline fixture coverage added;
 - command construction covered by tests.
 
+Use generic scopes (`plugins`, `catalog`, `ui`). If a module path is
+required for review, mention it once in Scope only — never expand into
+a brand or channel list.
+
 Code, fixtures, and tests may contain technical detail **inside the
-repository** when required for offline validation — but PR/commit **narrative**
-should still summarize at this level unless the maintainer explicitly requests
-more detail in the current conversation.
+repository** when required for offline validation — but PR/commit
+**narrative** must stay at this level unless the maintainer explicitly
+requests more detail in the current conversation.
 
 Canonical rule: `AGENTS.md` Section 20.14.
 

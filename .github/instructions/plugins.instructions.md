@@ -33,8 +33,8 @@ Provider, downloader, and export plugins under `plugins/`.
 - Protected content and provider policy: Section 18.4 → `docs/provider-policy.md`
   (includes [site authentication for download](../../docs/provider-policy.md#site-authentication-for-download)).
 
-- Provider public communication safety (20.14): high-level PR/commit text only;
-
+- Provider public communication safety (20.14): evasive PR/commit text only;
+  no channel/brand names; no operational media-handling vocabulary;
   see [`docs/provider-policy.md#public-communication-safety`](../../docs/provider-policy.md#public-communication-safety).
 
 

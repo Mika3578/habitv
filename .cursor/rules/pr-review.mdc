@@ -52,8 +52,9 @@ Never resolve conversations silently (root `AGENTS.md` Section 15.7).
 
 ## Concise communication
 
-Keep PR titles, bodies, and review replies scoped and reviewer-friendly
-(Section 20.13). Details:
+Keep PR titles, bodies, and review replies scoped, reviewer-friendly,
+and evasive about program behavior (Sections 20.13–20.14). Do not name
+channels or provider products. Details:
 [`docs/dev-workflow.md`](../../docs/dev-workflow.md#concise-communication).
 
 ## Review readiness

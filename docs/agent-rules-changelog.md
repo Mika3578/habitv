@@ -2,6 +2,25 @@
 
 Version history for Habitv AI agent rules. Canonical source: [`AGENTS.md`](../AGENTS.md).
 
+## 2026-09-18 — v1.6.1
+
+### Changed
+
+* Public PR/commit wording must stay evasive (`AGENTS.md` §5, §10,
+  §20.13–§20.14; `docs/provider-policy.md#public-communication-safety`).
+* Generic scopes only; no channel, brand, or provider product names in
+  titles or summaries.
+* Do not use operational media-handling vocabulary in public text.
+
+### Reason
+
+* Open plugin PRs repeated brands and operational wording in titles and
+  bodies. Public narrative should not describe program behavior.
+
+### Follow-up
+
+* Existing open plugin PR titles and bodies rewritten to match.
+
 ## 2026-06-18 — v1.6.0
 
 ### Added
