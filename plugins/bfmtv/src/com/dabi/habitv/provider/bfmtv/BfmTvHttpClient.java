@@ -17,23 +17,32 @@ final class BfmTvHttpClient {
 		String get(String url) throws IOException;
 	}
 
+	interface ProxySource {
+		Proxy current();
+	}
+
 	private BfmTvHttpClient() {
 	}
 
-	static Transport pluginTransport(final Proxy proxy) {
-		return new PluginTransport(proxy);
+	static Transport pluginTransport(final ProxySource proxySource) {
+		return new PluginTransport(proxySource);
+	}
+
+	static Proxy proxyForRequest(final ProxySource proxySource) {
+		return proxySource == null ? null : proxySource.current();
 	}
 
 	private static final class PluginTransport implements Transport {
 
-		private final Proxy proxy;
+		private final ProxySource proxySource;
 
-		private PluginTransport(final Proxy proxy) {
-			this.proxy = proxy;
+		private PluginTransport(final ProxySource proxySource) {
+			this.proxySource = proxySource;
 		}
 
 		@Override
 		public String get(final String url) throws IOException {
+			final Proxy proxy = proxyForRequest(proxySource);
 			final HttpURLConnection connection;
 			if (proxy != null) {
 				connection = (HttpURLConnection) new URL(url).openConnection(proxy);

@@ -1,6 +1,7 @@
 package com.dabi.habitv.provider.tf1plus;
 
 import java.io.IOException;
+import java.net.Proxy;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,12 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 	private final Tf1PlusCatalogClient catalogClient;
 
 	public Tf1PlusPluginManager() {
-		this.catalogClient = new Tf1PlusCatalogClient(Tf1PlusHttpClient.pluginTransport(getHttpProxy()));
+		this.catalogClient = new Tf1PlusCatalogClient(Tf1PlusHttpClient.pluginTransport(new Tf1PlusHttpClient.ProxySource() {
+			@Override
+			public Proxy current() {
+				return getHttpProxy();
+			}
+		}));
 	}
 
 	Tf1PlusPluginManager(final Tf1PlusCatalogClient catalogClient) {

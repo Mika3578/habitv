@@ -1,6 +1,7 @@
 package com.dabi.habitv.provider.bfmtv;
 
 import java.io.IOException;
+import java.net.Proxy;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -22,7 +23,12 @@ public class BfmTvPluginManager extends BasePluginWithProxy implements PluginPro
 	private final BfmTvCatalogClient catalogClient;
 
 	public BfmTvPluginManager() {
-		this.catalogClient = new BfmTvCatalogClient(BfmTvHttpClient.pluginTransport(getHttpProxy()));
+		this.catalogClient = new BfmTvCatalogClient(BfmTvHttpClient.pluginTransport(new BfmTvHttpClient.ProxySource() {
+			@Override
+			public Proxy current() {
+				return getHttpProxy();
+			}
+		}));
 	}
 
 	BfmTvPluginManager(final BfmTvCatalogClient catalogClient) {
