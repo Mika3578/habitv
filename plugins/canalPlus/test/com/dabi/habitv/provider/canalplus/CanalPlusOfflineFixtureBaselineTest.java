@@ -28,6 +28,8 @@ public class CanalPlusOfflineFixtureBaselineTest {
 					content.contains("page-home-react-query.html"));
 			assertTrue("fixture metadata must list mixed home catalog fixtures",
 					content.contains("page-home-mixed-react-query.html"));
+			assertTrue("fixture metadata must list mixed detail host fixtures",
+					content.contains("page-detail-mixed-react-query.html"));
 		}
 	}
 

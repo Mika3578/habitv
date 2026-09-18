@@ -28,8 +28,11 @@ final class CanalPlusPageDataParser {
 			return null;
 		}
 		final Matcher reactMatcher = REACT_DETAIL_PAGE.matcher(html);
-		if (reactMatcher.find()) {
-			return unescapeJsonUrl(reactMatcher.group(1));
+		while (reactMatcher.find()) {
+			final String url = approvedHodorUrl(reactMatcher.group(1));
+			if (url != null) {
+				return url;
+			}
 		}
 		return firstHodorUrlPage(html);
 	}
@@ -45,8 +48,9 @@ final class CanalPlusPageDataParser {
 		final Matcher reactMatcher = REACT_QUERY_HODOR.matcher(html);
 		while (reactMatcher.find()) {
 			final String queryKey = reactMatcher.group(1);
-			final String url = unescapeJsonUrl(reactMatcher.group(2));
-			if (!"detailPage".equals(queryKey) && CanalPlusContentIdParser.fromInput(url) == null) {
+			final String url = approvedHodorUrl(reactMatcher.group(2));
+			if (url != null && !"detailPage".equals(queryKey)
+					&& CanalPlusContentIdParser.fromInput(url) == null) {
 				return url;
 			}
 		}
@@ -57,7 +61,10 @@ final class CanalPlusPageDataParser {
 		final Matcher reactMatcher = REACT_QUERY_HODOR.matcher(html);
 		while (reactMatcher.find()) {
 			if (expectedKey.equals(reactMatcher.group(1))) {
-				return unescapeJsonUrl(reactMatcher.group(2));
+				final String url = approvedHodorUrl(reactMatcher.group(2));
+				if (url != null) {
+					return url;
+				}
 			}
 		}
 		return null;
@@ -65,8 +72,11 @@ final class CanalPlusPageDataParser {
 
 	private static String firstHodorUrlPage(final String html) {
 		final Matcher dataMatcher = WINDOW_DATA_URL_PAGE.matcher(html);
-		if (dataMatcher.find()) {
-			return unescapeJsonUrl(dataMatcher.group(1));
+		while (dataMatcher.find()) {
+			final String url = approvedHodorUrl(dataMatcher.group(1));
+			if (url != null) {
+				return url;
+			}
 		}
 		return null;
 	}
@@ -74,12 +84,20 @@ final class CanalPlusPageDataParser {
 	private static String firstHodorCatalogUrlPage(final String html) {
 		final Matcher dataMatcher = WINDOW_DATA_URL_PAGE.matcher(html);
 		while (dataMatcher.find()) {
-			final String url = unescapeJsonUrl(dataMatcher.group(1));
-			if (CanalPlusContentIdParser.fromInput(url) == null) {
+			final String url = approvedHodorUrl(dataMatcher.group(1));
+			if (url != null && CanalPlusContentIdParser.fromInput(url) == null) {
 				return url;
 			}
 		}
 		return null;
+	}
+
+	private static String approvedHodorUrl(final String rawUrl) {
+		if (StringUtils.isEmpty(rawUrl)) {
+			return null;
+		}
+		final String url = unescapeJsonUrl(rawUrl);
+		return CanalPlusContentIdParser.isHodorUrl(url) ? url : null;
 	}
 
 	private static String unescapeJsonUrl(final String url) {

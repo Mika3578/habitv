@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -84,5 +85,38 @@ public class BasePluginProviderTesterTest extends BasePluginProviderTester {
 		};
 
 		testPluginProvider(plugin, false);
+	}
+
+	@Test
+	public void testPluginProviderSucceedsWhenEpisodeIsFoundOnLastAttempt() throws Exception {
+		final CategoryDTO downloadable = new CategoryDTO("last-attempt-provider", "Shows", "shows", "mp4");
+		downloadable.setDownloadable(true);
+		final AtomicInteger findEpisodeCalls = new AtomicInteger();
+		final PluginProviderInterface plugin = new PluginProviderInterface() {
+			@Override
+			public String getName() {
+				return "last-attempt-provider";
+			}
+
+			@Override
+			public Set<CategoryDTO> findCategory() {
+				final Set<CategoryDTO> categories = new LinkedHashSet<>();
+				categories.add(downloadable);
+				return categories;
+			}
+
+			@Override
+			public Set<EpisodeDTO> findEpisode(final CategoryDTO category) {
+				if (findEpisodeCalls.incrementAndGet() < 10) {
+					return Collections.emptySet();
+				}
+				final Set<EpisodeDTO> episodes = new LinkedHashSet<>();
+				episodes.add(new EpisodeDTO(category, "Episode 10", "ep-10"));
+				return episodes;
+			}
+		};
+
+		testPluginProvider(plugin, false);
+		Assert.assertEquals(10, findEpisodeCalls.get());
 	}
 }

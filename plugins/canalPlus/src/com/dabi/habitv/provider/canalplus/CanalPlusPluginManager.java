@@ -103,6 +103,8 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 		final EpisodeDTO episode;
 		if (CanalPlusContentIdParser.isModernCanalPlusUrl(urlPage)) {
 			episode = new EpisodeDTO(category, displayName, urlPage);
+		} else if (!canUseCatalogUrl(category, urlPage)) {
+			return null;
 		} else {
 			String url = CanalUtils.findUrl(this, urlPage);
 			if (url == null) {
@@ -202,8 +204,24 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 		}
 	}
 
+	private static boolean canUseCatalogUrl(final CategoryDTO fatherCat, final String url) {
+		if (StringUtils.isEmpty(url)) {
+			return false;
+		}
+		if (CanalPlusContentIdParser.isModernCanalPlusUrl(url)) {
+			return true;
+		}
+		if (fatherCat != null && CanalPlusContentIdParser.isModernCanalPlusUrl(fatherCat.getId())) {
+			return false;
+		}
+		return CanalPlusContentIdParser.isLegacyCanalPlusUrl(url);
+	}
+
 	private Set<CategoryDTO> findCategoriesFromUrl(CategoryDTO fatherCat, String urlMainPage) throws IOException, JsonParseException,
 			JsonMappingException {
+		if (!canUseCatalogUrl(fatherCat, urlMainPage)) {
+			return new LinkedHashSet<>();
+		}
 		final ObjectMapper mapper = new ObjectMapper();
 		@SuppressWarnings("unchecked")
 		final Map<String, Object> catData = mapper.readValue(getInputStreamFromUrl(urlMainPage), Map.class);
@@ -243,6 +261,9 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 		Map<String, Object> onClick = (Map<String, Object>) dataMap.get("onClick");
 		String urlPage = onClick == null ? null : (String) onClick.get("URLPage");
 		if ("landing".equals(type)) {
+			if (!canUseCatalogUrl(fatherCat, urlPage)) {
+				return;
+			}
 			CategoryDTO leafCategory = buildLeafCategory(fatherCat, dataMap);
 			if (leafCategory != null) {
 				categories.add(leafCategory);
@@ -256,6 +277,9 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 				}
 			}
 		} else if (type == null && urlPage != null && !CanalPlusHodorParser.isUnitDetailItem(dataMap)) {
+			if (!canUseCatalogUrl(fatherCat, urlPage)) {
+				return;
+			}
 			CategoryDTO category = buildNodeCategory(dataMap);
 			category.setDownloadable(true);
 			category.addSubCategories(findCategoriesFromUrl(category, urlPage));

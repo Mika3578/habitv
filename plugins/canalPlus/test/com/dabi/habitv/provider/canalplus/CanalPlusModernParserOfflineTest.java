@@ -32,6 +32,16 @@ public class CanalPlusModernParserOfflineTest {
 	}
 
 	@Test
+	public void extractDetailPageUrlIgnoresUnapprovedHostBeforeHodor() throws IOException {
+		final String html = readFixture("page-detail-mixed-react-query.html");
+		final String detailUrl = CanalPlusPageDataParser.extractDetailPageUrl(html);
+		assertNotNull(detailUrl);
+		assertTrue(CanalPlusContentIdParser.isHodorUrl(detailUrl));
+		assertTrue(detailUrl.contains("31338503_50017"));
+		assertFalse(detailUrl.contains("evil.example"));
+	}
+
+	@Test
 	public void parsesCatalogPageUrlFromHomeHtmlFixture() throws IOException {
 		final String html = readFixture("page-home-react-query.html");
 		final String catalogUrl = CanalPlusPageDataParser.extractCatalogPageUrl(html);

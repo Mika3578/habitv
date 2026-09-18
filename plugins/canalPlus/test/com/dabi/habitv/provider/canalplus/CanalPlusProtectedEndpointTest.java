@@ -331,6 +331,89 @@ public class CanalPlusProtectedEndpointTest {
 	}
 
 	@Test
+	public void findEpisodeSkipsRowsWithWhitespaceOnlyTitleAndSubtitle() {
+		final String listingJson = "{\"strates\":[{\"type\":\"contentGrid\",\"contents\":[{"
+				+ "\"title\":\"   \",\"subtitle\":\"\\t\","
+				+ "\"onClick\":{\"URLPage\":\"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/1.json\","
+				+ "\"displayTemplate\":\"detailPage\"}},{"
+				+ "\"title\":\"Unit\",\"subtitle\":\"\","
+				+ "\"onClick\":{\"URLPage\":\"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/31338503_50017.json\","
+				+ "\"displayTemplate\":\"detailPage\"}}]}]}";
+		final CanalPlusPluginManager manager = new CanalPlusPluginManager() {
+			@Override
+			public InputStream getInputStreamFromUrl(final String url) {
+				return new ByteArrayInputStream(listingJson.getBytes(StandardCharsets.UTF_8));
+			}
+		};
+		final CategoryDTO category = new CategoryDTO(CanalPlusConf.NAME, "Decouverte",
+				"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/decouverte.json", "mp4");
+		final Set<EpisodeDTO> episodes = manager.findEpisode(category);
+		assertEquals(1, episodes.size());
+		assertEquals("Unit", episodes.iterator().next().getName());
+	}
+
+	@Test
+	public void findEpisodeSkipsUnapprovedEpisodeUrlFromModernCatalogWithoutFetch() {
+		final String listingJson = "{\"strates\":[{\"type\":\"contentGrid\",\"contents\":[{"
+				+ "\"title\":\"Evil episode\",\"subtitle\":\"\","
+				+ "\"onClick\":{\"URLPage\":\"https://evil.example/media.json\","
+				+ "\"displayTemplate\":\"detailPage\"}},{"
+				+ "\"title\":\"Unit\",\"subtitle\":\"\","
+				+ "\"onClick\":{\"URLPage\":\"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/31338503_50017.json\","
+				+ "\"displayTemplate\":\"detailPage\"}}]}]}";
+		final CanalPlusPluginManager manager = new CanalPlusPluginManager() {
+			@Override
+			public InputStream getInputStreamFromUrl(final String url) {
+				if (url.contains("evil.example")) {
+					throw new AssertionError("unapproved episode URL must not be fetched: " + url);
+				}
+				return new ByteArrayInputStream(listingJson.getBytes(StandardCharsets.UTF_8));
+			}
+		};
+		final CategoryDTO category = new CategoryDTO(CanalPlusConf.NAME, "Decouverte",
+				"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/decouverte.json", "mp4");
+		final Set<EpisodeDTO> episodes = manager.findEpisode(category);
+		assertEquals(1, episodes.size());
+		assertTrue(episodes.iterator().next().getId().contains("31338503_50017"));
+	}
+
+	@Test
+	public void findCategorySkipsUnapprovedCatalogUrlsWithoutFetch() throws IOException {
+		final String homeHtml = readFixture("page-home-react-query.html");
+		final String homeLanding = "{\"strates\":[{\"type\":\"contentRow\",\"contents\":[{"
+				+ "\"title\":\"Evil node\","
+				+ "\"onClick\":{\"URLPage\":\"https://evil.example/catalog.json\"}},{"
+				+ "\"type\":\"landing\",\"title\":\"Evil landing\","
+				+ "\"onClick\":{\"URLPage\":\"https://evil.example/landing.json\"}},{"
+				+ "\"type\":\"landing\",\"title\":\"Découverte\","
+				+ "\"onClick\":{\"URLPage\":\"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/decouverte.json?detailType=landingPage&objectType=brand\"}}]}]}";
+		final CanalPlusPluginManager manager = new CanalPlusPluginManager() {
+			@Override
+			public InputStream getInputStreamFromUrl(final String url) {
+				if (url.contains("evil.example")) {
+					throw new AssertionError("unapproved catalog URL must not be fetched: " + url);
+				}
+				if (CanalPlusConf.URL_HOME.equals(url)) {
+					throw new AssertionError("legacy authenticate endpoint must not be used when modern catalog succeeds");
+				}
+				if (CanalPlusModernConf.PAGE_BASE_URL.equals(url)) {
+					return new ByteArrayInputStream(homeHtml.getBytes(StandardCharsets.UTF_8));
+				}
+				if (url.contains("okapi/home.json")) {
+					return new ByteArrayInputStream(homeLanding.getBytes(StandardCharsets.UTF_8));
+				}
+				throw new TechnicalException("unexpected url " + url);
+			}
+		};
+
+		final Set<CategoryDTO> categories = manager.findCategory();
+		assertEquals(1, categories.size());
+		final CategoryDTO discovery = categories.iterator().next();
+		assertEquals("Découverte", discovery.getName());
+		assertTrue(discovery.getId().contains("okapi/decouverte.json"));
+	}
+
+	@Test
 	public void findEpisodeSkipsContentRowWithMissingContents() {
 		final String listingJson = "{\"strates\":[{\"type\":\"contentRow\"},{\"type\":\"contentGrid\",\"contents\":[{"
 				+ "\"title\":\"Unit\",\"subtitle\":\"\","

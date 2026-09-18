@@ -55,4 +55,16 @@ public class CanalPlusContentIdParserTest {
 		assertTrue(CanalPlusContentIdParser.isModernCanalPlusUrl("https://routemeup.canalplus-bo.net/path"));
 	}
 
+	@Test
+	public void acceptsExactLegacyCatalogHosts() {
+		assertTrue(CanalPlusContentIdParser.isLegacyCanalPlusUrl(
+				"http://service.mycanal.fr/page/abc/123.json"));
+		assertTrue(CanalPlusContentIdParser.isLegacyCanalPlusUrl(
+				"http://service.canal-plus.com/video/rest/getvideos/cplus/1?format=json"));
+		assertFalse(CanalPlusContentIdParser.isLegacyCanalPlusUrl(
+				"https://evil.example/?next=http://service.mycanal.fr/page/abc/123.json"));
+		assertFalse(CanalPlusContentIdParser.isLegacyCanalPlusUrl(
+				"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/1.json"));
+	}
+
 }

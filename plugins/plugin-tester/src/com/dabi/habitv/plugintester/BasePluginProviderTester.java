@@ -94,7 +94,7 @@ public class BasePluginProviderTester {
 			episodeList = plugin.findEpisode(category);
 			i++;
 		}
-		if (i == MAX_ATTEMPTS) {
+		if (i == MAX_ATTEMPTS && episodeList.isEmpty()) {
 			Assert.fail("no ep found in " + MAX_ATTEMPTS + " attempts");
 		}
 

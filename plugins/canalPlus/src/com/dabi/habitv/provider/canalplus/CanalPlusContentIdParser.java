@@ -60,6 +60,12 @@ final class CanalPlusContentIdParser {
 				|| CanalPlusModernConf.PAGE_WWW_HOST.equals(host);
 	}
 
+	static boolean isLegacyCanalPlusUrl(final String input) {
+		final String host = hostOf(input);
+		return "service.mycanal.fr".equals(host)
+				|| "service.canal-plus.com".equals(host);
+	}
+
 	static String hostOf(final String input) {
 		if (StringUtils.isEmpty(input)) {
 			return null;

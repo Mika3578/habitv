@@ -113,13 +113,15 @@ final class CanalPlusHodorParser {
 	}
 
 	static String joinTitle(final String title, final String subtitle) {
-		if (StringUtils.isEmpty(title)) {
-			return subtitle;
+		final String trimmedTitle = StringUtils.trimToNull(title);
+		final String trimmedSubtitle = StringUtils.trimToNull(subtitle);
+		if (trimmedTitle == null) {
+			return trimmedSubtitle;
 		}
-		if (StringUtils.isEmpty(subtitle)) {
-			return title;
+		if (trimmedSubtitle == null) {
+			return trimmedTitle;
 		}
-		return title + " " + subtitle;
+		return trimmedTitle + " " + trimmedSubtitle;
 	}
 
 	private static String stringValue(final Object value) {
