@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -81,15 +82,18 @@ public class BasePluginProviderTester {
 			return;
 		}
 
+		final List<CategoryDTO> eligibleCategories = collectEligibleCategories(categories, episodeOnlyOnLeaf);
+		if (eligibleCategories.isEmpty()) {
+			Assert.fail("no downloadable category for " + plugin.getName()
+					+ " (endpoint may be unavailable)");
+			return;
+		}
+
 		Set<EpisodeDTO> episodeList = Collections.emptySet();
 		int i = 0;
 		while (episodeList.isEmpty() && i < MAX_ATTEMPTS) {
 			LOG.error("no ep found, searching againg categories for " + plugin.getName());
-			final CategoryDTO category = findCategory(episodeOnlyOnLeaf, categories);
-			if (!category.isDownloadable()) {
-				i++;
-				continue;
-			}
+			final CategoryDTO category = eligibleCategories.get(getRandomIndex(eligibleCategories));
 			LOG.error("search episodes for " + plugin.getName() + "/" + category);
 			episodeList = plugin.findEpisode(category);
 			i++;
@@ -153,11 +157,38 @@ public class BasePluginProviderTester {
 	}
 
 	protected CategoryDTO findCategory(final boolean episodeOnlyOnLeaf, final Collection<CategoryDTO> categories) {
+		final List<CategoryDTO> eligible = collectEligibleCategories(categories, episodeOnlyOnLeaf);
+		if (!eligible.isEmpty()) {
+			return eligible.get(getRandomIndex(eligible));
+		}
 		final CategoryDTO category = (new ArrayList<>(categories)).get(getRandomIndex(categories));
 		if ((episodeOnlyOnLeaf || !category.isDownloadable()) && !category.getSubCategories().isEmpty()) {
 			return findCategory(episodeOnlyOnLeaf, category.getSubCategories());
 		}
 		return category;
+	}
+
+	protected List<CategoryDTO> collectEligibleCategories(final Collection<CategoryDTO> categories,
+			final boolean episodeOnlyOnLeaf) {
+		final List<CategoryDTO> eligible = new ArrayList<>();
+		collectEligibleCategories(categories, episodeOnlyOnLeaf, eligible);
+		return eligible;
+	}
+
+	private void collectEligibleCategories(final Collection<CategoryDTO> categories, final boolean episodeOnlyOnLeaf,
+			final List<CategoryDTO> eligible) {
+		if (categories == null || categories.isEmpty()) {
+			return;
+		}
+		for (final CategoryDTO category : categories) {
+			final boolean drillIntoChildren = (episodeOnlyOnLeaf || !category.isDownloadable())
+					&& category.getSubCategories() != null && !category.getSubCategories().isEmpty();
+			if (drillIntoChildren) {
+				collectEligibleCategories(category.getSubCategories(), episodeOnlyOnLeaf, eligible);
+			} else if (category.isDownloadable()) {
+				eligible.add(category);
+			}
+		}
 	}
 
 	protected DownloadParamDTO buildDownloadersHolder(final EpisodeDTO episode) {

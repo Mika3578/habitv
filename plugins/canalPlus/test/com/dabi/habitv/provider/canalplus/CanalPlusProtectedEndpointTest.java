@@ -40,6 +40,11 @@ public class CanalPlusProtectedEndpointTest {
 				"https://www.canalplus.com/decouverte/h/31338503_50017"));
 		assertEquals(DownloadableState.SPECIFIC, manager.canDownload(
 				"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/31338503_50017.json"));
+		assertEquals(DownloadableState.SPECIFIC, manager.canDownload(
+				"http://service.mycanal.fr/getMediaUrl/token/1.json?pfv=hls"));
+		assertEquals(DownloadableState.SPECIFIC, manager.canDownload(
+				"http://service.canal-plus.com/video/rest/getvideos/cplus/1?format=json"));
+		assertEquals(DownloadableState.IMPOSSIBLE, manager.canDownload("https://cdn.example/master.m3u8"));
 	}
 
 	@Test

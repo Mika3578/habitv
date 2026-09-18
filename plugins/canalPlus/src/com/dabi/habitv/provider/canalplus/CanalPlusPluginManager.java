@@ -339,7 +339,8 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 
 	@Override
 	public DownloadableState canDownload(String downloadInput) {
-		if (CanalPlusModernStreamSupport.isModernInput(downloadInput)) {
+		if (CanalPlusModernStreamSupport.isModernInput(downloadInput)
+				|| CanalPlusContentIdParser.isLegacyCanalPlusUrl(downloadInput)) {
 			return DownloadableState.SPECIFIC;
 		}
 		return DownloadableState.IMPOSSIBLE;
