@@ -127,6 +127,8 @@ public class CanalPlusProtectedEndpointTest {
 		assertNotNull(episode.getMetadata());
 		assertEquals("31338503_50017", episode.getMetadata().getProviderEpisodeId());
 		assertNull(episode.getMetadata().getSeriesTitle());
+		assertEquals("Journaliste, animatrice télé, Caroline Ithurbide parcourt l'Hexagone.",
+				episode.getMetadata().getDescription());
 		assertEquals(
 				"https://hodor.canalplus.pro/api/v2/mycanal/detail/b63a43e7548cb1a6e7c7319084f48af8/okapi/31338503_50017.json?detailType=detailPage&objectType=unit",
 				episode.getMetadata().getSourceUrl());
@@ -216,6 +218,8 @@ public class CanalPlusProtectedEndpointTest {
 		final Set<EpisodeDTO> episodes = manager.findEpisode(discovery);
 		assertEquals(1, episodes.size());
 		assertTrue(episodes.iterator().next().getId().contains("31338503_50017"));
+		assertEquals("Journaliste, animatrice télé, Caroline Ithurbide parcourt l'Hexagone.",
+				episodes.iterator().next().getMetadata().getDescription());
 	}
 
 	@Test
@@ -492,6 +496,38 @@ public class CanalPlusProtectedEndpointTest {
 			public InputStream getInputStreamFromUrl(final String url) {
 				if (url.contains("untitled.json")) {
 					throw new AssertionError("untitled catalog node must not be fetched: " + url);
+				}
+				if (CanalPlusConf.URL_HOME.equals(url)) {
+					throw new AssertionError("legacy authenticate endpoint must not be used when modern catalog succeeds");
+				}
+				if (CanalPlusModernConf.PAGE_BASE_URL.equals(url)) {
+					return new ByteArrayInputStream(homeHtml.getBytes(StandardCharsets.UTF_8));
+				}
+				if (url.contains("okapi/home.json")) {
+					return new ByteArrayInputStream(homeLanding.getBytes(StandardCharsets.UTF_8));
+				}
+				throw new TechnicalException("unexpected url " + url);
+			}
+		};
+
+		final Set<CategoryDTO> categories = manager.findCategory();
+		assertEquals(1, categories.size());
+		assertEquals("Découverte", categories.iterator().next().getName());
+	}
+
+	@Test
+	public void findCategorySkipsSubtitleOnlyCatalogNodesWithoutFetch() throws IOException {
+		final String homeHtml = readFixture("page-home-react-query.html");
+		final String homeLanding = "{\"strates\":[{\"type\":\"contentRow\",\"contents\":[{"
+				+ "\"title\":\"   \",\"subtitle\":\"Subtitle only\","
+				+ "\"onClick\":{\"URLPage\":\"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/subtitle-only.json\"}},{"
+				+ "\"type\":\"landing\",\"title\":\"Découverte\","
+				+ "\"onClick\":{\"URLPage\":\"https://hodor.canalplus.pro/api/v2/mycanal/detail/hash/okapi/decouverte.json?detailType=landingPage&objectType=brand\"}}]}]}";
+		final CanalPlusPluginManager manager = new CanalPlusPluginManager() {
+			@Override
+			public InputStream getInputStreamFromUrl(final String url) {
+				if (url.contains("subtitle-only.json")) {
+					throw new AssertionError("subtitle-only catalog node must not be fetched: " + url);
 				}
 				if (CanalPlusConf.URL_HOME.equals(url)) {
 					throw new AssertionError("legacy authenticate endpoint must not be used when modern catalog succeeds");

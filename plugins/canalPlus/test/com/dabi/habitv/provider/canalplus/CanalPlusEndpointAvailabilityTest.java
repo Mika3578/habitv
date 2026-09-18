@@ -107,6 +107,7 @@ public class CanalPlusEndpointAvailabilityTest {
 		final String message = CanalPlusEndpointAvailability.buildCategoryUnavailableMessage("cstar", error);
 		assertTrue(message.contains(CanalPlusEndpointAvailability.PROTECTED_ACCESS_DETAIL));
 		assertTrue(message.contains("HTTP 403 for URL: https://www.canalplus.com/chaines/cstar"));
+		assertFalse(message.contains("Hodor"));
 		assertFalse(message.toLowerCase().contains("pass token"));
 	}
 

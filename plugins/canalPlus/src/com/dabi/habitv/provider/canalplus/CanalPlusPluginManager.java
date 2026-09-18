@@ -112,7 +112,7 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 			}
 			episode = new EpisodeDTO(category, displayName, url);
 		}
-		attachCatalogMetadata(episode, category, displayName, urlPage);
+		attachCatalogMetadata(episode, category, displayName, urlPage, catalogRowSummary(mapEpisode));
 		return episode;
 	}
 
@@ -130,11 +130,6 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 		final EpisodeDTO episode = new EpisodeDTO(category, displayName, catalogUrl);
 		attachCatalogMetadata(episode, category, displayName, catalogUrl, metadata.getSummary());
 		return episode;
-	}
-
-	private static void attachCatalogMetadata(final EpisodeDTO episode, final CategoryDTO category,
-			final String displayName, final String catalogUrl) {
-		attachCatalogMetadata(episode, category, displayName, catalogUrl, null);
 	}
 
 	private static void attachCatalogMetadata(final EpisodeDTO episode, final CategoryDTO category,
@@ -209,12 +204,22 @@ public class CanalPlusPluginManager extends BasePluginWithProxy implements Plugi
 		}
 	}
 
+	private static String catalogRowSummary(final Map<String, Object> mapEpisode) {
+		if (mapEpisode == null) {
+			return null;
+		}
+		final String summary = StringUtils.trimToNull((String) mapEpisode.get("summary"));
+		if (summary != null) {
+			return summary;
+		}
+		return StringUtils.trimToNull((String) mapEpisode.get("description"));
+	}
+
 	private static boolean hasUsableCategoryTitle(final Map<String, Object> dataMap) {
 		if (dataMap == null) {
 			return false;
 		}
-		return !StringUtils.isEmpty(CanalPlusHodorParser.joinTitle(
-				(String) dataMap.get("title"), (String) dataMap.get("subtitle")));
+		return !StringUtils.isEmpty(StringUtils.trimToNull((String) dataMap.get("title")));
 	}
 
 	private static boolean canUseCatalogUrl(final CategoryDTO fatherCat, final String url) {

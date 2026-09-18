@@ -17,7 +17,7 @@ final class CanalPlusEndpointAvailability {
 			"Canal+ provider endpoint is no longer reachable or requires protected access.";
 
 	static final String PROTECTED_ACCESS_DETAIL =
-			"Hodor/canalplus.com APIs require protected access or an authenticated Canal+ session. "
+			"Catalog APIs require protected access or an authenticated session. "
 					+ "Browser cookies are not enabled for this provider.";
 
 	static final String CANAL_PLUS_UNAVAILABLE_LABEL =

@@ -10,6 +10,7 @@
         {
           "title": "Les 10 hôtels les plus incroyables de France",
           "subtitle": "",
+          "summary": "Journaliste, animatrice télé, Caroline Ithurbide parcourt l'Hexagone.",
           "onClick": {
             "URLPage": "https://hodor.canalplus.pro/api/v2/mycanal/detail/b63a43e7548cb1a6e7c7319084f48af8/okapi/31338503_50017.json?detailType=detailPage&objectType=unit",
             "displayTemplate": "detailPage"
