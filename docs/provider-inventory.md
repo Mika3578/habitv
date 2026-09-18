@@ -80,7 +80,7 @@ no provider rewrite, no runtime behavior change in inventory-only work.
 | `plugins/plugin-tester` | `plugin-tester` | test harness | infrastructure-only | `BasePluginProviderTester` / `BasePluginUpdateTester` provide shared live-style harness utilities | keep as-is |
 | `plugins/francetv` | `francetv` | provider | keep | `FranceTvPluginManager` queries `api-mobile.yatta.francetv.fr` catalogue and public hubs via `/apps/channels/{hubSlug}?platform=apps` (PR #137, plugin `4.1.3-SNAPSHOT`); download delegated to `youtube` (yt-dlp); offline `FranceTvUrlsTest` + fixture baseline; live `FranceTvPluginManagerTest` opt-in only; replaces former `plugins/pluzz` (legacy `pluzz.` URLs still recognised by `canDownload`; grab-config plugin id must be `francetv`) | keep |
 | `plugins/rtmpDump` | `rtmpDump` | downloader | keep | `RtmpDumpPluginDownloader` is binary wrapper with updater version pattern; dedicated test exists | keep as-is |
-| `plugins/sfr` | `sfr` | provider | unknown / needs fixture | `SFRConf` uses `sport.sfr.fr` API path; provider tests are live-network style only | add fixture tests |
+| `plugins/sfr` | `sfr` | provider | unknown / needs fixture | `SFRConf` uses `sport.sfr.fr` API path; live provider tests remain opt-in; download URL parsing has a deterministic offline unit test | add catalog fixtures |
 | `plugins/wat` | `wat` | provider | obsolete endpoint | `WatConf` points to TF1/WAT-era URLs; plugin naming and endpoint model reflect legacy provider branding | rewrite provider |
 | `plugins/youtube` | `youtube` | provider | keep | `YoutubePluginManager` provider; offline tests; binary contract migrated to yt-dlp (`YtDlpCmdExecutor`, defaults `yt-dlp` / `yt-dlp.exe`) | keep (yt-dlp binary) |
 

@@ -93,17 +93,21 @@ public class SFRPluginManager extends BasePluginWithProxy implements PluginProvi
 
 	}
 
-	private static final Pattern URL_PATTERN = Pattern.compile("var url = \"(.*)\";");
+	private static final Pattern URL_PATTERN = Pattern.compile("var url = \"([^\"]*)\";");
 
 	private String findDownloadlink(String url) {
-		String content = getUrlContent(url);
-		Matcher matcher = URL_PATTERN.matcher(content);
-		boolean hasMatched = matcher.find();
-		String ret = null;
-		if (hasMatched) {
-			ret = matcher.group(matcher.groupCount());
+		return extractDeclaredVideoUrl(getUrlContent(url));
+	}
+
+	static String extractDeclaredVideoUrl(final String content) {
+		if (content == null) {
+			return null;
 		}
-		return ret;
+		final Matcher matcher = URL_PATTERN.matcher(content);
+		if (matcher.find()) {
+			return matcher.group(1);
+		}
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")

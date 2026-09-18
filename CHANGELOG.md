@@ -39,6 +39,7 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-09-18 | TBD | Harden SFR download URL parsing so quoted values cannot over-match |
 | 2026-09-17 | TBD | Move tray Search and category-clean work off the JavaFX Application Thread (FxBackgroundRunner; was .run() instead of .start()) |
 | 2026-09-18 | TBD | Marshal tray AWT notifications onto the Event Dispatch Thread (AwtUiRunner); stop duplicate RetreiveEvent progression updates from DownloadController |
 | 2026-05-30 | `e38defdc` | Refresh static repository manifest after deploy (PR [#140](https://github.com/Mika3578/habitv/pull/140)) |
