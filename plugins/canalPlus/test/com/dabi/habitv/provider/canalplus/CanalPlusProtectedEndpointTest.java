@@ -76,6 +76,37 @@ public class CanalPlusProtectedEndpointTest {
 	}
 
 	@Test
+	public void cStarCategoryDiscoveryReturnsUnavailablePlaceholderWhenCatalogIsEmpty() {
+		final CStarPluginManager manager = new CStarPluginManager() {
+			@Override
+			protected String getUrlContent(final String url, final String encoding) {
+				return "<html><body><div>no menu</div></body></html>";
+			}
+		};
+
+		final Set<CategoryDTO> categories = manager.findCategory();
+		assertEquals(1, categories.size());
+		final CategoryDTO placeholder = categories.iterator().next();
+		assertEquals(CanalPlusEndpointAvailability.CSTAR_UNAVAILABLE_LABEL, placeholder.getName());
+		assertFalse(placeholder.isDownloadable());
+		assertTrue(CanalPlusEndpointAvailability.isUnavailablePlaceholder(placeholder));
+	}
+
+	@Test
+	public void cStarCategoryDiscoveryReturnsUnavailablePlaceholderWhenMainMenuIsEmpty() {
+		final CStarPluginManager manager = new CStarPluginManager() {
+			@Override
+			protected String getUrlContent(final String url, final String encoding) {
+				return "<html><body><ul class=\"main-menu\"></ul></body></html>";
+			}
+		};
+
+		final Set<CategoryDTO> categories = manager.findCategory();
+		assertEquals(1, categories.size());
+		assertEquals(CanalPlusEndpointAvailability.CSTAR_UNAVAILABLE_LABEL, categories.iterator().next().getName());
+	}
+
+	@Test
 	public void cStarCategoryDiscoveryReturnsUnavailablePlaceholderWhenEndpointIsForbidden() {
 		final CStarPluginManager manager = new CStarPluginManager() {
 			@Override

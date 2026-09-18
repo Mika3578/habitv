@@ -27,6 +27,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class CanalPlusPluginManager extends BasePluginWithProxy implements PluginProviderInterface, PluginDownloaderInterface { // NO_UCD
 
 	@Override
+	public InputStream getInputStreamFromUrl(final String url) {
+		return CanalPlusApprovedRetriever.openCatalog(url, getHttpProxy());
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public Set<EpisodeDTO> findEpisode(final CategoryDTO category) {
 		if (CanalPlusEndpointAvailability.isUnavailablePlaceholder(category)) {

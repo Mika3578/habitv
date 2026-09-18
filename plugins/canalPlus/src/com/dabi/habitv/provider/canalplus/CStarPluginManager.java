@@ -1,5 +1,6 @@
 package com.dabi.habitv.provider.canalplus;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -25,6 +26,21 @@ public class CStarPluginManager extends BasePluginWithProxy implements PluginPro
 	@Override
 	public String getName() {
 		return CStarConf.NAME;
+	}
+
+	@Override
+	public InputStream getInputStreamFromUrl(final String url) {
+		return CanalPlusApprovedRetriever.openCatalog(url, getHttpProxy());
+	}
+
+	@Override
+	protected String getUrlContent(final String url) {
+		return CanalPlusApprovedRetriever.readCatalog(url, null, getHttpProxy());
+	}
+
+	@Override
+	protected String getUrlContent(final String url, final String encoding) {
+		return CanalPlusApprovedRetriever.readCatalog(url, encoding, getHttpProxy());
 	}
 
 	@Override
@@ -66,14 +82,25 @@ public class CStarPluginManager extends BasePluginWithProxy implements PluginPro
 		try {
 			final Set<CategoryDTO> categories = new LinkedHashSet<>();
 			final org.jsoup.nodes.Document doc = Jsoup.parse(getUrlContent(CStarConf.HOME_URL, CStarConf.ENCODING));
-			final Elements select = doc.select(".main-menu").get(0).children();
-			for (final Element liElement : select) {
-				final Element aElement = liElement.child(0);
-				final String url = aElement.attr("href");
-				final String name = aElement.text();
-				final CategoryDTO categoryDTO = new CategoryDTO(CStarConf.NAME, name, url, CStarConf.EXTENSION);
-				categoryDTO.addSubCategories(findSubCategories(url));
-				categories.add(categoryDTO);
+			final Elements menus = doc.select(".main-menu");
+			if (!menus.isEmpty()) {
+				final Elements select = menus.get(0).children();
+				for (final Element liElement : select) {
+					if (liElement.children().isEmpty()) {
+						continue;
+					}
+					final Element aElement = liElement.child(0);
+					final String url = aElement.attr("href");
+					final String name = aElement.text();
+					final CategoryDTO categoryDTO = new CategoryDTO(CStarConf.NAME, name, url, CStarConf.EXTENSION);
+					categoryDTO.addSubCategories(findSubCategories(url));
+					categories.add(categoryDTO);
+				}
+			}
+			if (categories.isEmpty()) {
+				getLog().warn("CStar catalog empty; exposing protected-endpoint placeholder.");
+				return CanalPlusEndpointAvailability.buildUnavailablePlaceholderCategories(CStarConf.NAME,
+						CanalPlusEndpointAvailability.CSTAR_UNAVAILABLE_LABEL);
 			}
 			return categories;
 		} catch (RuntimeException e) {
