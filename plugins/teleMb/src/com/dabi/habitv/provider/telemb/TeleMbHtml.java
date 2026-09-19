@@ -317,12 +317,16 @@ final class TeleMbHtml {
 				}
 				final java.util.Calendar cal = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"));
 				cal.clear();
+				cal.setLenient(false);
 				cal.set(java.util.Calendar.YEAR, year);
 				cal.set(java.util.Calendar.MONTH, monthNums[m]);
 				cal.set(java.util.Calendar.DAY_OF_MONTH, day);
 				return cal.getTime();
 			} catch (final NumberFormatException e) {
-				return null;
+				continue;
+			} catch (final IllegalArgumentException e) {
+				// Non-lenient calendar rejects impossible dates such as 31 February.
+				continue;
 			}
 		}
 		return null;

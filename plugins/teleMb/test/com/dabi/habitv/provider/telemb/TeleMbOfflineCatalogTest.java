@@ -50,6 +50,7 @@ public class TeleMbOfflineCatalogTest {
 		assertEquals(java.util.Calendar.SEPTEMBER, cal.get(java.util.Calendar.MONTH));
 		assertEquals(19, cal.get(java.util.Calendar.DAY_OF_MONTH));
 		assertEquals(null, TeleMbHtml.parseFrenchBroadcastDate("Basket reportage"));
+		assertEquals(null, TeleMbHtml.parseFrenchBroadcastDate("Les Infos du 31 février 2026"));
 	}
 
 	@Test
@@ -90,6 +91,26 @@ public class TeleMbOfflineCatalogTest {
 		final DownloaderPluginHolder holder = new DownloaderPluginHolder("cmd", map, new HashMap<String, String>(),
 				".", ".", ".", ".");
 		plugin.download(new DownloadParamDTO(categoryUrl + "?token=x", "out.mp4", TeleMbConf.EXTENSION), holder);
+		assertNotNull(downloader.lastInput);
+		assertTrue(downloader.lastInput.startsWith("https://tvlocales-vod-cmaf.freecaster.com/"));
+		assertTrue(downloader.lastInput.contains(".m3u8"));
+	}
+
+	@Test
+	public void resolveStandardEmissionReplayHlsAndDownload() throws Exception {
+		final String episodeUrl =
+				"https://www.telemb.be/replay/emission/les-infos/les-infos-du-samedi-19-septembre-2026/41201";
+		final Map<String, String> pages = new HashMap<String, String>();
+		pages.put(episodeUrl, read("test/resources/fixtures/telemb/episode.html"));
+		pages.put(TeleMbUrls.freecasterEmbedUrl("a2c66395-5dca-4317-b2ed-0e35f79e7568"),
+				read("test/resources/fixtures/telemb/embed.html"));
+		final TeleMbPluginManager plugin = newRecordingPlugin(pages);
+		final RecordingDownloader downloader = new RecordingDownloader();
+		final Map<String, PluginDownloaderInterface> map = new HashMap<String, PluginDownloaderInterface>();
+		map.put(FrameworkConf.FFMPEG, downloader);
+		final DownloaderPluginHolder holder = new DownloaderPluginHolder("cmd", map, new HashMap<String, String>(),
+				".", ".", ".", ".");
+		plugin.download(new DownloadParamDTO(episodeUrl + "?token=x", "out.mp4", TeleMbConf.EXTENSION), holder);
 		assertNotNull(downloader.lastInput);
 		assertTrue(downloader.lastInput.startsWith("https://tvlocales-vod-cmaf.freecaster.com/"));
 		assertTrue(downloader.lastInput.contains(".m3u8"));
