@@ -92,6 +92,8 @@ public class TvComOfflineCatalogTest {
 		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload("https://www.tvcom.be/emission/coin-lecture"));
 		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload(
 				"https://user:pass@www.tvcom.be/replay/emission/coin-lecture/coin-lecture-18-09-26/58524"));
+		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload(
+				"https://www.tvcom.be/replay/emission/coin-lecture/coin%3Ftoken=x/58524"));
 		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload(null));
 	}
 
@@ -179,6 +181,8 @@ public class TvComOfflineCatalogTest {
 		assertEquals(null, TvComUrls.sanitizeHlsUrl("https://evil-vod.freecaster.com/x.m3u8"));
 		assertEquals(null, TvComUrls.sanitizeHlsUrl(
 				"https://tvlocales-vod-cmaf.freecaster.com:8443/tvcom/id/file.m3u8"));
+		assertEquals(null, TvComUrls.sanitizeHlsUrl(
+				"https://tvlocales-vod-cmaf.freecaster.com/tvcom/id/file%3Ftoken=x.m3u8"));
 		assertEquals("https://tvlocales-vod-cmaf.freecaster.com/tvcom/id/file.m3u8",
 				TvComUrls.sanitizeHlsUrl(
 						"https://tvlocales-vod-cmaf.freecaster.com/tvcom/id/file.m3u8?token=x"));
