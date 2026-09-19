@@ -8,7 +8,8 @@ import org.apache.commons.lang.StringUtils;
 
 final class TvLuxUrls {
 
-	private static final Pattern EPISODE_PATH = Pattern.compile("^/replay/[^/]+/.+_\\d+/?$");
+	// Episode pages are /replay/{show}/{title}_{id}; exclude /replay/{show}/page_{n} pagination.
+	private static final Pattern EPISODE_PATH = Pattern.compile("^/replay/[^/]+/(?!page_\\d+)[^/]+_\\d+/?$");
 
 	private TvLuxUrls() {
 	}
