@@ -1,3 +1,5 @@
 provider=6play
+parserBoundary=legacy-html-spa-obsolete
+homeUrl=https://www.6play.fr/
 network=disabled
-note=Fixture placeholder only. The current site behavior is SPA-driven.
+note=Live catalogue is SPA-driven; legacy .folders__list/.mosaic-programs selectors return empty. yt-dlp treats www.6play.fr as DRM-protected. Provider remains non-blocking with diagnostics.

@@ -71,6 +71,14 @@ public class SixPlayPluginManager extends BasePluginWithProxy implements PluginP
 			}
 		}
 
+		if (categories.isEmpty()) {
+			// Live site is an SPA; legacy folders__list / mosaic-programs markup is gone.
+			// yt-dlp also refuses www.6play.fr as DRM-protected. Keep discovery non-blocking.
+			getLog().warn("provider=6play operation=catalogue sourceUrl=" + SixPlayConf.HOME_URL
+					+ " rootCause=listing-selectors-obsolete cookiesEnabled=false"
+					+ " note=public-catalogue-html-no-longer-matches-legacy-scraper");
+		}
+
 		return categories;
 	}
 
