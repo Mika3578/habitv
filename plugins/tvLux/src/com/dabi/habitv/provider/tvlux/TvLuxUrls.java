@@ -85,11 +85,22 @@ final class TvLuxUrls {
 		}
 		try {
 			final URI uri = URI.create(url.trim());
+			final String rawPath = uri.getRawPath();
 			final String path = uri.getPath();
-			if (path == null || !EPISODE_PATH.matcher(path).matches()) {
+			if (rawPath == null || path == null) {
 				return null;
 			}
-			return TvLuxConf.HOME_URL + path;
+			if (path.indexOf('?') >= 0 || path.indexOf('#') >= 0) {
+				return null;
+			}
+			final String lowerRaw = rawPath.toLowerCase(Locale.ROOT);
+			if (lowerRaw.contains("%3f") || lowerRaw.contains("%23")) {
+				return null;
+			}
+			if (!EPISODE_PATH.matcher(rawPath).matches()) {
+				return null;
+			}
+			return TvLuxConf.HOME_URL + rawPath;
 		} catch (final IllegalArgumentException e) {
 			return null;
 		}
@@ -119,11 +130,22 @@ final class TvLuxUrls {
 			if (!TvLuxConf.FRECASTER_HLS_HOST.equals(lower)) {
 				return null;
 			}
+			final String rawPath = uri.getRawPath();
 			final String path = uri.getPath();
-			if (path == null || !path.toLowerCase(Locale.ROOT).endsWith(".m3u8")) {
+			if (rawPath == null || path == null) {
 				return null;
 			}
-			return "https://" + TvLuxConf.FRECASTER_HLS_HOST + path;
+			if (path.indexOf('?') >= 0 || path.indexOf('#') >= 0) {
+				return null;
+			}
+			final String lowerRaw = rawPath.toLowerCase(Locale.ROOT);
+			if (lowerRaw.contains("%3f") || lowerRaw.contains("%23")) {
+				return null;
+			}
+			if (!path.toLowerCase(Locale.ROOT).endsWith(".m3u8")) {
+				return null;
+			}
+			return "https://" + TvLuxConf.FRECASTER_HLS_HOST + rawPath;
 		} catch (final IllegalArgumentException e) {
 			return null;
 		}
