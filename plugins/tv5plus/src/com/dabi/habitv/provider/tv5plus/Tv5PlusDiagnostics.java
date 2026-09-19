@@ -1,6 +1,7 @@
 package com.dabi.habitv.provider.tv5plus;
 
 import java.net.URI;
+import java.util.Locale;
 
 import com.dabi.habitv.api.plugin.exception.ExecutorOutputSanitizer;
 
@@ -71,41 +72,38 @@ final class Tv5PlusDiagnostics {
 				}
 				final String rawPath = uri.getRawPath();
 				if (rawPath != null) {
-					final String lowerRaw = rawPath.toLowerCase(java.util.Locale.ROOT);
-					int cut = -1;
-					final int encodedQuery = lowerRaw.indexOf("%3f");
-					final int encodedFragment = lowerRaw.indexOf("%23");
-					if (encodedQuery >= 0) {
-						cut = encodedQuery;
-					}
-					if (encodedFragment >= 0 && (cut < 0 || encodedFragment < cut)) {
-						cut = encodedFragment;
-					}
-					safe.append(cut >= 0 ? rawPath.substring(0, cut) : rawPath);
+					safe.append(truncateAtUnsafeDelimiter(rawPath));
 				}
 				return safe.toString();
 			}
 		} catch (final IllegalArgumentException ignored) {
 			// fall through
 		}
-		int cut = redacted.length();
-		final int query = redacted.indexOf('?');
-		final int fragment = redacted.indexOf('#');
-		if (query >= 0) {
-			cut = Math.min(cut, query);
+		return truncateAtUnsafeDelimiter(redacted);
+	}
+
+	/**
+	 * Truncate before query/fragment markers, encoded delimiters, and CR/LF so
+	 * diagnostic lines cannot reintroduce secrets or inject extra log rows.
+	 */
+	private static String truncateAtUnsafeDelimiter(final String value) {
+		int cut = value.length();
+		cut = earlierIndex(cut, value.indexOf('?'));
+		cut = earlierIndex(cut, value.indexOf('#'));
+		cut = earlierIndex(cut, value.indexOf('\r'));
+		cut = earlierIndex(cut, value.indexOf('\n'));
+		final String lower = value.toLowerCase(Locale.ROOT);
+		cut = earlierIndex(cut, lower.indexOf("%3f"));
+		cut = earlierIndex(cut, lower.indexOf("%23"));
+		cut = earlierIndex(cut, lower.indexOf("%0a"));
+		cut = earlierIndex(cut, lower.indexOf("%0d"));
+		return value.substring(0, cut);
+	}
+
+	private static int earlierIndex(final int current, final int candidate) {
+		if (candidate >= 0 && candidate < current) {
+			return candidate;
 		}
-		if (fragment >= 0) {
-			cut = Math.min(cut, fragment);
-		}
-		final String lower = redacted.toLowerCase(java.util.Locale.ROOT);
-		final int encodedQuery = lower.indexOf("%3f");
-		final int encodedFragment = lower.indexOf("%23");
-		if (encodedQuery >= 0) {
-			cut = Math.min(cut, encodedQuery);
-		}
-		if (encodedFragment >= 0) {
-			cut = Math.min(cut, encodedFragment);
-		}
-		return redacted.substring(0, cut);
+		return current;
 	}
 }

@@ -112,11 +112,16 @@ public class Tv5PlusOfflineCatalogTest {
 	public void diagnosticsRejectEncodedDelimitersInPath() {
 		final Tv5PlusDiagnostics diagnostics = new Tv5PlusDiagnostics("download");
 		diagnostics.setSourceUrl("https://www.tv5unis.ca/videos/foo%3Ftoken=secret");
-		final String line = diagnostics.formatLogLine();
+		String line = diagnostics.formatLogLine();
 		assertTrue(line.contains("sourceUrl=https://www.tv5unis.ca/videos/foo"));
 		assertFalse(line.contains("token=secret"));
 		assertFalse(line.contains("%3F"));
 		assertFalse(line.contains("%3f"));
+
+		diagnostics.setSourceUrl("not a uri\ninjected rootCause=evil");
+		line = diagnostics.formatLogLine();
+		assertFalse(line.contains("\n"));
+		assertFalse(line.contains("injected"));
 	}
 
 	private static Map<String, String> catalogFixtures() throws IOException {
