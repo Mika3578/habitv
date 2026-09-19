@@ -71,7 +71,7 @@ final class TvaPlusHtml {
 		}
 		for (final JsonNode season : seasons) {
 			final String slug = text(season, "slug");
-			if (StringUtils.isEmpty(slug) || !slug.startsWith("/tva/")) {
+			if (!TvaPlusUrls.isSafeRelativeTvaPath(slug)) {
 				continue;
 			}
 			final Integer number = asInt(season.get("seasonNumber"));
@@ -138,7 +138,8 @@ final class TvaPlusHtml {
 				if (nested.isArray() && nested.size() > 0) {
 					return null;
 				}
-				return text(carousel, "slug");
+				final String slug = text(carousel, "slug");
+				return TvaPlusUrls.isSafeRelativeTvaPath(slug) ? slug : null;
 			}
 		}
 		return null;

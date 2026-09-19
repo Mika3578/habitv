@@ -2,6 +2,7 @@ package com.dabi.habitv.provider.tvaplus;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,11 @@ final class TvaPlusClient {
 	}
 
 	List<TvaPlusHtml.EpisodeRef> loadShowEpisodes(final String showSlug) throws IOException {
-		final String showHtml = contentLoader.load(TvaPlusUrls.pageUrl(showSlug));
+		final String showUrl = TvaPlusUrls.pageUrl(showSlug);
+		if (showUrl == null) {
+			return Collections.emptyList();
+		}
+		final String showHtml = contentLoader.load(showUrl);
 		final List<TvaPlusHtml.SeasonRef> seasons = TvaPlusHtml.parseShowSeasons(showHtml);
 		final Map<String, TvaPlusHtml.EpisodeRef> byUrl = new LinkedHashMap<String, TvaPlusHtml.EpisodeRef>();
 		int seasonCount = 0;
@@ -42,7 +47,11 @@ final class TvaPlusClient {
 	}
 
 	private List<TvaPlusHtml.EpisodeRef> loadSeasonEpisodes(final String seasonSlug) throws IOException {
-		final String seasonHtml = contentLoader.load(TvaPlusUrls.pageUrl(seasonSlug));
+		final String seasonUrl = TvaPlusUrls.pageUrl(seasonSlug);
+		if (seasonUrl == null) {
+			return Collections.emptyList();
+		}
+		final String seasonHtml = contentLoader.load(seasonUrl);
 		List<TvaPlusHtml.EpisodeRef> episodes = TvaPlusHtml.parseSeasonEpisodes(seasonHtml);
 		if (!episodes.isEmpty()) {
 			return episodes;
@@ -51,7 +60,11 @@ final class TvaPlusClient {
 		if (carouselSlug == null) {
 			return episodes;
 		}
-		return TvaPlusHtml.parseSeasonEpisodes(contentLoader.load(TvaPlusUrls.pageUrl(carouselSlug)));
+		final String carouselUrl = TvaPlusUrls.pageUrl(carouselSlug);
+		if (carouselUrl == null) {
+			return episodes;
+		}
+		return TvaPlusHtml.parseSeasonEpisodes(contentLoader.load(carouselUrl));
 	}
 
 	private static void addEpisodes(final Map<String, TvaPlusHtml.EpisodeRef> byUrl,

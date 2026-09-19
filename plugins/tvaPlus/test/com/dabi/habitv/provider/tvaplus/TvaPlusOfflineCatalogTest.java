@@ -120,6 +120,17 @@ public class TvaPlusOfflineCatalogTest {
 	}
 
 	@Test
+	public void pageUrlRejectsAbsoluteAndUnsafeRemoteSlugs() {
+		assertEquals("https://www.tvaplus.ca/tva/j-e/saison-34/tous-les-episodes",
+				TvaPlusUrls.pageUrl("/tva/j-e/saison-34/tous-les-episodes"));
+		assertEquals(null, TvaPlusUrls.pageUrl("https://evil.example/tva/j-e"));
+		assertEquals(null, TvaPlusUrls.pageUrl("http://www.tvaplus.ca/tva/j-e"));
+		assertEquals(null, TvaPlusUrls.pageUrl("/tva/j-e?token=x"));
+		assertEquals(null, TvaPlusUrls.pageUrl("/zeste/foo"));
+		assertFalse(TvaPlusUrls.isSafeRelativeTvaPath("https://evil.example/tva/j-e"));
+	}
+
+	@Test
 	public void diagnosticsStripQueryAndFragment() {
 		final TvaPlusDiagnostics diagnostics = new TvaPlusDiagnostics("download");
 		diagnostics.setSourceUrl("https://www.tvaplus.ca/tva/j-e/saison-1/episode-1-1?x=1#token=leak");

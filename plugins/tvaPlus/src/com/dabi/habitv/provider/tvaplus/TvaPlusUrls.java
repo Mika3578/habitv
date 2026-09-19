@@ -43,16 +43,24 @@ final class TvaPlusUrls {
 	}
 
 	static String pageUrl(final String slugOrPath) {
-		if (StringUtils.isEmpty(slugOrPath)) {
+		if (!isSafeRelativeTvaPath(slugOrPath)) {
 			return null;
 		}
-		if (slugOrPath.startsWith("http://") || slugOrPath.startsWith("https://")) {
-			return slugOrPath;
+		return TvaPlusConf.HOME_URL + slugOrPath;
+	}
+
+	/**
+	 * Accept only relative {@code /tva/...} paths with word/hyphen segments.
+	 * Reject absolute URLs and query/fragment so remote slugs cannot redirect fetches.
+	 */
+	static boolean isSafeRelativeTvaPath(final String slugOrPath) {
+		if (StringUtils.isEmpty(slugOrPath) || !slugOrPath.startsWith("/tva/")) {
+			return false;
 		}
-		if (slugOrPath.startsWith("/")) {
-			return TvaPlusConf.HOME_URL + slugOrPath;
+		if (slugOrPath.indexOf("://") >= 0 || slugOrPath.indexOf('?') >= 0 || slugOrPath.indexOf('#') >= 0) {
+			return false;
 		}
-		return TvaPlusConf.HOME_URL + "/" + slugOrPath;
+		return slugOrPath.matches("^/tva/[\\w-]+(/[\\w-]+)*$");
 	}
 
 	static boolean isTvaShowSlug(final String slug) {
