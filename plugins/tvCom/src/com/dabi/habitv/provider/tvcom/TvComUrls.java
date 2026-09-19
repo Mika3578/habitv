@@ -71,6 +71,10 @@ final class TvComUrls {
 			if (uri.getUserInfo() != null) {
 				return false;
 			}
+			final int port = uri.getPort();
+			if (port != -1 && port != 80 && port != 443) {
+				return false;
+			}
 			final String host = uri.getHost();
 			if (host == null) {
 				return false;

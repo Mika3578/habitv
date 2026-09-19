@@ -104,6 +104,8 @@ public class TvComOfflineCatalogTest {
 				"https://user:pass@www.tvcom.be/replay/emission/coin-lecture/coin-lecture-18-09-26/58524"));
 		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload(
 				"https://www.tvcom.be/replay/emission/coin-lecture/coin%3Ftoken=x/58524"));
+		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload(
+				"https://www.tvcom.be:8443/replay/emission/coin-lecture/coin-lecture-18-09-26/58524"));
 		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload(null));
 	}
 
