@@ -50,12 +50,22 @@ public class TvComOfflineCatalogTest {
 				TvComUrls.showCategoryId("coin-lecture"), TvComConf.EXTENSION);
 		final Set<EpisodeDTO> episodes = plugin.findEpisode(show);
 		assertEquals(4, episodes.size());
+		boolean foundCoinLectureDate = false;
+		boolean foundCoinLecturePaulColize = false;
 		for (final EpisodeDTO episode : episodes) {
 			assertTrue(TvComUrls.sanitizeEpisodeUrl(episode.getId()) != null);
 			assertNotNull(episode.getMetadata());
 			assertEquals(TvComConf.CHANNEL_LABEL, episode.getMetadata().getChannel());
 			assertFalse(episode.getName().isEmpty());
+			if ("Coin lecture : 18-09-26".equals(episode.getName())) {
+				foundCoinLectureDate = true;
+			}
+			if ("Coin lecture : 28-08-26 Paul Colize".equals(episode.getName())) {
+				foundCoinLecturePaulColize = true;
+			}
 		}
+		assertTrue(foundCoinLectureDate);
+		assertTrue(foundCoinLecturePaulColize);
 	}
 
 	@Test
@@ -106,6 +116,24 @@ public class TvComOfflineCatalogTest {
 		assertTrue(line.contains(
 				"sourceUrl=https://www.tvcom.be/replay/emission/coin-lecture/coin-lecture-18-09-26/58524"));
 		assertFalse(line.contains("token=leak"));
+	}
+
+	@Test
+	public void diagnosticsRejectEncodedDelimitersAndNewlines() {
+		final TvComDiagnostics diagnostics = new TvComDiagnostics("download");
+		diagnostics.setSourceUrl(
+				"https://www.tvcom.be/replay/emission/coin-lecture/coin-lecture-18-09-26/58524%3Ftoken=secret");
+		String line = diagnostics.formatLogLine();
+		assertTrue(line.contains(
+				"sourceUrl=https://www.tvcom.be/replay/emission/coin-lecture/coin-lecture-18-09-26/58524"));
+		assertFalse(line.contains("token=secret"));
+		assertFalse(line.contains("%3F"));
+		assertFalse(line.contains("%3f"));
+
+		diagnostics.setSourceUrl("not a uri\ninjected rootCause=evil");
+		line = diagnostics.formatLogLine();
+		assertFalse(line.contains("\n"));
+		assertFalse(line.contains("injected"));
 	}
 
 	@Test

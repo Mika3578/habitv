@@ -1,6 +1,7 @@
 package com.dabi.habitv.provider.tvcom;
 
 import java.net.URI;
+import java.util.Locale;
 
 import com.dabi.habitv.api.plugin.exception.ExecutorOutputSanitizer;
 
@@ -69,24 +70,40 @@ final class TvComDiagnostics {
 				if (uri.getPort() >= 0) {
 					safe.append(':').append(uri.getPort());
 				}
-				final String path = uri.getPath();
-				if (path != null) {
-					safe.append(path);
+				final String rawPath = uri.getRawPath();
+				if (rawPath != null) {
+					safe.append(truncateAtUnsafeDelimiter(rawPath));
 				}
 				return safe.toString();
 			}
 		} catch (final IllegalArgumentException ignored) {
 			// fall through
 		}
-		int cut = redacted.length();
-		final int query = redacted.indexOf('?');
-		final int fragment = redacted.indexOf('#');
-		if (query >= 0) {
-			cut = Math.min(cut, query);
+		return truncateAtUnsafeDelimiter(redacted);
+	}
+
+	/**
+	 * Truncate before query/fragment markers, encoded delimiters, and CR/LF so
+	 * diagnostic lines cannot reintroduce secrets or inject extra log rows.
+	 */
+	private static String truncateAtUnsafeDelimiter(final String value) {
+		int cut = value.length();
+		cut = earlierIndex(cut, value.indexOf('?'));
+		cut = earlierIndex(cut, value.indexOf('#'));
+		cut = earlierIndex(cut, value.indexOf('\r'));
+		cut = earlierIndex(cut, value.indexOf('\n'));
+		final String lower = value.toLowerCase(Locale.ROOT);
+		cut = earlierIndex(cut, lower.indexOf("%3f"));
+		cut = earlierIndex(cut, lower.indexOf("%23"));
+		cut = earlierIndex(cut, lower.indexOf("%0a"));
+		cut = earlierIndex(cut, lower.indexOf("%0d"));
+		return value.substring(0, cut);
+	}
+
+	private static int earlierIndex(final int current, final int candidate) {
+		if (candidate >= 0 && candidate < current) {
+			return candidate;
 		}
-		if (fragment >= 0) {
-			cut = Math.min(cut, fragment);
-		}
-		return redacted.substring(0, cut);
+		return current;
 	}
 }
