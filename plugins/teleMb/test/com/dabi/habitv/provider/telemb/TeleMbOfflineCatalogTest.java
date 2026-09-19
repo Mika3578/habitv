@@ -140,6 +140,8 @@ public class TeleMbOfflineCatalogTest {
 		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload(
 				"https://www.telemb.be/replay/emission/les-infos/title%3Ftoken=x/41201"));
 		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload(
+				"https://www.telemb.be/replay/emission/les-infos/title%2Fextra/41201"));
+		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload(
 				"https://www.telemb.be:8443/replay/emission/les-infos/les-infos-du-samedi-19-septembre-2026/41201"));
 		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload(null));
 	}
