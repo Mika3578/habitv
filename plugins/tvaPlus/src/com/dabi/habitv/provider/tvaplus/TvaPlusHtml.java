@@ -234,9 +234,8 @@ final class TvaPlusHtml {
 	private static boolean isPublic(final JsonNode node) {
 		final JsonNode groups = node.path("permission").path("groups");
 		if (!groups.isArray() || groups.size() == 0) {
-			// Missing permission metadata: keep only when slug is clearly a TVA episode/show
-			// already filtered by caller; treat as public for catalog stubs without groups.
-			return true;
+			// Fail closed: missing permission metadata must not be treated as free/public.
+			return false;
 		}
 		boolean publicGroup = false;
 		for (final JsonNode group : groups) {
