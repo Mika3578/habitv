@@ -75,17 +75,18 @@ final class TeleMbHtml {
 			}
 			from = end + 1;
 			final String absolute = TeleMbUrls.absoluteUrl(html.substring(start, end).trim());
-			if (TeleMbUrls.sanitizeEpisodeUrl(absolute) == null) {
+			final String sanitized = TeleMbUrls.sanitizeEpisodeUrl(absolute);
+			if (sanitized == null) {
 				continue;
 			}
-			final String path = uriPath(absolute);
+			final String path = uriPath(sanitized);
 			if (!path.startsWith(prefix)) {
 				continue;
 			}
 			final String title = extractNearbyTitle(html, href, end);
 			final String resolvedTitle = StringUtils.isEmpty(title) ? humanize(pathLastSegmentBeforeId(path)) : title;
-			if (!byUrl.containsKey(absolute)) {
-				byUrl.put(absolute, new EpisodeRef(resolvedTitle, absolute));
+			if (!byUrl.containsKey(sanitized)) {
+				byUrl.put(sanitized, new EpisodeRef(resolvedTitle, sanitized));
 			}
 		}
 		return new ArrayList<EpisodeRef>(byUrl.values());
@@ -124,8 +125,7 @@ final class TeleMbHtml {
 		if (end <= start) {
 			return null;
 		}
-		final String url = normalized.substring(start, end).trim();
-		return url.startsWith("http") ? url : null;
+		return TeleMbUrls.sanitizeHlsUrl(normalized.substring(start, end).trim());
 	}
 
 	private static String stripHost(final String hrefValue) {

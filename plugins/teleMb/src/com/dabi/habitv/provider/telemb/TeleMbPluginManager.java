@@ -118,14 +118,14 @@ public class TeleMbPluginManager extends BasePluginWithProxy implements PluginPr
 			throws DownloadFailedException {
 		final TeleMbDiagnostics diagnostics = new TeleMbDiagnostics("download");
 		diagnostics.setSourceUrl(downloadParam.getDownloadInput());
+		final String sanitizedInput = TeleMbUrls.sanitizeEpisodeUrl(downloadParam.getDownloadInput());
 		try {
-			final String sanitized = TeleMbUrls.sanitizeEpisodeUrl(downloadParam.getDownloadInput());
-			if (sanitized == null) {
+			if (sanitizedInput == null) {
 				diagnostics.setRootCauseSummary("unsupported-url");
 				getLog().warn(diagnostics.formatLogLine());
 				throw new DownloadFailedException(TeleMbConf.DOWNLOAD_UNAVAILABLE_MESSAGE);
 			}
-			final String hlsUrl = client.resolveHlsUrl(sanitized);
+			final String hlsUrl = client.resolveHlsUrl(sanitizedInput);
 			if (hlsUrl == null) {
 				diagnostics.setRootCauseSummary("missing-hls");
 				getLog().warn(diagnostics.formatLogLine());
@@ -143,9 +143,9 @@ public class TeleMbPluginManager extends BasePluginWithProxy implements PluginPr
 					? "download-failed"
 					: DownloadFailureDiagnostics.getClassificationKey(e));
 			getLog().warn(diagnostics.formatLogLine());
+			final String safeId = sanitizedInput != null ? sanitizedInput : TeleMbConf.NAME;
 			getLog().warn(DownloadFailureDiagnostics.formatLogLine(
-					new EpisodeDTO(null, downloadParam.getDownloadInput(), downloadParam.getDownloadInput()),
-					TeleMbConf.NAME, e));
+					new EpisodeDTO(null, safeId, safeId), TeleMbConf.NAME, e));
 			throw new DownloadFailedException(TeleMbConf.DOWNLOAD_UNAVAILABLE_MESSAGE, e);
 		} catch (final IOException e) {
 			diagnostics.setRootCauseSummary("io-error:" + e.getClass().getSimpleName());

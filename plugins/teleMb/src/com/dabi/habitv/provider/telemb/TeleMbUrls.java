@@ -111,6 +111,36 @@ final class TeleMbUrls {
 		return false;
 	}
 
+	static String sanitizeHlsUrl(final String url) {
+		if (StringUtils.isEmpty(url)) {
+			return null;
+		}
+		try {
+			final URI uri = URI.create(url.trim());
+			if (!"https".equalsIgnoreCase(uri.getScheme()) || uri.getUserInfo() != null) {
+				return null;
+			}
+			final String host = uri.getHost();
+			if (host == null) {
+				return null;
+			}
+			final String lower = host.toLowerCase(Locale.ROOT);
+			if (!lower.endsWith(".freecaster.com") && !"freecaster.com".equals(lower)) {
+				return null;
+			}
+			if (!lower.contains("vod")) {
+				return null;
+			}
+			final String path = uri.getPath();
+			if (path == null || !path.toLowerCase(Locale.ROOT).contains(".m3u8")) {
+				return null;
+			}
+			return uri.getScheme() + "://" + host + path;
+		} catch (final IllegalArgumentException e) {
+			return null;
+		}
+	}
+
 	private static boolean isDigits(final String value) {
 		if (StringUtils.isEmpty(value)) {
 			return false;
