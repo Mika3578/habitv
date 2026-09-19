@@ -89,11 +89,7 @@ final class TvComUrls {
 		try {
 			final URI uri = URI.create(url.trim());
 			final String rawPath = uri.getRawPath();
-			final String path = uri.getPath();
-			if (rawPath == null || path == null) {
-				return null;
-			}
-			if (path.indexOf('?') >= 0 || path.indexOf('#') >= 0) {
+			if (rawPath == null) {
 				return null;
 			}
 			final String lowerRaw = rawPath.toLowerCase(Locale.ROOT);
@@ -133,9 +129,6 @@ final class TvComUrls {
 			final String rawPath = uri.getRawPath();
 			final String path = uri.getPath();
 			if (rawPath == null || path == null) {
-				return null;
-			}
-			if (path.indexOf('?') >= 0 || path.indexOf('#') >= 0) {
 				return null;
 			}
 			final String lowerRaw = rawPath.toLowerCase(Locale.ROOT);
