@@ -23,6 +23,7 @@ Providers: [`providers.md`](providers.md). Configuration:
 | France Télévisions empty | Legacy plugin id | `pluzz` → `francetv` in grab-config |
 | 403 / DNS / empty replay | Obsolete or protected | See providers; no DRM/paywall bypass |
 | yt-dlp missing / SSL errors | Tool or network | Install yt-dlp; point `<youtube>` at the binary |
+| Windows yt-dlp fails before download (`[PYI-`, `_MEI`, extract errors) | PyInstaller bootstrap / TEMP | Habitv redirects yt-dlp `TEMP`/`TMP` under the bin home and runs `yt-dlp.exe --version` first. Stop Habitv, clear TEMP `_MEI*` folders, replace `yt-dlp.exe`, then run `--version` outside Habitv |
 
 ## Configuration
 

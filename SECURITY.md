@@ -40,7 +40,7 @@ The repository is undergoing modernization. Known sensitive areas:
 | `youtube-key-hardcoded` | Hardcoded YouTube Data API key in `plugins/youtube` | ✅ Mitigated (PR #29 merged) |
 | `legacy-maven-repo` | Legacy plain-HTTP `dabiboo.free.fr` Maven repository | ✅ Active wiring removed (PR #36 merged) |
 | `ftp-deploy` | FTP deployment with embedded credentials | 🟠 Migration planned (`legacy-url-migration`) |
-| `legacy-update-pull` | Auto-update can pull artifacts from unmaintained host | 🟠 Opt-in guard added; cutover pending (`static-repo-publish`) |
+| `legacy-update-pull` | Runtime plugin updater URL | ✅ Default is HTTPS `https://mika3578.github.io/habitv-repo/repository/` (`FrameworkConf.UPDATE_URL`). Disable with `-Dhabitv.update.enabled=false`. |
 | — | Hardcoded Gmail POP3/IMAP credentials in `plugins/email` tests | 🔴 Pending dedicated remediation PR |
 | — | Sample FTP credentials in `application/consoleView/config.xml` | 🔴 Sample is illustrative; do not reuse |
 

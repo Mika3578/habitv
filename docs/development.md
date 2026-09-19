@@ -73,7 +73,12 @@ Update base (HTTPS):
 `https://mika3578.github.io/habitv-repo/repository/`.
 
 Local publish to a `habitv-repo` checkout uses Maven profiles
-`static-repo-deploy` / `static-repo-publish` (`file://` only).
+`static-repo-deploy` / `static-repo-publish` (`file://` only). Staging
+path: `habitv.static.repo.path` (default
+`${user.home}/dev/habitv-repo/repository`). Scripts live in
+`scripts/static-repo/`; PowerShell wrappers expect `HABITV_REPO_DIR` to
+point at the local `habitv-repo` checkout. This is maintainer publish
+only — runtime clients still use the HTTPS URL above.
 
 ## CI
 

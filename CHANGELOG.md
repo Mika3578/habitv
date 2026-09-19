@@ -24,7 +24,7 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 | 2026-05-27 | TBD | Harden and DRY the Maven CI workflows (inspired by Apache Commons, the `actions/starter-workflows` Maven template, and `spring-petclinic`): set `persist-credentials: false` on every `actions/checkout`, extract the shared JDK-setup and artifact-upload steps into `.github/actions/setup-build-jdk` and `.github/actions/upload-maven-artifacts` composite actions, and add a non-required `validate-macos` diagnostic job. No change to the four required `develop` checks |
 | 2026-05-26 | TBD | Match the live `protect-develop` ruleset required checks: remove the now-stale `validate (zulu-8)` / `CI / validate (zulu-8)` context (deleted with `ci.yml`) and require the four live contexts (`validate-java8`, `deterministic-tests-java8`, `compile-and-package-java8`, `dependency-review`), unblocking `develop` PRs stranded at "Expected — Waiting". Keep the ruleset payload aligned with GitHub Settings (bare contexts, plus squash-only, `code_scanning`, `code_quality`, `copilot_code_review`) and update the governance, required-checks-roadmap, and repository-settings docs |
 | 2026-05-26 | TBD | Relax Dependabot policy so it can actually open PRs: allow GitHub Actions major bumps (every action is pinned to a floating major tag, so majors were the only possible update and the blanket ignore suppressed all PRs) and allow Maven majors except for jakarta-crossing artifacts (`jaxb-api`, `jaxb-runtime`, `javax.mail:mail`) guarded by the Java 8 / no-jakarta hard rule |
-| 2026-05-21 | TBD | Define `plugin-versioning-policy` ADR in `docs/decision-log.md`, document the policy in `CONTRIBUTING.md`, extend `AGENTS.md` §4 / `.github/copilot-instructions.md` / `.github/pull_request_template.md`, and bump `youtube` (`4.1.1-SNAPSHOT`), `arte` (`4.1.1-SNAPSHOT`), `francetv` (`4.1.2-SNAPSHOT`) accordingly |
+| 2026-05-21 | TBD | Define `plugin-versioning-policy` (now in [`CONTRIBUTING.md`](CONTRIBUTING.md)), extend `AGENTS.md` / `.github/pull_request_template.md`, and bump `youtube` (`4.1.1-SNAPSHOT`), `arte` (`4.1.1-SNAPSHOT`), `francetv` (`4.1.2-SNAPSHOT`) accordingly |
 | 2026-05-17 | `d68f795` | Align JDT compliance with Java 8 (PR [#32](https://github.com/Mika3578/habitv/pull/32)) |
 | 2026-05-17 | `a659383` | Standardize static repository workspace layout (PR [#34](https://github.com/Mika3578/habitv/pull/34)) |
 | 2026-05-17 | `f30773c` | Align own-version plugin internal dependencies (PR [#33](https://github.com/Mika3578/habitv/pull/33)) |
@@ -75,7 +75,7 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 | Date | Commit | Change |
 |------|--------|--------|
 | 2026-09-19 | TBD | Deduplicate maintainer docs; root `AGENTS.md` is the only agent rulebook. Java 8 remains the current compiler/CI baseline; Java 21 then 25 are targets |
-| 2026-09-15 | TBD | Document canonical media metadata vs legacy tokens and MEDIA_SERVER naming (`docs/media-metadata-naming.md`) |
+| 2026-09-15 | TBD | Document canonical media metadata vs legacy tokens and MEDIA_SERVER naming ([`docs/configuration.md`](docs/configuration.md)) |
 | 2026-05-31 | TBD | Refresh modernization tracker, plan, risks, provider inventory, and maintenance dashboard after merged May work |
 | 2026-05-29 | PR [#136](https://github.com/Mika3578/habitv/pull/136) | Plan JAXB and Activation deduplication (docs only) |
 | 2026-05-29 | PR [#134](https://github.com/Mika3578/habitv/pull/134) | Audit Maven Shade duplicate warnings |

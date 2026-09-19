@@ -27,8 +27,14 @@ Legacy tokens (`#TVSHOW_NAME#`, `#EPISODE_NAME#`, `#DATE#`) remain.
 
 Canonical metadata (`EpisodeMetadataDTO`) is additive. Providers fill
 facts only; they must not build filesystem paths. Global naming lives in
-`application/core` (`MediaNamingService`). Useful tokens include
-`#SERIES_NAME#`, `#AIR_DATE#`, `#SEASON_EPISODE#`, `#MEDIA_SERVER_PATH#`.
+`application/core` (`MediaNamingService`, `EpisodeMetadataResolver`,
+`MediaServerNamingPolicy`). Useful tokens include `#SERIES_NAME#`,
+`#AIR_DATE#`, `#SEASON_EPISODE#`, `#MEDIA_SERVER_PATH#`.
+
+`#AIR_DATE#` is a true broadcast date only. Publication or upload dates
+must not create dated MEDIA_SERVER paths. `#DATE#` remains the
+download/current date. Do not copy a provider category name into
+`seriesTitle` unless the item is a verified program/series.
 
 New configs may default `downloadOuput` to a MEDIA_SERVER path; existing
 user configs stay as stored.
