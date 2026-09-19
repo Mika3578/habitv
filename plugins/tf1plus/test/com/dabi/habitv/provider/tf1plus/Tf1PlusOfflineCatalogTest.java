@@ -3,6 +3,7 @@ package com.dabi.habitv.provider.tf1plus;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
@@ -72,6 +73,9 @@ public class Tf1PlusOfflineCatalogTest {
 			assertNotNull(episode.getMetadata());
 			assertEquals(episode.getId(), episode.getMetadata().getSourceUrl());
 			assertEquals("Quotidien", episode.getMetadata().getSeriesTitle());
+			assertNotNull("publication date mapped from GraphQL date", episode.getEpisodeDate());
+			assertNotNull(episode.getMetadata().getPublicationDate());
+			assertNull("GraphQL date must not be treated as airDate", episode.getMetadata().getAirDate());
 		}
 	}
 
@@ -92,6 +96,9 @@ public class Tf1PlusOfflineCatalogTest {
 		assertEquals(DownloadableState.IMPOSSIBLE,
 				plugin.canDownload("https://www.tf1.fr/tmc/quotidien-avec-yann-barthes"));
 		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload("https://www.france.tv/france-2/"));
+		assertEquals(DownloadableState.IMPOSSIBLE,
+				plugin.canDownload("https://attacker.example/tf1.fr/videos/spoof.html"));
+		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload(null));
 	}
 
 	@Test
@@ -101,7 +108,13 @@ public class Tf1PlusOfflineCatalogTest {
 				Tf1PlusUrls.programSlugFromCategoryId(
 						Tf1PlusUrls.programCategoryId("tmc", "quotidien-avec-yann-barthes")));
 		assertTrue(Tf1PlusUrls.isTf1PlusPageUrl("https://www.tf1.fr/tf1/foo/videos/bar.html"));
+		assertTrue(Tf1PlusUrls.isTf1PlusPageUrl("https://tf1.fr/tf1/foo/videos/bar.html"));
 		assertFalse(Tf1PlusUrls.isTf1PlusPageUrl("https://www.tf1.fr/novo19/foo/videos/bar.html"));
+		assertFalse(Tf1PlusUrls.isTf1PlusPageUrl("https://attacker.example/tf1.fr/videos/bar.html"));
+		assertFalse(Tf1PlusUrls.isTf1PlusVideoPageUrl("https://www.tf1.fr/tmc/program-only"));
+		assertEquals("", Tf1PlusUrls.programName(null));
+		assertNull(Tf1PlusUrls.programSlug(null));
+		assertNull(Tf1PlusUrls.videoUrl(null));
 	}
 
 	private static Tf1PlusPluginManager newRecordingPlugin(final Map<String, String> fixturesByQueryHint) {

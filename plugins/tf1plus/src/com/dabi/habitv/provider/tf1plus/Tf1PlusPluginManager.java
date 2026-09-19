@@ -1,8 +1,10 @@
 package com.dabi.habitv.provider.tf1plus;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -68,12 +70,15 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 				final List<Map<String, Object>> programs = graphqlClient.fetchPrograms(channelSlug);
 				int created = 0;
 				for (final Map<String, Object> program : programs) {
+					if (program == null) {
+						continue;
+					}
 					final String programSlug = Tf1PlusUrls.programSlug(program);
 					final String programName = Tf1PlusUrls.programName(program);
 					if (StringUtils.isEmpty(programSlug) || StringUtils.isEmpty(programName)) {
 						continue;
 					}
-					if ("novo19".equalsIgnoreCase(programSlug) || programSlug.toLowerCase().contains("novo19")) {
+					if (programSlug.toLowerCase(Locale.ROOT).contains("novo19")) {
 						continue;
 					}
 					final CategoryDTO programCat = new CategoryDTO(Tf1PlusConf.NAME, programName,
@@ -114,9 +119,12 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 		try {
 			final List<Map<String, Object>> videos = graphqlClient.fetchReplayVideos(programSlug);
 			for (final Map<String, Object> video : videos) {
+				if (video == null) {
+					continue;
+				}
 				final String url = Tf1PlusUrls.videoUrl(video);
 				final String title = Tf1PlusUrls.videoTitle(video);
-				if (StringUtils.isEmpty(url) || StringUtils.isEmpty(title) || !Tf1PlusUrls.isTf1PlusPageUrl(url)) {
+				if (StringUtils.isEmpty(url) || StringUtils.isEmpty(title) || !Tf1PlusUrls.isTf1PlusVideoPageUrl(url)) {
 					continue;
 				}
 				final EpisodeDTO episode = new EpisodeDTO(category, title, url);
@@ -130,6 +138,12 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 				final String description = Tf1PlusUrls.videoDescription(video);
 				if (StringUtils.isNotEmpty(description)) {
 					metadata.setDescription(description);
+				}
+				final Date publicationDate = Tf1PlusUrls.videoPublicationDate(video);
+				if (publicationDate != null) {
+					// GraphQL "date" is catalogue publication, not broadcast airDate.
+					metadata.setPublicationDate(publicationDate);
+					episode.setEpisodeDate(publicationDate);
 				}
 				episode.setMetadata(metadata);
 				episodes.add(episode);
@@ -176,7 +190,7 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 
 	@Override
 	public DownloadableState canDownload(final String downloadInput) {
-		if (Tf1PlusUrls.isTf1PlusPageUrl(downloadInput) && downloadInput.contains("/videos/")) {
+		if (Tf1PlusUrls.isTf1PlusVideoPageUrl(downloadInput)) {
 			return DownloadableState.SPECIFIC;
 		}
 		return DownloadableState.IMPOSSIBLE;

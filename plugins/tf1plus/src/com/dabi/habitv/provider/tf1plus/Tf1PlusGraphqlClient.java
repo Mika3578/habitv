@@ -100,6 +100,7 @@ final class Tf1PlusGraphqlClient {
 	}
 
 	private static String encode(final String value) throws UnsupportedEncodingException {
+		// Java 8 baseline: Charset overload of URLEncoder.encode arrived in Java 10.
 		return URLEncoder.encode(value, "UTF-8");
 	}
 
