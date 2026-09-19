@@ -135,6 +135,22 @@ public class TvLuxOfflineCatalogTest {
 		assertFalse(line.contains("token=leak"));
 	}
 
+	@Test
+	public void diagnosticsRejectEncodedDelimitersAndNewlines() {
+		final TvLuxDiagnostics diagnostics = new TvLuxDiagnostics("download");
+		diagnostics.setSourceUrl("https://www.tvlux.be/replay/jt/jt-du-18-09-2026_52260%3Ftoken=secret");
+		String line = diagnostics.formatLogLine();
+		assertTrue(line.contains("sourceUrl=https://www.tvlux.be/replay/jt/jt-du-18-09-2026_52260"));
+		assertFalse(line.contains("token=secret"));
+		assertFalse(line.contains("%3F"));
+		assertFalse(line.contains("%3f"));
+
+		diagnostics.setSourceUrl("not a uri\ninjected rootCause=evil");
+		line = diagnostics.formatLogLine();
+		assertFalse(line.contains("\n"));
+		assertFalse(line.contains("injected"));
+	}
+
 	private static TvLuxPluginManager newRecordingPlugin(final Map<String, String> pages) {
 		return new TvLuxPluginManager(new TvLuxClient(new TvLuxClient.ContentLoader() {
 			@Override
