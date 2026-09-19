@@ -74,7 +74,7 @@ final class Tv5PlusUrls {
 				return null;
 			}
 			final String slug = matcher.group(1);
-			if (matcher.group(2) != null) {
+			if (matcher.group(2) != null && matcher.group(3) != null) {
 				return episodeWatchUrl(slug, Integer.parseInt(matcher.group(2)), Integer.parseInt(matcher.group(3)));
 			}
 			return movieWatchUrl(slug);

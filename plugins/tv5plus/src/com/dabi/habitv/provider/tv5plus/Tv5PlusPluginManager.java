@@ -29,11 +29,25 @@ public class Tv5PlusPluginManager extends BasePluginWithProxy implements PluginP
 	private final Tv5PlusClient client;
 
 	public Tv5PlusPluginManager() {
-		this.client = new Tv5PlusClient();
+		this.client = new Tv5PlusClient(new PluginGraphqlTransport(this));
 	}
 
 	Tv5PlusPluginManager(final Tv5PlusClient client) {
 		this.client = client;
+	}
+
+	private static final class PluginGraphqlTransport implements Tv5PlusClient.GraphqlTransport {
+
+		private final Tv5PlusPluginManager plugin;
+
+		private PluginGraphqlTransport(final Tv5PlusPluginManager plugin) {
+			this.plugin = plugin;
+		}
+
+		@Override
+		public String post(final String body) throws IOException {
+			return Tv5PlusClient.postGraphql(body, plugin.getHttpProxy());
+		}
 	}
 
 	@Override
@@ -84,14 +98,12 @@ public class Tv5PlusPluginManager extends BasePluginWithProxy implements PluginP
 			for (final Tv5PlusClient.EpisodeRef ref : refs) {
 				final EpisodeDTO episode = new EpisodeDTO(category, ref.title, ref.watchUrl);
 				final EpisodeMetadataDTO metadata = new EpisodeMetadataDTO();
-				metadata.setSeriesTitle(category.getName());
 				metadata.setEpisodeTitle(ref.title);
 				metadata.setSourceUrl(ref.watchUrl);
 				metadata.setChannel(Tv5PlusConf.CHANNEL_LABEL);
-				if (ref.seasonNumber != null) {
+				if (ref.seasonNumber != null && ref.episodeNumber != null) {
+					metadata.setSeriesTitle(category.getName());
 					metadata.setSeasonNumber(ref.seasonNumber);
-				}
-				if (ref.episodeNumber != null) {
 					metadata.setEpisodeNumber(ref.episodeNumber);
 				}
 				episode.setMetadata(metadata);

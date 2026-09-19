@@ -1,8 +1,10 @@
 package com.dabi.habitv.provider.tv5plus;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.Proxy;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -30,12 +32,46 @@ final class Tv5PlusClient {
 
 	private final GraphqlTransport transport;
 
-	Tv5PlusClient() {
-		this(new DefaultGraphqlTransport());
-	}
-
 	Tv5PlusClient(final GraphqlTransport transport) {
 		this.transport = transport;
+	}
+
+	static String postGraphql(final String body, final Proxy proxy) throws IOException {
+		final HttpURLConnection connection;
+		if (proxy != null) {
+			connection = (HttpURLConnection) new URL(Tv5PlusConf.GRAPHQL_URL).openConnection(proxy);
+		} else {
+			connection = (HttpURLConnection) new URL(Tv5PlusConf.GRAPHQL_URL).openConnection();
+		}
+		connection.setRequestMethod("POST");
+		connection.setDoOutput(true);
+		connection.setConnectTimeout(30000);
+		connection.setReadTimeout(60000);
+		connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+		connection.setRequestProperty("Accept", "application/json");
+		connection.setRequestProperty("User-Agent", "HabiTV-tv5plus/1.0");
+		connection.setRequestProperty("apollographql-client-name", "tv5plus-web");
+		final byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+		connection.setRequestProperty("Content-Length", Integer.toString(bytes.length));
+		try (OutputStream output = connection.getOutputStream()) {
+			output.write(bytes);
+		}
+		final int status = connection.getResponseCode();
+		try (InputStream stream = status >= 400 ? connection.getErrorStream() : connection.getInputStream()) {
+			if (stream == null) {
+				throw new IOException("graphql-http-" + status);
+			}
+			final byte[] buffer = new byte[4096];
+			final StringBuilder response = new StringBuilder();
+			int read;
+			while ((read = stream.read(buffer)) != -1) {
+				response.append(new String(buffer, 0, read, StandardCharsets.UTF_8));
+			}
+			if (status >= 400) {
+				throw new IOException("graphql-http-" + status);
+			}
+			return response.toString();
+		}
 	}
 
 	List<ShowRef> loadShows() throws IOException {
@@ -182,7 +218,8 @@ final class Tv5PlusClient {
 	}
 
 	private static String escape(final String value) {
-		return value.replace("\\", "\\\\").replace("\"", "\\\"");
+		return value.replace("\\", "\\\\").replace("\"", "\\\"")
+				.replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t");
 	}
 
 	private static String text(final JsonNode node, final String field) {
@@ -251,40 +288,4 @@ final class Tv5PlusClient {
 		}
 	}
 
-	private static final class DefaultGraphqlTransport implements GraphqlTransport {
-		@Override
-		public String post(final String body) throws IOException {
-			final HttpURLConnection connection = (HttpURLConnection) new URL(Tv5PlusConf.GRAPHQL_URL).openConnection();
-			connection.setRequestMethod("POST");
-			connection.setDoOutput(true);
-			connection.setConnectTimeout(30000);
-			connection.setReadTimeout(60000);
-			connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-			connection.setRequestProperty("Accept", "application/json");
-			connection.setRequestProperty("User-Agent", "HabiTV-tv5plus/1.0");
-			connection.setRequestProperty("apollographql-client-name", "tv5plus-web");
-			final byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
-			connection.setRequestProperty("Content-Length", Integer.toString(bytes.length));
-			try (OutputStream output = connection.getOutputStream()) {
-				output.write(bytes);
-			}
-			final int status = connection.getResponseCode();
-			final java.io.InputStream stream = status >= 400 ? connection.getErrorStream()
-					: connection.getInputStream();
-			if (stream == null) {
-				throw new IOException("graphql-http-" + status);
-			}
-			final byte[] buffer = new byte[4096];
-			final StringBuilder response = new StringBuilder();
-			int read;
-			while ((read = stream.read(buffer)) != -1) {
-				response.append(new String(buffer, 0, read, StandardCharsets.UTF_8));
-			}
-			stream.close();
-			if (status >= 400) {
-				throw new IOException("graphql-http-" + status);
-			}
-			return response.toString();
-		}
-	}
 }

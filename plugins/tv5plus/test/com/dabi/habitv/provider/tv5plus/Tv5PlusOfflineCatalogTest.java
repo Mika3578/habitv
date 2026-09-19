@@ -61,6 +61,7 @@ public class Tv5PlusOfflineCatalogTest {
 		for (final EpisodeDTO episode : episodes) {
 			assertTrue(episode.getId().startsWith("https://www.tv5unis.ca/videos/watatatow/"));
 			assertNotNull(episode.getMetadata());
+			assertEquals("Watatatow", episode.getMetadata().getSeriesTitle());
 			assertEquals(Tv5PlusConf.CHANNEL_LABEL, episode.getMetadata().getChannel());
 		}
 	}
@@ -75,7 +76,10 @@ public class Tv5PlusOfflineCatalogTest {
 				Tv5PlusUrls.showCategoryId("babysitting"), Tv5PlusConf.EXTENSION);
 		final Set<EpisodeDTO> episodes = plugin.findEpisode(show);
 		assertEquals(1, episodes.size());
-		assertEquals("https://www.tv5unis.ca/videos/babysitting", episodes.iterator().next().getId());
+		final EpisodeDTO movie = episodes.iterator().next();
+		assertEquals("https://www.tv5unis.ca/videos/babysitting", movie.getId());
+		assertNotNull(movie.getMetadata());
+		assertEquals(null, movie.getMetadata().getSeriesTitle());
 	}
 
 	@Test
