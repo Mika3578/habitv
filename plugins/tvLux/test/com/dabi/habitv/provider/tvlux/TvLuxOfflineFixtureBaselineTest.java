@@ -3,6 +3,7 @@ package com.dabi.habitv.provider.tvlux;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,10 +15,13 @@ public class TvLuxOfflineFixtureBaselineTest {
 
 	@Test
 	public void fixtureBaselineDocumentsStrategy() throws IOException {
-		final String baseline = read("test/resources/fixtures/tvlux/fixture-baseline.txt");
+		final String path = "test/resources/fixtures/tvlux/fixture-baseline.txt";
+		assertTrue("missing fixture: " + path, new File(path).isFile());
+		final String baseline = read(path);
 		assertTrue(baseline.contains("provider=tvLux"));
 		assertTrue(baseline.contains("strategy=html-freecaster-hls"));
 		assertTrue(baseline.contains("Freecaster"));
+		assertTrue(baseline.contains("network=disabled"));
 	}
 
 	private static String read(final String path) throws IOException {
