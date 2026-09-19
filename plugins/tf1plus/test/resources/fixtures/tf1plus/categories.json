@@ -1,0 +1,111 @@
+{
+  "errors": [
+    {
+      "message": "category MAIN_EVENT not found",
+      "path": [
+        "event"
+      ],
+      "locations": [
+        {
+          "line": 39,
+          "column": 3
+        }
+      ]
+    }
+  ],
+  "data": {
+    "seriesAndFictions": {
+      "id": "GT_SERIES_AND_FICTIONS",
+      "label": "Séries & Fictions",
+      "main": false,
+      "slug": "series-et-fictions",
+      "type": "SERIES",
+      "decoration": {
+        "description": "",
+        "hook": "",
+        "label": "Séries & Fictions",
+        "programLabel": "",
+        "subLabel": "",
+        "__typename": "Decoration"
+      },
+      "__typename": "Category"
+    },
+    "movies": {
+      "id": "GT_MOVIES",
+      "label": "Cinéma",
+      "main": false,
+      "slug": "cinema",
+      "type": "SERIES",
+      "decoration": {
+        "description": "",
+        "hook": "",
+        "label": "Cinéma",
+        "programLabel": "",
+        "subLabel": "",
+        "__typename": "Decoration"
+      },
+      "__typename": "Category"
+    },
+    "entertainment": {
+      "id": "GT_ENTERTAINMENT",
+      "label": "Divertissements",
+      "main": false,
+      "slug": "divertissements",
+      "type": "SERIES",
+      "decoration": {
+        "description": "",
+        "hook": "",
+        "label": "Divertissements",
+        "programLabel": "",
+        "subLabel": "",
+        "__typename": "Decoration"
+      },
+      "__typename": "Category"
+    },
+    "infosMagazineSports": {
+      "id": "GT_INFOS_MAG_AND_SPORT",
+      "label": "Infos, Mag & Sport",
+      "main": false,
+      "slug": "infos-mag-et-sport",
+      "type": "SERIES",
+      "decoration": {
+        "description": "",
+        "hook": "",
+        "label": "Infos, Mag & Sport",
+        "programLabel": "",
+        "subLabel": "",
+        "__typename": "Decoration"
+      },
+      "__typename": "Category"
+    },
+    "youth": {
+      "id": "GT_YOUTH",
+      "label": "Jeunesse",
+      "main": false,
+      "slug": "jeunesse",
+      "type": "SERIES",
+      "decoration": {
+        "description": "",
+        "hook": "",
+        "label": "Jeunesse",
+        "programLabel": "",
+        "subLabel": "",
+        "__typename": "Decoration"
+      },
+      "__typename": "Category"
+    },
+    "event": null
+  },
+  "extensions": {
+    "report": {
+      "stream": "web",
+      "catalogCode": "fr-fr",
+      "version": "v1.29.5",
+      "execution": {
+        "start": 1789855632659135119,
+        "end": 1789855632659435493,
+        "time": 300569
+      }
+    }
+  }
+}

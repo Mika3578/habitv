@@ -1,0 +1,69 @@
+{
+  "data": {
+    "programs": {
+      "items": [
+        {
+          "id": "bcf882b1-c4aa-46ad-b012-43d67e0c7662",
+          "name": "Drop Dead Diva",
+          "slug": "drop-dead-diva",
+          "url": null,
+          "categories": [
+            {
+              "id": "GT_SERIES_AND_FICTIONS",
+              "label": "Séries & Fictions"
+            },
+            {
+              "id": "SGT_SERIES",
+              "label": "Séries"
+            }
+          ]
+        },
+        {
+          "id": "4771fb63-b3df-4197-a47b-eee8ae9048b9",
+          "name": "Quotidien",
+          "slug": "quotidien-avec-yann-barthes",
+          "url": null,
+          "categories": [
+            {
+              "id": "GT_INFOS_MAG_AND_SPORT",
+              "label": "Infos, Mag & Sport"
+            },
+            {
+              "id": "SGT_MAG_INFOS",
+              "label": "Magazine d'info"
+            }
+          ]
+        },
+        {
+          "id": "7968ff0d-2f24-40d8-b75b-b272106e403a",
+          "name": "Une nounou d'enfer",
+          "slug": "une-nounou-d-enfer",
+          "url": null,
+          "categories": [
+            {
+              "id": "GT_SERIES_AND_FICTIONS",
+              "label": "Séries & Fictions"
+            },
+            {
+              "id": "SGT_SERIES",
+              "label": "Séries"
+            }
+          ]
+        }
+      ],
+      "total": 3
+    }
+  },
+  "extensions": {
+    "report": {
+      "stream": "web",
+      "catalogCode": "fr-fr",
+      "version": "v1.29.5",
+      "execution": {
+        "start": 1789855649047931527,
+        "end": 1789855649081785515,
+        "time": 33854174
+      }
+    }
+  }
+}

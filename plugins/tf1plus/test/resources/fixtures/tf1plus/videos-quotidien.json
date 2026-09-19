@@ -1,0 +1,58 @@
+{
+  "data": {
+    "programBySlug": {
+      "videos": {
+        "items": [
+          {
+            "id": "fe0543c5-a4dd-40a9-8468-e54946792905",
+            "slug": "quotidien-troisieme-partie-du-19-septembre-2026-29488672",
+            "url": "https://www.tf1.fr/tmc/quotidien-avec-yann-barthes/videos/quotidien-troisieme-partie-du-19-septembre-2026-29488672.html",
+            "title": null,
+            "type": "REPLAY",
+            "decoration": {
+              "label": "Quotidien Le meilleur de la semaine du 19 septembre 2026",
+              "description": "QUOTIDIEN, présenté par Yann BARTHES avec son équipe de journalistes et de chroniqueurs, revient pour une saison 10 sur TMC. Le Talk-show d’actu et de culture, produit par Bangumi, continue de décrypter toutes les images qui inondent l’époque avec une formule enrichie et une équipe de reporters et d'humoristes élargie. Superstars internationales, invités d’actualité, nouveaux visages français, reportages à l’étranger et dans les régions, analyses, lives, humour, tous les ingrédients qui font le succès de QUOTIDIEN sont au rendez-vous du lundi au vendredi à 19h20 sur TMC."
+            },
+            "date": "2026-09-19T08:36:38Z"
+          },
+          {
+            "id": "1439fc03-f425-4799-8106-a9c1bd113bc0",
+            "slug": "quotidien-troisieme-partie-du-18-septembre-2026-44539500",
+            "url": "https://www.tf1.fr/tmc/quotidien-avec-yann-barthes/videos/quotidien-troisieme-partie-du-18-septembre-2026-44539500.html",
+            "title": null,
+            "type": "REPLAY",
+            "decoration": {
+              "label": "Quotidien troisième partie du 18 septembre 2026",
+              "description": "QUOTIDIEN, présenté par Yann BARTHES avec son équipe de journalistes et de chroniqueurs, revient pour une saison 10 sur TMC. Le Talk-show d’actu et de culture, produit par Bangumi, continue de décrypter toutes les images qui inondent l’époque avec une formule enrichie et une équipe de reporters et d'humoristes élargie. Superstars internationales, invités d’actualité, nouveaux visages français, reportages à l’étranger et dans les régions, analyses, lives, humour, tous les ingrédients qui font le succès de QUOTIDIEN sont au rendez-vous du lundi au vendredi à 19h20 sur TMC."
+            },
+            "date": "2026-09-18T19:01:17Z"
+          },
+          {
+            "id": "e68da0a9-493a-4fcf-92de-9731a8b8b72c",
+            "slug": "quotidien-deuxieme-partie-du-18-septembre-2026-23401051",
+            "url": "https://www.tf1.fr/tmc/quotidien-avec-yann-barthes/videos/quotidien-deuxieme-partie-du-18-septembre-2026-23401051.html",
+            "title": null,
+            "type": "REPLAY",
+            "decoration": {
+              "label": "Quotidien, deuxième partie du 18 septembre 2026",
+              "description": "QUOTIDIEN, présenté par Yann BARTHES avec son équipe de journalistes et de chroniqueurs, revient pour une saison 10 sur TMC. Le Talk-show d’actu et de culture, produit par Bangumi, continue de décrypter toutes les images qui inondent l’époque avec une formule enrichie et une équipe de reporters et d'humoristes élargie. Superstars internationales, invités d’actualité, nouveaux visages français, reportages à l’étranger et dans les régions, analyses, lives, humour, tous les ingrédients qui font le succès de QUOTIDIEN sont au rendez-vous du lundi au vendredi à 19h20 sur TMC."
+            },
+            "date": "2026-09-18T18:14:55Z"
+          }
+        ]
+      }
+    }
+  },
+  "extensions": {
+    "report": {
+      "stream": "web",
+      "catalogCode": "fr-fr",
+      "version": "v1.29.5",
+      "execution": {
+        "start": 1789855649491416578,
+        "end": 1789855649512357099,
+        "time": 20940644
+      }
+    }
+  }
+}

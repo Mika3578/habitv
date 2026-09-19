@@ -1,0 +1,7 @@
+provider=tf1plus
+strategy=graphql-ytdlp
+homeUrl=https://www.tf1.fr
+graphqlUrl=https://www.tf1.fr/graphql/web
+channels=tf1,tmc,tfx,tf1-series-films,lci
+excluded=novo19
+note=Offline GraphQL fixtures; download delegates to yt-dlp; no Gigya/DRM/login path.
