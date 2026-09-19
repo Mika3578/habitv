@@ -117,15 +117,16 @@ public class TvLuxPluginManager extends BasePluginWithProxy implements PluginPro
 	public ProcessHolder download(final DownloadParamDTO downloadParam, final DownloaderPluginHolder downloaders)
 			throws DownloadFailedException {
 		final TvLuxDiagnostics diagnostics = new TvLuxDiagnostics("download");
-		diagnostics.setSourceUrl(downloadParam.getDownloadInput());
+		final String downloadInput = downloadParam.getDownloadInput();
+		final String sanitizedEpisodeUrl = TvLuxUrls.sanitizeEpisodeUrl(downloadInput);
+		diagnostics.setSourceUrl(downloadInput);
 		try {
-			final String sanitized = TvLuxUrls.sanitizeEpisodeUrl(downloadParam.getDownloadInput());
-			if (sanitized == null) {
+			if (sanitizedEpisodeUrl == null) {
 				diagnostics.setRootCauseSummary("unsupported-url");
 				getLog().warn(diagnostics.formatLogLine());
 				throw new DownloadFailedException(TvLuxConf.DOWNLOAD_UNAVAILABLE_MESSAGE);
 			}
-			final String hlsUrl = client.resolveHlsUrl(sanitized);
+			final String hlsUrl = client.resolveHlsUrl(sanitizedEpisodeUrl);
 			if (hlsUrl == null) {
 				diagnostics.setRootCauseSummary("missing-hls");
 				getLog().warn(diagnostics.formatLogLine());
@@ -144,7 +145,7 @@ public class TvLuxPluginManager extends BasePluginWithProxy implements PluginPro
 					: DownloadFailureDiagnostics.getClassificationKey(e));
 			getLog().warn(diagnostics.formatLogLine());
 			getLog().warn(DownloadFailureDiagnostics.formatLogLine(
-					new EpisodeDTO(null, downloadParam.getDownloadInput(), downloadParam.getDownloadInput()),
+					new EpisodeDTO(null, sanitizedEpisodeUrl, sanitizedEpisodeUrl),
 					TvLuxConf.NAME, e));
 			throw new DownloadFailedException(TvLuxConf.DOWNLOAD_UNAVAILABLE_MESSAGE, e);
 		} catch (final IOException e) {

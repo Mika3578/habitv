@@ -22,6 +22,17 @@ import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
 public class TvLuxOfflineCatalogTest {
 
 	@Test
+	public void findCategoryParsesBareTvluxHostLinks() throws IOException {
+		final Map<String, String> pages = new HashMap<String, String>();
+		pages.put(TvLuxUrls.replayIndexUrl(),
+				"<!DOCTYPE html><html><body><a href=\"https://tvlux.be/replay/jt\">JT</a></body></html>");
+		final TvLuxPluginManager plugin = newRecordingPlugin(pages);
+		final Set<CategoryDTO> categories = plugin.findCategory();
+		assertEquals(1, categories.size());
+		assertEquals(TvLuxUrls.showCategoryId("jt"), categories.iterator().next().getId());
+	}
+
+	@Test
 	public void findCategoryParsesReplayShowLinks() throws IOException {
 		final Map<String, String> pages = new HashMap<String, String>();
 		pages.put(TvLuxUrls.replayIndexUrl(), read("test/resources/fixtures/tvlux/replay-index.html"));
@@ -78,10 +89,22 @@ public class TvLuxOfflineCatalogTest {
 		final TvLuxPluginManager plugin = new TvLuxPluginManager();
 		assertEquals(DownloadableState.SPECIFIC,
 				plugin.canDownload("https://www.tvlux.be/replay/jt/jt-du-18-09-2026_52260"));
+		assertEquals(DownloadableState.SPECIFIC,
+				plugin.canDownload("https://tvlux.be/replay/jt/jt-du-18-09-2026_52260"));
 		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload("https://www.tvlux.be/replay/jt"));
 		assertEquals(DownloadableState.IMPOSSIBLE,
 				plugin.canDownload("https://user:pass@www.tvlux.be/replay/jt/jt-du-18-09-2026_52260"));
 		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload(null));
+	}
+
+	@Test
+	public void sanitizeHlsUrlRequiresHttpsFreecasterM3u8() {
+		assertEquals(null, TvLuxUrls.sanitizeHlsUrl("http://tvlocales-vod-cmaf.freecaster.com/x.m3u8"));
+		assertEquals(null, TvLuxUrls.sanitizeHlsUrl("https://evil.example.com/x.m3u8"));
+		assertEquals(null, TvLuxUrls.sanitizeHlsUrl("https://tvlocales-vod-cmaf.freecaster.com/x.mp4"));
+		assertEquals("https://tvlocales-vod-cmaf.freecaster.com/tvlux/id/file.m3u8",
+				TvLuxUrls.sanitizeHlsUrl(
+						"https://tvlocales-vod-cmaf.freecaster.com/tvlux/id/file.m3u8?token=secret"));
 	}
 
 	@Test

@@ -93,4 +93,34 @@ final class TvLuxUrls {
 			return null;
 		}
 	}
+
+	static String sanitizeHlsUrl(final String url) {
+		if (StringUtils.isEmpty(url)) {
+			return null;
+		}
+		try {
+			final URI uri = URI.create(url.trim());
+			if (!"https".equalsIgnoreCase(uri.getScheme())) {
+				return null;
+			}
+			if (uri.getUserInfo() != null) {
+				return null;
+			}
+			final String host = uri.getHost();
+			if (host == null) {
+				return null;
+			}
+			final String lower = host.toLowerCase(Locale.ROOT);
+			if (!lower.endsWith(".freecaster.com") && !"freecaster.com".equals(lower)) {
+				return null;
+			}
+			final String path = uri.getPath();
+			if (path == null || !path.toLowerCase(Locale.ROOT).endsWith(".m3u8")) {
+				return null;
+			}
+			return "https://" + lower + path;
+		} catch (final IllegalArgumentException e) {
+			return null;
+		}
+	}
 }

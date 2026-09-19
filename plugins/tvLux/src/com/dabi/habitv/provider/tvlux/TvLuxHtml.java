@@ -36,12 +36,7 @@ final class TvLuxHtml {
 				break;
 			}
 			from = end + 1;
-			String hrefValue = html.substring(start, end).trim();
-			if (hrefValue.startsWith("https://www.tvlux.be")) {
-				hrefValue = hrefValue.substring("https://www.tvlux.be".length());
-			} else if (hrefValue.startsWith("http://www.tvlux.be")) {
-				hrefValue = hrefValue.substring("http://www.tvlux.be".length());
-			}
+			String hrefValue = stripHost(html.substring(start, end).trim());
 			if (!hrefValue.startsWith("/replay/")) {
 				continue;
 			}
@@ -77,15 +72,15 @@ final class TvLuxHtml {
 				break;
 			}
 			from = end + 1;
-			String hrefValue = html.substring(start, end).trim();
-			final String absolute = TvLuxUrls.absoluteUrl(hrefValue);
-			if (TvLuxUrls.sanitizeEpisodeUrl(absolute) == null) {
+			final String hrefValue = html.substring(start, end).trim();
+			final String sanitized = TvLuxUrls.sanitizeEpisodeUrl(TvLuxUrls.absoluteUrl(hrefValue));
+			if (sanitized == null) {
 				continue;
 			}
-			final String path = URI_PATH(absolute);
-			final String title = humanize(path.substring(path.lastIndexOf('/') + 1).replaceFirst("_\\d+$", ""));
-			if (!byUrl.containsKey(absolute)) {
-				byUrl.put(absolute, new EpisodeRef(title, absolute));
+			final String path = URI_PATH(sanitized);
+			final String title = humanize(stripTrailingEpisodeId(pathLastSegment(path)));
+			if (!byUrl.containsKey(sanitized)) {
+				byUrl.put(sanitized, new EpisodeRef(title, sanitized));
 			}
 		}
 		return new ArrayList<EpisodeRef>(byUrl.values());
@@ -125,7 +120,41 @@ final class TvLuxHtml {
 			return null;
 		}
 		final String url = normalized.substring(start, end).trim();
-		return url.startsWith("http") ? url : null;
+		return TvLuxUrls.sanitizeHlsUrl(url);
+	}
+
+	private static String stripHost(final String hrefValue) {
+		if (hrefValue.startsWith("https://www.tvlux.be")) {
+			return hrefValue.substring("https://www.tvlux.be".length());
+		}
+		if (hrefValue.startsWith("http://www.tvlux.be")) {
+			return hrefValue.substring("http://www.tvlux.be".length());
+		}
+		if (hrefValue.startsWith("https://tvlux.be")) {
+			return hrefValue.substring("https://tvlux.be".length());
+		}
+		if (hrefValue.startsWith("http://tvlux.be")) {
+			return hrefValue.substring("http://tvlux.be".length());
+		}
+		return hrefValue;
+	}
+
+	private static String pathLastSegment(final String path) {
+		final int slashPos = path.lastIndexOf('/');
+		return slashPos < 0 ? path : path.substring(slashPos + 1);
+	}
+
+	private static String stripTrailingEpisodeId(final String segment) {
+		final int underscore = segment.lastIndexOf('_');
+		if (underscore <= 0 || underscore >= segment.length() - 1) {
+			return segment;
+		}
+		for (int i = underscore + 1; i < segment.length(); i++) {
+			if (!Character.isDigit(segment.charAt(i))) {
+				return segment;
+			}
+		}
+		return segment.substring(0, underscore);
 	}
 
 	private static String URI_PATH(final String absolute) {
