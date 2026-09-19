@@ -4,9 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -21,8 +20,7 @@ final class RtbfAuvioClient {
 
 	private static final ObjectMapper MAPPER = new ObjectMapper();
 
-	private static final Pattern NEXT_DATA = Pattern.compile(
-			"<script id=\"__NEXT_DATA__\"[^>]*>(.*?)</script>", Pattern.DOTALL);
+	private static final String NEXT_DATA_MARKER = "id=\"__next_data__\"";
 
 	private final ContentLoader contentLoader;
 
@@ -34,11 +32,11 @@ final class RtbfAuvioClient {
 		if (StringUtils.isEmpty(channelPageHtml)) {
 			return Collections.emptyList();
 		}
-		final Matcher matcher = NEXT_DATA.matcher(channelPageHtml);
-		if (!matcher.find()) {
+		final String json = extractNextDataJson(channelPageHtml);
+		if (json == null) {
 			return Collections.emptyList();
 		}
-		final JsonNode root = MAPPER.readTree(matcher.group(1));
+		final JsonNode root = MAPPER.readTree(json);
 		final JsonNode ids = root.path("props").path("pageProps").path("rootData").path("preloadedWidgetIds");
 		final List<String> widgetIds = new ArrayList<String>();
 		if (ids.isArray()) {
@@ -47,6 +45,28 @@ final class RtbfAuvioClient {
 			}
 		}
 		return widgetIds;
+	}
+
+	/**
+	 * Locate {@code __NEXT_DATA__} with index scans only — avoids ReDoS-prone
+	 * regex against untrusted HTML.
+	 */
+	static String extractNextDataJson(final String html) {
+		final String lower = html.toLowerCase(Locale.ROOT);
+		final int marker = lower.indexOf(NEXT_DATA_MARKER);
+		if (marker < 0) {
+			return null;
+		}
+		final int openTagEnd = html.indexOf('>', marker);
+		if (openTagEnd < 0 || openTagEnd + 1 >= html.length()) {
+			return null;
+		}
+		final int closeTag = lower.indexOf("</script>", openTagEnd + 1);
+		if (closeTag < 0) {
+			return null;
+		}
+		final String json = html.substring(openTagEnd + 1, closeTag).trim();
+		return StringUtils.isEmpty(json) ? null : json;
 	}
 
 	String fetchChannelPage(final String channelSlug) throws IOException {
