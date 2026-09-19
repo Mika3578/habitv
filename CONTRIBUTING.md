@@ -13,7 +13,11 @@ Agents: follow [`AGENTS.md`](AGENTS.md). Humans: this file.
 | `fix/*`, `feat/*`, `docs/*`, `test/*`, `ci/*`, `chore/*`, `refactor/*` | Work branches |
 
 Format: `<type>/<short-scope>` (English kebab-case). No AI/tool prefixes
-(`cursor/`, `claude/`, `ai/`). PR titles use Conventional Commits.
+(`cursor/`, `claude/`, `ai/`).
+
+Branch names, PR titles, PR comments, and commit subjects stay short
+and generic. No product or brand names. Detail stays in the diff.
+PR titles use Conventional Commits.
 
 Target **`Mika3578/habitv`** → **`develop`**. Linear history on work
 branches (rebase, no merge commits).

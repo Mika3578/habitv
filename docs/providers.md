@@ -13,7 +13,7 @@ into git. User login material, if ever used, stays in local config or
 environment variables. Optional auth paths stay disabled until the user
 configures them.
 
-Keep public PR/commit text high-level (no bypass recipes).
+Keep public git text brief and generic.
 
 ## yt-dlp
 
