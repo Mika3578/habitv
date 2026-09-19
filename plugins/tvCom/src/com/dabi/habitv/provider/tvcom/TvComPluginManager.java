@@ -118,14 +118,14 @@ public class TvComPluginManager extends BasePluginWithProxy implements PluginPro
 			throws DownloadFailedException {
 		final TvComDiagnostics diagnostics = new TvComDiagnostics("download");
 		diagnostics.setSourceUrl(downloadParam.getDownloadInput());
+		final String sanitizedInput = TvComUrls.sanitizeEpisodeUrl(downloadParam.getDownloadInput());
 		try {
-			final String sanitized = TvComUrls.sanitizeEpisodeUrl(downloadParam.getDownloadInput());
-			if (sanitized == null) {
+			if (sanitizedInput == null) {
 				diagnostics.setRootCauseSummary("unsupported-url");
 				getLog().warn(diagnostics.formatLogLine());
 				throw new DownloadFailedException(TvComConf.DOWNLOAD_UNAVAILABLE_MESSAGE);
 			}
-			final String hlsUrl = client.resolveHlsUrl(sanitized);
+			final String hlsUrl = client.resolveHlsUrl(sanitizedInput);
 			if (hlsUrl == null) {
 				diagnostics.setRootCauseSummary("missing-hls");
 				getLog().warn(diagnostics.formatLogLine());
@@ -143,9 +143,9 @@ public class TvComPluginManager extends BasePluginWithProxy implements PluginPro
 					? "download-failed"
 					: DownloadFailureDiagnostics.getClassificationKey(e));
 			getLog().warn(diagnostics.formatLogLine());
+			final String safeId = sanitizedInput != null ? sanitizedInput : TvComConf.NAME;
 			getLog().warn(DownloadFailureDiagnostics.formatLogLine(
-					new EpisodeDTO(null, downloadParam.getDownloadInput(), downloadParam.getDownloadInput()),
-					TvComConf.NAME, e));
+					new EpisodeDTO(null, safeId, safeId), TvComConf.NAME, e));
 			throw new DownloadFailedException(TvComConf.DOWNLOAD_UNAVAILABLE_MESSAGE, e);
 		} catch (final IOException e) {
 			diagnostics.setRootCauseSummary("io-error:" + e.getClass().getSimpleName());

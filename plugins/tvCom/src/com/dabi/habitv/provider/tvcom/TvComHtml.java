@@ -78,18 +78,21 @@ final class TvComHtml {
 			from = end + 1;
 			String hrefValue = html.substring(start, end).trim();
 			final String absolute = TvComUrls.absoluteUrl(hrefValue);
-			if (TvComUrls.sanitizeEpisodeUrl(absolute) == null) {
+			final String sanitized = TvComUrls.sanitizeEpisodeUrl(absolute);
+			if (sanitized == null) {
 				continue;
 			}
-			final String path = uriPath(absolute);
-			if (!path.startsWith(prefix)) {
+			final String path = uriPath(sanitized);
+			final boolean showEpisode = path.startsWith(prefix);
+			final boolean legacyEpisode = path.startsWith("/replay/emissions/");
+			if (!showEpisode && !legacyEpisode) {
 				continue;
 			}
 			final String title = extractNearbyTitle(html, href, end);
 			final String fallback = humanize(pathLastSegmentBeforeId(path));
 			final String resolvedTitle = StringUtils.isEmpty(title) ? fallback : title;
-			if (!byUrl.containsKey(absolute)) {
-				byUrl.put(absolute, new EpisodeRef(resolvedTitle, absolute));
+			if (!byUrl.containsKey(sanitized)) {
+				byUrl.put(sanitized, new EpisodeRef(resolvedTitle, sanitized));
 			}
 		}
 		return new ArrayList<EpisodeRef>(byUrl.values());
@@ -128,8 +131,7 @@ final class TvComHtml {
 		if (end <= start) {
 			return null;
 		}
-		final String url = normalized.substring(start, end).trim();
-		return url.startsWith("http") ? url : null;
+		return TvComUrls.sanitizeHlsUrl(normalized.substring(start, end).trim());
 	}
 
 	private static String stripHost(final String hrefValue) {

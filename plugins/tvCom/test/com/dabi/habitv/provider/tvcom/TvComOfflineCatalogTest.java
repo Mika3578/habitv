@@ -15,9 +15,15 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import com.dabi.habitv.api.plugin.api.PluginDownloaderInterface;
 import com.dabi.habitv.api.plugin.api.PluginDownloaderInterface.DownloadableState;
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
+import com.dabi.habitv.api.plugin.dto.DownloadParamDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
+import com.dabi.habitv.api.plugin.exception.DownloadFailedException;
+import com.dabi.habitv.api.plugin.holder.DownloaderPluginHolder;
+import com.dabi.habitv.api.plugin.holder.ProcessHolder;
+import com.dabi.habitv.framework.FrameworkConf;
 
 public class TvComOfflineCatalogTest {
 
@@ -100,6 +106,75 @@ public class TvComOfflineCatalogTest {
 		assertFalse(line.contains("token=leak"));
 	}
 
+	@Test
+	public void findEpisodeStoresSanitizedUrlsWithoutQuery() throws IOException {
+		final Map<String, String> pages = new HashMap<String, String>();
+		pages.put(TvComUrls.showPageUrl("coin-lecture"),
+				"<html><body>"
+						+ "<h2><span>Legacy</span></h2>"
+						+ "<a href=\"/replay/emissions/emission-speciale-confreries/58494?token=secret\"></a>"
+						+ "<h2><span>Current</span></h2>"
+						+ "<a href=\"/replay/emission/coin-lecture/coin-lecture-18-09-26/58524?x=1#frag\"></a>"
+						+ "</body></html>");
+		final TvComPluginManager plugin = newRecordingPlugin(pages);
+		final CategoryDTO show = new CategoryDTO(TvComConf.NAME, "Coin Lecture",
+				TvComUrls.showCategoryId("coin-lecture"), TvComConf.EXTENSION);
+		final Set<EpisodeDTO> episodes = plugin.findEpisode(show);
+		assertEquals(2, episodes.size());
+		for (final EpisodeDTO episode : episodes) {
+			assertFalse(episode.getId().contains("?"));
+			assertFalse(episode.getId().contains("#"));
+			assertFalse(episode.getId().contains("token"));
+			assertTrue(episode.getId().startsWith("https://www.tvcom.be/replay/"));
+		}
+	}
+
+	@Test
+	public void downloadDelegatesSanitizedHlsToFfmpeg() throws Exception {
+		final Map<String, String> pages = new HashMap<String, String>();
+		pages.put("https://www.tvcom.be/replay/emission/coin-lecture/coin-lecture-18-09-26/58524",
+				read("test/resources/fixtures/tvcom/episode.html"));
+		pages.put(TvComUrls.freecasterEmbedUrl("a2981fdf-9ec4-4d17-b423-c1a6807049fc"),
+				read("test/resources/fixtures/tvcom/embed.html"));
+		final TvComPluginManager plugin = newRecordingPlugin(pages);
+		final RecordingDownloader downloader = new RecordingDownloader();
+		final Map<String, PluginDownloaderInterface> map = new HashMap<String, PluginDownloaderInterface>();
+		map.put(FrameworkConf.FFMPEG, downloader);
+		final DownloaderPluginHolder holder = new DownloaderPluginHolder("cmd", map,
+				new HashMap<String, String>(), ".", ".", ".", ".");
+		final DownloadParamDTO param = new DownloadParamDTO(
+				"https://www.tvcom.be/replay/emission/coin-lecture/coin-lecture-18-09-26/58524?token=x",
+				"out.mp4", TvComConf.EXTENSION);
+		plugin.download(param, holder);
+		assertNotNull(downloader.lastInput);
+		assertTrue(downloader.lastInput.startsWith("https://tvlocales-vod-cmaf.freecaster.com/"));
+		assertTrue(downloader.lastInput.contains(".m3u8"));
+	}
+
+	@Test(expected = DownloadFailedException.class)
+	public void downloadFailsWhenHlsMissing() throws Exception {
+		final Map<String, String> pages = new HashMap<String, String>();
+		pages.put("https://www.tvcom.be/replay/emission/coin-lecture/coin-lecture-18-09-26/58524",
+				"<html><body>no player</body></html>");
+		final TvComPluginManager plugin = newRecordingPlugin(pages);
+		final Map<String, PluginDownloaderInterface> map = new HashMap<String, PluginDownloaderInterface>();
+		map.put(FrameworkConf.FFMPEG, new RecordingDownloader());
+		final DownloaderPluginHolder holder = new DownloaderPluginHolder("cmd", map,
+				new HashMap<String, String>(), ".", ".", ".", ".");
+		plugin.download(new DownloadParamDTO(
+				"https://www.tvcom.be/replay/emission/coin-lecture/coin-lecture-18-09-26/58524", "out.mp4",
+				TvComConf.EXTENSION), holder);
+	}
+
+	@Test
+	public void sanitizeHlsRejectsNonFreecasterHosts() {
+		assertEquals(null, TvComUrls.sanitizeHlsUrl("https://evil.example/x.m3u8"));
+		assertEquals(null, TvComUrls.sanitizeHlsUrl("http://tvlocales-vod-cmaf.freecaster.com/x.m3u8"));
+		assertEquals(null, TvComUrls.sanitizeHlsUrl("httpfoo://tvlocales-vod-cmaf.freecaster.com/x.m3u8"));
+		assertNotNull(TvComUrls.sanitizeHlsUrl(
+				"https://tvlocales-vod-cmaf.freecaster.com/tvcom/id/file.m3u8?token=x"));
+	}
+
 	private static TvComPluginManager newRecordingPlugin(final Map<String, String> pages) {
 		return new TvComPluginManager(new TvComClient(new TvComClient.ContentLoader() {
 			@Override
@@ -122,6 +197,41 @@ public class TvComOfflineCatalogTest {
 				out.write(buffer, 0, read);
 			}
 			return out.toString("UTF-8");
+		}
+	}
+
+	private static final class RecordingDownloader implements PluginDownloaderInterface {
+
+		private String lastInput;
+
+		@Override
+		public String getName() {
+			return FrameworkConf.FFMPEG;
+		}
+
+		@Override
+		public DownloadableState canDownload(final String downloadInput) {
+			return DownloadableState.SPECIFIC;
+		}
+
+		@Override
+		public ProcessHolder download(final DownloadParamDTO downloadParam, final DownloaderPluginHolder downloaders)
+				throws DownloadFailedException {
+			lastInput = downloadParam.getDownloadInput();
+			return new ProcessHolder() {
+				@Override
+				public void start() {
+				}
+
+				@Override
+				public void stop() {
+				}
+
+				@Override
+				public String getProgression() {
+					return null;
+				}
+			};
 		}
 	}
 }
