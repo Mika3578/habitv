@@ -87,6 +87,8 @@ public class TvaPlusOfflineCatalogTest {
 		assertEquals(1, episodes.size());
 		final EpisodeDTO episode = episodes.iterator().next();
 		assertTrue(episode.getId().startsWith("https://www.tvaplus.ca/tva/"));
+		assertNotNull(episode.getMetadata());
+		assertEquals(null, episode.getMetadata().getSeriesTitle());
 	}
 
 	@Test

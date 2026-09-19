@@ -115,7 +115,9 @@ public class TvaPlusPluginManager extends BasePluginWithProxy implements PluginP
 			for (final TvaPlusHtml.EpisodeRef ref : refs) {
 				final EpisodeDTO episode = new EpisodeDTO(category, ref.title, ref.watchUrl);
 				final EpisodeMetadataDTO metadata = new EpisodeMetadataDTO();
-				metadata.setSeriesTitle(category.getName());
+				if (!TvaPlusUrls.isRecentCategory(category.getId())) {
+					metadata.setSeriesTitle(category.getName());
+				}
 				metadata.setEpisodeTitle(ref.title);
 				metadata.setSourceUrl(ref.watchUrl);
 				metadata.setChannel(TvaPlusConf.CHANNEL_LABEL);
@@ -148,8 +150,8 @@ public class TvaPlusPluginManager extends BasePluginWithProxy implements PluginP
 			throws DownloadFailedException {
 		final TvaPlusDiagnostics diagnostics = new TvaPlusDiagnostics("download");
 		diagnostics.setSourceUrl(downloadParam.getDownloadInput());
+		final String sanitized = TvaPlusUrls.sanitizeEpisodeUrl(downloadParam.getDownloadInput());
 		try {
-			final String sanitized = TvaPlusUrls.sanitizeEpisodeUrl(downloadParam.getDownloadInput());
 			if (sanitized == null) {
 				diagnostics.setRootCauseSummary("unsupported-url");
 				getLog().warn(diagnostics.formatLogLine());
@@ -170,8 +172,9 @@ public class TvaPlusPluginManager extends BasePluginWithProxy implements PluginP
 					? "download-failed"
 					: DownloadFailureDiagnostics.getClassificationKey(e));
 			getLog().warn(diagnostics.formatLogLine());
+			final String safeId = sanitized != null ? sanitized : TvaPlusConf.NAME;
 			getLog().warn(DownloadFailureDiagnostics.formatLogLine(
-					new EpisodeDTO(null, downloadParam.getDownloadInput(), downloadParam.getDownloadInput()),
+					new EpisodeDTO(null, safeId, safeId),
 					TvaPlusConf.NAME, e));
 			throw new DownloadFailedException(TvaPlusConf.DOWNLOAD_UNAVAILABLE_MESSAGE, e);
 		} catch (final RuntimeException e) {
