@@ -115,10 +115,10 @@ public class Tv5PlusPluginManager extends BasePluginWithProxy implements PluginP
 			}
 		} catch (final IOException e) {
 			diagnostics.setRootCauseSummary("io-error:" + e.getClass().getSimpleName());
-			getLog().warn("TV5+ episode listing failed for " + slug + ": " + e.getClass().getSimpleName());
+			getLog().warn("TV5+ episode listing failed: " + e.getClass().getSimpleName());
 		} catch (final RuntimeException e) {
 			diagnostics.setRootCauseSummary("runtime:" + e.getClass().getSimpleName());
-			getLog().warn("TV5+ episode listing failed for " + slug + ": " + e.getClass().getSimpleName());
+			getLog().warn("TV5+ episode listing failed: " + e.getClass().getSimpleName());
 		}
 		getLog().info(diagnostics.formatLogLine());
 		return episodes;
