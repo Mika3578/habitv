@@ -166,7 +166,6 @@ public class TvaPlusPluginManager extends BasePluginWithProxy implements PluginP
 					? downloadParam
 					: DownloadParamDTO.buildDownloadParam(downloadParam, sanitized);
 			// yt-dlp tvaplus extractor → Brightcove; may require CA network.
-			diagnostics.setRootCauseSummary("delegate-ytdlp");
 			getLog().info(diagnostics.formatLogLine());
 			return DownloadUtils.download(effectiveParam, downloaders, FrameworkConf.YOUTUBE);
 		} catch (final DownloadFailedException e) {

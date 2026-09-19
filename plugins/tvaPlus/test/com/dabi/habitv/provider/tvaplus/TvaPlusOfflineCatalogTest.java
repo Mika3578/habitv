@@ -16,9 +16,15 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import com.dabi.habitv.api.plugin.api.PluginDownloaderInterface;
 import com.dabi.habitv.api.plugin.api.PluginDownloaderInterface.DownloadableState;
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
+import com.dabi.habitv.api.plugin.dto.DownloadParamDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
+import com.dabi.habitv.api.plugin.exception.DownloadFailedException;
+import com.dabi.habitv.api.plugin.holder.DownloaderPluginHolder;
+import com.dabi.habitv.api.plugin.holder.ProcessHolder;
+import com.dabi.habitv.framework.FrameworkConf;
 
 public class TvaPlusOfflineCatalogTest {
 
@@ -139,6 +145,38 @@ public class TvaPlusOfflineCatalogTest {
 		assertFalse(line.contains("token=leak"));
 	}
 
+	@Test
+	public void downloadDelegatesSanitizedUrlToYtdlp() throws Exception {
+		final TvaPlusPluginManager plugin = new TvaPlusPluginManager();
+		final RecordingDownloader downloader = new RecordingDownloader();
+		final Map<String, PluginDownloaderInterface> map = new HashMap<String, PluginDownloaderInterface>();
+		map.put(FrameworkConf.YOUTUBE, downloader);
+		final DownloaderPluginHolder holder = new DownloaderPluginHolder("cmd", map,
+				new HashMap<String, String>(), ".", ".", ".", ".");
+		plugin.download(new DownloadParamDTO(
+				"https://www.tvaplus.ca/tva/j-e/saison-34/episode-973-2018367086?token=x#frag",
+				"out.mp4", TvaPlusConf.EXTENSION), holder);
+		assertEquals("https://www.tvaplus.ca/tva/j-e/saison-34/episode-973-2018367086", downloader.lastInput);
+	}
+
+	@Test(expected = DownloadFailedException.class)
+	public void downloadRejectsNullParam() throws Exception {
+		final TvaPlusPluginManager plugin = new TvaPlusPluginManager();
+		final Map<String, PluginDownloaderInterface> map = new HashMap<String, PluginDownloaderInterface>();
+		map.put(FrameworkConf.YOUTUBE, new RecordingDownloader());
+		plugin.download(null, new DownloaderPluginHolder("cmd", map, new HashMap<String, String>(), ".", ".", ".", "."));
+	}
+
+	@Test(expected = DownloadFailedException.class)
+	public void downloadRejectsUnsupportedUrl() throws Exception {
+		final TvaPlusPluginManager plugin = new TvaPlusPluginManager();
+		final Map<String, PluginDownloaderInterface> map = new HashMap<String, PluginDownloaderInterface>();
+		map.put(FrameworkConf.YOUTUBE, new RecordingDownloader());
+		plugin.download(new DownloadParamDTO("https://evil.example/tva/j-e/saison-1/episode-1-1", "out.mp4",
+				TvaPlusConf.EXTENSION),
+				new DownloaderPluginHolder("cmd", map, new HashMap<String, String>(), ".", ".", ".", "."));
+	}
+
 	private static TvaPlusPluginManager newRecordingPlugin(final Map<String, String> pages) {
 		return new TvaPlusPluginManager(new TvaPlusClient(new TvaPlusClient.ContentLoader() {
 			@Override
@@ -162,6 +200,27 @@ public class TvaPlusOfflineCatalogTest {
 				out.write(buffer, 0, read);
 			}
 			return out.toString("UTF-8");
+		}
+	}
+
+	private static final class RecordingDownloader implements PluginDownloaderInterface {
+		private String lastInput;
+
+		@Override
+		public String getName() {
+			return FrameworkConf.YOUTUBE;
+		}
+
+		@Override
+		public DownloadableState canDownload(final String downloadInput) {
+			return DownloadableState.SPECIFIC;
+		}
+
+		@Override
+		public ProcessHolder download(final DownloadParamDTO downloadParam, final DownloaderPluginHolder downloaders)
+				throws DownloadFailedException {
+			lastInput = downloadParam.getDownloadInput();
+			return ProcessHolder.EMPTY_PROCESS_HOLDER;
 		}
 	}
 }
