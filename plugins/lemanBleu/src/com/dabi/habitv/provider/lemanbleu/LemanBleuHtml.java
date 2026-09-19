@@ -17,18 +17,6 @@ import org.apache.commons.lang.StringUtils;
  */
 final class LemanBleuHtml {
 
-	private static final Pattern PROGRAM_LINK = Pattern.compile(
-			"<a[^>]+href=\"([^\"]*emission=(\\d+)[^\"]*)\"[^>]*title=\"([^\"]+)\"",
-			Pattern.CASE_INSENSITIVE);
-
-	private static final Pattern PROGRAM_LINK_TITLE_FIRST = Pattern.compile(
-			"<a[^>]+title=\"([^\"]+)\"[^>]*href=\"([^\"]*emission=(\\d+)[^\"]*)\"",
-			Pattern.CASE_INSENSITIVE);
-
-	private static final Pattern EPISODE_CARD = Pattern.compile(
-			"<div class=\"videoList-item-title\">(.*?)</div>\\s*<a href=\"(/fr/Emissions/[^\"]+)\"",
-			Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-
 	private static final Pattern ITEM_TEXT = Pattern.compile(
 			"videoList-item-text\">([^<]+)", Pattern.CASE_INSENSITIVE);
 
@@ -45,7 +33,10 @@ final class LemanBleuHtml {
 			"data-title=\"([^\"]+)\"", Pattern.CASE_INSENSITIVE);
 
 	private static final Pattern H1 = Pattern.compile(
-			"<h1[^>]*>(.*?)</h1>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+			"<h1[^>]*>([^<]*(?:<(?!/h1>)[^<]*)*)</h1>", Pattern.CASE_INSENSITIVE);
+
+	private static final Pattern FALLBACK_EPISODE_HREF = Pattern.compile(
+			"href=\"(/fr/Emissions/[^\"]+\\.html)\"", Pattern.CASE_INSENSITIVE);
 
 	private LemanBleuHtml() {
 	}
@@ -114,25 +105,40 @@ final class LemanBleuHtml {
 		return url;
 	}
 
+	/**
+	 * Scan {@code <a>} open tags with indexOf only — avoids ReDoS-prone
+	 * {@code <a[^>]+...} attribute regexes on untrusted HTML.
+	 */
 	static List<ProgramRef> parsePrograms(final String html) {
 		if (StringUtils.isEmpty(html)) {
 			return Collections.emptyList();
 		}
 		final Map<String, ProgramRef> byId = new LinkedHashMap<String, ProgramRef>();
-		final Matcher matcher = PROGRAM_LINK.matcher(html);
-		while (matcher.find()) {
-			final String id = matcher.group(2);
-			final String title = unescape(matcher.group(3));
-			if (StringUtils.isNotEmpty(id) && StringUtils.isNotEmpty(title) && !byId.containsKey(id)) {
-				byId.put(id, new ProgramRef(id, title));
+		final String lower = html.toLowerCase(Locale.ROOT);
+		int searchFrom = 0;
+		while (true) {
+			final int aStart = lower.indexOf("<a", searchFrom);
+			if (aStart < 0) {
+				break;
 			}
-		}
-		final Matcher alt = PROGRAM_LINK_TITLE_FIRST.matcher(html);
-		while (alt.find()) {
-			final String title = unescape(alt.group(1));
-			final String id = alt.group(3);
+			if (aStart + 2 < html.length()) {
+				final char next = html.charAt(aStart + 2);
+				if (next != ' ' && next != '\t' && next != '\n' && next != '\r' && next != '/') {
+					searchFrom = aStart + 2;
+					continue;
+				}
+			}
+			final int tagEnd = html.indexOf('>', aStart);
+			if (tagEnd < 0) {
+				break;
+			}
+			searchFrom = tagEnd + 1;
+			final String tag = html.substring(aStart, tagEnd + 1);
+			final String href = quotedAttr(tag, "href");
+			final String title = quotedAttr(tag, "title");
+			final String id = emissionIdFromHref(href);
 			if (StringUtils.isNotEmpty(id) && StringUtils.isNotEmpty(title) && !byId.containsKey(id)) {
-				byId.put(id, new ProgramRef(id, title));
+				byId.put(id, new ProgramRef(id, unescape(title)));
 			}
 		}
 		return new ArrayList<ProgramRef>(byId.values());
@@ -143,10 +149,27 @@ final class LemanBleuHtml {
 			return Collections.emptyList();
 		}
 		final List<EpisodeRef> episodes = new ArrayList<EpisodeRef>();
-		final Matcher matcher = EPISODE_CARD.matcher(html);
-		while (matcher.find()) {
-			final String block = matcher.group(1);
-			final String path = matcher.group(2);
+		final String lower = html.toLowerCase(Locale.ROOT);
+		final String titleMarker = "class=\"videolist-item-title\"";
+		int searchFrom = 0;
+		while (true) {
+			final int titlePos = lower.indexOf(titleMarker, searchFrom);
+			if (titlePos < 0) {
+				break;
+			}
+			final int openEnd = html.indexOf('>', titlePos);
+			if (openEnd < 0) {
+				break;
+			}
+			final int closeDiv = lower.indexOf("</div>", openEnd + 1);
+			if (closeDiv < 0) {
+				break;
+			}
+			final String block = html.substring(openEnd + 1, closeDiv);
+			searchFrom = closeDiv + 6;
+			final int nextTitle = lower.indexOf(titleMarker, searchFrom);
+			final int hrefLimit = nextTitle < 0 ? html.length() : nextTitle;
+			final String path = findEmissionHref(html, lower, closeDiv, hrefLimit);
 			final String text = firstGroup(ITEM_TEXT, block);
 			final String desc = firstGroup(ITEM_DESC, block);
 			final String date = firstGroup(ITEM_DATE, block);
@@ -159,9 +182,7 @@ final class LemanBleuHtml {
 		if (!episodes.isEmpty()) {
 			return episodes;
 		}
-		// Fallback: bare episode links.
-		final Matcher links = Pattern.compile("href=\"(/fr/Emissions/[^\"]+\\.html)\"",
-				Pattern.CASE_INSENSITIVE).matcher(html);
+		final Matcher links = FALLBACK_EPISODE_HREF.matcher(html);
 		while (links.find()) {
 			final String path = links.group(1);
 			final String slug = path.substring(path.lastIndexOf('/') + 1).replace(".html", "");
@@ -219,6 +240,63 @@ final class LemanBleuHtml {
 		return null;
 	}
 
+	private static String findEmissionHref(final String html, final String lower, final int from,
+			final int limit) {
+		int search = from;
+		while (search < limit) {
+			final int hrefPos = lower.indexOf("href=\"", search);
+			if (hrefPos < 0 || hrefPos >= limit) {
+				return null;
+			}
+			final int pathStart = hrefPos + 6;
+			final int pathEnd = html.indexOf('"', pathStart);
+			if (pathEnd < 0 || pathEnd > limit) {
+				return null;
+			}
+			final String path = html.substring(pathStart, pathEnd);
+			if (path.toLowerCase(Locale.ROOT).startsWith("/fr/emissions/")) {
+				return path;
+			}
+			search = pathEnd + 1;
+		}
+		return null;
+	}
+
+	private static String quotedAttr(final String tag, final String name) {
+		final String lower = tag.toLowerCase(Locale.ROOT);
+		final String needle = name.toLowerCase(Locale.ROOT) + "=\"";
+		final int start = lower.indexOf(needle);
+		if (start < 0) {
+			return null;
+		}
+		final int valueStart = start + needle.length();
+		final int valueEnd = tag.indexOf('"', valueStart);
+		if (valueEnd < 0) {
+			return null;
+		}
+		return tag.substring(valueStart, valueEnd);
+	}
+
+	private static String emissionIdFromHref(final String href) {
+		if (StringUtils.isEmpty(href)) {
+			return null;
+		}
+		final String lower = href.toLowerCase(Locale.ROOT);
+		final int idx = lower.indexOf("emission=");
+		if (idx < 0) {
+			return null;
+		}
+		final int start = idx + "emission=".length();
+		int end = start;
+		while (end < href.length() && Character.isDigit(href.charAt(end))) {
+			end++;
+		}
+		if (end == start) {
+			return null;
+		}
+		return href.substring(start, end);
+	}
+
 	private static int qualityScore(final String quality) {
 		if ("HD".equals(quality)) {
 			return 4;
@@ -264,7 +342,24 @@ final class LemanBleuHtml {
 	}
 
 	private static String stripTags(final String html) {
-		return unescape(html.replaceAll("(?s)<[^>]+>", " ").replaceAll("\\s+", " ").trim());
+		final StringBuilder out = new StringBuilder();
+		boolean inTag = false;
+		for (int i = 0; i < html.length(); i++) {
+			final char c = html.charAt(i);
+			if (c == '<') {
+				inTag = true;
+				continue;
+			}
+			if (c == '>') {
+				inTag = false;
+				out.append(' ');
+				continue;
+			}
+			if (!inTag) {
+				out.append(c);
+			}
+		}
+		return unescape(out.toString().replaceAll("\\s+", " ").trim());
 	}
 
 	private static String unescape(final String value) {
