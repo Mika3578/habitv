@@ -46,8 +46,7 @@ See [`docs/providers.md`](docs/providers.md).
   (`-Plive-provider-tests`), never the default proof.
 - Do not claim a provider works without code/tests/evidence.
 - One provider/plugin module per change when possible.
-- Keep public PR/commit text high-level (no bypass recipes, no session
-  extraction steps).
+- Public git text stays brief and generic (see Git Workflow).
 
 ## Safety and Legal Constraints
 
@@ -81,8 +80,10 @@ Never work on `develop`, `main`, or `master`. Branch format:
 `<type>/<short-scope>` with `feat/`, `fix/`, `docs/`, `test/`,
 `refactor/`, `chore/`, `ci/`. No AI/tool prefixes.
 
-Conventional Commits, English, imperative, required scope, ≤ 72 char
-subject. Follow [`CONTRIBUTING.md`](CONTRIBUTING.md).
+Branch names, PR titles, PR comments, and commit subjects stay short
+and generic. Conventional Commits, English, imperative, required scope,
+≤ 72 char subject. No product or brand names. Detail stays in the diff.
+Follow [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 Never run without explicit approval **in this conversation**:
 `git commit`, `git push`, `git push --force` / `--force-with-lease`,
@@ -105,6 +106,7 @@ Do not overwrite unrelated local changes.
 - Never open PRs against `ikfon10/habitv`
 
 Fill `.github/pull_request_template.md`. Keep PRs small and single-topic.
+Titles, bodies, and review comments stay brief and generic.
 Handle Copilot/review comments (fix, or reject with a reason). Ask before
 posting GitHub comments or resolving threads.
 
