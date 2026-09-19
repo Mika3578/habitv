@@ -251,11 +251,11 @@ final class TeleMbHtml {
 	}
 
 	private static int indexOfIgnoreCase(final String haystack, final String needle, final int from) {
-		return haystack.toLowerCase(Locale.ROOT).indexOf(needle.toLowerCase(Locale.ROOT), from);
+		return StringUtils.indexOfIgnoreCase(haystack, needle, from);
 	}
 
 	private static int lastIndexOfIgnoreCase(final String haystack, final String needle) {
-		return haystack.toLowerCase(Locale.ROOT).lastIndexOf(needle.toLowerCase(Locale.ROOT));
+		return StringUtils.lastIndexOfIgnoreCase(haystack, needle);
 	}
 
 	private static String humanize(final String slug) {
