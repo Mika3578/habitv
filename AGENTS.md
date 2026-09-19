@@ -1,66 +1,81 @@
-# HabiTV Agent Instructions
+# Development instructions
 
-Canonical repository instructions for coding agents. Humans: see
-[`CONTRIBUTING.md`](CONTRIBUTING.md). Architecture and build:
-[`docs/architecture.md`](docs/architecture.md),
-[`docs/development.md`](docs/development.md).
+Canonical, version-controlled guidance for HabiTV. This file is
+tool-independent: humans and automated tools follow the same conventions.
+Contributor overview: [`CONTRIBUTING.md`](CONTRIBUTING.md). Java/Maven:
+[`docs/development.md`](docs/development.md). Layout:
+[`docs/architecture.md`](docs/architecture.md). Providers:
+[`docs/providers.md`](docs/providers.md).
+
+Do not add other tracked rulebooks (`CLAUDE.md`, nested `AGENTS.md`,
+editor rule packs, assistant instruction mirrors). Editor settings stay
+on the local machine (for example `.git/info/exclude`). Do not commit
+machine-specific paths or tool-only configuration.
 
 ## Repository
 
-HabiTV is a Maven multi-module replay downloader (`fwk/`,
-`application/`, `plugins/`). Canonical remote: `Mika3578/habitv`.
-Integration branch: `develop`.
+HabiTV is a Maven multi-module application (`fwk/`, `application/`,
+`plugins/`) that scans catalogues and retrieves media through plugins.
+Canonical remote: `Mika3578/habitv`. Integration branch: `develop`.
 
-Current **build/runtime baseline is Java 8**; Java 21 is the
-modernization target, Java 25 next. Details:
-[`docs/development.md`](docs/development.md). Do not treat 21/25 as
-supported until compiler and required CI change.
+**Current build/runtime baseline is Java 8.** Java 21 is the
+modernization target; Java 25 is next. Do not treat 21/25 as supported
+until the compiler and required CI change. Details:
+[`docs/development.md`](docs/development.md).
 
-Do not rewrite architecture, migrate Java, replace JavaFX, regenerate
-JAXB, restructure the Maven reactor, or rewrite providers unless the
-current task explicitly asks for that scoped work.
+Do not rewrite architecture, change the Maven reactor, bump the Java
+baseline, migrate JavaFX, regenerate JAXB, or rewrite providers unless
+the current task explicitly asks for that scoped work.
 
-## Current Priorities
-
-Preferred work order: build/CI health, download diagnostics, yt-dlp
+Preferred order of work: build/CI health, retrieval diagnostics, yt-dlp
 reliability, then provider repairs, then JDK/packaging migration.
 
-## Engineering Baseline
+## Engineering baseline
 
-- Language: stay on the **current Java 8** baseline unless the task is
-  an explicit JDK migration. See [`docs/development.md`](docs/development.md).
+- Stay on Java 8 language and APIs unless the task is an explicit JDK
+  migration.
 - GUI modules need a JavaFX-capable JDK 8 at runtime (`jfxrt`).
 - Do not add, remove, or upgrade dependencies unless the task requires it.
-- Plugin version overrides must follow [`CONTRIBUTING.md`](CONTRIBUTING.md).
-  Internal plugin deps use `${project.parent.version}`.
+- Plugin version overrides follow [`CONTRIBUTING.md`](CONTRIBUTING.md).
+  Internal plugin dependencies use `${project.parent.version}`.
 - English for branches, commits, comments, docs, and PR text.
-- No secrets, tokens, credentials, or machine paths in git.
-- No AI/tool attribution in commits or PRs.
-- Scratch work goes in `agent_space/` (gitignored). Do not commit it.
+- No secrets, tokens, credentials, cookies, browser sessions, or
+  machine paths in git. User secrets stay in local config or environment
+  variables.
+- Scratch work belongs in `agent_space/` (gitignored). Do not commit it.
+- Do not delete user media, indexes, or configuration.
 
-## Download and Provider Rules
+## Providers and retrieval
 
 See [`docs/providers.md`](docs/providers.md).
 
-- Prefer offline fixtures; live network tests are opt-in
-  (`-Plive-provider-tests`), never the default proof.
-- Do not claim a provider works without code/tests/evidence.
+- Prefer offline fixtures. Live network tests are opt-in
+  (`-Plive-provider-tests`) and are not the default proof.
+- Do not claim a provider works without code, tests, or other evidence.
 - One provider/plugin module per change when possible.
-- Keep public PR/commit text high-level (no bypass recipes, no session
-  extraction steps).
+- Retrieval uses existing tools (yt-dlp through the `youtube` plugin,
+  plus curl, ffmpeg, and similar). Default yt-dlp flags, subtitle
+  behavior, and quality selection are documented in
+  [`docs/providers.md`](docs/providers.md). Do not change them silently.
+- User-facing messages use plain states: unavailable, unsupported,
+  authentication required, subscription required, restricted access,
+  premium. Logs may use precise technical terms when needed to identify
+  the failure.
 
-## Safety and Legal Constraints
+## Safety
 
-- No DRM, encryption, paywall, or license bypass.
-- No credential, cookie, or browser-session extraction into the repo.
-- User secrets stay in local config or environment variables.
+These constraints stay explicit and must not be weakened:
+
+- Do not circumvent access controls, encryption, paywalls, or licenses.
+- Do not extract credentials, cookies, or browser sessions into the repo.
+- Optional authenticated paths stay disabled until the user configures
+  them locally.
 - Do not re-enable legacy hosts (`dabiboo.free.fr`, `ftpperso.free.fr`).
-- Do not delete user downloads, indexes, or configs.
 
-## Testing and Validation
+## Testing and validation
 
-Docs-only: `git diff --check`. Maven optional if no Java/POM/workflow
-change.
+Docs-only: `git diff --check`. Maven is optional when no Java, POM, or
+workflow file changed.
 
 Default code validation:
 
@@ -72,52 +87,71 @@ Add targeted `mvn -B -ntp -pl <module> -am test` when Java changes.
 Do not treat `mvn verify` or full `package` as the default merge bar.
 Quote exact commands and results. Do not claim success without output.
 
-Windows is the primary dev OS: quote paths with spaces. If both `.sh`
-and `.ps1` exist, update both or say why not.
+Windows is the primary development OS: quote paths with spaces. If both
+`.sh` and `.ps1` exist, update both or say why not.
 
-## Git Workflow
+## Git
 
-Never work on `develop`, `main`, or `master`. Branch format:
-`<type>/<short-scope>` with `feat/`, `fix/`, `docs/`, `test/`,
-`refactor/`, `chore/`, `ci/`. No AI/tool prefixes.
+Never work on `develop`, `main`, or `master`.
 
-Conventional Commits, English, imperative, required scope, ≤ 72 char
-subject. Follow [`CONTRIBUTING.md`](CONTRIBUTING.md).
+Branch format: `<type>/<short-scope>` in lowercase kebab-case.
+Allowed prefixes: `feat/`, `fix/`, `docs/`, `test/`, `refactor/`,
+`chore/`, `ci/`. The scope names the affected concern. Keep it short.
+Do not include tool names, autogenerated identifiers, or implementation
+narratives in the branch name.
 
-Never run without explicit approval **in this conversation**:
-`git commit`, `git push`, `git push --force` / `--force-with-lease`,
-`gh pr create` / `merge` / `review` / `comment`, review resolution,
-or destructive git/fs commands.
+Examples: `fix/catalog-parsing`, `docs/development-rules`,
+`ci/maven-validation`.
 
-Do not chain those actions. Do not `git add -A`, `git add .`, or
-`git add --all`. Stage explicit paths only.
+Commits use Conventional Commits: English, imperative, required type,
+≤ 72 character subject. Prefer `<type>(<scope>): subject`. A type-only
+title such as `docs: subject` is fine when no narrower scope applies.
 
-Linear history: rebase onto `origin/develop`; never merge `develop`
-into the work branch. After rebase, `--force-with-lease` only, with
-approval. Never `--force`.
+Stage explicit paths only. Do not use `git add -A`, `git add .`, or
+`git add --all`.
+
+Keep history linear: rebase onto `origin/develop`. Do not merge
+`develop` into a work branch. After rebase, `git push --force-with-lease`
+only. Never `git push --force`.
 
 Do not overwrite unrelated local changes.
 
-## Pull Requests and Reviews
+Repository artifacts (branches, commits, PRs, comments, docs, TODOs,
+changelogs) describe the software and the change: component, behavior,
+reason, validation. They do not describe the environment or tool that
+produced the change.
+
+## Pull requests
 
 - Repository: `Mika3578/habitv`
 - Base: `develop`
-- Never open PRs against `ikfon10/habitv`
+- Do not open PRs against `ikfon10/habitv`
 
-Fill `.github/pull_request_template.md`. Keep PRs small and single-topic.
-Handle Copilot/review comments (fix, or reject with a reason). Ask before
-posting GitHub comments or resolving threads.
+Fill [`.github/pull_request_template.md`](.github/pull_request_template.md).
+Keep PRs small and single-topic.
 
-## Documentation
+Titles describe the change: `fix(scope): concise description`,
+`feat(scope): concise description`, or `docs: concise description`.
+Do not put tool attribution or workflow metadata in the title.
 
-One topic, one page. Link instead of copying. Do not add agent-rule
-mirrors (`CLAUDE.md`, nested `AGENTS.md`, Cursor rulebooks, Copilot
-`copilot-instructions.md`). Root `AGENTS.md` is the only agent rulebook.
+Descriptions should help review: motivation, observable behavior,
+important implementation choices, validation, compatibility,
+limitations, and risks. Skip implementation diaries and redundant
+narration.
 
-## Definition of Done
+Handle review comments by applying the change or explaining why not.
 
-- Change matches the requested scope only.
-- Validation for that scope ran (or is explicitly skipped).
+## Source comments
+
+Keep comments sparse. Write them for non-obvious intent, external
+constraints, compatibility, provider-specific behavior, deliberate
+fallbacks, and surprising edge cases. Do not restate the code in prose.
+Prefer clear names and structure over explanatory comments.
+
+## Definition of done
+
+- The change matches the requested scope only.
+- Validation for that scope ran, or is explicitly skipped.
 - Links and claims match the repository.
-- Developer was asked to test real behavior when runtime/UI is affected.
-- Commit/push/PR wait for explicit approval.
+- Runtime or UI changes were called out for real-application testing.
+- No secrets, binaries, or unrelated files are included.

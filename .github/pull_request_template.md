@@ -2,63 +2,49 @@
 
 ## Summary
 
-<!-- One or two sentences describing what this PR delivers and why. -->
+<!-- Motivation and observable behavior change. -->
 
 ## Scope
 
-<!-- Short descriptive scope, e.g. provider-youtube-ytdlp. -->
+<!-- Short concern name, e.g. catalog-parsing. -->
 -
 
 ## Related issue
 
-<!-- Optional: include a real GitHub issue number, e.g. #123. -->
+<!-- Optional: a real GitHub issue number, e.g. #123. -->
 - N/A
 
 ## Changes
 
-<!-- Bullet list of what this PR changes. -->
+<!-- Implementation choices that matter for review. -->
 -
 
 ## Validation
 
-<!-- Commands actually run locally and their honest outcome. -->
+<!-- Commands actually run and their outcome. -->
 - `git status --short`
 - `git diff --check`
 - `mvn -B -ntp -DskipTests validate` (required for code changes; optional for docs-only unless build files changed)
+
+## Compatibility / limitations
+
+<!-- User-config impact, Java 8, known gaps. -->
+-
 
 ## Risk / rollback
 
 - Risk:
 - Rollback:
 
-## Notes
-
-<!-- Bullet list of intentional non-changes to avoid scope creep. -->
--
-
 ## Checklist
 
-- [ ] Branch was created from `develop`
-- [ ] Duplicate-prevention checks completed before branch creation (see `AGENTS.md`)
-- [ ] No open PR already covered the same scope before opening this PR
+- [ ] Branch uses an allowed prefix from `develop` (`feat/`, `fix/`, `docs/`, `test/`, `refactor/`, `chore/`, `ci/`)
+- [ ] No open PR already covered the same scope
 - [ ] No unrelated source changes
 - [ ] `git diff --check` passed
-- [ ] `mvn -B -ntp -DskipTests validate` passed (or was N/A for docs-only PRs with no build file changes)
-- [ ] PR keeps linear history
+- [ ] `mvn -B -ntp -DskipTests validate` passed (or was N/A for docs-only)
+- [ ] History is linear
 - [ ] English used for branches, commits, comments, docs, and PR text
 - [ ] Docs updated if behavior or contributor workflow changed
-- [ ] If a `plugins/*/pom.xml` `<version>` is bumped, the trigger is named (downloader/parser, user-facing endpoint, or user-facing configuration), and internal deps use `${project.parent.version}`
+- [ ] If a `plugins/*/pom.xml` `<version>` is bumped, the trigger is named (parser, endpoint, or configuration) and internal deps use `${project.parent.version}`
 - [ ] No secrets, tokens, local paths, or build outputs committed
-
-## Suggested squash merge commit (optional)
-
-```text
-<type>(optional-scope): short summary (#PR_NUMBER)
-
-Short final summary of the merged change.
-
-Includes:
-- Main outcome.
-- Validation or documentation update.
-- Important compatibility note if needed.
-```
