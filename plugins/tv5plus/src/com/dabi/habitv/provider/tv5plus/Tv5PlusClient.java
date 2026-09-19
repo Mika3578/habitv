@@ -167,7 +167,7 @@ final class Tv5PlusClient {
 		}
 		query.append(") { ... on ArtisanPage { blocks { ... on ArtisanBlocksProductPlayableProductsStrip { "
 				+ "blockConfiguration { products { id title episodeNumber seasonNumber availabilityStatus "
-				+ "productType videoCanonicalUrl } } } } } } }");
+				+ "mediaType productType videoCanonicalUrl } } } } } } }");
 		final JsonNode blocks = execute(query.toString()).path("productPage").path("blocks");
 		if (!blocks.isArray()) {
 			return;
@@ -178,11 +178,11 @@ final class Tv5PlusClient {
 				continue;
 			}
 			for (final JsonNode product : products) {
-				if (!Tv5PlusConf.AVAILABILITY_AVAILABLE.equals(text(product, "availabilityStatus"))) {
+				if (!isAvailableVideo(product)) {
 					continue;
 				}
 				final String type = text(product, "productType");
-				if (type != null && !Tv5PlusConf.TYPE_EPISODE.equals(type) && !Tv5PlusConf.TYPE_MOVIE.equals(type)) {
+				if (type == null || (!Tv5PlusConf.TYPE_EPISODE.equals(type) && !Tv5PlusConf.TYPE_MOVIE.equals(type))) {
 					continue;
 				}
 				final Integer season = asInt(product.get("seasonNumber"));
