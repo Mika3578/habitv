@@ -128,10 +128,10 @@ public class Tv5PlusOfflineCatalogTest {
 		assertFalse(line.contains("%3F"));
 		assertFalse(line.contains("%3f"));
 
-		diagnostics.setSourceUrl("not a uri\ninjected rootCause=evil");
+		diagnostics.setSourceUrl("https://user:password with space@www.tv5unis.ca/videos/x");
 		line = diagnostics.formatLogLine();
-		assertFalse(line.contains("\n"));
-		assertFalse(line.contains("injected"));
+		assertTrue(line.contains("sourceUrl=invalid-url"));
+		assertFalse(line.contains("password"));
 	}
 
 	private static Map<String, String> catalogFixtures() throws IOException {
