@@ -1,0 +1,6 @@
+provider=tvLux
+strategy=html-freecaster-hls
+channels=TV Lux
+catalog=/replay show index + show episode links
+access=public Freecaster HLS; no account
+notes=TVCom and Télé MB share Freecaster player; separate providers deferred
