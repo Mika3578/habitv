@@ -213,8 +213,7 @@ final class Tv5PlusClient {
 		body.put("query", query);
 		final String response = transport.post(MAPPER.writeValueAsString(body));
 		final JsonNode root = MAPPER.readTree(response);
-		if (root.has("errors") && root.path("errors").isArray() && root.path("errors").size() > 0
-				&& root.path("data").isMissingNode()) {
+		if (root.has("errors") && root.path("errors").isArray() && root.path("errors").size() > 0) {
 			throw new IOException("graphql-error:" + root.path("errors").get(0).path("message").asText("unknown"));
 		}
 		return root.path("data");

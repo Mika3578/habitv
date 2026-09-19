@@ -69,9 +69,19 @@ final class Tv5PlusDiagnostics {
 				if (uri.getPort() >= 0) {
 					safe.append(':').append(uri.getPort());
 				}
-				final String path = uri.getPath();
-				if (path != null) {
-					safe.append(path);
+				final String rawPath = uri.getRawPath();
+				if (rawPath != null) {
+					final String lowerRaw = rawPath.toLowerCase(java.util.Locale.ROOT);
+					int cut = -1;
+					final int encodedQuery = lowerRaw.indexOf("%3f");
+					final int encodedFragment = lowerRaw.indexOf("%23");
+					if (encodedQuery >= 0) {
+						cut = encodedQuery;
+					}
+					if (encodedFragment >= 0 && (cut < 0 || encodedFragment < cut)) {
+						cut = encodedFragment;
+					}
+					safe.append(cut >= 0 ? rawPath.substring(0, cut) : rawPath);
 				}
 				return safe.toString();
 			}
@@ -86,6 +96,15 @@ final class Tv5PlusDiagnostics {
 		}
 		if (fragment >= 0) {
 			cut = Math.min(cut, fragment);
+		}
+		final String lower = redacted.toLowerCase(java.util.Locale.ROOT);
+		final int encodedQuery = lower.indexOf("%3f");
+		final int encodedFragment = lower.indexOf("%23");
+		if (encodedQuery >= 0) {
+			cut = Math.min(cut, encodedQuery);
+		}
+		if (encodedFragment >= 0) {
+			cut = Math.min(cut, encodedFragment);
 		}
 		return redacted.substring(0, cut);
 	}

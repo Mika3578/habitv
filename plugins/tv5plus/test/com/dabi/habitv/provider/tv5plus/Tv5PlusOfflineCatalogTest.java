@@ -108,6 +108,17 @@ public class Tv5PlusOfflineCatalogTest {
 		assertFalse(line.contains("token=leak"));
 	}
 
+	@Test
+	public void diagnosticsRejectEncodedDelimitersInPath() {
+		final Tv5PlusDiagnostics diagnostics = new Tv5PlusDiagnostics("download");
+		diagnostics.setSourceUrl("https://www.tv5unis.ca/videos/foo%3Ftoken=secret");
+		final String line = diagnostics.formatLogLine();
+		assertTrue(line.contains("sourceUrl=https://www.tv5unis.ca/videos/foo"));
+		assertFalse(line.contains("token=secret"));
+		assertFalse(line.contains("%3F"));
+		assertFalse(line.contains("%3f"));
+	}
+
 	private static Map<String, String> catalogFixtures() throws IOException {
 		final Map<String, String> fixtures = new HashMap<String, String>();
 		fixtures.put("featuredProductSets", read("test/resources/fixtures/tv5plus/featured-sets.json"));
