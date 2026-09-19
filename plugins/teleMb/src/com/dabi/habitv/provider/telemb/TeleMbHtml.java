@@ -147,18 +147,21 @@ final class TeleMbHtml {
 	private static String extractNearbyTitle(final String html, final int hrefPos, final int hrefEnd) {
 		final int closeA = indexOfIgnoreCase(html, "</a>", hrefEnd);
 		if (closeA > hrefEnd && closeA - hrefEnd < 400) {
-			final String inside = html.substring(hrefEnd, closeA);
-			final int spanOpen = indexOfIgnoreCase(inside, "<span>", 0);
-			if (spanOpen >= 0) {
-				final int spanStart = spanOpen + 6;
-				final int spanClose = indexOfIgnoreCase(inside, "</span>", spanStart);
-				if (spanClose > spanStart) {
-					return cleanTitle(inside.substring(spanStart, spanClose));
+			final int tagClose = html.indexOf('>', hrefEnd);
+			if (tagClose > hrefEnd && tagClose < closeA) {
+				final String inside = html.substring(tagClose + 1, closeA);
+				final int spanOpen = indexOfIgnoreCase(inside, "<span>", 0);
+				if (spanOpen >= 0) {
+					final int spanStart = spanOpen + 6;
+					final int spanClose = indexOfIgnoreCase(inside, "</span>", spanStart);
+					if (spanClose > spanStart) {
+						return cleanTitle(inside.substring(spanStart, spanClose));
+					}
 				}
-			}
-			final String direct = cleanTitle(stripTags(inside));
-			if (!StringUtils.isEmpty(direct)) {
-				return direct;
+				final String direct = cleanTitle(stripTags(inside));
+				if (!StringUtils.isEmpty(direct)) {
+					return direct;
+				}
 			}
 		}
 		final int lookFrom = Math.max(0, hrefPos - 600);
@@ -264,6 +267,65 @@ final class TeleMbHtml {
 			return slug;
 		}
 		return Character.toUpperCase(spaced.charAt(0)) + spaced.substring(1);
+	}
+
+	/**
+	 * Parse an explicit French broadcast date from a title such as
+	 * {@code Les Infos du samedi 19 septembre 2026}. Returns null when absent.
+	 */
+	static java.util.Date parseFrenchBroadcastDate(final String title) {
+		if (StringUtils.isEmpty(title)) {
+			return null;
+		}
+		final String lower = title.toLowerCase(Locale.ROOT);
+		final String[] months = { "janvier", "février", "fevrier", "mars", "avril", "mai", "juin", "juillet",
+				"août", "aout", "septembre", "octobre", "novembre", "décembre", "decembre" };
+		final int[] monthNums = { 0, 1, 1, 2, 3, 4, 5, 6, 7, 7, 8, 9, 10, 11, 11 };
+		for (int m = 0; m < months.length; m++) {
+			final int monthAt = lower.indexOf(months[m]);
+			if (monthAt < 0) {
+				continue;
+			}
+			int dayEnd = monthAt;
+			while (dayEnd > 0 && Character.isWhitespace(lower.charAt(dayEnd - 1))) {
+				dayEnd--;
+			}
+			int dayStart = dayEnd;
+			while (dayStart > 0 && Character.isDigit(lower.charAt(dayStart - 1))) {
+				dayStart--;
+			}
+			if (dayStart >= dayEnd) {
+				continue;
+			}
+			final String dayToken = lower.substring(dayStart, dayEnd);
+			int yearStart = monthAt + months[m].length();
+			while (yearStart < lower.length() && Character.isWhitespace(lower.charAt(yearStart))) {
+				yearStart++;
+			}
+			int yearEnd = yearStart;
+			while (yearEnd < lower.length() && Character.isDigit(lower.charAt(yearEnd))) {
+				yearEnd++;
+			}
+			if (yearEnd - yearStart != 4) {
+				continue;
+			}
+			try {
+				final int day = Integer.parseInt(dayToken);
+				final int year = Integer.parseInt(lower.substring(yearStart, yearEnd));
+				if (day < 1 || day > 31 || year < 1990 || year > 2100) {
+					continue;
+				}
+				final java.util.Calendar cal = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC"));
+				cal.clear();
+				cal.set(java.util.Calendar.YEAR, year);
+				cal.set(java.util.Calendar.MONTH, monthNums[m]);
+				cal.set(java.util.Calendar.DAY_OF_MONTH, day);
+				return cal.getTime();
+			} catch (final NumberFormatException e) {
+				return null;
+			}
+		}
+		return null;
 	}
 
 	static final class ShowRef {

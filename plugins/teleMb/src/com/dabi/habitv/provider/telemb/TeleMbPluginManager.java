@@ -67,10 +67,10 @@ public class TeleMbPluginManager extends BasePluginWithProxy implements PluginPr
 			}
 		} catch (final IOException e) {
 			diagnostics.setRootCauseSummary("io-error:" + e.getClass().getSimpleName());
-			getLog().warn("Télé MB catalogue failed: " + e.getMessage());
+			getLog().warn("Télé MB catalogue failed: " + e.getClass().getSimpleName());
 		} catch (final RuntimeException e) {
 			diagnostics.setRootCauseSummary("runtime:" + e.getClass().getSimpleName());
-			getLog().warn("Télé MB catalogue failed: " + e.getMessage());
+			getLog().warn("Télé MB catalogue failed: " + e.getClass().getSimpleName());
 		}
 		getLog().info(diagnostics.formatLogLine());
 		return categories;
@@ -95,6 +95,11 @@ public class TeleMbPluginManager extends BasePluginWithProxy implements PluginPr
 				metadata.setEpisodeTitle(ref.title);
 				metadata.setSourceUrl(ref.watchUrl);
 				metadata.setChannel(TeleMbConf.CHANNEL_LABEL);
+				final java.util.Date airDate = TeleMbHtml.parseFrenchBroadcastDate(ref.title);
+				if (airDate != null) {
+					metadata.setAirDate(airDate);
+					episode.setEpisodeDate(airDate);
+				}
 				episode.setMetadata(metadata);
 				episodes.add(episode);
 			}
@@ -104,10 +109,10 @@ public class TeleMbPluginManager extends BasePluginWithProxy implements PluginPr
 			}
 		} catch (final IOException e) {
 			diagnostics.setRootCauseSummary("io-error:" + e.getClass().getSimpleName());
-			getLog().warn("Télé MB episode listing failed for " + slug + ": " + e.getMessage());
+			getLog().warn("Télé MB episode listing failed for " + slug + ": " + e.getClass().getSimpleName());
 		} catch (final RuntimeException e) {
 			diagnostics.setRootCauseSummary("runtime:" + e.getClass().getSimpleName());
-			getLog().warn("Télé MB episode listing failed for " + slug + ": " + e.getMessage());
+			getLog().warn("Télé MB episode listing failed for " + slug + ": " + e.getClass().getSimpleName());
 		}
 		getLog().info(diagnostics.formatLogLine());
 		return episodes;
