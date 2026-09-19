@@ -99,7 +99,11 @@ public class TeleMbOfflineCatalogTest {
 	public void sanitizeHlsRejectsNonFreecasterHosts() {
 		assertEquals(null, TeleMbUrls.sanitizeHlsUrl("https://evil.example/x.m3u8"));
 		assertEquals(null, TeleMbUrls.sanitizeHlsUrl("http://tvlocales-vod-cmaf.freecaster.com/x.m3u8"));
-		assertNotNull(TeleMbUrls.sanitizeHlsUrl("https://tvlocales-vod-cmaf.freecaster.com/telemb/id/file.m3u8"));
+		assertEquals(null, TeleMbUrls.sanitizeHlsUrl("https://evil-vod.freecaster.com/x.m3u8"));
+		assertEquals(null, TeleMbUrls.sanitizeHlsUrl(
+				"https://tvlocales-vod-cmaf.freecaster.com:8443/telemb/id/file.m3u8"));
+		assertEquals("https://tvlocales-vod-cmaf.freecaster.com/telemb/id/file.m3u8",
+				TeleMbUrls.sanitizeHlsUrl("https://tvlocales-vod-cmaf.freecaster.com/telemb/id/file.m3u8?token=x"));
 	}
 
 	@Test
