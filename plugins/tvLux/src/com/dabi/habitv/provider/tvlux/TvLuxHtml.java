@@ -55,11 +55,12 @@ final class TvLuxHtml {
 		return new ArrayList<ShowRef>(bySlug.values());
 	}
 
-	static List<EpisodeRef> parseEpisodes(final String html) {
-		if (StringUtils.isEmpty(html)) {
+	static List<EpisodeRef> parseEpisodes(final String html, final String showSlug) {
+		if (StringUtils.isEmpty(html) || StringUtils.isEmpty(showSlug)) {
 			return Collections.emptyList();
 		}
 		final Map<String, EpisodeRef> byUrl = new LinkedHashMap<String, EpisodeRef>();
+		final String prefix = "/replay/" + showSlug + "/";
 		int from = 0;
 		while (true) {
 			final int href = indexOfIgnoreCase(html, "href=\"", from);
@@ -78,12 +79,79 @@ final class TvLuxHtml {
 				continue;
 			}
 			final String path = URI_PATH(sanitized);
-			final String title = humanize(stripTrailingEpisodeId(pathLastSegment(path)));
+			if (!path.startsWith(prefix)) {
+				continue;
+			}
+			final String anchorTitle = extractAnchorTitle(html, end);
+			final String title = StringUtils.isEmpty(anchorTitle)
+					? humanize(stripTrailingEpisodeId(pathLastSegment(path)))
+					: anchorTitle;
 			if (!byUrl.containsKey(sanitized)) {
 				byUrl.put(sanitized, new EpisodeRef(title, sanitized));
 			}
 		}
 		return new ArrayList<EpisodeRef>(byUrl.values());
+	}
+
+	private static String extractAnchorTitle(final String html, final int hrefQuoteEnd) {
+		final int tagClose = html.indexOf('>', hrefQuoteEnd);
+		if (tagClose < 0) {
+			return null;
+		}
+		final int closeA = indexOfIgnoreCase(html, "</a>", tagClose);
+		if (closeA <= tagClose || closeA - tagClose > 400) {
+			return null;
+		}
+		final String inside = html.substring(tagClose + 1, closeA);
+		final String direct = cleanTitle(stripTags(inside));
+		return StringUtils.isEmpty(direct) ? null : direct;
+	}
+
+	private static String cleanTitle(final String raw) {
+		if (raw == null) {
+			return null;
+		}
+		final String collapsed = collapseWhitespace(raw.replace('\u00a0', ' '));
+		return StringUtils.isEmpty(collapsed) ? null : collapsed;
+	}
+
+	private static String stripTags(final String raw) {
+		final StringBuilder out = new StringBuilder(raw.length());
+		boolean inTag = false;
+		for (int i = 0; i < raw.length(); i++) {
+			final char c = raw.charAt(i);
+			if (c == '<') {
+				inTag = true;
+				out.append(' ');
+				continue;
+			}
+			if (c == '>') {
+				inTag = false;
+				continue;
+			}
+			if (!inTag) {
+				out.append(c);
+			}
+		}
+		return out.toString();
+	}
+
+	private static String collapseWhitespace(final String raw) {
+		final StringBuilder out = new StringBuilder(raw.length());
+		boolean gap = false;
+		for (int i = 0; i < raw.length(); i++) {
+			final char c = raw.charAt(i);
+			if (Character.isWhitespace(c)) {
+				gap = true;
+				continue;
+			}
+			if (gap && out.length() > 0) {
+				out.append(' ');
+			}
+			gap = false;
+			out.append(c);
+		}
+		return out.toString().trim();
 	}
 
 	static String extractVideoId(final String html) {

@@ -67,10 +67,10 @@ public class TvLuxPluginManager extends BasePluginWithProxy implements PluginPro
 			}
 		} catch (final IOException e) {
 			diagnostics.setRootCauseSummary("io-error:" + e.getClass().getSimpleName());
-			getLog().warn("TV Lux catalogue failed: " + e.getMessage());
+			getLog().warn("TV Lux catalogue failed: " + e.getClass().getSimpleName());
 		} catch (final RuntimeException e) {
 			diagnostics.setRootCauseSummary("runtime:" + e.getClass().getSimpleName());
-			getLog().warn("TV Lux catalogue failed: " + e.getMessage());
+			getLog().warn("TV Lux catalogue failed: " + e.getClass().getSimpleName());
 		}
 		getLog().info(diagnostics.formatLogLine());
 		return categories;
@@ -104,10 +104,10 @@ public class TvLuxPluginManager extends BasePluginWithProxy implements PluginPro
 			}
 		} catch (final IOException e) {
 			diagnostics.setRootCauseSummary("io-error:" + e.getClass().getSimpleName());
-			getLog().warn("TV Lux episode listing failed for " + slug + ": " + e.getMessage());
+			getLog().warn("TV Lux episode listing failed for " + slug + ": " + e.getClass().getSimpleName());
 		} catch (final RuntimeException e) {
 			diagnostics.setRootCauseSummary("runtime:" + e.getClass().getSimpleName());
-			getLog().warn("TV Lux episode listing failed for " + slug + ": " + e.getMessage());
+			getLog().warn("TV Lux episode listing failed for " + slug + ": " + e.getClass().getSimpleName());
 		}
 		getLog().info(diagnostics.formatLogLine());
 		return episodes;

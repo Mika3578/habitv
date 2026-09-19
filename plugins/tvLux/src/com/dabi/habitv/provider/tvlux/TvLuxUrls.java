@@ -106,19 +106,23 @@ final class TvLuxUrls {
 			if (uri.getUserInfo() != null) {
 				return null;
 			}
+			final int port = uri.getPort();
+			if (port != -1 && port != 443) {
+				return null;
+			}
 			final String host = uri.getHost();
 			if (host == null) {
 				return null;
 			}
 			final String lower = host.toLowerCase(Locale.ROOT);
-			if (!lower.endsWith(".freecaster.com") && !"freecaster.com".equals(lower)) {
+			if (!TvLuxConf.FRECASTER_HLS_HOST.equals(lower)) {
 				return null;
 			}
 			final String path = uri.getPath();
 			if (path == null || !path.toLowerCase(Locale.ROOT).endsWith(".m3u8")) {
 				return null;
 			}
-			return "https://" + lower + path;
+			return "https://" + TvLuxConf.FRECASTER_HLS_HOST + path;
 		} catch (final IllegalArgumentException e) {
 			return null;
 		}

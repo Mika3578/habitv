@@ -53,12 +53,19 @@ public class TvLuxOfflineCatalogTest {
 		final CategoryDTO show = new CategoryDTO(TvLuxConf.NAME, "JT", TvLuxUrls.showCategoryId("jt"),
 				TvLuxConf.EXTENSION);
 		final Set<EpisodeDTO> episodes = plugin.findEpisode(show);
-		assertEquals(3, episodes.size());
+		assertEquals(2, episodes.size());
+		boolean sawAnchorTitle = false;
 		for (final EpisodeDTO episode : episodes) {
 			assertTrue(TvLuxUrls.sanitizeEpisodeUrl(episode.getId()) != null);
+			assertTrue(episode.getId().contains("/replay/jt/"));
+			assertFalse(episode.getId().contains("/replay/other/"));
 			assertNotNull(episode.getMetadata());
 			assertEquals(TvLuxConf.CHANNEL_LABEL, episode.getMetadata().getChannel());
+			if ("JT 18".equals(episode.getName()) || "JT 17".equals(episode.getName())) {
+				sawAnchorTitle = true;
+			}
 		}
+		assertTrue(sawAnchorTitle);
 	}
 
 	@Test
@@ -101,7 +108,10 @@ public class TvLuxOfflineCatalogTest {
 	public void sanitizeHlsUrlRequiresHttpsFreecasterM3u8() {
 		assertEquals(null, TvLuxUrls.sanitizeHlsUrl("http://tvlocales-vod-cmaf.freecaster.com/x.m3u8"));
 		assertEquals(null, TvLuxUrls.sanitizeHlsUrl("https://evil.example.com/x.m3u8"));
+		assertEquals(null, TvLuxUrls.sanitizeHlsUrl("https://evil-vod.freecaster.com/x.m3u8"));
 		assertEquals(null, TvLuxUrls.sanitizeHlsUrl("https://tvlocales-vod-cmaf.freecaster.com/x.mp4"));
+		assertEquals(null, TvLuxUrls.sanitizeHlsUrl(
+				"https://tvlocales-vod-cmaf.freecaster.com:8443/tvlux/id/file.m3u8"));
 		assertEquals("https://tvlocales-vod-cmaf.freecaster.com/tvlux/id/file.m3u8",
 				TvLuxUrls.sanitizeHlsUrl(
 						"https://tvlocales-vod-cmaf.freecaster.com/tvlux/id/file.m3u8?token=secret"));

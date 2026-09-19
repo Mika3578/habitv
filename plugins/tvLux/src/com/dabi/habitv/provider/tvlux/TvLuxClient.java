@@ -20,7 +20,7 @@ final class TvLuxClient {
 	}
 
 	List<TvLuxHtml.EpisodeRef> loadShowEpisodes(final String slug) throws IOException {
-		return TvLuxHtml.parseEpisodes(contentLoader.load(TvLuxUrls.showPageUrl(slug)));
+		return TvLuxHtml.parseEpisodes(contentLoader.load(TvLuxUrls.showPageUrl(slug)), slug);
 	}
 
 	String resolveHlsUrl(final String episodePageUrl) throws IOException {
