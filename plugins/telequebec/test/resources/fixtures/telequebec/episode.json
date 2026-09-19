@@ -1,0 +1,21 @@
+{
+  "data": {
+    "productByRootProductSlug": {
+      "availabilityStatus": "AVAILABLE",
+      "duration": 1020,
+      "episodeNumber": 1,
+      "id": "31075",
+      "seasonNumber": 1,
+      "slug": null,
+      "title": "Marché aux uces",
+      "videoCanonicalUrl": "https://telequebec.tv/regarder/penelope-partout/1/1",
+      "videoElement": {
+        "__typename": "Video",
+        "drmProtected": false,
+        "encodings": null,
+        "id": "10058",
+        "mediaId": "-1"
+      }
+    }
+  }
+}
