@@ -52,3 +52,21 @@ repository/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Agent scratch space (never commit)
+agent_space/
+
+# Local runtime/test layouts
+local/
+
+# Editor backups
+*~
+*.swp
+*.swo
+*.bak
+
+# Extra logs (habiTv.log* already covered above)
+*.log
+
+# Loose class files outside target/
+*.class

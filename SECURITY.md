@@ -33,9 +33,7 @@ For non-sensitive build/runtime bugs, please use the standard
 
 ## 🚨 Known sensitive areas
 
-The repository is undergoing modernization. The following areas have
-**known risks** tracked in [`docs/risk-register.md`](docs/risk-register.md)
-and should not be relied on in production until remediated:
+The repository is undergoing modernization. Known sensitive areas:
 
 | Risk ID | Area | Status |
 |---------|------|--------|

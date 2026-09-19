@@ -7,8 +7,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        Large architectural changes need a scoped work item and often an ADR.
-        See `docs/dev-tracker.md`.
+        Large architectural changes need a scoped GitHub issue and a small PR.
+        See `docs/modernization.md`.
 
   - type: textarea
     id: problem

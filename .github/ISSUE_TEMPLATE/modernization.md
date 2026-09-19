@@ -18,7 +18,7 @@ provider-youtube-ytdlp
 
 ## Motivation
 
-<!-- Why this matters now. Reference docs/risk-register.md entries when relevant. -->
+<!-- Why this matters now. -->
 
 ## Acceptance criteria
 
@@ -38,7 +38,7 @@ provider-youtube-ytdlp
 
 ## Risk
 
-<!-- Risk IDs from docs/risk-register.md (R-00X) and any new risks introduced. -->
+<!-- Known risks and any new risks introduced. -->
 - Existing:
 - New:
 

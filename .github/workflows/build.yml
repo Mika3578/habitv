@@ -2,7 +2,7 @@ name: build
 
 # Conservative baseline CI for the restart from master.
 # Intentionally validate-only (no compile, no tests) to avoid masking the
-# legacy reactor/plugin issues documented in docs/audit-master-baseline.md.
+# legacy reactor/plugin issues; see docs/history.md.
 # Subsequent PRs (`maven-reactor`, `java8-baseline`) will widen this workflow.
 
 on:

@@ -74,6 +74,7 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-09-19 | TBD | Deduplicate maintainer docs; root `AGENTS.md` is the only agent rulebook. Java 8 remains the current compiler/CI baseline; Java 21 then 25 are targets |
 | 2026-09-15 | TBD | Document canonical media metadata vs legacy tokens and MEDIA_SERVER naming (`docs/media-metadata-naming.md`) |
 | 2026-05-31 | TBD | Refresh modernization tracker, plan, risks, provider inventory, and maintenance dashboard after merged May work |
 | 2026-05-29 | PR [#136](https://github.com/Mika3578/habitv/pull/136) | Plan JAXB and Activation deduplication (docs only) |
@@ -92,7 +93,7 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 What this restart phase **delivers** so far:
 
-- ✅ A walkable Maven multi-module reactor (33 modules build with `mvn validate` / `mvn compile`)
+- ✅ A walkable Maven multi-module reactor (`mvn validate` / `mvn compile` on Java 8)
 - ✅ Reproducible Java 8 baseline on Ubuntu and Windows in CI
 - ✅ A runnable console fat-jar with a yt-dlp runtime path
 - ✅ Offline test coverage for the YouTube command wiring
@@ -100,7 +101,7 @@ What this restart phase **delivers** so far:
 
 What it intentionally **does not yet change** (tracked separately):
 
-- ⬜ Legacy URLs (`dabiboo.free.fr`, Assembla SVN, FTP) — still present
+- ✅ Legacy URLs (`dabiboo.free.fr`, Assembla SVN, FTP) — removed from active POM/runtime (PR [#36](https://github.com/Mika3578/habitv/pull/36); historical notes in `docs/history.md`)
 - ⬜ JavaFX 2.x / `${jdk.home}` packaging — `habiTv-linux` / `habiTv-windows` excluded from reactor
 - 🟡 `youtube-dl` → `yt-dlp` plugin binary migration (in progress; see `ytdlp-migration`)
 - ⬜ Provider plugin inventory / dead-endpoint cleanup
