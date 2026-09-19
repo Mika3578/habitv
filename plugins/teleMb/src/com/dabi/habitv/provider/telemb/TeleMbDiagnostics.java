@@ -24,7 +24,7 @@ final class TeleMbDiagnostics {
 	}
 
 	void setShowSlug(final String showSlug) {
-		this.showSlug = showSlug;
+		this.showSlug = showSlug == null ? null : truncateAtUnsafeDelimiter(showSlug);
 	}
 
 	void setSourceUrl(final String sourceUrl) {
@@ -79,7 +79,8 @@ final class TeleMbDiagnostics {
 		} catch (final IllegalArgumentException ignored) {
 			// fall through
 		}
-		return truncateAtUnsafeDelimiter(redacted);
+		// Do not echo malformed URLs: they may still contain userinfo credentials.
+		return "invalid-url";
 	}
 
 	/**

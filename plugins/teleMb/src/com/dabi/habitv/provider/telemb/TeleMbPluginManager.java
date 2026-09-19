@@ -109,10 +109,10 @@ public class TeleMbPluginManager extends BasePluginWithProxy implements PluginPr
 			}
 		} catch (final IOException e) {
 			diagnostics.setRootCauseSummary("io-error:" + e.getClass().getSimpleName());
-			getLog().warn("Télé MB episode listing failed for " + slug + ": " + e.getClass().getSimpleName());
+			getLog().warn("Télé MB episode listing failed: " + e.getClass().getSimpleName());
 		} catch (final RuntimeException e) {
 			diagnostics.setRootCauseSummary("runtime:" + e.getClass().getSimpleName());
-			getLog().warn("Télé MB episode listing failed for " + slug + ": " + e.getClass().getSimpleName());
+			getLog().warn("Télé MB episode listing failed: " + e.getClass().getSimpleName());
 		}
 		getLog().info(diagnostics.formatLogLine());
 		return episodes;

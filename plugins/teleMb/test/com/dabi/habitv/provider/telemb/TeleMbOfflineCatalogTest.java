@@ -167,10 +167,16 @@ public class TeleMbOfflineCatalogTest {
 		assertFalse(line.contains("%3F"));
 		assertFalse(line.contains("%3f"));
 
-		diagnostics.setSourceUrl("not a uri\ninjected rootCause=evil");
+		diagnostics.setSourceUrl("https://user:password with space@www.telemb.be/replay/x");
 		line = diagnostics.formatLogLine();
-		assertFalse(line.contains("\n"));
+		assertTrue(line.contains("sourceUrl=invalid-url"));
+		assertFalse(line.contains("password"));
+
+		diagnostics.setShowSlug("les-infos\ninjected=1");
+		line = diagnostics.formatLogLine();
+		assertTrue(line.contains("showSlug=les-infos"));
 		assertFalse(line.contains("injected"));
+		assertFalse(line.contains("\n"));
 	}
 
 	private static TeleMbPluginManager newRecordingPlugin(final Map<String, String> pages) {
