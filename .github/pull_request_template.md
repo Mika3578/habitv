@@ -28,7 +28,6 @@
 
 ## Risk / rollback
 
-<!-- Reference docs/risk-register.md IDs impacted/introduced and describe rollback. -->
 - Risk:
 - Rollback:
 
@@ -47,8 +46,8 @@
 - [ ] `mvn -B -ntp -DskipTests validate` passed (or was N/A for docs-only PRs with no build file changes)
 - [ ] PR keeps linear history
 - [ ] English used for branches, commits, comments, docs, and PR text
-- [ ] Documentation updated (`docs/dev-tracker.md`, `docs/dev-tracker.json`, risk register, decision log as needed)
-- [ ] If a `plugins/*/pom.xml` `<version>` is bumped, the trigger from `plugin-versioning-policy` is named in Summary/Changes (downloader/parser, user-facing endpoint, or user-facing configuration), and internal deps use `${project.parent.version}`
+- [ ] Docs updated if behavior or contributor workflow changed
+- [ ] If a `plugins/*/pom.xml` `<version>` is bumped, the trigger is named (downloader/parser, user-facing endpoint, or user-facing configuration), and internal deps use `${project.parent.version}`
 - [ ] No secrets, tokens, local paths, or build outputs committed
 
 ## Suggested squash merge commit (optional)

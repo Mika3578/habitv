@@ -33,16 +33,16 @@ For non-sensitive build/runtime bugs, please use the standard
 
 ## 🚨 Known sensitive areas
 
-The repository is undergoing modernization. The following areas have
-**known risks** tracked in [`docs/risk-register.md`](docs/risk-register.md)
-and should not be relied on in production until remediated:
+The repository is undergoing modernization. The table below lists known
+sensitive areas. Do not rely on 🟠 or 🔴 items in production until they
+are remediated.
 
 | Risk ID | Area | Status |
 |---------|------|--------|
 | `youtube-key-hardcoded` | Hardcoded YouTube Data API key in `plugins/youtube` | ✅ Mitigated (PR #29 merged) |
 | `legacy-maven-repo` | Legacy plain-HTTP `dabiboo.free.fr` Maven repository | ✅ Active wiring removed (PR #36 merged) |
 | `ftp-deploy` | FTP deployment with embedded credentials | 🟠 Migration planned (`legacy-url-migration`) |
-| `legacy-update-pull` | Auto-update can pull artifacts from unmaintained host | 🟠 Opt-in guard added; cutover pending (`static-repo-publish`) |
+| `legacy-update-pull` | Runtime plugin updater URL | ✅ Default is HTTPS `https://mika3578.github.io/habitv-repo/repository/` (`FrameworkConf.UPDATE_URL`). Disable with `-Dhabitv.update.enabled=false`. |
 | — | Hardcoded Gmail POP3/IMAP credentials in `plugins/email` tests | 🔴 Pending dedicated remediation PR |
 | — | Sample FTP credentials in `application/consoleView/config.xml` | 🔴 Sample is illustrative; do not reuse |
 
