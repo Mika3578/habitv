@@ -1,0 +1,4 @@
+provider=t18
+strategy=html-catalog-private-dailymotion
+homeUrl=https://t18.fr
+note=Public HTML catalogue; Dailymotion embeds are private; no auth-token reconstruction.

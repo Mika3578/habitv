@@ -30,7 +30,7 @@ still points at `youtube-dl`, switch it to yt-dlp.
 
 | Group | Modules |
 |-------|---------|
-| Recently worked | `francetv` (ex Pluzz), `youtube` (yt-dlp), `novo19` |
+| Recently worked | `francetv` (ex Pluzz), `youtube` (yt-dlp), `novo19`, `t18` |
 | Needs rewrite / investigation | `arte`, `6play`, `lequipe`, `footyroom`, `sfr`, `globalnews`, `mlssoccer` |
 | Obsolete / degraded endpoints | `canalPlus` (CStar; D8 removed), `wat`, `beinsport`, `clubic` |
 | Tools / infrastructure | `curl`, `ffmpeg`, `aria2`, `cmd`, `file`, `RSS`, `rclone`, `rtmpDump`, `adobeHDS`, `email`, `plugin-tester` |
@@ -41,7 +41,8 @@ Labels: **working** (validated), **degraded**, **protected** (auth/geo/DRM),
 
 France.tv and NOVO19 delegate download to the youtube/yt-dlp plugin when
 public URLs exist. Canal+ family and WAT/TF1+ are not treated as freely
-downloadable DRM catalogues.
+downloadable DRM catalogues. T18 exposes a public HTML catalogue but embeds
+private Dailymotion media; Habitv refuses download without auth-token workarounds.
 
 Full module list: `plugins/pom.xml`. Offline fixtures live under
 `plugins/<name>/test/resources/fixtures/<name>/`.
