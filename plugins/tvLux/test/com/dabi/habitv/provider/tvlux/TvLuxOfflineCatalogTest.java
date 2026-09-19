@@ -109,6 +109,8 @@ public class TvLuxOfflineCatalogTest {
 		assertEquals(DownloadableState.IMPOSSIBLE,
 				plugin.canDownload("https://www.tvlux.be/replay/jt/title%3Ftoken=x_1"));
 		assertEquals(DownloadableState.IMPOSSIBLE,
+				plugin.canDownload("https://www.tvlux.be/replay/jt/title%2Fextra_1"));
+		assertEquals(DownloadableState.IMPOSSIBLE,
 				plugin.canDownload("https://user:pass@www.tvlux.be/replay/jt/jt-du-18-09-2026_52260"));
 		assertEquals(DownloadableState.IMPOSSIBLE,
 				plugin.canDownload("https://www.tvlux.be:8443/replay/jt/jt-du-18-09-2026_52260"));

@@ -94,7 +94,8 @@ final class TvLuxUrls {
 				return null;
 			}
 			final String lowerRaw = rawPath.toLowerCase(Locale.ROOT);
-			if (lowerRaw.contains("%3f") || lowerRaw.contains("%23")) {
+			if (lowerRaw.contains("%3f") || lowerRaw.contains("%23") || lowerRaw.contains("%2f")
+					|| lowerRaw.contains("%5c")) {
 				return null;
 			}
 			if (!EPISODE_PATH.matcher(rawPath).matches()) {
@@ -136,7 +137,8 @@ final class TvLuxUrls {
 				return null;
 			}
 			final String lowerRaw = rawPath.toLowerCase(Locale.ROOT);
-			if (lowerRaw.contains("%3f") || lowerRaw.contains("%23")) {
+			if (lowerRaw.contains("%3f") || lowerRaw.contains("%23") || lowerRaw.contains("%2f")
+					|| lowerRaw.contains("%5c")) {
 				return null;
 			}
 			if (!path.toLowerCase(Locale.ROOT).endsWith(".m3u8")) {
