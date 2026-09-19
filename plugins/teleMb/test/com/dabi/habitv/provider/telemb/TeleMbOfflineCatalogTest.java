@@ -153,6 +153,24 @@ public class TeleMbOfflineCatalogTest {
 		assertFalse(line.contains("token=leak"));
 	}
 
+	@Test
+	public void diagnosticsRejectEncodedDelimitersAndNewlines() {
+		final TeleMbDiagnostics diagnostics = new TeleMbDiagnostics("download");
+		diagnostics.setSourceUrl(
+				"https://www.telemb.be/replay/emission/les-infos/les-infos-du-samedi-19-septembre-2026/41201%3Ftoken=secret");
+		String line = diagnostics.formatLogLine();
+		assertTrue(line.contains(
+				"sourceUrl=https://www.telemb.be/replay/emission/les-infos/les-infos-du-samedi-19-septembre-2026/41201"));
+		assertFalse(line.contains("token=secret"));
+		assertFalse(line.contains("%3F"));
+		assertFalse(line.contains("%3f"));
+
+		diagnostics.setSourceUrl("not a uri\ninjected rootCause=evil");
+		line = diagnostics.formatLogLine();
+		assertFalse(line.contains("\n"));
+		assertFalse(line.contains("injected"));
+	}
+
 	private static TeleMbPluginManager newRecordingPlugin(final Map<String, String> pages) {
 		return new TeleMbPluginManager(new TeleMbClient(new TeleMbClient.ContentLoader() {
 			@Override
