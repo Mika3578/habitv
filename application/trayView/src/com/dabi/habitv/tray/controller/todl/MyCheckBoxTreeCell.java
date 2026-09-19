@@ -28,12 +28,15 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -200,10 +203,16 @@ public abstract class MyCheckBoxTreeCell<T> extends TreeCell<T> {
 				}
 			}
 
-			if (showCheckBox(item)) {
-				setGraphic(checkBox);
+			final Node leading = leadingGraphic(item);
+			final Node selectionGraphic = showCheckBox(item) ? checkBox : new Label("     ");
+			if (leading == null) {
+				setGraphic(selectionGraphic);
 			} else {
-				setGraphic(new Label("     "));
+				final HBox row = new HBox(4);
+				row.setAlignment(Pos.CENTER_LEFT);
+				row.getChildren().add(leading);
+				row.getChildren().add(selectionGraphic);
+				setGraphic(row);
 			}
 
 			// uninstall bindings
@@ -246,4 +255,12 @@ public abstract class MyCheckBoxTreeCell<T> extends TreeCell<T> {
 	protected abstract boolean isBold(T item);
 
 	protected abstract boolean showCheckBox(T item);
+
+	/**
+	 * Optional leading graphic (for example a provider/channel logo). Default: none.
+	 * Implementations must never throw; return null to keep text-only rendering.
+	 */
+	protected Node leadingGraphic(T item) {
+		return null;
+	}
 }
