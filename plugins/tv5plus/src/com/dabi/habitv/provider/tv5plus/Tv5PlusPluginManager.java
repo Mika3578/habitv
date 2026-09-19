@@ -74,10 +74,10 @@ public class Tv5PlusPluginManager extends BasePluginWithProxy implements PluginP
 			}
 		} catch (final IOException e) {
 			diagnostics.setRootCauseSummary("io-error:" + e.getClass().getSimpleName());
-			getLog().warn("TV5+ catalogue failed: " + e.getMessage());
+			getLog().warn("TV5+ catalogue failed: " + e.getClass().getSimpleName());
 		} catch (final RuntimeException e) {
 			diagnostics.setRootCauseSummary("runtime:" + e.getClass().getSimpleName());
-			getLog().warn("TV5+ catalogue failed: " + e.getMessage());
+			getLog().warn("TV5+ catalogue failed: " + e.getClass().getSimpleName());
 		}
 		getLog().info(diagnostics.formatLogLine());
 		return categories;
@@ -115,10 +115,10 @@ public class Tv5PlusPluginManager extends BasePluginWithProxy implements PluginP
 			}
 		} catch (final IOException e) {
 			diagnostics.setRootCauseSummary("io-error:" + e.getClass().getSimpleName());
-			getLog().warn("TV5+ episode listing failed for " + slug + ": " + e.getMessage());
+			getLog().warn("TV5+ episode listing failed for " + slug + ": " + e.getClass().getSimpleName());
 		} catch (final RuntimeException e) {
 			diagnostics.setRootCauseSummary("runtime:" + e.getClass().getSimpleName());
-			getLog().warn("TV5+ episode listing failed for " + slug + ": " + e.getMessage());
+			getLog().warn("TV5+ episode listing failed for " + slug + ": " + e.getClass().getSimpleName());
 		}
 		getLog().info(diagnostics.formatLogLine());
 		return episodes;
@@ -129,8 +129,8 @@ public class Tv5PlusPluginManager extends BasePluginWithProxy implements PluginP
 			throws DownloadFailedException {
 		final Tv5PlusDiagnostics diagnostics = new Tv5PlusDiagnostics("download");
 		diagnostics.setSourceUrl(downloadParam.getDownloadInput());
+		final String sanitized = Tv5PlusUrls.sanitizeEpisodeUrl(downloadParam.getDownloadInput());
 		try {
-			final String sanitized = Tv5PlusUrls.sanitizeEpisodeUrl(downloadParam.getDownloadInput());
 			if (sanitized == null) {
 				diagnostics.setRootCauseSummary("unsupported-url");
 				getLog().warn(diagnostics.formatLogLine());
@@ -151,8 +151,9 @@ public class Tv5PlusPluginManager extends BasePluginWithProxy implements PluginP
 					? "download-failed"
 					: DownloadFailureDiagnostics.getClassificationKey(e));
 			getLog().warn(diagnostics.formatLogLine());
+			final String safeId = sanitized != null ? sanitized : Tv5PlusConf.NAME;
 			getLog().warn(DownloadFailureDiagnostics.formatLogLine(
-					new EpisodeDTO(null, downloadParam.getDownloadInput(), downloadParam.getDownloadInput()),
+					new EpisodeDTO(null, safeId, safeId),
 					Tv5PlusConf.NAME, e));
 			throw new DownloadFailedException(Tv5PlusConf.DOWNLOAD_UNAVAILABLE_MESSAGE, e);
 		} catch (final RuntimeException e) {
