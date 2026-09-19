@@ -110,22 +110,23 @@ final class TvComUrls {
 			if (!"https".equalsIgnoreCase(uri.getScheme()) || uri.getUserInfo() != null) {
 				return null;
 			}
+			final int port = uri.getPort();
+			if (port != -1 && port != 443) {
+				return null;
+			}
 			final String host = uri.getHost();
 			if (host == null) {
 				return null;
 			}
 			final String lower = host.toLowerCase(Locale.ROOT);
-			if (!lower.endsWith(".freecaster.com") && !"freecaster.com".equals(lower)) {
-				return null;
-			}
-			if (!lower.contains("vod")) {
+			if (!TvComConf.FRECASTER_HLS_HOST.equals(lower)) {
 				return null;
 			}
 			final String path = uri.getPath();
 			if (path == null || !path.toLowerCase(Locale.ROOT).contains(".m3u8")) {
 				return null;
 			}
-			return uri.getScheme() + "://" + host + path;
+			return "https://" + TvComConf.FRECASTER_HLS_HOST + path;
 		} catch (final IllegalArgumentException e) {
 			return null;
 		}

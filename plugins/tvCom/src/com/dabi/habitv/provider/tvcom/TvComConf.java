@@ -17,6 +17,9 @@ interface TvComConf {
 
 	String FRECAST_EMBED_PREFIX = "https://tvlocales-player.freecaster.com/embed/";
 
+	/** Exact Freecaster VOD HLS host used by TVCom embeds (no subdomain substring match). */
+	String FRECASTER_HLS_HOST = "tvlocales-vod-cmaf.freecaster.com";
+
 	String EXTENSION = FrameworkConf.MP4;
 
 	String CHANNEL_LABEL = "TVCom";

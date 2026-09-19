@@ -126,6 +126,11 @@ public class TvComOfflineCatalogTest {
 			assertFalse(episode.getId().contains("#"));
 			assertFalse(episode.getId().contains("token"));
 			assertTrue(episode.getId().startsWith("https://www.tvcom.be/replay/"));
+			assertNotNull(episode.getMetadata());
+			assertEquals(episode.getId(), episode.getMetadata().getSourceUrl());
+			assertFalse(episode.getMetadata().getSourceUrl().contains("?"));
+			assertFalse(episode.getMetadata().getSourceUrl().contains("#"));
+			assertFalse(episode.getMetadata().getSourceUrl().contains("token"));
 		}
 	}
 
@@ -171,8 +176,12 @@ public class TvComOfflineCatalogTest {
 		assertEquals(null, TvComUrls.sanitizeHlsUrl("https://evil.example/x.m3u8"));
 		assertEquals(null, TvComUrls.sanitizeHlsUrl("http://tvlocales-vod-cmaf.freecaster.com/x.m3u8"));
 		assertEquals(null, TvComUrls.sanitizeHlsUrl("httpfoo://tvlocales-vod-cmaf.freecaster.com/x.m3u8"));
-		assertNotNull(TvComUrls.sanitizeHlsUrl(
-				"https://tvlocales-vod-cmaf.freecaster.com/tvcom/id/file.m3u8?token=x"));
+		assertEquals(null, TvComUrls.sanitizeHlsUrl("https://evil-vod.freecaster.com/x.m3u8"));
+		assertEquals(null, TvComUrls.sanitizeHlsUrl(
+				"https://tvlocales-vod-cmaf.freecaster.com:8443/tvcom/id/file.m3u8"));
+		assertEquals("https://tvlocales-vod-cmaf.freecaster.com/tvcom/id/file.m3u8",
+				TvComUrls.sanitizeHlsUrl(
+						"https://tvlocales-vod-cmaf.freecaster.com/tvcom/id/file.m3u8?token=x"));
 	}
 
 	private static TvComPluginManager newRecordingPlugin(final Map<String, String> pages) {
