@@ -117,6 +117,11 @@ public class TvLuxPluginManager extends BasePluginWithProxy implements PluginPro
 	public ProcessHolder download(final DownloadParamDTO downloadParam, final DownloaderPluginHolder downloaders)
 			throws DownloadFailedException {
 		final TvLuxDiagnostics diagnostics = new TvLuxDiagnostics("download");
+		if (downloadParam == null || downloadParam.getDownloadInput() == null) {
+			diagnostics.setRootCauseSummary("null-download-param");
+			getLog().warn(diagnostics.formatLogLine());
+			throw new DownloadFailedException(TvLuxConf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+		}
 		final String downloadInput = downloadParam.getDownloadInput();
 		final String sanitizedEpisodeUrl = TvLuxUrls.sanitizeEpisodeUrl(downloadInput);
 		diagnostics.setSourceUrl(downloadInput);
