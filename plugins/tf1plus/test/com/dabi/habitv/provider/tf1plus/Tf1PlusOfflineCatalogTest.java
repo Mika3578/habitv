@@ -98,6 +98,8 @@ public class Tf1PlusOfflineCatalogTest {
 		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload("https://www.france.tv/france-2/"));
 		assertEquals(DownloadableState.IMPOSSIBLE,
 				plugin.canDownload("https://attacker.example/tf1.fr/videos/spoof.html"));
+		assertEquals(DownloadableState.IMPOSSIBLE,
+				plugin.canDownload("https://user:password@www.tf1.fr/tf1/foo/videos/bar.html"));
 		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload(null));
 	}
 
@@ -111,10 +113,24 @@ public class Tf1PlusOfflineCatalogTest {
 		assertTrue(Tf1PlusUrls.isTf1PlusPageUrl("https://tf1.fr/tf1/foo/videos/bar.html"));
 		assertFalse(Tf1PlusUrls.isTf1PlusPageUrl("https://www.tf1.fr/novo19/foo/videos/bar.html"));
 		assertFalse(Tf1PlusUrls.isTf1PlusPageUrl("https://attacker.example/tf1.fr/videos/bar.html"));
+		assertFalse(Tf1PlusUrls.isTf1PlusPageUrl("https://user:password@www.tf1.fr/tf1/foo/videos/bar.html"));
 		assertFalse(Tf1PlusUrls.isTf1PlusVideoPageUrl("https://www.tf1.fr/tmc/program-only"));
 		assertEquals("", Tf1PlusUrls.programName(null));
 		assertNull(Tf1PlusUrls.programSlug(null));
 		assertNull(Tf1PlusUrls.videoUrl(null));
+	}
+
+	@Test
+	public void diagnosticsStripQueryAndFragmentFromSourceUrl() {
+		final Tf1PlusDiagnostics diagnostics = new Tf1PlusDiagnostics("download");
+		diagnostics.setSourceUrl(
+				"https://www.tf1.fr/tf1/foo/videos/bar.html?session=secret#token=leak");
+		final String line = diagnostics.formatLogLine();
+		assertTrue(line.contains("sourceUrl=https://www.tf1.fr/tf1/foo/videos/bar.html"));
+		assertFalse(line.contains("session=secret"));
+		assertFalse(line.contains("token=leak"));
+		assertFalse(line.contains("?"));
+		assertFalse(line.contains("#"));
 	}
 
 	private static Tf1PlusPluginManager newRecordingPlugin(final Map<String, String> fixturesByQueryHint) {

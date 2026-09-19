@@ -1,5 +1,7 @@
 package com.dabi.habitv.provider.tf1plus;
 
+import java.net.URI;
+
 import com.dabi.habitv.api.plugin.exception.ExecutorOutputSanitizer;
 
 /**
@@ -73,12 +75,42 @@ final class Tf1PlusDiagnostics {
 		return ExecutorOutputSanitizer.redactSecretsInText(line.toString());
 	}
 
+	/**
+	 * Rebuild scheme/host/path only so query and fragment never appear in logs.
+	 */
 	private static String sanitizeUrl(final String url) {
 		if (url == null) {
 			return null;
 		}
 		final String redacted = ExecutorOutputSanitizer.redactSecretsInText(url);
+		try {
+			final URI uri = URI.create(redacted.trim());
+			final String scheme = uri.getScheme();
+			final String host = uri.getHost();
+			if (scheme != null && host != null) {
+				final StringBuilder safe = new StringBuilder();
+				safe.append(scheme).append("://").append(host);
+				if (uri.getPort() >= 0) {
+					safe.append(':').append(uri.getPort());
+				}
+				final String path = uri.getPath();
+				if (path != null) {
+					safe.append(path);
+				}
+				return safe.toString();
+			}
+		} catch (final IllegalArgumentException ignored) {
+			// fall through to delimiter strip
+		}
+		int cut = redacted.length();
 		final int query = redacted.indexOf('?');
-		return query >= 0 ? redacted.substring(0, query) : redacted;
+		final int fragment = redacted.indexOf('#');
+		if (query >= 0) {
+			cut = Math.min(cut, query);
+		}
+		if (fragment >= 0) {
+			cut = Math.min(cut, fragment);
+		}
+		return redacted.substring(0, cut);
 	}
 }

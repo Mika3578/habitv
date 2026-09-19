@@ -72,6 +72,10 @@ final class Tf1PlusUrls {
 			if (scheme == null || (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme))) {
 				return false;
 			}
+			// Reject credential-bearing URLs so userinfo never reaches yt-dlp or diagnostics.
+			if (uri.getUserInfo() != null) {
+				return false;
+			}
 			final String host = uri.getHost();
 			if (host == null) {
 				return false;
