@@ -117,6 +117,11 @@ public class TvComPluginManager extends BasePluginWithProxy implements PluginPro
 	public ProcessHolder download(final DownloadParamDTO downloadParam, final DownloaderPluginHolder downloaders)
 			throws DownloadFailedException {
 		final TvComDiagnostics diagnostics = new TvComDiagnostics("download");
+		if (downloadParam == null || downloadParam.getDownloadInput() == null) {
+			diagnostics.setRootCauseSummary("null-download-param");
+			getLog().warn(diagnostics.formatLogLine());
+			throw new DownloadFailedException(TvComConf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+		}
 		diagnostics.setSourceUrl(downloadParam.getDownloadInput());
 		final String sanitizedInput = TvComUrls.sanitizeEpisodeUrl(downloadParam.getDownloadInput());
 		try {
