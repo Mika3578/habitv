@@ -104,10 +104,10 @@ public class TvComPluginManager extends BasePluginWithProxy implements PluginPro
 			}
 		} catch (final IOException e) {
 			diagnostics.setRootCauseSummary("io-error:" + e.getClass().getSimpleName());
-			getLog().warn("TVCom episode listing failed for " + slug + ": " + e.getClass().getSimpleName());
+			getLog().warn("TVCom episode listing failed: " + e.getClass().getSimpleName());
 		} catch (final RuntimeException e) {
 			diagnostics.setRootCauseSummary("runtime:" + e.getClass().getSimpleName());
-			getLog().warn("TVCom episode listing failed for " + slug + ": " + e.getClass().getSimpleName());
+			getLog().warn("TVCom episode listing failed: " + e.getClass().getSimpleName());
 		}
 		getLog().info(diagnostics.formatLogLine());
 		return episodes;

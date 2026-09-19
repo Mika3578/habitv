@@ -132,10 +132,10 @@ public class TvComOfflineCatalogTest {
 		assertFalse(line.contains("%3F"));
 		assertFalse(line.contains("%3f"));
 
-		diagnostics.setSourceUrl("not a uri\ninjected rootCause=evil");
+		diagnostics.setSourceUrl("https://user:password with space@www.tvcom.be/replay/x");
 		line = diagnostics.formatLogLine();
-		assertFalse(line.contains("\n"));
-		assertFalse(line.contains("injected"));
+		assertTrue(line.contains("sourceUrl=invalid-url"));
+		assertFalse(line.contains("password"));
 	}
 
 	@Test
