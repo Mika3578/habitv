@@ -45,6 +45,7 @@ DRM or paywalls. Status: [`docs/providers.md`](docs/providers.md).
 | [`docs/development.md`](docs/development.md) | JDK, Maven, run, CI |
 | [`docs/configuration.md`](docs/configuration.md) | XML config and naming |
 | [`docs/troubleshooting.md`](docs/troubleshooting.md) | Common failures |
+| [`AGENTS.md`](AGENTS.md) | Repository conventions |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | How to contribute |
 | [`SECURITY.md`](SECURITY.md) | Vulnerability reporting |
 
