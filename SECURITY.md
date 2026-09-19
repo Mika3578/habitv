@@ -33,7 +33,8 @@ For non-sensitive build/runtime bugs, please use the standard
 
 ## 🚨 Known sensitive areas
 
-The repository is undergoing modernization. Known sensitive areas:
+The repository is undergoing modernization. Known sensitive areas.
+Do not rely on 🟠 or 🔴 items in production until they are remediated.
 
 | Risk ID | Area | Status |
 |---------|------|--------|

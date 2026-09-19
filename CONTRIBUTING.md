@@ -22,6 +22,8 @@ branches (rebase, no merge commits).
 <type>(<scope>): <subject>
 ```
 
+Required scope, imperative subject, ≤ 72 characters.
+
 Allowed types: `feat`, `fix`, `refactor`, `perf`, `docs`, `test`,
 `chore`, `ci`, `build`, `style`, `revert`.
 
@@ -54,8 +56,9 @@ Inside a bumped plugin, depend on `api` / `framework` /
 ## Out of scope unless explicitly requested
 
 Reactor topology changes, Java baseline bump, JavaFX migration, JAXB
-Jakarta move, provider rewrites, runtime updater URL changes, committing
-secrets or binaries.
+Jakarta move, provider rewrites, runtime updater URL changes.
+
+Never commit secrets, tokens, credentials, or generated binaries.
 
 ## License
 

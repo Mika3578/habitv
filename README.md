@@ -15,8 +15,8 @@ supported until the compiler and required CI change. Full table:
 [`docs/development.md`](docs/development.md).
 
 The Maven reactor and console path are the working baseline. Many
-provider sites have changed. Updates use HTTPS
-[habitv-repo](https://github.com/Mika3578/habitv-repo).
+provider sites have changed. Runtime updates use HTTPS
+[habitv-repo](https://mika3578.github.io/habitv-repo/repository/).
 
 ## Build
 
@@ -30,7 +30,7 @@ mvn -B -ntp -DskipTests validate
 
 `fwk/` (API + framework), `application/` (core, console, JavaFX GUI),
 `plugins/` (providers, downloaders, exporters).
-`application/habiTv-linux` and `habiTv-windows` are out of the default
+`application/habiTv-linux` and `application/habiTv-windows` are out of the default
 reactor. See [`docs/architecture.md`](docs/architecture.md).
 
 ## Providers

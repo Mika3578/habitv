@@ -19,7 +19,7 @@ Providers: [`providers.md`](providers.md). Configuration:
 |---------|--------------|------------|
 | No providers listed (`-lp`) | Plugin JARs missing | Copy module JARs into `plugins/` |
 | Command not parsed (spaces) | Missing `<cmdProcessor>` | Windows: `cmd.exe /c #CMD#`. Unix: `/bin/sh -c #CMD#` |
-| Plugin updates at startup | Default on | `-Dhabitv.update.enabled=false` |
+| Plugin updates at startup | Default on | `-Dhabitv.update.enabled=false` disables plugin-JAR checks; tool plugins may still update binaries |
 | France Télévisions empty | Legacy plugin id | `pluzz` → `francetv` in grab-config |
 | 403 / DNS / empty replay | Obsolete or protected | See providers; no DRM/paywall bypass |
 | yt-dlp missing / SSL errors | Tool or network | Install yt-dlp; point `<youtube>` at the binary |
@@ -27,8 +27,8 @@ Providers: [`providers.md`](providers.md). Configuration:
 
 ## Configuration
 
-Do not delete user downloads or indexes while debugging. Index keys are
-episode display names. Sample `application/consoleView/config.xml` is
-illustrative only.
+Do not delete user downloads or indexes while debugging. Index files
+store composite episode keys; older files may still use display names.
+Sample `application/consoleView/config.xml` is illustrative only.
 
 Vulnerabilities: [`../SECURITY.md`](../SECURITY.md).

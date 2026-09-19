@@ -7,7 +7,7 @@ Habitv directory when no local config is present):
 |------|------|
 | `configuration.xml` | Paths, tool binaries, update flags, pool sizes |
 | `grabconfig.xml` | Selected categories per provider |
-| `*.index` | Already-seen episode names per category |
+| `*.index` | Downloaded episode keys (legacy files may be display names) |
 | `plugins/` | Runtime plugin JARs |
 
 Samples/schema: `application/core/xsd/`. Preserve existing user files;
@@ -16,9 +16,9 @@ do not change defaults silently or delete downloads/indexes.
 ## Category watch
 
 Selected categories are scanned on a schedule. After the first baseline
-scan, only **new** episode **display names** are downloaded. Title changes
-can re-download; identical titles can skip. This is name-based, not a
-canonical episode id.
+scan, only episodes whose **index key** is new are downloaded. Current
+indexes store composite keys (id + name); legacy files may contain
+display names only. Title-only matching is therefore not guaranteed.
 
 ## Tokens and MEDIA_SERVER naming
 

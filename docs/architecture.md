@@ -65,7 +65,8 @@ next to the application, or resolved from the static update repository.
 |------|------|----------|
 | Provider | Categories and episodes | `francetv`, `youtube`, `arte`, `novo19` |
 | Downloader | Fetch media | `youtube` (yt-dlp), `curl`, `ffmpeg`, `aria2` |
-| Exporter | Post-download commands | `cmd`, `rclone`, `email` (mailbox input is a special case) |
+| Exporter | Post-download commands | `cmd`, `rclone` |
+| Mailbox input | POP3/IMAP ingest | `email` |
 
 A provider may delegate download to another plugin (France.tv and NOVO19
 delegate to the YouTube/yt-dlp plugin).
@@ -81,7 +82,7 @@ directory when no local config is present):
 |------|------|
 | `configuration.xml` | Download paths, tool binaries, update flags, task pool sizes |
 | `grabconfig.xml` | Selected categories per provider |
-| `*.index` | Per-category already-seen episode names |
+| `*.index` | Downloaded episode keys (legacy files may be display names) |
 | `plugins/` | Runtime plugin JARs |
 
 Schema samples live under `application/core/xsd/`. Existing user files

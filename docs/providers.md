@@ -20,8 +20,9 @@ Keep public PR/commit text high-level (no bypass recipes).
 Plugin Maven id remains `youtube`. The binary contract is **yt-dlp**
 (`yt-dlp.exe` on Windows, `yt-dlp` on Unix), artifact id `yt-dlp`.
 
-Default video flags: `-o <dest> --write-sub --write-auto-sub --no-check-certificate`.
-MP3 downloader: `--extract-audio --audio-format mp3 --no-check-certificate`.
+Default video command: `-o <dest> -f bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/bv*+ba/b --merge-output-format mp4 --newline --no-check-certificate`.
+MP3: `--extract-audio --audio-format mp3 --newline --no-check-certificate`.
+Default video does **not** pass `--write-sub` / `--write-auto-sub`.
 Habitv does not pass auth/browser flags by default. If `configuration.xml`
 still points at `youtube-dl`, switch it to yt-dlp.
 

@@ -24,7 +24,7 @@ and `${jdk.home}`.
 Required `develop` checks are `validate-java8`,
 `deterministic-tests-java8`, `compile-and-package-java8`,
 `dependency-review`. Jobs `compatibility-java17` / `21` (and 11/25 on
-schedule) are **diagnostic** (`continue-on-error`). Do not call them
+schedule or `workflow_dispatch`) are **diagnostic** (`continue-on-error`). Do not call them
 supported runtimes.
 
 Do not introduce Java 9+ language or APIs until a dedicated migration
@@ -53,7 +53,8 @@ Default Surefire excludes live `*PluginManagerTest` and
 `-Plive-provider-tests`.
 
 Console fat JAR:
-`application/consoleView/target/consoleView-4.1.0-SNAPSHOT-all.jar`.
+`application/consoleView/target/consoleView-4.1.0-SNAPSHOT-all.jar`
+(copy or rename to `habitv.jar` if you want the commands below).
 
 ## Run (console)
 
@@ -68,7 +69,8 @@ java -jar habitv.jar -lp
 java -jar habitv.jar "https://www.youtube.com/watch?v=jNQXAC9IVRw"
 ```
 
-Disable plugin updates: `-Dhabitv.update.enabled=false`.
+Disable plugin-JAR update checks: `-Dhabitv.update.enabled=false`.
+Tool plugins may still run their own binary updater after that.
 Update base (HTTPS):
 `https://mika3578.github.io/habitv-repo/repository/`.
 
