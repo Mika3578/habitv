@@ -53,12 +53,19 @@ public class ArteEmacParsingOfflineTest {
 	}
 
 	@Test
+	public void emacApiBaseUsesPublicApiHostNotRetiredRproxy() {
+		assertEquals("https://api.arte.tv/api/emac/v4", ArteConf.EMAC_API_BASE);
+		assertFalse(ArteConf.EMAC_API_BASE.contains("/rproxy/"));
+	}
+
+	@Test
 	public void findEpisodeParsesTeasersFiltersInvalidUrlsAndDedupes() throws IOException {
 		final Map<String, String> urlToContent = new HashMap<>();
-		final String pageUrl = "https://www.arte.tv/api/rproxy/emac/v4/fr/web/pages/DOR/?authorizedCountry=FR";
+		final String pageUrl = ArteConf.EMAC_API_BASE + "/fr/web/pages/DOR/?authorizedCountry=FR";
 		urlToContent.put(pageUrl, readFixture(PAGE_FIXTURE));
 		urlToContent.put(
-				"https://www.arte.tv/api/rproxy/emac/v4/fr/web/zones/listing_DOCUMENTARIES_main/content?page=2&pageId=DOR&authorizedCountry=FR",
+				ArteConf.EMAC_API_BASE
+						+ "/fr/web/zones/listing_DOCUMENTARIES_main/content?page=2&pageId=DOR&authorizedCountry=FR",
 				readFixture(ZONE_PAGE2_FIXTURE));
 
 		final RecordingArtePlugin plugin = new RecordingArtePlugin(urlToContent);
@@ -95,6 +102,21 @@ public class ArteEmacParsingOfflineTest {
 			assertNotNull(episode.getMetadata().getEpisodeTitle());
 			assertEquals(episode.getId(), episode.getMetadata().getSourceUrl());
 		}
+	}
+
+	@Test
+	public void findEpisodeStillParsesLegacyValueWrappedFixtures() throws IOException {
+		final Map<String, String> urlToContent = new HashMap<>();
+		final String pageUrl = ArteConf.EMAC_API_BASE + "/fr/web/pages/DOR/?authorizedCountry=FR";
+		urlToContent.put(pageUrl,
+				"{\"value\":{\"zones\":[{\"code\":\"\",\"content\":{\"data\":[{\"url\":\"/fr/videos/119999-900-A/legacy/\",\"title\":\"Legacy Wrapped\"}]}}]}}");
+
+		final RecordingArtePlugin plugin = new RecordingArtePlugin(urlToContent);
+		final CategoryDTO category = new CategoryDTO(ArteConf.NAME, "Documentaries", "fr:DOR", ArteConf.EXTENSION);
+		final Set<EpisodeDTO> episodes = plugin.findEpisode(category);
+
+		assertEquals(1, episodes.size());
+		assertEquals("https://www.arte.tv/fr/videos/119999-900-A/legacy/", episodes.iterator().next().getId());
 	}
 
 	@Test

@@ -46,12 +46,15 @@ public class ArteYtDlpLiveDownloadTest {
 	private static final boolean IS_WINDOWS = System.getProperty("os.name", "").toLowerCase().contains("win");
 	private static final String CMD_PROCESSOR = IS_WINDOWS ? "cmd.exe /c #CMD#" : "/bin/sh -c #CMD#";
 
-	/** Stable replay URL; 15s low-quality clip keeps bandwidth small. */
-	private static final String SAMPLE_EPISODE_URL = "https://www.arte.tv/fr/videos/019729-000-A/talons-aiguilles/";
+	/** Public FR replay; 15s section keeps bandwidth small. Refresh if rights expire. */
+	private static final String SAMPLE_EPISODE_URL =
+			"https://www.arte.tv/fr/videos/128788-000-A/la-femme-qui-murmure-a-l-oreille-des-baleines-bleues/";
 
 	private static final String YT_DLP_ARGS = " \"#VIDEO_URL#\" -o \"#FILE_DEST#\""
-			+ " -f VF-STF-426+VF-STF-audio_0-fran\u00e7ais"
+			+ " -f \"bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/bv*+ba/b\""
+			+ " --merge-output-format mp4"
 			+ " --download-sections \"*0:00-0:15\""
+			+ " --force-keyframes-at-cuts"
 			+ " --no-check-certificate --no-write-sub --no-write-auto-sub";
 
 	private File outputDir;
