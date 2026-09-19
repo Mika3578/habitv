@@ -97,7 +97,8 @@ final class TvComUrls {
 				return null;
 			}
 			final String lowerRaw = rawPath.toLowerCase(Locale.ROOT);
-			if (lowerRaw.contains("%3f") || lowerRaw.contains("%23")) {
+			if (lowerRaw.contains("%3f") || lowerRaw.contains("%23") || lowerRaw.contains("%2f")
+					|| lowerRaw.contains("%5c")) {
 				return null;
 			}
 			if (!EPISODE_PATH.matcher(rawPath).matches() && !LEGACY_EPISODE_PATH.matcher(rawPath).matches()) {
@@ -136,7 +137,8 @@ final class TvComUrls {
 				return null;
 			}
 			final String lowerRaw = rawPath.toLowerCase(Locale.ROOT);
-			if (lowerRaw.contains("%3f") || lowerRaw.contains("%23")) {
+			if (lowerRaw.contains("%3f") || lowerRaw.contains("%23") || lowerRaw.contains("%2f")
+					|| lowerRaw.contains("%5c")) {
 				return null;
 			}
 			if (!path.toLowerCase(Locale.ROOT).contains(".m3u8")) {
