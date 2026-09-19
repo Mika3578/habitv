@@ -30,7 +30,7 @@ still points at `youtube-dl`, switch it to yt-dlp.
 
 | Group | Modules |
 |-------|---------|
-| Recently worked | `francetv` (ex Pluzz), `youtube` (yt-dlp), `novo19` |
+| Recently worked | `francetv` (ex Pluzz), `youtube` (yt-dlp), `novo19`, `tvCom` |
 | Needs rewrite / investigation | `arte`, `6play`, `lequipe`, `footyroom`, `sfr`, `globalnews`, `mlssoccer` |
 | Obsolete / degraded endpoints | `canalPlus` (CStar; D8 removed), `wat`, `beinsport`, `clubic` |
 | Tools / infrastructure | `curl`, `ffmpeg`, `aria2`, `cmd`, `file`, `RSS`, `rclone`, `rtmpDump`, `adobeHDS`, `email`, `plugin-tester` |
