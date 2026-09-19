@@ -20,8 +20,10 @@ public class ArteOfflineFixtureBaselineTest {
 			String content = readUtf8(input);
 			assertTrue("fixture metadata must mention provider", content.contains("provider=arte"));
 			assertTrue("fixture metadata must disable network access", content.contains("network=disabled"));
-			assertTrue("fixture metadata must document parser boundary",
-					content.contains("parserBoundary=legacy-rss-html"));
+			assertTrue("fixture metadata must document EMAC JSON parser boundary",
+					content.contains("parserBoundary=emac-json"));
+			assertTrue("fixture metadata must document current EMAC API host",
+					content.contains("emacApiBase=https://api.arte.tv/api/emac/v4"));
 		}
 	}
 
