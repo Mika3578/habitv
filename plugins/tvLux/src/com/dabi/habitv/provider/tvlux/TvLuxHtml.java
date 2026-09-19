@@ -50,7 +50,9 @@ final class TvLuxHtml {
 			if (bySlug.containsKey(slug)) {
 				continue;
 			}
-			bySlug.put(slug, new ShowRef(humanize(slug), slug));
+			final String anchorTitle = extractAnchorTitle(html, end);
+			final String title = StringUtils.isEmpty(anchorTitle) ? humanize(slug) : anchorTitle;
+			bySlug.put(slug, new ShowRef(title, slug));
 		}
 		return new ArrayList<ShowRef>(bySlug.values());
 	}

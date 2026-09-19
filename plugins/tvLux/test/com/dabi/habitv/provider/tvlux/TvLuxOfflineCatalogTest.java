@@ -39,10 +39,15 @@ public class TvLuxOfflineCatalogTest {
 		final TvLuxPluginManager plugin = newRecordingPlugin(pages);
 		final Set<CategoryDTO> categories = plugin.findCategory();
 		assertEquals(3, categories.size());
+		final Map<String, String> namesById = new HashMap<String, String>();
 		for (final CategoryDTO category : categories) {
 			assertTrue(category.isDownloadable());
 			assertTrue(category.getId().startsWith(TvLuxConf.CATEGORY_SHOW_PREFIX));
+			namesById.put(category.getId(), category.getName());
 		}
+		assertEquals("JT", namesById.get(TvLuxUrls.showCategoryId("jt")));
+		assertEquals("L'hebdo", namesById.get(TvLuxUrls.showCategoryId("l-hebdo")));
+		assertEquals("Ciné Lux", namesById.get(TvLuxUrls.showCategoryId("cine-lux")));
 	}
 
 	@Test
