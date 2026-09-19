@@ -122,6 +122,11 @@ public class TeleMbPluginManager extends BasePluginWithProxy implements PluginPr
 	public ProcessHolder download(final DownloadParamDTO downloadParam, final DownloaderPluginHolder downloaders)
 			throws DownloadFailedException {
 		final TeleMbDiagnostics diagnostics = new TeleMbDiagnostics("download");
+		if (downloadParam == null || downloadParam.getDownloadInput() == null) {
+			diagnostics.setRootCauseSummary("null-download-param");
+			getLog().warn(diagnostics.formatLogLine());
+			throw new DownloadFailedException(TeleMbConf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+		}
 		diagnostics.setSourceUrl(downloadParam.getDownloadInput());
 		final String sanitizedInput = TeleMbUrls.sanitizeEpisodeUrl(downloadParam.getDownloadInput());
 		try {
