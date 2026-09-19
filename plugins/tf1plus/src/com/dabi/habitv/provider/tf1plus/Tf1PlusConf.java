@@ -39,7 +39,8 @@ interface Tf1PlusConf {
 
 	int VIDEO_PAGE_LIMIT = 40;
 
-	int MAX_VIDEO_PAGES = 5;
+	/** Safety ceiling only; paging stops earlier when a page is empty or short. */
+	int MAX_VIDEO_PAGES = 50;
 
 	String DOWNLOAD_UNAVAILABLE_MESSAGE =
 			"This replay is currently unavailable, premium, or not supported. See logs for details.";

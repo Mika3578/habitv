@@ -166,11 +166,21 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 	@Override
 	public ProcessHolder download(final DownloadParamDTO downloadParam, final DownloaderPluginHolder downloaders)
 			throws DownloadFailedException {
+		final Tf1PlusDiagnostics diagnostics = new Tf1PlusDiagnostics("download");
+		diagnostics.setSourceUrl(downloadParam.getDownloadInput());
 		try {
+			if (!Tf1PlusUrls.isTf1PlusVideoPageUrl(downloadParam.getDownloadInput())) {
+				diagnostics.setRootCauseSummary("unsupported-url");
+				getLog().warn(diagnostics.formatLogLine());
+				throw new DownloadFailedException(Tf1PlusConf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+			}
+			diagnostics.setRootCauseSummary("delegate-ytdlp");
+			getLog().info(diagnostics.formatLogLine());
 			return DownloadUtils.download(downloadParam, downloaders, FrameworkConf.YOUTUBE);
 		} catch (final DownloadFailedException e) {
-			final Tf1PlusDiagnostics diagnostics = new Tf1PlusDiagnostics("download");
-			diagnostics.setSourceUrl(downloadParam.getDownloadInput());
+			if (Tf1PlusConf.DOWNLOAD_UNAVAILABLE_MESSAGE.equals(e.getMessage())) {
+				throw e;
+			}
 			diagnostics.setRootCauseSummary(DownloadFailureDiagnostics.getClassificationKey(e) == null
 					? "download-failed"
 					: DownloadFailureDiagnostics.getClassificationKey(e));
@@ -180,8 +190,6 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 					Tf1PlusConf.NAME, e));
 			throw new DownloadFailedException(Tf1PlusConf.DOWNLOAD_UNAVAILABLE_MESSAGE, e);
 		} catch (final RuntimeException e) {
-			final Tf1PlusDiagnostics diagnostics = new Tf1PlusDiagnostics("download");
-			diagnostics.setSourceUrl(downloadParam.getDownloadInput());
 			diagnostics.setRootCauseSummary("runtime:" + e.getClass().getSimpleName());
 			getLog().warn(diagnostics.formatLogLine());
 			throw new DownloadFailedException(Tf1PlusConf.DOWNLOAD_UNAVAILABLE_MESSAGE, e);

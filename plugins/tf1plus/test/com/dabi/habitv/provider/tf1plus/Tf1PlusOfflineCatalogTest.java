@@ -18,7 +18,9 @@ import org.junit.Test;
 
 import com.dabi.habitv.api.plugin.api.PluginDownloaderInterface.DownloadableState;
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
+import com.dabi.habitv.api.plugin.dto.DownloadParamDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
+import com.dabi.habitv.api.plugin.exception.DownloadFailedException;
 
 public class Tf1PlusOfflineCatalogTest {
 
@@ -101,6 +103,26 @@ public class Tf1PlusOfflineCatalogTest {
 		assertEquals(DownloadableState.IMPOSSIBLE,
 				plugin.canDownload("https://user:password@www.tf1.fr/tf1/foo/videos/bar.html"));
 		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload(null));
+	}
+
+	@Test
+	public void downloadRejectsNonTf1VideoUrlsWithoutDelegating() {
+		final Tf1PlusPluginManager plugin = new Tf1PlusPluginManager();
+		final DownloadParamDTO param = new DownloadParamDTO("https://www.france.tv/france-2/foo.html", "/tmp/x.mp4",
+				Tf1PlusConf.EXTENSION);
+		try {
+			plugin.download(param, null);
+			throw new AssertionError("expected failure");
+		} catch (final DownloadFailedException e) {
+			assertEquals(Tf1PlusConf.DOWNLOAD_UNAVAILABLE_MESSAGE, e.getMessage());
+		}
+		try {
+			plugin.download(new DownloadParamDTO("https://user:password@www.tf1.fr/tf1/foo/videos/bar.html",
+					"/tmp/x.mp4", Tf1PlusConf.EXTENSION), null);
+			throw new AssertionError("expected failure");
+		} catch (final DownloadFailedException e) {
+			assertEquals(Tf1PlusConf.DOWNLOAD_UNAVAILABLE_MESSAGE, e.getMessage());
+		}
 	}
 
 	@Test
