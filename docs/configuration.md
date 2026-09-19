@@ -17,8 +17,9 @@ do not change defaults silently or delete downloads/indexes.
 
 Selected categories are scanned on a schedule. After the first baseline
 scan, only episodes whose **index key** is new are downloaded. Current
-indexes store composite keys (id + name); legacy files may contain
-display names only. Title-only matching is therefore not guaranteed.
+indexes store composite keys (plugin, category id, episode id, and name);
+legacy files may contain display names only. Title-only matching is
+therefore not guaranteed.
 
 ## Tokens and MEDIA_SERVER naming
 
