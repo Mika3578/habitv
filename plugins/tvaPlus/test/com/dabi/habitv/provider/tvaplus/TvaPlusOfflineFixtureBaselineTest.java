@@ -3,6 +3,7 @@ package com.dabi.habitv.provider.tvaplus;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +22,7 @@ public class TvaPlusOfflineFixtureBaselineTest {
 	}
 
 	private static String read(final String path) throws IOException {
+		assertTrue("missing local fixture: " + path, new File(path).exists());
 		try (InputStream input = new FileInputStream(path)) {
 			final ByteArrayOutputStream out = new ByteArrayOutputStream();
 			final byte[] buffer = new byte[4096];

@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -104,6 +105,19 @@ public class TvaPlusOfflineCatalogTest {
 	}
 
 	@Test
+	public void findEpisodeRejectsUnsafeShowSlugFromCategoryId() {
+		final TvaPlusPluginManager plugin = new TvaPlusPluginManager();
+		assertTrue(plugin.findEpisode(new CategoryDTO(TvaPlusConf.NAME, "Evil",
+				TvaPlusUrls.showCategoryId("https://evil.example/tva/j-e"), TvaPlusConf.EXTENSION)).isEmpty());
+		assertTrue(plugin.findEpisode(new CategoryDTO(TvaPlusConf.NAME, "Evil",
+				TvaPlusUrls.showCategoryId("/tva/j-e?token=leak"), TvaPlusConf.EXTENSION)).isEmpty());
+		assertTrue(plugin.findEpisode(new CategoryDTO(TvaPlusConf.NAME, "Evil",
+				TvaPlusUrls.showCategoryId("/tva/j-e#frag"), TvaPlusConf.EXTENSION)).isEmpty());
+		assertTrue(plugin.findEpisode(new CategoryDTO(TvaPlusConf.NAME, "Evil",
+				TvaPlusUrls.showCategoryId("/tva/j-e/extra"), TvaPlusConf.EXTENSION)).isEmpty());
+	}
+
+	@Test
 	public void diagnosticsStripQueryAndFragment() {
 		final TvaPlusDiagnostics diagnostics = new TvaPlusDiagnostics("download");
 		diagnostics.setSourceUrl("https://www.tvaplus.ca/tva/j-e/saison-1/episode-1-1?x=1#token=leak");
@@ -126,6 +140,7 @@ public class TvaPlusOfflineCatalogTest {
 	}
 
 	private static String read(final String path) throws IOException {
+		assertTrue("missing local fixture: " + path, new File(path).exists());
 		try (InputStream input = new FileInputStream(path)) {
 			final ByteArrayOutputStream out = new ByteArrayOutputStream();
 			final byte[] buffer = new byte[4096];

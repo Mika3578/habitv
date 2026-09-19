@@ -74,10 +74,10 @@ public class TvaPlusPluginManager extends BasePluginWithProxy implements PluginP
 			}
 		} catch (final IOException e) {
 			diagnostics.setRootCauseSummary("io-error:" + e.getClass().getSimpleName());
-			getLog().warn("TVA+ catalogue failed: " + e.getMessage());
+			getLog().warn("TVA+ catalogue failed: " + e.getClass().getSimpleName());
 		} catch (final RuntimeException e) {
 			diagnostics.setRootCauseSummary("runtime:" + e.getClass().getSimpleName());
-			getLog().warn("TVA+ catalogue failed: " + e.getMessage());
+			getLog().warn("TVA+ catalogue failed: " + e.getClass().getSimpleName());
 		}
 		getLog().info(diagnostics.formatLogLine());
 		return categories;
@@ -86,10 +86,12 @@ public class TvaPlusPluginManager extends BasePluginWithProxy implements PluginP
 	@Override
 	public Set<EpisodeDTO> findEpisode(final CategoryDTO category) {
 		final Set<EpisodeDTO> episodes = new LinkedHashSet<EpisodeDTO>();
+		final TvaPlusDiagnostics diagnostics = new TvaPlusDiagnostics("episodes");
 		if (category == null) {
+			diagnostics.setRootCauseSummary("null-category");
+			getLog().info(diagnostics.formatLogLine());
 			return episodes;
 		}
-		final TvaPlusDiagnostics diagnostics = new TvaPlusDiagnostics("episodes");
 		try {
 			final List<TvaPlusHtml.EpisodeRef> refs;
 			if (TvaPlusUrls.isRecentCategory(category.getId())) {
@@ -98,9 +100,16 @@ public class TvaPlusPluginManager extends BasePluginWithProxy implements PluginP
 			} else if (TvaPlusUrls.isShowCategory(category.getId())) {
 				final String slug = TvaPlusUrls.showSlugFromCategoryId(category.getId());
 				diagnostics.setShowSlug(slug);
+				if (!TvaPlusUrls.isSafeCategoryShowSlug(slug)) {
+					diagnostics.setRootCauseSummary("invalid-show-slug");
+					getLog().info(diagnostics.formatLogLine());
+					return episodes;
+				}
 				diagnostics.setSourceUrl(TvaPlusUrls.pageUrl(slug));
 				refs = client.loadShowEpisodes(slug);
 			} else {
+				diagnostics.setRootCauseSummary("unsupported-category");
+				getLog().info(diagnostics.formatLogLine());
 				return episodes;
 			}
 			for (final TvaPlusHtml.EpisodeRef ref : refs) {
@@ -125,10 +134,10 @@ public class TvaPlusPluginManager extends BasePluginWithProxy implements PluginP
 			}
 		} catch (final IOException e) {
 			diagnostics.setRootCauseSummary("io-error:" + e.getClass().getSimpleName());
-			getLog().warn("TVA+ episode listing failed: " + e.getMessage());
+			getLog().warn("TVA+ episode listing failed: " + e.getClass().getSimpleName());
 		} catch (final RuntimeException e) {
 			diagnostics.setRootCauseSummary("runtime:" + e.getClass().getSimpleName());
-			getLog().warn("TVA+ episode listing failed: " + e.getMessage());
+			getLog().warn("TVA+ episode listing failed: " + e.getClass().getSimpleName());
 		}
 		getLog().info(diagnostics.formatLogLine());
 		return episodes;

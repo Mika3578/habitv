@@ -8,7 +8,8 @@ import org.apache.commons.lang.StringUtils;
 
 final class TvaPlusUrls {
 
-	private static final Pattern EPISODE_SLUG = Pattern.compile(".*/episode-[\\w-]+-\\d+$");
+	private static final Pattern EPISODE_SLUG =
+			Pattern.compile("^/tva/[\\w-]+/saison-\\d+/episode-[\\w-]+-\\d+$");
 
 	private TvaPlusUrls() {
 	}
@@ -59,6 +60,21 @@ final class TvaPlusUrls {
 			return false;
 		}
 		return slug.startsWith("/tva/") && slug.indexOf('/', 5) < 0;
+	}
+
+	/**
+	 * Reject category-derived show slugs that are not a single /tva/{name} path or
+	 * that smuggle URL metacharacters.
+	 */
+	static boolean isSafeCategoryShowSlug(final String slug) {
+		if (!isTvaShowSlug(slug)) {
+			return false;
+		}
+		if (slug.indexOf("://") >= 0 || slug.indexOf('?') >= 0 || slug.indexOf('#') >= 0) {
+			return false;
+		}
+		final String showName = slug.substring(5);
+		return showName.length() > 0 && showName.matches("[\\w-]+");
 	}
 
 	static boolean isTvaEpisodeSlug(final String slug) {
