@@ -1,5 +1,6 @@
 package com.dabi.habitv.provider.tv5plus;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -61,16 +62,16 @@ final class Tv5PlusClient {
 			if (stream == null) {
 				throw new IOException("graphql-http-" + status);
 			}
+			final ByteArrayOutputStream out = new ByteArrayOutputStream();
 			final byte[] buffer = new byte[4096];
-			final StringBuilder response = new StringBuilder();
 			int read;
 			while ((read = stream.read(buffer)) != -1) {
-				response.append(new String(buffer, 0, read, StandardCharsets.UTF_8));
+				out.write(buffer, 0, read);
 			}
 			if (status >= 400) {
 				throw new IOException("graphql-http-" + status);
 			}
-			return response.toString();
+			return new String(out.toByteArray(), StandardCharsets.UTF_8);
 		}
 	}
 
@@ -130,7 +131,7 @@ final class Tv5PlusClient {
 		}
 		final String productType = text(root, "productType");
 		if (Tv5PlusConf.TYPE_MOVIE.equals(productType)) {
-			final String watchUrl = Tv5PlusUrls.movieWatchUrl(slug);
+			final String watchUrl = resolveWatchUrl(text(root, "videoCanonicalUrl"), slug, null, null);
 			byUrl.put(watchUrl, new EpisodeRef(text(root, "title"), watchUrl, null, null));
 			return new ArrayList<EpisodeRef>(byUrl.values());
 		}
@@ -187,17 +188,24 @@ final class Tv5PlusClient {
 				final Integer season = asInt(product.get("seasonNumber"));
 				final Integer episode = asInt(product.get("episodeNumber"));
 				final String title = firstNonEmpty(text(product, "title"), buildFallbackTitle(season, episode));
-				final String watchUrl;
-				if (season != null && episode != null) {
-					watchUrl = Tv5PlusUrls.episodeWatchUrl(slug, season.intValue(), episode.intValue());
-				} else {
-					watchUrl = Tv5PlusUrls.movieWatchUrl(slug);
-				}
+				final String watchUrl = resolveWatchUrl(text(product, "videoCanonicalUrl"), slug, season, episode);
 				if (!byUrl.containsKey(watchUrl)) {
 					byUrl.put(watchUrl, new EpisodeRef(title, watchUrl, season, episode));
 				}
 			}
 		}
+	}
+
+	private static String resolveWatchUrl(final String canonicalUrl, final String slug, final Integer season,
+			final Integer episode) {
+		final String sanitizedCanonical = Tv5PlusUrls.sanitizeEpisodeUrl(canonicalUrl);
+		if (sanitizedCanonical != null) {
+			return sanitizedCanonical;
+		}
+		if (season != null && episode != null) {
+			return Tv5PlusUrls.episodeWatchUrl(slug, season.intValue(), episode.intValue());
+		}
+		return Tv5PlusUrls.movieWatchUrl(slug);
 	}
 
 	private JsonNode execute(final String query) throws IOException {

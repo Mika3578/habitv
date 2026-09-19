@@ -10,7 +10,7 @@ import org.apache.commons.lang.StringUtils;
 final class Tv5PlusUrls {
 
 	private static final Pattern EPISODE_PATH = Pattern
-			.compile("^/videos/([^/]+)(?:/saisons/(\\d+)/episodes/(\\d+))?/?$");
+			.compile("^/videos/([A-Za-z0-9][A-Za-z0-9_-]*)(?:/saisons/(\\d+)/episodes/(\\d+))?/?$");
 
 	private Tv5PlusUrls() {
 	}
@@ -65,11 +65,20 @@ final class Tv5PlusUrls {
 					&& !"www.tv5unis.ca".equals(lowerHost) && !"tv5unis.ca".equals(lowerHost)) {
 				return null;
 			}
+			final String rawPath = uri.getRawPath();
 			final String path = uri.getPath();
-			if (path == null) {
+			if (rawPath == null || path == null) {
 				return null;
 			}
-			final Matcher matcher = EPISODE_PATH.matcher(path);
+			// Reject decoded or percent-encoded query/fragment separators smuggled into the path.
+			if (path.indexOf('?') >= 0 || path.indexOf('#') >= 0) {
+				return null;
+			}
+			final String lowerRaw = rawPath.toLowerCase(Locale.ROOT);
+			if (lowerRaw.contains("%3f") || lowerRaw.contains("%23")) {
+				return null;
+			}
+			final Matcher matcher = EPISODE_PATH.matcher(rawPath);
 			if (!matcher.matches()) {
 				return null;
 			}

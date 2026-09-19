@@ -92,6 +92,10 @@ public class Tv5PlusOfflineCatalogTest {
 		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload("https://www.tv5plus.ca/watatatow"));
 		assertEquals(DownloadableState.IMPOSSIBLE,
 				plugin.canDownload("https://user:pass@www.tv5unis.ca/videos/x/saisons/1/episodes/1"));
+		assertEquals(DownloadableState.IMPOSSIBLE,
+				plugin.canDownload("https://www.tv5plus.ca/videos/foo%3Ftoken=secret"));
+		assertEquals(DownloadableState.IMPOSSIBLE,
+				plugin.canDownload("https://www.tv5plus.ca/videos/foo%23frag"));
 		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload(null));
 	}
 
