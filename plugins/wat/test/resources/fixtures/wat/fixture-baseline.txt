@@ -1,0 +1,6 @@
+provider=wat
+parserBoundary=legacy-html-tf1-obsolete
+homeUrl=https://www.tf1.fr
+programmeUrl=https://www.tf1.fr/programmes-tv
+network=disabled
+note=Live TF1 catalogue HTML no longer matches legacy WAT selectors (ul.mobile_channel). Provider returns empty non-blocking catalogue with diagnostics.
