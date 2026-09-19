@@ -149,6 +149,11 @@ public class TvaPlusPluginManager extends BasePluginWithProxy implements PluginP
 	public ProcessHolder download(final DownloadParamDTO downloadParam, final DownloaderPluginHolder downloaders)
 			throws DownloadFailedException {
 		final TvaPlusDiagnostics diagnostics = new TvaPlusDiagnostics("download");
+		if (downloadParam == null || downloadParam.getDownloadInput() == null) {
+			diagnostics.setRootCauseSummary("null-download-param");
+			getLog().warn(diagnostics.formatLogLine());
+			throw new DownloadFailedException(TvaPlusConf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+		}
 		diagnostics.setSourceUrl(downloadParam.getDownloadInput());
 		final String sanitized = TvaPlusUrls.sanitizeEpisodeUrl(downloadParam.getDownloadInput());
 		try {

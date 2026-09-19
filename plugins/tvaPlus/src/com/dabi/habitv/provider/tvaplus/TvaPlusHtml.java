@@ -160,7 +160,8 @@ final class TvaPlusHtml {
 			if (isVideoShow(node) && isPublic(node)) {
 				final String slug = text(node, "slug");
 				final String name = firstNonEmpty(text(node, "name"), text(node, "label"), text(node, "title"));
-				if (TvaPlusUrls.isTvaShowSlug(slug) && StringUtils.isNotEmpty(name) && !bySlug.containsKey(slug)) {
+				if (TvaPlusUrls.isSafeCategoryShowSlug(slug) && StringUtils.isNotEmpty(name)
+						&& !bySlug.containsKey(slug)) {
 					bySlug.put(slug, new ShowRef(name, slug));
 				}
 			}
