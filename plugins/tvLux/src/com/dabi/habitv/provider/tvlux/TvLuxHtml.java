@@ -237,7 +237,7 @@ final class TvLuxHtml {
 	}
 
 	private static int indexOfIgnoreCase(final String haystack, final String needle, final int from) {
-		return haystack.toLowerCase(Locale.ROOT).indexOf(needle.toLowerCase(Locale.ROOT), from);
+		return StringUtils.indexOfIgnoreCase(haystack, needle, from);
 	}
 
 	private static String humanize(final String slug) {
