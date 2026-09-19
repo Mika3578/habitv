@@ -75,17 +75,7 @@ Inventory, status, and legal limits: [`providers.md`](providers.md).
 
 ## Configuration and user data
 
-Typical files next to the working directory (or under a user Habitv
-directory when no local config is present):
-
-| File | Role |
-|------|------|
-| `configuration.xml` | Download paths, tool binaries, update flags, task pool sizes |
-| `grabconfig.xml` | Selected categories per provider |
-| `*.index` | Downloaded episode keys (legacy files may be display names) |
-| `plugins/` | Runtime plugin JARs |
-
-Schema samples live under `application/core/xsd/`. Existing user files
+Typical files: [`configuration.md`](configuration.md). Existing user files
 must stay loadable; do not change defaults silently.
 
 Category watch and naming: [`configuration.md`](configuration.md).

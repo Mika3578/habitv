@@ -14,10 +14,15 @@ Durable direction only. Actionable work lives in GitHub issues and PRs.
 5. Later runtime move: **Java 21** (active target), then **Java 25**.
    Diagnostic CI on 11/17/21/25 is not runtime support.
 
+## Prohibited
+
+DRM, encryption, paywall, or license bypass. Never implement that as a
+“dedicated PR”.
+
 ## Do not mix into random PRs
 
 Java baseline bump, JavaFX/OpenJFX migration, JAXB `jakarta.*`, reactor
-topology, updater URL changes, DRM/auth bypass, batch dependency majors.
+topology, updater URL changes, batch dependency majors.
 
 ## Known leftovers
 

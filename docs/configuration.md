@@ -22,8 +22,9 @@ display names only. Title-only matching is therefore not guaranteed.
 
 ## Tokens and MEDIA_SERVER naming
 
-Legacy tokens (`#TVSHOW_NAME#`, `#EPISODE_NAME#`, `#DATE#`) remain.
-`#DATE#` is the download/current date.
+Legacy tokens (`#TVSHOW_NAME#`, `#EPISODE_NAME#`) remain.
+The download/current date token needs a format: `#DATE§yyyy-MM-dd#`
+(not bare `#DATE#`).
 
 Canonical metadata (`EpisodeMetadataDTO`) is additive. Providers fill
 facts only; they must not build filesystem paths. Global naming lives in
@@ -32,7 +33,7 @@ facts only; they must not build filesystem paths. Global naming lives in
 `#AIR_DATE#`, `#SEASON_EPISODE#`, `#MEDIA_SERVER_PATH#`.
 
 `#AIR_DATE#` is a true broadcast date only. Publication or upload dates
-must not create dated MEDIA_SERVER paths. `#DATE#` remains the
+must not create dated MEDIA_SERVER paths. `#DATE§pattern#` is the
 download/current date. Do not copy a provider category name into
 `seriesTitle` unless the item is a verified program/series.
 

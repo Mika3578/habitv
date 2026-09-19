@@ -101,7 +101,7 @@ What this restart phase **delivers** so far:
 
 What it intentionally **does not yet change** (tracked separately):
 
-- ✅ Legacy URLs (`dabiboo.free.fr`, Assembla SVN, FTP) — removed from active POM/runtime (PR [#36](https://github.com/Mika3578/habitv/pull/36); historical notes in `docs/history.md`)
+- ✅ Legacy `dabiboo.free.fr` / Assembla SVN / `ftpperso.free.fr` update hosts — removed from active POM/runtime (PR [#36](https://github.com/Mika3578/habitv/pull/36); historical notes in `docs/history.md`). FTP exporter/sample credentials remain.
 - ⬜ JavaFX 2.x / `${jdk.home}` packaging — `habiTv-linux` / `habiTv-windows` excluded from reactor
 - 🟡 `youtube-dl` → `yt-dlp` plugin binary migration (in progress; see `ytdlp-migration`)
 - ⬜ Provider plugin inventory / dead-endpoint cleanup
