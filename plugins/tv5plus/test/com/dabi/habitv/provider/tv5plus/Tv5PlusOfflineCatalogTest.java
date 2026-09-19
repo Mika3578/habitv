@@ -100,6 +100,16 @@ public class Tv5PlusOfflineCatalogTest {
 	}
 
 	@Test
+	public void findCategoryFailsClosedOnGraphqlErrorsWithPartialData() throws IOException {
+		final Map<String, String> fixtures = new HashMap<String, String>();
+		fixtures.put("featuredProductSets",
+				"{\"data\":{\"featuredProductSets\":[{\"slug\":\"categorie-fiction-serie\",\"title\":\"Fiction\"}]},"
+						+ "\"errors\":[{\"message\":\"partial\"}]}");
+		final Tv5PlusPluginManager plugin = newRecordingPlugin(fixtures);
+		assertTrue(plugin.findCategory().isEmpty());
+	}
+
+	@Test
 	public void diagnosticsStripQueryAndFragment() {
 		final Tv5PlusDiagnostics diagnostics = new Tv5PlusDiagnostics("download");
 		diagnostics.setSourceUrl("https://www.tv5unis.ca/videos/x/saisons/1/episodes/1?x=1#token=leak");
