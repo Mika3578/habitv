@@ -154,18 +154,21 @@ final class TvComHtml {
 		// Prefer a <span> title inside the same anchor.
 		final int closeA = indexOfIgnoreCase(html, "</a>", hrefEnd);
 		if (closeA > hrefEnd && closeA - hrefEnd < 400) {
-			final String inside = html.substring(hrefEnd, closeA);
-			final int spanOpen = indexOfIgnoreCase(inside, "<span>", 0);
-			if (spanOpen >= 0) {
-				final int spanStart = spanOpen + 6;
-				final int spanClose = indexOfIgnoreCase(inside, "</span>", spanStart);
-				if (spanClose > spanStart) {
-					return cleanTitle(inside.substring(spanStart, spanClose));
+			final int tagClose = html.indexOf('>', hrefEnd);
+			if (tagClose > hrefEnd && tagClose < closeA) {
+				final String inside = html.substring(tagClose + 1, closeA);
+				final int spanOpen = indexOfIgnoreCase(inside, "<span>", 0);
+				if (spanOpen >= 0) {
+					final int spanStart = spanOpen + 6;
+					final int spanClose = indexOfIgnoreCase(inside, "</span>", spanStart);
+					if (spanClose > spanStart) {
+						return cleanTitle(inside.substring(spanStart, spanClose));
+					}
 				}
-			}
-			final String direct = cleanTitle(stripTags(inside));
-			if (!StringUtils.isEmpty(direct)) {
-				return direct;
+				final String direct = cleanTitle(stripTags(inside));
+				if (!StringUtils.isEmpty(direct)) {
+					return direct;
+				}
 			}
 		}
 		// Look backward for <h2><span>Title</span></h2> (episode cards).
