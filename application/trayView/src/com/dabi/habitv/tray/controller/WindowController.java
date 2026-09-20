@@ -11,7 +11,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableView;
@@ -148,18 +147,6 @@ public class WindowController {
 	private TextField youtubeApiKey;
 
 	@FXML
-	private TextField tf1plusEmail;
-
-	@FXML
-	private PasswordField tf1plusPassword;
-
-	@FXML
-	private TextField tf1plusDevicePath;
-
-	@FXML
-	private TextField tf1plusNM3u8dlRe;
-
-	@FXML
 	private TextField maxConcurrentDownloads;
 
 	@FXML
@@ -227,8 +214,7 @@ public class WindowController {
 			manager.attach(toDlController);
 
 			new ConfigController(downloadOuput, nbrMaxAttempts,
-					daemonCheckTimeSec, autoUpdate, youtubeApiKey, tf1plusEmail,
-					tf1plusPassword, tf1plusDevicePath, tf1plusNM3u8dlRe,
+					daemonCheckTimeSec, autoUpdate, youtubeApiKey,
 					maxConcurrentDownloads, embedSubtitles).init(controller,
 					manager, primaryStage);
 

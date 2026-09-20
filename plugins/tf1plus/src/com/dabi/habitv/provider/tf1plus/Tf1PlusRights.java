@@ -6,11 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
-
 /**
  * Interprets TF1+ GraphQL {@code rights} and {@code authEnabled} for catalogue visibility
- * and download routing. Live API uses {@code MAX} (TF1+ MAX) where older payloads used
+ * and public download routing. Live API uses {@code MAX} (TF1+ MAX) where older payloads used
  * {@code PREMIUM}.
  */
 final class Tf1PlusRights {
@@ -18,26 +16,11 @@ final class Tf1PlusRights {
 	private Tf1PlusRights() {
 	}
 
-	static boolean hasDownloadableRights(final Map<String, Object> video, final boolean premiumDownloadEnabled) {
+	static boolean hasDownloadableRights(final Map<String, Object> video) {
 		if (isYtDlpEligible(video)) {
 			return true;
 		}
-		if (hasBasicRights(video)) {
-			return true;
-		}
-		if (!premiumDownloadEnabled) {
-			return false;
-		}
-		return isSubscriptionOnly(video) || hasMaxRights(video) || hasPremiumRights(video)
-				|| StringUtils.isNotEmpty(Tf1PlusGraphqlClient.resolveMediaStreamId(video));
-	}
-
-	static boolean shouldUsePremiumReplay(final Map<String, Object> video, final boolean premiumDownloadEnabled) {
-		if (!premiumDownloadEnabled || isYtDlpEligible(video)) {
-			return false;
-		}
-		return hasPremiumRights(video) || hasMaxRights(video) || isAuthEnabled(video)
-				|| StringUtils.isNotEmpty(Tf1PlusGraphqlClient.resolveMediaStreamId(video));
+		return hasBasicRights(video);
 	}
 
 	static boolean isYtDlpEligible(final Map<String, Object> video) {

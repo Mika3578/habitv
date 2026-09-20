@@ -7,10 +7,8 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import com.dabi.habitv.core.config.Tf1PlusPremiumReplayConfig;
 import com.dabi.habitv.core.config.UserConfig;
 import com.dabi.habitv.core.config.YoutubeApiKeyConfig;
 import com.dabi.habitv.tray.Popin;
@@ -27,33 +25,19 @@ public class ConfigController extends BaseController {
 
 	private TextField youtubeApiKey;
 
-	private TextField tf1plusEmail;
-
-	private PasswordField tf1plusPassword;
-
-	private TextField tf1plusDevicePath;
-
-	private TextField tf1plusNM3u8dlRe;
-
 	private TextField maxConcurrentDownloads;
 
 	private CheckBox embedSubtitles;
 
 	public ConfigController(TextField downloadOuput, TextField nbrMaxAttempts,
 			TextField daemonCheckTimeSec, CheckBox autoUpdate,
-			TextField youtubeApiKey, TextField tf1plusEmail, PasswordField tf1plusPassword,
-			TextField tf1plusDevicePath, TextField tf1plusNM3u8dlRe,
-			TextField maxConcurrentDownloads, CheckBox embedSubtitles) {
+			TextField youtubeApiKey, TextField maxConcurrentDownloads, CheckBox embedSubtitles) {
 		super();
 		this.downloadOuput = downloadOuput;
 		this.nbrMaxAttempts = nbrMaxAttempts;
 		this.daemonCheckTimeSec = daemonCheckTimeSec;
 		this.autoUpdate = autoUpdate;
 		this.youtubeApiKey = youtubeApiKey;
-		this.tf1plusEmail = tf1plusEmail;
-		this.tf1plusPassword = tf1plusPassword;
-		this.tf1plusDevicePath = tf1plusDevicePath;
-		this.tf1plusNM3u8dlRe = tf1plusNM3u8dlRe;
 		this.maxConcurrentDownloads = maxConcurrentDownloads;
 		this.embedSubtitles = embedSubtitles;
 	}
@@ -79,14 +63,6 @@ public class ConfigController extends BaseController {
 				"si coché habiTv se mettra à jour automatiquement."));
 		youtubeApiKey.setTooltip(new Tooltip(
 				"Clé API YouTube Data v3. Laissez vide pour utiliser la variable d'environnement ou l'option Java."));
-		tf1plusEmail.setTooltip(new Tooltip(
-				"Compte TF1+ pour le replay premium. Enregistré dans configuration.xml (comme la clé YouTube)."));
-		tf1plusPassword.setTooltip(new Tooltip(
-				"Mot de passe TF1+. Enregistré localement dans configuration.xml ; ne pas partager ce fichier."));
-		tf1plusDevicePath.setTooltip(new Tooltip(
-				"Chemin absolu vers le fichier device local requis pour le replay TF1+ protégé (fichier .wvd ou équivalent)."));
-		tf1plusNM3u8dlRe.setTooltip(new Tooltip(
-				"Chemin vers N_m3u8DL-RE.exe pour télécharger les flux DASH TF1+ protégés. Alternative : MediaFlow dans configuration.xml."));
 		maxConcurrentDownloads.setTooltip(new Tooltip(
 				"Nombre maximum de téléchargements d'épisodes exécutés en même temps (minimum 1)."));
 		embedSubtitles.setTooltip(new Tooltip(
@@ -136,10 +112,6 @@ public class ConfigController extends BaseController {
 				.getDemonCheckTime()));
 		autoUpdate.setSelected(userConfig.updateOnStartup());
 		youtubeApiKey.setText(userConfig.getYoutubeApiKey());
-		tf1plusEmail.setText(userConfig.getTf1PlusEmail());
-		tf1plusPassword.setText(userConfig.getTf1PlusPassword());
-		tf1plusDevicePath.setText(userConfig.getTf1PlusDevicePath());
-		tf1plusNM3u8dlRe.setText(userConfig.getTf1PlusNM3u8dlRe());
 		maxConcurrentDownloads.setText(String.valueOf(Math.max(1,
 				userConfig.getMaxConcurrentDownloads())));
 		embedSubtitles.setSelected(userConfig.getEmbedSubtitles());
@@ -224,66 +196,6 @@ public class ConfigController extends BaseController {
 		};
 		triggersave(youtubeApiKey, saveYoutubeApiKey);
 
-		Runnable saveTf1plusEmail = new Runnable() {
-
-			@Override
-			public void run() {
-				UserConfig userConfig = getController().loadUserConfig();
-				String currentValue = userConfig.getTf1PlusEmail();
-				String newValue = Tf1PlusPremiumReplayConfig.sanitizePlainValue(normalize(tf1plusEmail.getText()));
-				if (currentValue == null ? newValue != null : !currentValue.equals(newValue)) {
-					userConfig.setTf1PlusEmail(newValue);
-					saveConfig(userConfig);
-				}
-			}
-		};
-		triggersave(tf1plusEmail, saveTf1plusEmail);
-
-		Runnable saveTf1plusPassword = new Runnable() {
-
-			@Override
-			public void run() {
-				UserConfig userConfig = getController().loadUserConfig();
-				String currentValue = userConfig.getTf1PlusPassword();
-				String newValue = Tf1PlusPremiumReplayConfig.sanitizePlainValue(normalize(tf1plusPassword.getText()));
-				if (currentValue == null ? newValue != null : !currentValue.equals(newValue)) {
-					userConfig.setTf1PlusPassword(newValue);
-					saveConfig(userConfig);
-				}
-			}
-		};
-		triggersave(tf1plusPassword, saveTf1plusPassword);
-
-		Runnable saveTf1plusDevicePath = new Runnable() {
-
-			@Override
-			public void run() {
-				UserConfig userConfig = getController().loadUserConfig();
-				String currentValue = userConfig.getTf1PlusDevicePath();
-				String newValue = Tf1PlusPremiumReplayConfig.sanitizePlainValue(normalize(tf1plusDevicePath.getText()));
-				if (currentValue == null ? newValue != null : !currentValue.equals(newValue)) {
-					userConfig.setTf1PlusDevicePath(newValue);
-					saveConfig(userConfig);
-				}
-			}
-		};
-		triggersave(tf1plusDevicePath, saveTf1plusDevicePath);
-
-		Runnable saveTf1plusNM3u8dlRe = new Runnable() {
-
-			@Override
-			public void run() {
-				UserConfig userConfig = getController().loadUserConfig();
-				String currentValue = userConfig.getTf1PlusNM3u8dlRe();
-				String newValue = Tf1PlusPremiumReplayConfig.sanitizePlainValue(normalize(tf1plusNM3u8dlRe.getText()));
-				if (currentValue == null ? newValue != null : !currentValue.equals(newValue)) {
-					userConfig.setTf1PlusNM3u8dlRe(newValue);
-					saveConfig(userConfig);
-				}
-			}
-		};
-		triggersave(tf1plusNM3u8dlRe, saveTf1plusNM3u8dlRe);
-
 		Runnable saveMaxConcurrent = new Runnable() {
 
 			@Override
@@ -347,8 +259,7 @@ public class ConfigController extends BaseController {
 		new Popin()
 				.show("Configuration sauvegardée",
 						"La configuration a été sauvegardée.\n"
-								+ "Les réglages TF1+ (identifiants, device, N_m3u8DL-RE) sont pris en compte immédiatement.\n"
-								+ "Les autres réglages peuvent nécessiter un redémarrage de l'application.");
+								+ "Certains réglages peuvent nécessiter un redémarrage de l'application.");
 	}
 
 	private String normalize(String value) {

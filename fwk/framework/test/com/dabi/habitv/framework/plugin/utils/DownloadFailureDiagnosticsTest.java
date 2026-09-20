@@ -22,6 +22,14 @@ public class DownloadFailureDiagnosticsTest {
 	}
 
 	@Test
+	public void getClassificationKeyMatchesProviderProtectedContentMessage() {
+		final DownloadFailedException failure = new DownloadFailedException(
+				new IllegalStateException("Content appears protected. Habitv cannot decrypt or bypass protection."));
+		assertEquals(DownloadFailureDiagnostics.CLASSIFICATION_PROTECTED_CONTENT,
+				DownloadFailureDiagnostics.getClassificationKey(failure));
+	}
+
+	@Test
 	public void buildUserMessageClassifiesProtectedContentFailures() {
 		final ExecutorFailedException failure = new ExecutorFailedException("yt-dlp \"url\"",
 				"ERROR: Content is DRM protected by Widevine", "ERROR: Content is DRM protected by Widevine", null);

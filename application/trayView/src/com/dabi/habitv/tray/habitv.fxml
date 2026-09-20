@@ -267,10 +267,6 @@
 											vgrow="SOMETIMES" />
 										<RowConstraints minHeight="10.0" prefHeight="30.0"
 											vgrow="SOMETIMES" />
-										<RowConstraints minHeight="10.0" prefHeight="30.0"
-											vgrow="SOMETIMES" />
-										<RowConstraints minHeight="10.0" prefHeight="30.0"
-											vgrow="SOMETIMES" />
 									</rowConstraints>
 									<children>
 										<Label text="Destination des téléchargements : "
@@ -298,36 +294,16 @@
 										<TextField fx:id="youtubeApiKey"
 											BorderPane.alignment="CENTER" GridPane.columnIndex="1"
 											GridPane.rowIndex="4" />
-										<Label text="E-mail TF1+ : "
-											GridPane.columnIndex="0" GridPane.rowIndex="5" />
-										<TextField fx:id="tf1plusEmail"
-											BorderPane.alignment="CENTER" GridPane.columnIndex="1"
-											GridPane.rowIndex="5" />
-										<Label text="Mot de passe TF1+ : "
-											GridPane.columnIndex="0" GridPane.rowIndex="6" />
-										<PasswordField fx:id="tf1plusPassword"
-											BorderPane.alignment="CENTER" GridPane.columnIndex="1"
-											GridPane.rowIndex="6" />
-										<Label text="Fichier device TF1+ (local) : "
-											GridPane.columnIndex="0" GridPane.rowIndex="7" />
-										<TextField fx:id="tf1plusDevicePath"
-											BorderPane.alignment="CENTER" GridPane.columnIndex="1"
-											GridPane.rowIndex="7" />
-										<Label text="N_m3u8DL-RE : "
-											GridPane.columnIndex="0" GridPane.rowIndex="8" />
-										<TextField fx:id="tf1plusNM3u8dlRe"
-											BorderPane.alignment="CENTER" GridPane.columnIndex="1"
-											GridPane.rowIndex="8" />
 										<Label text="Téléchargements simultanés max : "
-											GridPane.columnIndex="0" GridPane.rowIndex="9" />
+											GridPane.columnIndex="0" GridPane.rowIndex="5" />
 										<TextField fx:id="maxConcurrentDownloads"
 											maxWidth="50.0" prefWidth="50.0" GridPane.columnIndex="1"
-											GridPane.rowIndex="9" />
+											GridPane.rowIndex="5" />
 										<Label text="Intégrer les sous-titres lorsqu'ils sont disponibles :"
-											GridPane.columnIndex="0" GridPane.rowIndex="10" />
+											GridPane.columnIndex="0" GridPane.rowIndex="6" />
 										<CheckBox fx:id="embedSubtitles"
 											mnemonicParsing="false" GridPane.columnIndex="1"
-											GridPane.rowIndex="10" />
+											GridPane.rowIndex="6" />
 									</children>
 									<padding>
 										<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

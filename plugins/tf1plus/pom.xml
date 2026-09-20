@@ -11,18 +11,6 @@
 	<name>tf1plus</name>
 	<version>4.1.1-SNAPSHOT</version>
 
-	<build>
-		<resources>
-			<resource>
-				<directory>scripts</directory>
-				<targetPath>scripts</targetPath>
-				<excludes>
-					<exclude>**/__pycache__/**</exclude>
-				</excludes>
-			</resource>
-		</resources>
-	</build>
-
 <dependencies>
 		<dependency>
 			<groupId>com.dabi.habitv</groupId>

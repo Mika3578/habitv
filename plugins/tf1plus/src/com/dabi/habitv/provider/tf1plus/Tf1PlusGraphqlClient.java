@@ -294,7 +294,7 @@ final class Tf1PlusGraphqlClient {
 	}
 
 	/**
-	 * Stream reference for the premium replay helper: numeric mediainfo id or GraphQL UUID.
+	 * Stream id from GraphQL: numeric mediainfo id or video UUID.
 	 */
 	static String resolvePremiumDeliveryId(final Map<String, Object> video) {
 		if (video == null) {

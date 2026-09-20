@@ -14,36 +14,30 @@ import org.junit.Test;
 public class Tf1PlusRightsTest {
 
 	@Test
-	public void shouldTreatBasicMaxWithAuthAsPremiumReplayCandidate() {
+	public void shouldTreatBasicMaxWithAuthAsCatalogueCandidate() {
 		final Map<String, Object> video = videoWithRights(true, "BASIC", "MAX");
-		assertTrue(Tf1PlusRights.hasDownloadableRights(video, false));
+		assertTrue(Tf1PlusRights.hasDownloadableRights(video));
 		assertFalse(Tf1PlusRights.isYtDlpEligible(video));
-		assertTrue(Tf1PlusRights.shouldUsePremiumReplay(video, true));
-		assertFalse(Tf1PlusRights.shouldUsePremiumReplay(video, false));
 	}
 
 	@Test
-	public void shouldHideMaxOnlyWithoutPremiumConfiguration() {
+	public void shouldHideMaxOnlyEpisodes() {
 		final Map<String, Object> video = videoWithRights(true, "MAX");
-		assertFalse(Tf1PlusRights.hasDownloadableRights(video, false));
+		assertFalse(Tf1PlusRights.hasDownloadableRights(video));
 		assertTrue(Tf1PlusRights.isSubscriptionOnly(video));
-		assertTrue(Tf1PlusRights.shouldUsePremiumReplay(video, true));
 	}
 
 	@Test
-	public void shouldKeepLegacyBasicOnlyOnYtDlpPath() {
+	public void shouldKeepLegacyBasicOnlyOnPublicDownloadPath() {
 		final Map<String, Object> video = videoWithRights(false, "BASIC");
 		assertTrue(Tf1PlusRights.isYtDlpEligible(video));
-		assertTrue(Tf1PlusRights.hasDownloadableRights(video, false));
-		assertFalse(Tf1PlusRights.shouldUsePremiumReplay(video, true));
+		assertTrue(Tf1PlusRights.hasDownloadableRights(video));
 	}
 
 	@Test
-	public void shouldSupportLegacyPremiumOnlyRights() {
+	public void shouldHideLegacyPremiumOnlyRights() {
 		final Map<String, Object> video = videoWithRights(false, "PREMIUM");
-		assertFalse(Tf1PlusRights.hasDownloadableRights(video, false));
-		assertTrue(Tf1PlusRights.hasDownloadableRights(video, true));
-		assertTrue(Tf1PlusRights.shouldUsePremiumReplay(video, true));
+		assertFalse(Tf1PlusRights.hasDownloadableRights(video));
 	}
 
 	@Test
@@ -53,16 +47,15 @@ public class Tf1PlusRightsTest {
 	}
 
 	@Test
-	public void shouldNotTreatEmptyRightsWithUuidAsPremiumWhenConfigured() {
+	public void shouldNotTreatEmptyRightsWithUuidAsDownloadable() {
 		final Map<String, Object> video = new HashMap<String, Object>();
 		video.put("rights", Collections.<String>emptyList());
 		video.put("id", "eae451da-f173-4db9-9f32-c36f810a512d");
-		assertFalse(Tf1PlusRights.hasDownloadableRights(video, true));
-		assertFalse(Tf1PlusRights.shouldUsePremiumReplay(video, true));
+		assertFalse(Tf1PlusRights.hasDownloadableRights(video));
 	}
 
 	@Test
-	public void shouldResolvePremiumDeliveryIdFromGraphqlUuid() {
+	public void shouldResolveDeliveryIdFromGraphqlUuid() {
 		final Map<String, Object> video = new HashMap<String, Object>();
 		video.put("id", "fa698bd7-1328-467c-8cb3-4167b119973f");
 		assertEquals("fa698bd7-1328-467c-8cb3-4167b119973f",

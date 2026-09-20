@@ -122,7 +122,7 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 
 	public DownloadableState canDownload(final String downloadInput) {
 
-		if (downloadInput != null && downloadInput.contains("tf1.fr")) {
+		if (Tf1PlusEpisodeUrl.isApprovedPublicDownloadUrl(downloadInput)) {
 
 			return DownloadableState.SPECIFIC;
 
@@ -144,65 +144,11 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 
 		if (Tf1PlusEpisodeUrl.requiresPremiumDownload(downloadInput)) {
 
-			LOG.info("TF1+ download route=premium-replay fragment="
-
-					+ Tf1PlusEpisodeUrl.parsePremiumStreamId(downloadInput) + " config="
-
-					+ Tf1PlusPremiumDownloadConfig.configurationStatusForLog());
-
-			return Tf1PlusPremiumDownloadExecutor.download(downloadParam, downloaders);
+			throw new DownloadFailedException(new IllegalStateException(Tf1PlusConf.USER_MESSAGE_PROTECTED_CONTENT));
 
 		}
 
-		final String streamId = resolveStreamIdForPremiumDownload(downloadInput);
-
-		if (StringUtils.isNotEmpty(streamId)) {
-
-			if (!isPremiumDownloadEnabled()) {
-
-				LOG.warn("TF1+ premium replay requires local setup (streamId=" + streamId + ") config="
-
-						+ Tf1PlusPremiumDownloadConfig.configurationStatusForLog());
-
-				throw new DownloadFailedException(new IllegalStateException(
-
-						Tf1PlusPremiumDownloadConfig.userFacingConfigurationMessage()));
-
-			}
-
-			LOG.info("TF1+ download route=premium-replay streamId=" + streamId + " config="
-
-					+ Tf1PlusPremiumDownloadConfig.configurationStatusForLog());
-
-			return Tf1PlusPremiumDownloadExecutor.download(
-
-					DownloadParamDTO.buildDownloadParam(downloadParam,
-
-							Tf1PlusEpisodeUrl.withPremiumStreamId(downloadInput, streamId)),
-
-					downloaders);
-
-		}
-
-		if (isPremiumDownloadEnabled()) {
-
-			if (!isYtDlpEligibleEpisodeUrl(downloadInput)) {
-
-				LOG.warn("TF1+ premium replay is configured but no stream id was resolved for "
-
-						+ Tf1PlusEpisodeUrl.pageUrlWithoutFragment(downloadInput));
-
-				throw new DownloadFailedException(new IllegalStateException(
-
-						Tf1PlusConf.USER_MESSAGE_PREMIUM_REPLAY));
-
-			}
-
-		}
-
-		LOG.info("TF1+ download route=yt-dlp config="
-
-				+ Tf1PlusPremiumDownloadConfig.configurationStatusForLog() + " url="
+		LOG.info("TF1+ download route=yt-dlp url="
 
 				+ Tf1PlusEpisodeUrl.pageUrlWithoutFragment(downloadInput));
 
@@ -215,94 +161,6 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 				downloaders,
 
 				FrameworkConf.YOUTUBE);
-
-	}
-
-
-
-	private String resolveStreamIdForPremiumDownload(final String episodeUrl) {
-
-		final Matcher matcher = VIDEO_PAGE_PATTERN.matcher(Tf1PlusEpisodeUrl.pageUrlWithoutFragment(episodeUrl));
-
-		if (!matcher.find()) {
-
-			return null;
-
-		}
-
-		final String programSlug = matcher.group(1);
-
-		final String videoSlug = matcher.group(2);
-
-		try {
-
-			final Map<String, Object> videoBySlug = graphqlClient.fetchVideoByVideoSlug(programSlug, videoSlug);
-
-			if (!videoBySlug.isEmpty()) {
-
-				if (isYtDlpEligible(videoBySlug)) {
-
-					return null;
-
-				}
-
-				final String premiumDeliveryId = Tf1PlusGraphqlClient.resolvePremiumDeliveryId(videoBySlug);
-
-				if (StringUtils.isNotEmpty(premiumDeliveryId)) {
-
-					return premiumDeliveryId;
-
-				}
-
-				return Tf1PlusGraphqlClient.stringValue(videoBySlug.get("streamId"));
-
-			}
-
-			final List<Map<String, Object>> videos = graphqlClient.fetchVideosByProgram(programSlug);
-
-			for (final Map<String, Object> video : videos) {
-
-				if (!videoSlug.equals(Tf1PlusGraphqlClient.stringValue(video.get("slug")))) {
-
-					continue;
-
-				}
-
-				if (isYtDlpEligible(video)) {
-
-					return null;
-
-				}
-
-				final String premiumDeliveryId = Tf1PlusGraphqlClient.resolvePremiumDeliveryId(video);
-
-				if (StringUtils.isNotEmpty(premiumDeliveryId)) {
-
-					return premiumDeliveryId;
-
-				}
-
-				return Tf1PlusGraphqlClient.stringValue(video.get("streamId"));
-
-			}
-
-			return null;
-
-		} catch (IOException e) {
-
-			LOG.warn("Unable to resolve TF1+ stream id for premium replay download: " + e.getMessage());
-
-			return null;
-
-		}
-
-	}
-
-
-
-	protected boolean isPremiumDownloadEnabled() {
-
-		return Tf1PlusPremiumDownloadConfig.isConfigured();
 
 	}
 
@@ -380,10 +238,6 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 
 			}
 
-			final String premiumDeliveryId = Tf1PlusGraphqlClient.resolvePremiumDeliveryId(video);
-
-			final boolean premiumEpisode = shouldUsePremiumReplay(video);
-
 			final String videoSlug = Tf1PlusGraphqlClient.stringValue(video.get("slug"));
 
 			if (StringUtils.isEmpty(videoSlug)) {
@@ -415,12 +269,6 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 			}
 
 			String url = buildVideoUrl(channelSlug, programSlug, videoSlug);
-
-			if (premiumEpisode && StringUtils.isNotEmpty(premiumDeliveryId)) {
-
-				url = Tf1PlusEpisodeUrl.withPremiumStreamId(url, premiumDeliveryId);
-
-			}
 
 			final EpisodeDTO episode = new EpisodeDTO(category, title, url);
 
@@ -458,9 +306,7 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 
 		if (episodes.isEmpty()) {
 
-			diagnostics.setRootCauseSummary(isPremiumDownloadEnabled() ? "no-downloadable-rights-episodes-found"
-
-					: "no-basic-rights-episodes-found");
+			diagnostics.setRootCauseSummary("no-basic-rights-episodes-found");
 
 			LOG.warn(Tf1PlusConf.USER_MESSAGE_UNAVAILABLE);
 
@@ -670,43 +516,7 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 
 	private boolean hasDownloadableRights(final Map<String, Object> video) {
 
-		return Tf1PlusRights.hasDownloadableRights(video, isPremiumDownloadEnabled());
-
-	}
-
-	private boolean shouldUsePremiumReplay(final Map<String, Object> video) {
-
-		return Tf1PlusRights.shouldUsePremiumReplay(video, isPremiumDownloadEnabled());
-
-	}
-
-	private boolean isYtDlpEligible(final Map<String, Object> video) {
-
-		return Tf1PlusRights.isYtDlpEligible(video);
-
-	}
-
-	private boolean isYtDlpEligibleEpisodeUrl(final String episodeUrl) {
-
-		final Matcher matcher = VIDEO_PAGE_PATTERN.matcher(Tf1PlusEpisodeUrl.pageUrlWithoutFragment(episodeUrl));
-
-		if (!matcher.find()) {
-
-			return false;
-
-		}
-
-		try {
-
-			final Map<String, Object> video = graphqlClient.fetchVideoByVideoSlug(matcher.group(1), matcher.group(2));
-
-			return !video.isEmpty() && isYtDlpEligible(video);
-
-		} catch (IOException e) {
-
-			return false;
-
-		}
+		return Tf1PlusRights.hasDownloadableRights(video);
 
 	}
 
