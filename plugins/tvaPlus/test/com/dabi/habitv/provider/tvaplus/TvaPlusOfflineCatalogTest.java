@@ -61,6 +61,25 @@ public class TvaPlusOfflineCatalogTest {
 	}
 
 	@Test
+	public void findEpisodeFetchesCarouselWhenNestedOnlyNonPublic() throws IOException {
+		final Map<String, String> pages = new HashMap<String, String>();
+		pages.put("https://www.tvaplus.ca/tva/j-e",
+				read("test/resources/fixtures/tvaplus/show-je-s50.html"));
+		pages.put("https://www.tvaplus.ca/tva/j-e/saison-50",
+				read("test/resources/fixtures/tvaplus/season-50-premium-nested.html"));
+		pages.put("https://www.tvaplus.ca/tva/j-e/saison-50/tous-les-episodes",
+				read("test/resources/fixtures/tvaplus/season-50-episodes.html"));
+		final TvaPlusPluginManager plugin = newRecordingPlugin(pages);
+		final CategoryDTO show = new CategoryDTO(TvaPlusConf.NAME, "J.E",
+				TvaPlusUrls.showCategoryId("/tva/j-e"), TvaPlusConf.EXTENSION);
+		final Set<EpisodeDTO> episodes = plugin.findEpisode(show);
+		assertEquals(1, episodes.size());
+		final EpisodeDTO episode = episodes.iterator().next();
+		assertTrue(episode.getId().contains("/saison-50/episode-2-2"));
+		assertFalse(episode.getId().contains("episode-1-1"));
+	}
+
+	@Test
 	public void findEpisodeWalksSeasonsAndFetchesEmptyCarouselPage() throws IOException {
 		final Map<String, String> pages = new HashMap<String, String>();
 		pages.put("https://www.tvaplus.ca/tva/j-e", read("test/resources/fixtures/tvaplus/show-je.html"));

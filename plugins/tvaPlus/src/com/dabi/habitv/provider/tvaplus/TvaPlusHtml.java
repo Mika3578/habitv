@@ -134,10 +134,10 @@ final class TvaPlusHtml {
 		}
 		for (final JsonNode carousel : related) {
 			if (isEpisodesCarousel(carousel)) {
-				final JsonNode nested = carousel.path("associatedEntities");
-				if (nested.isArray() && nested.size() > 0) {
-					return null;
-				}
+				// Always return the dedicated carousel page slug when present.
+				// Nested associatedEntities may be non-empty yet contain only
+				// non-PUBLIC items that parseSeasonEpisodes already filtered out;
+				// the client calls this only after an empty parse result.
 				final String slug = text(carousel, "slug");
 				return TvaPlusUrls.isSafeRelativeTvaPath(slug) ? slug : null;
 			}
