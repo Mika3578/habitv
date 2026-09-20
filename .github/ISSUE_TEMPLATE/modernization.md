@@ -8,8 +8,8 @@ assignees: []
 
 ## Scope slug
 
-<!-- Use a descriptive kebab-case scope, e.g. provider-youtube-ytdlp -->
-provider-youtube-ytdlp
+<!-- Use a short kebab-case scope, e.g. francetv -->
+francetv
 
 ## Scope
 

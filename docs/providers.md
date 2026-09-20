@@ -13,7 +13,8 @@ into git. User login material, if ever used, stays in local config or
 environment variables. Optional auth paths stay disabled until the user
 configures them.
 
-Keep public git text brief and generic.
+Keep public git text short and generic. See [`AGENTS.md`](../AGENTS.md)
+(**Public git text**).
 
 ## yt-dlp
 
