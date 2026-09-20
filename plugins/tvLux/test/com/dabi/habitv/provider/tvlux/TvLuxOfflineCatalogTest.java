@@ -161,6 +161,10 @@ public class TvLuxOfflineCatalogTest {
 		assertEquals(DownloadableState.IMPOSSIBLE,
 				plugin.canDownload("https://www.tvlux.be/replay/jt/title%2Fextra_1"));
 		assertEquals(DownloadableState.IMPOSSIBLE,
+				plugin.canDownload("https://www.tvlux.be/replay/jt/title%0Ainjected_1"));
+		assertEquals(DownloadableState.IMPOSSIBLE,
+				plugin.canDownload("https://www.tvlux.be/replay/jt/title%0dinjected_1"));
+		assertEquals(DownloadableState.IMPOSSIBLE,
 				plugin.canDownload("https://user:pass@www.tvlux.be/replay/jt/jt-du-18-09-2026_52260"));
 		assertEquals(DownloadableState.IMPOSSIBLE,
 				plugin.canDownload("https://www.tvlux.be:8443/replay/jt/jt-du-18-09-2026_52260"));
@@ -183,6 +187,10 @@ public class TvLuxOfflineCatalogTest {
 				"https://tvlocales-vod-cmaf.freecaster.com/telemb/id/file.m3u8"));
 		assertEquals(null, TvLuxUrls.sanitizeHlsUrl(
 				"https://tvlocales-vod-cmaf.freecaster.com/other/id/file.m3u8"));
+		assertEquals(null, TvLuxUrls.sanitizeHlsUrl(
+				"https://tvlocales-vod-cmaf.freecaster.com/tvlux/id/file%0A.m3u8"));
+		assertEquals(null, TvLuxUrls.sanitizeHlsUrl(
+				"https://tvlocales-vod-cmaf.freecaster.com/tvlux/id/file%0d.m3u8"));
 		assertEquals("https://tvlocales-vod-cmaf.freecaster.com/tvlux/id/file.m3u8",
 				TvLuxUrls.sanitizeHlsUrl(
 						"https://tvlocales-vod-cmaf.freecaster.com/tvlux/id/file.m3u8?token=secret"));

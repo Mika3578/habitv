@@ -117,7 +117,7 @@ final class TvLuxUrls {
 			}
 			final String lowerRaw = rawPath.toLowerCase(Locale.ROOT);
 			if (lowerRaw.contains("%3f") || lowerRaw.contains("%23") || lowerRaw.contains("%2f")
-					|| lowerRaw.contains("%5c")) {
+					|| lowerRaw.contains("%5c") || lowerRaw.contains("%0a") || lowerRaw.contains("%0d")) {
 				return null;
 			}
 			if (!EPISODE_PATH.matcher(rawPath).matches()) {
@@ -160,7 +160,7 @@ final class TvLuxUrls {
 			}
 			final String lowerRaw = rawPath.toLowerCase(Locale.ROOT);
 			if (lowerRaw.contains("%3f") || lowerRaw.contains("%23") || lowerRaw.contains("%2f")
-					|| lowerRaw.contains("%5c")) {
+					|| lowerRaw.contains("%5c") || lowerRaw.contains("%0a") || lowerRaw.contains("%0d")) {
 				return null;
 			}
 			final String lowerPath = path.toLowerCase(Locale.ROOT);

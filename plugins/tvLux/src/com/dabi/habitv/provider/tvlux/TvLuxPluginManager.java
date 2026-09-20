@@ -145,9 +145,8 @@ public class TvLuxPluginManager extends BasePluginWithProxy implements PluginPro
 			if (TvLuxConf.DOWNLOAD_UNAVAILABLE_MESSAGE.equals(e.getMessage())) {
 				throw e;
 			}
-			diagnostics.setRootCauseSummary(DownloadFailureDiagnostics.getClassificationKey(e) == null
-					? "download-failed"
-					: DownloadFailureDiagnostics.getClassificationKey(e));
+			final String classification = DownloadFailureDiagnostics.getClassificationKey(e);
+			diagnostics.setRootCauseSummary(classification == null ? "download-failed" : classification);
 			getLog().warn(diagnostics.formatLogLine());
 			getLog().warn(DownloadFailureDiagnostics.formatLogLine(
 					new EpisodeDTO(null, sanitizedEpisodeUrl, sanitizedEpisodeUrl),
