@@ -40,10 +40,14 @@ final class TvLuxHtml {
 			if (!hrefValue.startsWith("/replay/")) {
 				continue;
 			}
-			final String path = hrefValue.split("[?#]", 2)[0];
+			String path = hrefValue.split("[?#]", 2)[0];
+			while (path.length() > 1 && path.endsWith("/")) {
+				path = path.substring(0, path.length() - 1);
+			}
 			final String[] parts = path.split("/");
-			// /replay/{slug} only
-			if (parts.length != 3 || StringUtils.isEmpty(parts[2]) || parts[2].startsWith("page_")) {
+			// /replay/{slug} only (trailing slash already stripped)
+			if (parts.length != 3 || StringUtils.isEmpty(parts[2])
+					|| parts[2].regionMatches(true, 0, "page_", 0, 5)) {
 				continue;
 			}
 			final String slug = parts[2];

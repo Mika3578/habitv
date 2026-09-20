@@ -27,13 +27,21 @@ public class TvLuxOfflineCatalogTest {
 		pages.put(TvLuxUrls.replayIndexUrl(),
 				"<!DOCTYPE html><html><body>"
 						+ "<a href=\"https://tvlux.be/replay/jt\">JT</a>"
+						+ "<a href=\"/replay/l-hebdo/\">Hebdo trailing slash</a>"
+						+ "<a href=\"/replay/Page_2\">Pagination</a>"
 						+ "<a href=\"/replay/bad%2Fslug\">Bad</a>"
 						+ "<a href=\"/replay/JT\">JT upper</a>"
 						+ "</body></html>");
 		final TvLuxPluginManager plugin = newRecordingPlugin(pages);
 		final Set<CategoryDTO> categories = plugin.findCategory();
-		assertEquals(1, categories.size());
-		assertEquals(TvLuxUrls.showCategoryId("jt"), categories.iterator().next().getId());
+		assertEquals(2, categories.size());
+		final Map<String, String> namesById = new HashMap<String, String>();
+		for (final CategoryDTO category : categories) {
+			namesById.put(category.getId(), category.getName());
+		}
+		assertEquals("JT", namesById.get(TvLuxUrls.showCategoryId("jt")));
+		assertEquals("Hebdo trailing slash", namesById.get(TvLuxUrls.showCategoryId("l-hebdo")));
+		assertFalse(namesById.containsKey(TvLuxUrls.showCategoryId("page_2")));
 	}
 
 	@Test
@@ -142,6 +150,8 @@ public class TvLuxOfflineCatalogTest {
 		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload("https://www.tvlux.be/replay/jt"));
 		assertEquals(DownloadableState.IMPOSSIBLE,
 				plugin.canDownload("https://www.tvlux.be/replay/jt/page_2"));
+		assertEquals(DownloadableState.IMPOSSIBLE,
+				plugin.canDownload("https://www.tvlux.be/replay/jt/Page_2"));
 		assertEquals(DownloadableState.IMPOSSIBLE,
 				plugin.canDownload("https://www.tvlux.be/replay/jt/title%3Ftoken=x_1"));
 		assertEquals(DownloadableState.IMPOSSIBLE,

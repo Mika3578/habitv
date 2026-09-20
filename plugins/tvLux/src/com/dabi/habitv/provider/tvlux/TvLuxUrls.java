@@ -8,8 +8,10 @@ import org.apache.commons.lang.StringUtils;
 
 final class TvLuxUrls {
 
-	// Episode pages are /replay/{show}/{title}_{id}; exclude /replay/{show}/page_{n} pagination.
-	private static final Pattern EPISODE_PATH = Pattern.compile("^/replay/[^/]+/(?!page_\\d+)[^/]+_\\d+/?$");
+	// Episode pages are /replay/{show}/{title}_{id}; exclude /replay/{show}/page_{n} pagination
+	// (case-insensitive so Page_2 is not treated as an episode slug_id).
+	private static final Pattern EPISODE_PATH = Pattern
+			.compile("^/replay/[^/]+/(?!page_\\d+)[^/]+_\\d+/?$", Pattern.CASE_INSENSITIVE);
 
 	private TvLuxUrls() {
 	}
