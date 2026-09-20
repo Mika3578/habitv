@@ -60,6 +60,8 @@ public class Tv5PlusOfflineCatalogTest {
 		assertEquals(2, episodes.size());
 		for (final EpisodeDTO episode : episodes) {
 			assertTrue(episode.getId().startsWith("https://www.tv5unis.ca/videos/watatatow/"));
+			assertFalse("orphan EPISODE must not fall back to movie/series root",
+					"https://www.tv5unis.ca/videos/watatatow".equals(episode.getId()));
 			assertNotNull(episode.getMetadata());
 			assertEquals("Watatatow", episode.getMetadata().getSeriesTitle());
 			assertEquals(Tv5PlusConf.CHANNEL_LABEL, episode.getMetadata().getChannel());

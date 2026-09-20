@@ -131,8 +131,10 @@ final class Tv5PlusClient {
 		}
 		final String productType = text(root, "productType");
 		if (Tv5PlusConf.TYPE_MOVIE.equals(productType)) {
-			final String watchUrl = resolveWatchUrl(text(root, "videoCanonicalUrl"), slug, null, null);
-			byUrl.put(watchUrl, new EpisodeRef(text(root, "title"), watchUrl, null, null));
+			final String watchUrl = resolveWatchUrl(text(root, "videoCanonicalUrl"), slug, productType, null, null);
+			if (watchUrl != null) {
+				byUrl.put(watchUrl, new EpisodeRef(text(root, "title"), watchUrl, null, null));
+			}
 			return new ArrayList<EpisodeRef>(byUrl.values());
 		}
 
@@ -188,16 +190,22 @@ final class Tv5PlusClient {
 				final Integer season = asInt(product.get("seasonNumber"));
 				final Integer episode = asInt(product.get("episodeNumber"));
 				final String title = firstNonEmpty(text(product, "title"), buildFallbackTitle(season, episode));
-				final String watchUrl = resolveWatchUrl(text(product, "videoCanonicalUrl"), slug, season, episode);
-				if (!byUrl.containsKey(watchUrl)) {
+				final String watchUrl = resolveWatchUrl(text(product, "videoCanonicalUrl"), slug, type, season,
+						episode);
+				if (watchUrl != null && !byUrl.containsKey(watchUrl)) {
 					byUrl.put(watchUrl, new EpisodeRef(title, watchUrl, season, episode));
 				}
 			}
 		}
 	}
 
-	private static String resolveWatchUrl(final String canonicalUrl, final String slug, final Integer season,
-			final Integer episode) {
+	/**
+	 * Prefer a sanitized canonical URL. Otherwise synthesize an episode URL only
+	 * when season+episode numbers exist, or a movie URL only for MOVIE products.
+	 * Never fall an EPISODE back to the series/movie root URL.
+	 */
+	private static String resolveWatchUrl(final String canonicalUrl, final String slug, final String productType,
+			final Integer season, final Integer episode) {
 		final String sanitizedCanonical = Tv5PlusUrls.sanitizeEpisodeUrl(canonicalUrl);
 		if (sanitizedCanonical != null) {
 			return sanitizedCanonical;
@@ -205,7 +213,10 @@ final class Tv5PlusClient {
 		if (season != null && episode != null) {
 			return Tv5PlusUrls.episodeWatchUrl(slug, season.intValue(), episode.intValue());
 		}
-		return Tv5PlusUrls.movieWatchUrl(slug);
+		if (Tv5PlusConf.TYPE_MOVIE.equals(productType)) {
+			return Tv5PlusUrls.movieWatchUrl(slug);
+		}
+		return null;
 	}
 
 	private JsonNode execute(final String query) throws IOException {
