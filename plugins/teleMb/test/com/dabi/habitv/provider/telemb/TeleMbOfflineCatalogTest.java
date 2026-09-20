@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -152,6 +153,27 @@ public class TeleMbOfflineCatalogTest {
 		final Map<String, PluginDownloaderInterface> map = new HashMap<String, PluginDownloaderInterface>();
 		map.put(FrameworkConf.FFMPEG, new RecordingDownloader());
 		plugin.download(null, new DownloaderPluginHolder("cmd", map, new HashMap<String, String>(), ".", ".", ".", "."));
+	}
+
+	@Test
+	public void downloadRejectsNullParamAndNullInputWithUnavailableMessage() throws Exception {
+		final TeleMbPluginManager plugin = new TeleMbPluginManager();
+		final Map<String, PluginDownloaderInterface> map = new HashMap<String, PluginDownloaderInterface>();
+		map.put(FrameworkConf.FFMPEG, new RecordingDownloader());
+		final DownloaderPluginHolder holder = new DownloaderPluginHolder("cmd", map,
+				new HashMap<String, String>(), ".", ".", ".", ".");
+		try {
+			plugin.download(null, holder);
+			fail("expected DownloadFailedException");
+		} catch (final DownloadFailedException e) {
+			assertEquals(TeleMbConf.DOWNLOAD_UNAVAILABLE_MESSAGE, e.getMessage());
+		}
+		try {
+			plugin.download(new DownloadParamDTO(null, "out.mp4", TeleMbConf.EXTENSION), holder);
+			fail("expected DownloadFailedException");
+		} catch (final DownloadFailedException e) {
+			assertEquals(TeleMbConf.DOWNLOAD_UNAVAILABLE_MESSAGE, e.getMessage());
+		}
 	}
 
 	@Test
