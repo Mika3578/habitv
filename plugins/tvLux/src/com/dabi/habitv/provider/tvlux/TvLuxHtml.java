@@ -47,12 +47,13 @@ final class TvLuxHtml {
 				continue;
 			}
 			final String slug = parts[2];
-			if (bySlug.containsKey(slug)) {
+			if (!TvLuxUrls.isSafeShowSlug(slug) || bySlug.containsKey(slug.toLowerCase(Locale.ROOT))) {
 				continue;
 			}
+			final String normalizedSlug = slug.toLowerCase(Locale.ROOT);
 			final String anchorTitle = extractAnchorTitle(html, end);
-			final String title = StringUtils.isEmpty(anchorTitle) ? humanize(slug) : anchorTitle;
-			bySlug.put(slug, new ShowRef(title, slug));
+			final String title = StringUtils.isEmpty(anchorTitle) ? humanize(normalizedSlug) : anchorTitle;
+			bySlug.put(normalizedSlug, new ShowRef(title, normalizedSlug));
 		}
 		return new ArrayList<ShowRef>(bySlug.values());
 	}

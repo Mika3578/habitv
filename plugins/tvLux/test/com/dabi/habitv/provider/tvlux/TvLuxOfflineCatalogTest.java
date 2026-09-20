@@ -25,11 +25,23 @@ public class TvLuxOfflineCatalogTest {
 	public void findCategoryParsesBareTvluxHostLinks() throws IOException {
 		final Map<String, String> pages = new HashMap<String, String>();
 		pages.put(TvLuxUrls.replayIndexUrl(),
-				"<!DOCTYPE html><html><body><a href=\"https://tvlux.be/replay/jt\">JT</a></body></html>");
+				"<!DOCTYPE html><html><body>"
+						+ "<a href=\"https://tvlux.be/replay/jt\">JT</a>"
+						+ "<a href=\"/replay/bad%2Fslug\">Bad</a>"
+						+ "<a href=\"/replay/JT\">JT upper</a>"
+						+ "</body></html>");
 		final TvLuxPluginManager plugin = newRecordingPlugin(pages);
 		final Set<CategoryDTO> categories = plugin.findCategory();
 		assertEquals(1, categories.size());
 		assertEquals(TvLuxUrls.showCategoryId("jt"), categories.iterator().next().getId());
+	}
+
+	@Test
+	public void showSlugFromCategoryIdRejectsUnsafeValues() {
+		assertEquals("jt", TvLuxUrls.showSlugFromCategoryId(TvLuxUrls.showCategoryId("JT")));
+		assertEquals(null, TvLuxUrls.showSlugFromCategoryId(TvLuxUrls.showCategoryId("bad%2Fslug")));
+		assertEquals(null, TvLuxUrls.showSlugFromCategoryId(TvLuxUrls.showCategoryId("a?b")));
+		assertEquals(null, TvLuxUrls.showSlugFromCategoryId(TvLuxConf.CATEGORY_SHOW_PREFIX + "a/b"));
 	}
 
 	@Test

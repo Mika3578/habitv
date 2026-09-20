@@ -27,11 +27,27 @@ final class TvLuxUrls {
 			return null;
 		}
 		final String slug = categoryId.substring(TvLuxConf.CATEGORY_SHOW_PREFIX.length()).trim();
-		return StringUtils.isEmpty(slug) ? null : slug;
+		return isSafeShowSlug(slug) ? slug.toLowerCase(Locale.ROOT) : null;
 	}
 
 	static boolean isShowCategory(final String categoryId) {
 		return showSlugFromCategoryId(categoryId) != null;
+	}
+
+	/**
+	 * Replay show slugs are single path segments: letters, digits, underscore, hyphen.
+	 * Reject encoded delimiters, separators, and control characters.
+	 */
+	static boolean isSafeShowSlug(final String slug) {
+		if (StringUtils.isEmpty(slug)) {
+			return false;
+		}
+		if (slug.indexOf('%') >= 0 || slug.indexOf('?') >= 0 || slug.indexOf('#') >= 0
+				|| slug.indexOf('/') >= 0 || slug.indexOf('\\') >= 0
+				|| slug.indexOf('\r') >= 0 || slug.indexOf('\n') >= 0) {
+			return false;
+		}
+		return slug.matches("^[\\w-]+$");
 	}
 
 	static String showPageUrl(final String slug) {
