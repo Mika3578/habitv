@@ -68,7 +68,6 @@ public class TvaPlusPluginManager extends BasePluginWithProxy implements PluginP
 				category.setDownloadable(true);
 				categories.add(category);
 			}
-			diagnostics.setCreatedItems(categories.size());
 			if (categories.size() <= 1) {
 				diagnostics.setRootCauseSummary("empty-catalog");
 			}
@@ -79,6 +78,7 @@ public class TvaPlusPluginManager extends BasePluginWithProxy implements PluginP
 			diagnostics.setRootCauseSummary("runtime:" + e.getClass().getSimpleName());
 			getLog().warn("TVA+ catalogue failed: " + e.getClass().getSimpleName());
 		}
+		diagnostics.setCreatedItems(categories.size());
 		getLog().info(diagnostics.formatLogLine());
 		return categories;
 	}

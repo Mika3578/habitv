@@ -61,6 +61,14 @@ public class TvaPlusOfflineCatalogTest {
 	}
 
 	@Test
+	public void findCategoryKeepsRecentWhenCatalogueFetchFails() {
+		final TvaPlusPluginManager plugin = newRecordingPlugin(new HashMap<String, String>());
+		final Set<CategoryDTO> categories = plugin.findCategory();
+		assertEquals(1, categories.size());
+		assertEquals(TvaPlusConf.CATEGORY_RECENT, categories.iterator().next().getId());
+	}
+
+	@Test
 	public void findEpisodeFetchesCarouselWhenNestedOnlyNonPublic() throws IOException {
 		final Map<String, String> pages = new HashMap<String, String>();
 		pages.put("https://www.tvaplus.ca/tva/j-e",
