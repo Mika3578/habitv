@@ -75,7 +75,8 @@ final class Tv5PlusUrls {
 				return null;
 			}
 			final String lowerRaw = rawPath.toLowerCase(Locale.ROOT);
-			if (lowerRaw.contains("%3f") || lowerRaw.contains("%23")) {
+			if (lowerRaw.contains("%3f") || lowerRaw.contains("%23") || lowerRaw.contains("%253f")
+					|| lowerRaw.contains("%2523")) {
 				return null;
 			}
 			final Matcher matcher = EPISODE_PATH.matcher(rawPath);
@@ -90,6 +91,15 @@ final class Tv5PlusUrls {
 		} catch (final IllegalArgumentException e) {
 			return null;
 		}
+	}
+
+	/** True when the sanitized URL is an episode path, not a movie/series root. */
+	static boolean isEpisodeWatchUrl(final String url) {
+		if (StringUtils.isEmpty(url)) {
+			return false;
+		}
+		final String lower = url.toLowerCase(Locale.ROOT);
+		return lower.contains("/saisons/") && lower.contains("/episodes/");
 	}
 
 	static boolean isTv5PlusEpisodeUrl(final String url) {

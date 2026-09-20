@@ -98,6 +98,11 @@ final class Tv5PlusDiagnostics {
 		cut = earlierIndex(cut, lower.indexOf("%23"));
 		cut = earlierIndex(cut, lower.indexOf("%0a"));
 		cut = earlierIndex(cut, lower.indexOf("%0d"));
+		// Nested percent-encoding of the same delimiters (e.g. %253F → %3F).
+		cut = earlierIndex(cut, lower.indexOf("%253f"));
+		cut = earlierIndex(cut, lower.indexOf("%2523"));
+		cut = earlierIndex(cut, lower.indexOf("%250a"));
+		cut = earlierIndex(cut, lower.indexOf("%250d"));
 		return value.substring(0, cut);
 	}
 

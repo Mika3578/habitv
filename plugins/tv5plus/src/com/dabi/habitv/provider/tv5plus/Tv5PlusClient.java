@@ -202,13 +202,18 @@ final class Tv5PlusClient {
 	/**
 	 * Prefer a sanitized canonical URL. Otherwise synthesize an episode URL only
 	 * when season+episode numbers exist, or a movie URL only for MOVIE products.
-	 * Never fall an EPISODE back to the series/movie root URL.
+	 * Never fall an EPISODE back to the series/movie root URL — including when the
+	 * API supplies a root path as videoCanonicalUrl.
 	 */
 	private static String resolveWatchUrl(final String canonicalUrl, final String slug, final String productType,
 			final Integer season, final Integer episode) {
 		final String sanitizedCanonical = Tv5PlusUrls.sanitizeEpisodeUrl(canonicalUrl);
 		if (sanitizedCanonical != null) {
-			return sanitizedCanonical;
+			if (!Tv5PlusConf.TYPE_EPISODE.equals(productType)
+					|| Tv5PlusUrls.isEpisodeWatchUrl(sanitizedCanonical)) {
+				return sanitizedCanonical;
+			}
+			// EPISODE with a movie/series-root canonical: ignore and try synthesis below.
 		}
 		if (season != null && episode != null) {
 			return Tv5PlusUrls.episodeWatchUrl(slug, season.intValue(), episode.intValue());

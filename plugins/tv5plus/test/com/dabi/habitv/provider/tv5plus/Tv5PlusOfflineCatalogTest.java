@@ -63,15 +63,21 @@ public class Tv5PlusOfflineCatalogTest {
 		final CategoryDTO show = new CategoryDTO(Tv5PlusConf.NAME, "Watatatow",
 				Tv5PlusUrls.showCategoryId("watatatow"), Tv5PlusConf.EXTENSION);
 		final Set<EpisodeDTO> episodes = plugin.findEpisode(show);
-		assertEquals(2, episodes.size());
+		assertEquals(3, episodes.size());
+		boolean sawSynthesized = false;
 		for (final EpisodeDTO episode : episodes) {
 			assertTrue(episode.getId().startsWith("https://www.tv5unis.ca/videos/watatatow/"));
 			assertFalse("orphan EPISODE must not fall back to movie/series root",
 					"https://www.tv5unis.ca/videos/watatatow".equals(episode.getId()));
+			assertTrue(Tv5PlusUrls.isEpisodeWatchUrl(episode.getId()));
 			assertNotNull(episode.getMetadata());
 			assertEquals("Watatatow", episode.getMetadata().getSeriesTitle());
 			assertEquals(Tv5PlusConf.CHANNEL_LABEL, episode.getMetadata().getChannel());
+			if (episode.getId().endsWith("/saisons/12/episodes/6")) {
+				sawSynthesized = true;
+			}
 		}
+		assertTrue(sawSynthesized);
 	}
 
 	@Test
@@ -104,6 +110,8 @@ public class Tv5PlusOfflineCatalogTest {
 				plugin.canDownload("https://www.tv5plus.ca/videos/foo%3Ftoken=secret"));
 		assertEquals(DownloadableState.IMPOSSIBLE,
 				plugin.canDownload("https://www.tv5plus.ca/videos/foo%23frag"));
+		assertEquals(DownloadableState.IMPOSSIBLE,
+				plugin.canDownload("https://www.tv5plus.ca/videos/foo%253Ftoken=secret"));
 		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload(null));
 	}
 
@@ -162,6 +170,13 @@ public class Tv5PlusOfflineCatalogTest {
 		line = diagnostics.formatLogLine();
 		assertTrue(line.contains("sourceUrl=invalid-url"));
 		assertFalse(line.contains("password"));
+
+		diagnostics.setSourceUrl("https://www.tv5unis.ca/videos/foo%253Ftoken=secret");
+		line = diagnostics.formatLogLine();
+		assertTrue(line.contains("sourceUrl=https://www.tv5unis.ca/videos/foo"));
+		assertFalse(line.contains("token=secret"));
+		assertFalse(line.contains("%253F"));
+		assertFalse(line.contains("%253f"));
 
 		diagnostics.setShowSlug("categorie-fiction\ninjected=1");
 		line = diagnostics.formatLogLine();
