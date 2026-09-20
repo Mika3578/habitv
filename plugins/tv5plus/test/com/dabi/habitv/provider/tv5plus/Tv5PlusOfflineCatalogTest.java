@@ -132,6 +132,12 @@ public class Tv5PlusOfflineCatalogTest {
 		line = diagnostics.formatLogLine();
 		assertTrue(line.contains("sourceUrl=invalid-url"));
 		assertFalse(line.contains("password"));
+
+		diagnostics.setShowSlug("categorie-fiction\ninjected=1");
+		line = diagnostics.formatLogLine();
+		assertTrue(line.contains("showSlug=categorie-fiction"));
+		assertFalse(line.contains("injected"));
+		assertFalse(line.contains("\n"));
 	}
 
 	private static Map<String, String> catalogFixtures() throws IOException {
