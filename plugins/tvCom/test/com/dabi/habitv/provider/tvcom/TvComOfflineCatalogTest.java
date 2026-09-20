@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -209,6 +210,27 @@ public class TvComOfflineCatalogTest {
 		plugin.download(new DownloadParamDTO(
 				"https://www.tvcom.be/replay/emission/coin-lecture/coin-lecture-18-09-26/58524", "out.mp4",
 				TvComConf.EXTENSION), holder);
+	}
+
+	@Test
+	public void downloadRejectsNullParamAndNullInputWithUnavailableMessage() throws Exception {
+		final TvComPluginManager plugin = new TvComPluginManager();
+		final Map<String, PluginDownloaderInterface> map = new HashMap<String, PluginDownloaderInterface>();
+		map.put(FrameworkConf.FFMPEG, new RecordingDownloader());
+		final DownloaderPluginHolder holder = new DownloaderPluginHolder("cmd", map,
+				new HashMap<String, String>(), ".", ".", ".", ".");
+		try {
+			plugin.download(null, holder);
+			fail("expected DownloadFailedException");
+		} catch (final DownloadFailedException e) {
+			assertEquals(TvComConf.DOWNLOAD_UNAVAILABLE_MESSAGE, e.getMessage());
+		}
+		try {
+			plugin.download(new DownloadParamDTO(null, "out.mp4", TvComConf.EXTENSION), holder);
+			fail("expected DownloadFailedException");
+		} catch (final DownloadFailedException e) {
+			assertEquals(TvComConf.DOWNLOAD_UNAVAILABLE_MESSAGE, e.getMessage());
+		}
 	}
 
 	@Test
