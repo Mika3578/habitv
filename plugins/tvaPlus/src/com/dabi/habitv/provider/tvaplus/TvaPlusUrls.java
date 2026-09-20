@@ -11,6 +11,11 @@ final class TvaPlusUrls {
 	private static final Pattern EPISODE_SLUG =
 			Pattern.compile("^/tva/[\\w-]+/saison-\\d+/episode-[\\w-]+-\\d+$");
 
+	private static final Pattern RELATIVE_TVA_PATH =
+			Pattern.compile("^/tva/[\\w-]+(/[\\w-]+)*$");
+
+	private static final Pattern SHOW_NAME_SEGMENT = Pattern.compile("[\\w-]+");
+
 	private TvaPlusUrls() {
 	}
 
@@ -60,7 +65,7 @@ final class TvaPlusUrls {
 		if (slugOrPath.indexOf("://") >= 0 || slugOrPath.indexOf('?') >= 0 || slugOrPath.indexOf('#') >= 0) {
 			return false;
 		}
-		return slugOrPath.matches("^/tva/[\\w-]+(/[\\w-]+)*$");
+		return RELATIVE_TVA_PATH.matcher(slugOrPath).matches();
 	}
 
 	static boolean isTvaShowSlug(final String slug) {
@@ -82,7 +87,7 @@ final class TvaPlusUrls {
 			return false;
 		}
 		final String showName = slug.substring(5);
-		return showName.length() > 0 && showName.matches("[\\w-]+");
+		return showName.length() > 0 && SHOW_NAME_SEGMENT.matcher(showName).matches();
 	}
 
 	static boolean isTvaEpisodeSlug(final String slug) {

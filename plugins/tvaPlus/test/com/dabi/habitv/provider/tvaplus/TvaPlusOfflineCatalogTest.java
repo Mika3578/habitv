@@ -159,9 +159,26 @@ public class TvaPlusOfflineCatalogTest {
 	public void diagnosticsStripQueryAndFragment() {
 		final TvaPlusDiagnostics diagnostics = new TvaPlusDiagnostics("download");
 		diagnostics.setSourceUrl("https://www.tvaplus.ca/tva/j-e/saison-1/episode-1-1?x=1#token=leak");
-		final String line = diagnostics.formatLogLine();
+		String line = diagnostics.formatLogLine();
 		assertTrue(line.contains("sourceUrl=https://www.tvaplus.ca/tva/j-e/saison-1/episode-1-1"));
 		assertFalse(line.contains("token=leak"));
+
+		diagnostics.setSourceUrl("https://www.tvaplus.ca/tva/j-e/saison-1/episode-1-1%3Ftoken=secret");
+		line = diagnostics.formatLogLine();
+		assertTrue(line.contains("sourceUrl=https://www.tvaplus.ca/tva/j-e/saison-1/episode-1-1"));
+		assertFalse(line.contains("token=secret"));
+
+		diagnostics.setSourceUrl("https://user:password with space@www.tvaplus.ca/tva/x");
+		line = diagnostics.formatLogLine();
+		assertTrue(line.contains("sourceUrl=invalid-url"));
+		assertFalse(line.contains("password"));
+
+		diagnostics.setShowSlug("/tva/j-e?token=leak\ninjected=1");
+		line = diagnostics.formatLogLine();
+		assertTrue(line.contains("showSlug=/tva/j-e"));
+		assertFalse(line.contains("token=leak"));
+		assertFalse(line.contains("injected"));
+		assertFalse(line.contains("\n"));
 	}
 
 	@Test
