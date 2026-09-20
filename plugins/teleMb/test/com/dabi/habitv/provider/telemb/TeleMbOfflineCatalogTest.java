@@ -146,6 +146,14 @@ public class TeleMbOfflineCatalogTest {
 		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload(null));
 	}
 
+	@Test(expected = DownloadFailedException.class)
+	public void downloadRejectsNullParam() throws Exception {
+		final TeleMbPluginManager plugin = new TeleMbPluginManager();
+		final Map<String, PluginDownloaderInterface> map = new HashMap<String, PluginDownloaderInterface>();
+		map.put(FrameworkConf.FFMPEG, new RecordingDownloader());
+		plugin.download(null, new DownloaderPluginHolder("cmd", map, new HashMap<String, String>(), ".", ".", ".", "."));
+	}
+
 	@Test
 	public void diagnosticsStripQueryAndFragment() {
 		final TeleMbDiagnostics diagnostics = new TeleMbDiagnostics("download");
