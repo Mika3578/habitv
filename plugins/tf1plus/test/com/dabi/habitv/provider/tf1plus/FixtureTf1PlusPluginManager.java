@@ -37,11 +37,6 @@ public class FixtureTf1PlusPluginManager extends Tf1PlusPluginManager {
 	}
 
 	@Override
-	protected boolean isPremiumDownloadEnabled() {
-		return false;
-	}
-
-	@Override
 	public InputStream getInputStreamFromUrl(final String url) {
 		try {
 			if (url != null && url.contains("/graphql/web")) {

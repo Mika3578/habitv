@@ -82,7 +82,8 @@ public final class DownloadFailureDiagnostics {
 			return null;
 		}
 		final String lower = haystack.toLowerCase();
-		if (containsAny(lower, "widevine", "fairplay", "playready", "copyright protection")) {
+		if (containsAny(lower, "widevine", "fairplay", "playready", "copyright protection",
+				"appears protected", "cannot decrypt or bypass protection")) {
 			return CLASSIFICATION_PROTECTED_CONTENT;
 		}
 		if (containsAny(lower, "not available in your country", "geo restricted", "geoblocked",

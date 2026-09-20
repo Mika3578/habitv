@@ -49,14 +49,6 @@ import com.dabi.habitv.utils.XMLUtils;
 public class XMLUserConfig implements UserConfig {
 	private static final String YOUTUBE_API_KEY = "youtubeApiKey";
 	private static final String EMBED_SUBTITLES = "embedSubtitles";
-	private static final String TF1PLUS_EMAIL = "tf1plusEmail";
-	private static final String TF1PLUS_PASSWORD = "tf1plusPassword";
-	private static final String TF1PLUS_DEVICE_PATH = "tf1plusDevicePath";
-	private static final String TF1PLUS_WVD_PATH = "tf1plusWvdPath";
-	private static final String TF1PLUS_N_M3U8DL_RE = "tf1plusNM3u8dlRe";
-	private static final String TF1PLUS_MEDIAFLOW_URL = "tf1plusMediaflowUrl";
-	private static final String TF1PLUS_MEDIAFLOW_PASSWORD = "tf1plusMediaflowPassword";
-	private static final String TF1PLUS_PYTHON = "tf1plusPython";
 
 	private static final int DEFAULT_MAX_ATTEMPTS = 5;
 
@@ -414,8 +406,7 @@ public class XMLUserConfig implements UserConfig {
 			for (final Object downloader : downloaders.getAny()) {
 				final String tagName = XMLUtils.getTagName(downloader);
 				String value = XMLUtils.getTagValue(downloader);
-				if (YOUTUBE_API_KEY.equals(tagName) || EMBED_SUBTITLES.equals(tagName)
-						|| isTf1PlusPlainConfigTag(tagName)) {
+				if (YOUTUBE_API_KEY.equals(tagName) || EMBED_SUBTITLES.equals(tagName)) {
 					downloaderName2BinPath.put(tagName, value.replace("\\", "/"));
 					continue;
 				}
@@ -540,75 +531,6 @@ public class XMLUserConfig implements UserConfig {
 	@Override
 	public String getYoutubeApiKey() {
 		return YoutubeApiKeyConfig.sanitizePlainConfigValue(getDownloader().get(YOUTUBE_API_KEY));
-	}
-
-	@Override
-	public String getTf1PlusEmail() {
-		return getTf1PlusPremiumReplaySettings().getEmail();
-	}
-
-	@Override
-	public String getTf1PlusPassword() {
-		return getTf1PlusPremiumReplaySettings().getPassword();
-	}
-
-	@Override
-	public void setTf1PlusEmail(final String email) {
-		setPlainDownloaderValue(TF1PLUS_EMAIL, Tf1PlusPremiumReplayConfig.sanitizePlainValue(email));
-	}
-
-	@Override
-	public void setTf1PlusPassword(final String password) {
-		setPlainDownloaderValue(TF1PLUS_PASSWORD, Tf1PlusPremiumReplayConfig.sanitizePlainValue(password));
-	}
-
-	@Override
-	public String getTf1PlusDevicePath() {
-		return getTf1PlusPremiumReplaySettings().getDevicePath();
-	}
-
-	@Override
-	public void setTf1PlusDevicePath(final String devicePath) {
-		setPlainDownloaderValue(TF1PLUS_DEVICE_PATH, Tf1PlusPremiumReplayConfig.sanitizePlainValue(devicePath));
-	}
-
-	@Override
-	public String getTf1PlusNM3u8dlRe() {
-		return getTf1PlusPremiumReplaySettings().getNM3u8DlRePath();
-	}
-
-	@Override
-	public void setTf1PlusNM3u8dlRe(final String nM3u8dlRePath) {
-		setPlainDownloaderValue(TF1PLUS_N_M3U8DL_RE, Tf1PlusPremiumReplayConfig.sanitizePlainValue(nM3u8dlRePath));
-	}
-
-	@Override
-	public Tf1PlusPremiumReplaySettings getTf1PlusPremiumReplaySettings() {
-		final Map<String, String> downloaders = getDownloader();
-		return new Tf1PlusPremiumReplaySettings(
-				Tf1PlusPremiumReplayConfig.sanitizePlainValue(downloaders.get(TF1PLUS_EMAIL)),
-				Tf1PlusPremiumReplayConfig.sanitizePlainValue(downloaders.get(TF1PLUS_PASSWORD)),
-				resolveTf1PlusDevicePath(downloaders),
-				Tf1PlusPremiumReplayConfig.sanitizePlainValue(downloaders.get(TF1PLUS_N_M3U8DL_RE)),
-				Tf1PlusPremiumReplayConfig.sanitizePlainValue(downloaders.get(TF1PLUS_MEDIAFLOW_URL)),
-				Tf1PlusPremiumReplayConfig.sanitizePlainValue(downloaders.get(TF1PLUS_MEDIAFLOW_PASSWORD)),
-				Tf1PlusPremiumReplayConfig.sanitizePlainValue(downloaders.get(TF1PLUS_PYTHON)));
-	}
-
-	private static String resolveTf1PlusDevicePath(final Map<String, String> downloaders) {
-		final String devicePath = Tf1PlusPremiumReplayConfig.sanitizePlainValue(downloaders.get(TF1PLUS_DEVICE_PATH));
-		if (devicePath != null) {
-			return devicePath;
-		}
-		return Tf1PlusPremiumReplayConfig.sanitizePlainValue(downloaders.get(TF1PLUS_WVD_PATH));
-	}
-
-	private static boolean isTf1PlusPlainConfigTag(final String tagName) {
-		return TF1PLUS_EMAIL.equals(tagName) || TF1PLUS_PASSWORD.equals(tagName)
-				|| TF1PLUS_DEVICE_PATH.equals(tagName) || TF1PLUS_WVD_PATH.equals(tagName)
-				|| TF1PLUS_N_M3U8DL_RE.equals(tagName)
-				|| TF1PLUS_MEDIAFLOW_URL.equals(tagName) || TF1PLUS_MEDIAFLOW_PASSWORD.equals(tagName)
-				|| TF1PLUS_PYTHON.equals(tagName);
 	}
 
 	@Override

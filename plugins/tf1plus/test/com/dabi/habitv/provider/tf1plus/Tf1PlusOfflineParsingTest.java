@@ -126,7 +126,7 @@ public class Tf1PlusOfflineParsingTest {
 	}
 
 	@Test
-	public void shouldExcludeMaxOnlyEpisodesWhenPremiumDownloadIsDisabled() {
+	public void shouldExcludeMaxOnlyEpisodesFromCatalogue() {
 		Tf1PlusPluginManager plugin = new FixtureTf1PlusPluginManager();
 		CategoryDTO category = new CategoryDTO(Tf1PlusConf.NAME, "Automoto", "https://www.tf1.fr/tf1/automoto",
 				Tf1PlusConf.EXTENSION);
@@ -135,71 +135,38 @@ public class Tf1PlusOfflineParsingTest {
 	}
 
 	@Test
-	public void shouldExposeMaxOnlyAutomotoEpisodeWhenPremiumDownloadIsEnabled() {
-		Tf1PlusPluginManager plugin = new FixtureTf1PlusPluginManager() {
-			@Override
-			protected boolean isPremiumDownloadEnabled() {
-				return true;
-			}
-		};
-		CategoryDTO category = new CategoryDTO(Tf1PlusConf.NAME, "Automoto", "https://www.tf1.fr/tf1/automoto",
-				Tf1PlusConf.EXTENSION);
-		Set<EpisodeDTO> episodes = plugin.findEpisode(category);
-		assertEquals(1, episodes.size());
-		EpisodeDTO episode = episodes.iterator().next();
-		assertEquals("Automoto du 14 juin 2026", episode.getName());
-		assertTrue(episode.getId().contains("#habitvTf1=fa698bd7-1328-467c-8cb3-4167b119973f,premium"));
-		assertTrue(Tf1PlusEpisodeUrl.requiresPremiumDownload(episode.getId()));
-	}
-
-	@Test
-	public void shouldExposeLegacyPremiumEpisodeWhenPremiumDownloadIsEnabled() {
-		Tf1PlusPluginManager plugin = new FixtureTf1PlusPluginManager() {
-			@Override
-			protected boolean isPremiumDownloadEnabled() {
-				return true;
-			}
-		};
+	public void shouldExcludeLegacyPremiumOnlyEpisodesFromCatalogue() {
+		Tf1PlusPluginManager plugin = new FixtureTf1PlusPluginManager();
 		CategoryDTO category = new CategoryDTO(Tf1PlusConf.NAME, "Legacy premium",
 				"https://www.tf1.fr/tf1/fixture-legacy-premium-replay", Tf1PlusConf.EXTENSION);
 		Set<EpisodeDTO> episodes = plugin.findEpisode(category);
-		assertEquals(1, episodes.size());
-		EpisodeDTO episode = episodes.iterator().next();
-		assertTrue(episode.getId().contains("#habitvTf1=14510494,premium"));
+		assertTrue(episodes.isEmpty());
 	}
 
 	@Test
-	public void shouldTagBasicMaxReplayWithPremiumFragmentWhenPremiumDownloadIsEnabled() {
-		Tf1PlusPluginManager plugin = new FixtureTf1PlusPluginManager() {
-			@Override
-			protected boolean isPremiumDownloadEnabled() {
-				return true;
-			}
-		};
+	public void shouldListBasicMaxReplayWithoutConfiguredFragment() {
+		Tf1PlusPluginManager plugin = new FixtureTf1PlusPluginManager();
 		CategoryDTO category = new CategoryDTO(Tf1PlusConf.NAME, "Fixture basic max",
 				"https://www.tf1.fr/tf1/fixture-basic-max-replay", Tf1PlusConf.EXTENSION);
 		Set<EpisodeDTO> episodes = plugin.findEpisode(category);
 		assertEquals(1, episodes.size());
 		EpisodeDTO episode = episodes.iterator().next();
-		assertTrue(episode.getId().contains("#habitvTf1=e72e51c8-af61-4278-b04e-34b1c8302b44,premium"));
-		assertTrue(Tf1PlusEpisodeUrl.requiresPremiumDownload(episode.getId()));
+		assertFalse(Tf1PlusEpisodeUrl.requiresPremiumDownload(episode.getId()));
+		assertEquals("https://www.tf1.fr/tf1/fixture-basic-max-replay/videos/"
+				+ "demain-nous-appartient-du-jeudi-18-juin-2026-episode-2229.html", episode.getId());
 	}
 
 	@Test
-	public void shouldExposePremiumAndBasicEpisodeWhenPremiumDownloadIsEnabled() {
-		Tf1PlusPluginManager plugin = new FixtureTf1PlusPluginManager() {
-			@Override
-			protected boolean isPremiumDownloadEnabled() {
-				return true;
-			}
-		};
+	public void shouldListPremiumAndBasicEpisodeWithoutConfiguredFragment() {
+		Tf1PlusPluginManager plugin = new FixtureTf1PlusPluginManager();
 		CategoryDTO category = new CategoryDTO(Tf1PlusConf.NAME, "Fixture replay",
 				"https://www.tf1.fr/tmc/fixture-premium-basic-replay", Tf1PlusConf.EXTENSION);
 		Set<EpisodeDTO> episodes = plugin.findEpisode(category);
 		assertEquals(1, episodes.size());
 		EpisodeDTO episode = episodes.iterator().next();
-		assertTrue(episode.getId().contains("#habitvTf1=14510094,premium"));
-		assertTrue(Tf1PlusEpisodeUrl.requiresPremiumDownload(episode.getId()));
+		assertFalse(Tf1PlusEpisodeUrl.requiresPremiumDownload(episode.getId()));
+		assertEquals("https://www.tf1.fr/tmc/fixture-premium-basic-replay/videos/"
+				+ "fixture-episode-premium-and-basic.html", episode.getId());
 	}
 
 	@Test
