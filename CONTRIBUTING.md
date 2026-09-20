@@ -13,7 +13,13 @@ Agents: follow [`AGENTS.md`](AGENTS.md). Humans: this file.
 | `fix/*`, `feat/*`, `docs/*`, `test/*`, `ci/*`, `chore/*`, `refactor/*` | Work branches |
 
 Format: `<type>/<short-scope>` (English kebab-case). No AI/tool prefixes
-(`cursor/`, `claude/`, `ai/`). PR titles use Conventional Commits.
+(`cursor/`, `claude/`, `ai/`, `codex/`).
+
+Public git text stays short and generic. Module or topic as scope is
+fine (lowercase kebab-case). Detail stays in the diff. Canonical
+wording: [`AGENTS.md`](AGENTS.md) **Public git text**.
+
+PR titles use Conventional Commits.
 
 Target **`Mika3578/habitv`** → **`develop`**. Linear history on work
 branches (rebase, no merge commits).
@@ -37,8 +43,8 @@ Current compiler/CI: Java 8. Target: Java 21, then Java 25.
 | Docs only | `git diff --check` |
 | Code / POM / workflow | `mvn -B -ntp -DskipTests validate` plus targeted module tests when relevant |
 
-Paste exact command output in the PR body. Live provider tests are
-opt-in (`-Plive-provider-tests`), not default CI.
+Record the command and result in the PR body (not a full log). Live
+provider tests are opt-in (`-Plive-provider-tests`), not default CI.
 
 ## Plugin versioning
 

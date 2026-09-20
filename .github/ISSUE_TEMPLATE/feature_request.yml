@@ -8,7 +8,7 @@ body:
     attributes:
       value: |
         Large architectural changes need a scoped GitHub issue and a small PR.
-        See `docs/modernization.md`.
+        See `docs/modernization.md`. Keep the title short and generic.
 
   - type: textarea
     id: problem
@@ -34,7 +34,7 @@ body:
     id: tracker
     attributes:
       label: Related issue or scope (optional)
-      placeholder: "#123 or provider-youtube-ytdlp"
+      placeholder: "#123 or tf1plus"
 
   - type: checkboxes
     id: scope

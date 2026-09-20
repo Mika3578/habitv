@@ -46,6 +46,7 @@ DRM or paywalls. Status: [`docs/providers.md`](docs/providers.md).
 | [`docs/configuration.md`](docs/configuration.md) | XML config and naming |
 | [`docs/troubleshooting.md`](docs/troubleshooting.md) | Common failures |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | How to contribute |
+| [`AGENTS.md`](AGENTS.md) | Agent and public git-text rules |
 | [`SECURITY.md`](SECURITY.md) | Vulnerability reporting |
 
 No `LICENSE` file yet — treat sources as proprietary until one is added.

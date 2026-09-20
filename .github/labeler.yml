@@ -9,6 +9,9 @@ docs:
       - any-glob-to-any-file:
           - "docs/**"
           - "*.md"
+          - ".cursor/rules/**"
+          - ".cursor/skills/**"
+          - ".cursor/CLOUD.md"
 
 maven:
   - changed-files:
@@ -61,6 +64,9 @@ repository:
           - ".github/**"
           - "docs/repository-*.md"
           - "AGENTS.md"
+          - ".cursor/rules/**"
+          - ".cursor/skills/**"
+          - ".cursor/CLOUD.md"
 
 packaging:
   - changed-files:

@@ -74,6 +74,7 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-09-20 | TBD | Require short generic public git text in `AGENTS.md`, always-on `.cursor/rules/public-git-text.mdc`, skill `.cursor/skills/public-git-text`, and `.cursor/CLOUD.md` |
 | 2026-09-19 | TBD | Deduplicate maintainer docs; root `AGENTS.md` is the only agent rulebook. Java 8 remains the current compiler/CI baseline; Java 21 then 25 are targets |
 | 2026-09-15 | TBD | Document canonical media metadata vs legacy tokens and MEDIA_SERVER naming ([`docs/configuration.md`](docs/configuration.md)) |
 | 2026-05-31 | TBD | Refresh modernization tracker, plan, risks, provider inventory, and maintenance dashboard after merged May work |

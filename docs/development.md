@@ -91,5 +91,6 @@ Ruleset JSON payloads (admin): `docs/github-rulesets/`.
 
 ## Workflow
 
-See [`../CONTRIBUTING.md`](../CONTRIBUTING.md) and [`../AGENTS.md`](../AGENTS.md).
+See [`../CONTRIBUTING.md`](../CONTRIBUTING.md) and [`../AGENTS.md`](../AGENTS.md)
+(**Public git text**).
 Do not bypass branch protection or required checks.

@@ -1,12 +1,13 @@
-<!-- Keep this PR small, scoped, and reviewable. Use English only. -->
+<!-- Keep this PR small, scoped, and reviewable. Use English only.
+     Public git text stays short and generic (see AGENTS.md). -->
 
 ## Summary
 
-<!-- One or two sentences describing what this PR delivers and why. -->
+<!-- One or two short sentences: outcome and why. See AGENTS.md Public git text. -->
 
 ## Scope
 
-<!-- Short descriptive scope, e.g. provider-youtube-ytdlp. -->
+<!-- Short generic scope, e.g. tf1plus. -->
 -
 
 ## Related issue
@@ -47,7 +48,8 @@
 - [ ] PR keeps linear history
 - [ ] English used for branches, commits, comments, docs, and PR text
 - [ ] Docs updated if behavior or contributor workflow changed
-- [ ] If a `plugins/*/pom.xml` `<version>` is bumped, the trigger is named (downloader/parser, user-facing endpoint, or user-facing configuration), and internal deps use `${project.parent.version}`
+- [ ] Public git text is short and generic (see AGENTS.md)
+- [ ] If a `plugins/*/pom.xml` `<version>` is bumped, the trigger class is named (parser, endpoint, or configuration), and internal deps use `${project.parent.version}`
 - [ ] No secrets, tokens, local paths, or build outputs committed
 
 ## Suggested squash merge commit (optional)

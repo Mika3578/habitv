@@ -14,7 +14,7 @@
 #
 # Valid types: feat, fix, docs, test, refactor, perf, chore, ci, build,
 #              style, revert
-# Valid scopes: core, framework, ffmpeg-exporter, francetv-provider, etc.
+# Valid scopes: lowercase kebab-case (core, francetv, tf1plus, etc.).
 
 set -e
 
@@ -44,8 +44,8 @@ if ! echo "$FIRST_LINE" | grep -qE "$COMMIT_HEADER_RE"; then
     echo "  type(scope)!: subject"
     echo ""
     echo "Valid types: feat, fix, docs, test, refactor, perf, chore, ci, build, style, revert"
-    echo "Example: feat(francetv-provider): add series description extraction"
-    echo "Example: style(format): normalize shell script indentation"
+    echo "Example: feat(francetv): add provider"
+    echo "Example: style(format): normalize indentation"
     echo "Example: feat(core)!: rename provider API"
     echo ""
     exit 1
