@@ -20,6 +20,9 @@ interface TvLuxConf {
 	/** Exact Freecaster VOD HLS host used by TV Lux embeds (no subdomain substring match). */
 	String FRECASTER_HLS_HOST = "tvlocales-vod-cmaf.freecaster.com";
 
+	/** Freecaster tenant path prefix for TV Lux assets on the shared VOD host. */
+	String FRECASTER_TENANT_PATH = "/tvlux/";
+
 	String EXTENSION = FrameworkConf.MP4;
 
 	String CHANNEL_LABEL = "TV Lux";

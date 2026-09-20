@@ -52,6 +52,8 @@ public class TvLuxOfflineCatalogTest {
 		assertEquals(null, TvLuxUrls.showSlugFromCategoryId(TvLuxUrls.showCategoryId("bad%2Fslug")));
 		assertEquals(null, TvLuxUrls.showSlugFromCategoryId(TvLuxUrls.showCategoryId("a?b")));
 		assertEquals(null, TvLuxUrls.showSlugFromCategoryId(TvLuxConf.CATEGORY_SHOW_PREFIX + "a/b"));
+		assertEquals(null, TvLuxUrls.showSlugFromCategoryId(TvLuxUrls.showCategoryId("caf\u00e9")));
+		assertFalse(TvLuxUrls.isSafeShowSlug("caf\u00e9"));
 	}
 
 	@Test
@@ -177,6 +179,10 @@ public class TvLuxOfflineCatalogTest {
 		assertEquals(null, TvLuxUrls.sanitizeHlsUrl("https://tvlocales-vod-cmaf.freecaster.com/x.mp4"));
 		assertEquals(null, TvLuxUrls.sanitizeHlsUrl(
 				"https://tvlocales-vod-cmaf.freecaster.com:8443/tvlux/id/file.m3u8"));
+		assertEquals(null, TvLuxUrls.sanitizeHlsUrl(
+				"https://tvlocales-vod-cmaf.freecaster.com/telemb/id/file.m3u8"));
+		assertEquals(null, TvLuxUrls.sanitizeHlsUrl(
+				"https://tvlocales-vod-cmaf.freecaster.com/other/id/file.m3u8"));
 		assertEquals("https://tvlocales-vod-cmaf.freecaster.com/tvlux/id/file.m3u8",
 				TvLuxUrls.sanitizeHlsUrl(
 						"https://tvlocales-vod-cmaf.freecaster.com/tvlux/id/file.m3u8?token=secret"));

@@ -37,8 +37,8 @@ final class TvLuxUrls {
 	}
 
 	/**
-	 * Replay show slugs are single path segments: letters, digits, underscore, hyphen.
-	 * Reject encoded delimiters, separators, and control characters.
+	 * Replay show slugs are single path segments: ASCII letters, digits, underscore, hyphen.
+	 * Reject encoded delimiters, separators, control characters, and non-ASCII lookalikes.
 	 */
 	static boolean isSafeShowSlug(final String slug) {
 		if (StringUtils.isEmpty(slug)) {
@@ -49,7 +49,7 @@ final class TvLuxUrls {
 				|| slug.indexOf('\r') >= 0 || slug.indexOf('\n') >= 0) {
 			return false;
 		}
-		return slug.matches("^[\\w-]+$");
+		return slug.matches("^[A-Za-z0-9_-]+$");
 	}
 
 	static String showPageUrl(final String slug) {
@@ -163,7 +163,11 @@ final class TvLuxUrls {
 					|| lowerRaw.contains("%5c")) {
 				return null;
 			}
-			if (!path.toLowerCase(Locale.ROOT).endsWith(".m3u8")) {
+			final String lowerPath = path.toLowerCase(Locale.ROOT);
+			if (!lowerPath.startsWith(TvLuxConf.FRECASTER_TENANT_PATH)) {
+				return null;
+			}
+			if (!lowerPath.endsWith(".m3u8")) {
 				return null;
 			}
 			return "https://" + TvLuxConf.FRECASTER_HLS_HOST + rawPath;
