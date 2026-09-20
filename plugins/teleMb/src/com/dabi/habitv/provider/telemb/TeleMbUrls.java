@@ -23,11 +23,27 @@ final class TeleMbUrls {
 			return null;
 		}
 		final String slug = categoryId.substring(TeleMbConf.CATEGORY_SHOW_PREFIX.length()).trim();
-		return StringUtils.isEmpty(slug) ? null : slug;
+		return isSafeShowSlug(slug) ? slug.toLowerCase(Locale.ROOT) : null;
 	}
 
 	static boolean isShowCategory(final String categoryId) {
 		return showSlugFromCategoryId(categoryId) != null;
+	}
+
+	/**
+	 * Emission show slugs are single path segments: letters, digits, underscore, hyphen.
+	 * Reject encoded delimiters, separators, and control characters.
+	 */
+	static boolean isSafeShowSlug(final String slug) {
+		if (StringUtils.isEmpty(slug)) {
+			return false;
+		}
+		if (slug.indexOf('%') >= 0 || slug.indexOf('?') >= 0 || slug.indexOf('#') >= 0
+				|| slug.indexOf('/') >= 0 || slug.indexOf('\\') >= 0
+				|| slug.indexOf('\r') >= 0 || slug.indexOf('\n') >= 0) {
+			return false;
+		}
+		return slug.matches("^[\\w-]+$");
 	}
 
 	static String showPageUrl(final String slug) {
@@ -65,7 +81,11 @@ final class TeleMbUrls {
 				return false;
 			}
 			final int port = uri.getPort();
-			if (port != -1 && port != 80 && port != 443) {
+			if ("https".equalsIgnoreCase(scheme)) {
+				if (port != -1 && port != 443) {
+					return false;
+				}
+			} else if (port != -1 && port != 80) {
 				return false;
 			}
 			final String host = uri.getHost();

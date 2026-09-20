@@ -144,7 +144,19 @@ public class TeleMbOfflineCatalogTest {
 				"https://www.telemb.be/replay/emission/les-infos/title%2Fextra/41201"));
 		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload(
 				"https://www.telemb.be:8443/replay/emission/les-infos/les-infos-du-samedi-19-septembre-2026/41201"));
+		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload(
+				"https://www.telemb.be:80/replay/emission/les-infos/les-infos-du-samedi-19-septembre-2026/41201"));
+		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload(
+				"http://www.telemb.be:443/replay/emission/les-infos/les-infos-du-samedi-19-septembre-2026/41201"));
 		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload(null));
+	}
+
+	@Test
+	public void showSlugFromCategoryIdRejectsUnsafeValues() {
+		assertEquals("les-infos", TeleMbUrls.showSlugFromCategoryId(TeleMbUrls.showCategoryId("Les-Infos")));
+		assertEquals(null, TeleMbUrls.showSlugFromCategoryId(TeleMbUrls.showCategoryId("bad%2Fslug")));
+		assertEquals(null, TeleMbUrls.showSlugFromCategoryId(TeleMbUrls.showCategoryId("a?b")));
+		assertEquals(null, TeleMbUrls.showSlugFromCategoryId(TeleMbConf.CATEGORY_SHOW_PREFIX + "a/b"));
 	}
 
 	@Test(expected = DownloadFailedException.class)

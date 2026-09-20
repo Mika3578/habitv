@@ -47,11 +47,14 @@ final class TeleMbHtml {
 				continue;
 			}
 			final String slug = parts[2];
-			if ("emissions".equals(slug) || bySlug.containsKey(slug)) {
+			if ("emissions".equals(slug) || !TeleMbUrls.isSafeShowSlug(slug)
+					|| bySlug.containsKey(slug.toLowerCase(Locale.ROOT))) {
 				continue;
 			}
+			final String normalizedSlug = slug.toLowerCase(Locale.ROOT);
 			final String title = extractNearbyTitle(html, href, end);
-			bySlug.put(slug, new ShowRef(StringUtils.isEmpty(title) ? humanize(slug) : title, slug));
+			bySlug.put(normalizedSlug,
+					new ShowRef(StringUtils.isEmpty(title) ? humanize(normalizedSlug) : title, normalizedSlug));
 		}
 		return new ArrayList<ShowRef>(bySlug.values());
 	}
