@@ -158,7 +158,8 @@ public final class HabiTvTrayView implements CoreSubscriber {
 			checkInProgress = false;
 			changeAnimation();
 			LOG.error("", event.getException());
-			final String errorDetail = event.getException() == null ? ""
+			final String errorDetail = event.getException() == null
+					|| event.getException().getMessage() == null ? ""
 					: event.getException().getMessage();
 			final String errorMessage = event.getChannel() == null
 					? Messages.getString("HabiTvTrayView.18") + " " + errorDetail

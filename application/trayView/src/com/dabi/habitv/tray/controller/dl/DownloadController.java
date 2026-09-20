@@ -367,7 +367,11 @@ public class DownloadController extends BaseController implements
 					mainProgress.setProgress(1);
 					break;
 				case ERROR:
-					searchButton.setDisable(false);
+					// Provider/category ERROR can arrive while search continues;
+					// only cycle-level ERROR (no channel) should unlock the button.
+					if (event.getChannel() == null) {
+						searchButton.setDisable(false);
+					}
 					break;
 				default:
 					break;
