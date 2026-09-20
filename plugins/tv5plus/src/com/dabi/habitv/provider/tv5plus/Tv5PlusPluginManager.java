@@ -128,6 +128,11 @@ public class Tv5PlusPluginManager extends BasePluginWithProxy implements PluginP
 	public ProcessHolder download(final DownloadParamDTO downloadParam, final DownloaderPluginHolder downloaders)
 			throws DownloadFailedException {
 		final Tv5PlusDiagnostics diagnostics = new Tv5PlusDiagnostics("download");
+		if (downloadParam == null || downloadParam.getDownloadInput() == null) {
+			diagnostics.setRootCauseSummary("null-download-param");
+			getLog().warn(diagnostics.formatLogLine());
+			throw new DownloadFailedException(Tv5PlusConf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+		}
 		diagnostics.setSourceUrl(downloadParam.getDownloadInput());
 		final String sanitized = Tv5PlusUrls.sanitizeEpisodeUrl(downloadParam.getDownloadInput());
 		try {

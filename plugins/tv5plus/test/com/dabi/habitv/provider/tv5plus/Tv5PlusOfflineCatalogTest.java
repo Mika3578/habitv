@@ -15,9 +15,15 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import com.dabi.habitv.api.plugin.api.PluginDownloaderInterface;
 import com.dabi.habitv.api.plugin.api.PluginDownloaderInterface.DownloadableState;
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
+import com.dabi.habitv.api.plugin.dto.DownloadParamDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
+import com.dabi.habitv.api.plugin.exception.DownloadFailedException;
+import com.dabi.habitv.api.plugin.holder.DownloaderPluginHolder;
+import com.dabi.habitv.api.plugin.holder.ProcessHolder;
+import com.dabi.habitv.framework.FrameworkConf;
 
 public class Tv5PlusOfflineCatalogTest {
 
@@ -102,6 +108,28 @@ public class Tv5PlusOfflineCatalogTest {
 	}
 
 	@Test
+	public void downloadDelegatesSanitizedUrlToYtdlp() throws Exception {
+		final Tv5PlusPluginManager plugin = new Tv5PlusPluginManager();
+		final RecordingDownloader downloader = new RecordingDownloader();
+		final Map<String, PluginDownloaderInterface> map = new HashMap<String, PluginDownloaderInterface>();
+		map.put(FrameworkConf.YOUTUBE, downloader);
+		final DownloaderPluginHolder holder = new DownloaderPluginHolder("cmd", map,
+				new HashMap<String, String>(), ".", ".", ".", ".");
+		plugin.download(new DownloadParamDTO(
+				"https://www.tv5plus.ca/videos/watatatow/saisons/12/episodes/1?token=x#frag",
+				"out.mp4", Tv5PlusConf.EXTENSION), holder);
+		assertEquals("https://www.tv5unis.ca/videos/watatatow/saisons/12/episodes/1", downloader.lastInput);
+	}
+
+	@Test(expected = DownloadFailedException.class)
+	public void downloadRejectsNullParam() throws Exception {
+		final Tv5PlusPluginManager plugin = new Tv5PlusPluginManager();
+		final Map<String, PluginDownloaderInterface> map = new HashMap<String, PluginDownloaderInterface>();
+		map.put(FrameworkConf.YOUTUBE, new RecordingDownloader());
+		plugin.download(null, new DownloaderPluginHolder("cmd", map, new HashMap<String, String>(), ".", ".", ".", "."));
+	}
+
+	@Test
 	public void findCategoryFailsClosedOnGraphqlErrorsWithPartialData() throws IOException {
 		final Map<String, String> fixtures = new HashMap<String, String>();
 		fixtures.put("featuredProductSets",
@@ -179,6 +207,27 @@ public class Tv5PlusOfflineCatalogTest {
 				out.write(buffer, 0, read);
 			}
 			return out.toString("UTF-8");
+		}
+	}
+
+	private static final class RecordingDownloader implements PluginDownloaderInterface {
+		private String lastInput;
+
+		@Override
+		public String getName() {
+			return FrameworkConf.YOUTUBE;
+		}
+
+		@Override
+		public DownloadableState canDownload(final String downloadInput) {
+			return DownloadableState.SPECIFIC;
+		}
+
+		@Override
+		public ProcessHolder download(final DownloadParamDTO downloadParam, final DownloaderPluginHolder downloaders)
+				throws DownloadFailedException {
+			lastInput = downloadParam.getDownloadInput();
+			return ProcessHolder.EMPTY_PROCESS_HOLDER;
 		}
 	}
 }
