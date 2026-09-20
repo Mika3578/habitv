@@ -3,7 +3,8 @@
 Current HabiTV layout for maintainers. This is not a redesign proposal.
 
 Related: [`development.md`](development.md), [`providers.md`](providers.md),
-[`configuration.md`](configuration.md).
+[`configuration.md`](configuration.md),
+[`provider-configured-download.md`](provider-configured-download.md).
 
 ## What the application does
 
@@ -72,6 +73,8 @@ A provider may delegate download to another plugin (France.tv and NOVO19
 delegate to the YouTube/yt-dlp plugin).
 
 Inventory, status, and legal limits: [`providers.md`](providers.md).
+Optional configured download shape (per provider, separate PRs):
+[`provider-configured-download.md`](provider-configured-download.md).
 
 ## Configuration and user data
 
