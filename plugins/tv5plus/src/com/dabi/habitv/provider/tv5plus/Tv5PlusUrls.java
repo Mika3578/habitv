@@ -24,11 +24,27 @@ final class Tv5PlusUrls {
 			return null;
 		}
 		final String slug = categoryId.substring(Tv5PlusConf.CATEGORY_SHOW_PREFIX.length()).trim();
-		return StringUtils.isEmpty(slug) ? null : slug;
+		return isSafeShowSlug(slug) ? slug : null;
 	}
 
 	static boolean isShowCategory(final String categoryId) {
 		return showSlugFromCategoryId(categoryId) != null;
+	}
+
+	/**
+	 * Product slugs are single path segments matching EPISODE_PATH group 1:
+	 * letter/digit start, then letters, digits, underscore, hyphen.
+	 */
+	static boolean isSafeShowSlug(final String slug) {
+		if (StringUtils.isEmpty(slug)) {
+			return false;
+		}
+		if (slug.indexOf('%') >= 0 || slug.indexOf('?') >= 0 || slug.indexOf('#') >= 0
+				|| slug.indexOf('/') >= 0 || slug.indexOf('\\') >= 0
+				|| slug.indexOf('\r') >= 0 || slug.indexOf('\n') >= 0) {
+			return false;
+		}
+		return slug.matches("^[A-Za-z0-9][A-Za-z0-9_-]*$");
 	}
 
 	static String movieWatchUrl(final String slug) {

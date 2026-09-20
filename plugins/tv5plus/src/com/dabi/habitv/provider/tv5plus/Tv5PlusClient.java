@@ -110,7 +110,8 @@ final class Tv5PlusClient {
 					}
 					final String slug = text(product, "slug");
 					final String title = text(product, "title");
-					if (StringUtils.isEmpty(slug) || StringUtils.isEmpty(title) || bySlug.containsKey(slug)) {
+					if (StringUtils.isEmpty(slug) || StringUtils.isEmpty(title) || !Tv5PlusUrls.isSafeShowSlug(slug)
+							|| bySlug.containsKey(slug)) {
 						continue;
 					}
 					bySlug.put(slug, new ShowRef(title, slug, type));
@@ -214,6 +215,9 @@ final class Tv5PlusClient {
 				return sanitizedCanonical;
 			}
 			// EPISODE with a movie/series-root canonical: ignore and try synthesis below.
+		}
+		if (!Tv5PlusUrls.isSafeShowSlug(slug)) {
+			return null;
 		}
 		if (season != null && episode != null) {
 			return Tv5PlusUrls.episodeWatchUrl(slug, season.intValue(), episode.intValue());

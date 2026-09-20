@@ -116,6 +116,27 @@ public class Tv5PlusOfflineCatalogTest {
 	}
 
 	@Test
+	public void showSlugFromCategoryIdRejectsUnsafeValues() {
+		assertEquals("watatatow", Tv5PlusUrls.showSlugFromCategoryId(Tv5PlusUrls.showCategoryId("watatatow")));
+		assertEquals(null, Tv5PlusUrls.showSlugFromCategoryId(Tv5PlusUrls.showCategoryId("bad/slug")));
+		assertEquals(null, Tv5PlusUrls.showSlugFromCategoryId(Tv5PlusUrls.showCategoryId("a?b")));
+		assertEquals(null, Tv5PlusUrls.showSlugFromCategoryId(Tv5PlusUrls.showCategoryId("a#b")));
+		assertEquals(null, Tv5PlusUrls.showSlugFromCategoryId(Tv5PlusUrls.showCategoryId("a%2Fb")));
+		assertEquals(null, Tv5PlusUrls.showSlugFromCategoryId(Tv5PlusConf.CATEGORY_SHOW_PREFIX + "a\nb"));
+		assertFalse(Tv5PlusUrls.isSafeShowSlug(null));
+		assertFalse(Tv5PlusUrls.isSafeShowSlug(""));
+		assertFalse(Tv5PlusUrls.isSafeShowSlug("-leading-hyphen"));
+	}
+
+	@Test
+	public void findEpisodeSkipsUnsafeCategorySlug() throws IOException {
+		final Tv5PlusPluginManager plugin = newRecordingPlugin(new HashMap<String, String>());
+		final CategoryDTO show = new CategoryDTO(Tv5PlusConf.NAME, "Bad",
+				Tv5PlusConf.CATEGORY_SHOW_PREFIX + "bad/slug", Tv5PlusConf.EXTENSION);
+		assertTrue(plugin.findEpisode(show).isEmpty());
+	}
+
+	@Test
 	public void downloadDelegatesSanitizedUrlToYtdlp() throws Exception {
 		final Tv5PlusPluginManager plugin = new Tv5PlusPluginManager();
 		final RecordingDownloader downloader = new RecordingDownloader();
