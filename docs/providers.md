@@ -43,10 +43,9 @@ Labels: **working** (validated), **degraded**, **protected** (auth/geo/DRM),
 
 France.tv and NOVO19 delegate download to the youtube/yt-dlp plugin when
 public URLs exist. Canal+ family is not treated as a freely downloadable
-DRM catalogue. `tf1plus` replaces obsolete `wat`: GraphQL catalogue plus
-an optional protected download path when the user configures local
-credentials (validated end-to-end). Legacy grab-config plugin id `wat`
-is aliased to `tf1plus` at runtime.
+DRM catalogue. `tf1plus` replaces obsolete `wat`: GraphQL catalogue and
+download support (validated end-to-end). Legacy grab-config plugin id
+`wat` is aliased to `tf1plus` at runtime.
 
 Full module list: `plugins/pom.xml`. Offline fixtures live under
 `plugins/<name>/test/resources/fixtures/<name>/`.
