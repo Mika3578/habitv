@@ -138,6 +138,12 @@ public class TvComOfflineCatalogTest {
 		line = diagnostics.formatLogLine();
 		assertTrue(line.contains("sourceUrl=invalid-url"));
 		assertFalse(line.contains("password"));
+
+		diagnostics.setShowSlug("coin-lecture\ninjected=1");
+		line = diagnostics.formatLogLine();
+		assertTrue(line.contains("showSlug=coin-lecture"));
+		assertFalse(line.contains("injected"));
+		assertFalse(line.contains("\n"));
 	}
 
 	@Test
