@@ -211,8 +211,9 @@ final class TvLuxHtml {
 	}
 
 	private static String pathLastSegment(final String path) {
-		final int slashPos = path.lastIndexOf('/');
-		return slashPos < 0 ? path : path.substring(slashPos + 1);
+		final String trimmed = path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
+		final int slashPos = trimmed.lastIndexOf('/');
+		return slashPos < 0 ? trimmed : trimmed.substring(slashPos + 1);
 	}
 
 	private static String stripTrailingEpisodeId(final String segment) {

@@ -65,6 +65,27 @@ public class TvLuxOfflineCatalogTest {
 	@Test
 	public void findEpisodeParsesShowEpisodeLinks() throws IOException {
 		final Map<String, String> pages = new HashMap<String, String>();
+		pages.put(TvLuxUrls.showPageUrl("jt"),
+				"<html><body>"
+						+ "<a href=\"/replay/jt/jt-du-18-09-2026_52260/\"></a>"
+						+ "<a href=\"/replay/jt/jt-du-17-09-2026_52250\"></a>"
+						+ "</body></html>");
+		final TvLuxPluginManager plugin = newRecordingPlugin(pages);
+		final CategoryDTO show = new CategoryDTO(TvLuxConf.NAME, "JT", TvLuxUrls.showCategoryId("jt"),
+				TvLuxConf.EXTENSION);
+		final Set<EpisodeDTO> episodes = plugin.findEpisode(show);
+		assertEquals(2, episodes.size());
+		for (final EpisodeDTO episode : episodes) {
+			assertTrue(TvLuxUrls.sanitizeEpisodeUrl(episode.getId()) != null);
+			assertFalse("Episode".equals(episode.getName()));
+			assertTrue(episode.getName().toLowerCase().contains("jt du 18")
+					|| episode.getName().toLowerCase().contains("jt du 17"));
+		}
+	}
+
+	@Test
+	public void findEpisodeParsesFixtureShowEpisodeLinks() throws IOException {
+		final Map<String, String> pages = new HashMap<String, String>();
 		pages.put(TvLuxUrls.showPageUrl("jt"), read("test/resources/fixtures/tvlux/show-jt.html"));
 		final TvLuxPluginManager plugin = newRecordingPlugin(pages);
 		final CategoryDTO show = new CategoryDTO(TvLuxConf.NAME, "JT", TvLuxUrls.showCategoryId("jt"),
