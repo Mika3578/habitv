@@ -153,6 +153,12 @@ public class TvLuxOfflineCatalogTest {
 		line = diagnostics.formatLogLine();
 		assertTrue(line.contains("sourceUrl=invalid-url"));
 		assertFalse(line.contains("password"));
+
+		diagnostics.setShowSlug("jt\ninjected=1");
+		line = diagnostics.formatLogLine();
+		assertTrue(line.contains("showSlug=jt"));
+		assertFalse(line.contains("injected"));
+		assertFalse(line.contains("\n"));
 	}
 
 	private static TvLuxPluginManager newRecordingPlugin(final Map<String, String> pages) {
