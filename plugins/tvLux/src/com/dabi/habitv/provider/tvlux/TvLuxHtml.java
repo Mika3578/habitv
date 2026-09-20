@@ -37,7 +37,7 @@ final class TvLuxHtml {
 			}
 			from = end + 1;
 			String hrefValue = stripHost(html.substring(start, end).trim());
-			if (!hrefValue.startsWith("/replay/")) {
+			if (!hrefValue.regionMatches(true, 0, "/replay/", 0, 8)) {
 				continue;
 			}
 			String path = hrefValue.split("[?#]", 2)[0];

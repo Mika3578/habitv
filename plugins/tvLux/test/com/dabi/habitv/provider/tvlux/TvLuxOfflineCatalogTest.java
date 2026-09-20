@@ -27,6 +27,7 @@ public class TvLuxOfflineCatalogTest {
 		pages.put(TvLuxUrls.replayIndexUrl(),
 				"<!DOCTYPE html><html><body>"
 						+ "<a href=\"https://tvlux.be/replay/jt\">JT</a>"
+						+ "<a href=\"/Replay/cine-lux\">Ciné mixed path</a>"
 						+ "<a href=\"/replay/l-hebdo/\">Hebdo trailing slash</a>"
 						+ "<a href=\"/replay/Page_2\">Pagination</a>"
 						+ "<a href=\"/replay/bad%2Fslug\">Bad</a>"
@@ -34,12 +35,13 @@ public class TvLuxOfflineCatalogTest {
 						+ "</body></html>");
 		final TvLuxPluginManager plugin = newRecordingPlugin(pages);
 		final Set<CategoryDTO> categories = plugin.findCategory();
-		assertEquals(2, categories.size());
+		assertEquals(3, categories.size());
 		final Map<String, String> namesById = new HashMap<String, String>();
 		for (final CategoryDTO category : categories) {
 			namesById.put(category.getId(), category.getName());
 		}
 		assertEquals("JT", namesById.get(TvLuxUrls.showCategoryId("jt")));
+		assertEquals("Ciné mixed path", namesById.get(TvLuxUrls.showCategoryId("cine-lux")));
 		assertEquals("Hebdo trailing slash", namesById.get(TvLuxUrls.showCategoryId("l-hebdo")));
 		assertFalse(namesById.containsKey(TvLuxUrls.showCategoryId("page_2")));
 	}
