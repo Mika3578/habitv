@@ -69,17 +69,20 @@ public class TvLuxOfflineCatalogTest {
 				"<html><body>"
 						+ "<a href=\"/replay/jt/jt-du-18-09-2026_52260/\"></a>"
 						+ "<a href=\"/replay/jt/jt-du-17-09-2026_52250\"></a>"
+						+ "<a href=\"/replay/JT/jt-du-16-09-2026_52240\"></a>"
+						+ "<a href=\"/replay/other/ignored_1\"></a>"
 						+ "</body></html>");
 		final TvLuxPluginManager plugin = newRecordingPlugin(pages);
 		final CategoryDTO show = new CategoryDTO(TvLuxConf.NAME, "JT", TvLuxUrls.showCategoryId("jt"),
 				TvLuxConf.EXTENSION);
 		final Set<EpisodeDTO> episodes = plugin.findEpisode(show);
-		assertEquals(2, episodes.size());
+		assertEquals(3, episodes.size());
 		for (final EpisodeDTO episode : episodes) {
 			assertTrue(TvLuxUrls.sanitizeEpisodeUrl(episode.getId()) != null);
 			assertFalse("Episode".equals(episode.getName()));
-			assertTrue(episode.getName().toLowerCase().contains("jt du 18")
-					|| episode.getName().toLowerCase().contains("jt du 17"));
+			assertFalse(episode.getId().contains("/replay/other/"));
+			final String name = episode.getName().toLowerCase();
+			assertTrue(name.contains("jt du 18") || name.contains("jt du 17") || name.contains("jt du 16"));
 		}
 	}
 

@@ -82,7 +82,8 @@ final class TvLuxHtml {
 				continue;
 			}
 			final String path = URI_PATH(sanitized);
-			if (!path.startsWith(prefix)) {
+			// Show slugs are stored lowercase; site hrefs may differ in case.
+			if (!path.regionMatches(true, 0, prefix, 0, prefix.length())) {
 				continue;
 			}
 			final String anchorTitle = extractAnchorTitle(html, end);
