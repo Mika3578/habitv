@@ -69,7 +69,11 @@ final class TvLuxUrls {
 				return false;
 			}
 			final int port = uri.getPort();
-			if (port != -1 && port != 80 && port != 443) {
+			if ("https".equalsIgnoreCase(scheme)) {
+				if (port != -1 && port != 443) {
+					return false;
+				}
+			} else if (port != -1 && port != 80) {
 				return false;
 			}
 			final String host = uri.getHost();

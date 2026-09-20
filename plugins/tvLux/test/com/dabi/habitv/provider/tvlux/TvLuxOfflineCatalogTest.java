@@ -114,6 +114,10 @@ public class TvLuxOfflineCatalogTest {
 				plugin.canDownload("https://user:pass@www.tvlux.be/replay/jt/jt-du-18-09-2026_52260"));
 		assertEquals(DownloadableState.IMPOSSIBLE,
 				plugin.canDownload("https://www.tvlux.be:8443/replay/jt/jt-du-18-09-2026_52260"));
+		assertEquals(DownloadableState.IMPOSSIBLE,
+				plugin.canDownload("https://www.tvlux.be:80/replay/jt/jt-du-18-09-2026_52260"));
+		assertEquals(DownloadableState.IMPOSSIBLE,
+				plugin.canDownload("http://www.tvlux.be:443/replay/jt/jt-du-18-09-2026_52260"));
 		assertEquals(DownloadableState.IMPOSSIBLE, plugin.canDownload(null));
 	}
 
