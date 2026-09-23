@@ -41,6 +41,7 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 |------|--------|--------|
 | 2026-09-17 | TBD | Move tray Search and category-clean work off the JavaFX Application Thread (FxBackgroundRunner; was .run() instead of .start()) |
 | 2026-09-18 | TBD | Marshal tray AWT notifications onto the Event Dispatch Thread (AwtUiRunner); stop duplicate RetreiveEvent progression updates from DownloadController |
+| 2026-09-18 | TBD | Keep download-check daemon running after transient cycle failures (backoff + tray ERROR; stop only on shutdown) |
 | 2026-05-30 | `e38defdc` | Refresh static repository manifest after deploy (PR [#140](https://github.com/Mika3578/habitv/pull/140)) |
 | 2026-05-30 | `c9a4746d` | Improve sanitized download failure diagnostics (PR [#139](https://github.com/Mika3578/habitv/pull/139)) |
 | 2026-05-30 | PR [#138](https://github.com/Mika3578/habitv/pull/138) | Harden YouTube Data API lookup handling |
