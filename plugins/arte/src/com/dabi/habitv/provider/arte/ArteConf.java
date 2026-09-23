@@ -8,7 +8,11 @@ interface ArteConf {
 
 	String HOME_URL = "https://www.arte.tv";
 
-	String EMAC_API_BASE = "https://www.arte.tv/api/rproxy/emac/v4";
+	/**
+	 * Public EMAC catalogue API host. Arte retired the previous
+	 * {@code www.arte.tv/api/rproxy/emac/v4} reverse-proxy path (HTTP 404).
+	 */
+	String EMAC_API_BASE = "https://api.arte.tv/api/emac/v4";
 
 	/** Query param required by EMAC zone listing endpoints. */
 	String AUTHORIZED_COUNTRY = "FR";
