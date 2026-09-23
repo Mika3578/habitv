@@ -1,4 +1,5 @@
 provider=arte
-parserBoundary=legacy-rss-html
+parserBoundary=emac-json
+emacApiBase=https://api.arte.tv/api/emac/v4
 network=disabled
-note=Fixture placeholder for parser-shape stabilization before rewrite.
+note=Offline EMAC page/zone fixtures; live catalogue host is api.arte.tv (not www.arte.tv/api/rproxy).

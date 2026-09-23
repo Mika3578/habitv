@@ -77,7 +77,7 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 		final Set<EpisodeDTO> episodes = new LinkedHashSet<>();
 		final String pageUrl = buildPageUrl(languageCode, pageCode);
 		final JsonNode pageRoot = parseJson(getUrlContent(pageUrl), pageUrl);
-		final JsonNode zones = pageRoot.path("value").path("zones");
+		final JsonNode zones = emacZonesNode(pageRoot);
 		if (!zones.isArray()) {
 			return episodes;
 		}
@@ -99,12 +99,36 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 			final String zoneUrl = buildZoneUrl(languageCode, zoneCode, pageCode, pageNumber);
 			try {
 				final JsonNode zoneRoot = parseJson(getUrlContent(zoneUrl), zoneUrl);
-				addEpisodesFromDataNode(category, episodes, zoneRoot.path("value").path("data"));
+				addEpisodesFromDataNode(category, episodes, emacDataNode(zoneRoot));
 			} catch (final TechnicalException e) {
 				// EMAC sometimes reports extra pages that return HTTP 400; keep already fetched episodes.
 				break;
 			}
 		}
+	}
+
+	/**
+	 * Current EMAC page payloads expose {@code zones} at the root. Older
+	 * captured fixtures wrapped them under {@code value.zones}.
+	 */
+	static JsonNode emacZonesNode(final JsonNode pageRoot) {
+		final JsonNode zones = pageRoot.path("zones");
+		if (zones.isArray()) {
+			return zones;
+		}
+		return pageRoot.path("value").path("zones");
+	}
+
+	/**
+	 * Current EMAC zone pagination payloads expose {@code data} at the root.
+	 * Older fixtures wrapped them under {@code value.data}.
+	 */
+	static JsonNode emacDataNode(final JsonNode zoneRoot) {
+		final JsonNode data = zoneRoot.path("data");
+		if (data.isArray()) {
+			return data;
+		}
+		return zoneRoot.path("value").path("data");
 	}
 
 	private void addEpisodesFromDataNode(final CategoryDTO category, final Set<EpisodeDTO> episodes, final JsonNode data) {
