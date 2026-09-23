@@ -109,14 +109,28 @@ public class ArteEmacParsingOfflineTest {
 		final Map<String, String> urlToContent = new HashMap<>();
 		final String pageUrl = ArteConf.EMAC_API_BASE + "/fr/web/pages/DOR/?authorizedCountry=FR";
 		urlToContent.put(pageUrl,
-				"{\"value\":{\"zones\":[{\"code\":\"\",\"content\":{\"data\":[{\"url\":\"/fr/videos/119999-900-A/legacy/\",\"title\":\"Legacy Wrapped\"}]}}]}}");
+				"{\"value\":{\"zones\":[{\"code\":\"listing_LEGACY_main\",\"content\":{\"data\":[{\"url\":\"/fr/videos/119999-900-A/legacy/\",\"title\":\"Legacy Wrapped\"}],\"pagination\":{\"pages\":2}}}]}}");
+		urlToContent.put(
+				ArteConf.EMAC_API_BASE
+						+ "/fr/web/zones/listing_LEGACY_main/content?page=2&pageId=DOR&authorizedCountry=FR",
+				"{\"value\":{\"data\":[{\"url\":\"/fr/videos/119999-901-A/legacy-page-two/\",\"title\":\"Legacy Value Data\"}]}}");
 
 		final RecordingArtePlugin plugin = new RecordingArtePlugin(urlToContent);
 		final CategoryDTO category = new CategoryDTO(ArteConf.NAME, "Documentaries", "fr:DOR", ArteConf.EXTENSION);
 		final Set<EpisodeDTO> episodes = plugin.findEpisode(category);
 
-		assertEquals(1, episodes.size());
-		assertEquals("https://www.arte.tv/fr/videos/119999-900-A/legacy/", episodes.iterator().next().getId());
+		final List<String> ids = new ArrayList<>();
+		final List<String> names = new ArrayList<>();
+		for (final EpisodeDTO episode : episodes) {
+			ids.add(episode.getId());
+			names.add(episode.getName());
+		}
+
+		assertEquals(2, episodes.size());
+		assertTrue(ids.contains("https://www.arte.tv/fr/videos/119999-900-A/legacy/"));
+		assertTrue(ids.contains("https://www.arte.tv/fr/videos/119999-901-A/legacy-page-two/"));
+		assertTrue("legacy value.zones title must still be extracted", names.contains("Legacy Wrapped"));
+		assertTrue("legacy value.data title must still be extracted", names.contains("Legacy Value Data"));
 	}
 
 	@Test

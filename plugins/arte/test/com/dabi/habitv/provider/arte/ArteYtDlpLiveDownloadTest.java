@@ -46,12 +46,12 @@ public class ArteYtDlpLiveDownloadTest {
 	private static final boolean IS_WINDOWS = System.getProperty("os.name", "").toLowerCase().contains("win");
 	private static final String CMD_PROCESSOR = IS_WINDOWS ? "cmd.exe /c #CMD#" : "/bin/sh -c #CMD#";
 
-	/** Public FR replay; 15s section keeps bandwidth small. Refresh if rights expire. */
+	/** Public FR replay; 15s low-height clip keeps bandwidth small. Refresh if rights expire. */
 	private static final String SAMPLE_EPISODE_URL =
 			"https://www.arte.tv/fr/videos/128788-000-A/la-femme-qui-murmure-a-l-oreille-des-baleines-bleues/";
 
 	private static final String YT_DLP_ARGS = " \"#VIDEO_URL#\" -o \"#FILE_DEST#\""
-			+ " -f \"bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/bv*+ba/b\""
+			+ " -f \"bv*[height<=480][ext=mp4]+ba[ext=m4a]/b[height<=480][ext=mp4]/worst\""
 			+ " --merge-output-format mp4"
 			+ " --download-sections \"*0:00-0:15\""
 			+ " --force-keyframes-at-cuts"
