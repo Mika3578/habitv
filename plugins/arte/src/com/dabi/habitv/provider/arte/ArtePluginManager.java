@@ -152,6 +152,8 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 				|| hasCollectionChild;
 		hasPlayableItem = discoverPlayableInDeferredLink(zone) || hasPlayableItem;
 		hasCollectionChild = discoverCollectionsInDeferredLink(languageCode, zoneCategory, zone) || hasCollectionChild;
+		hasCollectionChild = discoverCollectionsInPaginatedZone(languageCode, pageCode, zoneCategory, zone)
+				|| hasCollectionChild;
 		if (!hasPlayableItem && !hasCollectionChild && !hasDeferredZoneContent(zone)) {
 			return null;
 		}
@@ -476,6 +478,43 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 			}
 		} else {
 			added = addCollectionChildren(languageCode, zoneCategory, ArteEmacJson.emacDataNode(linked));
+		}
+		return added;
+	}
+
+	private boolean discoverCollectionsInPaginatedZone(final String languageCode, final String pageCode,
+			final CategoryDTO zoneCategory, final JsonNode zone) {
+		final JsonNode pagination = zone.path("content").path("pagination");
+		if (pagination.isMissingNode() || pagination.path("pages").asInt(1) <= 1) {
+			return false;
+		}
+		boolean added = false;
+		String nextUrl = pagination.path("links").path("next").asText(null);
+		int pageNumber = 2;
+		final int pages = Math.min(pagination.path("pages").asInt(1), 5);
+		while (pageNumber <= pages) {
+			final JsonNode pageRoot;
+			if (StringUtils.isNotEmpty(nextUrl) && ArteRequestUrls.isTrustedCatalogueFetchUrl(nextUrl)) {
+				try {
+					pageRoot = ArteEmacJson.parseTree(transport.get(nextUrl), nextUrl);
+				} catch (final RuntimeException e) {
+					break;
+				}
+				nextUrl = ArteEmacJson.zonePagination(pageRoot).path("links").path("next").asText(null);
+			} else {
+				final String zoneCode = zone.path("code").asText(null);
+				if (StringUtils.isEmpty(zoneCode)) {
+					break;
+				}
+				final String zoneUrl = buildLegacyZoneUrl(languageCode, zoneCode, pageCode, pageNumber);
+				try {
+					pageRoot = ArteEmacJson.parseTree(transport.get(zoneUrl), zoneUrl);
+				} catch (final RuntimeException e) {
+					break;
+				}
+			}
+			added = addCollectionChildren(languageCode, zoneCategory, ArteEmacJson.emacDataNode(pageRoot)) || added;
+			pageNumber++;
 		}
 		return added;
 	}

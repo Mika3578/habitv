@@ -510,6 +510,42 @@ public class ArteEmacParsingOfflineTest {
 	}
 
 	@Test
+	public void findCategoryDiscoversCollectionFromPaginatedZone() throws IOException {
+		final Map<String, String> urls = new HashMap<>();
+		final String homeFr = ArteCatalogDiscovery.buildHomeUrl("fr");
+		urls.put(homeFr, readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(ArteConf.EMAC_API_BASE + "/fr/tv/pages/HOME/?authorizedCountry=FR",
+				readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(PAGE_URL,
+				"{\"code\":\"DOR\",\"zones\":[{\"id\":\"zone-coll-page\",\"code\":\"listing_COLL_page\",\"title\":\"Paged Collection\",\"content\":{\"data\":[],\"pagination\":{\"pages\":2}}}]}");
+		urls.put(
+				ArteConf.EMAC_API_BASE
+						+ "/fr/web/zones/listing_COLL_page/content?page=2&pageId=DOR&authorizedCountry=FR",
+				"{\"data\":[{\"url\":\"/fr/videos/RC-088888/paged-collection/\",\"title\":\"Paged Collection\"}]}");
+		stubDiscoveryPages(urls);
+		final ArtePluginManager plugin = new ArtePluginManager(new ArteCatalogDiscovery(urls::get), urls::get);
+
+		CategoryDTO zone = null;
+		for (final CategoryDTO language : plugin.findCategory()) {
+			if (!language.getId().endsWith("/fr/")) {
+				continue;
+			}
+			for (final CategoryDTO page : language.getSubCategories()) {
+				if (!page.getId().endsWith(":DOR")) {
+					continue;
+				}
+				for (final CategoryDTO candidate : page.getSubCategories()) {
+					if (ArteCategoryId.forZone("fr", "DOR", "zone-coll-page").equals(candidate.getId())) {
+						zone = candidate;
+					}
+				}
+			}
+		}
+		assertNotNull(zone);
+		assertEquals(ArteCategoryId.forCollection("fr", "RC-088888"), zone.getSubCategories().iterator().next().getId());
+	}
+
+	@Test
 	public void findEpisodeFollowsLinkedListingPagination() throws IOException {
 		final Map<String, String> urls = new HashMap<>();
 		final String linkUrl = ArteConf.EMAC_API_BASE + "/fr/web/zones/listing_LINK_paged/content?authorizedCountry=FR";
