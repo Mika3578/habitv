@@ -1,0 +1,44 @@
+{
+  "data": [
+    {
+      "id": "3608506",
+      "title": "RTS 1",
+      "livestreamUrn": "urn:rts:video:3608506",
+      "channelId": "143932a79bb5a123a646b68b1d1188d7ae493e5b",
+      "imageUrlRaw": "https://il.srgssr.ch/image-service/dynamic/857dda.svg",
+      "imageUrl": "https://img.rts.ch/articles/2023/image/ra3xg-26166607.image",
+      "playableAbroad": false
+    },
+    {
+      "id": "3608517",
+      "title": "RTS 2",
+      "livestreamUrn": "urn:rts:video:3608517",
+      "channelId": "d7dfff28deee44e1d3c49a3d37d36d492b29671b",
+      "imageUrlRaw": "https://il.srgssr.ch/image-service/dynamic/c915e35.svg",
+      "imageUrl": "https://img.rts.ch/articles/2023/image/81jyv5-26166616.image",
+      "playableAbroad": false
+    },
+    {
+      "id": "1967124",
+      "title": "RTS Info",
+      "livestreamUrn": "urn:rts:video:1967124",
+      "channelId": "5d332a26e06d08eec8ad385d566187df72955623",
+      "imageUrlRaw": "https://il.srgssr.ch/image-service/dynamic/497322.svg",
+      "imageUrl": "https://img.rts.ch/info/2023/image/sqoxct-27187770.image",
+      "playableAbroad": false
+    },
+    {
+      "id": "8841634",
+      "title": "RTS Couleur 3",
+      "livestreamUrn": "urn:rts:video:8841634",
+      "channelId": "8ceb28d9b3f1dd876d1df1780f908578cbefc3d7",
+      "imageUrlRaw": "https://il.srgssr.ch/image-service/dynamic/a9f904.svg",
+      "imageUrl": "https://img.rts.ch/articles/2020/image/9gpl81-26142286.image",
+      "playableAbroad": true
+    }
+  ],
+  "ilRequests": [
+    "https://il.srgssr.ch/integrationlayer/2.0/rts/mediaList/video/livestreams?vector=portalplay"
+  ],
+  "failedIlRequests": []
+}

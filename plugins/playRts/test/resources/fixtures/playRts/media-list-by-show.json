@@ -1,0 +1,245 @@
+{
+  "next": null,
+  "mediaList": [
+    {
+      "id": "21408e81-e5bf-3f7f-8e11-5c8c10b46f2b",
+      "mediaType": "VIDEO",
+      "vendor": "RTS",
+      "urn": "urn:rts:video:21408e81-e5bf-3f7f-8e11-5c8c10b46f2b",
+      "title": "Les Suisses sont illettrés en matière de prévoyance professionnelle",
+      "description": "Alexis Egger, spécialiste de la prévoyance professionnelle, tente de vulgariser le système suisse des trois piliers.",
+      "imageUrl": "https://img.rts.ch/medias/2026/image/5e6b2776-29360262.image/16x9",
+      "imageTitle": "Les Suisses sont illettrés en matière de prévoyance professionnelle",
+      "type": "EPISODE",
+      "date": "2026-09-17T13:15:16+02:00",
+      "duration": 290040,
+      "validFrom": "2026-09-17T13:26:40+02:00",
+      "validTo": "2100-01-01T23:59:59+01:00",
+      "playableAbroad": true,
+      "subtitlesAvailable": false,
+      "episode": {
+        "imageUrl": "https://img.rts.ch/medias/2026/image/5e6b2776-29360262.image/16x9",
+        "imageTitle": "120 secondes",
+        "publishedDate": "2026-09-17T13:15:00+02:00",
+        "id": "dc4caeb1-d9a3-320a-9c2d-30c68a94ba92",
+        "title": "120 secondes",
+        "description": "La chronique satirique de Vincent Kucholl et Vincent Veillon."
+      },
+      "show": {
+        "id": "5917099",
+        "vendor": "RTS",
+        "transmission": "TV",
+        "urn": "urn:rts:show:tv:5917099",
+        "title": "120 secondes",
+        "description": "Tous les épisodes de la chronique humoristique de Vincent Veillon et Vincent Kucholl.",
+        "imageUrl": "https://img.rts.ch/articles/2024/image/um735n-25886485.image/16x9",
+        "imageTitle": "120 secondes",
+        "posterImageUrl": "https://img.rts.ch/articles/2024/image/acm08b-25865764.image",
+        "posterImageIsFallbackUrl": false,
+        "podcastImageUrl": "https://img.rts.ch/articles/2024/image/um735n-25886485.image/1x1",
+        "podcastImageIsFallbackUrl": false,
+        "primaryChannelId": "8ceb28d9b3f1dd876d1df1780f908578cbefc3d7",
+        "primaryChannelUrn": "urn:rts:channel:radio:8ceb28d9b3f1dd876d1df1780f908578cbefc3d7",
+        "numberOfEpisodes": 339,
+        "audioDescriptionAvailable": false,
+        "subtitlesAvailable": false,
+        "multiAudioLanguagesAvailable": false,
+        "allowIndexing": true
+      },
+      "channel": {
+        "id": "8ceb28d9b3f1dd876d1df1780f908578cbefc3d7",
+        "vendor": "RTS",
+        "urn": "urn:rts:channel:radio:8ceb28d9b3f1dd876d1df1780f908578cbefc3d7",
+        "title": "RTS Couleur 3",
+        "imageUrl": "https://img.rts.ch/articles/2020/image/9gpl81-26142286.image",
+        "imageUrlRaw": "https://il.srgssr.ch/image-service/dynamic/a9f904.svg",
+        "imageTitle": "RTS Couleur 3",
+        "transmission": "RADIO"
+      },
+      "presentation": "DEFAULT",
+      "audioTrackList": [
+        {
+          "locale": "fr",
+          "language": "Français",
+          "source": "HLS",
+          "isAudioDescription": false,
+          "isOriginalVersion": false
+        }
+      ],
+      "aspectRatio": "16:9",
+      "possibleBlockReasons": [
+        "STARTDATE",
+        "ENDDATE"
+      ],
+      "displayable": true,
+      "tagList": [
+        "media_radio:couleur3",
+        "media_tv:couleur3"
+      ],
+      "bannerImageUrl": "https://img.rts.ch/medias/2026/image/5e6b2776-29360262.image/16x9",
+      "podcastImageUrl": "https://img.rts.ch/medias/2026/image/5e6b2776-29360262.image/1x1",
+      "podcastImageTitle": "Les Suisses sont illettrés en matière de prévoyance professionnelle",
+      "bannerImageTitle": "Les Suisses sont illettrés en matière de prévoyance professionnelle"
+    },
+    {
+      "id": "86e246e9-4795-30c6-b204-55ed20ce7e22",
+      "mediaType": "VIDEO",
+      "vendor": "RTS",
+      "urn": "urn:rts:video:86e246e9-4795-30c6-b204-55ed20ce7e22",
+      "title": "Nouvel épisode dans le fiasco des F-35",
+      "description": "Jochen Friedli, collaborateur au domaine de compétence des acquisitions chez Armasuisse, évoque le scandale lié au prix fixe du F-35 soi-disant négocié par la Suisse avec les États-Unis.",
+      "imageUrl": "https://img.rts.ch/medias/2026/image/391e310b-29353235.image/16x9",
+      "imageTitle": "Nouvel épisode dans le fiasco des F-35",
+      "type": "EPISODE",
+      "date": "2026-09-10T13:17:40+02:00",
+      "duration": 258000,
+      "validFrom": "2026-09-10T13:28:16+02:00",
+      "validTo": "2100-01-01T23:59:59+01:00",
+      "playableAbroad": true,
+      "subtitlesAvailable": false,
+      "episode": {
+        "imageUrl": "https://img.rts.ch/medias/2026/image/391e310b-29353235.image/16x9",
+        "imageTitle": "120 secondes",
+        "publishedDate": "2026-09-10T13:15:00+02:00",
+        "id": "ce34b0f5-2cb5-344d-a75b-93b4b7f1d7bf",
+        "title": "120 secondes",
+        "description": "La chronique satirique de Vincent Kucholl et Vincent Veillon."
+      },
+      "show": {
+        "id": "5917099",
+        "vendor": "RTS",
+        "transmission": "TV",
+        "urn": "urn:rts:show:tv:5917099",
+        "title": "120 secondes",
+        "description": "Tous les épisodes de la chronique humoristique de Vincent Veillon et Vincent Kucholl.",
+        "imageUrl": "https://img.rts.ch/articles/2024/image/um735n-25886485.image/16x9",
+        "imageTitle": "120 secondes",
+        "posterImageUrl": "https://img.rts.ch/articles/2024/image/acm08b-25865764.image",
+        "posterImageIsFallbackUrl": false,
+        "podcastImageUrl": "https://img.rts.ch/articles/2024/image/um735n-25886485.image/1x1",
+        "podcastImageIsFallbackUrl": false,
+        "primaryChannelId": "8ceb28d9b3f1dd876d1df1780f908578cbefc3d7",
+        "primaryChannelUrn": "urn:rts:channel:radio:8ceb28d9b3f1dd876d1df1780f908578cbefc3d7",
+        "numberOfEpisodes": 339,
+        "audioDescriptionAvailable": false,
+        "subtitlesAvailable": false,
+        "multiAudioLanguagesAvailable": false,
+        "allowIndexing": true
+      },
+      "channel": {
+        "id": "8ceb28d9b3f1dd876d1df1780f908578cbefc3d7",
+        "vendor": "RTS",
+        "urn": "urn:rts:channel:radio:8ceb28d9b3f1dd876d1df1780f908578cbefc3d7",
+        "title": "RTS Couleur 3",
+        "imageUrl": "https://img.rts.ch/articles/2020/image/9gpl81-26142286.image",
+        "imageUrlRaw": "https://il.srgssr.ch/image-service/dynamic/a9f904.svg",
+        "imageTitle": "RTS Couleur 3",
+        "transmission": "RADIO"
+      },
+      "presentation": "DEFAULT",
+      "audioTrackList": [
+        {
+          "locale": "fr",
+          "language": "Français",
+          "source": "HLS",
+          "isAudioDescription": false,
+          "isOriginalVersion": false
+        }
+      ],
+      "aspectRatio": "16:9",
+      "possibleBlockReasons": [
+        "STARTDATE",
+        "ENDDATE"
+      ],
+      "displayable": true,
+      "tagList": [
+        "media_tv:couleur3",
+        "media_radio:couleur3"
+      ],
+      "bannerImageUrl": "https://img.rts.ch/medias/2026/image/391e310b-29353235.image/16x9",
+      "podcastImageUrl": "https://img.rts.ch/medias/2026/image/391e310b-29353235.image/1x1",
+      "podcastImageTitle": "Nouvel épisode dans le fiasco des F-35",
+      "bannerImageTitle": "Nouvel épisode dans le fiasco des F-35"
+    },
+    {
+      "id": "c70d243b-b647-3c80-9b13-ab9479c6819b",
+      "mediaType": "VIDEO",
+      "vendor": "RTS",
+      "urn": "urn:rts:video:c70d243b-b647-3c80-9b13-ab9479c6819b",
+      "title": "Les habitants des Breuleux ne veulent pas que leur commune boursicote",
+      "description": "Jean-Serge Theurillat, habitant des Breuleux, nous explique pourquoi il a refusé le placement en bourse d’une partie de la fortune de sa commune.",
+      "imageUrl": "https://img.rts.ch/medias/2026/image/5742683d-29346285.image/16x9",
+      "imageTitle": "Les habitants des Breuleux ne veulent pas que leur commune boursicote",
+      "type": "EPISODE",
+      "date": "2026-09-03T13:15:56+02:00",
+      "duration": 215720,
+      "validFrom": "2026-09-03T13:25:47+02:00",
+      "validTo": "2100-01-01T23:59:59+01:00",
+      "playableAbroad": true,
+      "subtitlesAvailable": false,
+      "episode": {
+        "imageUrl": "https://img.rts.ch/medias/2026/image/5742683d-29346285.image/16x9",
+        "imageTitle": "120 secondes",
+        "publishedDate": "2026-09-03T13:15:00+02:00",
+        "id": "b94be040-280d-3567-ba88-55a7d85dd35b",
+        "title": "120 secondes",
+        "description": "La chronique satirique de Vincent Kucholl et Vincent Veillon."
+      },
+      "show": {
+        "id": "5917099",
+        "vendor": "RTS",
+        "transmission": "TV",
+        "urn": "urn:rts:show:tv:5917099",
+        "title": "120 secondes",
+        "description": "Tous les épisodes de la chronique humoristique de Vincent Veillon et Vincent Kucholl.",
+        "imageUrl": "https://img.rts.ch/articles/2024/image/um735n-25886485.image/16x9",
+        "imageTitle": "120 secondes",
+        "posterImageUrl": "https://img.rts.ch/articles/2024/image/acm08b-25865764.image",
+        "posterImageIsFallbackUrl": false,
+        "podcastImageUrl": "https://img.rts.ch/articles/2024/image/um735n-25886485.image/1x1",
+        "podcastImageIsFallbackUrl": false,
+        "primaryChannelId": "8ceb28d9b3f1dd876d1df1780f908578cbefc3d7",
+        "primaryChannelUrn": "urn:rts:channel:radio:8ceb28d9b3f1dd876d1df1780f908578cbefc3d7",
+        "numberOfEpisodes": 339,
+        "audioDescriptionAvailable": false,
+        "subtitlesAvailable": false,
+        "multiAudioLanguagesAvailable": false,
+        "allowIndexing": true
+      },
+      "channel": {
+        "id": "8ceb28d9b3f1dd876d1df1780f908578cbefc3d7",
+        "vendor": "RTS",
+        "urn": "urn:rts:channel:radio:8ceb28d9b3f1dd876d1df1780f908578cbefc3d7",
+        "title": "RTS Couleur 3",
+        "imageUrl": "https://img.rts.ch/articles/2020/image/9gpl81-26142286.image",
+        "imageUrlRaw": "https://il.srgssr.ch/image-service/dynamic/a9f904.svg",
+        "imageTitle": "RTS Couleur 3",
+        "transmission": "RADIO"
+      },
+      "presentation": "DEFAULT",
+      "audioTrackList": [
+        {
+          "locale": "fr",
+          "language": "Français",
+          "source": "HLS",
+          "isAudioDescription": false,
+          "isOriginalVersion": false
+        }
+      ],
+      "aspectRatio": "16:9",
+      "possibleBlockReasons": [
+        "STARTDATE",
+        "ENDDATE"
+      ],
+      "displayable": true,
+      "tagList": [
+        "media_radio:couleur3",
+        "media_tv:couleur3"
+      ],
+      "bannerImageUrl": "https://img.rts.ch/medias/2026/image/5742683d-29346285.image/16x9",
+      "podcastImageUrl": "https://img.rts.ch/medias/2026/image/5742683d-29346285.image/1x1",
+      "podcastImageTitle": "Les habitants des Breuleux ne veulent pas que leur commune boursicote",
+      "bannerImageTitle": "Les habitants des Breuleux ne veulent pas que leur commune boursicote"
+    }
+  ]
+}

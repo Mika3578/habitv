@@ -31,7 +31,7 @@ still points at `youtube-dl`, switch it to yt-dlp.
 
 | Group | Modules |
 |-------|---------|
-| Recently worked | `francetv` (ex Pluzz), `youtube` (yt-dlp), `novo19` |
+| Recently worked | `francetv` (ex Pluzz), `youtube` (yt-dlp), `novo19`, `playRts` |
 | Needs rewrite / investigation | `arte`, `6play`, `lequipe`, `footyroom`, `sfr`, `globalnews`, `mlssoccer` |
 | Obsolete / degraded endpoints | `canalPlus` (CStar; D8 removed), `wat`, `beinsport`, `clubic` |
 | Tools / infrastructure | `curl`, `ffmpeg`, `aria2`, `cmd`, `file`, `RSS`, `rclone`, `rtmpDump`, `adobeHDS`, `email`, `plugin-tester` |
@@ -40,9 +40,10 @@ still points at `youtube-dl`, switch it to yt-dlp.
 Labels: **working** (validated), **degraded**, **protected** (auth/geo/DRM),
 **obsolete**, **removed**, **unknown**.
 
-France.tv and NOVO19 delegate download to the youtube/yt-dlp plugin when
-public URLs exist. Canal+ family and WAT/TF1+ are not treated as freely
-downloadable DRM catalogues.
+France.tv, NOVO19, and Play RTS delegate download to the youtube/yt-dlp plugin when
+public URLs exist. Play RTS uses the public Play v3/IL show catalogue (RTS 1 / RTS 2
+platform brands); some titles are Switzerland-only. Canal+ family and WAT/TF1+ are not
+treated as freely downloadable DRM catalogues.
 
 ## Arte catalogue discovery
 
