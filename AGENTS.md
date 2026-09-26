@@ -67,7 +67,10 @@ See [`docs/providers.md`](docs/providers.md).
 
 ## Safety and Legal Constraints
 
-- No DRM, encryption, paywall, or license bypass.
+See [`docs/providers.md`](docs/providers.md).
+
+- Do not implement or document circumvention of technical protection,
+  paywalls, or license restrictions.
 - No credential, cookie, or browser-session extraction into the repo.
 - User secrets stay in local config or environment variables.
 - Do not re-enable legacy hosts (`dabiboo.free.fr`, `ftpperso.free.fr`).
@@ -103,10 +106,11 @@ Applies to branch names, PR titles, PR bodies, PR comments, and commit
 subjects. English only. Detail belongs in the diff, not in public git
 text.
 
-Do not mention DRM, Widevine, CDM, Gigya, VPN, geo bypass, login,
-cookies, sessions, stream recipes, or host/selector internals. Do not
-write "no unlock / no bypass / no account" lists. Do not add AI/tool
-footers or auto-summaries.
+Keep public git text **implementation-neutral**: use concise user-facing
+wording and avoid unnecessary detail about access mechanisms,
+authentication flows, delivery internals, provider-specific selectors, or
+host implementation specifics. Do not add AI/tool footers or auto-summaries.
+Do not publish negated topic checklists in public git text.
 
 **Branches:** `<type>/<short-scope>` kebab-case. Types: `feat`, `fix`,
 `docs`, `test`, `refactor`, `chore`, `ci`. Scope is the module or
@@ -134,7 +138,7 @@ wording.
 | Avoid | Use |
 |-------|-----|
 | `feat(tf1plus): add replay provider` | `feat(tf1plus): add provider` |
-| `fix(6play): diagnose obsolete SPA listing and DRM limits` | `fix(6play): diagnose listing` |
+| `fix(6play): diagnose obsolete SPA listing and access limits` | `fix(6play): diagnose listing` |
 
 **PR bodies:** Fill `.github/pull_request_template.md`. Keep Summary,
 Changes, and Notes generic. Validation is the command and result. Do

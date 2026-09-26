@@ -5,34 +5,15 @@ description: Writes short generic git branches, commit subjects, and GitHub pull
 
 # Public git text
 
-Read **Public git text** in [`AGENTS.md`](../../../AGENTS.md) before any branch,
-commit, or PR text. Fill [`.github/pull_request_template.md`](../../../.github/pull_request_template.md)
-for PR bodies.
+Canonical policy: **Public git text** in [`AGENTS.md`](../../../AGENTS.md).
 
-## Do
+## Procedure
 
-- Branch: `<type>/<short-scope>` kebab-case (`feat/tf1plus`)
-- Title/commit: `type(scope): subject` with lowercase kebab scope
-  (`feat(tf1plus): add provider`)
-- PR body: Summary, Scope, Changes, Validation (command + result),
-  Risk / rollback. Keep wording generic.
+1. Read that section in `AGENTS.md` before any branch, commit, or PR text.
+2. Fill [`.github/pull_request_template.md`](../../../.github/pull_request_template.md) for PR bodies.
+3. Record validation as the exact command and honest result (no log dumps).
+4. On an existing PR whose head is a platform `cursor/...` branch: keep title and
+   body generic; do not rename the PR head on GitHub.
 
-## Do not
-
-- Tool prefixes: `cursor/`, `claude/`, `ai/`, `codex/`
-- Suffixes: `replay`, `download`, `diagnostics`
-- DRM, Widevine, Gigya, VPN, geo, login, cookies, stream recipes
-- "No unlock / no bypass / no account" lists
-- AI/tool footers or auto-summaries
-- Rename an existing GitHub PR head branch (that closes the PR)
-- Fight a Cloud Agent platform `cursor/...` branch after the PR exists;
-  keep the title and body generic instead
-
-## Examples
-
-```text
-❌ cursor/lemanbleu-replay-1a2e
-✅ feat/lemanbleu
-❌ feat(lemanBleu): add replay provider
-✅ feat(lemanbleu): add provider
-```
+Branch, commit, and title formatting examples live in `AGENTS.md` (tables and
+**Branches** / **PR titles** subsections). Do not duplicate them here.
