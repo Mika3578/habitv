@@ -82,6 +82,7 @@ fi
 
 required_skills=(
   public-git-text
+  git-workflow
   code-change-verification
   provider-diagnostics
   pr-review

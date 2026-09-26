@@ -5,13 +5,11 @@ Local IDE chat ignores it.
 
 ## Branch name (platform)
 
-The harness often creates `cursor/...` before repo rules run. That
-prefix is not controlled by `AGENTS.md`. Do **not** rename an existing
-PR head on GitHub: GitHub closes the PR.
+Cloud harnesses may assign a platform branch before repository policy runs.
+Do **not** rename an open PR head on GitHub (GitHub closes the PR).
 
-- If you create a branch yourself before a PR exists, use
-  `<type>/<short-scope>` (`feat/tf1plus`).
-- If you are already on `cursor/...` with an open PR, stay on it.
+New tasks under agent control:
+[`.agents/skills/git-workflow/SKILL.md`](../.agents/skills/git-workflow/SKILL.md).
 
 ## Public git text
 

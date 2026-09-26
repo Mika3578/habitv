@@ -80,6 +80,7 @@ if (Test-Path ".cursor/skills") {
 
 $RequiredSkills = @(
     "public-git-text",
+    "git-workflow",
     "code-change-verification",
     "provider-diagnostics",
     "pr-review"

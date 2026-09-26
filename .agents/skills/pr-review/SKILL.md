@@ -8,6 +8,9 @@ description: Keeps a pull request in Draft until review, CI, full validation, an
 Authoritative policy: [`AGENTS.md`](../../../AGENTS.md) (**Pull request lifecycle**,
 **Git Workflow**). Template: [`.github/pull_request_template.md`](../../../.github/pull_request_template.md).
 
+Before opening a new pull request, complete branch setup in
+[`git-workflow`](../git-workflow/SKILL.md).
+
 ## Loop
 
 ```text
