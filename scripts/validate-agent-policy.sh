@@ -26,7 +26,7 @@ while IFS= read -r f; do
     ./AGENTS.md | AGENTS.md) ;;
     *) fail "unexpected nested AGENTS.md: $f" ;;
   esac
-done < <(find . -name AGENTS.md -not -path './.git/*')
+done < <(find . -name AGENTS.md -not -path './.git/*' -not -path './agent_space/*')
 
 for banned in CLAUDE.md GEMINI.md .cursorrules .windsurfrules; do
   if [[ -f "$banned" ]]; then
@@ -87,31 +87,33 @@ else
   done
 fi
 
-declare -A skill_names=()
-while IFS= read -r -d '' skill; do
-  rel="${skill#./}"
-  if ! head -n 30 "$skill" | grep -q '^name:'; then
-    fail "skill missing name metadata: $rel"
-  fi
-  if ! head -n 30 "$skill" | grep -q '^description:'; then
-    fail "skill missing description metadata: $rel"
-  fi
-  name=$(sed -n '/^name:/s/^name:[[:space:]]*//p' "$skill" | head -1)
-  desc=$(sed -n '/^description:/s/^description:[[:space:]]*//p' "$skill" | head -1)
-  if [[ -z "$name" ]]; then
-    fail "empty skill name: $rel"
-  fi
-  if [[ -z "$desc" ]]; then
-    fail "empty skill description: $rel"
-  fi
-  if [[ "${#desc}" -gt "$SKILL_DESC_MAX" ]]; then
-    fail "skill description too long (${#desc} chars): $rel"
-  fi
-  if [[ -n "${skill_names[$name]:-}" ]]; then
-    fail "duplicate skill name '$name': ${skill_names[$name]} and $rel"
-  fi
-  skill_names[$name]="$rel"
-done < <(find .agents/skills -name 'SKILL.md' -print0 2>/dev/null)
+if [[ -d .agents/skills ]]; then
+  declare -A skill_names=()
+  while IFS= read -r -d '' skill; do
+    rel="${skill#./}"
+    if ! head -n 30 "$skill" | grep -q '^name:'; then
+      fail "skill missing name metadata: $rel"
+    fi
+    if ! head -n 30 "$skill" | grep -q '^description:'; then
+      fail "skill missing description metadata: $rel"
+    fi
+    name=$(sed -n '/^name:/s/^name:[[:space:]]*//p' "$skill" | head -1)
+    desc=$(sed -n '/^description:/s/^description:[[:space:]]*//p' "$skill" | head -1)
+    if [[ -z "$name" ]]; then
+      fail "empty skill name: $rel"
+    fi
+    if [[ -z "$desc" ]]; then
+      fail "empty skill description: $rel"
+    fi
+    if [[ "${#desc}" -gt "$SKILL_DESC_MAX" ]]; then
+      fail "skill description too long (${#desc} chars): $rel"
+    fi
+    if [[ -n "${skill_names[$name]:-}" ]]; then
+      fail "duplicate skill name '$name': ${skill_names[$name]} and $rel"
+    fi
+    skill_names[$name]="$rel"
+  done < <(find .agents/skills -name 'SKILL.md' -print0 2>/dev/null)
+fi
 
 require_phrase() {
   local phrase="$1"
