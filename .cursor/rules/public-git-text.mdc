@@ -2,7 +2,7 @@
 alwaysApply: true
 ---
 
-Follow **Public git text** in @AGENTS.md. Fill @.github/pull_request_template.md.
+Follow **Public git text** in @AGENTS.md. Procedure: @.agents/skills/public-git-text/SKILL.md. Fill @.github/pull_request_template.md.
 
 - Branch: `feat/tf1plus`, never `cursor/tf1plus-replay-1a2e` when you create the branch
 - Title: `feat(tf1plus): add provider` (lowercase kebab-case scope)

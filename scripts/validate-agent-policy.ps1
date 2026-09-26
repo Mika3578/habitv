@@ -1,0 +1,93 @@
+# Deterministic checks for repository agent-policy layout.
+# Usage: scripts/validate-agent-policy.ps1
+
+$ErrorActionPreference = "Stop"
+$Root = Split-Path -Parent $PSScriptRoot
+Set-Location $Root
+
+$failures = 0
+function Fail([string]$Message) {
+    Write-Host "agent-policy: $Message"
+    $script:failures++
+}
+
+$AdapterMaxBytes = 8192
+$SkillDescMax = 500
+
+if (-not (Test-Path "AGENTS.md")) {
+    Fail "missing root AGENTS.md"
+}
+
+Get-ChildItem -Recurse -Filter "AGENTS.md" -File |
+    Where-Object { $_.FullName -notmatch [regex]::Escape((Join-Path $Root "AGENTS.md")) } |
+    ForEach-Object { Fail "unexpected nested AGENTS.md: $($_.FullName.Substring($Root.Length + 1))" }
+
+@("CLAUDE.md", "GEMINI.md", ".cursorrules", ".windsurfrules") | ForEach-Object {
+    if (Test-Path $_) {
+        $size = (Get-Item $_).Length
+        if ($size -gt 200) {
+            Fail "competing substantive file present: $_ ($size bytes)"
+        }
+    }
+}
+
+function Test-Adapter([string]$Path) {
+    if (-not (Test-Path $Path)) { return }
+    $size = (Get-Item $Path).Length
+    if ($size -gt $AdapterMaxBytes) {
+        Fail "adapter too large ($size bytes): $Path"
+    }
+    $text = Get-Content -Raw $Path
+    if ($text -notmatch "AGENTS\.md") {
+        Fail "adapter must reference AGENTS.md: $Path"
+    }
+}
+
+Test-Adapter ".continue/rules/00-habitv.md"
+Test-Adapter ".github/copilot-instructions.md"
+Test-Adapter ".cursor/CLOUD.md"
+
+if (Test-Path ".cursor/skills") {
+    Get-ChildItem ".cursor/skills" -Recurse -Filter "SKILL.md" | ForEach-Object {
+        $text = Get-Content -Raw $_.FullName
+        if ($text -notmatch "\.agents/skills/") {
+            Fail "Cursor skill must point to .agents/skills/: $($_.FullName)"
+        }
+    }
+}
+
+$skillNames = @{}
+Get-ChildItem ".agents/skills" -Recurse -Filter "SKILL.md" -ErrorAction SilentlyContinue | ForEach-Object {
+    $rel = $_.FullName.Substring($Root.Length + 1)
+    $head = Get-Content $_.FullName -TotalCount 30
+    if (-not ($head -match "^name:")) { Fail "skill missing name metadata: $rel" }
+    if (-not ($head -match "^description:")) { Fail "skill missing description metadata: $rel" }
+    $name = ($head | Where-Object { $_ -match "^name:" } | Select-Object -First 1) -replace "^name:\s*", ""
+    $desc = ($head | Where-Object { $_ -match "^description:" } | Select-Object -First 1) -replace "^description:\s*", ""
+    if ([string]::IsNullOrWhiteSpace($name)) { Fail "empty skill name: $rel" }
+    if ([string]::IsNullOrWhiteSpace($desc)) { Fail "empty skill description: $rel" }
+    if ($desc.Length -gt $SkillDescMax) { Fail "skill description too long ($($desc.Length) chars): $rel" }
+    if ($skillNames.ContainsKey($name)) {
+        Fail "duplicate skill name '$name': $($skillNames[$name]) and $rel"
+    }
+    $skillNames[$name] = $rel
+}
+
+$agents = Get-Content -Raw "AGENTS.md"
+@(
+    "Keep every pull request in **Draft**",
+    "current PR HEAD",
+    "explicitly confirms success in the current conversation"
+) | ForEach-Object {
+    if ($agents -notlike "*$_*") {
+        Fail "AGENTS.md missing required phrase: $_"
+    }
+}
+
+if ($failures -gt 0) {
+    Write-Host "agent-policy: FAILED ($failures check(s))"
+    exit 1
+}
+
+Write-Host "agent-policy: OK"
+exit 0
