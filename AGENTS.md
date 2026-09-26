@@ -226,6 +226,9 @@ are satisfied.
   metadata (body, draft/ready, replies, resolution, reviewer requests).
   Independent reviewers are read-only.
 - **Review rigor is proportional to risk** (see pr-review skill).
+- A **green check**, a bot comment, or a GitHub **APPROVED** state is not, by
+  itself, proof that a **substantive review** of the **current PR HEAD** ran.
+  Verify reviewer, SHA, and review body (see pr-review skill).
 - No actionable unresolved feedback remains at Ready.
 
 When runtime behavior may change, keep the PR in Draft until the user

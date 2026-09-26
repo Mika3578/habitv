@@ -19,3 +19,8 @@ Canonical policy: **Public git text** in [`AGENTS.md`](../../../AGENTS.md).
 
 Branch, commit, and title formatting examples live in `AGENTS.md` (tables and
 **Branches** / **PR titles** subsections). Do not duplicate them here.
+
+**HabiTV-controlled public text** is PR title/body, commit subjects, and
+orchestrator-written replies. Third-party reviewer bots may post their own
+issue or review comments; classify those in the pr-review loop — they are not
+automatic public-text policy violations.
