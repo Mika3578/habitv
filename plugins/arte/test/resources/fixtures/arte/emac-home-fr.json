@@ -1,0 +1,34 @@
+{
+  "code": "HOME",
+  "language": "fr",
+  "alternativeLanguages": [
+    { "code": "fr", "label": "Français" },
+    { "code": "de", "label": "Deutsch" },
+    { "code": "en", "label": "English" },
+    { "code": "es", "label": "Español" },
+    { "code": "pl", "label": "Polski" },
+    { "code": "it", "label": "Italiano" },
+    { "code": "ro", "label": "Romanian" }
+  ],
+  "zones": [
+    {
+      "id": "genres-zone",
+      "code": "genres_HOME",
+      "content": {
+        "data": [
+          { "title": "Documentaires", "url": "https://www.arte.tv/fr/videos/documentaires-et-reportages/" },
+          { "title": "Concerts", "deeplink": "arte://emac/ARTE_CONCERT", "url": "https://www.arte.tv/fr/arte-concert/" }
+        ]
+      }
+    },
+    {
+      "code": "editorial",
+      "content": {
+        "data": [
+          { "deeplink": "arte://emac/DOR", "title": "Doc hub" },
+          { "deeplink": "arte://emac/SER", "title": "Series hub" }
+        ]
+      }
+    }
+  ]
+}

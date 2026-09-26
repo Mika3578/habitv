@@ -44,5 +44,32 @@ France.tv and NOVO19 delegate download to the youtube/yt-dlp plugin when
 public URLs exist. Canal+ family and WAT/TF1+ are not treated as freely
 downloadable DRM catalogues.
 
+## Arte catalogue discovery
+
+HabiTV owns catalogue discovery and hierarchy; **yt-dlp** owns stream
+extraction (player API, HLS, languages, subtitles, geo messages).
+
+Discovery uses the public EMAC API (`https://api.arte.tv/api/emac/v4`) only
+(no copied tokens, no custom HLS parsing in the Arte plugin):
+
+- Languages from EMAC `HOME` `alternativeLanguages`, plus Romanian when the
+  `ro` HOME page is reachable (Romanian is a distinct web edition; some
+  areas such as `ro/DOR` may 404 while others work).
+- Catalogue **pages** from a merged walk of `web` and `tv` HOME payloads,
+  `genres_HOME`, and best-effort hub HTML `arte://emac/` hints. Small
+  fallback codes (`DEC`, `ACT`) apply only when HOME omits them.
+- UI tree: `language → page → zone/listing → collection (RC-*) → episodes`.
+  Category ids: `z/{lang}/{page}/{zoneId}`, `c/{lang}/{collectionId}`, with
+  legacy `lang:page` merge retained for older configs.
+- Zones are independent listings; collections load
+  `/web/collections/{id}`; pagination prefers `pagination.links.next`.
+- Playable leaves are `SHOW` items with classic `/videos/NNNNNN-NNN-A/…`
+  URLs. `RC-*` entries are collection navigation, not flattened episodes.
+- Downloads stay `ArtePluginManager.download` → youtube/yt-dlp on the
+  public Arte video URL.
+
+Offline fixtures: `plugins/arte/test/resources/fixtures/arte/`. Live checks
+are manual, not CI.
+
 Full module list: `plugins/pom.xml`. Offline fixtures live under
 `plugins/<name>/test/resources/fixtures/<name>/`.
