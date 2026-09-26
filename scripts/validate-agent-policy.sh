@@ -84,8 +84,8 @@ if [[ ! -f .cursor/hooks.json ]]; then
   fail "missing .cursor/hooks.json"
 elif [[ ! -f .cursor/hooks/before-shell-branch-policy.sh ]]; then
   fail "missing branch policy hook script"
-elif ! grep -q 'before-shell-branch-policy' .cursor/hooks.json; then
-  fail ".cursor/hooks.json must register before-shell-branch-policy hook"
+elif ! grep -qE '"command"[[:space:]]*:[[:space:]]*"[^"]*before-shell-branch-policy\.sh"' .cursor/hooks.json; then
+  fail ".cursor/hooks.json must register before-shell-branch-policy hook command"
 fi
 
 if [[ -f .agents/skills/git-workflow/SKILL.md ]]; then

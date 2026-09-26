@@ -18,8 +18,13 @@ if command -v jq >/dev/null 2>&1; then
   command="$(jq -r '.command // empty' <<<"$input")"
   cwd="$(jq -r '.cwd // empty' <<<"$input")"
 else
-  command="$(sed -n 's/.*"command"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' <<<"$input" | head -1)"
-  cwd="$(sed -n 's/.*"cwd"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' <<<"$input" | head -1)"
+  printf '%s\n' '{"permission":"deny","agent_message":"Branch policy hook requires jq for safe JSON parsing. Install jq or use a canonical branch from the repository root."}'
+  exit 0
+fi
+
+if [[ -n "$command" && "$command" =~ (^|[[:space:];&|])cd[[:space:]]+ ]]; then
+  printf '%s\n' '{"permission":"deny","agent_message":"Publishing blocked: do not combine cd with git commit, git push, or gh pr create in one shell command. Run publish commands from the repository working directory."}'
+  exit 0
 fi
 
 if [[ -z "$cwd" || ! -d "$cwd" ]]; then
@@ -35,7 +40,7 @@ if [[ -z "$branch" ]]; then
   exit 0
 fi
 
-canonical='^(feat|fix|docs|test|refactor|chore|ci)/[a-z0-9][a-z0-9-]*$'
+canonical='^(feat|fix|docs|test|refactor|chore|ci)/[a-z0-9]+(-[a-z0-9]+)*$'
 if [[ "$branch" =~ $canonical ]]; then
   printf '%s\n' '{"permission":"allow"}'
   exit 0
@@ -57,3 +62,4 @@ if [[ "$branch" =~ $platform ]]; then
 fi
 
 printf '%s\n' '{"permission":"deny","agent_message":"Publishing blocked: branch name must match <type>/<scope> (feat|fix|docs|test|refactor|chore|ci). See .agents/skills/git-workflow/SKILL.md"}'
+exit 0
