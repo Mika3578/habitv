@@ -1,6 +1,6 @@
 ---
 name: provider-diagnostics
-description: Diagnoses replay provider listing or download failures using fixtures and safe reproduction. Use for plugin/provider bugs, parsing errors, or network/tool integration issues.
+description: Diagnoses replay provider listing or retrieval failures using fixtures and safe reproduction. Use for plugin/provider bugs, parsing errors, or network/tool integration issues.
 ---
 
 # Provider diagnostics

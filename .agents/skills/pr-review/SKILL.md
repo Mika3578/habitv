@@ -46,6 +46,12 @@ only then eligible for Ready (with explicit authorization)
 Evaluate the **current PR head commit**, not historical checks or approvals.
 A prior green CI run or approval does not validate later commits.
 
+## Review replies (public text)
+
+Follow **Public git text** in `AGENTS.md`. Keep thread replies brief: what
+changed or why a finding is rejected. No diff narration, no implementation
+lectures. Procedure: [public-git-text](../public-git-text/SKILL.md).
+
 ## Forbidden without conversation authorization
 
 Posting GitHub comments, resolving threads, marking Ready, merging, pushing,

@@ -94,7 +94,8 @@ Ruleset JSON payloads (admin): `docs/github-rulesets/`.
 | Layer | Role |
 |-------|------|
 | [`AGENTS.md`](../AGENTS.md) | Canonical persistent policy (single full constitution) |
-| `docs/` | Technical reference (Java, providers, architecture) |
+| `docs/` | Technical reference (Java, providers, architecture); URLs and tool flags belong here, not in long source comments |
+| Code comments | Concise *why*; see `AGENTS.md` **Engineering Baseline** |
 | [`.agents/skills/`](../.agents/skills/) | Portable on-demand procedures |
 | Tool adapters (`.cursor/`, `.continue/rules/`, `.github/copilot-instructions.md`) | Thin compatibility; point to `AGENTS.md` |
 | `scripts/validate-agent-policy.*` + CI `agent-policy` | Deterministic policy layout checks |

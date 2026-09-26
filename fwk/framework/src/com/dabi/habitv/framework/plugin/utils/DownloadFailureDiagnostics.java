@@ -21,7 +21,7 @@ public final class DownloadFailureDiagnostics {
 	public static final String CLASSIFICATION_UNSUPPORTED_URL = "unsupported-url";
 	public static final String CLASSIFICATION_LIVE_UPCOMING = "live-upcoming";
 
-	private static final String DEFAULT_USER_MESSAGE = "Download failed. See the log for sanitized diagnostics.";
+	private static final String DEFAULT_USER_MESSAGE = "Episode retrieval failed. See the log for sanitized diagnostics.";
 
 	private DownloadFailureDiagnostics() {
 	}
@@ -121,13 +121,13 @@ public final class DownloadFailureDiagnostics {
 
 	private static String messageForClassificationKey(final String key) {
 		if (CLASSIFICATION_DRM_PROTECTED.equals(key)) {
-			return "Content appears DRM-protected. Habitv cannot bypass DRM.";
+			return "Content appears rights-protected. Habitv cannot unlock it.";
 		}
 		if (CLASSIFICATION_GEO_RESTRICTED.equals(key)) {
 			return "Content is unavailable in this region (geo restriction).";
 		}
 		if (CLASSIFICATION_AUTH_REQUIRED.equals(key)) {
-			return "Content requires authentication or a subscription. Habitv does not bypass login or paywalls.";
+			return "Content requires sign-in or a subscription. Habitv does not unlock restricted access.";
 		}
 		if (CLASSIFICATION_PRIVATE_VIDEO.equals(key)) {
 			return "Video is private or requires account access.";
@@ -136,19 +136,19 @@ public final class DownloadFailureDiagnostics {
 			return "Video is unavailable or no longer published.";
 		}
 		if (CLASSIFICATION_FORMAT_NOT_FOUND.equals(key)) {
-			return "No compatible download format was found for this replay.";
+			return "No compatible format was found for this replay.";
 		}
 		if (CLASSIFICATION_HTTP_403.equals(key)) {
-			return "Provider rejected the download request (HTTP 403).";
+			return "Provider rejected the request (HTTP 403).";
 		}
 		if (CLASSIFICATION_HTTP_404.equals(key)) {
 			return "Replay page or media endpoint was not found (HTTP 404).";
 		}
 		if (CLASSIFICATION_UNSUPPORTED_URL.equals(key)) {
-			return "URL is not supported by the configured downloader.";
+			return "URL is not supported by the configured tool plugin.";
 		}
 		if (CLASSIFICATION_LIVE_UPCOMING.equals(key)) {
-			return "Live or upcoming content is not downloadable yet.";
+			return "Live or upcoming content is not available for retrieval yet.";
 		}
 		return null;
 	}

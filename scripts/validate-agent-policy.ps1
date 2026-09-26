@@ -48,6 +48,14 @@ function Test-Adapter([string]$Path) {
     }
 }
 
+if (Test-Path ".continue/rules") {
+    Get-ChildItem ".continue/rules" -Filter "*.md" -File | ForEach-Object {
+        if ($_.Name -ne "00-habitv.md") {
+            Fail "unexpected Continue rule (use 00-habitv.md only): $($_.FullName.Substring($Root.Length + 1))"
+        }
+    }
+}
+
 Test-Adapter ".continue/rules/00-habitv.md"
 Test-Adapter ".github/copilot-instructions.md"
 Test-Adapter ".cursor/CLOUD.md"
