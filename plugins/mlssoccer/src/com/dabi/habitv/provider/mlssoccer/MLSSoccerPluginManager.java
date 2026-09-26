@@ -39,6 +39,11 @@ public class MLSSoccerPluginManager extends BasePluginWithProxy implements Plugi
 			final String name = aHref.text();
 			episodeList.add(new EpisodeDTO(category, name, MLSSoccerConf.VIDEO_HOME_URL + hRef));
 		}
+		if (episodeList.isEmpty()) {
+			getLog().warn("provider=mlssoccer operation=episodes sourceUrl=" + category.getId()
+					+ " rootCause=listing-selectors-obsolete cookiesEnabled=false"
+					+ " note=public-highlights-html-no-longer-matches-legacy-scraper");
+		}
 		return episodeList;
 	}
 
