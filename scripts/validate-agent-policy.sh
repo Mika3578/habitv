@@ -50,6 +50,15 @@ check_adapter() {
   fi
 }
 
+if [[ -d .continue/rules ]]; then
+  while IFS= read -r -d '' rule; do
+    base=$(basename "$rule")
+    if [[ "$base" != "00-habitv.md" ]]; then
+      fail "unexpected Continue rule (use 00-habitv.md only): $rule"
+    fi
+  done < <(find .continue/rules -maxdepth 1 -name '*.md' -print0 2>/dev/null)
+fi
+
 check_adapter .continue/rules/00-habitv.md
 check_adapter .github/copilot-instructions.md
 check_adapter .cursor/CLOUD.md

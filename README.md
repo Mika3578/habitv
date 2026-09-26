@@ -1,8 +1,8 @@
 # HabiTV
 
 HabiTV is a Maven application that watches French TV replay catalogues
-and downloads new episodes via provider and downloader plugins
-(yt-dlp, curl, ffmpeg, …).
+and saves new episodes via provider and tool plugins (yt-dlp, curl,
+ffmpeg, …).
 
 Canonical repository: [Mika3578/habitv](https://github.com/Mika3578/habitv).
 Integration branch: [`develop`](https://github.com/Mika3578/habitv/tree/develop).
@@ -35,8 +35,8 @@ reactor. See [`docs/architecture.md`](docs/architecture.md).
 
 ## Providers
 
-Do not assume a module works because it compiles. HabiTV does not bypass
-DRM or paywalls. Status: [`docs/providers.md`](docs/providers.md).
+Do not assume a module works because it compiles. HabiTV supports only
+public, user-authorized workflows. Status: [`docs/providers.md`](docs/providers.md).
 
 ## Docs
 

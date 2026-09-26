@@ -9,15 +9,15 @@ Durable direction only. Actionable work lives in GitHub issues and PRs.
 2. Restore providers incrementally with offline fixtures, then live checks.
 3. Treat the console fat JAR as the supported baseline; JavaFX packaging
    later.
-4. Finish yt-dlp as the YouTube-family downloader (binary publish, Windows
+4. Finish yt-dlp as the YouTube-family tool plugin (binary publish, Windows
    diagnostics) without mixing unrelated provider rewrites.
 5. Later runtime move: **Java 21** (active target), then **Java 25**.
    Diagnostic CI on 11/17/21/25 is not runtime support.
 
-## Prohibited
+## Out of scope
 
-DRM, encryption, paywall, or license bypass. Never implement that as a
-“dedicated PR”.
+Circumvention of technical protection, encryption, subscription gates, or
+license restrictions. Never implement that as a dedicated PR goal.
 
 ## Do not mix into random PRs
 

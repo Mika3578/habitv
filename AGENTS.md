@@ -10,7 +10,7 @@ Agent architecture overview: [`docs/development.md`](docs/development.md#agent-i
 
 ## Repository
 
-HabiTV is a Maven multi-module replay downloader (`fwk/`,
+HabiTV is a Maven multi-module replay application (`fwk/`,
 `application/`, `plugins/`). Canonical remote: `Mika3578/habitv`.
 Integration branch: `develop`.
 
@@ -25,7 +25,7 @@ current task explicitly asks for that scoped work.
 
 ## Current Priorities
 
-Preferred work order: build/CI health, download diagnostics, yt-dlp
+Preferred work order: build/CI health, retrieval diagnostics, yt-dlp
 reliability, then provider repairs, then JDK/packaging migration.
 
 ## Technical routing
@@ -52,6 +52,8 @@ reliability, then provider repairs, then JDK/packaging migration.
   Internal plugin deps use `${project.parent.version}`.
 - English for branches, commits, comments, docs, and PR text
   (**Public git text**).
+- Keep **code comments** concise: explain non-obvious *why*; do not narrate
+  parsing, hosts, URLs, or integration mechanics (use `docs/` or tests).
 - No secrets, tokens, credentials, or machine paths in git.
 - No AI/tool attribution in commits or PRs.
 - Scratch work goes in `agent_space/` (gitignored). Do not commit it.
@@ -70,12 +72,12 @@ See [`docs/providers.md`](docs/providers.md).
 
 See [`docs/providers.md`](docs/providers.md).
 
-- Do not implement or document circumvention of technical protection,
-  paywalls, or license restrictions.
+- Do not implement or document circumvention of technical protection
+  or license restrictions.
 - No credential, cookie, or browser-session extraction into the repo.
 - User secrets stay in local config or environment variables.
 - Do not re-enable legacy hosts (`dabiboo.free.fr`, `ftpperso.free.fr`).
-- Do not delete user downloads, indexes, or configs.
+- Do not delete user media files, indexes, or configs.
 
 ## Testing and Validation
 
@@ -149,6 +151,11 @@ wording.
 Changes, and Notes generic. Validation is the command and result. Do
 not add strategy, access-model, or manual-check sections.
 
+**PR review comments:** Short and factual. State the fix, rejection
+reason, or requested change with evidence. Do not restate the diff, do
+not narrate runtime or provider behavior, and do not write tutorial-length
+replies.
+
 ## Git Workflow
 
 Never work on `develop`, `main`, or `master`. Branch format follows
@@ -193,9 +200,10 @@ Do not overwrite unrelated local changes.
 - Never open PRs against `ikfon10/habitv`
 
 Fill `.github/pull_request_template.md`. Keep PRs small and single-topic.
-Titles, bodies, and review comments follow **Public git text**.
-Handle Copilot/review comments (fix, or reject with a reason). Ask before
-posting GitHub comments or resolving threads.
+Titles, bodies, and review comments follow **Public git text** (brief
+review replies; see **Public git text** above).
+Handle Copilot/review comments (fix, or reject briefly with a reason).
+Ask before posting GitHub comments or resolving threads.
 
 ## Pull request lifecycle
 
@@ -214,7 +222,7 @@ commit, repeat validation and review on that commit.
 1. Scope is complete.
 2. Required focused tests pass.
 3. Full reactor validation passes when the PR touches executable code,
-   build logic, runtime behavior, providers, download logic, packaging,
+   build logic, runtime behavior, providers, retrieval logic, packaging,
    startup, or UI (see [`docs/development.md`](docs/development.md)).
 4. All required GitHub checks pass on the current commit.
 5. Every review comment has been individually considered.
@@ -235,7 +243,7 @@ remains incomplete.
 ### Real-user functional validation
 
 When a change may affect observable application behavior (UI, provider
-discovery, listing, downloading, yt-dlp integration, subtitles, quality,
+discovery, listing, episode retrieval, yt-dlp integration, subtitles, quality,
 startup, daemon, packaging, plugin loading, updates, or runtime config),
 keep the PR in Draft until the user performs a real test in HabiTV and
 **explicitly confirms success in the current conversation**. Automated
