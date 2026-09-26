@@ -170,7 +170,7 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 		if (!hasPlayableItem && !hasCollectionChild && !hasDeferredZoneContent(zone)) {
 			return null;
 		}
-		if (hasCollectionChild && !hasPlayableItem) {
+		if (hasCollectionChild && !hasPlayableItem && !hasDeferredZoneContent(zone)) {
 			zoneCategory.setDownloadable(false);
 		}
 		return zoneCategory;

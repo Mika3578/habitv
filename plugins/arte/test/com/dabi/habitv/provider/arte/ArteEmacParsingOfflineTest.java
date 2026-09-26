@@ -263,6 +263,50 @@ public class ArteEmacParsingOfflineTest {
 	}
 
 	@Test
+	public void findCategoryKeepsDeferredZoneDownloadableWithCollectionChild() throws IOException {
+		final Map<String, String> urls = new HashMap<>();
+		final String homeFr = ArteCatalogDiscovery.buildHomeUrl("fr");
+		urls.put(homeFr, readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(ArteConf.EMAC_API_BASE + "/fr/tv/pages/HOME/?authorizedCountry=FR",
+				readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(PAGE_URL,
+				"{\"code\":\"DOR\",\"zones\":[{\"id\":\"zone-deferred-coll\",\"code\":\"listing_DEFERRED_coll\",\"title\":\"Deferred\",\"content\":{\"data\":[{\"url\":\"/fr/videos/RC-028069/l-empire-lvmh/\",\"title\":\"Collection Entry\"}],\"pagination\":{\"pages\":2}}}]}");
+		urls.put(
+				ArteConf.EMAC_API_BASE
+						+ "/fr/web/zones/listing_DEFERRED_coll/content?page=2&pageId=DOR&authorizedCountry=FR",
+				"{\"data\":[{\"url\":\"/fr/videos/119999-922-A/deferred-with-collection/\",\"title\":\"Deferred Episode\"}]}");
+		for (final String code : Arrays.asList("SER", "ARTE_CONCERT", "DEC", "ACT")) {
+			urls.put(ArteCatalogDiscovery.buildPageUrl("fr", code),
+					"{\"code\":\"" + code + "\",\"zones\":[{\"id\":\"z-" + code
+							+ "\",\"title\":\"Listing\",\"content\":{\"data\":[]}}]}");
+		}
+		final ArtePluginManager plugin = new ArtePluginManager(new ArteCatalogDiscovery(urls::get), urls::get);
+
+		CategoryDTO deferredZone = null;
+		for (final CategoryDTO language : plugin.findCategory()) {
+			if (!language.getId().endsWith("/fr/")) {
+				continue;
+			}
+			for (final CategoryDTO page : language.getSubCategories()) {
+				if (!page.getId().endsWith(":DOR")) {
+					continue;
+				}
+				for (final CategoryDTO zone : page.getSubCategories()) {
+					if (ArteCategoryId.forZone("fr", "DOR", "zone-deferred-coll").equals(zone.getId())) {
+						deferredZone = zone;
+						break;
+					}
+				}
+			}
+		}
+		assertNotNull(deferredZone);
+		assertTrue("deferred zones with collection children must stay downloadable", deferredZone.isDownloadable());
+		assertFalse(deferredZone.getSubCategories().isEmpty());
+		assertEquals(Arrays.asList("https://www.arte.tv/fr/videos/119999-922-A/deferred-with-collection/"),
+				episodeIds(plugin.findEpisode(deferredZone)));
+	}
+
+	@Test
 	public void findEpisodeReturnsEmptyForUnknownListing() throws IOException {
 		final RecordingArtePlugin plugin = multizonePlugin(true, true);
 		final CategoryDTO category = new CategoryDTO(ArteConf.NAME, "x", "fr:DOR:no_such_zone", ArteConf.EXTENSION);
