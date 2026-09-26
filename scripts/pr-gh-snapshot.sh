@@ -50,6 +50,11 @@ unresolved="$(jq '[.data.repository.pullRequest.reviewThreads.nodes[] | select(.
 outdated="$(jq '[.data.repository.pullRequest.reviewThreads.nodes[] | select(.isOutdated == true)] | length' <<<"$threads_json")"
 total="$(jq '.data.repository.pullRequest.reviewThreads.nodes | length' <<<"$threads_json")"
 
+comments_json="$(gh api "repos/$repo/issues/$pr/comments" --paginate 2>/dev/null || echo '[]')"
+head_sha="$(jq -r '.headRefOid' <<<"$pr_json")"
+reviews_json="$(jq '.reviews' <<<"$pr_json")"
+classify_json="$(bash "$(dirname "$0")/pr-classify-review-sources.sh" "$head_sha" "$reviews_json" "$comments_json")"
+
 jq -n \
   --arg repo "$repo" \
   --argjson pr "$pr_json" \
@@ -57,6 +62,7 @@ jq -n \
   --argjson outdated "$outdated" \
   --argjson total "$total" \
   --argjson body_policy_ok "$body_ok" \
+  --argjson classify "$classify_json" \
   '{
     repository: $repo,
     pr_number: $pr.number,
@@ -73,7 +79,10 @@ jq -n \
     },
     review_requests: $pr.reviewRequests,
     reviews: $pr.reviews,
-    status_check_rollup: $pr.statusCheckRollup
+    status_check_rollup: $pr.statusCheckRollup,
+    review_sources: $classify.review_sources,
+    substantive_review_on_head: $classify.substantive_review_on_head,
+    final_review_gate_eligible: $classify.final_review_gate_eligible
   }'
 
 exit 0

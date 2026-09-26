@@ -17,6 +17,8 @@ if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
 }
 
 $prJson = gh pr view $PrNumber --repo $Repo --json number,title,isDraft,baseRefName,headRefName,headRefOid,body,reviewRequests,reviews,statusCheckRollup | ConvertFrom-Json
+$issueComments = @(gh api "repos/$Repo/issues/$PrNumber/comments" --paginate | ConvertFrom-Json)
+if ($issueComments.Count -eq 1 -and $null -eq $issueComments[0].id) { $issueComments = @() }
 
 $owner, $name = $Repo.Split("/", 2)
 $gql = @"
@@ -43,23 +45,32 @@ $env:PR_BODY = $prJson.body
 & "$PSScriptRoot/validate-pr-public-body.ps1" | Out-Null
 if ($LASTEXITCODE -eq 0) { $bodyOk = $true }
 
+$classify = & "$PSScriptRoot/pr-classify-review-sources.ps1" `
+    -HeadSha $prJson.headRefOid `
+    -Reviews $prJson.reviews `
+    -IssueComments $issueComments `
+    -StatusRollup $prJson.statusCheckRollup
+
 $out = [ordered]@{
-    repository          = $Repo
-    pr_number           = $prJson.number
-    title               = $prJson.title
-    is_draft            = $prJson.isDraft
-    base                = $prJson.baseRefName
-    head_branch         = $prJson.headRefName
-    head_sha            = $prJson.headRefOid
-    body_policy_ok      = $bodyOk
-    review_threads      = [ordered]@{
+    repository                   = $Repo
+    pr_number                    = $prJson.number
+    title                        = $prJson.title
+    is_draft                     = $prJson.isDraft
+    base                         = $prJson.baseRefName
+    head_branch                  = $prJson.headRefName
+    head_sha                     = $prJson.headRefOid
+    body_policy_ok               = $bodyOk
+    review_threads               = [ordered]@{
         total      = $total
         unresolved = $unresolved
         outdated   = $outdated
     }
-    review_requests     = $prJson.reviewRequests
-    reviews             = $prJson.reviews
-    status_check_rollup = $prJson.statusCheckRollup
+    review_requests              = $prJson.reviewRequests
+    reviews                      = $prJson.reviews
+    status_check_rollup          = $prJson.statusCheckRollup
+    review_sources               = $classify.review_sources
+    substantive_review_on_head   = $classify.substantive_review_on_head
+    final_review_gate_eligible   = $classify.final_review_gate_eligible
 }
 
 $out | ConvertTo-Json -Depth 12 -Compress

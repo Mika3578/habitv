@@ -212,13 +212,21 @@ if (-not (Test-Path $prReviewSkill)) {
     if ($prReviewText -notmatch "pr-gh-snapshot") {
         Fail "pr-review skill must reference pr-gh-snapshot scripts"
     }
+    if ($prReviewText -notmatch "APPROVAL_ONLY") {
+        Fail "pr-review skill must distinguish approval-only reviews"
+    }
+    if ($prReviewText -notmatch "execution_state") {
+        Fail "pr-review skill must document review execution state"
+    }
 }
 
 @(
     "scripts/validate-pr-public-body.sh",
     "scripts/validate-pr-public-body.ps1",
     "scripts/pr-gh-snapshot.sh",
-    "scripts/pr-gh-snapshot.ps1"
+    "scripts/pr-gh-snapshot.ps1",
+    "scripts/pr-classify-review-sources.sh",
+    "scripts/pr-classify-review-sources.ps1"
 ) | ForEach-Object {
     if (-not (Test-Path $_)) {
         Fail "missing PR orchestration script: $_"

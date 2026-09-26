@@ -194,10 +194,17 @@ else
   if ! grep -qF "pr-gh-snapshot" "$pr_review_skill"; then
     fail "pr-review skill must reference pr-gh-snapshot scripts"
   fi
+  if ! grep -qF "APPROVAL_ONLY" "$pr_review_skill"; then
+    fail "pr-review skill must distinguish approval-only reviews"
+  fi
+  if ! grep -qF "execution_state" "$pr_review_skill"; then
+    fail "pr-review skill must document review execution state"
+  fi
 fi
 
 for script in scripts/validate-pr-public-body.sh scripts/validate-pr-public-body.ps1 \
-  scripts/pr-gh-snapshot.sh scripts/pr-gh-snapshot.ps1; do
+  scripts/pr-gh-snapshot.sh scripts/pr-gh-snapshot.ps1 \
+  scripts/pr-classify-review-sources.sh scripts/pr-classify-review-sources.ps1; do
   if [[ ! -f "$script" ]]; then
     fail "missing PR orchestration script: $script"
   fi
