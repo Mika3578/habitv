@@ -108,14 +108,16 @@ if [[ -d .agents/skills ]]; then
   declare -A skill_names=()
   while IFS= read -r -d '' skill; do
     rel="${skill#./}"
-    if ! head -n 30 "$skill" | grep -q '^name:'; then
-      fail "skill missing name metadata: $rel"
+    metadata="$(awk 'NR == 1 && $0 ~ /^---[[:space:]]*$/ { frontmatter = 1; next }
+      frontmatter && $0 ~ /^---[[:space:]]*$/ { closed = 1; exit }
+      frontmatter { print }
+      END { if (!frontmatter || !closed) exit 1 }' "$skill" 2>/dev/null)" || metadata=""
+    if [[ -z "$metadata" ]]; then
+      fail "skill missing YAML frontmatter: $rel"
+      continue
     fi
-    if ! head -n 30 "$skill" | grep -q '^description:'; then
-      fail "skill missing description metadata: $rel"
-    fi
-    name=$(sed -n '/^name:/s/^name:[[:space:]]*//p' "$skill" | head -1)
-    desc=$(sed -n '/^description:/s/^description:[[:space:]]*//p' "$skill" | head -1)
+    name=$(printf '%s\n' "$metadata" | sed -n 's/^name:[[:space:]]*//p' | head -1)
+    desc=$(printf '%s\n' "$metadata" | sed -n 's/^description:[[:space:]]*//p' | head -1)
     if [[ -z "$name" ]]; then
       fail "empty skill name: $rel"
     fi

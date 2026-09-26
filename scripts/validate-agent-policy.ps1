@@ -20,8 +20,10 @@ if (-not (Test-Path "AGENTS.md")) {
 
 Get-ChildItem -Recurse -Filter "AGENTS.md" -File -Force |
     Where-Object {
-        $rel = $_.FullName.Substring($Root.Length + 1)
-        $rel -ne "AGENTS.md" -and $rel -notlike "agent_space*"
+        $rel = $_.FullName.Substring($Root.Length + 1) -replace '\\', '/'
+        $rel -ne "AGENTS.md" -and
+            $rel -notmatch '^agent_space/' -and
+            $rel -notmatch '^\.git/'
     } |
     ForEach-Object { Fail "unexpected nested AGENTS.md: $($_.FullName.Substring($Root.Length + 1))" }
 
@@ -58,7 +60,7 @@ if (-not (Test-Path $publicGitRule)) {
     if ($ruleText -notmatch "\.agents/skills/public-git-text") {
         Fail "public-git-text Cursor rule must reference portable skill: $publicGitRule"
     }
-    $parts = $ruleText -split "(?m)^---\s*$", 0, "RegexMatch"
+    $parts = $ruleText -split "(?m)^---\s*$", 0
     if ($parts.Count -ge 3) {
         $body = $parts[2]
         if ($body -match "(?m)^\s*-\s") {
@@ -101,18 +103,37 @@ if (-not (Test-Path $SkillsRoot)) {
     $skillNames = @{}
     $skillFiles | ForEach-Object {
         $rel = $_.FullName.Substring($Root.Length + 1)
-        $head = Get-Content $_.FullName -TotalCount 30
-        if (-not ($head -match "^name:")) { Fail "skill missing name metadata: $rel" }
-        if (-not ($head -match "^description:")) { Fail "skill missing description metadata: $rel" }
-        $name = ($head | Where-Object { $_ -match "^name:" } | Select-Object -First 1) -replace "^name:\s*", ""
-        $desc = ($head | Where-Object { $_ -match "^description:" } | Select-Object -First 1) -replace "^description:\s*", ""
+        $lines = Get-Content $_.FullName
+        if ($lines.Count -lt 3 -or $lines[0] -ne "---") {
+            Fail "skill missing YAML frontmatter: $rel"
+            return
+        }
+        $frontmatter = @()
+        $closed = $false
+        for ($i = 1; $i -lt $lines.Count; $i++) {
+            if ($lines[$i] -eq "---") {
+                $closed = $true
+                break
+            }
+            $frontmatter += $lines[$i]
+        }
+        if (-not $closed) {
+            Fail "skill missing YAML frontmatter: $rel"
+            return
+        }
+        if (-not ($frontmatter -cmatch "^name:")) { Fail "skill missing name metadata: $rel" }
+        if (-not ($frontmatter -cmatch "^description:")) { Fail "skill missing description metadata: $rel" }
+        $name = ($frontmatter | Where-Object { $_ -cmatch "^name:" } | Select-Object -First 1) -replace "^name:\s*", ""
+        $desc = ($frontmatter | Where-Object { $_ -cmatch "^description:" } | Select-Object -First 1) -replace "^description:\s*", ""
         if ([string]::IsNullOrWhiteSpace($name)) { Fail "empty skill name: $rel" }
         if ([string]::IsNullOrWhiteSpace($desc)) { Fail "empty skill description: $rel" }
         if ($desc.Length -gt $SkillDescMax) { Fail "skill description too long ($($desc.Length) chars): $rel" }
-        if ($skillNames.ContainsKey($name)) {
+        if (-not [string]::IsNullOrEmpty($name) -and $skillNames.ContainsKey($name)) {
             Fail "duplicate skill name '$name': $($skillNames[$name]) and $rel"
         }
-        $skillNames[$name] = $rel
+        if (-not [string]::IsNullOrEmpty($name)) {
+            $skillNames[$name] = $rel
+        }
     }
 }
 

@@ -39,6 +39,7 @@ real-user functional test when runtime behavior changed
 
 ## Docs-only exemption
 
-When the change cannot affect executable behavior, `git diff --check` (and
-workflow/YAML validation if edited) may suffice. State the exemption explicitly
-in the PR.
+Only documentation or agent-configuration changes that cannot affect
+executable behavior may use `git diff --check` (and relevant config
+validation) instead of the full-reactor gate. Workflow, build, or CI logic
+changes are not exempt. State the exemption explicitly in the PR.
