@@ -101,14 +101,9 @@ Ruleset JSON payloads (admin): `docs/github-rulesets/`.
 | `scripts/validate-agent-policy.*` + CI `agent-policy` | Deterministic policy layout checks |
 | `docs/github-rulesets/` | Branch protection payloads (hard enforcement) |
 
-Pull request lifecycle (policy detail in `AGENTS.md`):
-
-```text
-Draft → implementation → focused validation → review/fix loop
-  → full reactor validation (when applicable) → required checks
-  → real-user test when applicable → explicit user confirmation
-  → final current-HEAD verification → Ready
-```
+Pull request orchestration: invariants in `AGENTS.md`; procedure in
+[`.agents/skills/pr-review/SKILL.md`](../.agents/skills/pr-review/SKILL.md).
+Live snapshots: `scripts/pr-gh-snapshot.sh` / `.ps1`.
 
 **Other agents:** Claude Code, Gemini CLI, Jules, Junie, Cline, Roo, Windsurf,
 Devin, and similar tools should read root `AGENTS.md` when supported. Portable

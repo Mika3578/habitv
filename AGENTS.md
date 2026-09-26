@@ -40,7 +40,7 @@ reliability, then provider repairs, then JDK/packaging migration.
 | Branch and worktree setup | [`.agents/skills/git-workflow/SKILL.md`](.agents/skills/git-workflow/SKILL.md) |
 | Validation workflow | [`.agents/skills/code-change-verification/SKILL.md`](.agents/skills/code-change-verification/SKILL.md) |
 | Provider diagnostics | [`.agents/skills/provider-diagnostics/SKILL.md`](.agents/skills/provider-diagnostics/SKILL.md) |
-| PR review loop | [`.agents/skills/pr-review/SKILL.md`](.agents/skills/pr-review/SKILL.md) |
+| PR orchestration | [`.agents/skills/pr-review/SKILL.md`](.agents/skills/pr-review/SKILL.md) |
 
 ## Engineering Baseline
 
@@ -184,10 +184,8 @@ Never run without explicit approval **in this conversation**:
 rebase when it would rewrite remote history, or destructive git/fs commands.
 
 When the user authorizes finishing or reviewing a **specific** pull request,
-that authorization includes the normal feedback loop for that PR only: concise
-thread replies and resolving threads after each finding is fixed or rejected
-with evidence (procedure:
-[`.agents/skills/pr-review/SKILL.md`](.agents/skills/pr-review/SKILL.md)).
+that authorization covers the bounded orchestration loop for that PR only
+([`.agents/skills/pr-review/SKILL.md`](.agents/skills/pr-review/SKILL.md)).
 It does not authorize merge or unrelated GitHub mutations.
 
 Do not chain those actions. Do not `git add -A`, `git add .`, or
@@ -206,74 +204,36 @@ Do not overwrite unrelated local changes.
 - Never open PRs against `ikfon10/habitv`
 
 Fill `.github/pull_request_template.md`. Keep PRs small and single-topic.
-Titles, bodies, and review comments follow **Public git text** (brief
-review replies; see **Public git text** above).
-Handle Copilot/review comments (fix, or reject briefly with a reason).
+Titles, bodies, and review comments follow **Public git text**.
 
-## Pull request lifecycle
+End-to-end PR work uses the **pr-review** orchestrator skill. Do not
+duplicate that procedure here.
+
+## Pull request lifecycle (invariants)
 
 Keep every pull request in **Draft** until gates on the **current PR HEAD**
-are satisfied. Invariants:
+are satisfied.
 
-- Every review finding gets an individual disposition (fix or reject with
-  evidence).
-- Addressed inline findings receive a concise reply before the thread is
-  resolved; verify live `isResolved` afterward.
-- Do not resolve unanswered or unexamined threads.
-- Readiness uses live GitHub state (threads, checks, body), not local files
-  alone.
-- Any new commit invalidates reviews and checks that do not apply to that
-  HEAD; repeat the round.
-- No actionable unresolved feedback remains before Ready.
+- Evaluate every PR against its **current PR HEAD**; new commits invalidate
+  prior reviews and checks that do not apply to that HEAD.
+- Every actionable review finding receives a disposition (fix, reject with
+  evidence, duplicate, or follow-up).
+- Addressed inline threads get a concise reply, then resolution only after
+  the fix or rejection is verified; re-fetch GitHub and confirm
+  `isResolved`. Do not resolve unanswered or unexamined threads.
+- **Live GitHub PR state is authoritative** over local memory or ledgers.
+- During a review cycle, **only the PR orchestrator** mutates GitHub PR
+  metadata (body, draft/ready, replies, resolution, reviewer requests).
+  Independent reviewers are read-only.
+- **Review rigor is proportional to risk** (see pr-review skill).
+- No actionable unresolved feedback remains at Ready.
 
-Always evaluate the **current PR HEAD**. A previous successful review,
-approval, build, or CI run does not validate later commits.
+When runtime behavior may change, keep the PR in Draft until the user
+**explicitly confirms success in the current conversation** after a real
+HabiTV test. Automated checks are not a substitute.
 
-### Draft → Ready (all applicable on current HEAD)
-
-1. Scope is complete.
-2. Required focused tests pass.
-3. Full reactor validation passes when the PR touches executable code,
-   build logic, runtime behavior, providers, retrieval logic, packaging,
-   startup, or UI (see [`docs/development.md`](docs/development.md)).
-4. All required GitHub checks pass on the current commit.
-5. Every review comment has been individually considered.
-6. Every valid review finding has been fixed.
-7. Every rejected finding has a documented technical reason where
-   appropriate.
-8. No unresolved actionable review thread remains.
-9. No actionable AI-review finding remains.
-10. Required real-user functional testing has succeeded when applicable.
-11. The user explicitly confirmed the functional test in the current
-    conversation.
-12. No newer commit has invalidated any of the above.
-
-If any condition becomes false after another commit, return to the relevant
-step. Do not declare a PR ready, good to merge, or validated while a gate
-remains incomplete.
-
-### Real-user functional validation
-
-When a change may affect observable application behavior (UI, provider
-discovery, listing, episode retrieval, yt-dlp integration, subtitles, quality,
-startup, daemon, packaging, plugin loading, updates, or runtime config),
-keep the PR in Draft until the user performs a real test in HabiTV and
-**explicitly confirms success in the current conversation**. Automated
-tests, fixtures, CI, and agent inspection are not substitutes.
-
-Provide a concise manual test procedure. Do not infer confirmation from
-silence. While pending, report:
-
-```text
-Functional validation: PENDING USER TEST
-```
-
-Pure documentation or agent-configuration changes that cannot affect
-executable behavior are exempt from full reactor build and real-user
-testing when that exemption is stated and `git diff --check` (and
-config validation) pass.
-
-Procedure detail: [`.agents/skills/pr-review/SKILL.md`](.agents/skills/pr-review/SKILL.md).
+Ready gate, batching, Copilot final review, and live reconciliation:
+[`.agents/skills/pr-review/SKILL.md`](.agents/skills/pr-review/SKILL.md).
 
 ## Documentation
 

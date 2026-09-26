@@ -44,7 +44,7 @@
 - [ ] No open PR already covered the same scope before opening this PR
 - [ ] No unrelated source changes
 - [ ] `git diff --check` passed
-- [ ] `mvn -B -ntp -DskipTests validate` passed (or was N/A for docs-only PRs with no build file changes)
+- [ ] Validation matches scope (`validate` and, when required before Ready, full reactor gate in `docs/development.md`)
 - [ ] PR keeps linear history
 - [ ] English used for branches, commits, comments, docs, and PR text
 - [ ] Docs updated if behavior or contributor workflow changed

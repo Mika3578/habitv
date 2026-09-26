@@ -180,7 +180,9 @@ $agents = Get-Content -Raw "AGENTS.md"
     "Keep every pull request in **Draft**",
     "current PR HEAD",
     "explicitly confirms success in the current conversation",
-    "Do not resolve unanswered"
+    "Do not resolve unanswered",
+    "Live GitHub PR state is authoritative",
+    "only the PR orchestrator"
 ) | ForEach-Object {
     if ($agents.IndexOf($_, [StringComparison]::Ordinal) -lt 0) {
         Fail "AGENTS.md missing required phrase: $_"
@@ -198,11 +200,28 @@ if (-not (Test-Path $prReviewSkill)) {
     if ($prReviewText -notmatch "validate-pr-public-body") {
         Fail "pr-review skill must reference validate-pr-public-body scripts"
     }
+    if ($prReviewText -notmatch "READY_GATE") {
+        Fail "pr-review skill must document READY_GATE orchestration"
+    }
+    if ($prReviewText -notmatch "BLOCKING") {
+        Fail "pr-review skill must document finding classification"
+    }
+    if ($prReviewText -notmatch "Single-writer") {
+        Fail "pr-review skill must document single-writer rule"
+    }
+    if ($prReviewText -notmatch "pr-gh-snapshot") {
+        Fail "pr-review skill must reference pr-gh-snapshot scripts"
+    }
 }
 
-@("scripts/validate-pr-public-body.sh", "scripts/validate-pr-public-body.ps1") | ForEach-Object {
+@(
+    "scripts/validate-pr-public-body.sh",
+    "scripts/validate-pr-public-body.ps1",
+    "scripts/pr-gh-snapshot.sh",
+    "scripts/pr-gh-snapshot.ps1"
+) | ForEach-Object {
     if (-not (Test-Path $_)) {
-        Fail "missing PR public-body validator: $_"
+        Fail "missing PR orchestration script: $_"
     }
 }
 

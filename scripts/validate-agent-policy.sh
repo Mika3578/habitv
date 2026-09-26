@@ -169,6 +169,8 @@ require_phrase "Keep every pull request in **Draft**"
 require_phrase "current PR HEAD"
 require_phrase "explicitly confirms success in the current conversation"
 require_phrase "Do not resolve unanswered"
+require_phrase "Live GitHub PR state is authoritative"
+require_phrase "only the PR orchestrator"
 
 pr_review_skill=".agents/skills/pr-review/SKILL.md"
 if [[ ! -f "$pr_review_skill" ]]; then
@@ -180,11 +182,24 @@ else
   if ! grep -qF "validate-pr-public-body" "$pr_review_skill"; then
     fail "pr-review skill must reference validate-pr-public-body scripts"
   fi
+  if ! grep -qF "READY_GATE" "$pr_review_skill"; then
+    fail "pr-review skill must document READY_GATE orchestration"
+  fi
+  if ! grep -qF "BLOCKING" "$pr_review_skill"; then
+    fail "pr-review skill must document finding classification"
+  fi
+  if ! grep -qF "Single-writer" "$pr_review_skill"; then
+    fail "pr-review skill must document single-writer rule"
+  fi
+  if ! grep -qF "pr-gh-snapshot" "$pr_review_skill"; then
+    fail "pr-review skill must reference pr-gh-snapshot scripts"
+  fi
 fi
 
-for script in scripts/validate-pr-public-body.sh scripts/validate-pr-public-body.ps1; do
+for script in scripts/validate-pr-public-body.sh scripts/validate-pr-public-body.ps1 \
+  scripts/pr-gh-snapshot.sh scripts/pr-gh-snapshot.ps1; do
   if [[ ! -f "$script" ]]; then
-    fail "missing PR public-body validator: $script"
+    fail "missing PR orchestration script: $script"
   fi
 done
 
