@@ -26,7 +26,7 @@ public class DownloadFailureDiagnosticsTest {
 		final ExecutorFailedException failure = new ExecutorFailedException("yt-dlp \"url\"",
 				"ERROR: Content is DRM protected by Widevine", "ERROR: Content is DRM protected by Widevine", null);
 		final String message = DownloadFailureDiagnostics.buildUserMessage(null, failure);
-		assertEquals("Content appears DRM-protected. Habitv cannot bypass DRM.", message);
+		assertEquals("Content appears rights-protected. Habitv cannot unlock it.", message);
 	}
 
 	@Test
@@ -68,7 +68,7 @@ public class DownloadFailureDiagnosticsTest {
 				"ERROR: Sign in to confirm your age", "ERROR: Sign in to confirm your age", null));
 		final Throwable userFacing = DownloadFailureDiagnostics.toUserFacingFailure(cause, episode);
 		assertEquals(
-				"Content requires authentication or a subscription. Habitv does not bypass login or paywalls.",
+				"Content requires sign-in or a subscription. Habitv does not unlock restricted access.",
 				userFacing.getMessage());
 		assertTrue(userFacing.getCause() instanceof DownloadFailedException);
 	}

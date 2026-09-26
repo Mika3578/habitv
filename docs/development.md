@@ -89,6 +89,49 @@ the section above.
 
 Ruleset JSON payloads (admin): `docs/github-rulesets/`.
 
+## Agent instructions
+
+| Layer | Role |
+|-------|------|
+| [`AGENTS.md`](../AGENTS.md) | Canonical persistent policy (single full constitution) |
+| `docs/` | Technical reference (Java, providers, architecture); URLs and tool flags belong here, not in long source comments |
+| Code comments | Concise *why*; see `AGENTS.md` **Engineering Baseline** |
+| [`.agents/skills/`](../.agents/skills/) | Portable on-demand procedures |
+| Tool adapters (`.cursor/`, `.continue/rules/`, `.github/copilot-instructions.md`) | Thin compatibility; point to `AGENTS.md` |
+| `scripts/validate-agent-policy.*` + CI `agent-policy` | Deterministic policy layout checks |
+| `docs/github-rulesets/` | Branch protection payloads (hard enforcement) |
+
+Pull request orchestration: invariants in `AGENTS.md`; procedure in
+[`.agents/skills/pr-review/SKILL.md`](../.agents/skills/pr-review/SKILL.md).
+Live snapshots: `scripts/pr-gh-snapshot.sh` / `.ps1`.
+
+**Other agents:** Claude Code, Gemini CLI, Jules, Junie, Cline, Roo, Windsurf,
+Devin, and similar tools should read root `AGENTS.md` when supported. Portable
+skills live under `.agents/skills/`. **Aider:** pass `AGENTS.md` explicitly
+(for example `aider --read AGENTS.md`) rather than maintaining a separate
+`.aider.conf.yml` in the repository.
+
+**Cursor Cloud Agents — branch prefix:** In the Cursor Dashboard, open
+[Cloud Agents defaults](https://cursor.com/dashboard/cloud-agents#my-defaults)
+(or **Cursor Settings → Cloud Agents** in the desktop app). The **branch prefix**
+is a single static string (empty falls back to `cursor/`). It cannot select
+`feat/` vs `fix/` per task and does not read `AGENTS.md` before the platform
+creates the initial branch. Do not set the prefix to one task type (for example
+all `feat/`) to mimic HabiTV policy. For canonical `<type>/<scope>` branches,
+use the strict workflow in
+[`.agents/skills/git-workflow/SKILL.md`](../.agents/skills/git-workflow/SKILL.md)
+(API with `workOnCurrentBranch` and a pre-created `startingRef`, or recovery
+before first push). Optional helper:
+[`scripts/launch-cloud-agent-strict.ps1`](../scripts/launch-cloud-agent-strict.ps1)
+(`CURSOR_API_KEY` from local secrets only).
+
+**GitHub enforcement gaps (documented):** `docs/github-rulesets/protect-develop.json`
+sets `dismiss_stale_reviews_on_push` to `false`; prefer `true` in the hosted
+ruleset so approvals of an older diff do not remain valid after new commits
+(see [`github-rulesets/README.md`](github-rulesets/README.md)). Adding
+`agent-policy` and `agent-policy (windows)` to required status checks is
+recommended after agent-policy CI is stable on `develop`.
+
 ## Workflow
 
 See [`../CONTRIBUTING.md`](../CONTRIBUTING.md) and [`../AGENTS.md`](../AGENTS.md)

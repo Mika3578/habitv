@@ -2,10 +2,4 @@
 alwaysApply: true
 ---
 
-Follow **Public git text** in @AGENTS.md. Fill @.github/pull_request_template.md.
-
-- Branch: `feat/tf1plus`, never `cursor/tf1plus-replay-1a2e` when you create the branch
-- Title: `feat(tf1plus): add provider` (lowercase kebab-case scope)
-- No DRM, Widevine, Gigya, VPN, geo, login, cookies, or stream recipes
-- Do not rename an existing PR head on GitHub; that closes the PR
-- Cloud Agents: the platform may already be on `cursor/...`; keep the PR text generic and do not rename
+Follow **Public git text** in @AGENTS.md. Procedure: @.agents/skills/public-git-text/SKILL.md. Fill @.github/pull_request_template.md.

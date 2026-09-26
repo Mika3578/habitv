@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      {
+        "command": "bash .cursor/hooks/before-shell-branch-policy.sh",
+        "matcher": "git(\\s+-C\\s+\\S+\\s+)?(push|commit)|gh\\s+pr\\s+create",
+        "timeout": 30,
+        "failClosed": false
+      }
+    ]
+  }
+}
