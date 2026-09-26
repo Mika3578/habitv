@@ -18,8 +18,11 @@ if (-not (Test-Path "AGENTS.md")) {
     Fail "missing root AGENTS.md"
 }
 
-Get-ChildItem -Recurse -Filter "AGENTS.md" -File |
-    Where-Object { $_.FullName -notmatch [regex]::Escape((Join-Path $Root "AGENTS.md")) } |
+Get-ChildItem -Recurse -Filter "AGENTS.md" -File -Force |
+    Where-Object {
+        $rel = $_.FullName.Substring($Root.Length + 1)
+        $rel -ne "AGENTS.md" -and $rel -notlike "agent_space*"
+    } |
     ForEach-Object { Fail "unexpected nested AGENTS.md: $($_.FullName.Substring($Root.Length + 1))" }
 
 @("CLAUDE.md", "GEMINI.md", ".cursorrules", ".windsurfrules") | ForEach-Object {
@@ -67,7 +70,7 @@ $skillFiles = @()
 if (-not (Test-Path $SkillsRoot)) {
     Fail "missing .agents/skills directory"
 } else {
-    $skillFiles = @(Get-ChildItem $SkillsRoot -Recurse -Filter "SKILL.md" -File)
+    $skillFiles = @(Get-ChildItem $SkillsRoot -Recurse -Filter "SKILL.md" -File -Force)
     if ($skillFiles.Count -eq 0) {
         Fail "no SKILL.md files under .agents/skills"
     }
