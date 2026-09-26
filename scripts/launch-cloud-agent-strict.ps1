@@ -24,8 +24,6 @@ param(
 
     [string] $RepoUrl = "https://github.com/Mika3578/habitv",
 
-    [string] $StartingRef = "develop",
-
     [switch] $AutoCreatePR
 )
 

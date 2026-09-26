@@ -8,10 +8,13 @@ set -euo pipefail
 branch="$(git branch --show-current 2>/dev/null || true)"
 if [[ -z "$branch" ]]; then
   echo "check-branch-name: no current branch"
+  if [[ "${HABITV_STRICT_BRANCH:-}" == "1" ]]; then
+    exit 1
+  fi
   exit 0
 fi
 
-canonical='^(feat|fix|docs|test|refactor|chore|ci)/[a-z0-9][a-z0-9-]*$'
+canonical='^(feat|fix|docs|test|refactor|chore|ci)/[a-z0-9]+(-[a-z0-9]+)*$'
 if [[ "$branch" =~ $canonical ]]; then
   echo "check-branch-name: OK ($branch)"
   exit 0

@@ -81,8 +81,24 @@ if (-not (Test-Path ".cursor/hooks.json")) {
     Fail "missing .cursor/hooks.json"
 } elseif (-not (Test-Path ".cursor/hooks/before-shell-branch-policy.sh")) {
     Fail "missing branch policy hook script"
-} elseif (-not (Select-String -Path ".cursor/hooks.json" -Pattern "before-shell-branch-policy" -Quiet)) {
-    Fail ".cursor/hooks.json must register before-shell-branch-policy hook"
+} else {
+    try {
+        $hooksJson = Get-Content -Raw ".cursor/hooks.json" | ConvertFrom-Json
+        $hookRegistered = $false
+        if ($hooksJson.hooks.beforeShellExecution) {
+            foreach ($entry in @($hooksJson.hooks.beforeShellExecution)) {
+                if ($entry.command -match "before-shell-branch-policy\.sh") {
+                    $hookRegistered = $true
+                    break
+                }
+            }
+        }
+        if (-not $hookRegistered) {
+            Fail ".cursor/hooks.json must register before-shell-branch-policy hook command"
+        }
+    } catch {
+        Fail ".cursor/hooks.json is not valid JSON: $($_.Exception.Message)"
+    }
 }
 
 $gitWorkflowSkill = ".agents/skills/git-workflow/SKILL.md"
