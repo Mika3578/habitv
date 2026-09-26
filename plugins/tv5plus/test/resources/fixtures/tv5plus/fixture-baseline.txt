@@ -1,0 +1,6 @@
+provider=tv5plus
+strategy=graphql-catalog-ytdlp
+channels=TV5+ (TV5 / Unis free catch-up)
+catalog=featuredProductSets → AVAILABLE VIDEO COLLECTION/MOVIE
+access=Canada geo; availabilityStatus=AVAILABLE only; live-auth excluded
+notes=Download URLs rewritten to tv5unis.ca for yt-dlp extractors
