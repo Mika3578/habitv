@@ -115,6 +115,20 @@ skills live under `.agents/skills/`. **Aider:** pass `AGENTS.md` explicitly
 (for example `aider --read AGENTS.md`) rather than maintaining a separate
 `.aider.conf.yml` in the repository.
 
+**Cursor Cloud Agents — branch prefix:** In the Cursor Dashboard, open
+[Cloud Agents defaults](https://cursor.com/dashboard/cloud-agents#my-defaults)
+(or **Cursor Settings → Cloud Agents** in the desktop app). The **branch prefix**
+is a single static string (empty falls back to `cursor/`). It cannot select
+`feat/` vs `fix/` per task and does not read `AGENTS.md` before the platform
+creates the initial branch. Do not set the prefix to one task type (for example
+all `feat/`) to mimic HabiTV policy. For canonical `<type>/<scope>` branches,
+use the strict workflow in
+[`.agents/skills/git-workflow/SKILL.md`](../.agents/skills/git-workflow/SKILL.md)
+(API with `workOnCurrentBranch` and a pre-created `startingRef`, or recovery
+before first push). Optional helper:
+[`scripts/launch-cloud-agent-strict.ps1`](../scripts/launch-cloud-agent-strict.ps1)
+(`CURSOR_API_KEY` from local secrets only).
+
 **GitHub enforcement gaps (documented):** `docs/github-rulesets/protect-develop.json`
 sets `dismiss_stale_reviews_on_push` and `require_last_push_approval` to `false`;
 enable those in the hosted ruleset if stale approvals after new commits must be

@@ -8,8 +8,10 @@ Local IDE chat ignores it.
 Cloud harnesses may assign a platform branch before repository policy runs.
 Do **not** rename an open PR head on GitHub (GitHub closes the PR).
 
-New tasks under agent control:
-[`.agents/skills/git-workflow/SKILL.md`](../.agents/skills/git-workflow/SKILL.md).
+New Cloud tasks and branch recovery:
+[`.agents/skills/git-workflow/SKILL.md`](../.agents/skills/git-workflow/SKILL.md)
+(Cloud Agents section). Dashboard branch prefix is static; see
+[`docs/development.md`](../docs/development.md).
 
 ## Public git text
 

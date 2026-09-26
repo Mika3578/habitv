@@ -69,6 +69,19 @@ if (-not (Test-Path $publicGitRule)) {
     }
 }
 
+if (-not (Test-Path ".cursor/hooks.json")) {
+    Fail "missing .cursor/hooks.json"
+} elseif (-not (Test-Path ".cursor/hooks/before-shell-branch-policy.sh")) {
+    Fail "missing branch policy hook script"
+} elseif (-not (Select-String -Path ".cursor/hooks.json" -Pattern "before-shell-branch-policy" -Quiet)) {
+    Fail ".cursor/hooks.json must register before-shell-branch-policy hook"
+}
+
+$gitWorkflowSkill = ".agents/skills/git-workflow/SKILL.md"
+if ((Test-Path $gitWorkflowSkill) -and -not (Select-String -Path $gitWorkflowSkill -Pattern "workOnCurrentBranch" -Quiet)) {
+    Fail "git-workflow skill must document Cloud workOnCurrentBranch workflow"
+}
+
 if (Test-Path ".cursor/skills") {
     Get-ChildItem ".cursor/skills" -Recurse -Filter "SKILL.md" | ForEach-Object {
         $text = Get-Content -Raw $_.FullName

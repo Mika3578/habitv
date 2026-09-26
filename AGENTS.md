@@ -121,9 +121,13 @@ prefixes. No `replay`, `download`, or diagnostic suffixes.
 Name the branch correctly at creation. Do not rename an existing PR
 head on GitHub: that closes the PR.
 
-Cursor Cloud Agents often start on a platform `cursor/...` branch
-before these rules run. Stay on that head if a PR already exists.
-Keep the PR title and body generic anyway.
+Cursor Cloud Agents may create a platform-prefixed branch before
+repository policy loads; `AGENTS.md` cannot change that initial step.
+For new work, follow **Cloud agents** in
+[`.agents/skills/git-workflow/SKILL.md`](.agents/skills/git-workflow/SKILL.md).
+An open pull request on a platform-created head stays on that head
+unless the maintainer explicitly authorizes replacement (renaming the
+head closes the PR on GitHub).
 
 | Avoid | Use |
 |-------|-----|
@@ -158,11 +162,10 @@ start and verify with `git branch --show-current` before the first commit or
 push. Do not intentionally create a tool-prefixed or randomly suffixed public
 branch when the branch name is under agent control.
 
-If a platform assigns a non-compliant branch before policy applies and **no
-pull request is open yet**, correct the branch before push or PR creation when
-safe. If a pull request already exists on a platform-created head, do not
-rename that head on GitHub (GitHub closes the pull request); keep working on
-the existing head unless the maintainer explicitly authorizes replacement.
+Cloud Agents: repository files do not run before the platform may assign an
+initial branch. Use strict pre-branch API launch or in-workspace recovery in
+`git-workflow` before the first publish. If a pull request already exists on a
+platform-created head, do not rename that head on GitHub.
 
 Before creating a branch, search open PRs and existing branches for
 the same scope. Do not open a second PR that covers the same module
