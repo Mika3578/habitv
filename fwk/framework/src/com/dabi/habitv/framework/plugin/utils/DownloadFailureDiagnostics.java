@@ -10,7 +10,7 @@ import com.dabi.habitv.api.plugin.exception.ExecutorOutputSanitizer;
  */
 public final class DownloadFailureDiagnostics {
 
-	public static final String CLASSIFICATION_DRM_PROTECTED = "drm-protected";
+	public static final String CLASSIFICATION_PROTECTED_CONTENT = "protected-content";
 	public static final String CLASSIFICATION_GEO_RESTRICTED = "geo-restricted";
 	public static final String CLASSIFICATION_AUTH_REQUIRED = "auth-required";
 	public static final String CLASSIFICATION_PRIVATE_VIDEO = "private-video";
@@ -82,8 +82,9 @@ public final class DownloadFailureDiagnostics {
 			return null;
 		}
 		final String lower = haystack.toLowerCase();
-		if (containsAny(lower, "drm", "widevine", "fairplay", "playready", "copyright protection")) {
-			return CLASSIFICATION_DRM_PROTECTED;
+		if (containsAny(lower, "widevine", "fairplay", "playready", "copyright protection",
+				"appears protected", "cannot decrypt or bypass protection")) {
+			return CLASSIFICATION_PROTECTED_CONTENT;
 		}
 		if (containsAny(lower, "not available in your country", "geo restricted", "geoblocked",
 				"only available in ", "this video is not available")) {
@@ -120,8 +121,8 @@ public final class DownloadFailureDiagnostics {
 	}
 
 	private static String messageForClassificationKey(final String key) {
-		if (CLASSIFICATION_DRM_PROTECTED.equals(key)) {
-			return "Content appears DRM-protected. Habitv cannot bypass DRM.";
+		if (CLASSIFICATION_PROTECTED_CONTENT.equals(key)) {
+			return "Content appears protected. Habitv cannot decrypt or bypass protection.";
 		}
 		if (CLASSIFICATION_GEO_RESTRICTED.equals(key)) {
 			return "Content is unavailable in this region (geo restriction).";

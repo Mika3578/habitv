@@ -31,8 +31,7 @@ public class ConfigController extends BaseController {
 
 	public ConfigController(TextField downloadOuput, TextField nbrMaxAttempts,
 			TextField daemonCheckTimeSec, CheckBox autoUpdate,
-			TextField youtubeApiKey, TextField maxConcurrentDownloads,
-			CheckBox embedSubtitles) {
+			TextField youtubeApiKey, TextField maxConcurrentDownloads, CheckBox embedSubtitles) {
 		super();
 		this.downloadOuput = downloadOuput;
 		this.nbrMaxAttempts = nbrMaxAttempts;
@@ -259,7 +258,8 @@ public class ConfigController extends BaseController {
 		getController().saveConfig(userConfig);
 		new Popin()
 				.show("Configuration sauvegardée",
-						"La configuration a été sauvegardée \n mais ne sera active qu'après un redémarrage de l'application.");
+						"La configuration a été sauvegardée.\n"
+								+ "Certains réglages peuvent nécessiter un redémarrage de l'application.");
 	}
 
 	private String normalize(String value) {

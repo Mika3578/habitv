@@ -593,12 +593,15 @@ public class XMLUserConfig implements UserConfig {
 
 	@Override
 	public void setYoutubeApiKey(String youtubeApiKey) {
-		String normalizedValue = YoutubeApiKeyConfig.sanitizePlainConfigValue(youtubeApiKey);
+		setPlainDownloaderValue(YOUTUBE_API_KEY, YoutubeApiKeyConfig.sanitizePlainConfigValue(youtubeApiKey));
+	}
+
+	private void setPlainDownloaderValue(final String tagName, final String normalizedValue) {
 		Downloaders downloaders = loadDownloaders();
 		Iterator<Object> iterator = downloaders.getAny().iterator();
 		while (iterator.hasNext()) {
 			Object downloader = iterator.next();
-			if (YOUTUBE_API_KEY.equals(XMLUtils.getTagName(downloader))) {
+			if (tagName.equals(XMLUtils.getTagName(downloader))) {
 				if (normalizedValue == null) {
 					iterator.remove();
 				} else {
@@ -608,8 +611,7 @@ public class XMLUserConfig implements UserConfig {
 			}
 		}
 		if (normalizedValue != null) {
-			downloaders.getAny().add(
-					XMLUtils.buildAnyElement(YOUTUBE_API_KEY, normalizedValue));
+			downloaders.getAny().add(XMLUtils.buildAnyElement(tagName, normalizedValue));
 		}
 	}
 

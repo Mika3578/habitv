@@ -14,19 +14,27 @@ import com.dabi.habitv.api.plugin.exception.ExecutorFailedException;
 public class DownloadFailureDiagnosticsTest {
 
 	@Test
-	public void getClassificationKeyReturnsStableIdentifierForDrmFailure() {
+	public void getClassificationKeyReturnsStableIdentifierForProtectedContentFailure() {
 		final ExecutorFailedException failure = new ExecutorFailedException("yt-dlp \"url\"",
 				"ERROR: Content is DRM protected by Widevine", "ERROR: Content is DRM protected by Widevine", null);
-		assertEquals(DownloadFailureDiagnostics.CLASSIFICATION_DRM_PROTECTED,
+		assertEquals(DownloadFailureDiagnostics.CLASSIFICATION_PROTECTED_CONTENT,
 				DownloadFailureDiagnostics.getClassificationKey(failure));
 	}
 
 	@Test
-	public void buildUserMessageClassifiesDrmFailures() {
+	public void getClassificationKeyMatchesProviderProtectedContentMessage() {
+		final DownloadFailedException failure = new DownloadFailedException(
+				new IllegalStateException("Content appears protected. Habitv cannot decrypt or bypass protection."));
+		assertEquals(DownloadFailureDiagnostics.CLASSIFICATION_PROTECTED_CONTENT,
+				DownloadFailureDiagnostics.getClassificationKey(failure));
+	}
+
+	@Test
+	public void buildUserMessageClassifiesProtectedContentFailures() {
 		final ExecutorFailedException failure = new ExecutorFailedException("yt-dlp \"url\"",
 				"ERROR: Content is DRM protected by Widevine", "ERROR: Content is DRM protected by Widevine", null);
 		final String message = DownloadFailureDiagnostics.buildUserMessage(null, failure);
-		assertEquals("Content appears DRM-protected. Habitv cannot bypass DRM.", message);
+		assertEquals("Content appears protected. Habitv cannot decrypt or bypass protection.", message);
 	}
 
 	@Test
