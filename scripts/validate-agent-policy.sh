@@ -63,6 +63,30 @@ if [[ -d .cursor/skills ]]; then
   done < <(find .cursor/skills -name 'SKILL.md' -print0 2>/dev/null)
 fi
 
+required_skills=(
+  public-git-text
+  code-change-verification
+  provider-diagnostics
+  pr-review
+)
+
+if [[ ! -d .agents/skills ]]; then
+  fail "missing .agents/skills directory"
+else
+  skill_count=0
+  while IFS= read -r -d '' _; do
+    skill_count=$((skill_count + 1))
+  done < <(find .agents/skills -name 'SKILL.md' -print0 2>/dev/null)
+  if [[ "$skill_count" -eq 0 ]]; then
+    fail "no SKILL.md files under .agents/skills"
+  fi
+  for req in "${required_skills[@]}"; do
+    if [[ ! -f ".agents/skills/$req/SKILL.md" ]]; then
+      fail "missing required skill: .agents/skills/$req/SKILL.md"
+    fi
+  done
+fi
+
 declare -A skill_names=()
 while IFS= read -r -d '' skill; do
   rel="${skill#./}"
@@ -89,7 +113,6 @@ while IFS= read -r -d '' skill; do
   skill_names[$name]="$rel"
 done < <(find .agents/skills -name 'SKILL.md' -print0 2>/dev/null)
 
-agents_md=$(cat AGENTS.md)
 require_phrase() {
   local phrase="$1"
   if ! grep -qF "$phrase" AGENTS.md; then

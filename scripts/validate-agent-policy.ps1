@@ -56,21 +56,44 @@ if (Test-Path ".cursor/skills") {
     }
 }
 
-$skillNames = @{}
-Get-ChildItem ".agents/skills" -Recurse -Filter "SKILL.md" -ErrorAction SilentlyContinue | ForEach-Object {
-    $rel = $_.FullName.Substring($Root.Length + 1)
-    $head = Get-Content $_.FullName -TotalCount 30
-    if (-not ($head -match "^name:")) { Fail "skill missing name metadata: $rel" }
-    if (-not ($head -match "^description:")) { Fail "skill missing description metadata: $rel" }
-    $name = ($head | Where-Object { $_ -match "^name:" } | Select-Object -First 1) -replace "^name:\s*", ""
-    $desc = ($head | Where-Object { $_ -match "^description:" } | Select-Object -First 1) -replace "^description:\s*", ""
-    if ([string]::IsNullOrWhiteSpace($name)) { Fail "empty skill name: $rel" }
-    if ([string]::IsNullOrWhiteSpace($desc)) { Fail "empty skill description: $rel" }
-    if ($desc.Length -gt $SkillDescMax) { Fail "skill description too long ($($desc.Length) chars): $rel" }
-    if ($skillNames.ContainsKey($name)) {
-        Fail "duplicate skill name '$name': $($skillNames[$name]) and $rel"
+$RequiredSkills = @(
+    "public-git-text",
+    "code-change-verification",
+    "provider-diagnostics",
+    "pr-review"
+)
+$SkillsRoot = ".agents/skills"
+$skillFiles = @()
+if (-not (Test-Path $SkillsRoot)) {
+    Fail "missing .agents/skills directory"
+} else {
+    $skillFiles = @(Get-ChildItem $SkillsRoot -Recurse -Filter "SKILL.md" -File)
+    if ($skillFiles.Count -eq 0) {
+        Fail "no SKILL.md files under .agents/skills"
     }
-    $skillNames[$name] = $rel
+    foreach ($req in $RequiredSkills) {
+        $requiredPath = Join-Path $SkillsRoot "$req/SKILL.md"
+        if (-not (Test-Path $requiredPath)) {
+            Fail "missing required skill: $requiredPath"
+        }
+    }
+
+    $skillNames = @{}
+    $skillFiles | ForEach-Object {
+        $rel = $_.FullName.Substring($Root.Length + 1)
+        $head = Get-Content $_.FullName -TotalCount 30
+        if (-not ($head -match "^name:")) { Fail "skill missing name metadata: $rel" }
+        if (-not ($head -match "^description:")) { Fail "skill missing description metadata: $rel" }
+        $name = ($head | Where-Object { $_ -match "^name:" } | Select-Object -First 1) -replace "^name:\s*", ""
+        $desc = ($head | Where-Object { $_ -match "^description:" } | Select-Object -First 1) -replace "^description:\s*", ""
+        if ([string]::IsNullOrWhiteSpace($name)) { Fail "empty skill name: $rel" }
+        if ([string]::IsNullOrWhiteSpace($desc)) { Fail "empty skill description: $rel" }
+        if ($desc.Length -gt $SkillDescMax) { Fail "skill description too long ($($desc.Length) chars): $rel" }
+        if ($skillNames.ContainsKey($name)) {
+            Fail "duplicate skill name '$name': $($skillNames[$name]) and $rel"
+        }
+        $skillNames[$name] = $rel
+    }
 }
 
 $agents = Get-Content -Raw "AGENTS.md"
@@ -79,7 +102,7 @@ $agents = Get-Content -Raw "AGENTS.md"
     "current PR HEAD",
     "explicitly confirms success in the current conversation"
 ) | ForEach-Object {
-    if ($agents -notlike "*$_*") {
+    if ($agents.IndexOf($_, [StringComparison]::Ordinal) -lt 0) {
         Fail "AGENTS.md missing required phrase: $_"
     }
 }
