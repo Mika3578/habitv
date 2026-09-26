@@ -179,10 +179,30 @@ $agents = Get-Content -Raw "AGENTS.md"
 @(
     "Keep every pull request in **Draft**",
     "current PR HEAD",
-    "explicitly confirms success in the current conversation"
+    "explicitly confirms success in the current conversation",
+    "Do not resolve unanswered"
 ) | ForEach-Object {
     if ($agents.IndexOf($_, [StringComparison]::Ordinal) -lt 0) {
         Fail "AGENTS.md missing required phrase: $_"
+    }
+}
+
+$prReviewSkill = ".agents/skills/pr-review/SKILL.md"
+if (-not (Test-Path $prReviewSkill)) {
+    Fail "missing pr-review skill: $prReviewSkill"
+} else {
+    $prReviewText = Get-Content -Raw $prReviewSkill
+    if ($prReviewText -notmatch "REVIEW_HEAD") {
+        Fail "pr-review skill must document HEAD-bound review rounds"
+    }
+    if ($prReviewText -notmatch "validate-pr-public-body") {
+        Fail "pr-review skill must reference validate-pr-public-body scripts"
+    }
+}
+
+@("scripts/validate-pr-public-body.sh", "scripts/validate-pr-public-body.ps1") | ForEach-Object {
+    if (-not (Test-Path $_)) {
+        Fail "missing PR public-body validator: $_"
     }
 }
 

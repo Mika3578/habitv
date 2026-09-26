@@ -168,6 +168,25 @@ require_phrase() {
 require_phrase "Keep every pull request in **Draft**"
 require_phrase "current PR HEAD"
 require_phrase "explicitly confirms success in the current conversation"
+require_phrase "Do not resolve unanswered"
+
+pr_review_skill=".agents/skills/pr-review/SKILL.md"
+if [[ ! -f "$pr_review_skill" ]]; then
+  fail "missing pr-review skill: $pr_review_skill"
+else
+  if ! grep -qF "REVIEW_HEAD" "$pr_review_skill"; then
+    fail "pr-review skill must document HEAD-bound review rounds"
+  fi
+  if ! grep -qF "validate-pr-public-body" "$pr_review_skill"; then
+    fail "pr-review skill must reference validate-pr-public-body scripts"
+  fi
+fi
+
+for script in scripts/validate-pr-public-body.sh scripts/validate-pr-public-body.ps1; do
+  if [[ ! -f "$script" ]]; then
+    fail "missing PR public-body validator: $script"
+  fi
+done
 
 if [[ "$failures" -gt 0 ]]; then
   echo "agent-policy: FAILED ($failures check(s))"

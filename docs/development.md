@@ -131,10 +131,11 @@ before first push). Optional helper:
 (`CURSOR_API_KEY` from local secrets only).
 
 **GitHub enforcement gaps (documented):** `docs/github-rulesets/protect-develop.json`
-sets `dismiss_stale_reviews_on_push` and `require_last_push_approval` to `false`;
-enable those in the hosted ruleset if stale approvals after new commits must be
-blocked mechanically. Adding `agent-policy` to required status checks is
-recommended after this workflow merges (update the ruleset JSON and GitHub UI).
+sets `dismiss_stale_reviews_on_push` to `false`; prefer `true` in the hosted
+ruleset so approvals of an older diff do not remain valid after new commits
+(see [`github-rulesets/README.md`](github-rulesets/README.md)). Adding
+`agent-policy` and `agent-policy (windows)` to required status checks is
+recommended after agent-policy CI is stable on `develop`.
 
 ## Workflow
 

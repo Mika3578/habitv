@@ -48,7 +48,10 @@
 - [ ] PR keeps linear history
 - [ ] English used for branches, commits, comments, docs, and PR text
 - [ ] Docs updated if behavior or contributor workflow changed
-- [ ] Public git text is short and generic (see AGENTS.md)
+- [ ] Public git text is short and generic (see AGENTS.md); no tool-generated PR summary blocks
+- [ ] Actionable review findings addressed; qualifying threads replied and resolved on GitHub
+- [ ] Validation and required checks recorded for the current PR HEAD
+- [ ] Final required review completed on the current PR HEAD (when applicable)
 - [ ] If a `plugins/*/pom.xml` `<version>` is bumped, the trigger class is named (parser, endpoint, or configuration), and internal deps use `${project.parent.version}`
 - [ ] No secrets, tokens, local paths, or build outputs committed
 
