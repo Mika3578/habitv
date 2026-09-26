@@ -50,6 +50,23 @@ Test-Adapter ".continue/rules/00-habitv.md"
 Test-Adapter ".github/copilot-instructions.md"
 Test-Adapter ".cursor/CLOUD.md"
 
+$publicGitRule = ".cursor/rules/public-git-text.mdc"
+if (-not (Test-Path $publicGitRule)) {
+    Fail "missing thin Cursor rule: $publicGitRule"
+} else {
+    $ruleText = Get-Content -Raw $publicGitRule
+    if ($ruleText -notmatch "\.agents/skills/public-git-text") {
+        Fail "public-git-text Cursor rule must reference portable skill: $publicGitRule"
+    }
+    $parts = $ruleText -split "(?m)^---\s*$", 0, "RegexMatch"
+    if ($parts.Count -ge 3) {
+        $body = $parts[2]
+        if ($body -match "(?m)^\s*-\s") {
+            Fail "thin Cursor rule must not duplicate policy bullets: $publicGitRule"
+        }
+    }
+}
+
 if (Test-Path ".cursor/skills") {
     Get-ChildItem ".cursor/skills" -Recurse -Filter "SKILL.md" | ForEach-Object {
         $text = Get-Content -Raw $_.FullName
