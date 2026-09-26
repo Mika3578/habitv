@@ -37,6 +37,7 @@ reliability, then provider repairs, then JDK/packaging migration.
 | Architecture | [`docs/architecture.md`](docs/architecture.md) |
 | Modernization roadmap | [`docs/modernization.md`](docs/modernization.md) |
 | Public git text procedure | [`.agents/skills/public-git-text/SKILL.md`](.agents/skills/public-git-text/SKILL.md) |
+| Branch and worktree setup | [`.agents/skills/git-workflow/SKILL.md`](.agents/skills/git-workflow/SKILL.md) |
 | Validation workflow | [`.agents/skills/code-change-verification/SKILL.md`](.agents/skills/code-change-verification/SKILL.md) |
 | Provider diagnostics | [`.agents/skills/provider-diagnostics/SKILL.md`](.agents/skills/provider-diagnostics/SKILL.md) |
 | PR review loop | [`.agents/skills/pr-review/SKILL.md`](.agents/skills/pr-review/SKILL.md) |
@@ -148,6 +149,20 @@ not add strategy, access-model, or manual-check sections.
 
 Never work on `develop`, `main`, or `master`. Branch format follows
 **Public git text**. Follow [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+Before an agent creates a branch or worktree for a **new** task, determine
+the canonical branch name (`<type>/<short-scope>`) and follow
+[`.agents/skills/git-workflow/SKILL.md`](.agents/skills/git-workflow/SKILL.md).
+When the environment allows explicit naming, use the compliant name from the
+start and verify with `git branch --show-current` before the first commit or
+push. Do not intentionally create a tool-prefixed or randomly suffixed public
+branch when the branch name is under agent control.
+
+If a platform assigns a non-compliant branch before policy applies and **no
+pull request is open yet**, correct the branch before push or PR creation when
+safe. If a pull request already exists on a platform-created head, do not
+rename that head on GitHub (GitHub closes the pull request); keep working on
+the existing head unless the maintainer explicitly authorizes replacement.
 
 Before creating a branch, search open PRs and existing branches for
 the same scope. Do not open a second PR that covers the same module
