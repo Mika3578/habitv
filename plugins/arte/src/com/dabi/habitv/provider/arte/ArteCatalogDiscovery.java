@@ -38,14 +38,13 @@ final class ArteCatalogDiscovery {
 	}
 
 	List<ArteLanguage> discoverLanguages() {
-		final String homeUrl = buildHomeUrl(ArteConf.DISCOVERY_REFERENCE_LANGUAGE);
-		final JsonNode home = ArteEmacJson.parseTree(transport.get(homeUrl), homeUrl);
 		final Map<String, String> languages = new LinkedHashMap<>();
-		for (final JsonNode alt : home.path("alternativeLanguages")) {
-			final String code = alt.path("code").asText(null);
-			if (StringUtils.isNotEmpty(code)) {
-				languages.put(code, alt.path("label").asText(code));
-			}
+		try {
+			final String homeUrl = buildHomeUrl(ArteConf.DISCOVERY_REFERENCE_LANGUAGE);
+			final JsonNode home = ArteEmacJson.parseTree(transport.get(homeUrl), homeUrl);
+			collectLanguagesFromHome(home, languages);
+		} catch (final RuntimeException e) {
+			languages.put(ArteConf.DISCOVERY_REFERENCE_LANGUAGE, "Français");
 		}
 		if (!languages.containsKey(ArteConf.DISCOVERY_REFERENCE_LANGUAGE)) {
 			languages.put(ArteConf.DISCOVERY_REFERENCE_LANGUAGE, "Français");
@@ -92,45 +91,42 @@ final class ArteCatalogDiscovery {
 		return discoveredPageRootsByUrl.get(pageUrl);
 	}
 
+	private static void collectLanguagesFromHome(final JsonNode home, final Map<String, String> languages) {
+		for (final JsonNode alt : home.path("alternativeLanguages")) {
+			final String code = alt.path("code").asText(null);
+			if (StringUtils.isNotEmpty(code)) {
+				languages.put(code, alt.path("label").asText(code));
+			}
+		}
+	}
+
 	private void collectFromHome(final String languageCode, final String support, final Set<String> codes) {
 		final String homeUrl = ArteConf.EMAC_API_BASE + "/" + languageCode + "/" + support + "/pages/HOME/?authorizedCountry="
 				+ ArteConf.AUTHORIZED_COUNTRY;
 		try {
 			final JsonNode home = ArteEmacJson.parseTree(transport.get(homeUrl), homeUrl);
 			ArteEmacJson.collectEmacPageCodes(home, codes);
-			collectGenreHubPages(languageCode, home, codes);
+			collectGenreHubPages(languageCode, support, home, codes);
 		} catch (final RuntimeException e) {
 			// Non-blocking: try the other HOME variant.
 		}
 	}
 
-	private void collectGenreHubPages(final String languageCode, final JsonNode home, final Set<String> codes) {
+	private void collectGenreHubPages(final String languageCode, final String support, final JsonNode home,
+			final Set<String> codes) {
 		for (final JsonNode zone : ArteEmacJson.emacZonesNode(home)) {
 			if (!"genres_HOME".equals(zone.path("code").asText(null))) {
 				continue;
 			}
-			for (final JsonNode item : zone.path("content").path("data")) {
-				final String deeplink = item.path("deeplink").asText(null);
-				if (StringUtils.isNotEmpty(deeplink)) {
-					ArteEmacJson.collectEmacPageCodes(item, codes);
-				} else {
-					resolveHubPageCode(languageCode, item.path("url").asText(null), codes);
-				}
-			}
+			collectGenreItems(languageCode, zone.path("content").path("data"), codes);
 			final String zoneId = zone.path("id").asText(null);
 			if (StringUtils.isNotEmpty(zoneId)) {
-				final String zoneUrl = ArteConf.EMAC_API_BASE + "/" + languageCode + "/web/zones/" + zoneId
+				final String zoneUrl = ArteConf.EMAC_API_BASE + "/" + languageCode + "/" + support + "/zones/" + zoneId
 						+ "/content?authorizedCountry=" + ArteConf.AUTHORIZED_COUNTRY + "&page=1";
 				try {
 					final JsonNode zoneContent = ArteEmacJson.parseTree(transport.get(zoneUrl), zoneUrl);
-					for (final JsonNode item : ArteEmacJson.emacDataNode(zoneContent)) {
-						final String deeplink = item.path("deeplink").asText(null);
-						if (StringUtils.isNotEmpty(deeplink)) {
-							ArteEmacJson.collectEmacPageCodes(item, codes);
-						} else {
-							resolveHubPageCode(languageCode, item.path("url").asText(null), codes);
-						}
-					}
+					collectGenreItems(languageCode, ArteEmacJson.emacDataNode(zoneContent), codes);
+					followGenreZonePagination(languageCode, support, zoneId, zoneContent, codes);
 				} catch (final RuntimeException e) {
 					// Genre zone optional.
 				}
@@ -138,12 +134,44 @@ final class ArteCatalogDiscovery {
 		}
 	}
 
+	private void collectGenreItems(final String languageCode, final JsonNode data, final Set<String> codes) {
+		if (!data.isArray()) {
+			return;
+		}
+		for (final JsonNode item : data) {
+			final String deeplink = item.path("deeplink").asText(null);
+			if (StringUtils.isNotEmpty(deeplink)) {
+				ArteEmacJson.collectEmacPageCodes(item, codes);
+			} else {
+				resolveHubPageCode(languageCode, item.path("url").asText(null), codes);
+			}
+		}
+	}
+
+	private void followGenreZonePagination(final String languageCode, final String support, final String zoneId,
+			JsonNode zoneContent, final Set<String> codes) {
+		String nextUrl = ArteEmacJson.zonePagination(zoneContent).path("links").path("next").asText(null);
+		int fetched = 1;
+		while (StringUtils.isNotEmpty(nextUrl) && ArteRequestUrls.isTrustedEmacApiUrl(nextUrl)
+				&& fetched < ArteConf.MAX_PAGINATION_REQUESTS) {
+			try {
+				zoneContent = ArteEmacJson.parseTree(transport.get(nextUrl), nextUrl);
+				collectGenreItems(languageCode, ArteEmacJson.emacDataNode(zoneContent), codes);
+				fetched++;
+				nextUrl = ArteEmacJson.zonePagination(zoneContent).path("links").path("next").asText(null);
+			} catch (final RuntimeException e) {
+				break;
+			}
+		}
+	}
+
 	private void resolveHubPageCode(final String languageCode, final String hubUrl, final Set<String> codes) {
-		if (StringUtils.isEmpty(hubUrl) || !hubUrl.contains("arte.tv")) {
+		final String resolved = resolvePublicSiteUrl(hubUrl);
+		if (!ArteRequestUrls.isTrustedPublicSiteUrl(resolved)) {
 			return;
 		}
 		try {
-			final String html = transport.get(hubUrl);
+			final String html = transport.get(resolved);
 			ArteEmacJson.addPageCodesFromHtml(html, codes);
 		} catch (final RuntimeException e) {
 			// Hub HTML resolution is best-effort only.
@@ -179,6 +207,19 @@ final class ArteCatalogDiscovery {
 	static String buildHomeUrl(final String languageCode) {
 		return ArteConf.EMAC_API_BASE + "/" + languageCode + "/web/pages/HOME/?authorizedCountry="
 				+ ArteConf.AUTHORIZED_COUNTRY;
+	}
+
+	static String resolvePublicSiteUrl(final String url) {
+		if (StringUtils.isEmpty(url)) {
+			return url;
+		}
+		if (url.startsWith("http://") || url.startsWith("https://")) {
+			return url;
+		}
+		if (url.startsWith("/")) {
+			return ArteConf.HOME_URL + url;
+		}
+		return ArteConf.HOME_URL + "/" + url;
 	}
 
 	static String buildPageUrl(final String languageCode, final String pageCode) {

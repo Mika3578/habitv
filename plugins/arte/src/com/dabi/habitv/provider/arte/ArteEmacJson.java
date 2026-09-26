@@ -27,8 +27,15 @@ final class ArteEmacJson {
 	}
 
 	static JsonNode parseTree(final String json, final String sourceUrl) {
+		if (json == null) {
+			throw new TechnicalException("Cannot parse Arte EMAC response from " + sourceUrl);
+		}
 		try {
-			return OBJECT_MAPPER.readTree(json);
+			final JsonNode tree = OBJECT_MAPPER.readTree(json);
+			if (tree == null) {
+				throw new TechnicalException("Cannot parse Arte EMAC response from " + sourceUrl);
+			}
+			return tree;
 		} catch (final IOException e) {
 			throw new TechnicalException("Cannot parse Arte EMAC response from " + sourceUrl, e);
 		}
@@ -59,12 +66,18 @@ final class ArteEmacJson {
 	}
 
 	static String pageTitle(final JsonNode pageRoot) {
-		final String title = pageRoot.path("metadata").path("title").asText(null);
+		final JsonNode metadata = pageRoot.path("metadata").isObject() ? pageRoot.path("metadata")
+				: pageRoot.path("value").path("metadata");
+		final String title = metadata.path("title").asText(null);
 		if (StringUtils.isNotEmpty(title)) {
 			final int pipe = title.indexOf('|');
 			return pipe > 0 ? title.substring(0, pipe).trim() : title.trim();
 		}
-		return pageRoot.path("code").asText(null);
+		final String code = pageRoot.path("code").asText(null);
+		if (StringUtils.isNotEmpty(code)) {
+			return code;
+		}
+		return pageRoot.path("value").path("code").asText(null);
 	}
 
 	static void collectEmacPageCodes(final JsonNode node, final Set<String> pageCodes) {

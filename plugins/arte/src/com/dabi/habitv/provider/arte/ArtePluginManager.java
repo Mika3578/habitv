@@ -1,5 +1,6 @@
 package com.dabi.habitv.provider.arte;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -116,11 +117,12 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 			if (pageRoot == null) {
 				pageRoot = ArteEmacJson.parseTree(transport.get(page.getSourceUrl()), page.getSourceUrl());
 			}
+			final Set<String> zoneTitlesOnPage = new HashSet<>();
 			for (final JsonNode zone : ArteEmacJson.emacZonesNode(pageRoot)) {
 				if (ArteContentClassifier.shouldSkipZone(zone)) {
 					continue;
 				}
-				final CategoryDTO zoneCategory = buildZoneCategory(languageCode, page.getCode(), zone);
+				final CategoryDTO zoneCategory = buildZoneCategory(languageCode, page.getCode(), zone, zoneTitlesOnPage);
 				if (zoneCategory != null) {
 					pageCategory.addSubCategory(zoneCategory);
 				}
@@ -131,42 +133,25 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 		return pageCategory;
 	}
 
-	private CategoryDTO buildZoneCategory(final String languageCode, final String pageCode, final JsonNode zone) {
+	private CategoryDTO buildZoneCategory(final String languageCode, final String pageCode, final JsonNode zone,
+			final Set<String> zoneTitlesOnPage) {
 		final String zoneId = zone.path("id").asText(null);
 		final String zoneCode = zone.path("code").asText(null);
 		final String zoneKey = StringUtils.isNotEmpty(zoneId) ? zoneId : zoneCode;
 		if (StringUtils.isEmpty(zoneKey)) {
 			return null;
 		}
-		final String zoneTitle = zone.path("title").asText(zoneKey);
+		final String zoneTitle = uniqueZoneTitle(zone.path("title").asText(zoneKey), zoneKey, zoneTitlesOnPage);
 		final CategoryDTO zoneCategory = new CategoryDTO(ArteConf.NAME, zoneTitle,
 				ArteCategoryId.forZone(languageCode, pageCode, zoneKey), ArteConf.EXTENSION);
 		zoneCategory.setDownloadable(true);
 		boolean hasCollectionChild = false;
 		boolean hasPlayableItem = false;
-		for (final JsonNode item : zone.path("content").path("data")) {
-			final String resolvedUrl = resolveUrl(item.path("url").asText(null));
-			final ContentKind kind = ArteContentClassifier.classifyTeaser(item, resolvedUrl);
-			if (kind == ContentKind.PLAYABLE_SHOW) {
-				hasPlayableItem = true;
-			}
-			if (kind != ContentKind.COLLECTION) {
-				continue;
-			}
-			final String collectionId = ArteContentClassifier.collectionId(item, resolvedUrl);
-			if (StringUtils.isEmpty(collectionId)) {
-				continue;
-			}
-			String title = item.path("title").asText(null);
-			if (StringUtils.isEmpty(title)) {
-				title = collectionId;
-			}
-			final CategoryDTO collectionCategory = new CategoryDTO(ArteConf.NAME, title,
-					ArteCategoryId.forCollection(languageCode, collectionId), ArteConf.EXTENSION);
-			collectionCategory.setDownloadable(true);
-			zoneCategory.addSubCategory(collectionCategory);
-			hasCollectionChild = true;
-		}
+		hasPlayableItem = scanTeasersForPlayable(zone.path("content").path("data")) || hasPlayableItem;
+		hasCollectionChild = addCollectionChildren(languageCode, zoneCategory, zone.path("content").path("data"))
+				|| hasCollectionChild;
+		hasPlayableItem = discoverPlayableInDeferredLink(zone) || hasPlayableItem;
+		hasCollectionChild = discoverCollectionsInDeferredLink(languageCode, zoneCategory, zone) || hasCollectionChild;
 		if (!hasPlayableItem && !hasCollectionChild && !hasDeferredZoneContent(zone)) {
 			return null;
 		}
@@ -185,7 +170,7 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 			return false;
 		}
 		final String nextUrl = pagination.path("links").path("next").asText(null);
-		if (StringUtils.isNotEmpty(nextUrl) && nextUrl.startsWith(ArteConf.EMAC_API_BASE + "/")) {
+		if (StringUtils.isNotEmpty(nextUrl) && ArteRequestUrls.isTrustedCatalogueFetchUrl(nextUrl)) {
 			return true;
 		}
 		return pagination.path("pages").asInt(1) > 1 && StringUtils.isNotEmpty(zone.path("code").asText(null));
@@ -242,7 +227,7 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 				continue;
 			}
 			try {
-				addZoneEpisodes(category, episodes, languageCode, "collection", zone);
+				addZoneEpisodes(category, episodes, languageCode, collectionId, zone);
 			} catch (final RuntimeException e) {
 				logCatalogSkip(languageCode, "collection", zone.path("id").asText(null), collectionUrl, e);
 			}
@@ -266,13 +251,22 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 			return;
 		}
 		final String linkUrl = resolveUrl(link.path("url").asText(null));
-		if (StringUtils.isEmpty(linkUrl) || !linkUrl.startsWith(ArteConf.EMAC_API_BASE)) {
+		if (!ArteRequestUrls.isTrustedEmacApiUrl(linkUrl)) {
 			return;
 		}
 		try {
 			final JsonNode linked = ArteEmacJson.parseTree(transport.get(linkUrl), linkUrl);
-			addEpisodesFromDataNode(category, episodes, ArteEmacJson.emacDataNode(linked), languageCode,
-					zone.path("title").asText(null));
+			final String zoneTitle = zone.path("title").asText(null);
+			final JsonNode linkedZones = ArteEmacJson.emacZonesNode(linked);
+			if (linkedZones.isArray() && linkedZones.size() > 0) {
+				for (final JsonNode linkedZone : linkedZones) {
+					addZoneEpisodes(category, episodes, languageCode, null, linkedZone);
+				}
+			} else {
+				addEpisodesFromDataNode(category, episodes, ArteEmacJson.emacDataNode(linked), languageCode, zoneTitle);
+				loadZonePagination(category, episodes, languageCode, null, linked, zoneTitle,
+						ArteEmacJson.zonePagination(linked));
+			}
 		} catch (final RuntimeException e) {
 			logCatalogSkip(languageCode, null, zone.path("id").asText(null), linkUrl, e);
 		}
@@ -283,7 +277,8 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 		if (pagination.isMissingNode() || pagination.isNull()) {
 			return;
 		}
-		if (followPaginationLinks(category, episodes, languageCode, zoneTitle, pagination)) {
+		final int linkPages = followPaginationLinks(category, episodes, languageCode, zoneTitle, pagination);
+		if (linkPages < 0) {
 			return;
 		}
 		final String zoneCode = zone.path("code").asText(null);
@@ -291,7 +286,7 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 			return;
 		}
 		final int pages = Math.min(pagination.path("pages").asInt(1), ArteConf.MAX_PAGINATION_REQUESTS);
-		for (int pageNumber = 2; pageNumber <= pages; pageNumber++) {
+		for (int pageNumber = Math.max(2, linkPages + 1); pageNumber <= pages; pageNumber++) {
 			final String zoneUrl = buildLegacyZoneUrl(languageCode, zoneCode, pageCode, pageNumber);
 			try {
 				final JsonNode zoneRoot = ArteEmacJson.parseTree(transport.get(zoneUrl), zoneUrl);
@@ -303,31 +298,35 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 		}
 	}
 
-	private boolean followPaginationLinks(final CategoryDTO category, final Set<EpisodeDTO> episodes,
+	/**
+	 * @return highest page index reached via {@code links.next} (1 = inline page
+	 *         only), or -1 when the full chain was consumed with no remaining pages
+	 */
+	private int followPaginationLinks(final CategoryDTO category, final Set<EpisodeDTO> episodes,
 			final String languageCode, final String zoneTitle, final JsonNode pagination) {
 		String nextUrl = pagination.path("links").path("next").asText(null);
-		if (StringUtils.isEmpty(nextUrl) || !isSafePublicEmacUrl(nextUrl)) {
-			return false;
+		if (StringUtils.isEmpty(nextUrl) || !ArteRequestUrls.isTrustedCatalogueFetchUrl(nextUrl)) {
+			return 0;
 		}
 		int fetched = 1;
-		boolean exhausted = true;
 		while (!StringUtils.isEmpty(nextUrl) && fetched < ArteConf.MAX_PAGINATION_REQUESTS) {
 			final JsonNode zoneRoot;
 			try {
 				zoneRoot = ArteEmacJson.parseTree(transport.get(nextUrl), nextUrl);
 			} catch (final TechnicalException e) {
-				exhausted = false;
-				break;
+				return fetched;
 			}
 			fetched++;
 			addEpisodesFromDataNode(category, episodes, ArteEmacJson.emacDataNode(zoneRoot), languageCode, zoneTitle);
 			nextUrl = ArteEmacJson.zonePagination(zoneRoot).path("links").path("next").asText(null);
-			if (StringUtils.isNotEmpty(nextUrl) && !isSafePublicEmacUrl(nextUrl)) {
-				exhausted = false;
-				break;
+			if (StringUtils.isNotEmpty(nextUrl) && !ArteRequestUrls.isTrustedCatalogueFetchUrl(nextUrl)) {
+				return fetched;
 			}
 		}
-		return exhausted;
+		if (StringUtils.isEmpty(nextUrl)) {
+			return -1;
+		}
+		return fetched;
 	}
 
 	private void addEpisodesFromDataNode(final CategoryDTO category, final Set<EpisodeDTO> episodes, final JsonNode data,
@@ -384,31 +383,113 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 
 	private boolean hasEmacZoneLink(final JsonNode zone) {
 		final String linkUrl = resolveUrl(zone.path("link").path("url").asText(null));
-		return StringUtils.isNotEmpty(linkUrl) && linkUrl.startsWith(ArteConf.EMAC_API_BASE);
-	}
-
-	private static boolean isSafePublicEmacUrl(final String url) {
-		return StringUtils.isNotEmpty(url)
-				&& (url.startsWith(ArteConf.EMAC_API_BASE + "/") || url.startsWith(ArteConf.HOME_URL));
+		return ArteRequestUrls.isTrustedEmacApiUrl(linkUrl);
 	}
 
 	private String buildLegacyZoneUrl(final String languageCode, final String zoneCode, final String pageCode,
 			final int pageNumber) {
+		final String pageId = StringUtils.isEmpty(pageCode) ? zoneCode : pageCode;
 		return ArteConf.EMAC_API_BASE + "/" + languageCode + "/web/zones/" + zoneCode + "/content?page=" + pageNumber
-				+ "&pageId=" + pageCode + "&authorizedCountry=" + ArteConf.AUTHORIZED_COUNTRY;
+				+ "&pageId=" + pageId + "&authorizedCountry=" + ArteConf.AUTHORIZED_COUNTRY;
 	}
 
 	private String resolveUrl(final String url) {
-		if (StringUtils.isEmpty(url)) {
-			return url;
+		return ArteCatalogDiscovery.resolvePublicSiteUrl(url);
+	}
+
+	private static String uniqueZoneTitle(final String title, final String zoneKey, final Set<String> seenTitles) {
+		if (seenTitles.add(title)) {
+			return title;
 		}
-		if (url.startsWith("http://") || url.startsWith("https://")) {
-			return url;
+		return title + " (" + zoneKey + ")";
+	}
+
+	private boolean scanTeasersForPlayable(final JsonNode data) {
+		if (!data.isArray()) {
+			return false;
 		}
-		if (url.startsWith("/")) {
-			return ArteConf.HOME_URL + url;
+		for (final JsonNode item : data) {
+			final String resolvedUrl = ArteCatalogDiscovery.resolvePublicSiteUrl(item.path("url").asText(null));
+			if (ArteContentClassifier.classifyTeaser(item, resolvedUrl) == ContentKind.PLAYABLE_SHOW) {
+				return true;
+			}
 		}
-		return ArteConf.HOME_URL + "/" + url;
+		return false;
+	}
+
+	private boolean addCollectionChildren(final String languageCode, final CategoryDTO zoneCategory, final JsonNode data) {
+		if (!data.isArray()) {
+			return false;
+		}
+		boolean added = false;
+		for (final JsonNode item : data) {
+			final String resolvedUrl = resolveUrl(item.path("url").asText(null));
+			if (ArteContentClassifier.classifyTeaser(item, resolvedUrl) != ContentKind.COLLECTION) {
+				continue;
+			}
+			final String collectionId = ArteContentClassifier.collectionId(item, resolvedUrl);
+			if (StringUtils.isEmpty(collectionId)) {
+				continue;
+			}
+			String title = item.path("title").asText(null);
+			if (StringUtils.isEmpty(title)) {
+				title = collectionId;
+			}
+			final CategoryDTO collectionCategory = new CategoryDTO(ArteConf.NAME, title,
+					ArteCategoryId.forCollection(languageCode, collectionId), ArteConf.EXTENSION);
+			collectionCategory.setDownloadable(true);
+			zoneCategory.addSubCategory(collectionCategory);
+			added = true;
+		}
+		return added;
+	}
+
+	private boolean discoverPlayableInDeferredLink(final JsonNode zone) {
+		final JsonNode linked = fetchTrustedZoneLink(zone);
+		if (linked == null) {
+			return false;
+		}
+		final JsonNode linkedZones = ArteEmacJson.emacZonesNode(linked);
+		if (linkedZones.isArray() && linkedZones.size() > 0) {
+			for (final JsonNode linkedZone : linkedZones) {
+				if (scanTeasersForPlayable(linkedZone.path("content").path("data"))) {
+					return true;
+				}
+			}
+			return false;
+		}
+		return scanTeasersForPlayable(ArteEmacJson.emacDataNode(linked));
+	}
+
+	private boolean discoverCollectionsInDeferredLink(final String languageCode, final CategoryDTO zoneCategory,
+			final JsonNode zone) {
+		final JsonNode linked = fetchTrustedZoneLink(zone);
+		if (linked == null) {
+			return false;
+		}
+		boolean added = false;
+		final JsonNode linkedZones = ArteEmacJson.emacZonesNode(linked);
+		if (linkedZones.isArray() && linkedZones.size() > 0) {
+			for (final JsonNode linkedZone : linkedZones) {
+				added = addCollectionChildren(languageCode, zoneCategory, linkedZone.path("content").path("data"))
+						|| added;
+			}
+		} else {
+			added = addCollectionChildren(languageCode, zoneCategory, ArteEmacJson.emacDataNode(linked));
+		}
+		return added;
+	}
+
+	private JsonNode fetchTrustedZoneLink(final JsonNode zone) {
+		final String linkUrl = resolveUrl(zone.path("link").path("url").asText(null));
+		if (!ArteRequestUrls.isTrustedEmacApiUrl(linkUrl)) {
+			return null;
+		}
+		try {
+			return ArteEmacJson.parseTree(transport.get(linkUrl), linkUrl);
+		} catch (final RuntimeException e) {
+			return null;
+		}
 	}
 
 	private void logCatalogSkip(final String languageCode, final String pageCode, final String zoneKey,

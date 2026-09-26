@@ -78,7 +78,7 @@ final class ArteContentClassifier {
 		if (zone == null || zone.isMissingNode()) {
 			return true;
 		}
-		if (!zone.path("authenticatedContent").isMissingNode() && !zone.path("authenticatedContent").isNull()) {
+		if (zone.path("authenticatedContent").asBoolean(false)) {
 			return true;
 		}
 		final String title = zone.path("title").asText("");
