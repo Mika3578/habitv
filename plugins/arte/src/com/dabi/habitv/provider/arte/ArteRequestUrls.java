@@ -52,6 +52,10 @@ final class ArteRequestUrls {
 			if (StringUtils.isEmpty(uri.getHost())) {
 				return null;
 			}
+			final int port = uri.getPort();
+			if (port != -1 && port != 443) {
+				return null;
+			}
 			return uri;
 		} catch (final URISyntaxException e) {
 			return null;

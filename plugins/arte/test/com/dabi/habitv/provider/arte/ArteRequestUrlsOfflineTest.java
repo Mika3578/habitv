@@ -24,5 +24,7 @@ public class ArteRequestUrlsOfflineTest {
 		assertFalse(ArteRequestUrls.isTrustedEmacApiUrl("http://api.arte.tv/api/emac/v4/fr/web/pages/DOR/"));
 		assertFalse(ArteRequestUrls.isTrustedEmacApiUrl("not-a-url"));
 		assertFalse(ArteRequestUrls.isTrustedCatalogueFetchUrl("ftp://www.arte.tv/fr/videos/"));
+		assertFalse(ArteRequestUrls.isTrustedEmacApiUrl("https://api.arte.tv/other/path"));
+		assertFalse(ArteRequestUrls.isTrustedPublicSiteUrl("https://www.arte.tv:8443/fr/videos/"));
 	}
 }

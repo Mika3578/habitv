@@ -70,13 +70,16 @@ final class ArteCatalogDiscovery {
 			if (!isCataloguePageCode(code)) {
 				continue;
 			}
-			final String pageUrl = buildPageUrl(languageCode, code);
-			try {
-				final JsonNode pageRoot = ArteEmacJson.parseTree(transport.get(pageUrl), pageUrl);
-				discoveredPageRootsByUrl.put(pageUrl, pageRoot);
-				pages.add(new ArtePageRef(code, ArteEmacJson.pageTitle(pageRoot), pageUrl));
-			} catch (final RuntimeException e) {
-				// Missing page for this language (e.g. ro/DOR) must not break discovery.
+			for (final String support : new String[] { "web", "tv" }) {
+				final String pageUrl = buildPageUrl(languageCode, code, support);
+				try {
+					final JsonNode pageRoot = ArteEmacJson.parseTree(transport.get(pageUrl), pageUrl);
+					discoveredPageRootsByUrl.put(pageUrl, pageRoot);
+					pages.add(new ArtePageRef(code, ArteEmacJson.pageTitle(pageRoot), pageUrl));
+					break;
+				} catch (final RuntimeException e) {
+					// Try the other HOME support variant.
+				}
 			}
 		}
 		return pages;
@@ -118,7 +121,7 @@ final class ArteCatalogDiscovery {
 			if (!"genres_HOME".equals(zone.path("code").asText(null))) {
 				continue;
 			}
-			collectGenreItems(languageCode, zone.path("content").path("data"), codes);
+			collectGenreItems(languageCode, ArteEmacJson.emacDataNode(zone.path("content")), codes);
 			final String zoneId = zone.path("id").asText(null);
 			if (StringUtils.isNotEmpty(zoneId)) {
 				final String zoneUrl = ArteConf.EMAC_API_BASE + "/" + languageCode + "/" + support + "/zones/" + zoneId
@@ -184,7 +187,10 @@ final class ArteCatalogDiscovery {
 		}
 		final String roHome = buildHomeUrl("ro");
 		try {
-			ArteEmacJson.parseTree(transport.get(roHome), roHome);
+			final JsonNode roRoot = ArteEmacJson.parseTree(transport.get(roHome), roHome);
+			if (!roRoot.path("alternativeLanguages").isArray() && StringUtils.isEmpty(roRoot.path("code").asText(null))) {
+				return;
+			}
 			languages.put("ro", "Română");
 		} catch (final RuntimeException e) {
 			// Romanian web edition not reachable from this network.
@@ -223,8 +229,12 @@ final class ArteCatalogDiscovery {
 	}
 
 	static String buildPageUrl(final String languageCode, final String pageCode) {
-		return ArteConf.EMAC_API_BASE + "/" + languageCode + "/web/pages/" + pageCode + "/?authorizedCountry="
-				+ ArteConf.AUTHORIZED_COUNTRY;
+		return buildPageUrl(languageCode, pageCode, "web");
+	}
+
+	static String buildPageUrl(final String languageCode, final String pageCode, final String support) {
+		return ArteConf.EMAC_API_BASE + "/" + languageCode + "/" + support + "/pages/" + pageCode
+				+ "/?authorizedCountry=" + ArteConf.AUTHORIZED_COUNTRY;
 	}
 
 	static final class ArteLanguage {

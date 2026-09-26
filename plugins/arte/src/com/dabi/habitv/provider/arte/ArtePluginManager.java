@@ -150,8 +150,9 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 		hasPlayableItem = scanTeasersForPlayable(zone.path("content").path("data")) || hasPlayableItem;
 		hasCollectionChild = addCollectionChildren(languageCode, zoneCategory, zone.path("content").path("data"))
 				|| hasCollectionChild;
-		hasPlayableItem = discoverPlayableInDeferredLink(zone) || hasPlayableItem;
-		hasCollectionChild = discoverCollectionsInDeferredLink(languageCode, zoneCategory, zone) || hasCollectionChild;
+		final DeferredLinkScan deferredLink = scanDeferredLinkContent(languageCode, zoneCategory, zone);
+		hasPlayableItem = deferredLink.hasPlayable || hasPlayableItem;
+		hasCollectionChild = deferredLink.hasCollections || hasCollectionChild;
 		hasCollectionChild = discoverCollectionsInPaginatedZone(languageCode, pageCode, zoneCategory, zone)
 				|| hasCollectionChild;
 		if (!hasPlayableItem && !hasCollectionChild && !hasDeferredZoneContent(zone)) {
@@ -446,40 +447,26 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 		return added;
 	}
 
-	private boolean discoverPlayableInDeferredLink(final JsonNode zone) {
-		final JsonNode linked = fetchTrustedZoneLink(zone);
-		if (linked == null) {
-			return false;
-		}
-		final JsonNode linkedZones = ArteEmacJson.emacZonesNode(linked);
-		if (linkedZones.isArray() && linkedZones.size() > 0) {
-			for (final JsonNode linkedZone : linkedZones) {
-				if (scanTeasersForPlayable(linkedZone.path("content").path("data"))) {
-					return true;
-				}
-			}
-			return false;
-		}
-		return scanTeasersForPlayable(ArteEmacJson.emacDataNode(linked));
-	}
-
-	private boolean discoverCollectionsInDeferredLink(final String languageCode, final CategoryDTO zoneCategory,
+	private DeferredLinkScan scanDeferredLinkContent(final String languageCode, final CategoryDTO zoneCategory,
 			final JsonNode zone) {
 		final JsonNode linked = fetchTrustedZoneLink(zone);
 		if (linked == null) {
-			return false;
+			return DeferredLinkScan.NONE;
 		}
-		boolean added = false;
+		boolean hasPlayable = false;
+		boolean hasCollections = false;
 		final JsonNode linkedZones = ArteEmacJson.emacZonesNode(linked);
 		if (linkedZones.isArray() && linkedZones.size() > 0) {
 			for (final JsonNode linkedZone : linkedZones) {
-				added = addCollectionChildren(languageCode, zoneCategory, linkedZone.path("content").path("data"))
-						|| added;
+				hasPlayable = scanTeasersForPlayable(linkedZone.path("content").path("data")) || hasPlayable;
+				hasCollections = addCollectionChildren(languageCode, zoneCategory, linkedZone.path("content").path("data"))
+						|| hasCollections;
 			}
 		} else {
-			added = addCollectionChildren(languageCode, zoneCategory, ArteEmacJson.emacDataNode(linked));
+			hasPlayable = scanTeasersForPlayable(ArteEmacJson.emacDataNode(linked));
+			hasCollections = addCollectionChildren(languageCode, zoneCategory, ArteEmacJson.emacDataNode(linked));
 		}
-		return added;
+		return new DeferredLinkScan(hasPlayable, hasCollections);
 	}
 
 	private boolean discoverCollectionsInPaginatedZone(final String languageCode, final String pageCode,
@@ -491,17 +478,18 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 		boolean added = false;
 		String nextUrl = pagination.path("links").path("next").asText(null);
 		int pageNumber = 2;
-		final int pages = Math.min(pagination.path("pages").asInt(1), 5);
+		final int pages = Math.min(pagination.path("pages").asInt(1), ArteConf.MAX_PAGINATION_REQUESTS);
 		while (pageNumber <= pages) {
-			final JsonNode pageRoot;
-			if (StringUtils.isNotEmpty(nextUrl) && ArteRequestUrls.isTrustedCatalogueFetchUrl(nextUrl)) {
+			JsonNode pageRoot = null;
+			if (StringUtils.isNotEmpty(nextUrl) && ArteRequestUrls.isTrustedEmacApiUrl(nextUrl)) {
 				try {
 					pageRoot = ArteEmacJson.parseTree(transport.get(nextUrl), nextUrl);
+					nextUrl = ArteEmacJson.zonePagination(pageRoot).path("links").path("next").asText(null);
 				} catch (final RuntimeException e) {
-					break;
+					nextUrl = null;
 				}
-				nextUrl = ArteEmacJson.zonePagination(pageRoot).path("links").path("next").asText(null);
-			} else {
+			}
+			if (pageRoot == null) {
 				final String zoneCode = zone.path("code").asText(null);
 				if (StringUtils.isEmpty(zoneCode)) {
 					break;
@@ -512,11 +500,24 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 				} catch (final RuntimeException e) {
 					break;
 				}
+				nextUrl = null;
 			}
 			added = addCollectionChildren(languageCode, zoneCategory, ArteEmacJson.emacDataNode(pageRoot)) || added;
 			pageNumber++;
 		}
 		return added;
+	}
+
+	private static final class DeferredLinkScan {
+		private static final DeferredLinkScan NONE = new DeferredLinkScan(false, false);
+
+		private final boolean hasPlayable;
+		private final boolean hasCollections;
+
+		private DeferredLinkScan(final boolean hasPlayable, final boolean hasCollections) {
+			this.hasPlayable = hasPlayable;
+			this.hasCollections = hasCollections;
+		}
 	}
 
 	private JsonNode fetchTrustedZoneLink(final JsonNode zone) {

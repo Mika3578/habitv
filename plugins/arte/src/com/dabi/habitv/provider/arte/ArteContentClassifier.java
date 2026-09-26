@@ -1,5 +1,6 @@
 package com.dabi.habitv.provider.arte;
 
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
@@ -82,7 +83,7 @@ final class ArteContentClassifier {
 			return true;
 		}
 		final String title = zone.path("title").asText("");
-		final String lower = title.toLowerCase();
+		final String lower = title.toLowerCase(Locale.ROOT);
 		if (lower.contains("newsletter") || lower.contains("boutique")) {
 			return true;
 		}
