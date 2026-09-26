@@ -1,147 +1,297 @@
 ---
 name: pr-review
-description: Keeps a pull request in Draft until review, CI, full validation, and user functional gates pass on the latest commit. Use when addressing review comments or preparing a PR for Ready.
+description: Canonical PR orchestrator — Draft through Ready on current HEAD. Use when continuing, reviewing, or finishing a specific pull request.
 ---
 
-# Pull request review loop
+# PR orchestrator
 
-Authoritative invariants: [`AGENTS.md`](../../../AGENTS.md) (**Pull request lifecycle**).
+Constitutional invariants: [`AGENTS.md`](../../../AGENTS.md) (**Pull request lifecycle**).
 Template: [`.github/pull_request_template.md`](../../../.github/pull_request_template.md).
 Public replies: [public-git-text](../public-git-text/SKILL.md).
+Verification: [code-change-verification](../code-change-verification/SKILL.md).
+New PR setup: [git-workflow](../git-workflow/SKILL.md).
 
-Before opening a new pull request, complete branch setup in
-[`git-workflow`](../git-workflow/SKILL.md).
+This skill is the **only** canonical end-to-end PR procedure. Do not add
+parallel PR-management skills.
 
-## Authorization (this PR)
-
-When the user asks to finish a PR, address reviews, process findings, or
-prepare for Ready **for a named PR**, that includes for that PR only:
-
-- concise replies on existing review threads;
-- resolving threads after the resolution gate below;
-- re-fetching thread state to confirm `isResolved=true`.
-
-Separate approval is still required for merge, closing unrelated issues/PRs,
-branch deletion, and force operations outside the approved workflow.
-
-## Review item lifecycle
-
-Each finding moves through:
+## Operating model
 
 ```text
-DISCOVERED → EVALUATED → FIXED or REJECTED_WITH_REASON
-    → VALIDATED → PUSHED (when remote) → REPLIED → RESOLVED (verified)
+small global invariants (AGENTS.md)
+    → this orchestrator
+    → deterministic scripts
+    → live GitHub reconciliation
+    → independent review (read-only)
+    → bounded feedback loop
+    → explicit Ready gate
 ```
 
-Code findings (typical):
+Mechanical facts (HEAD SHA, thread counts, body markers, check names) come
+from scripts and `gh` — not from model memory.
+
+## Single-writer rule
+
+During a review cycle for one PR, **only the orchestrating agent** may:
+
+- edit PR title/body or Draft/Ready;
+- post disposition replies on review threads;
+- resolve threads;
+- request reviewers.
+
+**Independent reviewers** (subagents, Copilot, humans as consulted) are
+**read-only** on GitHub. They may inspect diff, tests, and context and
+return findings. They must not post duplicate PR comments, resolve threads,
+change PR metadata, request reviewers, or merge.
+
+The orchestrator deduplicates, adjudicates, batches fixes, publishes,
+replies, resolves, and reconciles live state.
+
+## Local durable state (resumability)
+
+Store operational metadata only under `agent_space/pr-<number>/` (gitignored).
+Never commit it. Never cite it in public git text.
+
+Live GitHub state **overrides** stale local files.
+
+Example `state.json` shape:
+
+```json
+{
+  "repository": "Mika3578/habitv",
+  "pr_number": 0,
+  "base": "develop",
+  "head_sha": "",
+  "review_round": 1,
+  "review_head": "",
+  "findings": [
+    {
+      "id": "thread-or-comment-id",
+      "source": "copilot|human|bot",
+      "classification": "BLOCKING",
+      "disposition": "FIXED",
+      "fix_commit": "",
+      "validation": "pass|fail|pending",
+      "replied": true,
+      "resolved": true
+    }
+  ]
+}
+```
+
+No credentials, tokens, or session data.
+
+## Authorization
+
+When the user authorizes **finish this PR**, **address this PR's reviews**,
+or **prepare this PR for final review**, that includes for **that PR only**:
+
+- adjudicating and fixing findings;
+- concise replies on existing threads;
+- resolving verified threads;
+- re-fetching GitHub state.
+
+Still requires separate approval: merge, unrelated issues/PRs, branch
+deletion, unrelated force operations, creating GitHub issues (unless
+explicitly authorized).
+
+## Orchestration phases
 
 ```text
-edit → focused validation → commit/push → verify fix on remote HEAD
-    → reply (with commit SHA when useful) → resolve → verify isResolved
+INTAKE → SNAPSHOT → INVENTORY → ADJUDICATE → FIX_BATCH → VERIFY
+    → PUBLISH → REPLY → RESOLVE → LIVE_RECONCILE → FINAL_REVIEW → READY_GATE
 ```
 
-Rejected findings: `evaluate → evidence → reply → resolve → verify`.
+| Phase | Purpose |
+|-------|---------|
+| INTAKE | Confirm repo, PR number, user scope, risk tier, round number |
+| SNAPSHOT | Record `REVIEW_HEAD=<40-char SHA>`; run [`scripts/pr-gh-snapshot.sh`](../../../scripts/pr-gh-snapshot.sh) (or `.ps1`) |
+| INVENTORY | Classify all feedback surfaces (see below) |
+| ADJUDICATE | Assign disposition per finding; deduplicate |
+| FIX_BATCH | Implement accepted fixes in one coherent batch |
+| VERIFY | Run applicable validation ([code-change-verification](../code-change-verification/SKILL.md)) |
+| PUBLISH | Commit/push; confirm remote HEAD contains fixes |
+| REPLY | Concise disposition in **existing** thread (commit SHA when useful) |
+| RESOLVE | GraphQL/REST resolve; re-query `isResolved` (not `isOutdated`) |
+| LIVE_RECONCILE | Full live PR fetch before claiming cleanliness |
+| FINAL_REVIEW | One independent review on exact current HEAD (tier-dependent) |
+| READY_GATE | All gates on current HEAD; explicit user authorization to mark Ready |
 
-Never resolve without a disposition reply. Never resolve because a bot
-comment looks stale. Never open a duplicate thread when the same concern
-already has one.
+## Finding lifecycle
 
-## Review round (HEAD-bound)
+```text
+DISCOVERED → EVALUATED → FIXED | REJECTED | DUPLICATE | FOLLOW_UP
+    → VALIDATED → PUBLISHED → REPLIED → RESOLVED
+```
 
-Record `REVIEW_HEAD=<40-char SHA>` at the start of a round.
+Editing a file does **not** complete a finding.
 
-Before reporting “review complete”, “ready”, or “approved on HEAD”, fetch
-the live PR HEAD again. If `current HEAD != REVIEW_HEAD`, the round is
-stale; repeat validation and review for the new SHA.
+**FIXED (valid):** fix → validate → publish → verify on remote HEAD → reply →
+resolve → confirm `isResolved=true`.
 
-After fixing findings in a round: validate, push once, reply, resolve
-qualifying threads, confirm CI on that HEAD, then **re-request the final
-reviewer once** for that HEAD. Do not re-request after every intermediate
-commit.
+**REJECTED (invalid):** technical evidence → reply → resolve → confirm.
 
-## Inventory (start and end of each round)
+**DUPLICATE:** map to canonical thread/finding; no second comment.
 
-Fetch live GitHub state for the target PR:
+**FOLLOW_UP:** legitimate but out of scope — record locally; open a GitHub
+issue only when authorized; do not expand the PR.
 
-- metadata, title, body, draft flag, branch, HEAD SHA;
+## Classification vocabulary
+
+| Class | Meaning |
+|-------|---------|
+| `BLOCKING` | Must fix or reject with evidence before Ready |
+| `NON_BLOCKING` | May defer with documented reason if policy allows |
+| `INVALID` | Reject with concise technical reason |
+| `DUPLICATE` | Same concern as an existing thread |
+| `FOLLOW_UP` | Out of scope for this PR |
+
+Review tools supply evidence; the orchestrator adjudicates. Do not implement
+every AI suggestion blindly.
+
+## Batch fixes (default)
+
+```text
+collect complete round → adjudicate all → fix accepted batch
+    → validate → publish once → reply → resolve eligible threads
+    → request next substantive review once
+```
+
+Do not loop: one bot comment → one commit → one review request.
+
+Exceptions: urgent blockers or findings that change implementation strategy.
+
+## HEAD-bound review rounds
+
+At SNAPSHOT set `REVIEW_HEAD` to the live PR HEAD.
+
+Before reporting a clean review, green eligibility, or Ready: fetch HEAD
+again. If `current HEAD != REVIEW_HEAD`, the round is stale — re-run
+invalidated gates. Never report historical reviews as current.
+
+Track `review_round` in local state. Increment when HEAD changes materially
+after a published fix batch.
+
+## Bounded review loops
+
+If ~3 correction rounds target the same root rule/design area without
+stability, **escalate**: question the condition, layer, or architecture;
+restate policy instead of patching endlessly. This is not permission to
+ignore valid defects.
+
+## Risk-proportional independent review
+
+Pick the **smallest** tier that safely covers the diff.
+
+| Tier | Typical scope | Independent review |
+|------|---------------|------------------|
+| LIGHTWEIGHT | Formatting, spelling, non-semantic docs | Self-review acceptable |
+| ORDINARY | Normal code, providers, tests, ordinary CI/config | One fresh-context independent review |
+| HIGH_RISK | Credentials, process execution, updater/security, packaging/runtime, major Maven/JDK, shared cross-provider logic | Stronger independent coverage |
+
+Independent reviewers must not inherit the implementer's conclusions.
+Launch with fresh context and diff evidence only.
+
+## Inventory (every round, start and end)
+
+Fetch live GitHub state:
+
+- HEAD SHA, base, branch, draft flag, title, body;
 - review submissions and requested reviewers;
-- inline review threads (`isResolved`, comments);
-- top-level issue/PR conversation comments;
+- inline threads (`isResolved`, `isOutdated`, comments);
+- top-level issue/PR comments;
 - check runs / statuses.
 
-Classify each item. Do not ignore top-level comments because they are not
-inline threads.
+Use [`scripts/pr-gh-snapshot.sh`](../../../scripts/pr-gh-snapshot.sh) for a
+deterministic baseline, then classify each item.
 
-Deduplicate: if a new bot finding matches an existing thread, continue that
-thread; do not count it twice.
+Deduplicate before acting on new bot output.
 
 ## Status checks vs substantive review
 
-Green CI, policy validators, or a skipped bot status does **not** prove a
-substantive code review ran. Track separately:
+Track separately: `checks` · `review submissions` · `thread findings` ·
+`approvals`. A green policy or skipped bot check is not a substantive review.
 
-`checks` · `review submissions` · `thread findings` · `approvals`
+## PR body ownership
 
-## Live reconciliation before Ready
+The orchestrator owns the canonical PR description (template sections).
+External tools may comment; do not rely on multiple tools rewriting the body.
 
-Immediately before recommending or marking Ready, re-fetch the PR from
-GitHub. Confirm:
+Hygiene: live body must pass
+[`scripts/validate-pr-public-body.sh`](../../../scripts/validate-pr-public-body.sh)
+(`.ps1`). CI runs this on `pull_request` events including `edited`.
 
-- no unresolved actionable review threads;
-- live body passes [`scripts/validate-pr-public-body.sh`](../../../scripts/validate-pr-public-body.sh)
-  (or `.ps1`) — remove forbidden generated blocks if maintenance is in scope;
-- required checks green on **current** HEAD;
-- final substantive review (when required) targets **current** HEAD.
+**Sourcery:** disable **Enable pull request summary** in Sourcery Review
+Settings when possible ([`docs/github-rulesets/README.md`](../../../docs/github-rulesets/README.md)).
 
-Local files alone are not sufficient.
+**cubic:** no in-repo `cubic.yaml`; use official dashboard/repo config only —
+do not invent keys. If auto-description cannot be disabled, keep reconciling
+the live body.
 
-## Loop (summary)
+## Copilot final review (HabiTV model)
 
-```text
-PR stays Draft
-    ↓
-inventory all feedback (round opens: REVIEW_HEAD)
-    ↓
-evaluate each finding; fix or reject with evidence
-    ↓
-validate; push when needed; reply; resolve; verify threads
-    ↓
-CI green on current HEAD
-    ↓
-one final review request for that HEAD (when applicable)
-    ↓
-functional test + explicit user confirmation when applicable
-    ↓
-live reconciliation gate
-    ↓
-Ready only with explicit authorization
+**Draft phase:** implementation, validation, auxiliary bot rounds, batch fixes.
+
+**Final phase:** live reconcile → required checks green on current HEAD →
+**request Copilot review once** on that HEAD → address findings in a new
+round if needed → repeat only if HEAD changes → Ready.
+
+Do not request Copilot after every intermediate commit. Do not treat a status
+check as Copilot review.
+
+## Live reconciliation (READY_GATE prerequisites)
+
+On current HEAD, confirm:
+
+- scope complete and validation recorded;
+- full reactor validation when required ([`docs/development.md`](../../../docs/development.md));
+- required GitHub checks pass;
+- zero actionable unresolved threads;
+- PR body policy-clean;
+- substantive final review on this HEAD when tier requires it;
+- functional test: user **explicitly confirms success in the current
+  conversation** when runtime behavior may change — else report
+  `Functional validation: PENDING USER TEST`;
+- explicit user authorization to mark Ready.
+
+```bash
+scripts/pr-gh-snapshot.sh Mika3578/habitv <pr>
 ```
 
-## Latest HEAD
+Local files alone are insufficient.
 
-Evaluate the **current PR head commit**, not historical checks or approvals.
+## Draft → Ready checklist (operational)
+
+All items apply to **current PR HEAD** only:
+
+1. Scope complete.
+2. Focused tests pass when code changed.
+3. Full reactor validation when applicable.
+4. Required checks green on HEAD.
+5. Every feedback item inventoried and adjudicated.
+6. Every `BLOCKING` item fixed or rejected with evidence.
+7. Qualifying threads replied and resolved (`isResolved` verified).
+8. No actionable unresolved threads.
+9. Live body passes `validate-pr-public-body`.
+10. Final substantive review on HEAD (tier-dependent).
+11. User functional confirmation when applicable.
+12. No newer commit invalidates the above.
+13. Explicit authorization to mark Ready.
+
+## Continuing an existing PR
+
+1. INTAKE — user authorized this PR.
+2. SNAPSHOT — `REVIEW_HEAD`, `pr-gh-snapshot`, update `agent_space/pr-<n>/state.json`.
+3. INVENTORY + ADJUDICATE — all sources; map duplicates.
+4. If work remains: FIX_BATCH through RESOLVE; one review request when round complete.
+5. LIVE_RECONCILE + FINAL_REVIEW + READY_GATE.
+
+## Deferred (not in every PR)
+
+- **Merge queue:** future governance option for parallel provider PRs; requires
+  `merge_group` workflow support — see
+  [`docs/github-rulesets/README.md`](../../../docs/github-rulesets/README.md).
 
 ## Forbidden without conversation authorization
 
-Merge, marking Ready without completing gates, closing unrelated PRs,
-destructive branch operations, and force-push outside approved workflow.
-See **Git Workflow** in `AGENTS.md`.
-
-## Do not declare completion while
-
-- Any review item is unexamined.
-- Any actionable finding is unfixed and not rejected with evidence.
-- Any qualifying thread lacks a reply or remains unresolved.
-- Required checks are pending or failing on the latest commit.
-- Full-reactor validation is required but missing.
-- Functional testing is required but unconfirmed.
-- Live PR body contains forbidden generated summary blocks.
-- `REVIEW_HEAD` does not match live PR HEAD when claiming review completeness.
-
-## Functional validation
-
-When runtime behavior may change, provide a concise manual test procedure and
-report `Functional validation: PENDING USER TEST` until the user explicitly
-confirms success in the current conversation.
-
-Verification commands: [`code-change-verification`](../code-change-verification/SKILL.md).
+Merge, marking Ready before READY_GATE, unrelated GitHub mutations,
+destructive branch ops, force-push outside approved workflow.

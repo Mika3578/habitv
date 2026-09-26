@@ -31,3 +31,10 @@ Hosted Copilot rule in the payload sets `review_draft_pull_requests: false`.
 - **cubic:** no `cubic.yaml` in this repository; use the cubic dashboard or
   supported repo config if available. CI runs
   `scripts/validate-pr-public-body.*` on `pull_request` `edited` events.
+
+## Merge queue (deferred)
+
+GitHub merge queues can reduce integration friction when many provider PRs
+land in parallel. Enabling a queue is **out of scope for agent-rules PRs**;
+workflows would need `merge_group` event support and a dedicated governance
+change. Document only until a maintainer adopts it.

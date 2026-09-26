@@ -7,7 +7,8 @@ description: Runs focused then full Maven validation and records evidence before
 
 Canonical build baseline and commands: [`docs/development.md`](../../../docs/development.md).
 Policy gates: [`AGENTS.md`](../../../AGENTS.md) (**Testing and Validation**,
-**Pull request lifecycle**).
+**Pull request lifecycle**). PR orchestration:
+[pr-review](../pr-review/SKILL.md).
 
 ## Workflow
 
