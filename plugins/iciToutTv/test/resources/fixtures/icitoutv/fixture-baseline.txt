@@ -1,0 +1,6 @@
+provider=iciToutTv
+strategy=nextjs-catalog-ytdlp
+channels=ICI TOU.TV
+catalog=/collection/gratuit (Show, non-Premium)
+access=Canada geo; Member may need optional cookies; Premium EXTRA excluded
+notes=services.radio-canada.ca may return HTTP 426 from some networks; fail closed
