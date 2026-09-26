@@ -54,6 +54,23 @@ check_adapter .continue/rules/00-habitv.md
 check_adapter .github/copilot-instructions.md
 check_adapter .cursor/CLOUD.md
 
+check_thin_public_git_cursor_rule() {
+  local path=".cursor/rules/public-git-text.mdc"
+  if [[ ! -f "$path" ]]; then
+    fail "missing thin Cursor rule: $path"
+    return
+  fi
+  if ! grep -qE '\.agents/skills/public-git-text' "$path"; then
+    fail "public-git-text Cursor rule must reference portable skill: $path"
+  fi
+  local body
+  body="$(awk 'BEGIN { n = 0; show = 0 } /^---$/ { n++; if (n >= 2) { show = 1 }; next } show { print }' "$path")"
+  if printf '%s\n' "$body" | grep -qE '^[[:space:]]*- '; then
+    fail "thin Cursor rule must not duplicate policy bullets: $path"
+  fi
+}
+check_thin_public_git_cursor_rule
+
 if [[ -d .cursor/skills ]]; then
   while IFS= read -r -d '' skill; do
     rel="${skill#./}"
