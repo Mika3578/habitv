@@ -89,6 +89,38 @@ the section above.
 
 Ruleset JSON payloads (admin): `docs/github-rulesets/`.
 
+## Agent instructions
+
+| Layer | Role |
+|-------|------|
+| [`AGENTS.md`](../AGENTS.md) | Canonical persistent policy (single full constitution) |
+| `docs/` | Technical reference (Java, providers, architecture) |
+| [`.agents/skills/`](../.agents/skills/) | Portable on-demand procedures |
+| Tool adapters (`.cursor/`, `.continue/rules/`, `.github/copilot-instructions.md`) | Thin compatibility; point to `AGENTS.md` |
+| `scripts/validate-agent-policy.*` + CI `agent-policy` | Deterministic policy layout checks |
+| `docs/github-rulesets/` | Branch protection payloads (hard enforcement) |
+
+Pull request lifecycle (policy detail in `AGENTS.md`):
+
+```text
+Draft → implementation → focused validation → review/fix loop
+  → full reactor validation (when applicable) → required checks
+  → real-user test when applicable → explicit user confirmation
+  → final current-HEAD verification → Ready
+```
+
+**Other agents:** Claude Code, Gemini CLI, Jules, Junie, Cline, Roo, Windsurf,
+Devin, and similar tools should read root `AGENTS.md` when supported. Portable
+skills live under `.agents/skills/`. **Aider:** pass `AGENTS.md` explicitly
+(for example `aider --read AGENTS.md`) rather than maintaining a separate
+`.aider.conf.yml` in the repository.
+
+**GitHub enforcement gaps (documented):** `docs/github-rulesets/protect-develop.json`
+sets `dismiss_stale_reviews_on_push` and `require_last_push_approval` to `false`;
+enable those in the hosted ruleset if stale approvals after new commits must be
+blocked mechanically. Adding `agent-policy` to required status checks is
+recommended after this workflow merges (update the ruleset JSON and GitHub UI).
+
 ## Workflow
 
 See [`../CONTRIBUTING.md`](../CONTRIBUTING.md) and [`../AGENTS.md`](../AGENTS.md)

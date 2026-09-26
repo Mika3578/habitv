@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+# Deterministic checks for repository agent-policy layout.
+# Usage: scripts/validate-agent-policy.sh
+# Exit 0 when valid, 1 on failure.
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+
+failures=0
+fail() {
+  echo "agent-policy: $1"
+  failures=$((failures + 1))
+}
+
+ADAPTER_MAX_BYTES=8192
+SKILL_DESC_MAX=500
+
+if [[ ! -f AGENTS.md ]]; then
+  fail "missing root AGENTS.md"
+fi
+
+while IFS= read -r f; do
+  case "$f" in
+    ./AGENTS.md | AGENTS.md) ;;
+    *) fail "unexpected nested AGENTS.md: $f" ;;
+  esac
+done < <(find . -name AGENTS.md -not -path './.git/*')
+
+for banned in CLAUDE.md GEMINI.md .cursorrules .windsurfrules; do
+  if [[ -f "$banned" ]]; then
+    size=$(wc -c <"$banned")
+    if [[ "$size" -gt 200 ]]; then
+      fail "competing substantive file present: $banned ($size bytes)"
+    fi
+  fi
+done
+
+check_adapter() {
+  local path="$1"
+  [[ -f "$path" ]] || return 0
+  local size
+  size=$(wc -c <"$path")
+  if [[ "$size" -gt "$ADAPTER_MAX_BYTES" ]]; then
+    fail "adapter too large ($size bytes): $path"
+  fi
+  if ! grep -q 'AGENTS.md' "$path"; then
+    fail "adapter must reference AGENTS.md: $path"
+  fi
+}
+
+check_adapter .continue/rules/00-habitv.md
+check_adapter .github/copilot-instructions.md
+check_adapter .cursor/CLOUD.md
+
+if [[ -d .cursor/skills ]]; then
+  while IFS= read -r -d '' skill; do
+    rel="${skill#./}"
+    if ! grep -qE '\.agents/skills/' "$skill"; then
+      fail "Cursor skill must point to .agents/skills/: $rel"
+    fi
+  done < <(find .cursor/skills -name 'SKILL.md' -print0 2>/dev/null)
+fi
+
+declare -A skill_names=()
+while IFS= read -r -d '' skill; do
+  rel="${skill#./}"
+  if ! head -n 30 "$skill" | grep -q '^name:'; then
+    fail "skill missing name metadata: $rel"
+  fi
+  if ! head -n 30 "$skill" | grep -q '^description:'; then
+    fail "skill missing description metadata: $rel"
+  fi
+  name=$(sed -n '/^name:/s/^name:[[:space:]]*//p' "$skill" | head -1)
+  desc=$(sed -n '/^description:/s/^description:[[:space:]]*//p' "$skill" | head -1)
+  if [[ -z "$name" ]]; then
+    fail "empty skill name: $rel"
+  fi
+  if [[ -z "$desc" ]]; then
+    fail "empty skill description: $rel"
+  fi
+  if [[ "${#desc}" -gt "$SKILL_DESC_MAX" ]]; then
+    fail "skill description too long (${#desc} chars): $rel"
+  fi
+  if [[ -n "${skill_names[$name]:-}" ]]; then
+    fail "duplicate skill name '$name': ${skill_names[$name]} and $rel"
+  fi
+  skill_names[$name]="$rel"
+done < <(find .agents/skills -name 'SKILL.md' -print0 2>/dev/null)
+
+agents_md=$(cat AGENTS.md)
+require_phrase() {
+  local phrase="$1"
+  if ! grep -qF "$phrase" AGENTS.md; then
+    fail "AGENTS.md missing required phrase: $phrase"
+  fi
+}
+
+require_phrase "Keep every pull request in **Draft**"
+require_phrase "current PR HEAD"
+require_phrase "explicitly confirms success in the current conversation"
+
+if [[ "$failures" -gt 0 ]]; then
+  echo "agent-policy: FAILED ($failures check(s))"
+  exit 1
+fi
+
+echo "agent-policy: OK"
+exit 0
