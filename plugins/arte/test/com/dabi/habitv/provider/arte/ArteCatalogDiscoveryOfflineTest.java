@@ -107,7 +107,9 @@ public class ArteCatalogDiscoveryOfflineTest {
 			final String pageUrl = ArteCatalogDiscovery.buildPageUrl("fr", code);
 			urls.put(pageUrl,
 					"{\"code\":\"" + code + "\",\"metadata\":{\"title\":\"" + code + " title\"},\"zones\":[{\"id\":\"z-"
-							+ code + "\",\"code\":\"z-" + code + "\",\"title\":\"Listing\",\"content\":{\"data\":[]}}]}");
+							+ code + "\",\"code\":\"z-" + code
+							+ "\",\"title\":\"Listing\",\"content\":{\"data\":[{\"url\":\"/fr/videos/119999-000-A/example-"
+							+ code.toLowerCase() + "/\",\"title\":\"Example\"}]}}]}");
 		}
 		return urls;
 	}

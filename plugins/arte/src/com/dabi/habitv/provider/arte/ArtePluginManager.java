@@ -167,6 +167,9 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 			zoneCategory.addSubCategory(collectionCategory);
 			hasCollectionChild = true;
 		}
+		if (!hasPlayableItem && !hasCollectionChild) {
+			return null;
+		}
 		if (hasCollectionChild && !hasPlayableItem) {
 			zoneCategory.setDownloadable(false);
 		}
@@ -289,24 +292,27 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 			final String languageCode, final String zoneTitle, final JsonNode pagination) {
 		String nextUrl = pagination.path("links").path("next").asText(null);
 		if (StringUtils.isEmpty(nextUrl) || !isSafePublicEmacUrl(nextUrl)) {
-			return !StringUtils.isEmpty(pagination.path("links").path("next").asText(null));
+			return false;
 		}
 		int fetched = 1;
+		boolean exhausted = true;
 		while (!StringUtils.isEmpty(nextUrl) && fetched < ArteConf.MAX_PAGINATION_REQUESTS) {
 			final JsonNode zoneRoot;
 			try {
 				zoneRoot = ArteEmacJson.parseTree(transport.get(nextUrl), nextUrl);
 			} catch (final TechnicalException e) {
+				exhausted = false;
 				break;
 			}
 			fetched++;
 			addEpisodesFromDataNode(category, episodes, ArteEmacJson.emacDataNode(zoneRoot), languageCode, zoneTitle);
 			nextUrl = ArteEmacJson.zonePagination(zoneRoot).path("links").path("next").asText(null);
 			if (StringUtils.isNotEmpty(nextUrl) && !isSafePublicEmacUrl(nextUrl)) {
+				exhausted = false;
 				break;
 			}
 		}
-		return true;
+		return exhausted;
 	}
 
 	private void addEpisodesFromDataNode(final CategoryDTO category, final Set<EpisodeDTO> episodes, final JsonNode data,

@@ -144,6 +144,38 @@ public class ArteEmacParsingOfflineTest {
 	}
 
 	@Test
+	public void findCategorySkipsNavigationOnlyZone() throws IOException {
+		final Map<String, String> urls = new HashMap<>();
+		final String homeFr = ArteCatalogDiscovery.buildHomeUrl("fr");
+		urls.put(homeFr, readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(ArteConf.EMAC_API_BASE + "/fr/tv/pages/HOME/?authorizedCountry=FR",
+				readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(PAGE_URL,
+				"{\"code\":\"DOR\",\"zones\":[{\"id\":\"zone-nav\",\"title\":\"Navigation\",\"content\":{\"data\":[{\"title\":\"Sub page\",\"deeplink\":\"arte://emac/SUBPAGE\"}]}}]}");
+		for (final String code : Arrays.asList("SER", "ARTE_CONCERT", "DEC", "ACT")) {
+			urls.put(ArteCatalogDiscovery.buildPageUrl("fr", code),
+					"{\"code\":\"" + code + "\",\"zones\":[{\"id\":\"z-" + code
+							+ "\",\"title\":\"Listing\",\"content\":{\"data\":[]}}]}");
+		}
+		final ArtePluginManager plugin = new ArtePluginManager(new ArteCatalogDiscovery(urls::get), urls::get);
+
+		CategoryDTO dorPage = null;
+		for (final CategoryDTO language : plugin.findCategory()) {
+			if (!language.getId().endsWith("/fr/")) {
+				continue;
+			}
+			for (final CategoryDTO page : language.getSubCategories()) {
+				if (page.getId().endsWith(":DOR")) {
+					dorPage = page;
+					break;
+				}
+			}
+		}
+		assertNotNull("DOR page must still be exposed", dorPage);
+		assertTrue("navigation-only zones must not become empty downloadable leaves", dorPage.getSubCategories().isEmpty());
+	}
+
+	@Test
 	public void findEpisodeReturnsEmptyForUnknownListing() throws IOException {
 		final RecordingArtePlugin plugin = multizonePlugin(true, true);
 		final CategoryDTO category = new CategoryDTO(ArteConf.NAME, "x", "fr:DOR:no_such_zone", ArteConf.EXTENSION);
@@ -235,6 +267,23 @@ public class ArteEmacParsingOfflineTest {
 				episodeNames(episodes).contains("Legacy Wrapped"));
 		assertTrue("legacy value.data title must still be extracted",
 				episodeNames(episodes).contains("Legacy Value Data"));
+	}
+
+	@Test
+	public void findEpisodeFallsBackToLegacyPaginationWhenNextLinkIsNotEmacJson() {
+		final Map<String, String> urlToContent = new HashMap<>();
+		urlToContent.put(PAGE_URL,
+				"{\"zones\":[{\"code\":\"listing_FALLBACK_main\",\"title\":\"Fallback\",\"content\":{\"data\":[{\"url\":\"/fr/videos/119999-910-A/page-one/\",\"title\":\"Page One\"}],\"pagination\":{\"pages\":2,\"links\":{\"next\":\"https://www.arte.tv/fr/videos/119999-911-A/not-json/\"}}}}]}");
+		urlToContent.put(
+				ArteConf.EMAC_API_BASE
+						+ "/fr/web/zones/listing_FALLBACK_main/content?page=2&pageId=DOR&authorizedCountry=FR",
+				"{\"data\":[{\"url\":\"/fr/videos/119999-911-A/page-two/\",\"title\":\"Page Two\"}]}");
+
+		final RecordingArtePlugin plugin = new RecordingArtePlugin(urlToContent);
+		final CategoryDTO category = new CategoryDTO(ArteConf.NAME, "Documentaries", "fr:DOR", ArteConf.EXTENSION);
+
+		assertEquals(Arrays.asList("https://www.arte.tv/fr/videos/119999-910-A/page-one/",
+				"https://www.arte.tv/fr/videos/119999-911-A/page-two/"), episodeIds(plugin.findEpisode(category)));
 	}
 
 	@Test
