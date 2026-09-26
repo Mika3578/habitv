@@ -180,9 +180,15 @@ or topic.
 
 Never run without explicit approval **in this conversation**:
 `git commit`, `git push`, `git push --force` / `--force-with-lease`,
-`gh pr create` / `merge` / `review` / `comment`, review resolution,
-mark a PR Ready, merge, delete branches, rebase when it would rewrite
-remote history, or destructive git/fs commands.
+`gh pr create`, `gh pr merge`, mark a PR Ready, merge, delete branches,
+rebase when it would rewrite remote history, or destructive git/fs commands.
+
+When the user authorizes finishing or reviewing a **specific** pull request,
+that authorization includes the normal feedback loop for that PR only: concise
+thread replies and resolving threads after each finding is fixed or rejected
+with evidence (procedure:
+[`.agents/skills/pr-review/SKILL.md`](.agents/skills/pr-review/SKILL.md)).
+It does not authorize merge or unrelated GitHub mutations.
 
 Do not chain those actions. Do not `git add -A`, `git add .`, or
 `git add --all`. Stage explicit paths only.
@@ -203,19 +209,25 @@ Fill `.github/pull_request_template.md`. Keep PRs small and single-topic.
 Titles, bodies, and review comments follow **Public git text** (brief
 review replies; see **Public git text** above).
 Handle Copilot/review comments (fix, or reject briefly with a reason).
-Ask before posting GitHub comments or resolving threads.
 
 ## Pull request lifecycle
 
-Keep every pull request in **Draft** until all review comments and
-unresolved threads have been individually addressed, all required checks
-pass on the **latest commit**, and no actionable review finding remains.
-Do not mark a pull request Ready for review while any of these conditions
-is unmet.
+Keep every pull request in **Draft** until gates on the **current PR HEAD**
+are satisfied. Invariants:
+
+- Every review finding gets an individual disposition (fix or reject with
+  evidence).
+- Addressed inline findings receive a concise reply before the thread is
+  resolved; verify live `isResolved` afterward.
+- Do not resolve unanswered or unexamined threads.
+- Readiness uses live GitHub state (threads, checks, body), not local files
+  alone.
+- Any new commit invalidates reviews and checks that do not apply to that
+  HEAD; repeat the round.
+- No actionable unresolved feedback remains before Ready.
 
 Always evaluate the **current PR HEAD**. A previous successful review,
-approval, build, or CI run does not validate later commits. After any new
-commit, repeat validation and review on that commit.
+approval, build, or CI run does not validate later commits.
 
 ### Draft → Ready (all applicable on current HEAD)
 
