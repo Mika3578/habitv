@@ -1,0 +1,33 @@
+{
+  "code": "RC-028069",
+  "language": "fr",
+  "metadata": {
+    "title": "L'empire LVMH"
+  },
+  "zones": [
+    {
+      "id": "videos-all",
+      "code": "videos_all",
+      "title": "Toutes les vidéos",
+      "content": {
+        "data": [
+          {
+            "url": "/fr/videos/122704-001-A/l-empire-lvmh-1-2/",
+            "title": "Partie 1",
+            "kind": { "code": "SHOW", "isCollection": false }
+          },
+          {
+            "url": "/fr/videos/122704-002-A/l-empire-lvmh-2-2/",
+            "title": "Partie 2",
+            "kind": { "code": "SHOW", "isCollection": false }
+          }
+        ],
+        "pagination": {
+          "links": {
+            "next": null
+          }
+        }
+      }
+    }
+  ]
+}

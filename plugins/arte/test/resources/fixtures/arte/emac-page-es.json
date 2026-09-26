@@ -1,0 +1,20 @@
+{
+  "code": "DEC",
+  "language": "es",
+  "url": "https://www.arte.tv/es/videos/viajes-y-descubrimientos/",
+  "zones": [
+    {
+      "code": "8dac9f36-b31f-4eb9-aa4e-9d297aee5fd1",
+      "title": "Selección",
+      "content": {
+        "data": [
+          {
+            "url": "/es/videos/119999-400-A/viaje-uno/",
+            "title": "Viaje Uno",
+            "subtitle": "Episodio 1"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "code": "ARTE_CONCERT",
+  "language": "fr",
+  "url": "https://www.arte.tv/fr/arte-concert/",
+  "zones": [
+    {
+      "code": "highlights_category_ARS",
+      "title": "Top teaser",
+      "content": {
+        "data": [
+          {
+            "url": "/fr/videos/RC-027959/catastrophe/",
+            "title": "Catastrophe",
+            "subtitle": "La comédie british culte"
+          }
+        ]
+      }
+    },
+    {
+      "code": "8914cb39-97a1-4fd9-ac01-12098848ed40_8914cb39-97a1-4fd9-ac01-12098848ed40",
+      "title": "En ce moment",
+      "content": {
+        "data": [
+          {
+            "url": "/fr/videos/123976-000-A/gomorra-manifeste-antimafia/",
+            "title": "Gomorra"
+          },
+          {
+            "url": "https://www.arte.tv/fr/p/pop-rock/",
+            "title": "Pop Rock Genre Link"
+          }
+        ]
+      }
+    }
+  ]
+}

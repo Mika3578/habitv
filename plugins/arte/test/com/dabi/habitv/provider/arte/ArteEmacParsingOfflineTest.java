@@ -11,7 +11,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,35 +23,41 @@ import org.junit.Test;
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
 import com.dabi.habitv.api.plugin.exception.TechnicalException;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Offline test covering {@link ArtePluginManager} category browsing and EMAC
  * teaser parsing against captured JSON fixtures. Runs without network access so
  * the parsing contract can be verified in CI sandboxes where arte.tv is
  * unreachable.
+ *
+ * <p>Completeness expectations (supported languages, catalogue areas) are
+ * asserted against literal values, never against {@link ArteConf} constants,
+ * so a regression to a partial catalogue fails loudly.
  */
 public class ArteEmacParsingOfflineTest {
 
-	private static final String PAGE_FIXTURE = "test/resources/fixtures/arte/emac-page-DOR.json";
-	private static final String ZONE_PAGE2_FIXTURE = "test/resources/fixtures/arte/emac-zone-page2.json";
+	private static final String ZONE_ALPHA_ID = "zone-alpha";
+
+	private static final String PAGE_FIXTURE = "test/resources/fixtures/arte/emac-page-multizone.json";
+	private static final String ALPHA_PAGE2_FIXTURE = "test/resources/fixtures/arte/emac-zone-alpha-page2.json";
+	private static final String BETA_PAGE2_FIXTURE = "test/resources/fixtures/arte/emac-zone-beta-page2.json";
+	private static final String CONCERT_FIXTURE = "test/resources/fixtures/arte/emac-page-concert.json";
+	private static final String ES_FIXTURE = "test/resources/fixtures/arte/emac-page-es.json";
+
+	private static final String PAGE_URL = ArteConf.EMAC_API_BASE + "/fr/web/pages/DOR/?authorizedCountry=FR";
+	private static final String ALPHA_PAGE2_URL = ArteConf.EMAC_API_BASE
+			+ "/fr/web/zones/listing_ALPHA_main/content?page=2&pageId=DOR&authorizedCountry=FR";
+	private static final String BETA_PAGE2_URL = "https://api.arte.tv/api/emac/v4/fr/web/zones/aced3934-9828-4d5d-9fbb-bf848fd6cb24/content?authorizedCountry=FR&page=2";
 
 	@Test
-	public void findCategoryReturnsLanguageTreeWithStablePageCodes() {
-		final ArtePluginManager plugin = new ArtePluginManager();
-
-		final Set<CategoryDTO> languages = plugin.findCategory();
-
-		assertEquals("one CategoryDTO per supported language", ArteConf.LANGUAGES.length, languages.size());
-		for (final CategoryDTO language : languages) {
-			assertFalse("language container must not be downloadable", language.isDownloadable());
-			assertEquals("each language exposes the configured page codes",
-					ArteConf.PAGE_CODES.length, language.getSubCategories().size());
-			for (final CategoryDTO sub : language.getSubCategories()) {
-				assertTrue("sub-category id must include language:pageCode separator",
-						sub.getId().contains(":"));
-				assertTrue("sub-categories must be downloadable", sub.isDownloadable());
-			}
-		}
+	public void shouldSkipZoneTreatsAuthenticatedContentAsBooleanFlag() {
+		final JsonNode publicZone = ArteEmacJson.parseTree("{\"authenticatedContent\":false,\"title\":\"Public\"}",
+				"fixture");
+		final JsonNode protectedZone = ArteEmacJson.parseTree("{\"authenticatedContent\":true,\"title\":\"Protected\"}",
+				"fixture");
+		assertFalse(ArteContentClassifier.shouldSkipZone(publicZone));
+		assertTrue(ArteContentClassifier.shouldSkipZone(protectedZone));
 	}
 
 	@Test
@@ -59,56 +67,329 @@ public class ArteEmacParsingOfflineTest {
 	}
 
 	@Test
-	public void findEpisodeParsesTeasersFiltersInvalidUrlsAndDedupes() throws IOException {
-		final Map<String, String> urlToContent = new HashMap<>();
-		final String pageUrl = ArteConf.EMAC_API_BASE + "/fr/web/pages/DOR/?authorizedCountry=FR";
-		urlToContent.put(pageUrl, readFixture(PAGE_FIXTURE));
-		urlToContent.put(
-				ArteConf.EMAC_API_BASE
-						+ "/fr/web/zones/listing_DOCUMENTARIES_main/content?page=2&pageId=DOR&authorizedCountry=FR",
-				readFixture(ZONE_PAGE2_FIXTURE));
-
-		final RecordingArtePlugin plugin = new RecordingArtePlugin(urlToContent);
+	public void findEpisodeMergesIndependentListingsWithOrderAndDedup() throws IOException {
+		final RecordingArtePlugin plugin = multizonePlugin(true, true);
 		final CategoryDTO category = new CategoryDTO(ArteConf.NAME, "Documentaries", "fr:DOR", ArteConf.EXTENSION);
 
 		final Set<EpisodeDTO> episodes = plugin.findEpisode(category);
 
-		final List<String> ids = new ArrayList<>();
-		final List<String> names = new ArrayList<>();
-		for (final EpisodeDTO episode : episodes) {
-			ids.add(episode.getId());
-			names.add(episode.getName());
-		}
+		final List<String> ids = episodeIds(episodes);
+		assertEquals(
+				Arrays.asList("https://www.arte.tv/fr/videos/119999-000-A/test-documentary-one/",
+						"https://www.arte.tv/fr/videos/119999-001-A/test-documentary-two/",
+						"https://www.arte.tv/fr/videos/119999-200-A/alpha-page-two/",
+						"https://www.arte.tv/fr/videos/119999-002-A/beta-one/",
+						"https://www.arte.tv/fr/videos/119999-100-A/beta-two/",
+						"https://www.arte.tv/fr/videos/119999-201-A/beta-page-two/",
+						"https://www.arte.tv/fr/videos/119999-300-A/no-code-zone/"),
+				ids);
+		assertEquals("duplicate URL collapses into a single episode", new HashSet<>(ids).size(), ids.size());
 
-		assertTrue("absolute https URL preserved",
-				ids.contains("https://www.arte.tv/fr/videos/119999-001-A/test-documentary-two/"));
-		assertTrue("relative URL resolved against HOME_URL",
-				ids.contains("https://www.arte.tv/fr/videos/119999-000-A/test-documentary-one/"));
-		assertTrue("teaser without title falls back to subtitle",
-				names.contains("Subtitle Only Three"));
-		assertTrue("zone pagination fetched page 2",
-				ids.contains("https://www.arte.tv/fr/videos/119999-200-A/page-two-item/"));
-		assertFalse("non-episode URL filtered out by EPISODE_URL_PATTERN",
-				ids.contains("https://www.arte.tv/fr/programmes/119999/"));
-		assertFalse("teaser without title or subtitle dropped",
-				ids.contains("https://www.arte.tv/fr/videos/119999-003-A/test-no-title/"));
-		assertEquals("duplicate URL collapses into a single episode",
-				new java.util.HashSet<>(ids).size(), ids.size());
-		assertEquals("expected episodes after filtering and dedup", 6, episodes.size());
+		final List<String> names = episodeNames(episodes);
+		assertTrue("relative URL resolved against HOME_URL", names.contains("Test Documentary One"));
+		assertTrue("teaser without title falls back to subtitle", names.contains("Beta Subtitle Only"));
+		assertFalse("non-episode URL filtered out", names.contains("Not An Episode (programmes path)"));
+
 		for (final EpisodeDTO episode : episodes) {
 			assertNotNull("canonical metadata attached", episode.getMetadata());
 			assertNull("Arte thematic category must not become seriesTitle",
 					episode.getMetadata().getSeriesTitle());
+			assertEquals("fr", episode.getMetadata().getContentLanguage());
 			assertNotNull(episode.getMetadata().getEpisodeTitle());
 			assertEquals(episode.getId(), episode.getMetadata().getSourceUrl());
+			assertNotNull("originating listing preserved in description",
+					episode.getMetadata().getDescription());
 		}
+		assertTrue("subtitle kept alongside listing title",
+				descriptions(episodes).contains("Alpha Picks — Episode 2"));
+	}
+
+	@Test
+	public void findEpisodeSupportsSingleListingScope() throws IOException {
+		final RecordingArtePlugin plugin = multizonePlugin(true, true);
+		final CategoryDTO category = new CategoryDTO(ArteConf.NAME, "Alpha Picks",
+				ArteCategoryId.forZone("fr", "DOR", ZONE_ALPHA_ID), ArteConf.EXTENSION);
+
+		final Set<EpisodeDTO> episodes = plugin.findEpisode(category);
+
+		assertEquals(Arrays.asList("https://www.arte.tv/fr/videos/119999-000-A/test-documentary-one/",
+				"https://www.arte.tv/fr/videos/119999-001-A/test-documentary-two/",
+				"https://www.arte.tv/fr/videos/119999-200-A/alpha-page-two/"), episodeIds(episodes));
+	}
+
+	@Test
+	public void findCategoryKeepsMixedZoneDownloadableWithCollectionChild() throws IOException {
+		final Map<String, String> urls = new HashMap<>();
+		final String homeFr = ArteCatalogDiscovery.buildHomeUrl("fr");
+		urls.put(homeFr, readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(ArteConf.EMAC_API_BASE + "/fr/tv/pages/HOME/?authorizedCountry=FR",
+				readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(PAGE_URL, readFixture(PAGE_FIXTURE));
+		for (final String code : Arrays.asList("SER", "ARTE_CONCERT", "DEC", "ACT")) {
+			urls.put(ArteCatalogDiscovery.buildPageUrl("fr", code),
+					"{\"code\":\"" + code + "\",\"zones\":[{\"id\":\"z-" + code
+							+ "\",\"title\":\"Listing\",\"content\":{\"data\":[]}}]}");
+		}
+		final ArtePluginManager plugin = new ArtePluginManager(new ArteCatalogDiscovery(urls::get), urls::get);
+
+		CategoryDTO zoneAlpha = null;
+		for (final CategoryDTO language : plugin.findCategory()) {
+			if (!language.getId().endsWith("/fr/")) {
+				continue;
+			}
+			for (final CategoryDTO page : language.getSubCategories()) {
+				if (!page.getId().endsWith(":DOR")) {
+					continue;
+				}
+				for (final CategoryDTO zone : page.getSubCategories()) {
+					if (ArteCategoryId.forZone("fr", "DOR", ZONE_ALPHA_ID).equals(zone.getId())) {
+						zoneAlpha = zone;
+						break;
+					}
+				}
+			}
+		}
+		assertNotNull("zone-alpha must be exposed in the catalogue tree", zoneAlpha);
+		assertTrue("mixed zones with shows stay downloadable", zoneAlpha.isDownloadable());
+		assertFalse("collection child must remain under the zone", zoneAlpha.getSubCategories().isEmpty());
+	}
+
+	@Test
+	public void findCategorySkipsNavigationOnlyZone() throws IOException {
+		final Map<String, String> urls = new HashMap<>();
+		final String homeFr = ArteCatalogDiscovery.buildHomeUrl("fr");
+		urls.put(homeFr, readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(ArteConf.EMAC_API_BASE + "/fr/tv/pages/HOME/?authorizedCountry=FR",
+				readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(PAGE_URL,
+				"{\"code\":\"DOR\",\"zones\":[{\"id\":\"zone-nav\",\"title\":\"Navigation\",\"content\":{\"data\":[{\"title\":\"Sub page\",\"deeplink\":\"arte://emac/SUBPAGE\"}]}}]}");
+		for (final String code : Arrays.asList("SER", "ARTE_CONCERT", "DEC", "ACT")) {
+			urls.put(ArteCatalogDiscovery.buildPageUrl("fr", code),
+					"{\"code\":\"" + code + "\",\"zones\":[{\"id\":\"z-" + code
+							+ "\",\"title\":\"Listing\",\"content\":{\"data\":[]}}]}");
+		}
+		final ArtePluginManager plugin = new ArtePluginManager(new ArteCatalogDiscovery(urls::get), urls::get);
+
+		CategoryDTO dorPage = null;
+		for (final CategoryDTO language : plugin.findCategory()) {
+			if (!language.getId().endsWith("/fr/")) {
+				continue;
+			}
+			for (final CategoryDTO page : language.getSubCategories()) {
+				if (page.getId().endsWith(":DOR")) {
+					dorPage = page;
+					break;
+				}
+			}
+		}
+		assertNotNull("DOR page must still be exposed", dorPage);
+		assertTrue("navigation-only zones must not become empty downloadable leaves", dorPage.getSubCategories().isEmpty());
+	}
+
+	@Test
+	public void findCategoryKeepsLinkBackedZoneWithoutInlineItems() throws IOException {
+		final Map<String, String> urls = new HashMap<>();
+		final String homeFr = ArteCatalogDiscovery.buildHomeUrl("fr");
+		final String linkUrl = ArteConf.EMAC_API_BASE
+				+ "/fr/web/zones/listing_LINK_main/content?authorizedCountry=FR";
+		urls.put(homeFr, readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(ArteConf.EMAC_API_BASE + "/fr/tv/pages/HOME/?authorizedCountry=FR",
+				readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(PAGE_URL,
+				"{\"code\":\"DOR\",\"zones\":[{\"id\":\"zone-link\",\"code\":\"listing_LINK_main\",\"title\":\"Linked\",\"content\":{\"data\":[]},\"link\":{\"url\":\""
+						+ linkUrl + "\"}}]}");
+		urls.put(linkUrl,
+				"{\"data\":[{\"url\":\"/fr/videos/119999-920-A/linked-page/\",\"title\":\"Linked Page\"}]}");
+		for (final String code : Arrays.asList("SER", "ARTE_CONCERT", "DEC", "ACT")) {
+			urls.put(ArteCatalogDiscovery.buildPageUrl("fr", code),
+					"{\"code\":\"" + code + "\",\"zones\":[{\"id\":\"z-" + code
+							+ "\",\"title\":\"Listing\",\"content\":{\"data\":[]}}]}");
+		}
+		final ArtePluginManager plugin = new ArtePluginManager(new ArteCatalogDiscovery(urls::get), urls::get);
+
+		CategoryDTO linkedZone = null;
+		for (final CategoryDTO language : plugin.findCategory()) {
+			if (!language.getId().endsWith("/fr/")) {
+				continue;
+			}
+			for (final CategoryDTO page : language.getSubCategories()) {
+				if (!page.getId().endsWith(":DOR")) {
+					continue;
+				}
+				for (final CategoryDTO zone : page.getSubCategories()) {
+					if (ArteCategoryId.forZone("fr", "DOR", "zone-link").equals(zone.getId())) {
+						linkedZone = zone;
+						break;
+					}
+				}
+			}
+		}
+		assertNotNull("link-backed zone must stay reachable from the catalogue tree", linkedZone);
+		assertTrue(linkedZone.isDownloadable());
+		assertEquals(Arrays.asList("https://www.arte.tv/fr/videos/119999-920-A/linked-page/"),
+				episodeIds(plugin.findEpisode(linkedZone)));
+	}
+
+	@Test
+	public void findCategoryKeepsPaginationBackedZoneWithoutInlineItems() throws IOException {
+		final Map<String, String> urls = new HashMap<>();
+		final String homeFr = ArteCatalogDiscovery.buildHomeUrl("fr");
+		urls.put(homeFr, readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(ArteConf.EMAC_API_BASE + "/fr/tv/pages/HOME/?authorizedCountry=FR",
+				readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(PAGE_URL,
+				"{\"code\":\"DOR\",\"zones\":[{\"id\":\"zone-paged\",\"code\":\"listing_PAGED_main\",\"title\":\"Paged\",\"content\":{\"data\":[],\"pagination\":{\"pages\":2}}}]}");
+		urls.put(
+				ArteConf.EMAC_API_BASE
+						+ "/fr/web/zones/listing_PAGED_main/content?page=2&pageId=DOR&authorizedCountry=FR",
+				"{\"data\":[{\"url\":\"/fr/videos/119999-921-A/paged-entry/\",\"title\":\"Paged Entry\"}]}");
+		for (final String code : Arrays.asList("SER", "ARTE_CONCERT", "DEC", "ACT")) {
+			urls.put(ArteCatalogDiscovery.buildPageUrl("fr", code),
+					"{\"code\":\"" + code + "\",\"zones\":[{\"id\":\"z-" + code
+							+ "\",\"title\":\"Listing\",\"content\":{\"data\":[]}}]}");
+		}
+		final ArtePluginManager plugin = new ArtePluginManager(new ArteCatalogDiscovery(urls::get), urls::get);
+
+		CategoryDTO pagedZone = null;
+		for (final CategoryDTO language : plugin.findCategory()) {
+			if (!language.getId().endsWith("/fr/")) {
+				continue;
+			}
+			for (final CategoryDTO page : language.getSubCategories()) {
+				if (!page.getId().endsWith(":DOR")) {
+					continue;
+				}
+				for (final CategoryDTO zone : page.getSubCategories()) {
+					if (ArteCategoryId.forZone("fr", "DOR", "zone-paged").equals(zone.getId())) {
+						pagedZone = zone;
+						break;
+					}
+				}
+			}
+		}
+		assertNotNull("pagination-backed zone must stay reachable from the catalogue tree", pagedZone);
+		assertTrue(pagedZone.isDownloadable());
+		assertEquals(Arrays.asList("https://www.arte.tv/fr/videos/119999-921-A/paged-entry/"),
+				episodeIds(plugin.findEpisode(pagedZone)));
+	}
+
+	@Test
+	public void findCategoryKeepsDeferredZoneDownloadableWithCollectionChild() throws IOException {
+		final Map<String, String> urls = new HashMap<>();
+		final String homeFr = ArteCatalogDiscovery.buildHomeUrl("fr");
+		urls.put(homeFr, readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(ArteConf.EMAC_API_BASE + "/fr/tv/pages/HOME/?authorizedCountry=FR",
+				readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(PAGE_URL,
+				"{\"code\":\"DOR\",\"zones\":[{\"id\":\"zone-deferred-coll\",\"code\":\"listing_DEFERRED_coll\",\"title\":\"Deferred\",\"content\":{\"data\":[{\"url\":\"/fr/videos/RC-028069/l-empire-lvmh/\",\"title\":\"Collection Entry\"}],\"pagination\":{\"pages\":2}}}]}");
+		urls.put(
+				ArteConf.EMAC_API_BASE
+						+ "/fr/web/zones/listing_DEFERRED_coll/content?page=2&pageId=DOR&authorizedCountry=FR",
+				"{\"data\":[{\"url\":\"/fr/videos/119999-922-A/deferred-with-collection/\",\"title\":\"Deferred Episode\"}]}");
+		for (final String code : Arrays.asList("SER", "ARTE_CONCERT", "DEC", "ACT")) {
+			urls.put(ArteCatalogDiscovery.buildPageUrl("fr", code),
+					"{\"code\":\"" + code + "\",\"zones\":[{\"id\":\"z-" + code
+							+ "\",\"title\":\"Listing\",\"content\":{\"data\":[]}}]}");
+		}
+		final ArtePluginManager plugin = new ArtePluginManager(new ArteCatalogDiscovery(urls::get), urls::get);
+
+		CategoryDTO deferredZone = null;
+		for (final CategoryDTO language : plugin.findCategory()) {
+			if (!language.getId().endsWith("/fr/")) {
+				continue;
+			}
+			for (final CategoryDTO page : language.getSubCategories()) {
+				if (!page.getId().endsWith(":DOR")) {
+					continue;
+				}
+				for (final CategoryDTO zone : page.getSubCategories()) {
+					if (ArteCategoryId.forZone("fr", "DOR", "zone-deferred-coll").equals(zone.getId())) {
+						deferredZone = zone;
+						break;
+					}
+				}
+			}
+		}
+		assertNotNull(deferredZone);
+		assertTrue("deferred zones with collection children must stay downloadable", deferredZone.isDownloadable());
+		assertFalse(deferredZone.getSubCategories().isEmpty());
+		assertEquals(Arrays.asList("https://www.arte.tv/fr/videos/119999-922-A/deferred-with-collection/"),
+				episodeIds(plugin.findEpisode(deferredZone)));
+	}
+
+	@Test
+	public void findEpisodeReturnsEmptyForUnknownListing() throws IOException {
+		final RecordingArtePlugin plugin = multizonePlugin(true, true);
+		final CategoryDTO category = new CategoryDTO(ArteConf.NAME, "x", "fr:DOR:no_such_zone", ArteConf.EXTENSION);
+
+		assertTrue(plugin.findEpisode(category).isEmpty());
+	}
+
+	@Test
+	public void findEpisodeKeepsOtherListingsWhenOnePaginationFails() throws IOException {
+		// Beta page 2 is missing: that listing keeps its first page while the
+		// Alpha listing still paginates through the legacy pageId URL.
+		final RecordingArtePlugin plugin = multizonePlugin(true, false);
+		final CategoryDTO category = new CategoryDTO(ArteConf.NAME, "Documentaries", "fr:DOR", ArteConf.EXTENSION);
+
+		final List<String> ids = episodeIds(plugin.findEpisode(category));
+
+		assertEquals(6, ids.size());
+		assertTrue(ids.contains("https://www.arte.tv/fr/videos/119999-200-A/alpha-page-two/"));
+		assertTrue(ids.contains("https://www.arte.tv/fr/videos/119999-100-A/beta-two/"));
+		assertFalse(ids.contains("https://www.arte.tv/fr/videos/119999-201-A/beta-page-two/"));
+	}
+
+	@Test
+	public void findEpisodeLoadsCollectionZones() throws IOException {
+		final Map<String, String> urlToContent = new HashMap<>();
+		urlToContent.put(ArteConf.EMAC_API_BASE + "/fr/web/collections/RC-028069/?authorizedCountry=FR",
+				readFixture("test/resources/fixtures/arte/emac-collection-rc.json"));
+		final RecordingArtePlugin plugin = new RecordingArtePlugin(urlToContent);
+		final CategoryDTO category = new CategoryDTO(ArteConf.NAME, "Collection",
+				ArteCategoryId.forCollection("fr", "RC-028069"), ArteConf.EXTENSION);
+
+		final List<String> ids = episodeIds(plugin.findEpisode(category));
+		assertEquals(Arrays.asList("https://www.arte.tv/fr/videos/122704-001-A/l-empire-lvmh-1-2/",
+				"https://www.arte.tv/fr/videos/122704-002-A/l-empire-lvmh-2-2/"), ids);
+	}
+
+	@Test
+	public void findEpisodeParsesConcertThroughCommonMechanism() throws IOException {
+		final Map<String, String> urlToContent = new HashMap<>();
+		urlToContent.put(ArteConf.EMAC_API_BASE + "/fr/web/pages/ARTE_CONCERT/?authorizedCountry=FR",
+				readFixture(CONCERT_FIXTURE));
+
+		final RecordingArtePlugin plugin = new RecordingArtePlugin(urlToContent);
+		final CategoryDTO category = new CategoryDTO(ArteConf.NAME, "Concert", "fr:ARTE_CONCERT", ArteConf.EXTENSION);
+
+		final List<String> ids = episodeIds(plugin.findEpisode(category));
+
+		assertEquals(Arrays.asList("https://www.arte.tv/fr/videos/123976-000-A/gomorra-manifeste-antimafia/"), ids);
+	}
+
+	@Test
+	public void findEpisodeParsesLocalisedCatalogue() throws IOException {
+		final Map<String, String> urlToContent = new HashMap<>();
+		urlToContent.put(ArteConf.EMAC_API_BASE + "/es/web/pages/DEC/?authorizedCountry=FR",
+				readFixture(ES_FIXTURE));
+
+		final RecordingArtePlugin plugin = new RecordingArtePlugin(urlToContent);
+		final CategoryDTO category = new CategoryDTO(ArteConf.NAME, "Viajes", "es:DEC", ArteConf.EXTENSION);
+
+		final Set<EpisodeDTO> episodes = plugin.findEpisode(category);
+
+		assertEquals(1, episodes.size());
+		final EpisodeDTO episode = episodes.iterator().next();
+		assertEquals("https://www.arte.tv/es/videos/119999-400-A/viaje-uno/", episode.getId());
+		assertEquals("Viaje Uno", episode.getName());
+		assertEquals("es", episode.getMetadata().getContentLanguage());
 	}
 
 	@Test
 	public void findEpisodeStillParsesLegacyValueWrappedFixtures() throws IOException {
 		final Map<String, String> urlToContent = new HashMap<>();
-		final String pageUrl = ArteConf.EMAC_API_BASE + "/fr/web/pages/DOR/?authorizedCountry=FR";
-		urlToContent.put(pageUrl,
+		urlToContent.put(PAGE_URL,
 				"{\"value\":{\"zones\":[{\"code\":\"listing_LEGACY_main\",\"content\":{\"data\":[{\"url\":\"/fr/videos/119999-900-A/legacy/\",\"title\":\"Legacy Wrapped\"}],\"pagination\":{\"pages\":2}}}]}}");
 		urlToContent.put(
 				ArteConf.EMAC_API_BASE
@@ -117,20 +398,34 @@ public class ArteEmacParsingOfflineTest {
 
 		final RecordingArtePlugin plugin = new RecordingArtePlugin(urlToContent);
 		final CategoryDTO category = new CategoryDTO(ArteConf.NAME, "Documentaries", "fr:DOR", ArteConf.EXTENSION);
+
 		final Set<EpisodeDTO> episodes = plugin.findEpisode(category);
 
-		final List<String> ids = new ArrayList<>();
-		final List<String> names = new ArrayList<>();
-		for (final EpisodeDTO episode : episodes) {
-			ids.add(episode.getId());
-			names.add(episode.getName());
-		}
-
+		final List<String> ids = episodeIds(episodes);
 		assertEquals(2, episodes.size());
 		assertTrue(ids.contains("https://www.arte.tv/fr/videos/119999-900-A/legacy/"));
 		assertTrue(ids.contains("https://www.arte.tv/fr/videos/119999-901-A/legacy-page-two/"));
-		assertTrue("legacy value.zones title must still be extracted", names.contains("Legacy Wrapped"));
-		assertTrue("legacy value.data title must still be extracted", names.contains("Legacy Value Data"));
+		assertTrue("legacy value.zones title must still be extracted",
+				episodeNames(episodes).contains("Legacy Wrapped"));
+		assertTrue("legacy value.data title must still be extracted",
+				episodeNames(episodes).contains("Legacy Value Data"));
+	}
+
+	@Test
+	public void findEpisodeFallsBackToLegacyPaginationWhenNextLinkIsNotEmacJson() {
+		final Map<String, String> urlToContent = new HashMap<>();
+		urlToContent.put(PAGE_URL,
+				"{\"zones\":[{\"code\":\"listing_FALLBACK_main\",\"title\":\"Fallback\",\"content\":{\"data\":[{\"url\":\"/fr/videos/119999-910-A/page-one/\",\"title\":\"Page One\"}],\"pagination\":{\"pages\":2,\"links\":{\"next\":\"https://www.arte.tv/fr/videos/119999-911-A/not-json/\"}}}}]}");
+		urlToContent.put(
+				ArteConf.EMAC_API_BASE
+						+ "/fr/web/zones/listing_FALLBACK_main/content?page=2&pageId=DOR&authorizedCountry=FR",
+				"{\"data\":[{\"url\":\"/fr/videos/119999-911-A/page-two/\",\"title\":\"Page Two\"}]}");
+
+		final RecordingArtePlugin plugin = new RecordingArtePlugin(urlToContent);
+		final CategoryDTO category = new CategoryDTO(ArteConf.NAME, "Documentaries", "fr:DOR", ArteConf.EXTENSION);
+
+		assertEquals(Arrays.asList("https://www.arte.tv/fr/videos/119999-910-A/page-one/",
+				"https://www.arte.tv/fr/videos/119999-911-A/page-two/"), episodeIds(plugin.findEpisode(category)));
 	}
 
 	@Test
@@ -139,6 +434,152 @@ public class ArteEmacParsingOfflineTest {
 		assertTrue(plugin.findEpisode(new CategoryDTO(ArteConf.NAME, "x", "", ArteConf.EXTENSION)).isEmpty());
 		assertTrue(plugin.findEpisode(new CategoryDTO(ArteConf.NAME, "x", "fr", ArteConf.EXTENSION)).isEmpty());
 		assertTrue(plugin.findEpisode(new CategoryDTO(ArteConf.NAME, "x", "fr:", ArteConf.EXTENSION)).isEmpty());
+		assertTrue(plugin.findEpisode(new CategoryDTO(ArteConf.NAME, "x", "fr:DOR:", ArteConf.EXTENSION)).isEmpty());
+		assertTrue(plugin.findEpisode(new CategoryDTO(ArteConf.NAME, "x", "fr:DOR:a:b", ArteConf.EXTENSION))
+				.isEmpty());
+		assertTrue(plugin.findEpisode(new CategoryDTO(ArteConf.NAME, "x", ":DOR", ArteConf.EXTENSION)).isEmpty());
+	}
+
+	@Test
+	public void findCategoryKeepsIndependentZonesWithDuplicateTitles() throws IOException {
+		final Map<String, String> urls = new HashMap<>();
+		final String homeFr = ArteCatalogDiscovery.buildHomeUrl("fr");
+		urls.put(homeFr, readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(ArteConf.EMAC_API_BASE + "/fr/tv/pages/HOME/?authorizedCountry=FR",
+				readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(PAGE_URL,
+				"{\"code\":\"DOR\",\"zones\":[{\"id\":\"zone-dup-a\",\"title\":\"Shared\",\"content\":{\"data\":[{\"url\":\"/fr/videos/119999-801-A/a/\",\"title\":\"A\"}]}},{\"id\":\"zone-dup-b\",\"title\":\"Shared\",\"content\":{\"data\":[{\"url\":\"/fr/videos/119999-802-A/b/\",\"title\":\"B\"}]}}]}");
+		stubDiscoveryPages(urls);
+		final ArtePluginManager plugin = new ArtePluginManager(new ArteCatalogDiscovery(urls::get), urls::get);
+
+		int sharedTitleZones = 0;
+		for (final CategoryDTO language : plugin.findCategory()) {
+			if (!language.getId().endsWith("/fr/")) {
+				continue;
+			}
+			for (final CategoryDTO page : language.getSubCategories()) {
+				if (!page.getId().endsWith(":DOR")) {
+					continue;
+				}
+				assertEquals(2, page.getSubCategories().size());
+				for (final CategoryDTO zone : page.getSubCategories()) {
+					if (zone.getName().startsWith("Shared")) {
+						sharedTitleZones++;
+					}
+				}
+			}
+		}
+		assertEquals(2, sharedTitleZones);
+	}
+
+	@Test
+	public void findCategoryDiscoversCollectionFromDeferredLink() throws IOException {
+		final Map<String, String> urls = new HashMap<>();
+		final String homeFr = ArteCatalogDiscovery.buildHomeUrl("fr");
+		urls.put(homeFr, readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(ArteConf.EMAC_API_BASE + "/fr/tv/pages/HOME/?authorizedCountry=FR",
+				readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		final String linkUrl = ArteConf.EMAC_API_BASE + "/fr/web/zones/listing_LINK_coll/content?authorizedCountry=FR";
+		urls.put(PAGE_URL,
+				"{\"code\":\"DOR\",\"zones\":[{\"id\":\"zone-coll-deferred\",\"title\":\"Deferred Collection\",\"content\":{\"data\":[]},\"link\":{\"url\":\""
+						+ linkUrl + "\"}}]}");
+		urls.put(linkUrl,
+				"{\"data\":[{\"url\":\"/fr/videos/RC-099999/deferred-collection/\",\"title\":\"Deferred Collection\"}]}");
+		stubDiscoveryPages(urls);
+		final ArtePluginManager plugin = new ArtePluginManager(new ArteCatalogDiscovery(urls::get), urls::get);
+
+		CategoryDTO zone = null;
+		for (final CategoryDTO language : plugin.findCategory()) {
+			if (!language.getId().endsWith("/fr/")) {
+				continue;
+			}
+			for (final CategoryDTO page : language.getSubCategories()) {
+				if (!page.getId().endsWith(":DOR")) {
+					continue;
+				}
+				for (final CategoryDTO candidate : page.getSubCategories()) {
+					if (ArteCategoryId.forZone("fr", "DOR", "zone-coll-deferred").equals(candidate.getId())) {
+						zone = candidate;
+					}
+				}
+			}
+		}
+		assertNotNull(zone);
+		assertEquals(1, zone.getSubCategories().size());
+		assertEquals(ArteCategoryId.forCollection("fr", "RC-099999"), zone.getSubCategories().iterator().next().getId());
+	}
+
+	@Test
+	public void findCategoryDiscoversCollectionFromPaginatedZone() throws IOException {
+		final Map<String, String> urls = new HashMap<>();
+		final String homeFr = ArteCatalogDiscovery.buildHomeUrl("fr");
+		urls.put(homeFr, readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(ArteConf.EMAC_API_BASE + "/fr/tv/pages/HOME/?authorizedCountry=FR",
+				readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(PAGE_URL,
+				"{\"code\":\"DOR\",\"zones\":[{\"id\":\"zone-coll-page\",\"code\":\"listing_COLL_page\",\"title\":\"Paged Collection\",\"content\":{\"data\":[],\"pagination\":{\"pages\":2}}}]}");
+		urls.put(
+				ArteConf.EMAC_API_BASE
+						+ "/fr/web/zones/listing_COLL_page/content?page=2&pageId=DOR&authorizedCountry=FR",
+				"{\"data\":[{\"url\":\"/fr/videos/RC-088888/paged-collection/\",\"title\":\"Paged Collection\"}]}");
+		stubDiscoveryPages(urls);
+		final ArtePluginManager plugin = new ArtePluginManager(new ArteCatalogDiscovery(urls::get), urls::get);
+
+		CategoryDTO zone = null;
+		for (final CategoryDTO language : plugin.findCategory()) {
+			if (!language.getId().endsWith("/fr/")) {
+				continue;
+			}
+			for (final CategoryDTO page : language.getSubCategories()) {
+				if (!page.getId().endsWith(":DOR")) {
+					continue;
+				}
+				for (final CategoryDTO candidate : page.getSubCategories()) {
+					if (ArteCategoryId.forZone("fr", "DOR", "zone-coll-page").equals(candidate.getId())) {
+						zone = candidate;
+					}
+				}
+			}
+		}
+		assertNotNull(zone);
+		assertEquals(ArteCategoryId.forCollection("fr", "RC-088888"), zone.getSubCategories().iterator().next().getId());
+	}
+
+	@Test
+	public void findEpisodeFollowsLinkedListingPagination() throws IOException {
+		final Map<String, String> urls = new HashMap<>();
+		final String linkUrl = ArteConf.EMAC_API_BASE + "/fr/web/zones/listing_LINK_paged/content?authorizedCountry=FR";
+		urls.put(PAGE_URL,
+				"{\"code\":\"DOR\",\"zones\":[{\"id\":\"zone-link-paged\",\"title\":\"Linked Paged\",\"content\":{\"data\":[]},\"link\":{\"url\":\""
+						+ linkUrl + "\"}}]}");
+		urls.put(linkUrl,
+				"{\"data\":[{\"url\":\"/fr/videos/119999-930-A/linked-one/\",\"title\":\"Linked One\"}],\"pagination\":{\"links\":{\"next\":\""
+						+ ArteConf.EMAC_API_BASE
+						+ "/fr/web/zones/listing_LINK_paged/content?authorizedCountry=FR&page=2\"}}}");
+		urls.put(ArteConf.EMAC_API_BASE + "/fr/web/zones/listing_LINK_paged/content?authorizedCountry=FR&page=2",
+				"{\"data\":[{\"url\":\"/fr/videos/119999-931-A/linked-two/\",\"title\":\"Linked Two\"}]}");
+		final RecordingArtePlugin plugin = new RecordingArtePlugin(urls);
+		final CategoryDTO category = new CategoryDTO(ArteConf.NAME, "Linked Paged",
+				ArteCategoryId.forZone("fr", "DOR", "zone-link-paged"), ArteConf.EXTENSION);
+
+		assertEquals(Arrays.asList("https://www.arte.tv/fr/videos/119999-930-A/linked-one/",
+				"https://www.arte.tv/fr/videos/119999-931-A/linked-two/"), episodeIds(plugin.findEpisode(category)));
+	}
+
+	@Test
+	public void findEpisodePaginatesCollectionUsingCollectionId() {
+		final Map<String, String> urls = new HashMap<>();
+		final String collectionUrl = ArteConf.EMAC_API_BASE + "/fr/web/collections/RC-099998/?authorizedCountry=FR";
+		urls.put(collectionUrl,
+				"{\"zones\":[{\"code\":\"videos_all\",\"title\":\"All\",\"content\":{\"data\":[{\"url\":\"/fr/videos/119999-940-A/coll-one/\",\"title\":\"Coll One\"}],\"pagination\":{\"pages\":2}}}]}");
+		urls.put(ArteConf.EMAC_API_BASE + "/fr/web/zones/videos_all/content?page=2&pageId=RC-099998&authorizedCountry=FR",
+				"{\"data\":[{\"url\":\"/fr/videos/119999-941-A/coll-two/\",\"title\":\"Coll Two\"}]}");
+		final RecordingArtePlugin plugin = new RecordingArtePlugin(urls);
+		final CategoryDTO category = new CategoryDTO(ArteConf.NAME, "Collection",
+				ArteCategoryId.forCollection("fr", "RC-099998"), ArteConf.EXTENSION);
+
+		assertEquals(Arrays.asList("https://www.arte.tv/fr/videos/119999-940-A/coll-one/",
+				"https://www.arte.tv/fr/videos/119999-941-A/coll-two/"), episodeIds(plugin.findEpisode(category)));
 	}
 
 	@Test
@@ -148,6 +589,51 @@ public class ArteEmacParsingOfflineTest {
 
 		assertTrue("network failures must surface as an empty set, not a runtime exception",
 				plugin.findEpisode(category).isEmpty());
+	}
+
+	private static void stubDiscoveryPages(final Map<String, String> urls) {
+		for (final String code : Arrays.asList("SER", "ARTE_CONCERT", "DEC", "ACT")) {
+			urls.put(ArteCatalogDiscovery.buildPageUrl("fr", code),
+					"{\"code\":\"" + code + "\",\"zones\":[{\"id\":\"z-" + code
+							+ "\",\"title\":\"Listing\",\"content\":{\"data\":[]}}]}");
+		}
+	}
+
+	private static RecordingArtePlugin multizonePlugin(final boolean withAlphaPage2, final boolean withBetaPage2)
+			throws IOException {
+		final Map<String, String> urlToContent = new HashMap<>();
+		urlToContent.put(PAGE_URL, readFixture(PAGE_FIXTURE));
+		if (withAlphaPage2) {
+			urlToContent.put(ALPHA_PAGE2_URL, readFixture(ALPHA_PAGE2_FIXTURE));
+		}
+		if (withBetaPage2) {
+			urlToContent.put(BETA_PAGE2_URL, readFixture(BETA_PAGE2_FIXTURE));
+		}
+		return new RecordingArtePlugin(urlToContent);
+	}
+
+	private static List<String> episodeIds(final Set<EpisodeDTO> episodes) {
+		final List<String> ids = new ArrayList<>();
+		for (final EpisodeDTO episode : episodes) {
+			ids.add(episode.getId());
+		}
+		return ids;
+	}
+
+	private static List<String> episodeNames(final Set<EpisodeDTO> episodes) {
+		final List<String> names = new ArrayList<>();
+		for (final EpisodeDTO episode : episodes) {
+			names.add(episode.getName());
+		}
+		return names;
+	}
+
+	private static List<String> descriptions(final Set<EpisodeDTO> episodes) {
+		final List<String> descriptions = new ArrayList<>();
+		for (final EpisodeDTO episode : episodes) {
+			descriptions.add(episode.getMetadata().getDescription());
+		}
+		return descriptions;
 	}
 
 	private static String readFixture(final String relativePath) throws IOException {
@@ -164,19 +650,19 @@ public class ArteEmacParsingOfflineTest {
 
 	private static final class RecordingArtePlugin extends ArtePluginManager {
 
-		private final Map<String, String> urlToContent;
-
 		RecordingArtePlugin(final Map<String, String> urlToContent) {
-			this.urlToContent = urlToContent;
+			super(new ArteCatalogDiscovery(recordingTransport(urlToContent)), recordingTransport(urlToContent));
 		}
 
-		@Override
-		protected String getUrlContent(final String url) {
-			final String content = urlToContent.get(url);
-			if (content == null) {
-				throw new TechnicalException("unexpected URL fetched: " + url);
-			}
-			return content;
+		private static ArteCatalogDiscovery.ArteEmacTransport recordingTransport(
+				final Map<String, String> urlToContent) {
+			return url -> {
+				final String content = urlToContent.get(url);
+				if (content == null) {
+					throw new TechnicalException("unexpected URL fetched: " + url);
+				}
+				return content;
+			};
 		}
 	}
 }

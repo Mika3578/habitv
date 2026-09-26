@@ -1,0 +1,96 @@
+{
+  "code": "DOR",
+  "language": "fr",
+  "url": "https://www.arte.tv/fr/videos/documentaires-et-reportages/",
+  "zones": [
+    {
+      "id": "zone-alpha",
+      "code": "listing_ALPHA_main",
+      "title": "Alpha Picks",
+      "content": {
+        "data": [
+          {
+            "url": "/fr/videos/119999-000-A/test-documentary-one/",
+            "title": "Test Documentary One"
+          },
+          {
+            "url": "https://www.arte.tv/fr/videos/119999-001-A/test-documentary-two/",
+            "title": "Test Documentary Two",
+            "subtitle": "Episode 2"
+          },
+          {
+            "url": "/fr/videos/RC-028069/l-empire-lvmh/",
+            "title": "Collection Entry"
+          },
+          {
+            "url": "/fr/videos/119999-000-A/test-documentary-one/",
+            "title": "Duplicate Of First"
+          },
+          {
+            "url": "/fr/programmes/119999/",
+            "title": "Not An Episode (programmes path)"
+          },
+          {
+            "url": "/fr/videos/119999-003-A/test-no-title/"
+          }
+        ],
+        "pagination": {
+          "pages": 2
+        }
+      }
+    },
+    {
+      "id": "aced3934-9828-4d5d-9fbb-bf848fd6cb24",
+      "code": "aced3934-9828-4d5d-9fbb-bf848fd6cb24",
+      "title": "Beta List",
+      "content": {
+        "data": [
+          {
+            "url": "/fr/videos/119999-002-A/beta-one/",
+            "title": "",
+            "subtitle": "Beta Subtitle Only"
+          },
+          {
+            "url": "https://www.arte.tv/fr/videos/119999-100-A/beta-two/",
+            "title": "Beta Two"
+          }
+        ],
+        "pagination": {
+          "page": 1,
+          "pages": 2,
+          "links": {
+            "first": "https://api.arte.tv/api/emac/v4/fr/web/zones/aced3934-9828-4d5d-9fbb-bf848fd6cb24/content?authorizedCountry=FR&page=1",
+            "next": "https://api.arte.tv/api/emac/v4/fr/web/zones/aced3934-9828-4d5d-9fbb-bf848fd6cb24/content?authorizedCountry=FR&page=2",
+            "last": "https://api.arte.tv/api/emac/v4/fr/web/zones/aced3934-9828-4d5d-9fbb-bf848fd6cb24/content?authorizedCountry=FR&page=2"
+          }
+        }
+      }
+    },
+    {
+      "code": "broken_zone",
+      "title": "Broken Zone Without Content"
+    },
+    {
+      "code": "empty_zone",
+      "title": "Empty Zone",
+      "content": {
+        "data": []
+      }
+    },
+    {
+      "code": "",
+      "title": "Zone Without Code",
+      "content": {
+        "data": [
+          {
+            "url": "/fr/videos/119999-300-A/no-code-zone/",
+            "title": "No Code Zone"
+          }
+        ],
+        "pagination": {
+          "pages": 5
+        }
+      }
+    }
+  ]
+}

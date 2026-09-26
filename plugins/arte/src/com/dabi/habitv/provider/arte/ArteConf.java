@@ -17,24 +17,18 @@ interface ArteConf {
 	/** Query param required by EMAC zone listing endpoints. */
 	String AUTHORIZED_COUNTRY = "FR";
 
-	String[][] LANGUAGES = {
-			{ "fr", "Français" },
-			{ "de", "Deutsch" },
-			{ "en", "English" },
-	};
+	/** Language used to bootstrap {@code alternativeLanguages} discovery. */
+	String DISCOVERY_REFERENCE_LANGUAGE = "fr";
 
 	/**
-	 * Stable EMAC page codes used to discover replay categories.
+	 * Resilience fallback when EMAC HOME payloads omit a stable page deeplink
+	 * (notably {@code DEC} and {@code ACT} on web HOME). Primary discovery is
+	 * dynamic via {@link ArteCatalogDiscovery}.
 	 */
-	String[][] PAGE_CODES = {
-			{ "DOR", "Documentaries" },
-			{ "CIN", "Cinema" },
-			{ "SER", "Series" },
-			{ "ACT", "News & Society" },
-			{ "CPO", "Culture & Pop" },
-			{ "SCI", "Science" },
-			{ "HIS", "History" },
-	};
+	String[] FALLBACK_PAGE_CODES = { "DEC", "ACT" };
+
+	/** Safety cap when following {@code pagination.links.next} chains. */
+	int MAX_PAGINATION_REQUESTS = 100;
 
 	String EXTENSION = FrameworkConf.MP4;
 }
