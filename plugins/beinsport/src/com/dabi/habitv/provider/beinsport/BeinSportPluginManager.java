@@ -56,6 +56,11 @@ public class BeinSportPluginManager extends BasePluginWithProxy implements Plugi
 		        BeinSportConf.EXTENSION);
 		videoCategory.setDownloadable(false);
 		addSubCategories(videoCategory);
+		if (videoCategory.getSubCategories() == null || videoCategory.getSubCategories().isEmpty()) {
+			getLog().warn("provider=beinsport operation=catalogue sourceUrl=" + BeinSportConf.VIDEOS_URL
+					+ " rootCause=listing-selectors-obsolete cookiesEnabled=false"
+					+ " note=public-videos-html-no-longer-matches-legacy-scraper");
+		}
 		categoryDTOs.add(videoCategory);
 		return categoryDTOs;
 	}
@@ -65,7 +70,15 @@ public class BeinSportPluginManager extends BasePluginWithProxy implements Plugi
 		try {
 			doc = Jsoup.parse(getInputStreamFromUrl(category.getId()), "UTF-8", category.getId());
 		} catch (IOException e) {
-			throw new TechnicalException(e);
+			getLog().warn("provider=beinsport operation=catalogue sourceUrl=" + category.getId()
+					+ " rootCause=endpoint-unavailable cookiesEnabled=false cause=" + e.getClass().getSimpleName()
+					+ ": " + e.getMessage());
+			return;
+		} catch (RuntimeException e) {
+			getLog().warn("provider=beinsport operation=catalogue sourceUrl=" + category.getId()
+					+ " rootCause=endpoint-unavailable cookiesEnabled=false cause=" + e.getClass().getSimpleName()
+					+ ": " + e.getMessage());
+			return;
 		}
 
 		addSubCategories(category, doc, "categories");
