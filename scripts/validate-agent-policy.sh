@@ -71,6 +71,20 @@ check_thin_public_git_cursor_rule() {
 }
 check_thin_public_git_cursor_rule
 
+if [[ ! -f .cursor/hooks.json ]]; then
+  fail "missing .cursor/hooks.json"
+elif [[ ! -f .cursor/hooks/before-shell-branch-policy.sh ]]; then
+  fail "missing branch policy hook script"
+elif ! grep -q 'before-shell-branch-policy' .cursor/hooks.json; then
+  fail ".cursor/hooks.json must register before-shell-branch-policy hook"
+fi
+
+if [[ -f .agents/skills/git-workflow/SKILL.md ]]; then
+  if ! grep -q 'workOnCurrentBranch' .agents/skills/git-workflow/SKILL.md; then
+    fail "git-workflow skill must document Cloud workOnCurrentBranch workflow"
+  fi
+fi
+
 if [[ -d .cursor/skills ]]; then
   while IFS= read -r -d '' skill; do
     rel="${skill#./}"
