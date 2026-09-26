@@ -21,8 +21,9 @@ import com.dabi.habitv.provider.arte.ArteCatalogDiscovery.ArteLanguage;
 import com.dabi.habitv.provider.arte.ArteCatalogDiscovery.ArtePageRef;
 
 /**
- * Offline coverage for dynamic EMAC catalogue discovery. Expectations are
- * independent from {@link ArteConf#FALLBACK_PAGE_CODES}.
+ * Offline coverage for dynamic EMAC catalogue discovery including the DEC/ACT
+ * resilience fallback. Expected codes are hardcoded here; they are not derived
+ * from {@link ArteConf#FALLBACK_PAGE_CODES}.
  */
 public class ArteCatalogDiscoveryOfflineTest {
 
@@ -64,8 +65,7 @@ public class ArteCatalogDiscoveryOfflineTest {
 		for (final String expected : EXPECTED_FR_PAGE_CODES) {
 			assertTrue("catalogue must include " + expected, codes.contains(expected));
 		}
-		assertFalse("must not be limited to the old seven-page PR #55 set",
-				codes.size() <= 7 && !codes.contains("DEC") && !codes.contains("ARTE_CONCERT"));
+		assertTrue("fixture must expose dynamically discovered SER hub page", codes.contains("SER"));
 	}
 
 	@Test
