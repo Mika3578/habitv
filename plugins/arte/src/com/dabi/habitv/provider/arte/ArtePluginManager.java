@@ -167,13 +167,28 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 			zoneCategory.addSubCategory(collectionCategory);
 			hasCollectionChild = true;
 		}
-		if (!hasPlayableItem && !hasCollectionChild) {
+		if (!hasPlayableItem && !hasCollectionChild && !hasDeferredZoneContent(zone)) {
 			return null;
 		}
 		if (hasCollectionChild && !hasPlayableItem) {
 			zoneCategory.setDownloadable(false);
 		}
 		return zoneCategory;
+	}
+
+	private boolean hasDeferredZoneContent(final JsonNode zone) {
+		if (hasEmacZoneLink(zone)) {
+			return true;
+		}
+		final JsonNode pagination = zone.path("content").path("pagination");
+		if (pagination.isMissingNode() || pagination.isNull()) {
+			return false;
+		}
+		final String nextUrl = pagination.path("links").path("next").asText(null);
+		if (StringUtils.isNotEmpty(nextUrl) && nextUrl.startsWith(ArteConf.EMAC_API_BASE + "/")) {
+			return true;
+		}
+		return pagination.path("pages").asInt(1) > 1 && StringUtils.isNotEmpty(zone.path("code").asText(null));
 	}
 
 	private Set<EpisodeDTO> loadEpisodesFromPage(final CategoryDTO category, final String languageCode,
@@ -365,6 +380,11 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 
 	private static boolean zoneMatches(final JsonNode zone, final String zoneKey) {
 		return zoneKey.equals(zone.path("id").asText(null)) || zoneKey.equals(zone.path("code").asText(null));
+	}
+
+	private boolean hasEmacZoneLink(final JsonNode zone) {
+		final String linkUrl = resolveUrl(zone.path("link").path("url").asText(null));
+		return StringUtils.isNotEmpty(linkUrl) && linkUrl.startsWith(ArteConf.EMAC_API_BASE);
 	}
 
 	private static boolean isSafePublicEmacUrl(final String url) {

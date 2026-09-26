@@ -176,6 +176,93 @@ public class ArteEmacParsingOfflineTest {
 	}
 
 	@Test
+	public void findCategoryKeepsLinkBackedZoneWithoutInlineItems() throws IOException {
+		final Map<String, String> urls = new HashMap<>();
+		final String homeFr = ArteCatalogDiscovery.buildHomeUrl("fr");
+		final String linkUrl = ArteConf.EMAC_API_BASE
+				+ "/fr/web/zones/listing_LINK_main/content?authorizedCountry=FR";
+		urls.put(homeFr, readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(ArteConf.EMAC_API_BASE + "/fr/tv/pages/HOME/?authorizedCountry=FR",
+				readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(PAGE_URL,
+				"{\"code\":\"DOR\",\"zones\":[{\"id\":\"zone-link\",\"code\":\"listing_LINK_main\",\"title\":\"Linked\",\"content\":{\"data\":[]},\"link\":{\"url\":\""
+						+ linkUrl + "\"}}]}");
+		urls.put(linkUrl,
+				"{\"data\":[{\"url\":\"/fr/videos/119999-920-A/linked-page/\",\"title\":\"Linked Page\"}]}");
+		for (final String code : Arrays.asList("SER", "ARTE_CONCERT", "DEC", "ACT")) {
+			urls.put(ArteCatalogDiscovery.buildPageUrl("fr", code),
+					"{\"code\":\"" + code + "\",\"zones\":[{\"id\":\"z-" + code
+							+ "\",\"title\":\"Listing\",\"content\":{\"data\":[]}}]}");
+		}
+		final ArtePluginManager plugin = new ArtePluginManager(new ArteCatalogDiscovery(urls::get), urls::get);
+
+		CategoryDTO linkedZone = null;
+		for (final CategoryDTO language : plugin.findCategory()) {
+			if (!language.getId().endsWith("/fr/")) {
+				continue;
+			}
+			for (final CategoryDTO page : language.getSubCategories()) {
+				if (!page.getId().endsWith(":DOR")) {
+					continue;
+				}
+				for (final CategoryDTO zone : page.getSubCategories()) {
+					if (ArteCategoryId.forZone("fr", "DOR", "zone-link").equals(zone.getId())) {
+						linkedZone = zone;
+						break;
+					}
+				}
+			}
+		}
+		assertNotNull("link-backed zone must stay reachable from the catalogue tree", linkedZone);
+		assertTrue(linkedZone.isDownloadable());
+		assertEquals(Arrays.asList("https://www.arte.tv/fr/videos/119999-920-A/linked-page/"),
+				episodeIds(plugin.findEpisode(linkedZone)));
+	}
+
+	@Test
+	public void findCategoryKeepsPaginationBackedZoneWithoutInlineItems() throws IOException {
+		final Map<String, String> urls = new HashMap<>();
+		final String homeFr = ArteCatalogDiscovery.buildHomeUrl("fr");
+		urls.put(homeFr, readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(ArteConf.EMAC_API_BASE + "/fr/tv/pages/HOME/?authorizedCountry=FR",
+				readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(PAGE_URL,
+				"{\"code\":\"DOR\",\"zones\":[{\"id\":\"zone-paged\",\"code\":\"listing_PAGED_main\",\"title\":\"Paged\",\"content\":{\"data\":[],\"pagination\":{\"pages\":2}}}]}");
+		urls.put(
+				ArteConf.EMAC_API_BASE
+						+ "/fr/web/zones/listing_PAGED_main/content?page=2&pageId=DOR&authorizedCountry=FR",
+				"{\"data\":[{\"url\":\"/fr/videos/119999-921-A/paged-entry/\",\"title\":\"Paged Entry\"}]}");
+		for (final String code : Arrays.asList("SER", "ARTE_CONCERT", "DEC", "ACT")) {
+			urls.put(ArteCatalogDiscovery.buildPageUrl("fr", code),
+					"{\"code\":\"" + code + "\",\"zones\":[{\"id\":\"z-" + code
+							+ "\",\"title\":\"Listing\",\"content\":{\"data\":[]}}]}");
+		}
+		final ArtePluginManager plugin = new ArtePluginManager(new ArteCatalogDiscovery(urls::get), urls::get);
+
+		CategoryDTO pagedZone = null;
+		for (final CategoryDTO language : plugin.findCategory()) {
+			if (!language.getId().endsWith("/fr/")) {
+				continue;
+			}
+			for (final CategoryDTO page : language.getSubCategories()) {
+				if (!page.getId().endsWith(":DOR")) {
+					continue;
+				}
+				for (final CategoryDTO zone : page.getSubCategories()) {
+					if (ArteCategoryId.forZone("fr", "DOR", "zone-paged").equals(zone.getId())) {
+						pagedZone = zone;
+						break;
+					}
+				}
+			}
+		}
+		assertNotNull("pagination-backed zone must stay reachable from the catalogue tree", pagedZone);
+		assertTrue(pagedZone.isDownloadable());
+		assertEquals(Arrays.asList("https://www.arte.tv/fr/videos/119999-921-A/paged-entry/"),
+				episodeIds(plugin.findEpisode(pagedZone)));
+	}
+
+	@Test
 	public void findEpisodeReturnsEmptyForUnknownListing() throws IOException {
 		final RecordingArtePlugin plugin = multizonePlugin(true, true);
 		final CategoryDTO category = new CategoryDTO(ArteConf.NAME, "x", "fr:DOR:no_such_zone", ArteConf.EXTENSION);
