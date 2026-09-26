@@ -1,0 +1,5 @@
+provider=lemanBleu
+strategy=html-infomaniak-curl
+homeUrl=https://videos.lemanbleu.ch/fr/Toutes-les-emissions.html
+channels=Léman Bleu
+note=Public IceCube HTML catalogue; Infomaniak progressive MP4 via curl. Prefer videos.lemanbleu.ch over CF-protected www host.
