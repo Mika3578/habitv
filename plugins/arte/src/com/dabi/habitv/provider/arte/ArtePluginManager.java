@@ -243,7 +243,7 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 			return;
 		}
 		final String linkUrl = resolveUrl(link.path("url").asText(null));
-		if (!linkUrl.startsWith(ArteConf.EMAC_API_BASE)) {
+		if (StringUtils.isEmpty(linkUrl) || !linkUrl.startsWith(ArteConf.EMAC_API_BASE)) {
 			return;
 		}
 		try {
