@@ -107,6 +107,43 @@ public class ArteEmacParsingOfflineTest {
 	}
 
 	@Test
+	public void findCategoryKeepsMixedZoneDownloadableWithCollectionChild() throws IOException {
+		final Map<String, String> urls = new HashMap<>();
+		final String homeFr = ArteCatalogDiscovery.buildHomeUrl("fr");
+		urls.put(homeFr, readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(ArteConf.EMAC_API_BASE + "/fr/tv/pages/HOME/?authorizedCountry=FR",
+				readFixture("test/resources/fixtures/arte/emac-home-fr.json"));
+		urls.put(PAGE_URL, readFixture(PAGE_FIXTURE));
+		for (final String code : Arrays.asList("SER", "ARTE_CONCERT", "DEC", "ACT")) {
+			urls.put(ArteCatalogDiscovery.buildPageUrl("fr", code),
+					"{\"code\":\"" + code + "\",\"zones\":[{\"id\":\"z-" + code
+							+ "\",\"title\":\"Listing\",\"content\":{\"data\":[]}}]}");
+		}
+		final ArtePluginManager plugin = new ArtePluginManager(new ArteCatalogDiscovery(urls::get), urls::get);
+
+		CategoryDTO zoneAlpha = null;
+		for (final CategoryDTO language : plugin.findCategory()) {
+			if (!language.getId().endsWith("/fr/")) {
+				continue;
+			}
+			for (final CategoryDTO page : language.getSubCategories()) {
+				if (!page.getId().endsWith(":DOR")) {
+					continue;
+				}
+				for (final CategoryDTO zone : page.getSubCategories()) {
+					if (ArteCategoryId.forZone("fr", "DOR", ZONE_ALPHA_ID).equals(zone.getId())) {
+						zoneAlpha = zone;
+						break;
+					}
+				}
+			}
+		}
+		assertNotNull("zone-alpha must be exposed in the catalogue tree", zoneAlpha);
+		assertTrue("mixed zones with shows stay downloadable", zoneAlpha.isDownloadable());
+		assertFalse("collection child must remain under the zone", zoneAlpha.getSubCategories().isEmpty());
+	}
+
+	@Test
 	public void findEpisodeReturnsEmptyForUnknownListing() throws IOException {
 		final RecordingArtePlugin plugin = multizonePlugin(true, true);
 		final CategoryDTO category = new CategoryDTO(ArteConf.NAME, "x", "fr:DOR:no_such_zone", ArteConf.EXTENSION);

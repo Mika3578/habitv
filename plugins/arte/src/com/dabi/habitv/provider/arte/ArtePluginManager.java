@@ -143,9 +143,14 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 				ArteCategoryId.forZone(languageCode, pageCode, zoneKey), ArteConf.EXTENSION);
 		zoneCategory.setDownloadable(true);
 		boolean hasCollectionChild = false;
+		boolean hasPlayableItem = false;
 		for (final JsonNode item : zone.path("content").path("data")) {
 			final String resolvedUrl = resolveUrl(item.path("url").asText(null));
-			if (ArteContentClassifier.classifyTeaser(item, resolvedUrl) != ContentKind.COLLECTION) {
+			final ContentKind kind = ArteContentClassifier.classifyTeaser(item, resolvedUrl);
+			if (kind == ContentKind.PLAYABLE_SHOW) {
+				hasPlayableItem = true;
+			}
+			if (kind != ContentKind.COLLECTION) {
 				continue;
 			}
 			final String collectionId = ArteContentClassifier.collectionId(item, resolvedUrl);
@@ -162,7 +167,7 @@ public class ArtePluginManager extends BasePluginWithProxy implements PluginProv
 			zoneCategory.addSubCategory(collectionCategory);
 			hasCollectionChild = true;
 		}
-		if (hasCollectionChild) {
+		if (hasCollectionChild && !hasPlayableItem) {
 			zoneCategory.setDownloadable(false);
 		}
 		return zoneCategory;
