@@ -51,3 +51,7 @@ undocumented batch flags.
 
 Rename `<plugin name="pluzz">` to `francetv`. Legacy `pluzz.` URLs may
 still be accepted by `canDownload`.
+
+Rename `<plugin name="wat">` to `tf1plus`. A runtime alias still maps
+`wat` to the `tf1plus` plugin so existing grab-config files keep
+loading.
