@@ -1,0 +1,4 @@
+provider=teleMb
+strategy=html-freecaster-hls
+access=public
+notes=Télé MB Belgium local TV replay via Freecaster HLS. Catalogue from /emissions; episodes from /emission/{slug}. Also accepts /replay/{category}/{slug}/{id} article replays. No DRM, account, or geo bypass.
