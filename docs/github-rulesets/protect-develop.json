@@ -26,9 +26,9 @@
         "strict_required_status_checks_policy": true,
         "do_not_enforce_on_create": true,
         "required_status_checks": [
-          { "context": "validate-java8" },
-          { "context": "deterministic-tests-java8" },
-          { "context": "compile-and-package-java8" },
+          { "context": "validate-java21" },
+          { "context": "deterministic-tests-java21" },
+          { "context": "compile-and-package-java21" },
           { "context": "dependency-review" }
         ]
       }

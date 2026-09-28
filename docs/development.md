@@ -5,38 +5,28 @@ instead of restating compiler flags.
 
 ## Java baseline (current vs target)
 
-Verified against: root `pom.xml` `maven-compiler-plugin` (`<source>1.8</source>`
-`<target>1.8</target>`), no `maven.compiler.release`, no toolchains file,
-required jobs in `.github/workflows/ci-maven.yml` (`java-version: "8"`,
-Liberica `jdk+fx`), `.github/workflows/build.yml` (Temurin 8),
-`.github/workflows/codeql.yml` (Liberica 8 `jdk+fx`). GUI modules still
-use JavaFX 2.x / `jfxrt` on Java 8. Out-of-reactor
-`habiTv-linux` / `habiTv-windows` pin `maven.compiler.source/target` 1.8
-and `${jdk.home}`.
+Verified against: root `pom.xml` `maven-compiler-plugin`
+(`<release>${maven.compiler.release}</release>` with `maven.compiler.release`
+`21`), OpenJFX `${openjfx.version}` in dependency management, required jobs in
+`.github/workflows/ci-maven.yml` (`java-version: "21"`, Temurin),
+`.github/workflows/codeql.yml` (Temurin 21). GUI modules use OpenJFX Maven
+dependencies on Java 21. Packaging modules `habiTv-linux` / `habiTv-windows` are
+in the `application` reactor.
 
 | | |
 |--|--|
-| **Current build / runtime baseline** | **Java 8** bytecode and required CI |
-| **Active modernization target** | **Java 21** (not the merge baseline yet) |
+| **Current build / runtime baseline** | **Java 21** bytecode and required CI |
 | **Next target** | **Java 25** |
-| `maven.compiler.release` | unset |
+| `maven.compiler.release` | `21` |
 
-Required `develop` checks are `validate-java8`,
-`deterministic-tests-java8`, `compile-and-package-java8`,
-`dependency-review`. Jobs `compatibility-java17` / `21` (and 11/25 on
-schedule or `workflow_dispatch`) are **diagnostic** (`continue-on-error`). Do not call them
-supported runtimes.
+Required `develop` checks are `validate-java21`,
+`deterministic-tests-java21`, `compile-and-package-java21`,
+`dependency-review`. Jobs `compatibility-java*` (and broader sweeps on
+schedule or `workflow_dispatch`) are **diagnostic** (`continue-on-error`).
+JDKs below 21 cannot compile the reactor (`--release 21`).
 
-Do not introduce Java 9+ language or APIs until a dedicated migration
-changes the compiler and required CI.
-
-GUI work needs a **JavaFX-capable JDK 8** (Liberica Full 8 or Zulu 8 with
-FX). Plain Temurin 8 often has no JavaFX. JDK 11+ may compile via
-`javafx-openjfx-compile`; that is not a runtime migration.
-
-Prerequisites: JDK 8, Maven 3.6+, Git.
-Default reactor: **35** modules. Out of reactor:
-`application/habiTv-linux`, `application/habiTv-windows`.
+Prerequisites: JDK 21, Maven 3.6+, Git.
+Default reactor includes Linux and Windows packaging modules.
 `build/static-repo-publisher` is profile-only.
 
 ## Commands
@@ -44,7 +34,7 @@ Default reactor: **35** modules. Out of reactor:
 ```bash
 mvn -B -ntp -DskipTests validate
 mvn -B -ntp -DskipTests compile
-mvn -B -ntp -DskipTests -pl "!application/trayView,!application/habiTv" package
+mvn -B -ntp -DskipTests package
 mvn -B -ntp -pl <module> -am test
 ```
 
@@ -55,6 +45,9 @@ Default Surefire excludes live `*PluginManagerTest` and
 Console fat JAR:
 `application/consoleView/target/consoleView-4.1.0-SNAPSHOT-all.jar`
 (copy or rename to `habitv.jar` if you want the commands below).
+
+Native installers (opt-in profiles):
+`mvn -B -ntp -P linux-jpackage package` or `-P windows-jpackage package`.
 
 ## Run (console)
 

@@ -36,7 +36,7 @@ Allowed types: `feat`, `fix`, `refactor`, `perf`, `docs`, `test`,
 ## Validation
 
 Java baseline and build details: [`docs/development.md`](docs/development.md).
-Current compiler/CI: Java 8. Target: Java 21, then Java 25.
+Current compiler/CI: Java 21. Target: Java 25.
 
 | Change | Minimum |
 |--------|---------|

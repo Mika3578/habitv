@@ -25,8 +25,8 @@ defaults:
     shell: bash
 
 jobs:
-  validate-java8:
-    name: validate-java8
+  validate-java21:
+    name: validate-java21
     if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -36,25 +36,24 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Liberica JDK 8 with JavaFX
+      - name: Set up Temurin JDK 21
         uses: ./.github/actions/setup-build-jdk
         with:
-          distribution: liberica
-          java-version: "8"
-          java-package: jdk+fx
+          distribution: temurin
+          java-version: "21"
 
-      - name: Maven validate (Java 8 baseline)
+      - name: Maven validate (Java 21 baseline)
         run: mvn -B -ntp -DskipTests validate
 
       - name: Upload Maven artifacts
         if: always()
         uses: ./.github/actions/upload-maven-artifacts
         with:
-          name: validate-java8-artifacts
+          name: validate-java21-artifacts
 
-  deterministic-tests-java8:
-    name: deterministic-tests-java8
-    needs: validate-java8
+  deterministic-tests-java21:
+    name: deterministic-tests-java21
+    needs: validate-java21
     if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -64,12 +63,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Liberica JDK 8 with JavaFX
+      - name: Set up Temurin JDK 21
         uses: ./.github/actions/setup-build-jdk
         with:
-          distribution: liberica
-          java-version: "8"
-          java-package: jdk+fx
+          distribution: temurin
+          java-version: "21"
 
       - name: Deterministic test subset
         run: mvn -B -ntp -pl fwk/api,fwk/framework,application/core,plugins/plugin-tester -am test
@@ -78,11 +76,11 @@ jobs:
         if: always()
         uses: ./.github/actions/upload-maven-artifacts
         with:
-          name: deterministic-tests-java8-artifacts
+          name: deterministic-tests-java21-artifacts
 
-  compile-and-package-java8:
-    name: compile-and-package-java8
-    needs: validate-java8
+  compile-and-package-java21:
+    name: compile-and-package-java21
+    needs: validate-java21
     if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -92,31 +90,26 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Liberica JDK 8 with JavaFX
+      - name: Set up Temurin JDK 21
         uses: ./.github/actions/setup-build-jdk
         with:
-          distribution: liberica
-          java-version: "8"
-          java-package: jdk+fx
+          distribution: temurin
+          java-version: "21"
 
-      - name: Maven package (Java 8 baseline)
+      - name: Maven package (Java 21 baseline)
         run: mvn -B -ntp -DskipTests package
 
       - name: Upload Maven artifacts
         if: always()
         uses: ./.github/actions/upload-maven-artifacts
         with:
-          name: compile-and-package-java8-artifacts
+          name: compile-and-package-java21-artifacts
 
   # Cross-platform validate signal (non-required, diagnostic). Mirrors the
   # Windows signal in build.yml so macOS regressions surface on develop PRs.
-  # Uses Liberica JDK 8 (the project's trusted distribution; it ships macOS
-  # aarch64 JDK 8, which macos-latest runners need). validate needs no JavaFX,
-  # so the plain jdk package is enough. Not part of the develop merge baseline;
-  # do not add to branch protection.
   validate-macos:
     name: validate-macos
-    needs: validate-java8
+    needs: validate-java21
     if: github.event_name != 'schedule'
     runs-on: macos-latest
     timeout-minutes: 20
@@ -126,19 +119,17 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Liberica JDK 8
+      - name: Set up Temurin JDK 21
         uses: ./.github/actions/setup-build-jdk
         with:
-          distribution: liberica
-          java-version: "8"
+          distribution: temurin
+          java-version: "21"
 
-      - name: Maven validate (macOS, Java 8)
+      - name: Maven validate (macOS, Java 21)
         run: mvn -B -ntp -DskipTests validate
 
-  # Resolve the compatibility matrix per event: PR/push stay on the LTS subset
-  # to keep routine CI cheap; the full sweep runs only on schedule and manual
-  # dispatch. These jobs are diagnostic (continue-on-error) until the JAXB and
-  # JavaFX migrations land.
+  # Diagnostic matrix: older JDKs cannot compile --release 21, so routine PR
+  # runs only exercise the merge baseline (21). Scheduled/manual sweeps add 25.
   setup-compat:
     name: setup-compat
     runs-on: ubuntu-latest
@@ -152,12 +143,12 @@ jobs:
           event="${GITHUB_EVENT_NAME}"
           case "$event" in
             schedule|workflow_dispatch)
-              versions='["11","17","21","25"]'
-              reason="Scheduled or manual run: full compatibility sweep"
+              versions='["21","25"]'
+              reason="Scheduled or manual run: Java 21 baseline plus next LTS preview"
               ;;
             *)
-              versions='["17","21"]'
-              reason="Routine PR/push: LTS compatibility subset only"
+              versions='["21"]'
+              reason="Routine PR/push: Java 21 merge baseline only"
               ;;
           esac
           echo "versions=$versions" >> "$GITHUB_OUTPUT"
@@ -194,15 +185,11 @@ jobs:
           distribution: temurin
           java-version: ${{ matrix.java }}
 
-      # Java 11+ remains diagnostic only until JAXB and JavaFX migration is complete.
       - name: Maven validate diagnostic
         run: mvn -B -ntp -DskipTests validate
 
-      # Java 11+ package diagnostics exclude JavaFX-dependent modules until the
-      # JavaFX migration is complete (trayView and habiTv directly import the
-      # javafx.* packages bundled only in Liberica JDK 8 with jdk+fx).
       - name: Maven package diagnostic
-        run: mvn -B -ntp -DskipTests -pl '!application/trayView,!application/habiTv' package
+        run: mvn -B -ntp -DskipTests package
 
       - name: Upload Maven artifacts
         if: always()
@@ -222,12 +209,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Liberica JDK 8 with JavaFX
+      - name: Set up Temurin JDK 21
         uses: ./.github/actions/setup-build-jdk
         with:
-          distribution: liberica
-          java-version: "8"
-          java-package: jdk+fx
+          distribution: temurin
+          java-version: "21"
 
       # Non-blocking until provider tests are migrated to offline fixtures.
       - name: Run full legacy test suite

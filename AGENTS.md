@@ -14,10 +14,9 @@ HabiTV is a Maven multi-module replay application (`fwk/`,
 `application/`, `plugins/`). Canonical remote: `Mika3578/habitv`.
 Integration branch: `develop`.
 
-Current **build/runtime baseline is Java 8**; Java 21 is the
-modernization target, Java 25 next. Details:
-[`docs/development.md`](docs/development.md). Migrations run as dedicated,
-module-scoped tasks.
+Current **build/runtime baseline is Java 21**; Java 25 is the next
+target. Details: [`docs/development.md`](docs/development.md).
+Migrations run as dedicated, module-scoped tasks.
 
 Architecture, Java migration, JavaFX, JAXB, Maven reactor, and provider
 rewrites run as explicitly scoped tasks — one concern per task. The
@@ -48,9 +47,9 @@ cross-platform packaging.
 
 ## Engineering Baseline
 
-- Language: stay on the **current Java 8** baseline unless the task is
+- Language: stay on the **current Java 21** baseline unless the task is
   an explicit JDK migration. See [`docs/development.md`](docs/development.md).
-- GUI modules need a JavaFX-capable JDK 8 at runtime (`jfxrt`).
+- GUI modules use OpenJFX Maven dependencies on Java 21.
 - Do not add, remove, or upgrade dependencies unless the task requires it.
 - Plugin version overrides must follow [`CONTRIBUTING.md`](CONTRIBUTING.md).
   Internal plugin deps use `${project.parent.version}`.
