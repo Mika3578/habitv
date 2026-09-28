@@ -9,10 +9,8 @@ Integration branch: [`develop`](https://github.com/Mika3578/habitv/tree/develop)
 
 ## Status
 
-Current **build/runtime baseline is Java 8**. Java **21** is the
-modernization target; Java **25** is next. Neither 21 nor 25 is
-supported until the compiler and required CI change. Full table:
-[`docs/development.md`](docs/development.md).
+Current **build/runtime baseline is Java 21**. Java **25** is next.
+Full table: [`docs/development.md`](docs/development.md).
 
 The Maven reactor and console path are the working baseline. Many
 provider sites have changed. Runtime updates use HTTPS
@@ -20,7 +18,7 @@ provider sites have changed. Runtime updates use HTTPS
 
 ## Build
 
-JDK 8, Maven 3.6+, Git. Commands: [`docs/development.md`](docs/development.md).
+JDK 21, Maven 3.6+, Git. Commands: [`docs/development.md`](docs/development.md).
 
 ```bash
 mvn -B -ntp -DskipTests validate
