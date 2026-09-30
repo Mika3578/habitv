@@ -193,9 +193,7 @@ final class Novo19FixtureSupport {
 			throw new IOException("fixture has no sections object: " + file);
 		}
 		cached = new HashMap<String, String>();
-		final java.util.Iterator<Map.Entry<String, JsonNode>> fields = sections.fields();
-		while (fields.hasNext()) {
-			final Map.Entry<String, JsonNode> entry = fields.next();
+		for (final Map.Entry<String, JsonNode> entry : sections.properties()) {
 			cached.put(entry.getKey(), MAPPER.writeValueAsString(entry.getValue()));
 		}
 		SECTION_CACHE.put(file, cached);

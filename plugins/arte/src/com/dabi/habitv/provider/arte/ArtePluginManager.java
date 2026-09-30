@@ -20,7 +20,6 @@ import com.dabi.habitv.framework.plugin.utils.DownloadUtils;
 import com.dabi.habitv.provider.arte.ArteCatalogDiscovery.ArteEmacTransport;
 import com.dabi.habitv.provider.arte.ArteCatalogDiscovery.ArteLanguage;
 import com.dabi.habitv.provider.arte.ArteCatalogDiscovery.ArtePageRef;
-import com.dabi.habitv.provider.arte.ArteCategoryId.Kind;
 import com.dabi.habitv.provider.arte.ArteContentClassifier.ContentKind;
 import com.fasterxml.jackson.databind.JsonNode;
 

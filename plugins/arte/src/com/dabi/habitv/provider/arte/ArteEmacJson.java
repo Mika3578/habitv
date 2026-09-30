@@ -1,7 +1,6 @@
 package com.dabi.habitv.provider.arte;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -96,9 +95,8 @@ final class ArteEmacJson {
 					pageCodes.add(page);
 				}
 			}
-			final Iterator<Map.Entry<String, JsonNode>> fields = node.fields();
-			while (fields.hasNext()) {
-				collectEmacPageCodes(fields.next().getValue(), pageCodes);
+			for (final Map.Entry<String, JsonNode> field : node.properties()) {
+				collectEmacPageCodes(field.getValue(), pageCodes);
 			}
 		} else if (node.isArray()) {
 			for (final JsonNode child : node) {

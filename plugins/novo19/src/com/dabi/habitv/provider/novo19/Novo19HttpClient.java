@@ -37,27 +37,22 @@ final class Novo19HttpClient {
 
 	static String getWithRetry(final GetAttempt attempt, final String url, final String authorizationHeader)
 			throws IOException {
-		for (int attemptIndex = 1; attemptIndex <= Novo19Conf.BFF_GET_MAX_ATTEMPTS; attemptIndex++) {
+		for (int attemptIndex = 1; attemptIndex < Novo19Conf.BFF_GET_MAX_ATTEMPTS; attemptIndex++) {
 			try {
 				return attempt.execute(url, authorizationHeader);
 			} catch (final Novo19HttpException e) {
-				if (!isRetriableStatus(e.getStatus()) || attemptIndex >= Novo19Conf.BFF_GET_MAX_ATTEMPTS) {
+				if (!isRetriableStatus(e.getStatus())) {
 					throw e;
 				}
 			} catch (final IOException e) {
-				if (attemptIndex >= Novo19Conf.BFF_GET_MAX_ATTEMPTS) {
-					throw e;
-				}
+				// transient failure, retry below
 			}
 			sleepBeforeRetry();
 		}
-		throw new IllegalStateException("retry-exhausted:" + url);
+		return attempt.execute(url, authorizationHeader);
 	}
 
 	private static void sleepBeforeRetry() throws IOException {
-		if (Novo19Conf.BFF_GET_RETRY_DELAY_MS <= 0L) {
-			return;
-		}
 		try {
 			Thread.sleep(Novo19Conf.BFF_GET_RETRY_DELAY_MS);
 		} catch (final InterruptedException e) {
