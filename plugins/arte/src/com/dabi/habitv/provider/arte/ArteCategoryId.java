@@ -1,6 +1,6 @@
 package com.dabi.habitv.provider.arte;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Stable internal category identifiers.

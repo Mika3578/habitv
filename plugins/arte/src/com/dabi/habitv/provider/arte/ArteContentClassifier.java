@@ -3,7 +3,7 @@ package com.dabi.habitv.provider.arte;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
