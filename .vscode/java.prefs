@@ -1,0 +1,3 @@
+# Shared Eclipse JDT preferences for the Cursor / VS Code Java language server.
+# Referenced by java.settings.url in .vscode/settings.json.
+org.eclipse.jdt.core.compiler.problem.forbiddenReference=ignore

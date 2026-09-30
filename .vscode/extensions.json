@@ -1,16 +1,17 @@
 {
-    "recommendations": [
-        "redhat.java",
-        "vscjava.vscode-java-debug",
-        "vscjava.vscode-java-test",
-        "vscjava.vscode-maven",
-        "vscjava.vscode-java-dependency",
-        "ms-python.python",
-        "ms-python.vscode-python-envs",
-        "redhat.vscode-xml",
-        "redhat.vscode-yaml",
-        "github.vscode-github-actions",
-        "ms-vscode.powershell",
-        "editorconfig.editorconfig"
-    ]
+	"recommendations": [
+		"redhat.java",
+		"vscjava.vscode-java-debug",
+		"vscjava.vscode-java-test",
+		"vscjava.vscode-maven",
+		"vscjava.vscode-java-dependency",
+		"redhat.vscode-xml",
+		"redhat.vscode-yaml",
+		"github.vscode-github-actions",
+		"editorconfig.editorconfig",
+		"ms-vscode.powershell"
+	],
+	"unwantedRecommendations": [
+		"vscjava.vscode-gradle"
+	]
 }
