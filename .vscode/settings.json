@@ -1,0 +1,35 @@
+{
+	"java.import.maven.enabled": true,
+	"java.import.gradle.enabled": false,
+	"java.project.importOnFirstTimeStartup": "automatic",
+	"java.configuration.updateBuildConfiguration": "automatic",
+	"java.autobuild.enabled": true,
+	"java.compile.nullAnalysis.mode": "disabled",
+	"java.format.enabled": true,
+	"java.format.settings.url": ".vscode/java-formatter.xml",
+	"java.format.settings.profile": "JavaConventions",
+	"java.settings.url": ".vscode/java.prefs",
+	"java.errors.incompleteClasspath.severity": "warning",
+	"java.maven.downloadSources": true,
+	"maven.terminal.useJavaHome": true,
+	"files.trimTrailingWhitespace": true,
+	"files.insertFinalNewline": true,
+	"files.eol": "\n",
+	"editor.detectIndentation": true,
+	"[java]": {
+		"editor.tabSize": 4,
+		"editor.insertSpaces": false,
+		"editor.formatOnSave": false
+	},
+	"[xml]": {
+		"editor.tabSize": 4,
+		"editor.insertSpaces": false
+	},
+	"[json]": {
+		"editor.tabSize": 2,
+		"editor.insertSpaces": true
+	},
+	"[markdown]": {
+		"files.trimTrailingWhitespace": false
+	}
+}
