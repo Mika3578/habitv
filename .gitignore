@@ -11,9 +11,15 @@ application/core/testOldGrabconfig.xml
 .factorypath
 
 # IDE
-.vscode/
+.vscode/*
 .idea/
 *.iml
+.venv/
+
+# Shared VS Code workspace settings and formatter profile.
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/java-formatter.xml
 
 # Maven
 target/

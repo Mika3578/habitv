@@ -1,0 +1,26 @@
+{
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "maven.terminal.useJavaHome": true,
+    "python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+    "python.terminal.activateEnvironment": true,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true
+}
+{
+  "java.jdt.ls.java.home": "C:\\Program Files\\Zulu\\zulu-8",
+  "java.import.maven.enabled": true,
+  "java.project.importOnFirstTimeStartup": "automatic",
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.configuration.runtimes": [
+    {
+      "name": "JavaSE-1.8",
+      "path": "C:\\Program Files\\Zulu\\zulu-8",
+      "default": true
+    }
+  ],
+  "java.autobuild.enabled": false,
+  "java.compile.nullAnalysis.mode": "disabled",
+  "maven.terminal.useJavaHome": true,
+  "java.format.settings.url": ".vscode/java-formatter.xml",
+  "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx8G -Xms100m -Xlog:disable"
+}
