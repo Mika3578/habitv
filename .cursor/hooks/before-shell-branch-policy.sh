@@ -53,7 +53,7 @@ cwd="$("$JQ_BIN" -r '.cwd // empty' <<<"$input" | tr -d '\r')"
 # Deny only when `cd` is a shell statement before the publish verb (not inside -m text).
 # Strip simple quoted regions before matching.
 cmd_unquoted="$(printf '%s' "$command" | sed -E 's/"[^"]*"//g; s/'\''[^'\'']*'\''//g')"
-if [[ "$cmd_unquoted" =~ (^|[[:space:];&|])cd[[:space:]] && "$cmd_unquoted" =~ (^|[[:space:];&|])git([[:space:]]+-C[[:space:]]+[^[:space:]]+)?[[:space:]]+(push|commit) ]]; then
+if [[ "$cmd_unquoted" =~ (^|[[:space:];&|])cd[[:space:]] ]] && { [[ "$cmd_unquoted" =~ (^|[[:space:];&|])git([[:space:]]+-C[[:space:]]+[^[:space:]]+)?[[:space:]]+(push|commit) ]] || [[ "$cmd_unquoted" =~ (^|[[:space:];&|])gh[[:space:]]+pr[[:space:]]+create ]]; }; then
   printf '%s\n' '{"permission":"deny","agent_message":"Publishing blocked: do not combine cd with git commit, git push, or gh pr create in one shell command. Run publish commands from the repository working directory."}'
   exit 0
 fi
