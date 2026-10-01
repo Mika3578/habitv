@@ -2,8 +2,14 @@
 # Deterministic checks for repository agent-policy layout.
 # Usage: scripts/validate-agent-policy.sh
 # Exit 0 when valid, 1 on failure.
+# Requires Bash 4+ (associative arrays, read -d '', ${var:-} defaults).
 
 set -euo pipefail
+
+if [[ "${BASH_VERSINFO[0]}" -lt 4 ]]; then
+  echo "agent-policy: Bash 4+ required (found ${BASH_VERSION})"
+  exit 1
+fi
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
@@ -141,7 +147,19 @@ if [[ -d .agents/skills ]]; then
       continue
     fi
     name=$(printf '%s\n' "$metadata" | sed -n 's/^name:[[:space:]]*//p' | head -1)
-    desc=$(printf '%s\n' "$metadata" | sed -n 's/^description:[[:space:]]*//p' | head -1)
+    # Collect folded/literal or single-line description values.
+    desc=$(printf '%s\n' "$metadata" | awk '
+      BEGIN { grabbing = 0 }
+      /^description:[[:space:]]*[>|][-+]?[[:space:]]*$/ { grabbing = 1; next }
+      /^description:[[:space:]]*/ {
+        sub(/^description:[[:space:]]*/, "")
+        print
+        exit
+      }
+      grabbing && /^[A-Za-z0-9_-]+:/ { exit }
+      grabbing { print }
+    ')
+    desc=$(printf '%s' "$desc" | tr '\n' ' ' | sed 's/[[:space:]]\{1,\}/ /g; s/^[[:space:]]*//; s/[[:space:]]*$//')
     if [[ -z "$name" ]]; then
       fail "empty skill name: $rel"
     fi

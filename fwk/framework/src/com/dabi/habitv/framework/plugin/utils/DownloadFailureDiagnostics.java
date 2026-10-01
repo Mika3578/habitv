@@ -121,13 +121,13 @@ public final class DownloadFailureDiagnostics {
 
 	private static String messageForClassificationKey(final String key) {
 		if (CLASSIFICATION_DRM_PROTECTED.equals(key)) {
-			return "Content appears rights-protected. Habitv cannot unlock it.";
+			return "Content appears rights-protected. Habitv cannot retrieve it.";
 		}
 		if (CLASSIFICATION_GEO_RESTRICTED.equals(key)) {
 			return "Content is unavailable in this region (geo restriction).";
 		}
 		if (CLASSIFICATION_AUTH_REQUIRED.equals(key)) {
-			return "Content requires sign-in or a subscription. Habitv does not unlock restricted access.";
+			return "Content requires sign-in or a subscription. Habitv does not support restricted access.";
 		}
 		if (CLASSIFICATION_PRIVATE_VIDEO.equals(key)) {
 			return "Video is private or requires account access.";

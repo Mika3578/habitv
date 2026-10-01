@@ -36,7 +36,7 @@ Default reactor: **35 modules** (`mvn -B -ntp -DskipTests validate` on
 │   ├── consoleView/        # CLI fat JAR
 │   ├── trayView/           # JavaFX tray UI
 │   └── habiTv/             # GUI launcher
-├── plugins/                # provider, tool, and exporter modules
+├── plugins/                # provider, downloader, and exporter modules
 └── build/static-repo-publisher/   # only with -Pstatic-repo-deploy / -Pstatic-repo-publish
 ```
 
@@ -64,7 +64,7 @@ next to the application, or resolved from the static update repository.
 | Kind | Role | Examples |
 |------|------|----------|
 | Provider | Categories and episodes | `francetv`, `youtube`, `arte`, `novo19` |
-| Tool | Fetch media | `youtube` (yt-dlp), `curl`, `ffmpeg`, `aria2` |
+| Downloader | Fetch media (`PluginDownloaderInterface`) | `youtube` (yt-dlp), `curl`, `ffmpeg`, `aria2` |
 | Exporter | Post-fetch commands | `cmd`, `rclone` |
 | Mailbox input | POP3/IMAP ingest | `email` |
 

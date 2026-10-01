@@ -32,7 +32,8 @@ markers=(
 )
 
 for marker in "${markers[@]}"; do
-  if printf '%s' "$body" | grep -qiF "$marker"; then
+  # Avoid printf|grep under pipefail (SIGPIPE can miss a match on large bodies).
+  if grep -qiF -- "$marker" <<<"$body"; then
     echo "pr-public-body: forbidden generated block detected: $marker"
     exit 1
   fi

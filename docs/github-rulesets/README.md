@@ -1,8 +1,8 @@
 # GitHub rulesets (admin payloads)
 
-JSON under this directory documents the intended `develop` protection
-settings. Apply changes in the GitHub UI or Rulesets API; files here are
-not applied automatically.
+JSON under this directory documents the intended `protect-develop.json`
+ruleset for the `develop` branch only. Apply changes in the GitHub UI or
+Rulesets API; files here are not applied automatically.
 
 ## `protect-develop.json` — recommended follow-ups
 
@@ -20,9 +20,11 @@ before enabling):
 | `required_review_thread_resolution` | `true` | keep `true` |
 | `dismiss_stale_reviews_on_push` | `false` | `true` |
 | `require_last_push_approval` | `false` | keep `false` unless a second approval gate is desired |
-| `review_on_push` (Copilot) | `false` | optional; enable when Draft PRs should receive Copilot on each push |
+| `review_on_push` (Copilot) | `false` | optional; enable with draft review when each push should get Copilot |
+| `review_draft_pull_requests` (Copilot) | `false` | set `true` together with `review_on_push` if Draft PRs should be reviewed |
 
-Hosted Copilot rule in the payload sets `review_draft_pull_requests: false`.
+`review_on_push` alone does not cover Draft PRs while
+`review_draft_pull_requests` remains `false`; enable both when that is desired.
 
 ## External PR description tools
 

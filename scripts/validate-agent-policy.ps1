@@ -43,7 +43,7 @@ function Test-Adapter([string]$Path) {
         Fail "adapter too large ($size bytes): $Path"
     }
     $text = Get-Content -Raw $Path
-    if ($text -notmatch "AGENTS\.md") {
+    if ($text.IndexOf("AGENTS.md", [System.StringComparison]::Ordinal) -lt 0) {
         Fail "adapter must reference AGENTS.md: $Path"
     }
 }

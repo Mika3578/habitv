@@ -49,21 +49,31 @@ fi
 
 command="$("$JQ_BIN" -r '.command // empty' <<<"$input")"
 cwd="$("$JQ_BIN" -r '.cwd // empty' <<<"$input")"
-if [[ -n "$command" && "$command" =~ (^|[[:space:];&|])cd[[:space:]]+ ]]; then
+
+# Deny only when `cd` is a shell statement before the publish verb (not inside -m text).
+# Strip simple quoted regions before matching.
+cmd_unquoted="$(printf '%s' "$command" | sed -E 's/"[^"]*"//g; s/'\''[^'\'']*'\''//g')"
+if [[ "$cmd_unquoted" =~ (^|[[:space:];&|])cd[[:space:]] && "$cmd_unquoted" =~ (^|[[:space:];&|])git([[:space:]]+-C[[:space:]]+[^[:space:]]+)?[[:space:]]+(push|commit) ]]; then
   printf '%s\n' '{"permission":"deny","agent_message":"Publishing blocked: do not combine cd with git commit, git push, or gh pr create in one shell command. Run publish commands from the repository working directory."}'
   exit 0
 fi
 
-if [[ -z "$cwd" || ! -d "$cwd" ]]; then
+# Prefer `git -C <path>` when present so branch checks use that repo.
+repo_dir="$cwd"
+if [[ "$cmd_unquoted" =~ (^|[[:space:]])git[[:space:]]+-C[[:space:]]+([^[:space:]]+) ]]; then
+  repo_dir="${BASH_REMATCH[2]}"
+fi
+
+if [[ -z "$repo_dir" || ! -d "$repo_dir" ]]; then
   printf '%s\n' '{"permission":"allow"}'
   exit 0
 fi
 
-cd "$cwd"
+cd "$repo_dir"
 
 branch="$(git branch --show-current 2>/dev/null || true)"
 if [[ -z "$branch" ]]; then
-  printf '%s\n' '{"permission":"allow"}'
+  printf '%s\n' '{"permission":"deny","agent_message":"Publishing blocked: detached HEAD or empty branch name. Check out a canonical <type>/<scope> branch before git commit, git push, or gh pr create."}'
   exit 0
 fi
 

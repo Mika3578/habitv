@@ -1,7 +1,7 @@
 # HabiTV
 
 HabiTV is a Maven application that watches French TV replay catalogues
-and saves new episodes via provider and tool plugins (yt-dlp, curl,
+and saves new episodes via provider and downloader plugins (yt-dlp, curl,
 ffmpeg, …).
 
 Canonical repository: [Mika3578/habitv](https://github.com/Mika3578/habitv).
