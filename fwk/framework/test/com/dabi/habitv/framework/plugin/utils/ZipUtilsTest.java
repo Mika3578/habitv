@@ -1,6 +1,7 @@
 package com.dabi.habitv.framework.plugin.utils;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -14,6 +15,8 @@ import java.util.zip.ZipOutputStream;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import com.dabi.habitv.api.plugin.exception.TechnicalException;
 
 public class ZipUtilsTest {
 
@@ -34,6 +37,18 @@ public class ZipUtilsTest {
 	}
 
 	@Test
+	public void extractsEntryWithInternalParentSegment() throws IOException {
+		final File outputDir = temporaryFolder.newFolder("out");
+		final File zipFile = temporaryFolder.newFile("internal.zip");
+		writeZip(zipFile, "nested/../safe.txt", "hello");
+
+		ZipUtils.unZipIt(zipFile, outputDir.getAbsolutePath());
+
+		final File extracted = new File(outputDir, "safe.txt");
+		assertTrue(extracted.isFile());
+	}
+
+	@Test
 	public void rejectsZipEntryThatEscapesOutputFolder() throws IOException {
 		final File outputDir = temporaryFolder.newFolder("out");
 		final File outsideMarker = temporaryFolder.newFile("outside-marker.txt");
@@ -41,7 +56,7 @@ public class ZipUtilsTest {
 		final File zipFile = temporaryFolder.newFile("evil.zip");
 		writeZip(zipFile, "../outside-marker.txt", "evil");
 
-		ZipUtils.unZipIt(zipFile, outputDir.getAbsolutePath());
+		assertThrows(TechnicalException.class, () -> ZipUtils.unZipIt(zipFile, outputDir.getAbsolutePath()));
 
 		assertTrue(outsideMarker.isFile());
 		assertTrue(new String(Files.readAllBytes(outsideMarker.toPath()), StandardCharsets.UTF_8).contains("untouched"));
