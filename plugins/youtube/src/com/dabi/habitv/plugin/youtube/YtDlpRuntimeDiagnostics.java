@@ -105,9 +105,39 @@ public final class YtDlpRuntimeDiagnostics {
 		LOG.info("yt-dlp process TMP: " + tempPath);
 	}
 
-	public static void runPreflight(final String cmdProcessor, final String executablePath, final String binDir) {
+	public static boolean supportsProgressTemplate(final String versionOutput) {
+		if (versionOutput == null || versionOutput.trim().isEmpty()) {
+			return false;
+		}
+		final String line = versionOutput.trim().split("\\R", 2)[0].trim();
+		if (line.toLowerCase().contains("youtube-dl")) {
+			return false;
+		}
+		return parseYtDlpReleaseDate(line) >= 20231013;
+	}
+
+	static int parseYtDlpReleaseDate(final String versionLine) {
+		if (versionLine == null) {
+			return 0;
+		}
+		final java.util.regex.Matcher matcher = java.util.regex.Pattern
+				.compile("(20\\d{2})[.](\\d{1,2})[.](\\d{1,2})").matcher(versionLine);
+		if (!matcher.find()) {
+			return 0;
+		}
+		try {
+			final int year = Integer.parseInt(matcher.group(1));
+			final int month = Integer.parseInt(matcher.group(2));
+			final int day = Integer.parseInt(matcher.group(3));
+			return year * 10000 + month * 100 + day;
+		} catch (final NumberFormatException e) {
+			return 0;
+		}
+	}
+
+	public static String runPreflight(final String cmdProcessor, final String executablePath, final String binDir) {
 		if (!preflightEnabled) {
-			return;
+			return "";
 		}
 		logExecutableDiagnostics(executablePath, binDir);
 		final String versionCmd = executablePath + " --version";
@@ -144,6 +174,7 @@ public final class YtDlpRuntimeDiagnostics {
 		}
 		final String versionLine = fullOutput == null ? "" : fullOutput.trim();
 		LOG.info("yt-dlp version: " + versionLine);
+		return versionLine;
 	}
 
 	static ExecutorFailedException asBootstrapFailureIfNeeded(final String cmd, final String fullOutput,

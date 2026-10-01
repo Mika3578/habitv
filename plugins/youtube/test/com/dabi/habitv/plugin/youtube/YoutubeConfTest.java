@@ -27,8 +27,11 @@ public class YoutubeConfTest {
 		assertTrue(YoutubeConf.DUMP_CMD.contains("--merge-output-format mp4"));
 		assertTrue(YoutubeConf.DUMP_CMD.contains("--newline"));
 		assertTrue(YoutubeConf.DUMP_CMD.contains("--no-check-certificate"));
-		assertTrue(YoutubeConf.DUMP_CMD.contains("--progress-template"));
-		assertTrue(YoutubeConf.DUMP_CMD.contains(YoutubeConf.PROGRESS_LINE_PREFIX));
+		assertFalse(YoutubeConf.DUMP_CMD.contains("--progress-template"));
+		assertTrue(YoutubeConf.augmentBuiltInDumpCommand(YoutubeConf.DUMP_CMD, "2024.01.01")
+				.contains("--progress-template"));
+		assertTrue(YoutubeConf.augmentBuiltInDumpCommand(YoutubeConf.DUMP_CMD, "2023.09.01")
+				.equals(YoutubeConf.DUMP_CMD));
 		assertFalse(YoutubeConf.DUMP_CMD.contains("--audio-quality"));
 		assertFalse(YoutubeConf.DUMP_CMD.contains("--extract-audio"));
 		assertFalse(YoutubeConf.DUMP_CMD.contains("-x"));

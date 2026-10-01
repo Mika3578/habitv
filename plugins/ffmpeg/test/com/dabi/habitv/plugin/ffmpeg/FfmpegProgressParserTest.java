@@ -42,6 +42,14 @@ public class FfmpegProgressParserTest {
 	}
 
 	@Test
+	public void outTimeMsTreatedAsMicroseconds() {
+		final FfmpegProgressParser.State state = new FfmpegProgressParser.State();
+		FfmpegProgressParser.parseLine("duration=10.000000", state);
+		final DownloadProgressSnapshot snapshot = FfmpegProgressParser.parseLine("out_time_ms=5000000", state);
+		assertEquals(0.5d, snapshot.getProgressRatio().doubleValue(), 0.0001d);
+	}
+
+	@Test
 	public void outTimeStringParsed() {
 		final FfmpegProgressParser.State state = new FfmpegProgressParser.State();
 		FfmpegProgressParser.parseLine("duration=2.000000", state);

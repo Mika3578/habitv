@@ -166,6 +166,10 @@ public final class YtDlpProgressParser {
 			return DownloadStage.POST_PROCESSING;
 		}
 		final String token = postProcessor.trim();
+		if ("VideoRemuxer".equalsIgnoreCase(token) || "VideoConvertor".equalsIgnoreCase(token)
+				|| "FFmpegVideoRemuxer".equalsIgnoreCase(token) || "FFmpegVideoConvertor".equalsIgnoreCase(token)) {
+			return DownloadStage.REMUXING;
+		}
 		final DownloadStage fromTag = detectPostProcessingStage("[" + token + "]");
 		return fromTag == null ? DownloadStage.POST_PROCESSING : fromTag;
 	}

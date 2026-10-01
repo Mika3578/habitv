@@ -186,6 +186,13 @@ public class YtDlpProgressParserTest {
 	}
 
 	@Test
+	public void parseVideoRemuxerPostProcessorTemplateAsRemux() {
+		final DownloadProgressSnapshot remux = YtDlpProgressParser.parse(
+				YoutubeConf.PROGRESS_LINE_PREFIX + "{\"phase\":\"postprocess\",\"pp\":\"VideoRemuxer\"}", null);
+		assertEquals(DownloadStage.REMUXING, remux.getStage());
+	}
+
+	@Test
 	public void parseHabitvProgressAudioAfterVideoComplete() {
 		DownloadProgressSnapshot snapshot = YtDlpProgressParser.parse(
 				YoutubeConf.PROGRESS_LINE_PREFIX + "{\"phase\":\"download\",\"pct\":99.0,\"dest\":\"episode.f137.mp4\"}",

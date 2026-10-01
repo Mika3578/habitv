@@ -39,6 +39,8 @@ public class CmdExecutor implements ProcessHolder {
 	private String lastOutputLine = null;
 	private String progression;
 
+	private final Object progressLock = new Object();
+
 	private Thread killThread;
 
 	public CmdExecutor(final String cmdProcessor, final String cmd, final long maxHungTime) {
@@ -218,15 +220,18 @@ public class CmdExecutor implements ProcessHolder {
 							fullOutput.append(line);
 							fullOutput.append("\n");
 							lastOutputLine = line;
-							lastHandledLine = progression;
-							String newProgression = handleProgression(line);
-							if (newProgression != null) {
-								progression = newProgression;
-								LOG.debug(line);
-								final long now = System.currentTimeMillis();
-								if (progression != null && (now - lastTime) > FrameworkConf.TIME_BETWEEN_LOG) {
-									hungThread = isHungProcess(lastHandledLine, progression, now, lastTime, maxHungTime);
-									lastTime = now;
+							synchronized (getProgressLock()) {
+								lastHandledLine = progression;
+								String newProgression = handleProgression(line);
+								if (newProgression != null) {
+									progression = newProgression;
+									LOG.debug(line);
+									final long now = System.currentTimeMillis();
+									if (progression != null && (now - lastTime) > FrameworkConf.TIME_BETWEEN_LOG) {
+										hungThread = isHungProcess(lastHandledLine, progression, now, lastTime,
+												maxHungTime);
+										lastTime = now;
+									}
 								}
 							}
 						}
@@ -258,6 +263,10 @@ public class CmdExecutor implements ProcessHolder {
 
 	protected boolean isSuccess(final String fullOutput) {
 		return true;
+	}
+
+	protected Object getProgressLock() {
+		return progressLock;
 	}
 
 	protected String handleProgression(final String line) {

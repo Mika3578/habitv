@@ -31,8 +31,10 @@ carried over (for example download at 100% then merger is indeterminate).
 
 ## yt-dlp (youtube plugin)
 
-Default commands append `--progress-template` flags that emit one line per
-update prefixed with `habitv-progress:` followed by JSON (`YoutubeConf`).
+Built-in default downloader commands (`YoutubeConf.DUMP_CMD` / `DUMP_CMD_MP3`)
+append `--progress-template` only when preflight detects a yt-dlp build that
+supports the flag (not youtube-dl). Lines are prefixed with `habitv-progress:`
+followed by JSON.
 
 - `phase=download` — numeric `pct`, optional `total`, `speed`, `eta`, `dest`.
 - `phase=postprocess` — `pp` post-processor name mapped to `DownloadStage`.
@@ -43,7 +45,8 @@ unavailable.
 
 ## ffmpeg plugin
 
-Export commands include `-progress pipe:1 -nostats`. `FfmpegProgressParser`
+Built-in ffmpeg downloader constants (`FFMPEGConf`) append `-progress pipe:1 -nostats`.
+User-configured export scripts are unchanged. `FfmpegProgressParser`
 reads `duration=` and `out_time_*` keys on stdout. A ratio is published only
 when duration is known; otherwise the stage stays indeterminate **REMUXING**.
 Stderr `Duration:` / `time=` lines remain a fallback for older invocations.

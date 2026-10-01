@@ -44,10 +44,7 @@ public final class FfmpegProgressParser {
 		if (trimmed.startsWith("out_time_us=")) {
 			state.outTimeMicros = parseLongValue(trimmed.substring("out_time_us=".length()));
 		} else if (trimmed.startsWith("out_time_ms=")) {
-			final Long ms = parseLongValue(trimmed.substring("out_time_ms=".length()));
-			if (ms != null) {
-				state.outTimeMicros = Long.valueOf(ms.longValue() * 1000L);
-			}
+			state.outTimeMicros = parseLongValue(trimmed.substring("out_time_ms=".length()));
 		} else if (trimmed.startsWith("out_time=")) {
 			state.outTimeMicros = parseOutTimeToMicros(trimmed.substring("out_time=".length()));
 		} else {
