@@ -197,10 +197,10 @@ Fetch live GitHub state:
 
 - HEAD SHA, base, branch, draft flag, title, body;
 - review submissions and requested reviewers;
-- **Copilot review overview** (including "Needs a closer look" and
-  "Changes recommended") plus every Copilot inline/thread comment;
-- inline threads (`isResolved`, `isOutdated`, comments);
-- top-level issue/PR comments;
+- Copilot **inline/thread** comments (code findings);
+- Copilot overview text only to classify whether it is meta/footer-only
+  (`Findings: None`) or points at open code findings;
+- top-level issue/PR comments when they contain actionable code notes;
 - check runs / statuses.
 
 Use [`scripts/pr-gh-snapshot.sh`](../../../scripts/pr-gh-snapshot.sh) for a
@@ -208,9 +208,15 @@ deterministic baseline, then classify each item.
 
 Deduplicate before acting on new bot output.
 
-Copilot overview statuses are **BLOCKING** until each item is fixed or
-rejected with evidence on the thread. Quota / rate-limit messages are
-`RATE_LIMITED`, not a clean review.
+**Copilot overview vs code findings**
+
+| Overview | Treat as |
+|----------|----------|
+| `Findings: None`, or only PR-body / attribution / process complaints | `NON_BLOCKING` — one short reject reply; do not edit the body |
+| Points at open inline findings | Work the **threads**; ignore the badge once threads are adjudicated |
+| Quota / unable to review | `RATE_LIMITED` — not a gate |
+
+Do not open fixup loops to make an overview badge turn green.
 
 ## Four different concepts (do not conflate)
 
@@ -259,9 +265,10 @@ Record `execution_state` per source in `agent_space/pr-<n>/state.json`.
 - **SonarCloud:** `STATIC_ANALYSIS` only.
 - **Cursor Approval Agent:** `APPROVAL_ONLY` when it approves from checks
   without Bugbot/substantive diff review — **does not** satisfy final review.
-- **Copilot:** required **substantive** final reviewer when policy applies;
-  must appear as a review submission with `commit_id == HEAD`.
-
+- **Copilot:** preferred substantive reviewer for code. Adjudicate inline
+  findings on HEAD. A human `APPROVED` on HEAD with no open code threads
+  also satisfies final review when the user authorizes merge. Overview
+  badges alone never block merge.
 ## PR body ownership
 
 The orchestrator owns the canonical PR description (template sections).
@@ -278,35 +285,32 @@ this policy. Advisory helper only:
 Optional: disable Sourcery **Enable pull request summary** in the dashboard
 when convenient ([`docs/github-rulesets/README.md`](../../../docs/github-rulesets/README.md)).
 
-## Copilot final review (HabiTV model)
+## Copilot and merge (HabiTV model)
 
-**Draft phase:** implementation, validation, auxiliary rounds (e.g. Amazon Q),
-batch fixes. Auxiliary tools are not substitutes for the final reviewer.
+**Objective:** code is good and findings on the diff are handled so the
+user can merge. Not: endless body/overview cleanup.
 
-**Final phase** — do not assume Ready triggers Copilot automatically:
+**Draft phase:** implementation, validation, fix real code findings.
+
+**Final phase:**
 
 ```text
-PRE_REVIEW_GATE  (threads, checks, body, scope)
+required CI green on HEAD
     ↓
-REQUEST COPILOT EXPLICITLY  (gh pr edit --add-reviewer @copilot)
+actionable code threads adjudicated (fix or reject + resolve)
     ↓
-verify a Copilot review submission exists
+substantive signal on HEAD:
+  Copilot review with findings handled, OR human APPROVED on HEAD
     ↓
-verify review.commit_id == current HEAD
-    ↓
-classify execution_state (SUBSTANTIVE or NO_FINDINGS)
-    ↓
-FINAL_REVIEW_GATE
-    ↓
-Ready  (only when FINAL_REVIEW_GATE + READY_GATE pass + user authorizes)
+user authorizes Ready / merge
 ```
 
-If Copilot is `MISSING` or `PENDING` after request, wait and re-fetch; do not
-declare final review complete. If `SKIPPED` / `RATE_LIMITED`, record and
-escalate to maintainer — do not treat as clean.
+Quota / "unable to review" is not a blocker when CI is green and a human
+approved on HEAD (or code threads are clean and the user authorizes).
 
 Do not request Copilot after every intermediate commit.
-Do not mark Ready before Copilot final review on HEAD when required.
+Do not block merge on overview-only "Changes recommended" with
+`Findings: None`.
 
 ## Live reconciliation (READY_GATE prerequisites)
 
@@ -315,14 +319,13 @@ On current HEAD, confirm:
 - scope complete and validation recorded;
 - full reactor validation when required ([`docs/development.md`](../../../docs/development.md));
 - required GitHub checks pass;
-- zero actionable unresolved threads;
-- **final substantive review** on this HEAD when required: source actually
-  ran, `execution_state` is `SUBSTANTIVE` or `NO_FINDINGS`, and
-  `commit_id == HEAD` (not `APPROVAL_ONLY`, `SKIPPED`, or stale);
+- zero actionable unresolved **code** threads;
+- substantive signal on HEAD: Copilot findings adjudicated, or human
+  `APPROVED` on HEAD (Cursor Approval Agent alone is insufficient);
 - functional test: user **explicitly confirms success in the current
   conversation** when runtime behavior may change — else report
   `Functional validation: PENDING USER TEST`;
-- explicit user authorization to mark Ready.
+- explicit user authorization to mark Ready / merge.
 
 ```bash
 scripts/pr-gh-snapshot.sh Mika3578/habitv <pr>
@@ -338,20 +341,19 @@ All items apply to **current PR HEAD** only:
 2. Focused tests pass when code changed.
 3. Full reactor validation when applicable.
 4. Required checks green on HEAD.
-5. Every feedback item inventoried and adjudicated, including Copilot
-   overview statuses ("Needs a closer look", "Changes recommended").
-   Overview items that only complain about third-party PR body footers
-   may be rejected with evidence (tolerated; not blocking).
-6. Every `BLOCKING` item fixed or rejected with evidence.
-7. Qualifying threads replied and resolved (`isResolved` verified).
-8. No actionable unresolved threads.
-9. History cleaned: no noisy WIP/fixup stack left for merge; body/title
-    current; stale checklist claims removed. Third-party body footers OK.
-10. Final substantive review on HEAD: Copilot (or tier-equivalent) with
-    `execution_state` ∈ {`SUBSTANTIVE`, `NO_FINDINGS`} and `commit_id == HEAD`.
+5. Actionable Copilot **code** threads inventoried and adjudicated.
+   Overview-only / footer-only / `Findings: None` items: short reject,
+   not a merge blocker.
+6. Every `BLOCKING` **code** finding fixed or rejected with evidence.
+7. Qualifying code threads replied and resolved (`isResolved` verified).
+8. No actionable unresolved code threads.
+9. History cleaned when practical; title current. Third-party body
+   footers ignored.
+10. Substantive signal on HEAD: Copilot findings handled, or human
+    `APPROVED` on HEAD.
 11. User functional confirmation when applicable.
 12. No newer commit invalidates the above.
-13. Explicit authorization to mark Ready.
+13. Explicit authorization to mark Ready / merge.
 
 ## Continuing an existing PR
 

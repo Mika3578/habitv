@@ -49,10 +49,10 @@
 - [ ] English used for branches, commits, comments, docs, and PR text
 - [ ] Docs updated if behavior or contributor workflow changed
 - [ ] Public git text is short and generic (see AGENTS.md)
-- [ ] Copilot review overview ("Needs a closer look" / "Changes recommended") and threads handled; history and comments cleaned for merge
-- [ ] Actionable review findings addressed; qualifying threads replied and resolved on GitHub
+- [ ] Actionable Copilot **code** findings addressed; overview-only / footer-only items are not merge blockers
+- [ ] Actionable review findings addressed; qualifying code threads replied and resolved on GitHub
 - [ ] Validation and required checks recorded for the current PR HEAD
-- [ ] Final required review completed on the current PR HEAD (when applicable)
+- [ ] Substantive review on HEAD when applicable (Copilot findings handled, or human approval on HEAD)
 - [ ] If a `plugins/*/pom.xml` `<version>` is bumped, the trigger class is named (parser, endpoint, or configuration), and internal deps use `${project.parent.version}`
 - [ ] No secrets, tokens, local paths, or build outputs committed
 

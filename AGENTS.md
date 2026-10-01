@@ -219,12 +219,17 @@ are satisfied.
 
 - Evaluate every PR against its **current PR HEAD**; new commits invalidate
   prior reviews and checks that do not apply to that HEAD.
-- Every actionable review finding receives a disposition (fix, reject with
-  evidence, duplicate, or follow-up).
-- **Always** inventory and handle **Copilot review overview** statuses
-  (including "Needs a closer look" and "Changes recommended") and every
-  Copilot inline / thread comment before Ready. Fix or reject with a short
-  evidence reply; do not leave overview recommendations unaddressed.
+- **Goal:** code that is correct and reviewable. Do not spend cycles on
+  third-party PR-body footers, overview meta text, or process theater.
+- Every **actionable code finding** (inline review thread on the diff)
+  receives a disposition (fix, reject with evidence, duplicate, or
+  follow-up).
+- **Copilot overview** ("Needs a closer look" / "Changes recommended"):
+  - If **Findings: None**, or the text only complains about PR-body
+    footers / attribution / process: **NON_BLOCKING**. One short reject
+    reply is enough; do not clean the body or open a fixup loop.
+  - If it points at open inline findings: treat those threads as the
+    work; do not chase the overview badge itself.
 - Addressed inline threads get a concise reply, then resolution only after
   the fix or rejection is verified; re-fetch GitHub and confirm
   `isResolved`. Do not resolve unanswered or unexamined threads.
@@ -233,17 +238,14 @@ are satisfied.
   metadata (body, draft/ready, replies, resolution, reviewer requests).
   Independent reviewers are read-only.
 - **Review rigor is proportional to risk** (see pr-review skill).
-- A **green check**, a bot comment, or a GitHub **APPROVED** state is not, by
-  itself, proof that a **substantive review** of the **current PR HEAD** ran.
-  Verify reviewer, SHA, and review body (see pr-review skill). Cursor
-  Approval Agent rubber-stamps do not satisfy final review.
-- **PR hygiene before Ready:** keep a short linear history (squash/rebase
-  noisy WIP or fixup commits on the work branch, with approval when
-  rewriting a pushed branch); keep title/body short, generic, and current;
-  keep title/body current; resolve addressed threads; avoid status spam
-  (one clear reply per thread). Third-party body footers are not a Ready
-  blocker.
-- No actionable unresolved feedback remains at Ready.
+- Merge eligibility (when the user authorizes): required CI green on HEAD,
+  no actionable unresolved **code** threads, and a substantive review on
+  HEAD (Copilot with findings adjudicated, or human `APPROVED` on HEAD).
+  Cursor Approval Agent rubber-stamps alone are not enough.
+- **PR hygiene before Ready:** short linear history when practical; title
+  current; resolve addressed code threads. Third-party body footers are
+  ignored for Ready/merge.
+- No actionable unresolved **code** feedback remains at Ready.
 
 When runtime behavior may change, keep the PR in Draft until the user
 **explicitly confirms success in the current conversation** after a real
@@ -278,7 +280,7 @@ paths but must not hold a second canonical copy.
 - Links and claims match the repository.
 - Applicable Draft → Ready gates satisfied on the latest commit before
   Ready (with explicit authorization).
-- Copilot overview statuses and review threads handled (fix or reject
-  with reason); PR history and comments cleaned for merge.
+- Actionable Copilot **code** threads handled (fix or reject with
+  evidence). Overview-only / footer-only items are not merge blockers.
 - Developer was asked to test real behavior when runtime/UI is affected.
 - Commit/push/PR wait for explicit approval.
