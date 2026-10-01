@@ -117,8 +117,21 @@ $onHeadSubstantive = @($sources | Where-Object {
     $countsForFinal -contains $_.execution_state -and $_.commit -eq $HeadSha
 })
 
+# Human APPROVED on HEAD also satisfies the final gate (Cursor bot alone does not).
+$knownBots = @(
+    'copilot-pull-request-reviewer[bot]', 'github-copilot[bot]',
+    'amazon-q-developer[bot]', 'amazon-q[bot]',
+    'cursor[bot]', 'coderabbitai[bot]', 'sourcery-ai[bot]',
+    'sonarqubecloud[bot]', 'sonarcloud[bot]'
+)
+$humanApprovedOnHead = @($Reviews | Where-Object {
+    $_.state -eq 'APPROVED' -and $_.commit.oid -eq $HeadSha -and
+    -not (Test-ExactLogin $_.author.login $knownBots)
+}).Count -gt 0
+$copilotEligible = ($onHeadSubstantive | Where-Object { $_.source -eq 'copilot' }).Count -gt 0
+
 return [ordered]@{
     review_sources              = $sources
-    substantive_review_on_head  = ($onHeadSubstantive.Count -gt 0)
-    final_review_gate_eligible  = ($onHeadSubstantive | Where-Object { $_.source -eq 'copilot' }).Count -gt 0
+    substantive_review_on_head  = ($onHeadSubstantive.Count -gt 0 -or $humanApprovedOnHead)
+    final_review_gate_eligible  = ($copilotEligible -or $humanApprovedOnHead)
 }

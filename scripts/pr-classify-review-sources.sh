@@ -55,6 +55,16 @@ jq -n \
   ($comments | map(select(is_coderabbit_login(.user.login)))) as $cr_c |
   ($comments | map(select(is_sourcery_login(.user.login)))) as $so_c |
   ($comments | map(select(is_sonar_login(.user.login)))) as $sonar_c |
+  ($reviews | map(select(
+      (.state == "APPROVED")
+      and (.commit.oid == $head)
+      and (is_copilot_login(.author.login) | not)
+      and (is_amazon_q_login(.author.login) | not)
+      and (is_cursor_login(.author.login) | not)
+      and (is_coderabbit_login(.author.login) | not)
+      and (is_sourcery_login(.author.login) | not)
+      and (is_sonar_login(.author.login) | not)
+    ))) as $human_approved |
 
   ([]) as $src |
   ($src
@@ -96,7 +106,13 @@ jq -n \
 
   {
     review_sources: $sources,
-    substantive_review_on_head: ($sources | any((.execution_state == "SUBSTANTIVE" or .execution_state == "NO_FINDINGS") and .commit == $head)),
-    final_review_gate_eligible: ($sources | any(.source == "copilot" and (.execution_state == "SUBSTANTIVE" or .execution_state == "NO_FINDINGS") and .commit == $head))
+    substantive_review_on_head: (
+      ($sources | any((.execution_state == "SUBSTANTIVE" or .execution_state == "NO_FINDINGS") and .commit == $head))
+      or (($human_approved | length) > 0)
+    ),
+    final_review_gate_eligible: (
+      ($sources | any(.source == "copilot" and (.execution_state == "SUBSTANTIVE" or .execution_state == "NO_FINDINGS") and .commit == $head))
+      or (($human_approved | length) > 0)
+    )
   }
   '
