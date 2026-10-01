@@ -76,6 +76,100 @@ public final class EpisodeMetadataFormatting {
 		return trimToHttpUrl(category.getId());
 	}
 
+	/**
+	 * Exact episode page URL: metadata source URL first, HTTP(S) episode id as
+	 * fallback. Never invents a URL.
+	 */
+	public static String episodePageUrl(final EpisodeDTO episode) {
+		if (episode == null) {
+			return null;
+		}
+		if (episode.getMetadata() != null) {
+			final String source = trimToHttpUrl(episode.getMetadata().getSourceUrl());
+			if (source != null) {
+				return source;
+			}
+		}
+		return trimToHttpUrl(episode.getId());
+	}
+
+	/**
+	 * Episode description for tooltips / details, truncated to {@code maxChars}
+	 * (including the ellipsis). Null when absent or blank.
+	 * <p>
+	 * Provider descriptions are plain HTML in the wild: tags are stripped,
+	 * common entities decoded and whitespace normalized.
+	 */
+	public static String formatDescription(final EpisodeDTO episode, final int maxChars) {
+		if (episode == null || episode.getMetadata() == null
+				|| maxChars < ELLIPSIS.length()) {
+			return null;
+		}
+		final String description = episode.getMetadata().getDescription();
+		final String cleaned = cleanDescription(description);
+		if (cleaned == null) {
+			return null;
+		}
+		if (cleaned.length() <= maxChars) {
+			return cleaned;
+		}
+		return cleaned.substring(0, maxChars - ELLIPSIS.length()) + ELLIPSIS;
+	}
+
+	/** Strips simple HTML markup, decodes common entities, normalizes spaces. */
+	public static String cleanDescription(final String rawHtml) {
+		if (rawHtml == null) {
+			return null;
+		}
+		String text = rawHtml.replaceAll("(?i)<br\\s*/?>", " ")
+				.replaceAll("(?i)</p>\\s*<p[^>]*>", " ")
+				.replaceAll("<[^>]*>", " ");
+		text = decodeEntities(text);
+		text = text.replaceAll("\\s+", " ").trim();
+		return text.isEmpty() ? null : text;
+	}
+
+	private static String decodeEntities(final String text) {
+		return text
+				.replace("&nbsp;", " ")
+				.replace("&amp;", "&")
+				.replace("&quot;", "\"")
+				.replace("&apos;", "'")
+				.replace("&#39;", "'")
+				.replace("&lt;", "<")
+				.replace("&gt;", ">")
+				.replace("&#34;", "\"");
+	}
+
+	/**
+	 * Wraps cleaned text on word boundaries at {@code maxLineLength} for
+	 * plain-text tooltips (JavaFX 8 tooltips do not wrap reliably).
+	 */
+	public static String wrapLines(final String text, final int maxLineLength) {
+		if (text == null || maxLineLength <= 0) {
+			return text;
+		}
+		final String[] words = text.split(" ");
+		final StringBuilder wrapped = new StringBuilder(text.length() + 16);
+		int lineLength = 0;
+		for (final String word : words) {
+			if (lineLength > 0 && lineLength + 1 + word.length() > maxLineLength) {
+				wrapped.append('\n');
+				lineLength = 0;
+			}
+			if (lineLength > 0) {
+				wrapped.append(' ');
+				lineLength++;
+			}
+			wrapped.append(word);
+			lineLength += word.length();
+		}
+		return wrapped.toString();
+	}
+
+	private static final String ELLIPSIS = "…";
+
+
 	public static String formatProgramLinkLabel(final EpisodeDTO episode) {
 		if (episode != null && episode.getCategory() != null
 				&& episode.getCategory().getName() != null) {

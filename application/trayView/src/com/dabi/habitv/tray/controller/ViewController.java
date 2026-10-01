@@ -355,8 +355,15 @@ public class ViewController implements CoreSubscriber {
 	}
 
 	public void copyUrl(EpisodeDTO episode) {
+		copyText(episode == null ? null : episode.getId());
+	}
+
+	public void copyText(final String text) {
+		if (text == null || text.trim().isEmpty()) {
+			return;
+		}
 		Toolkit.getDefaultToolkit().getSystemClipboard()
-				.setContents(new StringSelection(episode.getId()), null);
+				.setContents(new StringSelection(text), null);
 	}
 
 	public void openInBrowser(final EpisodeDTO episodeDTO) {

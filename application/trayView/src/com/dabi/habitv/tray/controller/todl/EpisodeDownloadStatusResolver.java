@@ -8,31 +8,65 @@ import com.dabi.habitv.core.event.EpisodeStateEnum;
 
 final class EpisodeDownloadStatusResolver {
 
+	/** Semantic UI state: drives icon, accent color and primary action. */
+	enum UiState {
+		AVAILABLE, QUEUED, DOWNLOADING, DOWNLOADED, ERROR, UNKNOWN
+	}
+
 	private EpisodeDownloadStatusResolver() {
 	}
 
 	static String resolve(final EpisodeDTO episode,
 			final Set<String> downloadedEpisodeNames,
 			final EpisodeStateEnum liveState) {
+		return label(resolveState(episode, downloadedEpisodeNames, liveState));
+	}
+
+	static UiState resolveState(final EpisodeDTO episode,
+			final Set<String> downloadedEpisodeNames,
+			final EpisodeStateEnum liveState) {
 		if (episode == null) {
-			return "Inconnu";
+			return UiState.UNKNOWN;
 		}
 		if (downloadedEpisodeNames != null
 				&& DownloadedDAO.containsEpisodeOrLegacyName(downloadedEpisodeNames,
 						episode)) {
-			return "Téléchargé";
+			return UiState.DOWNLOADED;
 		}
 		if (liveState != null) {
 			if (liveState == EpisodeStateEnum.DOWNLOAD_STARTING) {
-				return "Téléchargement";
+				return UiState.DOWNLOADING;
 			}
 			if (liveState == EpisodeStateEnum.TO_DOWNLOAD) {
-				return "En file";
+				return UiState.QUEUED;
+			}
+			if (liveState.hasFailed()) {
+				return UiState.ERROR;
 			}
 			if (liveState.isInProgress()) {
-				return "En cours";
+				return UiState.DOWNLOADING;
+			}
+			if (liveState == EpisodeStateEnum.READY) {
+				return UiState.DOWNLOADED;
 			}
 		}
-		return "Disponible";
+		return UiState.AVAILABLE;
+	}
+
+	static String label(final UiState state) {
+		switch (state) {
+		case AVAILABLE:
+			return "Disponible";
+		case QUEUED:
+			return "En file";
+		case DOWNLOADING:
+			return "En cours";
+		case DOWNLOADED:
+			return "Téléchargé";
+		case ERROR:
+			return "Erreur";
+		default:
+			return "Inconnu";
+		}
 	}
 }

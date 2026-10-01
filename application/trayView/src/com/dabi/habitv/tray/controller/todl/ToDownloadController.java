@@ -42,6 +42,7 @@ import com.dabi.habitv.tray.logo.LogoImageCache;
 import com.dabi.habitv.tray.logo.ProviderChannelLogoResolver;
 import com.dabi.habitv.tray.subscriber.CoreSubscriber;
 import com.dabi.habitv.tray.utils.FxBackgroundRunner;
+import com.dabi.habitv.tray.utils.Icons;
 import com.dabi.habitv.utils.FilterUtils;
 
 import javafx.application.Platform;
@@ -77,7 +78,13 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
@@ -166,14 +173,26 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 
 	private void initEpisodeTable() {
 		episodeTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		episodeTableView.setTableMenuButtonVisible(true);
 		episodeTableView.getColumns().clear();
+		episodeTableView.getColumns().add(buildPreviewColumn());
 		episodeTableView.getColumns().add(buildNameColumn());
 		episodeTableView.getColumns().add(buildDateColumn());
 		episodeTableView.getColumns().add(buildDurationColumn());
 		episodeTableView.getColumns().add(buildSizeColumn());
-		episodeTableView.getColumns().add(buildStatusColumn());
+		episodeTableView.getColumns().add(buildStateColumn());
 		episodeTableView.getColumns().add(buildProgramLinkColumn());
-		episodeTableView.getColumns().add(buildQuickDownloadColumn());
+		episodeTableView.getSelectionModel().selectedItemProperty()
+				.addListener(new ChangeListener<EpisodeDTO>() {
+					@Override
+					public void changed(ObservableValue<? extends EpisodeDTO> observable,
+							EpisodeDTO oldValue, EpisodeDTO newValue) {
+						updateEpisodeDetailsPane(newValue);
+						if (ouvrirUrl != null) {
+							ouvrirUrl.setDisable(!isHttpUrl(newValue));
+						}
+					}
+				});
 		episodeTableView.setRowFactory(tv -> new TableRow<EpisodeDTO>() {
 			@Override
 			protected void updateItem(EpisodeDTO episode, boolean empty) {
@@ -233,16 +252,7 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 			}
 		});
 		episodeTableView.setContextMenu(buildEpisodeContextMenu());
-		episodeTableView.getSelectionModel().selectedItemProperty()
-				.addListener(new ChangeListener<EpisodeDTO>() {
-					@Override
-					public void changed(ObservableValue<? extends EpisodeDTO> observable,
-							EpisodeDTO oldValue, EpisodeDTO newValue) {
-						if (ouvrirUrl != null) {
-							ouvrirUrl.setDisable(!isHttpUrl(newValue));
-						}
-					}
-				});
+		installEpisodeDetailsPane();
 		updateDownloadSelectionUi();
 	}
 
@@ -271,17 +281,71 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 
 	private TableColumn<EpisodeDTO, String> buildNameColumn() {
 		final TableColumn<EpisodeDTO, String> column = new TableColumn<>("Épisode");
-		column.setPrefWidth(180);
+		column.setMinWidth(180);
+		column.setPrefWidth(340);
+		// no max: absorbs nearly all extra width under CONSTRAINED_RESIZE_POLICY
 		column.setCellValueFactory(features -> new ReadOnlyObjectWrapper<>(
 				features.getValue() == null ? "" : features.getValue().getName()));
+		column.setCellFactory(col -> new EpisodeTitleTableCell());
 		column.setComparator(nullsFirst(String.CASE_INSENSITIVE_ORDER));
 		column.setSortable(true);
 		return column;
 	}
 
+	/**
+	 * Episode title as plain readable text. A single click just selects the
+	 * row (details panel follows); opening the web page stays on explicit
+	 * controls (details panel button, context menu, preview column).
+	 */
+	private final class EpisodeTitleTableCell extends TableCell<EpisodeDTO, String> {
+
+		private final Label label = new Label();
+
+		{
+			label.setMaxWidth(Double.MAX_VALUE);
+		}
+
+		@Override
+		protected void updateItem(final String item, final boolean empty) {
+			super.updateItem(item, empty);
+			if (empty || item == null) {
+				setGraphic(null);
+				setTooltip(null);
+				return;
+			}
+			final EpisodeDTO episode = episodeAtRow();
+			label.setText(item);
+			setGraphic(label);
+			applyTooltip(episode);
+		}
+
+		private void applyTooltip(final EpisodeDTO episode) {
+			final String description = EpisodeMetadataFormatting.formatDescription(
+					episode, TOOLTIP_DESCRIPTION_MAX_CHARS);
+			if (description == null) {
+				setTooltip(null);
+				return;
+			}
+			final String wrapped = EpisodeMetadataFormatting.wrapLines(description,
+					TOOLTIP_LINE_LENGTH);
+			setTooltip(new Tooltip(wrapped));
+		}
+
+		private EpisodeDTO episodeAtRow() {
+			final TableRow<?> row = getTableRow();
+			if (row == null) {
+				return null;
+			}
+			final Object rowItem = row.getItem();
+			return rowItem instanceof EpisodeDTO ? (EpisodeDTO) rowItem : null;
+		}
+	}
+
 	private TableColumn<EpisodeDTO, Date> buildDateColumn() {
 		final TableColumn<EpisodeDTO, Date> column = new TableColumn<>("Date");
-		column.setPrefWidth(90);
+		column.setMinWidth(100);
+		column.setPrefWidth(110);
+		column.setMaxWidth(120);
 		column.setCellValueFactory(features -> new ReadOnlyObjectWrapper<>(
 				features.getValue() == null ? null : features.getValue().getEpisodeDate()));
 		column.setCellFactory(col -> new TableCell<EpisodeDTO, Date>() {
@@ -297,15 +361,21 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 	}
 
 	private TableColumn<EpisodeDTO, Long> buildDurationColumn() {
-		return buildLongColumn("Durée", 80,
+		final TableColumn<EpisodeDTO, Long> column = buildLongColumn("Durée", 80,
 				episode -> episode.getDurationSeconds(),
 				EpisodeMetadataFormatting::formatDuration);
+		column.setMinWidth(70);
+		column.setMaxWidth(90);
+		return column;
 	}
 
 	private TableColumn<EpisodeDTO, Long> buildSizeColumn() {
-		return buildLongColumn("Taille", 70,
+		final TableColumn<EpisodeDTO, Long> column = buildLongColumn("Taille", 70,
 				episode -> episode.getSizeBytes(),
 				EpisodeMetadataFormatting::formatSize);
+		// size metadata is often unavailable; stays re-enableable via the column menu
+		column.setVisible(false);
+		return column;
 	}
 
 	private TableColumn<EpisodeDTO, Long> buildLongColumn(final String title,
@@ -343,49 +413,60 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 		};
 	}
 
-	private TableColumn<EpisodeDTO, String> buildStatusColumn() {
-		final TableColumn<EpisodeDTO, String> column = new TableColumn<>("Statut");
-		column.setPrefWidth(100);
-		column.setCellValueFactory(features -> {
-			final EpisodeDTO episode = features.getValue();
-			final String status = EpisodeDownloadStatusResolver.resolve(episode,
-					downloadedEpisodes, episodeLiveStates.get(episode));
-			return new javafx.beans.property.SimpleStringProperty(status);
-		});
-		column.setSortable(false);
-		return column;
-	}
-
-	private TableColumn<EpisodeDTO, Void> buildProgramLinkColumn() {
-		final TableColumn<EpisodeDTO, Void> column = new TableColumn<>("Programme");
-		column.setPrefWidth(140);
-		column.setSortable(false);
-		column.setCellFactory(col -> new ProgramLinkTableCell());
-		return column;
-	}
-
-	private TableColumn<EpisodeDTO, Void> buildQuickDownloadColumn() {
-		final TableColumn<EpisodeDTO, Void> column = new TableColumn<>("Action");
-		column.setPrefWidth(110);
+	/** Compact clickable thumbnail (episode page link); empty when absent. */
+	private TableColumn<EpisodeDTO, Void> buildPreviewColumn() {
+		final TableColumn<EpisodeDTO, Void> column = new TableColumn<>("Aperçu");
+		column.setMinWidth(75);
+		column.setPrefWidth(80);
+		column.setMaxWidth(85);
 		column.setSortable(false);
 		column.setCellFactory(col -> new TableCell<EpisodeDTO, Void>() {
-			private final Button actionButton = new Button("Télécharger");
+			private final Button previewButton = new Button();
+			private final ImageView previewView = new ImageView();
+			private String loadedUrl;
+
 			{
-				actionButton.setOnAction(new EventHandler<ActionEvent>() {
+				previewView.setFitWidth(64);
+				previewView.setFitHeight(36);
+				previewView.setPreserveRatio(true);
+				previewView.setSmooth(true);
+				previewButton.setGraphic(previewView);
+				previewButton.getStyleClass().add("icon-button");
+				previewButton.setOnAction(new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent event) {
-						final EpisodeDTO episode = episodeAtRow();
-						if (episode != null) {
-							getController().downloadEpisode(episode);
+						final String url = EpisodeMetadataFormatting
+								.episodePageUrl(episodeAtRow());
+						if (url != null) {
+							getController().openInBrowser(url);
 						}
 					}
 				});
 			}
 
 			@Override
-			protected void updateItem(Void item, boolean empty) {
+			protected void updateItem(final Void item, final boolean empty) {
 				super.updateItem(item, empty);
-				setGraphic(empty || episodeAtRow() == null ? null : actionButton);
+				final EpisodeDTO episode = empty ? null : episodeAtRow();
+				if (episode == null) {
+					setGraphic(null);
+					setTooltip(null);
+					return;
+				}
+				previewButton.setVisible(EpisodeMetadataFormatting
+						.episodePageUrl(episode) != null);
+				applyThumbnail(episode);
+				Icons.tooltip(previewButton, EpisodeMetadataFormatting
+						.formatDescription(episode, TOOLTIP_DESCRIPTION_MAX_CHARS));
+				setGraphic(previewButton);
+			}
+
+			private void applyThumbnail(final EpisodeDTO episode) {
+				final String thumbnailUrl = thumbnailUrlOf(episode);
+				if (thumbnailUrl == null || !thumbnailUrl.equals(loadedUrl)) {
+					loadedUrl = thumbnailUrl;
+					previewView.setImage(loadThumbnail(thumbnailUrl));
+				}
 			}
 
 			private EpisodeDTO episodeAtRow() {
@@ -400,12 +481,161 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 		return column;
 	}
 
+	private static String thumbnailUrlOf(final EpisodeDTO episode) {
+		if (episode == null || episode.getMetadata() == null
+				|| episode.getMetadata().getThumbnailUrl() == null) {
+			return null;
+		}
+		final String url = episode.getMetadata().getThumbnailUrl().trim();
+		return DownloadUtils.isHttpUrl(url) ? url : null;
+	}
+
+	private static Image loadThumbnail(final String thumbnailUrl) {
+		if (thumbnailUrl == null) {
+			return null;
+		}
+		final Image cached = THUMBNAIL_CACHE.get(thumbnailUrl);
+		if (cached != null) {
+			return cached;
+		}
+		// backgroundLoading keeps the JavaFX Application Thread unblocked;
+		// a failed or unreachable image simply renders nothing
+		final Image image = new Image(thumbnailUrl, DETAILS_THUMB_WIDTH,
+				DETAILS_THUMB_HEIGHT, true, true, true);
+		THUMBNAIL_CACHE.put(thumbnailUrl, image);
+		return image;
+	}
+
+	private TableColumn<EpisodeDTO, String> buildStatusColumn() {
+		final TableColumn<EpisodeDTO, String> column = new TableColumn<>("Statut");
+		column.setPrefWidth(100);
+		column.setCellValueFactory(features -> {
+			final EpisodeDTO episode = features.getValue();
+			final String status = EpisodeDownloadStatusResolver.resolve(episode,
+					downloadedEpisodes, episodeLiveStates.get(episode));
+			return new javafx.beans.property.SimpleStringProperty(status);
+		});
+		column.setSortable(false);
+		return column;
+	}
+
+	/**
+	 * Merged status + primary action: the icon shows the episode state and,
+	 * when meaningful, clicking performs the primary action (download or
+	 * retry). Downloaded episodes show a non-destructive check.
+	 */
+	private TableColumn<EpisodeDTO, Void> buildStateColumn() {
+		final TableColumn<EpisodeDTO, Void> column = new TableColumn<>("État");
+		column.setMinWidth(44);
+		column.setPrefWidth(52);
+		column.setMaxWidth(65);
+		column.setSortable(false);
+		column.setCellFactory(col -> new TableCell<EpisodeDTO, Void>() {
+			private final Button stateButton = new Button();
+			{
+				stateButton.getStyleClass().add("icon-button");
+				stateButton.setOnAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent event) {
+						final EpisodeDTO episode = episodeAtRow();
+						if (episode == null) {
+							return;
+						}
+						final EpisodeDownloadStatusResolver.UiState state =
+								EpisodeDownloadStatusResolver.resolveState(episode,
+										downloadedEpisodes, episodeLiveStates.get(episode));
+						if (state == EpisodeDownloadStatusResolver.UiState.AVAILABLE
+								|| state == EpisodeDownloadStatusResolver.UiState.ERROR) {
+							getController().downloadEpisode(episode);
+						}
+					}
+				});
+			}
+
+			@Override
+			protected void updateItem(final Void item, final boolean empty) {
+				super.updateItem(item, empty);
+				final EpisodeDTO episode = empty ? null : episodeAtRow();
+				if (episode == null) {
+					setGraphic(null);
+					return;
+				}
+				final EpisodeDownloadStatusResolver.UiState state =
+						EpisodeDownloadStatusResolver.resolveState(episode,
+								downloadedEpisodes, episodeLiveStates.get(episode));
+				stateButton.setGraphic(stateIcon(state));
+				Icons.tooltip(stateButton, stateTooltip(state));
+				stateButton.setDisable(state == EpisodeDownloadStatusResolver.UiState.DOWNLOADING
+						|| state == EpisodeDownloadStatusResolver.UiState.QUEUED
+						|| state == EpisodeDownloadStatusResolver.UiState.UNKNOWN);
+				setGraphic(stateButton);
+			}
+
+			private javafx.scene.Node stateIcon(
+					final EpisodeDownloadStatusResolver.UiState state) {
+				switch (state) {
+				case AVAILABLE:
+					return Icons.download();
+				case QUEUED:
+					return Icons.clock();
+				case DOWNLOADING:
+					return Icons.progress();
+				case DOWNLOADED:
+					return Icons.checkCircle();
+				case ERROR:
+					return Icons.error();
+				default:
+					return Icons.progress();
+				}
+			}
+
+			private String stateTooltip(final EpisodeDownloadStatusResolver.UiState state) {
+				switch (state) {
+				case AVAILABLE:
+					return "Télécharger cet épisode";
+				case QUEUED:
+					return "En attente de téléchargement";
+				case DOWNLOADING:
+					return "Téléchargement en cours";
+				case DOWNLOADED:
+					return "Déjà téléchargé (clic droit pour retélécharger)";
+				case ERROR:
+					return "Échec du téléchargement (cliquer pour relancer)";
+				default:
+					return "État inconnu";
+				}
+			}
+
+			private EpisodeDTO episodeAtRow() {
+				final TableRow<?> row = getTableRow();
+				if (row == null) {
+					return null;
+				}
+				final Object rowItem = row.getItem();
+				return rowItem instanceof EpisodeDTO ? (EpisodeDTO) rowItem : null;
+			}
+		});
+		return column;
+	}
+
+	private TableColumn<EpisodeDTO, Void> buildProgramLinkColumn() {
+		final TableColumn<EpisodeDTO, Void> column = new TableColumn<>("Programme");
+		column.setMinWidth(36);
+		column.setPrefWidth(50);
+		column.setMaxWidth(56);
+		column.setSortable(false);
+		column.setCellFactory(col -> new ProgramLinkTableCell());
+		return column;
+	}
+
 	private final class ProgramLinkTableCell extends TableCell<EpisodeDTO, Void> {
 
-		private final Hyperlink link = new Hyperlink();
+		private final Button programButton = new Button();
 
 		private ProgramLinkTableCell() {
-			link.setOnAction(event -> {
+			programButton.getStyleClass().add("icon-button");
+			programButton.setGraphic(Icons.externalLink());
+			programButton.setOnAction(event -> {
 				final String url = programPageUrl(episodeAtRow());
 				if (url != null) {
 					getController().openInBrowser(url);
@@ -428,10 +658,14 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 			final String url = programPageUrl(episode);
 			final String label = formatProgramLinkLabel(episode);
 			if (url == null) {
-				setGraphic(new Label(label));
+				// no program page: compact neutral marker keeps the column aligned
+				programButton.setDisable(true);
+				Icons.tooltip(programButton, label);
+				setGraphic(programButton);
 			} else {
-				link.setText(label);
-				setGraphic(link);
+				programButton.setDisable(false);
+				Icons.tooltip(programButton, "Ouvrir la page de l'émission — " + label);
+				setGraphic(programButton);
 			}
 		}
 
@@ -815,7 +1049,39 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 		});
 		contextMenu.getItems().add(telecharger);
 
-		MenuItem urlCopie = new MenuItem("Copier l'URL/Id");
+		MenuItem telechargerANouveau = new MenuItem("Télécharger à nouveau");
+		telechargerANouveau.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				getController().downloadEpisode(episodeTableView.getSelectionModel().getSelectedItem());
+			}
+		});
+		contextMenu.getItems().add(telechargerANouveau);
+
+		MenuItem ouvrirPageEpisode = new MenuItem("Ouvrir la page de l'épisode");
+		ouvrirPageEpisode.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				getController().openInBrowser(EpisodeMetadataFormatting
+						.episodePageUrl(episodeTableView.getSelectionModel().getSelectedItem()));
+			}
+		});
+		contextMenu.getItems().add(ouvrirPageEpisode);
+
+		MenuItem ouvrirPageEmission = new MenuItem("Ouvrir la page de l'émission");
+		ouvrirPageEmission.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				getController().openInBrowser(EpisodeMetadataFormatting
+						.programPageUrl(episodeTableView.getSelectionModel().getSelectedItem()));
+			}
+		});
+		contextMenu.getItems().add(ouvrirPageEmission);
+
+		MenuItem urlCopie = new MenuItem("Copier l'URL de l'épisode");
 		urlCopie.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
@@ -825,6 +1091,34 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 		});
 		contextMenu.getItems().add(urlCopie);
 
+		MenuItem copierProgramme = new MenuItem("Copier l'URL de l'émission");
+		copierProgramme.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				getController().copyText(EpisodeMetadataFormatting.programPageUrl(
+						episodeTableView.getSelectionModel().getSelectedItem()));
+			}
+		});
+		contextMenu.getItems().add(copierProgramme);
+
+		contextMenu.setOnShowing(event -> {
+			final EpisodeDTO selected = episodeTableView.getSelectionModel()
+					.getSelectedItem();
+			final boolean downloaded = EpisodeDownloadStatusResolver.resolveState(
+					selected, downloadedEpisodes,
+					episodeLiveStates.get(selected)) == EpisodeDownloadStatusResolver.UiState.DOWNLOADED;
+			telecharger.visibleProperty().set(!downloaded);
+			telechargerANouveau.visibleProperty().set(downloaded);
+			ouvrirPageEpisode.visibleProperty().set(
+					EpisodeMetadataFormatting.episodePageUrl(selected) != null);
+			ouvrirPageEmission.visibleProperty().set(
+					EpisodeMetadataFormatting.programPageUrl(selected) != null);
+			copierProgramme.visibleProperty().set(
+					EpisodeMetadataFormatting.programPageUrl(selected) != null);
+			ouvrirUrl.setVisible(false);
+		});
+
 		ouvrirUrl.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
@@ -832,8 +1126,6 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 				getController().openInBrowser(episodeTableView.getSelectionModel().getSelectedItem());
 			}
 		});
-		contextMenu.setOnShowing(event -> ouvrirUrl
-				.setDisable(!isHttpUrl(episodeTableView.getSelectionModel().getSelectedItem())));
 		contextMenu.getItems().add(ouvrirUrl);
 
 		MenuItem marquerTelecharger = new MenuItem("Marquer comme téléchargé");
@@ -1257,6 +1549,170 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 		        };
 			}
 		};
+	}
+
+	private static final int TOOLTIP_DESCRIPTION_MAX_CHARS = 320;
+	private static final int TOOLTIP_LINE_LENGTH = 64;
+	private static final int DETAILS_PANE_MAX_HEIGHT_PX = 140;
+	private static final double DETAILS_THUMB_WIDTH = 160.0;
+	private static final double DETAILS_THUMB_HEIGHT = 90.0;
+
+	private HBox episodeDetailsPane;
+
+	private ImageView episodeDetailsThumbnail;
+
+	private Label episodeDetailsTitle;
+
+	private Hyperlink episodeDetailsProgramLink;
+
+	private Label episodeDetailsMeta;
+
+	private Label episodeDetailsDescription;
+
+	private static final java.util.concurrent.ConcurrentMap<String, Image> THUMBNAIL_CACHE =
+			new java.util.concurrent.ConcurrentHashMap<>();
+
+	/**
+	 * Compact selected-episode details below the table (Captvty-like list +
+	 * details hierarchy). Disappears when nothing is selected or metadata is
+	 * entirely absent.
+	 */
+	private void installEpisodeDetailsPane() {
+		if (episodeDetailsPane != null) {
+			return;
+		}
+		episodeDetailsPane = new HBox(10);
+		episodeDetailsPane.setPadding(new Insets(6, 8, 6, 8));
+		episodeDetailsPane.setAlignment(Pos.TOP_LEFT);
+		episodeDetailsPane.setMaxHeight(DETAILS_PANE_MAX_HEIGHT_PX);
+		episodeDetailsPane.setVisible(false);
+
+		episodeDetailsThumbnail = new ImageView();
+		episodeDetailsThumbnail.setFitWidth(DETAILS_THUMB_WIDTH);
+		episodeDetailsThumbnail.setFitHeight(DETAILS_THUMB_HEIGHT);
+		episodeDetailsThumbnail.setPreserveRatio(true);
+		episodeDetailsThumbnail.setSmooth(true);
+
+		episodeDetailsTitle = new Label();
+		episodeDetailsTitle.setWrapText(true);
+		episodeDetailsTitle.setFont(Font.font(null, FontWeight.BOLD, 12));
+
+		episodeDetailsProgramLink = new Hyperlink();
+		episodeDetailsProgramLink.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				final String url = EpisodeMetadataFormatting.programPageUrl(
+						episodeTableView.getSelectionModel().getSelectedItem());
+				if (url != null) {
+					getController().openInBrowser(url);
+				}
+			}
+		});
+		final HBox programRow = new HBox(4,
+				new Label("Programme :"), episodeDetailsProgramLink);
+
+		episodeDetailsMeta = new Label();
+		episodeDetailsMeta.getStyleClass().add("muted");
+		episodeDetailsDescription = new Label();
+		episodeDetailsDescription.setWrapText(true);
+		episodeDetailsDescription.setMaxHeight(60);
+
+		final Button openPageButton = new Button("Ouvrir la page");
+		openPageButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				final String url = EpisodeMetadataFormatting.episodePageUrl(
+						episodeTableView.getSelectionModel().getSelectedItem());
+				if (url != null) {
+					getController().openInBrowser(url);
+				}
+			}
+		});
+		final Button downloadButton = new Button("Télécharger");
+		downloadButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				getController().downloadEpisode(
+						episodeTableView.getSelectionModel().getSelectedItem());
+			}
+		});
+		final VBox actionsColumn = new VBox(4, openPageButton, downloadButton);
+		actionsColumn.setAlignment(Pos.TOP_CENTER);
+
+		final VBox textColumn = new VBox(2, episodeDetailsTitle,
+				programRow, episodeDetailsMeta,
+				episodeDetailsDescription);
+		textColumn.setMaxWidth(Double.MAX_VALUE);
+		HBox.setHgrow(textColumn, Priority.ALWAYS);
+
+		episodeDetailsPane.getChildren().addAll(episodeDetailsThumbnail,
+				textColumn, actionsColumn);
+
+		if (episodeTableView.getParent() instanceof Pane) {
+			final Pane parent = (Pane) episodeTableView.getParent();
+			final int tableIndex = parent.getChildren().indexOf(episodeTableView);
+			parent.getChildren().add(tableIndex + 1, episodeDetailsPane);
+		}
+	}
+
+	private void updateEpisodeDetailsPane(final EpisodeDTO episode) {
+		if (episodeDetailsPane == null) {
+			return;
+		}
+		if (episode == null) {
+			episodeDetailsPane.setVisible(false);
+			return;
+		}
+		episodeDetailsTitle.setText(episode.getName());
+		final String programUrl = EpisodeMetadataFormatting.programPageUrl(episode);
+		final String programLabel = EpisodeMetadataFormatting.formatProgramLinkLabel(episode);
+		episodeDetailsProgramLink.setText(programLabel);
+		episodeDetailsProgramLink.setVisible(programUrl != null);
+		episodeDetailsProgramLink.setManaged(programUrl != null);
+		episodeDetailsMeta.setText(detailsMetaLine(episode));
+		final String description = EpisodeMetadataFormatting.formatDescription(episode, 600);
+		episodeDetailsDescription.setText(description == null ? "" : description);
+		episodeDetailsDescription.setVisible(description != null);
+		episodeDetailsDescription.setManaged(description != null);
+		episodeDetailsPane.setVisible(true);
+		applyDetailsThumbnail(episode);
+	}
+
+	private static String detailsMetaLine(final EpisodeDTO episode) {
+		final StringBuilder meta = new StringBuilder();
+		if (episode.getEpisodeDate() != null) {
+			meta.append(EpisodeMetadataFormatting.formatDate(episode.getEpisodeDate()));
+		}
+		if (episode.getDurationSeconds() != null) {
+			if (meta.length() > 0) {
+				meta.append("  •  ");
+			}
+			meta.append(EpisodeMetadataFormatting.formatDuration(episode.getDurationSeconds()));
+		}
+		return meta.toString();
+	}
+
+	private void applyDetailsThumbnail(final EpisodeDTO episode) {
+		episodeDetailsThumbnail.setImage(null);
+		if (episode.getMetadata() == null
+				|| episode.getMetadata().getThumbnailUrl() == null) {
+			return;
+		}
+		final String url = episode.getMetadata().getThumbnailUrl().trim();
+		if (!DownloadUtils.isHttpUrl(url)) {
+			return;
+		}
+		final Image cached = THUMBNAIL_CACHE.get(url);
+		if (cached != null) {
+			episodeDetailsThumbnail.setImage(cached);
+			return;
+		}
+		// backgroundLoading keeps the JavaFX Application Thread unblocked;
+		// a failed or unreachable image simply renders nothing
+		final Image image = new Image(url, DETAILS_THUMB_WIDTH, DETAILS_THUMB_HEIGHT,
+				true, true, true);
+		THUMBNAIL_CACHE.put(url, image);
+		episodeDetailsThumbnail.setImage(image);
 	}
 
 	private javafx.scene.Node buildLogoGraphic(final CategoryDTO item) {

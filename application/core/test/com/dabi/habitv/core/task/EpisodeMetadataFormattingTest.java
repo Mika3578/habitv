@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
+import com.dabi.habitv.api.plugin.dto.EpisodeMetadataDTO;
 
 public class EpisodeMetadataFormattingTest {
 
@@ -156,6 +157,105 @@ public class EpisodeMetadataFormattingTest {
 	@Test
 	public void formatStatusLabelTrimsWhitespace() {
 		assertEquals("DONE", EpisodeMetadataFormatting.formatStatusLabel("  DONE  "));
+	}
+
+	@Test
+	public void episodePageUrlPrefersMetadataSourceUrl() {
+		final EpisodeDTO episode = episode("test");
+		episode.setMetadata(metadataWithSource("  https://example.com/watch/ep1  "));
+		assertEquals("https://example.com/watch/ep1",
+				EpisodeMetadataFormatting.episodePageUrl(episode));
+	}
+
+	@Test
+	public void episodePageUrlFallsBackToHttpId() {
+		final EpisodeDTO episode = new EpisodeDTO(null, "ep1", "https://example.com/id-page");
+		assertEquals("https://example.com/id-page",
+				EpisodeMetadataFormatting.episodePageUrl(episode));
+	}
+
+	@Test
+	public void episodePageUrlIgnoresNonHttpValues() {
+		final EpisodeDTO noUrlEpisode = new EpisodeDTO(null, "ep1", "internal-video-id");
+		assertNull(EpisodeMetadataFormatting.episodePageUrl(noUrlEpisode));
+		final EpisodeDTO badSourceEpisode = new EpisodeDTO(null, "ep2", "internal-video-id");
+		badSourceEpisode.setMetadata(metadataWithSource("javascript:alert(1)"));
+		assertNull(EpisodeMetadataFormatting.episodePageUrl(badSourceEpisode));
+		assertNull(EpisodeMetadataFormatting.episodePageUrl(null));
+	}
+
+	@Test
+	public void formatDescriptionReturnsTrimmedDescription() {
+		final EpisodeDTO episode = episode("test");
+		final EpisodeMetadataDTO metadata = new EpisodeMetadataDTO();
+		metadata.setDescription("  Un résumé.  ");
+		episode.setMetadata(metadata);
+		assertEquals("Un résumé.", EpisodeMetadataFormatting.formatDescription(episode, 300));
+	}
+
+	@Test
+	public void cleanDescriptionStripsHtmlAndEntities() {
+		assertEquals("Un paragraphe avec du texte.",
+				EpisodeMetadataFormatting.cleanDescription(
+						"<p>Un paragraphe avec<br/>du texte.</p>"));
+		assertEquals("\"Émission\" & suite <drama>",
+				EpisodeMetadataFormatting.cleanDescription(
+						"&quot;Émission&quot; &amp; suite &lt;drama&gt;"));
+		assertEquals("Mot mot   mot".replace("   ", " "),
+				EpisodeMetadataFormatting.cleanDescription("Mot&nbsp;mot\tmot"));
+		assertNull(EpisodeMetadataFormatting.cleanDescription(null));
+		assertNull(EpisodeMetadataFormatting.cleanDescription("   "));
+		assertNull(EpisodeMetadataFormatting.cleanDescription("<p></p>"));
+	}
+
+	@Test
+	public void formatDescriptionCleansHtmlBeforeTruncation() {
+		final EpisodeDTO episode = episode("test");
+		final EpisodeMetadataDTO metadata = new EpisodeMetadataDTO();
+		metadata.setDescription("<p>" + new StringBuilder("abcdefghij")
+				.append("0123456789").toString() + "</p>");
+		episode.setMetadata(metadata);
+		assertEquals("abcdefg…",
+				EpisodeMetadataFormatting.formatDescription(episode, 8));
+	}
+
+	@Test
+	public void wrapLinesBreaksOnWordBoundaries() {
+		assertEquals("un deux\ntrois",
+				EpisodeMetadataFormatting.wrapLines("un deux trois", 7));
+		assertEquals("abcdef", EpisodeMetadataFormatting.wrapLines("abcdef", 10));
+		assertNull(EpisodeMetadataFormatting.wrapLines(null, 10));
+	}
+
+	@Test
+	public void formatDescriptionTruncatesWithEllipsis() {
+		final EpisodeDTO episode = episode("test");
+		final EpisodeMetadataDTO metadata = new EpisodeMetadataDTO();
+		metadata.setDescription(new StringBuilder("abcdefghij")
+				.append("0123456789").toString());
+		episode.setMetadata(metadata);
+		final String truncated = EpisodeMetadataFormatting.formatDescription(episode, 8);
+		assertEquals("abcdefg…", truncated);
+		assertEquals(8, truncated.length());
+	}
+
+	@Test
+	public void formatDescriptionReturnsNullWhenAbsent() {
+		final EpisodeDTO episode = episode("test");
+		assertNull(EpisodeMetadataFormatting.formatDescription(episode, 300));
+		episode.setMetadata(new EpisodeMetadataDTO());
+		assertNull(EpisodeMetadataFormatting.formatDescription(episode, 300));
+		final EpisodeMetadataDTO blank = new EpisodeMetadataDTO();
+		blank.setDescription("   ");
+		episode.setMetadata(blank);
+		assertNull(EpisodeMetadataFormatting.formatDescription(episode, 300));
+		assertNull(EpisodeMetadataFormatting.formatDescription(null, 300));
+	}
+
+	private static EpisodeMetadataDTO metadataWithSource(final String sourceUrl) {
+		final EpisodeMetadataDTO metadata = new EpisodeMetadataDTO();
+		metadata.setSourceUrl(sourceUrl);
+		return metadata;
 	}
 
 	@Test
