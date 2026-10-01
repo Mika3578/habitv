@@ -1,0 +1,5 @@
+provider=playRts
+strategy=play-v3-api-ytdlp
+homeUrl=https://www.rts.ch/play/tv
+channels=RTS 1,RTS 2
+note=Public Play RTS v3/IL catalogue; yt-dlp SRGSSR download; CH geo limits possible.

@@ -1,0 +1,76 @@
+{
+  "data": [
+    {
+      "id": "5917099",
+      "urn": "urn:rts:show:tv:5917099",
+      "title": "120 secondes",
+      "imageUrl": "https://img.rts.ch/articles/2024/image/um735n-25886485.image/16x9",
+      "transmission": "TV",
+      "posterImageIsFallbackUrl": false,
+      "vendor": "rts",
+      "description": "Tous les épisodes de la chronique humoristique de Vincent Veillon et Vincent Kucholl.",
+      "posterImageUrl": "https://img.rts.ch/articles/2024/image/acm08b-25865764.image",
+      "numberOfEpisodes": 339
+    },
+    {
+      "id": "548307",
+      "urn": "urn:rts:show:tv:548307",
+      "title": "12h45",
+      "imageUrl": "https://img.rts.ch/medias/2026/image/w2wogi-29275982.image/16x9",
+      "transmission": "TV",
+      "posterImageIsFallbackUrl": false,
+      "vendor": "rts",
+      "description": "12h45 – Le téléjournal de midi de la RTS. Chaque édition résume et met en contexte l’actualité suisse et internationale, avec des reportages, des sujets de société, économie ou politique, et des invités en plateau.",
+      "posterImageUrl": "https://img.rts.ch/medias/2026/image/6n65t2-29275983.image",
+      "numberOfEpisodes": 8074,
+      "topicList": [
+        "665"
+      ]
+    },
+    {
+      "id": "105932",
+      "urn": "urn:rts:show:tv:105932",
+      "title": "19h30",
+      "imageUrl": "https://img.rts.ch/medias/2025/image/9u2s8e-28862907.image/16x9",
+      "transmission": "TV",
+      "posterImageIsFallbackUrl": false,
+      "vendor": "rts",
+      "description": "19h30 – Le téléjournal du soir de la RTS. Chaque édition résume l’actualité suisse et internationale, avec des reportages de terrain, des analyses et du décryptage pour comprendre les faits et leur contexte.",
+      "posterImageUrl": "https://img.rts.ch/medias/2026/image/ni3wsa-29275984.image",
+      "numberOfEpisodes": 8507,
+      "topicList": [
+        "665"
+      ]
+    },
+    {
+      "id": "1799072",
+      "urn": "urn:rts:show:tv:1799072",
+      "title": "19h30 - Signé",
+      "imageUrl": "https://img.rts.ch/articles/2024/image/hrfqq0-28610148.image/16x9",
+      "transmission": "TV",
+      "posterImageIsFallbackUrl": false,
+      "vendor": "rts",
+      "lead": "Le journal signé.",
+      "posterImageUrl": "https://img.rts.ch/articles/2024/image/4xz2mx-28693865.image",
+      "numberOfEpisodes": 4368,
+      "topicList": [
+        "59220",
+        "665"
+      ]
+    },
+    {
+      "id": "49893",
+      "urn": "urn:rts:show:tv:49893",
+      "title": "36.9°",
+      "imageUrl": "https://img.rts.ch/emissions/36-9/2024/image/zhp8xx-28392987.image/16x9",
+      "transmission": "TV",
+      "posterImageIsFallbackUrl": false,
+      "vendor": "rts",
+      "description": "36.9° correspond à la température moyenne du corps quand il se trouve au calme et – en bonne santé – elle définit la santé comme une recherche permanente d'équilibre. Tout comme ce magazine santé de la RTS.",
+      "posterImageUrl": "https://img.rts.ch/medias/2025/image/gbjm9c-28911090.image",
+      "numberOfEpisodes": 280
+    }
+  ],
+  "ilRequests": [],
+  "failedIlRequests": []
+}
