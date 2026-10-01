@@ -201,6 +201,23 @@ public class YtDlpProgressParserTest {
 	}
 
 	@Test
+	public void parseHabitvProgressDownloadTemplateWithNullPct() {
+		final String line = YoutubeConf.PROGRESS_LINE_PREFIX
+				+ "{\"phase\":\"download\",\"pct\":null,\"total\":\"NA\",\"speed\":\"NA\",\"eta\":\"NA\"}";
+		final DownloadProgressSnapshot snapshot = YtDlpProgressParser.parse(line, null);
+		assertNotNull(snapshot);
+		assertEquals(DownloadStage.DOWNLOADING, snapshot.getStage());
+		assertTrue(snapshot.isIndeterminate());
+	}
+
+	@Test
+	public void parseHabitvProgressRejectsInvalidUnquotedNaPct() {
+		final String line = YoutubeConf.PROGRESS_LINE_PREFIX
+				+ "{\"phase\":\"download\",\"pct\":NA,\"total\":\"10.00MiB\"}";
+		assertNull(YtDlpProgressParser.parse(line, null));
+	}
+
+	@Test
 	public void parseHabitvProgressPostprocessMerger() {
 		final DownloadProgressSnapshot previous = YtDlpProgressParser.parse(
 				YoutubeConf.PROGRESS_LINE_PREFIX + "{\"phase\":\"download\",\"pct\":100.0}", null);

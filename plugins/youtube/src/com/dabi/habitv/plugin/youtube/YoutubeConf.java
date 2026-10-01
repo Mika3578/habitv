@@ -29,7 +29,7 @@ public final class YoutubeConf {
 	 * {@code [download]} lines remain parsed when templates are absent or ignored.
 	 */
 	private static final String PROGRESS_TEMPLATE_FLAGS_RAW = " --progress-template \"download:" + PROGRESS_LINE_PREFIX
-			+ "{\\\"phase\\\":\\\"download\\\",\\\"pct\\\":%(progress._percent)s,\\\"total\\\":\\\"%(progress._total_bytes_str)s\\\",\\\"speed\\\":\\\"%(progress._speed_str)s\\\",\\\"eta\\\":\\\"%(progress._eta_str)s\\\",\\\"dest\\\":%(progress.filename)j}\""
+			+ "{\\\"phase\\\":\\\"download\\\",\\\"pct\\\":%(progress._percent)j,\\\"total\\\":\\\"%(progress._total_bytes_str)s\\\",\\\"speed\\\":\\\"%(progress._speed_str)s\\\",\\\"eta\\\":\\\"%(progress._eta_str)s\\\",\\\"dest\\\":%(progress.filename)j}\""
 			+ " --progress-template \"postprocess:" + PROGRESS_LINE_PREFIX
 			+ "{\\\"phase\\\":\\\"postprocess\\\",\\\"pp\\\":\\\"%(postprocessor)s\\\"}\"";
 
