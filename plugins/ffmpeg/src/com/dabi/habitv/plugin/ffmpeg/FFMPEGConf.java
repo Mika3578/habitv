@@ -41,8 +41,17 @@ public final class FFMPEGConf {
 		if (executablePath == null || executablePath.trim().isEmpty()) {
 			return false;
 		}
-		final String baseName = new File(executablePath.trim()).getName().toLowerCase(Locale.ROOT);
+		final String baseName = executableBaseName(executablePath).toLowerCase(Locale.ROOT);
 		return "ffmpeg".equals(baseName) || "ffmpeg.exe".equals(baseName);
+	}
+
+	static String executableBaseName(final String executablePath) {
+		final String normalized = executablePath.trim().replace('\\', '/');
+		final int lastSlash = normalized.lastIndexOf('/');
+		if (lastSlash >= 0 && lastSlash < normalized.length() - 1) {
+			return normalized.substring(lastSlash + 1);
+		}
+		return normalized;
 	}
 
 	public static String augmentRemuxCommand(final String remuxCommandSuffix, final String executablePath) {

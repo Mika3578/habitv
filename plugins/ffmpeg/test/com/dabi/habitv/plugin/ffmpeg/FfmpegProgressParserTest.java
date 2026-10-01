@@ -19,8 +19,8 @@ public class FfmpegProgressParserTest {
 		FfmpegProgressParser.parseLine("duration=100.000000", state);
 		final DownloadProgressSnapshot first = FfmpegProgressParser.parseLine("out_time_us=50400000", state);
 		final String firstToken = FfmpegProgressParser.toActivityToken(first, state, "out_time_us=50400000");
-		final DownloadProgressSnapshot second = FfmpegProgressParser.parseLine("out_time_us=50450000", state);
-		final String secondToken = FfmpegProgressParser.toActivityToken(second, state, "out_time_us=50450000");
+		final DownloadProgressSnapshot second = FfmpegProgressParser.parseLine("out_time_us=50440000", state);
+		final String secondToken = FfmpegProgressParser.toActivityToken(second, state, "out_time_us=50440000");
 		assertEquals(FfmpegProgressParser.toProgressionString(first), FfmpegProgressParser.toProgressionString(second));
 		assertNotEquals(firstToken, secondToken);
 	}

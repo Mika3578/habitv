@@ -32,6 +32,7 @@ public class FFMPEGConfTest {
 		assertFalse(FFMPEGConf.augmentRemuxCommand(FFMPEGConf.FFMPEG_CMD_WINDOWS, "C:\\bin\\avconv.exe")
 				.contains("-progress"));
 		assertTrue(FFMPEGConf.supportsProgressPipe("ffmpeg.exe"));
+		assertTrue(FFMPEGConf.supportsProgressPipe("C:\\Program Files\\ffmpeg\\ffmpeg.exe"));
 	}
 
 }
