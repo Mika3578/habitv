@@ -77,17 +77,19 @@ foreach ($r in $cursor) {
 
 # --- Issue comments (bots that post to conversation, not always as reviews) ---
 $codeRabbitLogins = @('coderabbitai[bot]')
-$cr = @($IssueComments | Where-Object { Test-ExactLogin $_.user.login $codeRabbitLogins })
-if ($cr.Count -gt 0) {
-    $body = ($cr | ForEach-Object { $_.body }) -join ' '
+$cr = @($IssueComments | Where-Object { Test-ExactLogin $_.user.login $codeRabbitLogins } |
+    Sort-Object { $_.updated_at } | Select-Object -Last 1)
+if ($null -ne $cr) {
+    $body = [string]$cr.body
     $st = if (Test-BodyMatch $body @('does not receive automatic reviews', 'fewer than 10 stars', 'Review skipped')) { 'SKIPPED' } else { 'PENDING' }
     $sources.Add([ordered]@{ source = 'coderabbit'; execution_state = $st })
 }
 
 $sourceryLogins = @('sourcery-ai[bot]')
-$so = @($IssueComments | Where-Object { Test-ExactLogin $_.user.login $sourceryLogins })
-if ($so.Count -gt 0) {
-    $body = ($so | ForEach-Object { $_.body }) -join ' '
+$so = @($IssueComments | Where-Object { Test-ExactLogin $_.user.login $sourceryLogins } |
+    Sort-Object { $_.updated_at } | Select-Object -Last 1)
+if ($null -ne $so) {
+    $body = [string]$so.body
     if (Test-BodyMatch $body @('diff characters', 'quota', '6 days', '6 hours')) {
         $sources.Add([ordered]@{ source = 'sourcery'; execution_state = 'RATE_LIMITED' })
     } elseif (Test-BodyMatch $body @("Reviewer's Guide", 'review_guide')) {

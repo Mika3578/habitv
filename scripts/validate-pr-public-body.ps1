@@ -8,10 +8,14 @@ param(
     [string] $BodyFile = ""
 )
 
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Continue"
 
 if ($BodyFile) {
-    $Body = Get-Content -Raw $BodyFile
+    try {
+        $Body = Get-Content -Raw -LiteralPath $BodyFile -ErrorAction Stop
+    } catch {
+        $Body = ""
+    }
 } elseif (-not $Body -and $env:PR_BODY) {
     $Body = $env:PR_BODY
 }

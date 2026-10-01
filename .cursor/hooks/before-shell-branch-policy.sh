@@ -50,21 +50,22 @@ resolve_jq() {
 }
 
 resolve_python() {
-  if command -v python3 >/dev/null 2>&1; then
-    command -v python3
-    return 0
-  fi
-  if command -v python >/dev/null 2>&1; then
-    command -v python
-    return 0
-  fi
-  local candidate user
+  local candidate user out
+  for candidate in python3 python; do
+    if command -v "$candidate" >/dev/null 2>&1; then
+      candidate="$(command -v "$candidate")"
+      if out="$("$candidate" -c "import json; print(json.dumps({'ok': True}))" 2>/dev/null)" && [[ "$out" == *ok* ]]; then
+        printf '%s\n' "$candidate"
+        return 0
+      fi
+    fi
+  done
   user="${USERNAME:-${USER:-}}"
   for candidate in \
     /usr/bin/python3 \
     /usr/local/bin/python3
   do
-    if [[ -x "$candidate" ]]; then
+    if [[ -x "$candidate" ]] && out="$("$candidate" -c "import json; print(1)" 2>/dev/null)" && [[ "$out" == "1" ]]; then
       printf '%s\n' "$candidate"
       return 0
     fi
@@ -74,7 +75,7 @@ resolve_python() {
       /mnt/c/Users/"$user"/AppData/Local/Programs/Python/Python3*/python.exe \
       /c/Users/"$user"/AppData/Local/Programs/Python/Python3*/python.exe
     do
-      if [[ -x "$candidate" ]]; then
+      if [[ -x "$candidate" ]] && out="$("$candidate" -c "import json; print(1)" 2>/dev/null)" && [[ "$out" == "1" ]]; then
         printf '%s\n' "$candidate"
         return 0
       fi
@@ -232,7 +233,7 @@ if [[ "$branch" =~ $platform ]]; then
   if [[ -n "$upstream" && "$upstream" == */* ]]; then
     remote="${upstream%%/*}"
     remote_branch="${upstream#*/}"
-    if git ls-remote --exit-code --heads "$remote" "$remote_branch" >/dev/null 2>&1; then
+    if [[ "$remote_branch" == "$branch" ]] && git ls-remote --exit-code --heads "$remote" "$remote_branch" >/dev/null 2>&1; then
       printf '%s\n' '{"permission":"allow"}'
       exit 0
     fi

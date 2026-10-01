@@ -12,7 +12,7 @@ set -euo pipefail
 # Consume input for compatibility with callers; do not fail on content.
 body="${PR_BODY:-}"
 if [[ $# -gt 0 ]]; then
-  body="$(cat "$1")"
+  body="$(cat "$1" 2>/dev/null || true)"
 elif [[ -z "$body" ]]; then
   body="$(cat || true)"
 fi

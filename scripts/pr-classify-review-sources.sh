@@ -89,12 +89,14 @@ jq -n \
         github_state:.state
       }))
     + if ($cr_c | length) > 0 then
-        [{source:"coderabbit",execution_state:(if body_has(($cr_c | map(.body) | join(" ")); ["does not receive automatic reviews","fewer than 10 stars","Review skipped"]) then "SKIPPED" else "PENDING" end)}]
+        (($cr_c[-1].body) as $cr_body |
+          [{source:"coderabbit",execution_state:(if body_has($cr_body; ["does not receive automatic reviews","fewer than 10 stars","Review skipped"]) then "SKIPPED" else "PENDING" end)}])
       else [] end
     + if ($so_c | length) > 0 then
-        [{source:"sourcery",execution_state:(if body_has(($so_c | map(.body) | join(" ")); ["diff characters","quota","6 days","6 hours"]) then "RATE_LIMITED"
-          elif body_has(($so_c | map(.body) | join(" ")); ["Reviewer'\''s Guide","review_guide"]) then "SUMMARY_ONLY"
-          else "PENDING" end)}]
+        (($so_c[-1].body) as $so_body |
+          [{source:"sourcery",execution_state:(if body_has($so_body; ["diff characters","quota","6 days","6 hours"]) then "RATE_LIMITED"
+            elif body_has($so_body; ["Reviewer'\''s Guide","review_guide"]) then "SUMMARY_ONLY"
+            else "PENDING" end)}])
       else [] end
     + if ($sonar_c | length) > 0 then [{source:"sonarcloud",execution_state:"STATIC_ANALYSIS"}] else [] end
   ) as $sources |
