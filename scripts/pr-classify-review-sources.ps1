@@ -71,14 +71,7 @@ $cursor = @($Reviews | Where-Object {
     Test-ExactLogin $_.author.login @('cursor[bot]')
 })
 foreach ($r in $cursor) {
-    $st = 'APPROVAL_ONLY'
-    if (Test-BodyMatch $r.body @('Bugbot was not present', 'did not report findings that need human review')) {
-        $st = 'APPROVAL_ONLY'
-    } elseif ($r.commit.oid -eq $HeadSha -and $r.state -eq 'APPROVED') {
-        $st = 'APPROVAL_ONLY'
-    } elseif ($r.commit.oid -ne $HeadSha) {
-        $st = 'STALE'
-    }
+    $st = if ($r.commit.oid -ne $HeadSha) { 'STALE' } else { 'APPROVAL_ONLY' }
     $sources.Add([ordered]@{ source = 'cursor'; execution_state = $st; commit = $r.commit.oid; github_state = $r.state })
 }
 
@@ -117,16 +110,10 @@ $onHeadSubstantive = @($sources | Where-Object {
     $countsForFinal -contains $_.execution_state -and $_.commit -eq $HeadSha
 })
 
-# Human APPROVED on HEAD also satisfies the final gate (Cursor bot alone does not).
-$knownBots = @(
-    'copilot-pull-request-reviewer[bot]', 'github-copilot[bot]',
-    'amazon-q-developer[bot]', 'amazon-q[bot]',
-    'cursor[bot]', 'coderabbitai[bot]', 'sourcery-ai[bot]',
-    'sonarqubecloud[bot]', 'sonarcloud[bot]'
-)
+# Human APPROVED on HEAD also satisfies the final gate (any [bot] login does not).
 $humanApprovedOnHead = @($Reviews | Where-Object {
     $_.state -eq 'APPROVED' -and $_.commit.oid -eq $HeadSha -and
-    -not (Test-ExactLogin $_.author.login $knownBots)
+    ($_.author.login -notmatch '\[bot\]$')
 }).Count -gt 0
 $copilotEligible = ($onHeadSubstantive | Where-Object { $_.source -eq 'copilot' }).Count -gt 0
 

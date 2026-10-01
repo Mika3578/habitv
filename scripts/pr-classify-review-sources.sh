@@ -58,12 +58,7 @@ jq -n \
   ($reviews | map(select(
       (.state == "APPROVED")
       and (.commit.oid == $head)
-      and (is_copilot_login(.author.login) | not)
-      and (is_amazon_q_login(.author.login) | not)
-      and (is_cursor_login(.author.login) | not)
-      and (is_coderabbit_login(.author.login) | not)
-      and (is_sourcery_login(.author.login) | not)
-      and (is_sonar_login(.author.login) | not)
+      and (((.author.login // "") | test("\\[bot\\]$")) | not)
     ))) as $human_approved |
 
   ([]) as $src |

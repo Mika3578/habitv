@@ -269,9 +269,10 @@ Record `execution_state` per source in `agent_space/pr-<n>/state.json`.
 - **Cursor Approval Agent:** `APPROVAL_ONLY` when it approves from checks
   without Bugbot/substantive diff review — **does not** satisfy final review.
 - **Copilot:** preferred substantive reviewer for code. Adjudicate inline
-  findings on HEAD. A human `APPROVED` on HEAD with no open code threads
-  also satisfies final review when the user authorizes merge. Overview
-  badges alone never block merge.
+  findings on HEAD. A human `APPROVED` on HEAD also satisfies the final
+  review gate when Copilot cannot review. Cursor Approval Agent alone
+  does not. Overview badges alone never block merge. User authorization
+  to mark Ready or merge remains a separate required step.
 ## PR body ownership
 
 The orchestrator owns the canonical PR description (template sections).

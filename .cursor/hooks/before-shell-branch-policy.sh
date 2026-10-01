@@ -13,19 +13,18 @@ if [[ "${HABITV_SKIP_BRANCH_HOOK:-}" == "1" ]]; then
   exit 0
 fi
 
-input="$(cat)"
-command=""
-cwd=""
-
 resolve_jq() {
   if command -v jq >/dev/null 2>&1; then
     command -v jq
     return 0
   fi
-  local candidate
+  local candidate user
+  user="${USERNAME:-${USER:-}}"
   for candidate in \
     "/mnt/c/Program Files/Git/usr/bin/jq.exe" \
+    "/c/Program Files/Git/usr/bin/jq.exe" \
     "/mnt/c/ProgramData/chocolatey/bin/jq.exe" \
+    "/c/ProgramData/chocolatey/bin/jq.exe" \
     /usr/bin/jq \
     /usr/local/bin/jq
   do
@@ -34,27 +33,93 @@ resolve_jq() {
       return 0
     fi
   done
-  local winget_jq
-  winget_jq="$(ls /mnt/c/Users/*/AppData/Local/Microsoft/WinGet/Packages/jqlang.jq_*/jq.exe 2>/dev/null | head -n 1 || true)"
-  if [[ -n "$winget_jq" && -x "$winget_jq" ]]; then
-    printf '%s\n' "$winget_jq"
+  # Only search the current Windows user profile (no multi-user glob).
+  if [[ -n "$user" ]]; then
+    for candidate in \
+      /mnt/c/Users/"$user"/AppData/Local/Microsoft/WinGet/Packages/jqlang.jq_*/jq.exe \
+      /c/Users/"$user"/AppData/Local/Microsoft/WinGet/Packages/jqlang.jq_*/jq \
+      /c/Users/"$user"/AppData/Local/Microsoft/WinGet/Packages/jqlang.jq_*/jq.exe
+    do
+      if [[ -x "$candidate" ]]; then
+        printf '%s\n' "$candidate"
+        return 0
+      fi
+    done
+  fi
+  return 1
+}
+
+resolve_python() {
+  if command -v python3 >/dev/null 2>&1; then
+    command -v python3
     return 0
+  fi
+  if command -v python >/dev/null 2>&1; then
+    command -v python
+    return 0
+  fi
+  local candidate user
+  user="${USERNAME:-${USER:-}}"
+  for candidate in \
+    /usr/bin/python3 \
+    /usr/local/bin/python3
+  do
+    if [[ -x "$candidate" ]]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+  if [[ -n "$user" ]]; then
+    for candidate in \
+      /mnt/c/Users/"$user"/AppData/Local/Programs/Python/Python3*/python.exe \
+      /c/Users/"$user"/AppData/Local/Programs/Python/Python3*/python.exe
+    do
+      if [[ -x "$candidate" ]]; then
+        printf '%s\n' "$candidate"
+        return 0
+      fi
+    done
   fi
   return 1
 }
 
 deny() {
-  printf '%s\n' "{\"permission\":\"deny\",\"agent_message\":\"$1\"}"
+  if [[ -n "${JQ_BIN:-}" ]]; then
+    "$JQ_BIN" -n --arg msg "$1" '{permission:"deny",agent_message:$msg}'
+  elif [[ -n "${PY_BIN:-}" ]]; then
+    "$PY_BIN" -c 'import json,sys; print(json.dumps({"permission":"deny","agent_message":sys.argv[1]}))' "$1"
+  else
+    printf '%s\n' '{"permission":"deny","agent_message":"Publishing blocked by branch policy."}'
+  fi
   exit 0
 }
 
-JQ_BIN="$(resolve_jq || true)"
-if [[ -z "$JQ_BIN" ]]; then
-  deny "Branch policy hook requires jq for safe JSON parsing. Install jq or use a canonical branch from the repository root."
+json_field() {
+  local key="$1"
+  if [[ -n "${JQ_BIN:-}" ]]; then
+    "$JQ_BIN" -r --arg k "$key" '.[$k] // empty' <<<"$input" | tr -d '\r'
+  elif [[ -n "${PY_BIN:-}" ]]; then
+    "$PY_BIN" -c 'import json,sys; d=json.loads(sys.stdin.read()); v=d.get(sys.argv[1],""); print("" if v is None else v)' "$key" <<<"$input" | tr -d '\r'
+  else
+    printf ''
+  fi
+}
+
+input="$(cat || true)"
+if [[ -z "$input" ]]; then
+  printf '%s\n' '{"permission":"deny","agent_message":"Branch policy hook received empty input."}'
+  exit 0
 fi
 
-command="$("$JQ_BIN" -r '.command // empty' <<<"$input" | tr -d '\r')"
-cwd="$("$JQ_BIN" -r '.cwd // empty' <<<"$input" | tr -d '\r')"
+JQ_BIN="$(resolve_jq || true)"
+PY_BIN="$(resolve_python || true)"
+if [[ -z "$JQ_BIN" && -z "$PY_BIN" ]]; then
+  printf '%s\n' '{"permission":"deny","agent_message":"Branch policy hook requires jq or python for safe JSON parsing."}'
+  exit 0
+fi
+
+command="$(json_field command)"
+cwd="$(json_field cwd)"
 
 # Normalize quoted -C paths, quoted publish verbs, and git -c config flags.
 cmd_norm="$(printf '%s' "$command" | sed -E \

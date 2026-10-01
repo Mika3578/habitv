@@ -232,7 +232,8 @@ are satisfied.
     reply is enough; do not clean the body or open a fixup loop.
   - If **Findings ≥ 1** or it points at open inline findings: those
     threads are **BLOCKING** until fixed or rejected with evidence and
-    pushed. Fix the code; do not chase the overview badge itself.- Addressed inline threads get a concise reply, then resolution only after
+    pushed. Fix the code; do not chase the overview badge itself.
+- Addressed inline threads get a concise reply, then resolution only after
   the fix or rejection is verified; re-fetch GitHub and confirm
   `isResolved`. Do not resolve unanswered or unexamined threads.
 - **Live GitHub PR state is authoritative** over local memory or ledgers.
