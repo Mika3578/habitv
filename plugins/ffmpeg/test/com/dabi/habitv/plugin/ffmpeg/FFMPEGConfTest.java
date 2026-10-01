@@ -21,10 +21,17 @@ public class FFMPEGConfTest {
 	}
 
 	@Test
+	public void similarlyNamedBinariesDoNotEnableProgressPipe() {
+		assertFalse(FFMPEGConf.supportsProgressPipe("/usr/bin/ffmpeg-wrapper"));
+		assertFalse(FFMPEGConf.supportsProgressPipe("C:\\bin\\notffmpeg.exe"));
+	}
+
+	@Test
 	public void windowsAvconvDefaultOmitsProgressFlags() {
 		assertFalse(FFMPEGConf.FFMPEG_CMD_WINDOWS.contains("-progress"));
 		assertFalse(FFMPEGConf.augmentRemuxCommand(FFMPEGConf.FFMPEG_CMD_WINDOWS, "C:\\bin\\avconv.exe")
 				.contains("-progress"));
+		assertTrue(FFMPEGConf.supportsProgressPipe("C:\\Program Files\\ffmpeg\\ffmpeg.exe"));
 	}
 
 }

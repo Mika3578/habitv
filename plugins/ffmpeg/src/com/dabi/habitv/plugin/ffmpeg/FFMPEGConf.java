@@ -1,6 +1,7 @@
 package com.dabi.habitv.plugin.ffmpeg;
 
 import java.io.File;
+import java.util.Locale;
 
 import com.dabi.habitv.framework.FrameworkConf;
 
@@ -40,8 +41,8 @@ public final class FFMPEGConf {
 		if (executablePath == null || executablePath.trim().isEmpty()) {
 			return false;
 		}
-		final String baseName = new File(executablePath.trim()).getName().toLowerCase();
-		return baseName.contains("ffmpeg");
+		final String baseName = new File(executablePath.trim()).getName().toLowerCase(Locale.ROOT);
+		return "ffmpeg".equals(baseName) || "ffmpeg.exe".equals(baseName);
 	}
 
 	public static String augmentRemuxCommand(final String remuxCommandSuffix, final String executablePath) {
