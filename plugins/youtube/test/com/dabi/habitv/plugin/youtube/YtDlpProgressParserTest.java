@@ -36,6 +36,17 @@ public class YtDlpProgressParserTest {
 	}
 
 	@Test
+	public void activityTokenUsesRawLineWhenRoundedPercentUnchanged() {
+		final String lineOne = "[download]  12.0% of 1.00GiB at 1.00MiB/s ETA 15:00";
+		final String lineTwo = "[download]  12.0% of 1.00GiB at 2.00MiB/s ETA 07:30";
+		final DownloadProgressSnapshot first = YtDlpProgressParser.parse(lineOne, null);
+		final DownloadProgressSnapshot second = YtDlpProgressParser.parse(lineTwo, first);
+		assertEquals(first.getProgressRatio(), second.getProgressRatio());
+		assertNotEquals(YtDlpProgressParser.toActivityToken(first, lineOne),
+				YtDlpProgressParser.toActivityToken(second, lineTwo));
+	}
+
+	@Test
 	public void activityTokenChangesDuringMergeWhileStageProgressionConstant() {
 		final DownloadProgressSnapshot previous = YtDlpProgressParser
 				.parse("[download] 100.0% of 10.00MiB at 1.00MiB/s ETA 00:00", null);

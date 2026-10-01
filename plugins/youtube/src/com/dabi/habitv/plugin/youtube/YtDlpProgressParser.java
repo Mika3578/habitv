@@ -410,14 +410,14 @@ public final class YtDlpProgressParser {
 
 	/** Activity token for hung-process detection while UI progression stays constant. */
 	public static String toActivityToken(final DownloadProgressSnapshot snapshot, final String line) {
+		if (line != null && !line.trim().isEmpty()) {
+			return "line:" + line.trim();
+		}
 		if (snapshot != null && snapshot.getDownloadedBytes() != null) {
 			return "bytes:" + snapshot.getDownloadedBytes();
 		}
 		if (snapshot != null && snapshot.getProgressRatio() != null) {
 			return "ratio:" + snapshot.getProgressRatio().doubleValue();
-		}
-		if (line != null && !line.trim().isEmpty()) {
-			return "line:" + line.trim();
 		}
 		if (snapshot != null) {
 			return "stage:" + snapshot.getStage().name();
