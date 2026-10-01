@@ -37,6 +37,8 @@ public class YoutubePluginDownloader extends BaseUpdatablePlugin implements Plug
 			if (isEmbedSubtitlesEnabled(downloadParam)) {
 				builtInDump += YoutubeConf.DUMP_CMD_EMBED_SUBS;
 			}
+		} else if (YoutubeConf.DUMP_CMD_MP3.equals(cmdParam)) {
+			builtInDump = YoutubeConf.DUMP_CMD_MP3;
 		} else {
 			cmd += cmdParam;
 		}
