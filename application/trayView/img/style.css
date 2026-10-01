@@ -1,0 +1,26 @@
+/* Tray view shared styles */
+
+/* Compact icon-only button: transparent idle, subtle hover, visible focus */
+.icon-button {
+	-fx-background-color: transparent;
+	-fx-background-radius: 4;
+	-fx-padding: 2;
+	-fx-min-width: 28;
+	-fx-min-height: 28;
+	-fx-max-width: 30;
+	-fx-max-height: 30;
+	-fx-content-display: graphic-only;
+}
+
+.icon-button:hover {
+	-fx-background-color: rgba(0, 0, 0, 0.08);
+}
+
+.icon-button:pressed {
+	-fx-background-color: rgba(0, 0, 0, 0.16);
+}
+
+.icon-button:focused {
+	-fx-background-insets: 0, 0 0 0 0;
+	-fx-border-color: transparent;
+}

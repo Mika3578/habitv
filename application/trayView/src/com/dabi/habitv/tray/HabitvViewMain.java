@@ -47,6 +47,10 @@ public class HabitvViewMain extends Application {
 
 			VBox root = (VBox) fxmlLoader.load();
 			Scene scene = new Scene(root);
+			final java.net.URL styleUrl = ClassLoader.getSystemResource("style.css");
+			if (styleUrl != null) {
+				scene.getStylesheets().add(styleUrl.toExternalForm());
+			}
 			primaryStage.setScene(scene);
 			primaryStage.show();
 			controller.init(manager, primaryStage);
