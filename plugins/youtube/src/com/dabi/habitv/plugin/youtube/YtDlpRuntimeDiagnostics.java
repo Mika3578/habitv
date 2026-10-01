@@ -105,6 +105,10 @@ public final class YtDlpRuntimeDiagnostics {
 		LOG.info("yt-dlp process TMP: " + tempPath);
 	}
 
+	static long preflightHungProcessTimeoutMillis() {
+		return YT_DLP_PREFLIGHT_TIMEOUT_MILLIS;
+	}
+
 	public static boolean supportsProgressTemplate(final String versionOutput) {
 		if (versionOutput == null || versionOutput.trim().isEmpty()) {
 			return false;

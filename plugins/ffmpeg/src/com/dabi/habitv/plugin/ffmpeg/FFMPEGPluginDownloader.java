@@ -35,7 +35,7 @@ public class FFMPEGPluginDownloader extends BaseUpdatablePlugin implements
 			throws DownloadFailedException {
 
 		final String downloaderBin = getBinParam(downloaders);
-		String cmd = downloaderBin + getCmd();
+		String cmd = downloaderBin + getCmd(downloaderBin);
 		cmd = cmd.replaceFirst(FrameworkConf.DOWNLOAD_INPUT,
 				Matcher.quoteReplacement(downloadParam.getDownloadInput()));
 		cmd = cmd.replaceFirst(FrameworkConf.DOWNLOAD_DESTINATION,
@@ -50,9 +50,11 @@ public class FFMPEGPluginDownloader extends BaseUpdatablePlugin implements
 		}
 	}
 
-	private String getCmd() {
-		return OSUtils.isWindows() ? FFMPEGConf.FFMPEG_CMD_WINDOWS_COR
-				: FFMPEGConf.FFMPEG_CMD_LINUX;
+	private String getCmd(final String executablePath) {
+		if (OSUtils.isWindows()) {
+			return FFMPEGConf.FFMPEG_CMD_WINDOWS_COR;
+		}
+		return FFMPEGConf.augmentRemuxCommand(FFMPEGConf.FFMPEG_CMD_LINUX, executablePath);
 	}
 
 	@Override

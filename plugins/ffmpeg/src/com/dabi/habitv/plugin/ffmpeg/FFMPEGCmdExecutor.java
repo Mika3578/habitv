@@ -38,22 +38,37 @@ public class FFMPEGCmdExecutor extends CmdExecutor {
 
 	@Override
 	public void start() {
-		progressSnapshot = null;
+		synchronized (getProgressLock()) {
+			progressSnapshot = null;
+			duration = null;
+			progressState.clear();
+		}
 		super.start();
 	}
 
 	@Override
 	protected String handleProgression(final String line) {
 		LOG.debug(line);
-		final DownloadProgressSnapshot parsed = FfmpegProgressParser.parseLine(line, progressState);
-		if (parsed != null) {
-			progressSnapshot = parsed;
-			final String progression = FfmpegProgressParser.toProgressionString(parsed);
-			if (progression != null) {
-				return progression;
+		final DownloadProgressSnapshot parsed;
+		final String progressionResult;
+		synchronized (getProgressLock()) {
+			parsed = FfmpegProgressParser.parseLine(line, progressState);
+			if (parsed != null) {
+				progressSnapshot = parsed;
+				final String progression = FfmpegProgressParser.toProgressionString(parsed);
+				if (progression != null) {
+					progressionResult = progression;
+				} else {
+					progressionResult = "stage:" + parsed.getStage().name();
+				}
+			} else {
+				progressionResult = handleLegacyProgressionLine(line);
 			}
-			return "stage:" + parsed.getStage().name();
 		}
+		return progressionResult;
+	}
+
+	private String handleLegacyProgressionLine(final String line) {
 		if (duration == null) {
 			duration = findDuration(line);
 		}
@@ -86,11 +101,13 @@ public class FFMPEGCmdExecutor extends CmdExecutor {
 
 	@Override
 	public DownloadProgressSnapshot getProgressSnapshot() {
-		final DownloadProgressSnapshot snapshot = progressSnapshot;
-		if (snapshot != null) {
-			return snapshot;
+		synchronized (getProgressLock()) {
+			final DownloadProgressSnapshot snapshot = progressSnapshot;
+			if (snapshot != null) {
+				return snapshot;
+			}
+			return DownloadProgressSnapshot.fromProgressionString(getProgression());
 		}
-		return DownloadProgressSnapshot.fromProgressionString(getProgression());
 	}
 
 	private String matchPercentage(final String line) {

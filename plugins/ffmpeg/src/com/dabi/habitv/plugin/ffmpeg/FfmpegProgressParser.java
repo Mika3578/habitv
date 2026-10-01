@@ -20,6 +20,11 @@ public final class FfmpegProgressParser {
 		private Double durationMicros;
 		private Long outTimeMicros;
 
+		public void clear() {
+			durationMicros = null;
+			outTimeMicros = null;
+		}
+
 		public Double getDurationMicros() {
 			return durationMicros;
 		}

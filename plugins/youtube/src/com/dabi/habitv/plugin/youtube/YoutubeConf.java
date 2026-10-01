@@ -28,10 +28,14 @@ public final class YoutubeConf {
 	 * Requires a yt-dlp build that supports {@code --progress-template}; legacy
 	 * {@code [download]} lines remain parsed when templates are absent or ignored.
 	 */
-	public static final String PROGRESS_TEMPLATE_FLAGS = " --progress-template \"download:" + PROGRESS_LINE_PREFIX
-			+ "{\\\"phase\\\":\\\"download\\\",\\\"pct\\\":%(progress._percent)s,\\\"total\\\":\\\"%(progress._total_bytes_str)s\\\",\\\"speed\\\":\\\"%(progress._speed_str)s\\\",\\\"eta\\\":\\\"%(progress._eta_str)s\\\",\\\"dest\\\":\\\"%(progress._filename)s\\\"}\""
+	private static final String PROGRESS_TEMPLATE_FLAGS_RAW = " --progress-template \"download:" + PROGRESS_LINE_PREFIX
+			+ "{\\\"phase\\\":\\\"download\\\",\\\"pct\\\":%(progress._percent)s,\\\"total\\\":\\\"%(progress._total_bytes_str)s\\\",\\\"speed\\\":\\\"%(progress._speed_str)s\\\",\\\"eta\\\":\\\"%(progress._eta_str)s\\\"}\""
 			+ " --progress-template \"postprocess:" + PROGRESS_LINE_PREFIX
 			+ "{\\\"phase\\\":\\\"postprocess\\\",\\\"pp\\\":\\\"%(postprocessor)s\\\"}\"";
+
+	/** @deprecated use {@link #progressTemplateFlagsFor(String)} */
+	@Deprecated
+	public static final String PROGRESS_TEMPLATE_FLAGS = PROGRESS_TEMPLATE_FLAGS_RAW;
 
 	/**
 	 * Default video download flags for yt-dlp (youtube-dl compatible subset).
@@ -48,14 +52,22 @@ public final class YoutubeConf {
 	/**
 	 * Appends {@link #PROGRESS_TEMPLATE_FLAGS} when the resolved yt-dlp version supports them.
 	 */
-	public static String augmentBuiltInDumpCommand(final String builtInCommand, final String versionOutput) {
+	public static String progressTemplateFlagsFor(final String cmdProcessor) {
+		if (cmdProcessor != null && cmdProcessor.toLowerCase().contains("cmd.exe")) {
+			return PROGRESS_TEMPLATE_FLAGS_RAW.replace("%", "%%");
+		}
+		return PROGRESS_TEMPLATE_FLAGS_RAW;
+	}
+
+	public static String augmentBuiltInDumpCommand(final String builtInCommand, final String versionOutput,
+			final String cmdProcessor) {
 		if (builtInCommand == null) {
 			return null;
 		}
 		if (!YtDlpRuntimeDiagnostics.supportsProgressTemplate(versionOutput)) {
 			return builtInCommand;
 		}
-		return builtInCommand + PROGRESS_TEMPLATE_FLAGS;
+		return builtInCommand + progressTemplateFlagsFor(cmdProcessor);
 	}
 
 	public static final long MAX_HUNG_TIME = 300000L;

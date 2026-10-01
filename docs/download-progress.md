@@ -36,7 +36,7 @@ append `--progress-template` only when preflight detects a yt-dlp build that
 supports the flag (not youtube-dl). Lines are prefixed with `habitv-progress:`
 followed by JSON.
 
-- `phase=download` — numeric `pct`, optional `total`, `speed`, `eta`, `dest`.
+- `phase=download` — numeric `pct`, optional `total`, `speed`, `eta` (no filename in JSON; avoids broken escaping).
 - `phase=postprocess` — `pp` post-processor name mapped to `DownloadStage`.
 
 `YtDlpProgressParser` consumes these lines and still accepts legacy

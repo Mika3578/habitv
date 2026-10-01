@@ -59,18 +59,20 @@ public class YtDlpCmdExecutor extends CmdExecutor {
 
 	@Override
 	protected String handleProgression(final String line) {
-		final DownloadProgressSnapshot previous = progressSnapshot;
-		final DownloadProgressSnapshot parsed = YtDlpProgressParser.parse(line, previous);
-		if (parsed == null) {
-			return null;
+		synchronized (getProgressLock()) {
+			final DownloadProgressSnapshot previous = progressSnapshot;
+			final DownloadProgressSnapshot parsed = YtDlpProgressParser.parse(line, previous);
+			if (parsed == null) {
+				return null;
+			}
+			progressSnapshot = parsed;
+			final String progression = YtDlpProgressParser.toProgressionString(parsed);
+			if (progression != null) {
+				return progression;
+			}
+			// Keep hung-process detection alive during post-processing without a percentage.
+			return "stage:" + parsed.getStage().name();
 		}
-		progressSnapshot = parsed;
-		final String progression = YtDlpProgressParser.toProgressionString(parsed);
-		if (progression != null) {
-			return progression;
-		}
-		// Keep hung-process detection alive during post-processing without a percentage.
-		return "stage:" + parsed.getStage().name();
 	}
 
 	@Override
@@ -87,15 +89,17 @@ public class YtDlpCmdExecutor extends CmdExecutor {
 
 	@Override
 	public DownloadProgressSnapshot getProgressSnapshot() {
-		final DownloadProgressSnapshot snapshot = progressSnapshot;
-		if (snapshot != null) {
-			return snapshot;
+		synchronized (getProgressLock()) {
+			final DownloadProgressSnapshot snapshot = progressSnapshot;
+			if (snapshot != null) {
+				return snapshot;
+			}
+			final String progression = super.getProgression();
+			if (progression != null && progression.startsWith("stage:")) {
+				return DownloadProgressSnapshot.indeterminate(DownloadStage.POST_PROCESSING, null);
+			}
+			return DownloadProgressSnapshot.fromProgressionString(progression);
 		}
-		final String progression = super.getProgression();
-		if (progression != null && progression.startsWith("stage:")) {
-			return DownloadProgressSnapshot.indeterminate(DownloadStage.POST_PROCESSING, null);
-		}
-		return DownloadProgressSnapshot.fromProgressionString(progression);
 	}
 
 	@Override
