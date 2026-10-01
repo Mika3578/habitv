@@ -197,6 +197,8 @@ Fetch live GitHub state:
 
 - HEAD SHA, base, branch, draft flag, title, body;
 - review submissions and requested reviewers;
+- **Copilot review overview** (including "Needs a closer look" and
+  "Changes recommended") plus every Copilot inline/thread comment;
 - inline threads (`isResolved`, `isOutdated`, comments);
 - top-level issue/PR comments;
 - check runs / statuses.
@@ -205,6 +207,10 @@ Use [`scripts/pr-gh-snapshot.sh`](../../../scripts/pr-gh-snapshot.sh) for a
 deterministic baseline, then classify each item.
 
 Deduplicate before acting on new bot output.
+
+Copilot overview statuses are **BLOCKING** until each item is fixed or
+rejected with evidence on the thread. Quota / rate-limit messages are
+`RATE_LIMITED`, not a clean review.
 
 ## Four different concepts (do not conflate)
 
@@ -332,16 +338,19 @@ All items apply to **current PR HEAD** only:
 2. Focused tests pass when code changed.
 3. Full reactor validation when applicable.
 4. Required checks green on HEAD.
-5. Every feedback item inventoried and adjudicated.
+5. Every feedback item inventoried and adjudicated, including Copilot
+   overview statuses ("Needs a closer look", "Changes recommended").
 6. Every `BLOCKING` item fixed or rejected with evidence.
 7. Qualifying threads replied and resolved (`isResolved` verified).
 8. No actionable unresolved threads.
 9. Live body passes `validate-pr-public-body`.
-10. Final substantive review on HEAD: Copilot (or tier-equivalent) with
+10. History cleaned: no noisy WIP/fixup stack left for merge; body/title
+    current; no tool footers or stale checklist claims.
+11. Final substantive review on HEAD: Copilot (or tier-equivalent) with
     `execution_state` ∈ {`SUBSTANTIVE`, `NO_FINDINGS`} and `commit_id == HEAD`.
-11. User functional confirmation when applicable.
-12. No newer commit invalidates the above.
-13. Explicit authorization to mark Ready.
+12. User functional confirmation when applicable.
+13. No newer commit invalidates the above.
+14. Explicit authorization to mark Ready.
 
 ## Continuing an existing PR
 
