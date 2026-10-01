@@ -16,7 +16,11 @@ import com.dabi.habitv.api.plugin.dto.CategoryDTO;
  */
 public final class ProviderChannelLogoResolver {
 
-	public static final int DISPLAY_SIZE_PX = 16;
+	/** Provider-root logo size in the category tree (px). */
+	public static final int PROVIDER_DISPLAY_SIZE_PX = 24;
+
+	/** Channel-level logo size in the category tree (px). */
+	public static final int CHANNEL_DISPLAY_SIZE_PX = 32;
 
 	private static final Pattern FRANCE_TV_SLUG = Pattern
 			.compile("(?:https?://)?(?:www\\.)?france\\.tv/([^/?#]+)/?", Pattern.CASE_INSENSITIVE);
@@ -61,6 +65,16 @@ public final class ProviderChannelLogoResolver {
 	static boolean isChannelLevel(final CategoryDTO category) {
 		final CategoryDTO father = category.getFatherCategory();
 		return father != null && father.getFatherCategory() == null;
+	}
+
+	/**
+	 * @return pixel size for a resolved logo at this tree level
+	 */
+	public static int displaySizePx(final CategoryDTO category) {
+		if (category != null && isChannelLevel(category)) {
+			return CHANNEL_DISPLAY_SIZE_PX;
+		}
+		return PROVIDER_DISPLAY_SIZE_PX;
 	}
 
 	static String normalizeId(final String raw) {

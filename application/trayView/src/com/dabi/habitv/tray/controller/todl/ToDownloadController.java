@@ -77,6 +77,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
@@ -1268,12 +1269,19 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 			if (image == null) {
 				return null;
 			}
+			final int tileSize = ProviderChannelLogoResolver.displaySizePx(item);
+			final int imageSize = Math.max(12, tileSize - 4);
 			final ImageView view = new ImageView(image);
-			view.setFitWidth(ProviderChannelLogoResolver.DISPLAY_SIZE_PX);
-			view.setFitHeight(ProviderChannelLogoResolver.DISPLAY_SIZE_PX);
+			view.setFitWidth(imageSize);
+			view.setFitHeight(imageSize);
 			view.setPreserveRatio(true);
 			view.setSmooth(true);
-			return view;
+			final StackPane tile = new StackPane(view);
+			tile.setMinSize(tileSize, tileSize);
+			tile.setPrefSize(tileSize, tileSize);
+			tile.setMaxSize(tileSize, tileSize);
+			tile.setStyle("-fx-background-color: rgba(0,0,0,0.06); -fx-background-radius: 3;");
+			return tile;
 		} catch (RuntimeException e) {
 			return null;
 		}

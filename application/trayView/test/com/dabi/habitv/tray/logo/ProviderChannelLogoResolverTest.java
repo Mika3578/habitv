@@ -103,6 +103,21 @@ public class ProviderChannelLogoResolverTest {
 	}
 
 	@Test
+	public void displaySizeUsesProviderAndChannelSizes() {
+		final CategoryDTO root = new CategoryDTO("francetv", new HashSet<CategoryDTO>());
+		final CategoryDTO channel = new CategoryDTO("francetv", "France 2",
+				"https://www.france.tv/france-2/", "mp4");
+		root.addSubCategory(channel);
+
+		assertEquals(ProviderChannelLogoResolver.PROVIDER_DISPLAY_SIZE_PX,
+				ProviderChannelLogoResolver.displaySizePx(root));
+		assertEquals(ProviderChannelLogoResolver.CHANNEL_DISPLAY_SIZE_PX,
+				ProviderChannelLogoResolver.displaySizePx(channel));
+		assertEquals(ProviderChannelLogoResolver.PROVIDER_DISPLAY_SIZE_PX,
+				ProviderChannelLogoResolver.displaySizePx(null));
+	}
+
+	@Test
 	public void sanitizeKeyStripsUnsafeCharacters() {
 		assertEquals("france-2", ProviderChannelLogoResolver.sanitizeKey("France 2"));
 		assertEquals("6ter", ProviderChannelLogoResolver.sanitizeKey("6ter"));
