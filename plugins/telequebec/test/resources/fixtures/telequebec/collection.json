@@ -1,0 +1,19 @@
+{
+  "data": {
+    "productByRootProductSlug": {
+      "id": "31079",
+      "productType": "COLLECTION",
+      "seasonCount": 1,
+      "seasons": [
+        {
+          "episodeCount": 8,
+          "id": "31065",
+          "seasonNumber": 1,
+          "title": "Pénélope partout"
+        }
+      ],
+      "slug": "penelope-partout",
+      "title": "Pénélope partout"
+    }
+  }
+}

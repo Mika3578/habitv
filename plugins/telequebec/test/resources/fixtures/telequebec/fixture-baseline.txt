@@ -1,0 +1,5 @@
+provider=telequebec
+strategy=graphql-ytdlp-geo
+homeUrl=https://www.telequebec.tv
+channels=Télé-Québec
+note=Public GraphQL catalogue; playback often Canada-geo-limited; yt-dlp TeleQuebecEmission currently broken for /regarder URLs.
