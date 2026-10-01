@@ -25,6 +25,13 @@ public class YtDlpRuntimeDiagnosticsTest {
 		assertTrue(YtDlpRuntimeDiagnostics.supportsProgressTemplate("2024.08.01"));
 		assertFalse(YtDlpRuntimeDiagnostics.supportsProgressTemplate("2023.09.01"));
 		assertFalse(YtDlpRuntimeDiagnostics.supportsProgressTemplate("2021.01.01 youtube-dl"));
+		assertTrue(YtDlpRuntimeDiagnostics.supportsProgressTemplate("WARNING: deprecated flag\n2024.08.01"));
+	}
+
+	@Test
+	public void extractYtDlpVersionLineSkipsWarnings() {
+		assertEquals("2024.08.01",
+				YtDlpRuntimeDiagnostics.extractYtDlpVersionLine("WARNING: test\n2024.08.01\n"));
 	}
 
 	@Test
@@ -110,7 +117,7 @@ public class YtDlpRuntimeDiagnosticsTest {
 				"habitv-preflight-" + UUID.randomUUID());
 		final File binDir = new File(parent, "bin");
 		assertTrue(binDir.mkdirs());
-		final String slowCmd = OSUtils.isWindows() ? "ping -n 6 127.0.0.1" : "sleep 5";
+		final String slowCmd = OSUtils.isWindows() ? "cmd.exe /c timeout /t 8 /nobreak >nul" : "sleep 8";
 		YtDlpRuntimeDiagnostics.setPreflightTimeoutMillisForTests(400L);
 		final CmdExecutor executor = YtDlpRuntimeDiagnostics.createPreflightVersionExecutor("", slowCmd,
 				binDir.getAbsolutePath());

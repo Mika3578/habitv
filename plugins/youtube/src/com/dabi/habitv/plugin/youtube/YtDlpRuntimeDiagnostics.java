@@ -122,12 +122,29 @@ public final class YtDlpRuntimeDiagnostics {
 		return preflightTimeoutMillis();
 	}
 
-	public static boolean supportsProgressTemplate(final String versionOutput) {
-		if (versionOutput == null || versionOutput.trim().isEmpty()) {
-			return false;
+	static String extractYtDlpVersionLine(final String mergedOutput) {
+		if (mergedOutput == null || mergedOutput.trim().isEmpty()) {
+			return "";
 		}
-		final String line = versionOutput.trim().split("\\R", 2)[0].trim();
-		if (line.toLowerCase().contains("youtube-dl")) {
+		final String[] lines = mergedOutput.split("\\R");
+		for (final String line : lines) {
+			final String trimmed = line.trim();
+			if (trimmed.isEmpty()) {
+				continue;
+			}
+			if (trimmed.toLowerCase().contains("youtube-dl")) {
+				continue;
+			}
+			if (parseYtDlpReleaseDate(trimmed) > 0) {
+				return trimmed;
+			}
+		}
+		return lines[0].trim();
+	}
+
+	public static boolean supportsProgressTemplate(final String versionOutput) {
+		final String line = extractYtDlpVersionLine(versionOutput);
+		if (line.isEmpty()) {
 			return false;
 		}
 		return parseYtDlpReleaseDate(line) >= 20231013;
@@ -174,7 +191,12 @@ public final class YtDlpRuntimeDiagnostics {
 		};
 	}
 
-	public static String runPreflight(final String cmdProcessor, final String executablePath, final String binDir) {
+	public static void runPreflight(final String cmdProcessor, final String executablePath, final String binDir) {
+		preflightVersionOutput(cmdProcessor, executablePath, binDir);
+	}
+
+	public static String preflightVersionOutput(final String cmdProcessor, final String executablePath,
+			final String binDir) {
 		if (!preflightEnabled) {
 			return "";
 		}
@@ -195,7 +217,7 @@ public final class YtDlpRuntimeDiagnostics {
 			throw new ExecutorFailedException(versionCmd, fullOutput,
 					buildBootstrapFailureUserMessage(executablePath), null);
 		}
-		final String versionLine = fullOutput == null ? "" : fullOutput.trim();
+		final String versionLine = extractYtDlpVersionLine(fullOutput);
 		LOG.info("yt-dlp version: " + versionLine);
 		return versionLine;
 	}

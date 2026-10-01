@@ -45,7 +45,9 @@ unavailable.
 
 ## ffmpeg plugin
 
-Built-in ffmpeg downloader constants (`FFMPEGConf`) append `-progress pipe:1 -nostats`.
+Built-in ffmpeg downloader commands (`FFMPEGConf`) prepend `-progress pipe:1 -nostats`
+only when the resolved executable basename is exactly `ffmpeg` or `ffmpeg.exe`
+(avconv and other similarly named tools stay on the legacy stderr parser).
 User-configured export scripts are unchanged. `FfmpegProgressParser`
 reads `duration=` and `out_time_*` keys on stdout. A ratio is published only
 when duration is known; otherwise the stage stays indeterminate **REMUXING**.
@@ -54,6 +56,7 @@ Stderr `Duration:` / `time=` lines remain a fallback for older invocations.
 ## UI
 
 `DownloadProgressFormatter` and `DownloadBox` map stages to labels and choose
-determinate vs indeterminate bars via `DownloadStage.isIndeterminate()`.
+determinate vs indeterminate bars from `DownloadProgressSnapshot.isIndeterminate()`
+(a null `progressRatio` on the snapshot), not from `DownloadStage` alone.
 
 See also [`architecture.md`](architecture.md).
