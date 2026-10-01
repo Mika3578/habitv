@@ -28,11 +28,10 @@ before enabling):
 
 ## External PR description tools
 
-- **Sourcery:** disable **Enable pull request summary** in Sourcery Review
-  Settings (dashboard) to stop mutating the GitHub PR description.
-- **cubic:** no `cubic.yaml` in this repository; use the cubic dashboard or
-  supported repo config if available. CI runs
-  `scripts/validate-pr-public-body.*` on `pull_request` `edited` events.
+Third-party PR description footers are tolerated (not a CI or Ready gate).
+Optional: disable Sourcery **Enable pull request summary** in the dashboard
+to reduce noise. cubic: no in-repo `cubic.yaml`; use the cubic dashboard if
+needed.
 
 ## Merge queue (deferred)
 

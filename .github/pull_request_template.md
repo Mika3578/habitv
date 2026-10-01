@@ -48,7 +48,7 @@
 - [ ] PR keeps linear history
 - [ ] English used for branches, commits, comments, docs, and PR text
 - [ ] Docs updated if behavior or contributor workflow changed
-- [ ] Public git text is short and generic (see AGENTS.md); no tool-generated PR summary blocks
+- [ ] Public git text is short and generic (see AGENTS.md)
 - [ ] Copilot review overview ("Needs a closer look" / "Changes recommended") and threads handled; history and comments cleaned for merge
 - [ ] Actionable review findings addressed; qualifying threads replied and resolved on GitHub
 - [ ] Validation and required checks recorded for the current PR HEAD

@@ -55,7 +55,8 @@ reliability, then provider repairs, then JDK/packaging migration.
 - Keep **code comments** concise: explain non-obvious *why*; do not narrate
   parsing, hosts, URLs, or integration mechanics (use `docs/` or tests).
 - No secrets, tokens, credentials, or machine paths in git.
-- No AI/tool attribution in commits or PRs.
+- No AI/tool attribution in commits. Agents must not author tool footers
+  in PR bodies; third-party appended blocks are tolerated.
 - Scratch work goes in `agent_space/` (gitignored). Do not commit it.
 
 ## Download and Provider Rules
@@ -112,8 +113,10 @@ text.
 Keep public git text **implementation-neutral**: use concise user-facing
 wording and avoid unnecessary detail about access mechanisms,
 authentication flows, delivery internals, provider-specific selectors, or
-host implementation specifics. Do not add AI/tool footers or auto-summaries.
-Do not publish negated topic checklists in public git text.
+host implementation specifics. Agents must not author AI/tool footers or
+auto-summaries. Third-party tools may append description blocks; that is
+tolerated and is not a CI or Ready blocker. Do not publish negated topic
+checklists in public git text.
 
 **Branches:** `<type>/<short-scope>` kebab-case. Types: `feat`, `fix`,
 `docs`, `test`, `refactor`, `chore`, `ci`. Scope is the module or
@@ -237,8 +240,9 @@ are satisfied.
 - **PR hygiene before Ready:** keep a short linear history (squash/rebase
   noisy WIP or fixup commits on the work branch, with approval when
   rewriting a pushed branch); keep title/body short, generic, and current;
-  remove tool footers and stale checklist claims; resolve addressed
-  threads; avoid status spam (one clear reply per thread).
+  keep title/body current; resolve addressed threads; avoid status spam
+  (one clear reply per thread). Third-party body footers are not a Ready
+  blocker.
 - No actionable unresolved feedback remains at Ready.
 
 When runtime behavior may change, keep the PR in Draft until the user

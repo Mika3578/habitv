@@ -265,18 +265,18 @@ Record `execution_state` per source in `agent_space/pr-<n>/state.json`.
 ## PR body ownership
 
 The orchestrator owns the canonical PR description (template sections).
-External tools may comment; do not rely on multiple tools rewriting the body.
+Agents write template sections only and must not author tool footers.
 
-Hygiene: live body must pass
+Third-party tools (Sourcery, cubic, Cursor, etc.) may append description
+blocks. Those appends are **tolerated**: not a CI failure, not a Ready
+blocker, and not a reason to keep a Copilot overview as `BLOCKING` by
+themselves. Reject such overview items with a short evidence reply citing
+this policy. Advisory helper only:
 [`scripts/validate-pr-public-body.sh`](../../../scripts/validate-pr-public-body.sh)
-(`.ps1`). CI runs this on `pull_request` events including `edited`.
+/ `.ps1` (always exit 0).
 
-**Sourcery:** disable **Enable pull request summary** in Sourcery Review
-Settings when possible ([`docs/github-rulesets/README.md`](../../../docs/github-rulesets/README.md)).
-
-**cubic:** no in-repo `cubic.yaml`; use official dashboard/repo config only —
-do not invent keys. If auto-description cannot be disabled, keep reconciling
-the live body.
+Optional: disable Sourcery **Enable pull request summary** in the dashboard
+when convenient ([`docs/github-rulesets/README.md`](../../../docs/github-rulesets/README.md)).
 
 ## Copilot final review (HabiTV model)
 
@@ -316,7 +316,6 @@ On current HEAD, confirm:
 - full reactor validation when required ([`docs/development.md`](../../../docs/development.md));
 - required GitHub checks pass;
 - zero actionable unresolved threads;
-- PR body policy-clean;
 - **final substantive review** on this HEAD when required: source actually
   ran, `execution_state` is `SUBSTANTIVE` or `NO_FINDINGS`, and
   `commit_id == HEAD` (not `APPROVAL_ONLY`, `SKIPPED`, or stale);
@@ -341,17 +340,18 @@ All items apply to **current PR HEAD** only:
 4. Required checks green on HEAD.
 5. Every feedback item inventoried and adjudicated, including Copilot
    overview statuses ("Needs a closer look", "Changes recommended").
+   Overview items that only complain about third-party PR body footers
+   may be rejected with evidence (tolerated; not blocking).
 6. Every `BLOCKING` item fixed or rejected with evidence.
 7. Qualifying threads replied and resolved (`isResolved` verified).
 8. No actionable unresolved threads.
-9. Live body passes `validate-pr-public-body`.
-10. History cleaned: no noisy WIP/fixup stack left for merge; body/title
-    current; no tool footers or stale checklist claims.
-11. Final substantive review on HEAD: Copilot (or tier-equivalent) with
+9. History cleaned: no noisy WIP/fixup stack left for merge; body/title
+    current; stale checklist claims removed. Third-party body footers OK.
+10. Final substantive review on HEAD: Copilot (or tier-equivalent) with
     `execution_state` ∈ {`SUBSTANTIVE`, `NO_FINDINGS`} and `commit_id == HEAD`.
-12. User functional confirmation when applicable.
-13. No newer commit invalidates the above.
-14. Explicit authorization to mark Ready.
+11. User functional confirmation when applicable.
+12. No newer commit invalidates the above.
+13. Explicit authorization to mark Ready.
 
 ## Continuing an existing PR
 
