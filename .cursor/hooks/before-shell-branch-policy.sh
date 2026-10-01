@@ -109,9 +109,9 @@ deny() {
 json_field() {
   local key="$1"
   if [[ -n "${JQ_BIN:-}" ]]; then
-    "$JQ_BIN" -r --arg k "$key" '.[$k] // empty' <<<"$input" | tr -d '\n'
+    "$JQ_BIN" -r --arg k "$key" '.[$k] // empty' <<<"$input" | tr -d '\r\n'
   elif [[ -n "${PY_BIN:-}" ]]; then
-    "$PY_BIN" -c 'import json,sys; d=json.loads(sys.stdin.read()); v=d.get(sys.argv[1],""); print("" if v is None else v)' "$key" <<<"$input" | tr -d '\n'
+    "$PY_BIN" -c 'import json,sys; d=json.loads(sys.stdin.read()); v=d.get(sys.argv[1],""); print("" if v is None else v)' "$key" <<<"$input" | tr -d '\r\n'
   else
     printf ''
   fi
@@ -186,12 +186,12 @@ fi
 # Prefer trusted hook cwd. Only honor git -C when the command is a clear direct publish.
 repo_dir="$cwd"
 if [[ "$is_publish" -eq 1 && "$ambiguous" -eq 0 ]]; then
-  if [[ "$command" =~ (^|[[:space:]])git(\.exe)?[[:space:]]+-C[[:space:]]+\"([^\"]+)\" ]]; then
-    repo_dir="${BASH_REMATCH[3]}"
-  elif [[ "$command" =~ (^|[[:space:]])git(\.exe)?[[:space:]]+-C[[:space:]]+\'([^\']+)\' ]]; then
-    repo_dir="${BASH_REMATCH[3]}"
-  elif [[ "$cmd_norm" =~ (^|[[:space:]])git(\.exe)?[[:space:]]+-C[[:space:]]+([^[:space:]]+) ]]; then
-    repo_dir="${BASH_REMATCH[3]}"
+  if [[ "$command" =~ (^|[[:space:]])([^[:space:]]*/)?git(\.exe)?[[:space:]]+-C[[:space:]]+\"([^\"]+)\" ]]; then
+    repo_dir="${BASH_REMATCH[4]}"
+  elif [[ "$command" =~ (^|[[:space:]])([^[:space:]]*/)?git(\.exe)?[[:space:]]+-C[[:space:]]+\'([^\']+)\' ]]; then
+    repo_dir="${BASH_REMATCH[4]}"
+  elif [[ "$cmd_norm" =~ (^|[[:space:]])([^[:space:]]*/)?git(\.exe)?[[:space:]]+-C[[:space:]]+([^[:space:]]+) ]]; then
+    repo_dir="${BASH_REMATCH[4]}"
   fi
 fi
 
