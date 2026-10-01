@@ -152,16 +152,11 @@ public final class YtDlpRuntimeDiagnostics {
 		}
 	}
 
-	public static String runPreflight(final String cmdProcessor, final String executablePath, final String binDir) {
-		if (!preflightEnabled) {
-			return "";
-		}
-		logExecutableDiagnostics(executablePath, binDir);
-		final String versionCmd = executablePath + " --version";
-		LOG.info("yt-dlp preflight command: " + versionCmd);
+	static CmdExecutor createPreflightVersionExecutor(final String cmdProcessor, final String versionCmd,
+			final String binDir) {
 		final Map<String, String> env = buildYtDlpEnvironment(binDir);
 		final long preflightTimeoutMillis = preflightTimeoutMillis();
-		final CmdExecutor versionExecutor = new CmdExecutor(cmdProcessor, versionCmd, preflightTimeoutMillis) {
+		return new CmdExecutor(cmdProcessor, versionCmd, preflightTimeoutMillis) {
 			@Override
 			protected long getHungProcessTime() {
 				return preflightTimeoutMillis;
@@ -177,6 +172,16 @@ public final class YtDlpRuntimeDiagnostics {
 				return true;
 			}
 		};
+	}
+
+	public static String runPreflight(final String cmdProcessor, final String executablePath, final String binDir) {
+		if (!preflightEnabled) {
+			return "";
+		}
+		logExecutableDiagnostics(executablePath, binDir);
+		final String versionCmd = executablePath + " --version";
+		LOG.info("yt-dlp preflight command: " + versionCmd);
+		final CmdExecutor versionExecutor = createPreflightVersionExecutor(cmdProcessor, versionCmd, binDir);
 		final long startedAt = System.currentTimeMillis();
 		try {
 			versionExecutor.start();

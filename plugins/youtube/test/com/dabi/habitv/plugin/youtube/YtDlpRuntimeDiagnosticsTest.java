@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.UUID;
@@ -11,6 +12,9 @@ import java.util.UUID;
 import org.junit.Test;
 
 import com.dabi.habitv.api.plugin.exception.ExecutorFailedException;
+import com.dabi.habitv.framework.plugin.exception.HungProcessException;
+import com.dabi.habitv.framework.plugin.utils.CmdExecutor;
+import com.dabi.habitv.framework.plugin.utils.OSUtils;
 
 public class YtDlpRuntimeDiagnosticsTest {
 
@@ -98,6 +102,31 @@ public class YtDlpRuntimeDiagnosticsTest {
 	@Test
 	public void preflightHungProcessTimeoutAllowsSlowStartup() {
 		assertTrue(YtDlpRuntimeDiagnostics.preflightHungProcessTimeoutMillis() >= 5000L);
+	}
+
+	@Test
+	public void preflightVersionExecutorHonorsHungTimeout() throws Exception {
+		final File parent = new File(System.getProperty("java.io.tmpdir"),
+				"habitv-preflight-" + UUID.randomUUID());
+		final File binDir = new File(parent, "bin");
+		assertTrue(binDir.mkdirs());
+		final String slowCmd = OSUtils.isWindows() ? "ping -n 6 127.0.0.1" : "sleep 5";
+		YtDlpRuntimeDiagnostics.setPreflightTimeoutMillisForTests(400L);
+		final CmdExecutor executor = YtDlpRuntimeDiagnostics.createPreflightVersionExecutor("", slowCmd,
+				binDir.getAbsolutePath());
+		final long startedAt = System.currentTimeMillis();
+		try {
+			try {
+				executor.start();
+				fail("expected hung preflight executor");
+			} catch (HungProcessException expected) {
+				assertTrue(System.currentTimeMillis() - startedAt < 3000L);
+			}
+		} finally {
+			YtDlpRuntimeDiagnostics.setPreflightTimeoutMillisForTests(null);
+			binDir.delete();
+			parent.delete();
+		}
 	}
 
 	@Test
