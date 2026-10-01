@@ -51,7 +51,13 @@ if ($copilot.Count -eq 0) {
 $aq = @($Reviews | Where-Object { $_.author.login -match 'amazon-q' })
 if ($aq.Count -gt 0) {
     $r = $aq[-1]
-    $st = if ($r.commit.oid -eq $HeadSha) { 'SUBSTANTIVE' } else { 'STALE' }
+    if ($r.commit.oid -ne $HeadSha) {
+        $st = 'STALE'
+    } elseif ($r.state -eq 'APPROVED') {
+        $st = 'NO_FINDINGS'
+    } else {
+        $st = 'SUBSTANTIVE'
+    }
     $sources.Add([ordered]@{ source = 'amazon-q'; execution_state = $st; commit = $r.commit.oid; github_state = $r.state })
 }
 

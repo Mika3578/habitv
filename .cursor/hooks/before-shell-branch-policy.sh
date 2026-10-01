@@ -59,8 +59,13 @@ if [[ "$cmd_unquoted" =~ (^|[[:space:];&|])cd[[:space:]] ]] && { [[ "$cmd_unquot
 fi
 
 # Prefer `git -C <path>` when present so branch checks use that repo.
+# Accept unquoted tokens or simple single/double-quoted paths (including spaces).
 repo_dir="$cwd"
-if [[ "$cmd_unquoted" =~ (^|[[:space:]])git[[:space:]]+-C[[:space:]]+([^[:space:]]+) ]]; then
+if [[ "$command" =~ (^|[[:space:]])git[[:space:]]+-C[[:space:]]+\"([^\"]+)\" ]]; then
+  repo_dir="${BASH_REMATCH[2]}"
+elif [[ "$command" =~ (^|[[:space:]])git[[:space:]]+-C[[:space:]]+\'([^\']+)\' ]]; then
+  repo_dir="${BASH_REMATCH[2]}"
+elif [[ "$cmd_unquoted" =~ (^|[[:space:]])git[[:space:]]+-C[[:space:]]+([^[:space:]]+) ]]; then
   repo_dir="${BASH_REMATCH[2]}"
 fi
 

@@ -162,15 +162,19 @@ if [[ -d .agents/skills ]]; then
     desc=$(printf '%s' "$desc" | tr '\n' ' ' | sed 's/[[:space:]]\{1,\}/ /g; s/^[[:space:]]*//; s/[[:space:]]*$//')
     if [[ -z "$name" ]]; then
       fail "empty skill name: $rel"
+      continue
     fi
     if [[ -z "$desc" ]]; then
       fail "empty skill description: $rel"
+      continue
     fi
     if [[ "${#desc}" -gt "$SKILL_DESC_MAX" ]]; then
       fail "skill description too long (${#desc} chars): $rel"
+      continue
     fi
     if [[ -n "${skill_names[$name]:-}" ]]; then
       fail "duplicate skill name '$name': ${skill_names[$name]} and $rel"
+      continue
     fi
     skill_names[$name]="$rel"
   done < <(find .agents/skills -name 'SKILL.md' -print0 2>/dev/null)

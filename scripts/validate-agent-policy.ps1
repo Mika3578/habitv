@@ -159,19 +159,34 @@ if (-not (Test-Path $SkillsRoot)) {
             Fail "skill missing YAML frontmatter: $rel"
             return
         }
-        if (-not ($frontmatter -cmatch "^name:")) { Fail "skill missing name metadata: $rel" }
-        if (-not ($frontmatter -cmatch "^description:")) { Fail "skill missing description metadata: $rel" }
+        if (-not ($frontmatter -cmatch "^name:")) { Fail "skill missing name metadata: $rel"; return }
+        if (-not ($frontmatter -cmatch "^description:")) { Fail "skill missing description metadata: $rel"; return }
         $name = ($frontmatter | Where-Object { $_ -cmatch "^name:" } | Select-Object -First 1) -replace "^name:\s*", ""
-        $desc = ($frontmatter | Where-Object { $_ -cmatch "^description:" } | Select-Object -First 1) -replace "^description:\s*", ""
-        if ([string]::IsNullOrWhiteSpace($name)) { Fail "empty skill name: $rel" }
-        if ([string]::IsNullOrWhiteSpace($desc)) { Fail "empty skill description: $rel" }
-        if ($desc.Length -gt $SkillDescMax) { Fail "skill description too long ($($desc.Length) chars): $rel" }
-        if (-not [string]::IsNullOrEmpty($name) -and $skillNames.ContainsKey($name)) {
+        $descParts = [System.Collections.Generic.List[string]]::new()
+        $grabbing = $false
+        foreach ($line in $frontmatter) {
+            if ($line -cmatch '^description:\s*[>|][-+]?\s*$') {
+                $grabbing = $true
+                continue
+            }
+            if ($line -cmatch '^description:\s*') {
+                $descParts.Add(($line -replace '^description:\s*', ''))
+                break
+            }
+            if ($grabbing) {
+                if ($line -cmatch '^[A-Za-z0-9_-]+:') { break }
+                $descParts.Add($line.Trim())
+            }
+        }
+        $desc = (($descParts -join ' ') -replace '\s+', ' ').Trim()
+        if ([string]::IsNullOrWhiteSpace($name)) { Fail "empty skill name: $rel"; return }
+        if ([string]::IsNullOrWhiteSpace($desc)) { Fail "empty skill description: $rel"; return }
+        if ($desc.Length -gt $SkillDescMax) { Fail "skill description too long ($($desc.Length) chars): $rel"; return }
+        if ($skillNames.ContainsKey($name)) {
             Fail "duplicate skill name '$name': $($skillNames[$name]) and $rel"
+            return
         }
-        if (-not [string]::IsNullOrEmpty($name)) {
-            $skillNames[$name] = $rel
-        }
+        $skillNames[$name] = $rel
     }
 }
 

@@ -58,7 +58,13 @@ jq -n \
             github_state:$r.state}])
       end
     + if ($aq | length) > 0 then
-        [{source:"amazon-q",execution_state:(if $aq[-1].commit.oid == $head then "SUBSTANTIVE" else "STALE" end),commit:$aq[-1].commit.oid,github_state:$aq[-1].state}]
+        (($aq[-1]) as $r |
+          [{source:"amazon-q",
+            execution_state:(if $r.commit.oid != $head then "STALE"
+              elif $r.state == "APPROVED" then "NO_FINDINGS"
+              else "SUBSTANTIVE" end),
+            commit:$r.commit.oid,
+            github_state:$r.state}])
       else [] end
     + ($cursor | map({
         source:"cursor",
