@@ -2,7 +2,7 @@ package com.dabi.habitv.provider.novo19;
 
 import java.io.IOException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.dabi.habitv.api.plugin.dto.DownloadParamDTO;
 import com.dabi.habitv.provider.novo19.dto.Novo19BffPage;

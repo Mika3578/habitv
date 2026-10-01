@@ -2,7 +2,7 @@ package com.dabi.habitv.provider.novo19;
 
 import java.io.IOException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 final class Novo19PlaybackClient {
 

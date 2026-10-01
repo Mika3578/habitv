@@ -2,7 +2,7 @@ package com.dabi.habitv.provider.francetv;
 
 import java.util.LinkedHashSet;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.dabi.habitv.framework.FrameworkConf;
 

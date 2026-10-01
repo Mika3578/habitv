@@ -3,7 +3,7 @@ package com.dabi.habitv.provider.arte;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Host and scheme checks for catalogue metadata URLs (EMAC API and public site).
