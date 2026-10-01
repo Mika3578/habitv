@@ -113,6 +113,24 @@ public class FFMPEGCmdExecutor extends CmdExecutor {
 	}
 
 	@Override
+	public String getProgression() {
+		synchronized (getProgressLock()) {
+			final DownloadProgressSnapshot snapshot = progressSnapshot;
+			if (snapshot != null) {
+				if (snapshot.isIndeterminate()) {
+					return null;
+				}
+				return FfmpegProgressParser.toProgressionString(snapshot);
+			}
+			final String progression = super.getProgression();
+			if (progression != null && progression.startsWith("stage:")) {
+				return null;
+			}
+			return progression;
+		}
+	}
+
+	@Override
 	public DownloadProgressSnapshot getProgressSnapshot() {
 		synchronized (getProgressLock()) {
 			final DownloadProgressSnapshot snapshot = progressSnapshot;

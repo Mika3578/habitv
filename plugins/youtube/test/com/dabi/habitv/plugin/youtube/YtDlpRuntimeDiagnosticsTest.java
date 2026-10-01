@@ -124,9 +124,23 @@ public class YtDlpRuntimeDiagnosticsTest {
 			}
 		} finally {
 			YtDlpRuntimeDiagnostics.setPreflightTimeoutMillisForTests(null);
-			binDir.delete();
-			parent.delete();
+			deleteRecursively(parent);
 		}
+	}
+
+	private static void deleteRecursively(final File file) {
+		if (file == null || !file.exists()) {
+			return;
+		}
+		if (file.isDirectory()) {
+			final File[] children = file.listFiles();
+			if (children != null) {
+				for (final File child : children) {
+					deleteRecursively(child);
+				}
+			}
+		}
+		file.delete();
 	}
 
 	@Test

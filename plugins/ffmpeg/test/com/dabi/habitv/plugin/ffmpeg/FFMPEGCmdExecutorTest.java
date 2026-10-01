@@ -1,6 +1,7 @@
 package com.dabi.habitv.plugin.ffmpeg;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
@@ -14,6 +15,13 @@ public class FFMPEGCmdExecutorTest {
 		final DownloadProgressSnapshot snapshot = FFMPEGCmdExecutor.snapshotFromLegacyProgressionString("50");
 		assertEquals(DownloadStage.REMUXING, snapshot.getStage());
 		assertEquals(0.5d, snapshot.getProgressRatio().doubleValue(), 0.0001d);
+	}
+
+	@Test
+	public void getProgressionHidesIndeterminateStageTokens() {
+		final FFMpegTestExecutor executor = new FFMpegTestExecutor("", "");
+		executor.progressLine("duration=10.000000");
+		assertNull(executor.legacyProgression());
 	}
 
 	@Test
@@ -38,6 +46,10 @@ public class FFMPEGCmdExecutorTest {
 
 		DownloadProgressSnapshot readSnapshot() {
 			return getProgressSnapshot();
+		}
+
+		String legacyProgression() {
+			return getProgression();
 		}
 	}
 }
