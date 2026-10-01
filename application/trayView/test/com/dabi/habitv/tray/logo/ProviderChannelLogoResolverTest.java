@@ -103,18 +103,46 @@ public class ProviderChannelLogoResolverTest {
 	}
 
 	@Test
-	public void displaySizeUsesProviderAndChannelSizes() {
+	public void displaySizeUsesProviderAndChannelBoxes() {
 		final CategoryDTO root = new CategoryDTO("francetv", new HashSet<CategoryDTO>());
 		final CategoryDTO channel = new CategoryDTO("francetv", "France 2",
 				"https://www.france.tv/france-2/", "mp4");
 		root.addSubCategory(channel);
 
-		assertEquals(ProviderChannelLogoResolver.PROVIDER_DISPLAY_SIZE_PX,
-				ProviderChannelLogoResolver.displaySizePx(root));
+		assertEquals(ProviderChannelLogoResolver.PROVIDER_DISPLAY_WIDTH_PX,
+				ProviderChannelLogoResolver.displayWidthPx(root));
+		assertEquals(ProviderChannelLogoResolver.PROVIDER_DISPLAY_HEIGHT_PX,
+				ProviderChannelLogoResolver.displayHeightPx(root));
 		assertEquals(ProviderChannelLogoResolver.CHANNEL_DISPLAY_SIZE_PX,
-				ProviderChannelLogoResolver.displaySizePx(channel));
-		assertEquals(ProviderChannelLogoResolver.PROVIDER_DISPLAY_SIZE_PX,
-				ProviderChannelLogoResolver.displaySizePx(null));
+				ProviderChannelLogoResolver.displayWidthPx(channel));
+		assertEquals(ProviderChannelLogoResolver.CHANNEL_DISPLAY_SIZE_PX,
+				ProviderChannelLogoResolver.displayHeightPx(channel));
+		assertEquals(ProviderChannelLogoResolver.PROVIDER_DISPLAY_WIDTH_PX,
+				ProviderChannelLogoResolver.displayWidthPx(null));
+		assertEquals(ProviderChannelLogoResolver.PROVIDER_DISPLAY_HEIGHT_PX,
+				ProviderChannelLogoResolver.displayHeightPx(null));
+	}
+
+	@Test
+	public void resolvesTf1PlusChannelsFromWatAssetDir() {
+		final RecordingProbe probe = new RecordingProbe();
+		probe.add("icons/channels/wat/tf1.png");
+		probe.add("icons/channels/tf1plus/tf1.png");
+		final ProviderChannelLogoResolver resolver = new ProviderChannelLogoResolver(probe);
+		final CategoryDTO root = new CategoryDTO("tf1plus", new HashSet<CategoryDTO>());
+		final CategoryDTO channel = new CategoryDTO("tf1plus", "TF1", "http://tf1", "mp4");
+		root.addSubCategory(channel);
+
+		assertTrue(resolver.resolveClasspathResource(channel).isPresent());
+
+		// tf1plus directory wins when both exist
+		assertEquals("icons/channels/tf1plus/tf1.png",
+				resolver.resolveClasspathResource(channel).get());
+
+		final CategoryDTO legacyRoot = new CategoryDTO("wat", new HashSet<CategoryDTO>());
+		final CategoryDTO legacyChannel = new CategoryDTO("wat", "TF1", "http://tf1", "mp4");
+		legacyRoot.addSubCategory(legacyChannel);
+		assertTrue(resolver.resolveClasspathResource(legacyChannel).isPresent());
 	}
 
 	@Test

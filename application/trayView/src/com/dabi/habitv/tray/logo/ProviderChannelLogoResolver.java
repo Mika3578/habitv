@@ -16,11 +16,14 @@ import com.dabi.habitv.api.plugin.dto.CategoryDTO;
  */
 public final class ProviderChannelLogoResolver {
 
-	/** Provider-root logo size in the category tree (px). */
-	public static final int PROVIDER_DISPLAY_SIZE_PX = 24;
+	/** Provider-root logo box width in the category tree (px). */
+	public static final int PROVIDER_DISPLAY_WIDTH_PX = 56;
 
-	/** Channel-level logo size in the category tree (px). */
-	public static final int CHANNEL_DISPLAY_SIZE_PX = 32;
+	/** Provider-root logo box height in the category tree (px). */
+	public static final int PROVIDER_DISPLAY_HEIGHT_PX = 16;
+
+	/** Channel-level logo box size in the category tree (px, square). */
+	public static final int CHANNEL_DISPLAY_SIZE_PX = 18;
 
 	private static final Pattern FRANCE_TV_SLUG = Pattern
 			.compile("(?:https?://)?(?:www\\.)?france\\.tv/([^/?#]+)/?", Pattern.CASE_INSENSITIVE);
@@ -52,10 +55,27 @@ public final class ProviderChannelLogoResolver {
 		if (isChannelLevel(category)) {
 			final String channelKey = channelKey(plugin, category);
 			if (channelKey != null) {
-				return existing("icons/channels/" + plugin + "/" + channelKey + ".png");
+				for (final String dir : pluginAssetDirs(plugin)) {
+					final Optional<String> found =
+							existing("icons/channels/" + dir + "/" + channelKey + ".png");
+					if (found.isPresent()) {
+						return found;
+					}
+				}
 			}
 		}
 		return Optional.empty();
+	}
+
+	/**
+	 * Asset directory candidates for a plugin id. Plugins sharing the same
+	 * channel family (legacy `wat`, now `tf1plus`) resolve to one directory.
+	 */
+	static String[] pluginAssetDirs(final String plugin) {
+		if ("tf1plus".equalsIgnoreCase(plugin) || "wat".equalsIgnoreCase(plugin)) {
+			return new String[] {"tf1plus", "wat"};
+		}
+		return new String[] {plugin};
 	}
 
 	static boolean isProviderRoot(final CategoryDTO category) {
@@ -68,13 +88,23 @@ public final class ProviderChannelLogoResolver {
 	}
 
 	/**
-	 * @return pixel size for a resolved logo at this tree level
+	 * @return display box width for a resolved logo at this tree level
 	 */
-	public static int displaySizePx(final CategoryDTO category) {
+	public static int displayWidthPx(final CategoryDTO category) {
 		if (category != null && isChannelLevel(category)) {
 			return CHANNEL_DISPLAY_SIZE_PX;
 		}
-		return PROVIDER_DISPLAY_SIZE_PX;
+		return PROVIDER_DISPLAY_WIDTH_PX;
+	}
+
+	/**
+	 * @return display box height for a resolved logo at this tree level
+	 */
+	public static int displayHeightPx(final CategoryDTO category) {
+		if (category != null && isChannelLevel(category)) {
+			return CHANNEL_DISPLAY_SIZE_PX;
+		}
+		return PROVIDER_DISPLAY_HEIGHT_PX;
 	}
 
 	static String normalizeId(final String raw) {

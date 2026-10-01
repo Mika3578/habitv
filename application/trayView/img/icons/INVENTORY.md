@@ -6,10 +6,17 @@ logo research pass. Runtime commit status is explicit.
 | Brand | Preferred source type | Candidate | Format | License (Commons API / page) | Commit? |
 |-------|----------------------|-----------|--------|------------------------------|---------|
 | France.tv | Official + Commons | File:France.tv_-_logo_2022.svg | SVG | Public domain (PD-textlogo) | Yes → `providers/francetv.png` |
-| France 2 | Commons | File:France_2_-_logo_2018.svg | SVG | PD-textlogo | Yes |
-| France 3 | Commons | File:France_3_-_logo_2018.svg | SVG | PD-textlogo | Yes |
-| France 4 | Commons | File:France_4_-_logo_2018.svg | SVG | PD-textlogo | Yes |
-| France 5 | Commons | File:France_5_-_logo_2018.svg | SVG | PD-textlogo | Yes |
+| France 2 | Commons | File:France_2_2018.svg (near-square) | SVG | PD-textlogo | Yes |
+| France 3 | Commons | File:France_3_2018.svg | SVG | PD-textlogo | Yes |
+| France 4 | Commons | File:France_4_2018.svg | SVG | PD-textlogo | Yes |
+| France 5 | Commons | File:France_5_2018.svg | SVG | PD-textlogo | Yes |
+| TF1 | paomedia/chaines-tv-francaises (01.png) | PNG 512x512 | PNG | simple mark / PD-textlogo | Yes |
+| TFX | paomedia (11.png) | PNG 512x512 | PNG | simple mark | Yes |
+| TMC | paomedia (10.png) | PNG 512x512 | PNG | simple mark | Yes |
+| LCI | paomedia (26.png) | PNG 512x512 | PNG | simple mark | Yes |
+| TF1 Séries Films | paomedia (20.png) | PNG 512x512 | PNG | simple mark | Yes |
+| Arte | paomedia (07.png) | PNG 512x512 | PNG | simple mark | Yes |
+| Canal+ | paomedia (04.png) | PNG 512x512 | PNG | simple mark | Yes |
 | franceinfo | Commons | File:Franceinfo.svg | SVG | PD-textlogo | Yes |
 | Arte | Official brand page | corporate.arte.tv visual identity | ZIP (auth) | Requires prior authorisation | **No** |
 | Arte | Commons | File:Arte_Logo_2017.svg / Arte_Logo_2026.svg | SVG | PD-textlogo + trademark | **No** (official policy) |

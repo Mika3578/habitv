@@ -1269,18 +1269,17 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 			if (image == null) {
 				return null;
 			}
-			final int tileSize = ProviderChannelLogoResolver.displaySizePx(item);
-			final int imageSize = Math.max(12, tileSize - 4);
+			final int boxW = ProviderChannelLogoResolver.displayWidthPx(item);
+			final int boxH = ProviderChannelLogoResolver.displayHeightPx(item);
 			final ImageView view = new ImageView(image);
-			view.setFitWidth(imageSize);
-			view.setFitHeight(imageSize);
+			view.setFitWidth(boxW);
+			view.setFitHeight(boxH);
 			view.setPreserveRatio(true);
 			view.setSmooth(true);
 			final StackPane tile = new StackPane(view);
-			tile.setMinSize(tileSize, tileSize);
-			tile.setPrefSize(tileSize, tileSize);
-			tile.setMaxSize(tileSize, tileSize);
-			tile.setStyle("-fx-background-color: rgba(0,0,0,0.06); -fx-background-radius: 3;");
+			tile.setMinSize(boxW, boxH);
+			tile.setPrefSize(boxW, boxH);
+			tile.setMaxSize(boxW, boxH);
 			return tile;
 		} catch (RuntimeException e) {
 			return null;
