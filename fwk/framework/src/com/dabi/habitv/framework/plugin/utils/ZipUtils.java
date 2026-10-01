@@ -45,11 +45,11 @@ public class ZipUtils {
 	}
 
 	private static File safeTarget(final File outputRoot, final String entryName) throws IOException {
-		// Canonical paths resolve symlinks and "..", so the prefix check cannot be
-		// bypassed by traversal or alternate representations of the root.
+		// Canonical paths resolve symlinks and "..", so traversal cannot escape the root.
+		// Path.startsWith compares segments, so sibling folders and root outputs are handled.
 		final File target = new File(outputRoot, entryName);
 		final File canonical = target.getCanonicalFile();
-		if (!canonical.getPath().startsWith(outputRoot.getPath() + File.separator)) {
+		if (!canonical.toPath().startsWith(outputRoot.toPath())) {
 			throw new IOException("Rejected zip entry outside output folder: " + entryName);
 		}
 		return canonical;
