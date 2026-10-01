@@ -47,6 +47,12 @@ public abstract class MyCheckBoxTreeCell<T> extends TreeCell<T> {
 
 	private final CheckBox checkBox;
 
+	private final HBox leadingSlot;
+
+	private final HBox selectionSlot;
+
+	private final HBox graphicRow;
+
 	private ObservableValue<Boolean> booleanProperty;
 
 	private BooleanProperty indeterminateProperty;
@@ -98,7 +104,15 @@ public abstract class MyCheckBoxTreeCell<T> extends TreeCell<T> {
 
 		this.checkBox = new CheckBox();
 		this.checkBox.setAllowIndeterminate(false);
-		setGraphic(checkBox);
+		// dedicated slots: the checkbox is only ever a child of its slot, so
+		// swapping leading graphics never re-parents it (JavaFX parent conflict)
+		this.leadingSlot = new HBox();
+		this.selectionSlot = new HBox();
+		this.selectionSlot.getChildren().add(this.checkBox);
+		this.graphicRow = new HBox(4);
+		this.graphicRow.setAlignment(Pos.CENTER_LEFT);
+		this.graphicRow.getChildren().addAll(this.leadingSlot, this.selectionSlot);
+		setGraphic(graphicRow);
 	}
 
 	/***************************************************************************
@@ -205,15 +219,11 @@ public abstract class MyCheckBoxTreeCell<T> extends TreeCell<T> {
 
 			final Node leading = leadingGraphic(item);
 			final Node selectionGraphic = showCheckBox(item) ? checkBox : new Label("     ");
-			if (leading == null) {
-				setGraphic(selectionGraphic);
-			} else {
-				final HBox row = new HBox(4);
-				row.setAlignment(Pos.CENTER_LEFT);
-				row.getChildren().add(leading);
-				row.getChildren().add(selectionGraphic);
-				setGraphic(row);
-			}
+			// leading/selection live in dedicated slots; the checkbox is never
+			// attached to the cell directly, avoiding parent conflicts on reuse
+			leadingSlot.getChildren().setAll(leading == null ? new Node[0] : new Node[]{leading});
+			selectionSlot.getChildren().setAll(selectionGraphic);
+			setGraphic(graphicRow);
 
 			// uninstall bindings
 			if (booleanProperty != null) {
