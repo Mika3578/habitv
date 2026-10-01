@@ -1,7 +1,6 @@
 package com.dabi.habitv.plugin.ffmpeg;
 
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -119,31 +118,28 @@ public final class FfmpegProgressParser {
 		if (raw == null || raw.trim().isEmpty()) {
 			return null;
 		}
-		final String token = raw.trim();
-		final String[] parts = token.split(":");
+		final String[] parts = raw.trim().split(":");
 		try {
+			final double totalSeconds;
 			if (parts.length == 3) {
 				final long hours = Long.parseLong(parts[0]);
 				final long minutes = Long.parseLong(parts[1]);
 				final double seconds = Double.parseDouble(parts[2].replace(',', '.'));
-				final long totalSeconds = TimeUnit.HOURS.toSeconds(hours) + TimeUnit.MINUTES.toSeconds(minutes)
-						+ (long) seconds;
-				final long microsFromSeconds = totalSeconds * 1_000_000L;
-				final long fractionalMicros = Math.round((seconds - Math.floor(seconds)) * 1_000_000d);
-				return Long.valueOf(microsFromSeconds + fractionalMicros);
-			}
-			if (parts.length == 2) {
+				totalSeconds = hours * 3600d + minutes * 60d + seconds;
+			} else if (parts.length == 2) {
 				final long minutes = Long.parseLong(parts[0]);
 				final double seconds = Double.parseDouble(parts[1].replace(',', '.'));
-				final long totalSeconds = TimeUnit.MINUTES.toSeconds(minutes) + (long) seconds;
-				final long microsFromSeconds = totalSeconds * 1_000_000L;
-				final long fractionalMicros = Math.round((seconds - Math.floor(seconds)) * 1_000_000d);
-				return Long.valueOf(microsFromSeconds + fractionalMicros);
+				totalSeconds = minutes * 60d + seconds;
+			} else {
+				return null;
 			}
+			if (totalSeconds < 0d) {
+				return null;
+			}
+			return Long.valueOf(Math.round(totalSeconds * 1_000_000d));
 		} catch (final NumberFormatException e) {
 			return null;
 		}
-		return null;
 	}
 
 	static Long parseLongValue(final String raw) {

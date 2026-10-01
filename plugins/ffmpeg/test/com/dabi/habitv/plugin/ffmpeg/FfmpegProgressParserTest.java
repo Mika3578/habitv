@@ -48,4 +48,16 @@ public class FfmpegProgressParserTest {
 		final DownloadProgressSnapshot snapshot = FfmpegProgressParser.parseLine("out_time=00:00:01.000000", state);
 		assertEquals(0.5d, snapshot.getProgressRatio().doubleValue(), 0.01d);
 	}
+
+	@Test
+	public void parseHhMmSsDurationMinutesAndFractionalSeconds() {
+		assertEquals(Long.valueOf(65_500_000L),
+				FfmpegProgressParser.parseHhMmSsDurationToMicros("01:05.5"));
+	}
+
+	@Test
+	public void parseHhMmSsDurationHoursMinutesSecondsAndFraction() {
+		assertEquals(Long.valueOf(3_723_250_000L),
+				FfmpegProgressParser.parseHhMmSsDurationToMicros("1:02:03.25"));
+	}
 }

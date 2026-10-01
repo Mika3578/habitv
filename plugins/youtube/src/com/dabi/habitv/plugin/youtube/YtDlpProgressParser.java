@@ -5,6 +5,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.dabi.habitv.api.plugin.holder.DownloadProgressSnapshot;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.dabi.habitv.api.plugin.holder.DownloadStage;
 
 /**
@@ -33,6 +36,8 @@ public final class YtDlpProgressParser {
 	private static final Pattern DOWNLOAD_DESTINATION = Pattern.compile(
 			"\\[download\\]\\s+Destination:\\s+(.+)",
 			Pattern.CASE_INSENSITIVE);
+
+	private static final ObjectMapper PROGRESS_JSON = new ObjectMapper();
 
 	private YtDlpProgressParser() {
 	}
@@ -104,35 +109,44 @@ public final class YtDlpProgressParser {
 		if (json.isEmpty() || !json.startsWith("{")) {
 			return null;
 		}
-		final String phase = jsonStringField(json, "phase");
+		final JsonNode root;
+		try {
+			root = PROGRESS_JSON.readTree(json);
+		} catch (final JsonProcessingException e) {
+			return null;
+		}
+		if (root == null || !root.isObject()) {
+			return null;
+		}
+		final String phase = jsonTextField(root, "phase");
 		if ("download".equalsIgnoreCase(phase)) {
-			return buildTemplateDownloadSnapshot(json, previous);
+			return buildTemplateDownloadSnapshot(root, previous);
 		}
 		if ("postprocess".equalsIgnoreCase(phase)) {
-			final String pp = jsonStringField(json, "pp");
+			final String pp = jsonTextField(root, "pp");
 			final DownloadStage stage = stageFromPostProcessorName(pp);
 			return DownloadProgressSnapshot.indeterminate(stage, pp == null || pp.isEmpty() ? null : pp);
 		}
 		return null;
 	}
 
-	private static DownloadProgressSnapshot buildTemplateDownloadSnapshot(final String json,
+	private static DownloadProgressSnapshot buildTemplateDownloadSnapshot(final JsonNode root,
 			final DownloadProgressSnapshot previous) {
-		final Double pct = jsonNumberField(json, "pct");
+		final Double pct = jsonNumberField(root, "pct");
 		final Double ratio = pct == null ? null
 				: Double.valueOf(Math.min(1.0d, Math.max(0.0d, pct.doubleValue() / 100.0d)));
 
-		final String totalToken = jsonStringField(json, "total");
+		final String totalToken = jsonTextField(root, "total");
 		final Long totalBytes = parseSizeToBytes(totalToken);
 		Long downloadedBytes = null;
 		if (ratio != null && totalBytes != null) {
 			downloadedBytes = Long.valueOf(Math.round(totalBytes.doubleValue() * ratio.doubleValue()));
 		}
 
-		final Double bytesPerSecond = parseSpeedToBytesPerSecond(jsonStringField(json, "speed"));
-		final Long etaSeconds = parseEtaToSeconds(jsonStringField(json, "eta"));
+		final Double bytesPerSecond = parseSpeedToBytesPerSecond(jsonTextField(root, "speed"));
+		final Long etaSeconds = parseEtaToSeconds(jsonTextField(root, "eta"));
 
-		final String dest = jsonStringField(json, "dest");
+		final String dest = jsonTextField(root, "dest");
 		final String detail;
 		if (dest != null && !dest.isEmpty()) {
 			detail = detectStreamLabel(dest);
@@ -156,29 +170,26 @@ public final class YtDlpProgressParser {
 		return fromTag == null ? DownloadStage.POST_PROCESSING : fromTag;
 	}
 
-	static String jsonStringField(final String json, final String field) {
-		if (json == null || field == null) {
+	static String jsonTextField(final JsonNode root, final String field) {
+		if (root == null || field == null) {
 			return null;
 		}
-		final Matcher matcher = Pattern.compile("\"" + Pattern.quote(field) + "\"\\s*:\\s*\"([^\"]*)\"")
-				.matcher(json);
-		return matcher.find() ? matcher.group(1) : null;
+		final JsonNode node = root.get(field);
+		if (node == null || node.isNull() || !node.isValueNode()) {
+			return null;
+		}
+		return node.asText();
 	}
 
-	static Double jsonNumberField(final String json, final String field) {
-		if (json == null || field == null) {
+	static Double jsonNumberField(final JsonNode root, final String field) {
+		if (root == null || field == null) {
 			return null;
 		}
-		final Matcher matcher = Pattern.compile("\"" + Pattern.quote(field) + "\"\\s*:\\s*([0-9]+(?:\\.[0-9]+)?)")
-				.matcher(json);
-		if (!matcher.find()) {
+		final JsonNode node = root.get(field);
+		if (node == null || node.isNull() || !node.isNumber()) {
 			return null;
 		}
-		try {
-			return Double.valueOf(parseLocaleNumber(matcher.group(1)));
-		} catch (final NumberFormatException e) {
-			return null;
-		}
+		return Double.valueOf(node.doubleValue());
 	}
 
 	private static DownloadProgressSnapshot buildDownloadSnapshot(final Matcher matcher,

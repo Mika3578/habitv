@@ -204,4 +204,23 @@ public class YtDlpProgressParserTest {
 		assertEquals(DownloadStage.DOWNLOADING, snapshot.getStage());
 		assertEquals(0.22d, snapshot.getProgressRatio().doubleValue(), 0.0001d);
 	}
+
+	@Test
+	public void invalidHabitvProgressJsonFallsBackToLegacyParsing() {
+		final String line = YoutubeConf.PROGRESS_LINE_PREFIX + "{not json}";
+		final DownloadProgressSnapshot snapshot = YtDlpProgressParser.parse(
+				line + " [download]  30.0% of 1.00MiB at 1.00MiB/s ETA 00:01", null);
+		assertNotNull(snapshot);
+		assertEquals(0.3d, snapshot.getProgressRatio().doubleValue(), 0.0001d);
+	}
+
+	@Test
+	public void parseHabitvProgressDestWithEscapedQuotes() {
+		final String line = YoutubeConf.PROGRESS_LINE_PREFIX
+				+ "{\"phase\":\"download\",\"pct\":50.0,\"dest\":\"ep\\\"isode.f137.mp4\"}";
+		final DownloadProgressSnapshot snapshot = YtDlpProgressParser.parse(line, null);
+		assertNotNull(snapshot);
+		assertEquals("Vidéo", snapshot.getDetail());
+		assertEquals(0.5d, snapshot.getProgressRatio().doubleValue(), 0.0001d);
+	}
 }
