@@ -263,7 +263,7 @@ cat > "$APPLY_FIXTURE/application/app/pom.xml" <<'EOF'
 EOF
 
 echo -n "Testing: apply --check fails before bump ... "
-if "$APPLY_SCRIPT" --root "$APPLY_FIXTURE" --type feat --check >/dev/null 2>&1; then
+if bash "$APPLY_SCRIPT" --root "$APPLY_FIXTURE" --type feat --check >/dev/null 2>&1; then
   echo "❌ (expected failure)"
   TESTS_FAILED=$((TESTS_FAILED + 1))
 else
@@ -272,7 +272,7 @@ else
 fi
 
 echo -n "Testing: apply feat bumps parent and preserves plugin override ... "
-"$APPLY_SCRIPT" --root "$APPLY_FIXTURE" --type feat >/dev/null
+bash "$APPLY_SCRIPT" --root "$APPLY_FIXTURE" --type feat >/dev/null
 root_v="$(sed -n 's/.*<version>\([^<]*\)<\/version>.*/\1/p' "$APPLY_FIXTURE/pom.xml" | head -n1 | tr -d '[:space:]')"
 parent_v="$(tr '\n' ' ' < "$APPLY_FIXTURE/plugins/demo/pom.xml" | sed -n 's/.*<parent>\(.*\)<\/parent>.*/\1/p' | sed -n 's/.*<version>\([^<]*\)<\/version>.*/\1/p' | head -n1 | tr -d '[:space:]')"
 plugin_v="$(grep -n '<version>' "$APPLY_FIXTURE/plugins/demo/pom.xml" | tail -n1 | sed -n 's/.*<version>\([^<]*\)<\/version>.*/\1/p' | tr -d '[:space:]')"
@@ -285,7 +285,7 @@ else
   TESTS_FAILED=$((TESTS_FAILED + 1))
 fi
 echo -n "Testing: apply --check passes after bump ... "
-if "$APPLY_SCRIPT" --root "$APPLY_FIXTURE" --to 1.1.0-SNAPSHOT --check >/dev/null 2>&1; then
+if bash "$APPLY_SCRIPT" --root "$APPLY_FIXTURE" --to 1.1.0-SNAPSHOT --check >/dev/null 2>&1; then
   echo "✅"
   TESTS_PASSED=$((TESTS_PASSED + 1))
 else
