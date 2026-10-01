@@ -17,9 +17,12 @@ Bundled files come from two source families:
 - **Wikimedia Commons** entries marked **Public domain / PD-textlogo**
   (or **CC0** for TF1+).
 - **[paomedia/chaines-tv-francaises](https://github.com/paomedia/chaines-tv-francaises)**
-  512×512 TNT marks (no explicit license file; marks are simple
-  text/geometric logos, equivalent PD-textlogo status; used as source of
-  current on-air identities for TF1 group channels, arte and Canal+).
+  512×512 TNT marks. The repository carries **no explicit license file**;
+  each committed file was cross-checked against its closest
+  **Commons PD-textlogo equivalent** (same simple text/geometric mark) —
+  the two render identically at tree size. Copyright status therefore
+  follows the PD-textlogo analysis below. Removal path: delete the PNG
+  and mapping row; the UI falls back to text-only automatically.
 
 These marks remain **trademarks** of their owners. Habitv uses them only
 as small identification icons next to existing text labels in the
