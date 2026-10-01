@@ -28,11 +28,9 @@ function Test-ExactLogin([string] $login, [string[]] $allowed) {
 $sources = [System.Collections.Generic.List[object]]::new()
 
 # --- Copilot (required final reviewer when policy applies) ---
-# Exact bot identities only (do not substring-match "copilot").
+# Exact GitHub App bot identities only (no squattable human logins).
 $copilotLogins = @(
     'copilot-pull-request-reviewer[bot]',
-    'copilot-pull-request-reviewer',
-    'copilot',
     'github-copilot[bot]'
 )
 $copilot = @($Reviews | Where-Object { Test-ExactLogin $_.author.login $copilotLogins })
@@ -54,7 +52,7 @@ if ($copilot.Count -eq 0) {
 }
 
 # --- Amazon Q ---
-$amazonQLogins = @('amazon-q-developer[bot]', 'amazon-q[bot]', 'amazon-q')
+$amazonQLogins = @('amazon-q-developer[bot]', 'amazon-q[bot]')
 $aq = @($Reviews | Where-Object { Test-ExactLogin $_.author.login $amazonQLogins })
 if ($aq.Count -gt 0) {
     $r = $aq[-1]
@@ -70,7 +68,7 @@ if ($aq.Count -gt 0) {
 
 # --- Cursor / routing approval ---
 $cursor = @($Reviews | Where-Object {
-    Test-ExactLogin $_.author.login @('cursor', 'cursor[bot]')
+    Test-ExactLogin $_.author.login @('cursor[bot]')
 })
 foreach ($r in $cursor) {
     $st = 'APPROVAL_ONLY'
@@ -85,7 +83,7 @@ foreach ($r in $cursor) {
 }
 
 # --- Issue comments (bots that post to conversation, not always as reviews) ---
-$codeRabbitLogins = @('coderabbitai[bot]', 'coderabbitai', 'coderabbit')
+$codeRabbitLogins = @('coderabbitai[bot]')
 $cr = @($IssueComments | Where-Object { Test-ExactLogin $_.user.login $codeRabbitLogins })
 if ($cr.Count -gt 0) {
     $body = ($cr | ForEach-Object { $_.body }) -join ' '
@@ -93,7 +91,7 @@ if ($cr.Count -gt 0) {
     $sources.Add([ordered]@{ source = 'coderabbit'; execution_state = $st })
 }
 
-$sourceryLogins = @('sourcery-ai[bot]', 'sourcery-ai', 'sourcery')
+$sourceryLogins = @('sourcery-ai[bot]')
 $so = @($IssueComments | Where-Object { Test-ExactLogin $_.user.login $sourceryLogins })
 if ($so.Count -gt 0) {
     $body = ($so | ForEach-Object { $_.body }) -join ' '
@@ -106,17 +104,13 @@ if ($so.Count -gt 0) {
     }
 }
 
-$sonarLogins = @('sonarqubecloud[bot]', 'sonarcloud[bot]', 'sonarcloud', 'sonar')
+$sonarLogins = @('sonarqubecloud[bot]', 'sonarcloud[bot]')
 $sonar = @($IssueComments | Where-Object { Test-ExactLogin $_.user.login $sonarLogins })
 if ($sonar.Count -gt 0) {
     $sources.Add([ordered]@{ source = 'sonarcloud'; execution_state = 'STATIC_ANALYSIS' })
 }
 
-# Status context "success" without reading body is insufficient for CodeRabbit
-$crCtx = @($StatusRollup | Where-Object { $_.context -eq 'CodeRabbit' -or $_.name -eq 'CodeRabbit' })
-if ($crCtx.Count -gt 0 -and -not ($sources | Where-Object { $_.source -eq 'coderabbit' })) {
-    $sources.Add([ordered]@{ source = 'coderabbit'; execution_state = 'SKIPPED'; note = 'status_context_only' })
-}
+# Do not infer CodeRabbit SKIPPED from a status context alone.
 
 $countsForFinal = @('SUBSTANTIVE', 'NO_FINDINGS')
 $onHeadSubstantive = @($sources | Where-Object {

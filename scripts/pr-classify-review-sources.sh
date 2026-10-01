@@ -35,22 +35,19 @@ jq -n \
     reduce $pats[] as $p (false; . or matchp($text; $p));
   def is_copilot_login($login):
     ($login // "") | ascii_downcase | . == "copilot-pull-request-reviewer[bot]"
-      or . == "copilot-pull-request-reviewer"
-      or . == "copilot" or . == "github-copilot[bot]";
+      or . == "github-copilot[bot]";
   def is_amazon_q_login($login):
     ($login // "") | ascii_downcase | . == "amazon-q-developer[bot]"
-      or . == "amazon-q[bot]" or . == "amazon-q";
+      or . == "amazon-q[bot]";
   def is_cursor_login($login):
-    ($login // "") | ascii_downcase | . == "cursor" or . == "cursor[bot]";
+    ($login // "") | ascii_downcase | . == "cursor[bot]";
   def is_coderabbit_login($login):
-    ($login // "") | ascii_downcase | . == "coderabbitai[bot]"
-      or . == "coderabbitai" or . == "coderabbit";
+    ($login // "") | ascii_downcase | . == "coderabbitai[bot]";
   def is_sourcery_login($login):
-    ($login // "") | ascii_downcase | . == "sourcery-ai[bot]"
-      or . == "sourcery-ai" or . == "sourcery";
+    ($login // "") | ascii_downcase | . == "sourcery-ai[bot]";
   def is_sonar_login($login):
     ($login // "") | ascii_downcase | . == "sonarqubecloud[bot]"
-      or . == "sonarcloud[bot]" or . == "sonarcloud" or . == "sonar";
+      or . == "sonarcloud[bot]";
 
   ($reviews | map(select(is_copilot_login(.author.login)))) as $copilot |
   ($reviews | map(select(is_amazon_q_login(.author.login)))) as $aq |

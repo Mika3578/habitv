@@ -56,10 +56,13 @@ fi
 command="$("$JQ_BIN" -r '.command // empty' <<<"$input" | tr -d '\r')"
 cwd="$("$JQ_BIN" -r '.cwd // empty' <<<"$input" | tr -d '\r')"
 
-# Normalize quoted -C paths and git -c config flags so verb detection still works.
+# Normalize quoted -C paths, quoted publish verbs, and git -c config flags.
 cmd_norm="$(printf '%s' "$command" | sed -E \
   -e 's/-C[[:space:]]+"[^"]+"/-C _PATH_/g' \
-  -e "s/-C[[:space:]]+'[^']+'/-C _PATH_/g")"
+  -e "s/-C[[:space:]]+'[^']+'/-C _PATH_/g" \
+  -e 's/"push"/push/g; s/'\''push'\''/push/g' \
+  -e 's/"commit"/commit/g; s/'\''commit'\''/commit/g' \
+  -e 's/"create"/create/g; s/'\''create'\''/create/g')"
 _strip_i=0
 while [[ $_strip_i -lt 16 ]]; do
   _cmd_next="$(printf '%s' "$cmd_norm" | sed -E \
@@ -149,6 +152,11 @@ fi
 
 canonical='^(feat|fix|docs|test|refactor|chore|ci)/[a-z0-9]+(-[a-z0-9]+)*$'
 if [[ "$branch" =~ $canonical ]]; then
+  scope="${branch#*/}"
+  # Match check-branch-name.sh: reject generated-looking -1a2e suffixes.
+  if [[ "$scope" =~ -[0-9][0-9a-f]{3}$ ]]; then
+    deny "Publishing blocked: generated-looking branch suffix on '$branch'. Use a canonical <type>/<scope> without agent hex suffixes."
+  fi
   printf '%s\n' '{"permission":"allow"}'
   exit 0
 fi

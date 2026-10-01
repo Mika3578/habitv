@@ -213,10 +213,13 @@ Deduplicate before acting on new bot output.
 | Overview | Treat as |
 |----------|----------|
 | `Findings: None`, or only PR-body / attribution / process complaints | `NON_BLOCKING` — one short reject reply; do not edit the body |
-| Points at open inline findings | Work the **threads**; ignore the badge once threads are adjudicated |
+| `Findings ≥ 1` or points at open inline findings | **BLOCKING code work** — investigate, fix or reject with evidence, **push**, reply, resolve after verify |
 | Quota / unable to review | `RATE_LIMITED` — not a gate |
 
-Do not open fixup loops to make an overview badge turn green.
+Agents must not skip open Copilot (or other) **code** threads. Leaving
+them unresolved while claiming Ready/merge-ready is a policy violation.
+
+Do not open fixup loops only to make an overview badge turn green.
 
 ## Four different concepts (do not conflate)
 

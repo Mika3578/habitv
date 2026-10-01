@@ -222,15 +222,17 @@ are satisfied.
 - **Goal:** code that is correct and reviewable. Do not spend cycles on
   third-party PR-body footers, overview meta text, or process theater.
 - Every **actionable code finding** (inline review thread on the diff)
-  receives a disposition (fix, reject with evidence, duplicate, or
-  follow-up).
+  is **mandatory**. The agent must investigate, implement or reject with
+  evidence, push the branch, reply on the thread, and resolve only after
+  verification. Do not leave open Copilot/code-review findings and move
+  on. Do not treat them as optional or overview-only noise.
 - **Copilot overview** ("Needs a closer look" / "Changes recommended"):
   - If **Findings: None**, or the text only complains about PR-body
     footers / attribution / process: **NON_BLOCKING**. One short reject
     reply is enough; do not clean the body or open a fixup loop.
-  - If it points at open inline findings: treat those threads as the
-    work; do not chase the overview badge itself.
-- Addressed inline threads get a concise reply, then resolution only after
+  - If **Findings ≥ 1** or it points at open inline findings: those
+    threads are **BLOCKING** until fixed or rejected with evidence and
+    pushed. Fix the code; do not chase the overview badge itself.- Addressed inline threads get a concise reply, then resolution only after
   the fix or rejection is verified; re-fetch GitHub and confirm
   `isResolved`. Do not resolve unanswered or unexamined threads.
 - **Live GitHub PR state is authoritative** over local memory or ledgers.
