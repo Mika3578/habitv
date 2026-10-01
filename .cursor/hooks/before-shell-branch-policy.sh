@@ -56,24 +56,32 @@ fi
 command="$("$JQ_BIN" -r '.command // empty' <<<"$input" | tr -d '\r')"
 cwd="$("$JQ_BIN" -r '.cwd // empty' <<<"$input" | tr -d '\r')"
 
-# Normalize quoted -C paths and -c config flags so verb detection still works.
+# Normalize quoted -C paths and git -c config flags so verb detection still works.
 cmd_norm="$(printf '%s' "$command" | sed -E \
   -e 's/-C[[:space:]]+"[^"]+"/-C _PATH_/g' \
-  -e "s/-C[[:space:]]+'[^']+'/-C _PATH_/g" \
-  -e 's/-c[[:space:]]+[^[:space:]]+//g')"
+  -e "s/-C[[:space:]]+'[^']+'/-C _PATH_/g")"
+_strip_i=0
+while [[ $_strip_i -lt 16 ]]; do
+  _cmd_next="$(printf '%s' "$cmd_norm" | sed -E \
+    's#(^|[[:space:];&|])([^[:space:]]*/)?git(\.exe)?([[:space:]]+-C[[:space:]]+[^[:space:]]+)*[[:space:]]+-c[[:space:]]+[^[:space:]]+#\1\2git\3#g')"
+  [[ "$_cmd_next" == "$cmd_norm" ]] && break
+  cmd_norm="$_cmd_next"
+  _strip_i=$((_strip_i + 1))
+done
+unset _strip_i _cmd_next
 # Strip remaining simple quotes for cd / wrapper checks.
 cmd_unquoted="$(printf '%s' "$cmd_norm" | sed -E 's/"[^"]*"//g; s/'\''[^'\'']*'\''//g')"
 
 # Ambiguous indirection: fail closed when publish verbs appear.
 ambiguous=0
-if [[ "$cmd_unquoted" =~ (^|[[:space:];&|])(bash|sh|zsh|dash|pwsh|powershell)([[:space:]]|\.exe) ]] || \
-   [[ "$cmd_unquoted" =~ (^|[[:space:];&|])(eval|source|\.)[[:space:]] ]] || \
-   [[ "$command" == *'$('* ]] || [[ "$command" == *'`'* ]]; then
+if [[ "$cmd_unquoted" =~ (^|[[:space:];&|])([^[:space:]]*/)?(bash|sh|zsh|dash|pwsh|powershell)([[:space:]]|\.exe) ]] || \
+   [[ "$cmd_unquoted" =~ (^|[[:space:];&|])(eval|source)[[:space:]] ]]; then
   ambiguous=1
 fi
 
 looks_publish=0
-if [[ "$cmd_unquoted" =~ (push|commit|pr[[:space:]]+create) ]]; then
+if [[ "$cmd_unquoted" =~ (push|commit|pr[[:space:]]+create) ]] || \
+   [[ "$cmd_norm" =~ (push|commit|pr[[:space:]]+create) ]]; then
   looks_publish=1
 fi
 
