@@ -1,7 +1,6 @@
 package com.dabi.habitv.provider.novo19;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
