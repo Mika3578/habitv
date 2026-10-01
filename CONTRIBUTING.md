@@ -24,6 +24,9 @@ PR titles use Conventional Commits.
 Target **`Mika3578/habitv`** → **`develop`**. Linear history on work
 branches (rebase, no merge commits).
 
+Before merging, follow the **Merge checklist** in
+[`docs/development.md`](docs/development.md) (required CI, ruleset sync).
+
 ```
 <type>(<scope>): <subject>
 ```
