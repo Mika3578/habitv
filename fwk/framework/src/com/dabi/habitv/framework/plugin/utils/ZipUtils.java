@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -45,11 +46,13 @@ public class ZipUtils {
 	}
 
 	private static File safeTarget(final File outputRoot, final String entryName) throws IOException {
-		// Canonical paths resolve symlinks and "..", so traversal cannot escape the root.
-		// Path.startsWith compares segments, so sibling folders and root outputs are handled.
+		// Canonical paths resolve symlinks and ".."; Path.startsWith compares name
+		// elements so sibling paths (e.g. /out vs /outside) are not confused.
 		final File target = new File(outputRoot, entryName);
 		final File canonical = target.getCanonicalFile();
-		if (!canonical.toPath().startsWith(outputRoot.toPath())) {
+		final Path rootPath = outputRoot.getCanonicalFile().toPath();
+		final Path targetPath = canonical.toPath();
+		if (!targetPath.startsWith(rootPath)) {
 			throw new IOException("Rejected zip entry outside output folder: " + entryName);
 		}
 		return canonical;
