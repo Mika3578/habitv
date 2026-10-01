@@ -31,7 +31,7 @@ still points at `youtube-dl`, switch it to yt-dlp.
 
 | Group | Modules |
 |-------|---------|
-| Recently worked | `francetv` (ex Pluzz), `youtube` (yt-dlp), `novo19` |
+| Recently worked | `francetv` (ex Pluzz), `youtube` (yt-dlp), `novo19`, `rtbfAuvio` |
 | Needs rewrite / investigation | `arte`, `6play`, `lequipe`, `footyroom`, `sfr`, `globalnews`, `mlssoccer` |
 | Obsolete / degraded endpoints | `canalPlus` (CStar; D8 removed), `wat`, `beinsport`, `clubic` |
 | Tools / infrastructure | `curl`, `ffmpeg`, `aria2`, `cmd`, `file`, `RSS`, `rclone`, `rtmpDump`, `adobeHDS`, `email`, `plugin-tester` |
@@ -41,7 +41,8 @@ Labels: **working** (validated), **degraded**, **protected** (auth/geo/DRM),
 **obsolete**, **removed**, **unknown**.
 
 France.tv and NOVO19 delegate download to the youtube/yt-dlp plugin when
-public URLs exist. Canal+ family and WAT/TF1+ are not treated as freely
+public URLs exist. RTBF Auvio catalogue discovery is available, but RedBee/DRM
+playback remains unsupported. Canal+ family and WAT/TF1+ are not treated as freely
 downloadable DRM catalogues.
 
 ## Arte catalogue discovery

@@ -1,0 +1,108 @@
+{
+  "status": 200,
+  "meta": {
+    "page": {
+      "current": 1,
+      "from": 1,
+      "last": null,
+      "path": "https://bff-service.rtbf.be?_page=1&_limit=20&_embed=content&includeFastTv=true&disable_cache=1",
+      "limit": 20,
+      "to": 20,
+      "totalCount": null
+    }
+  },
+  "links": {
+    "first": "https://bff-service.rtbf.be?_page=1&_limit=20&_embed=content&includeFastTv=true&disable_cache=1",
+    "last": null,
+    "prev": null,
+    "next": "https://bff-service.rtbf.be?_page=2&_limit=20&_embed=content&includeFastTv=true&disable_cache=1"
+  },
+  "data": {
+    "id": "19488",
+    "type": "PROGRAM_LIST",
+    "title": "Nos émissions",
+    "grid": false,
+    "content": [
+      {
+        "resourceType": "PROGRAM",
+        "id": "14926",
+        "path": "/emission/stoemp-peket-et-des-rawettes-14926",
+        "pathTitle": "",
+        "title": "Stoemp, Pèkèt… et des rawettes !   ",
+        "type": "SHOW",
+        "illustration": {
+          "xs": "https://static-content.rtbf.be/image/media/program/2x3/180xauto/9/d/e/9de9ca685556cd7920d653cfd54be13a.jpg",
+          "s": "https://static-content.rtbf.be/image/media/program/2x3/370xauto/9/d/e/9de9ca685556cd7920d653cfd54be13a.jpg",
+          "m": "https://static-content.rtbf.be/image/media/program/2x3/770xauto/9/d/e/9de9ca685556cd7920d653cfd54be13a.jpg",
+          "l": "https://static-content.rtbf.be/image/media/program/2x3/1248xauto/9/d/e/9de9ca685556cd7920d653cfd54be13a.jpg",
+          "xl": "https://static-content.rtbf.be/image/media/program/2x3/1920xauto/9/d/e/9de9ca685556cd7920d653cfd54be13a.jpg"
+        },
+        "hero": null
+      },
+      {
+        "resourceType": "PROGRAM",
+        "id": "13432",
+        "path": "/emission/les-fetes-de-wallonie-13432",
+        "pathTitle": "",
+        "title": "Les Fêtes de Wallonie",
+        "type": "SHOW",
+        "illustration": {
+          "xs": "https://static-content.rtbf.be/image/media/program/2x3/180xauto/c/9/e/c9e25cd59b49606323f3a923a5c8e932.jpg",
+          "s": "https://static-content.rtbf.be/image/media/program/2x3/370xauto/c/9/e/c9e25cd59b49606323f3a923a5c8e932.jpg",
+          "m": "https://static-content.rtbf.be/image/media/program/2x3/770xauto/c/9/e/c9e25cd59b49606323f3a923a5c8e932.jpg",
+          "l": "https://static-content.rtbf.be/image/media/program/2x3/1248xauto/c/9/e/c9e25cd59b49606323f3a923a5c8e932.jpg",
+          "xl": "https://static-content.rtbf.be/image/media/program/2x3/1920xauto/c/9/e/c9e25cd59b49606323f3a923a5c8e932.jpg"
+        },
+        "hero": null
+      },
+      {
+        "resourceType": "PROGRAM",
+        "id": "5",
+        "path": "/emission/journal-televise-19h30-5",
+        "pathTitle": "",
+        "title": "Journal télévisé 19h30",
+        "type": "SHOW",
+        "illustration": {
+          "xs": "https://static-content.rtbf.be/image/media/program/2x3/180xauto/a/0/9/a092cf6916d91e882a135c52a3b75b35.jpg",
+          "s": "https://static-content.rtbf.be/image/media/program/2x3/370xauto/a/0/9/a092cf6916d91e882a135c52a3b75b35.jpg",
+          "m": "https://static-content.rtbf.be/image/media/program/2x3/770xauto/a/0/9/a092cf6916d91e882a135c52a3b75b35.jpg",
+          "l": "https://static-content.rtbf.be/image/media/program/2x3/1248xauto/a/0/9/a092cf6916d91e882a135c52a3b75b35.jpg",
+          "xl": "https://static-content.rtbf.be/image/media/program/2x3/1920xauto/a/0/9/a092cf6916d91e882a135c52a3b75b35.jpg"
+        },
+        "hero": null
+      },
+      {
+        "resourceType": "PROGRAM",
+        "id": "14272",
+        "path": "/emission/chiens-et-chats-sans-collier-14272",
+        "pathTitle": "",
+        "title": "Chiens et chats sans collier",
+        "type": "SERIE",
+        "illustration": {
+          "xs": "https://static-content.rtbf.be/image/media/program/2x3/180xauto/c/4/2/c42ec2b66bf9b1990e2febcbf7d80e7c.jpg",
+          "s": "https://static-content.rtbf.be/image/media/program/2x3/370xauto/c/4/2/c42ec2b66bf9b1990e2febcbf7d80e7c.jpg",
+          "m": "https://static-content.rtbf.be/image/media/program/2x3/770xauto/c/4/2/c42ec2b66bf9b1990e2febcbf7d80e7c.jpg",
+          "l": "https://static-content.rtbf.be/image/media/program/2x3/1248xauto/c/4/2/c42ec2b66bf9b1990e2febcbf7d80e7c.jpg",
+          "xl": "https://static-content.rtbf.be/image/media/program/2x3/1920xauto/c/4/2/c42ec2b66bf9b1990e2febcbf7d80e7c.jpg"
+        },
+        "hero": null
+      },
+      {
+        "resourceType": "PROGRAM",
+        "id": "8802",
+        "path": "/emission/les-ambassadeurs-8802",
+        "pathTitle": "",
+        "title": "Les Ambassadeurs",
+        "type": "SHOW",
+        "illustration": {
+          "xs": "https://static-content.rtbf.be/image/media/program/2x3/180xauto/2/6/6/266ac94690035e1dffb13f5b2ee8be36.jpg",
+          "s": "https://static-content.rtbf.be/image/media/program/2x3/370xauto/2/6/6/266ac94690035e1dffb13f5b2ee8be36.jpg",
+          "m": "https://static-content.rtbf.be/image/media/program/2x3/770xauto/2/6/6/266ac94690035e1dffb13f5b2ee8be36.jpg",
+          "l": "https://static-content.rtbf.be/image/media/program/2x3/1248xauto/2/6/6/266ac94690035e1dffb13f5b2ee8be36.jpg",
+          "xl": "https://static-content.rtbf.be/image/media/program/2x3/1920xauto/2/6/6/266ac94690035e1dffb13f5b2ee8be36.jpg"
+        },
+        "hero": null
+      }
+    ]
+  }
+}
