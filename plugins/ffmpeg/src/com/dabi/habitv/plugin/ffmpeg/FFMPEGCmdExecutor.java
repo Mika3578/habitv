@@ -28,6 +28,8 @@ public class FFMPEGCmdExecutor extends CmdExecutor {
 
 	private volatile DownloadProgressSnapshot progressSnapshot;
 
+	private String lastProgressActivityToken;
+
 	public FFMPEGCmdExecutor(final String cmdProcessor, final String cmd) {
 		super(cmdProcessor, cmd, FFMPEGConf.MAX_HUNG_TIME);
 	}
@@ -42,6 +44,7 @@ public class FFMPEGCmdExecutor extends CmdExecutor {
 			progressSnapshot = null;
 			duration = null;
 			progressState.clear();
+			lastProgressActivityToken = null;
 		}
 		super.start();
 	}
@@ -64,6 +67,15 @@ public class FFMPEGCmdExecutor extends CmdExecutor {
 			} else {
 				progressionResult = handleLegacyProgressionLine(line);
 			}
+			lastProgressActivityToken = FfmpegProgressParser.toActivityToken(parsed, progressState, line);
+		}
+		return progressionResult;
+	}
+
+	@Override
+	protected String progressionActivityTokenFor(final String line, final String progressionResult) {
+		if (lastProgressActivityToken != null) {
+			return lastProgressActivityToken;
 		}
 		return progressionResult;
 	}

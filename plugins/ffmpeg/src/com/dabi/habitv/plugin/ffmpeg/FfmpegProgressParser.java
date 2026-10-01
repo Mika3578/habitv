@@ -165,4 +165,25 @@ public final class FfmpegProgressParser {
 		}
 		return String.format(Locale.US, "%.1f", percent);
 	}
+
+	/**
+	 * Token used for hung-process detection; changes while remux advances even when
+	 * {@link #toProgressionString} stays on the same rounded percent.
+	 */
+	public static String toActivityToken(final DownloadProgressSnapshot snapshot, final State state,
+			final String line) {
+		if (state != null && state.outTimeMicros != null) {
+			return "out:" + state.outTimeMicros;
+		}
+		if (snapshot != null && snapshot.getProgressRatio() != null) {
+			return "ratio:" + snapshot.getProgressRatio().doubleValue();
+		}
+		if (line != null && !line.trim().isEmpty()) {
+			return "line:" + line.trim();
+		}
+		if (snapshot != null) {
+			return "stage:" + snapshot.getStage().name();
+		}
+		return "none";
+	}
 }

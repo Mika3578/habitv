@@ -2,6 +2,7 @@ package com.dabi.habitv.plugin.ffmpeg;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -11,6 +12,18 @@ import com.dabi.habitv.api.plugin.holder.DownloadProgressSnapshot;
 import com.dabi.habitv.api.plugin.holder.DownloadStage;
 
 public class FfmpegProgressParserTest {
+
+	@Test
+	public void activityTokenTracksOutTimeWhilePercentMayRepeat() {
+		final FfmpegProgressParser.State state = new FfmpegProgressParser.State();
+		FfmpegProgressParser.parseLine("duration=100.000000", state);
+		final DownloadProgressSnapshot first = FfmpegProgressParser.parseLine("out_time_us=50400000", state);
+		final String firstToken = FfmpegProgressParser.toActivityToken(first, state, "out_time_us=50400000");
+		final DownloadProgressSnapshot second = FfmpegProgressParser.parseLine("out_time_us=50450000", state);
+		final String secondToken = FfmpegProgressParser.toActivityToken(second, state, "out_time_us=50450000");
+		assertEquals(FfmpegProgressParser.toProgressionString(first), FfmpegProgressParser.toProgressionString(second));
+		assertNotEquals(firstToken, secondToken);
+	}
 
 	@Test
 	public void progressPipeReportsRatioWhenDurationKnown() {

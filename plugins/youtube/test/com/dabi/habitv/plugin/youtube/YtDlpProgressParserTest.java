@@ -2,6 +2,7 @@ package com.dabi.habitv.plugin.youtube;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -32,6 +33,19 @@ public class YtDlpProgressParserTest {
 				.parse("[download]  45.2% of 10.00MiB at 1.23MiB/s ETA 00:05", null);
 		assertNotNull(snapshot);
 		assertEquals("45.2", YtDlpProgressParser.toProgressionString(snapshot));
+	}
+
+	@Test
+	public void activityTokenChangesDuringMergeWhileStageProgressionConstant() {
+		final DownloadProgressSnapshot previous = YtDlpProgressParser
+				.parse("[download] 100.0% of 10.00MiB at 1.00MiB/s ETA 00:00", null);
+		final String lineOne = "[Merger] Merging formats into \"episode.mp4\"";
+		final String lineTwo = "[Merger] Merging formats into \"episode.mp4\" (2/2)";
+		final DownloadProgressSnapshot mergedOne = YtDlpProgressParser.parse(lineOne, previous);
+		final DownloadProgressSnapshot mergedTwo = YtDlpProgressParser.parse(lineTwo, mergedOne);
+		assertEquals("stage:MERGING", "stage:" + mergedTwo.getStage().name());
+		assertNotEquals(YtDlpProgressParser.toActivityToken(mergedOne, lineOne),
+				YtDlpProgressParser.toActivityToken(mergedTwo, lineTwo));
 	}
 
 	@Test

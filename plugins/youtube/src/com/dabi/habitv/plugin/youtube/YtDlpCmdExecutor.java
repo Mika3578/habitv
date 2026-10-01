@@ -20,6 +20,8 @@ public class YtDlpCmdExecutor extends CmdExecutor {
 
 	private volatile DownloadProgressSnapshot progressSnapshot;
 
+	private String lastProgressActivityToken;
+
 	public YtDlpCmdExecutor(final String cmdProcessor, final String cmd) {
 		this(cmdProcessor, cmd, null, null);
 	}
@@ -34,6 +36,7 @@ public class YtDlpCmdExecutor extends CmdExecutor {
 	@Override
 	public void start() {
 		progressSnapshot = null;
+		lastProgressActivityToken = null;
 		super.start();
 	}
 
@@ -67,12 +70,21 @@ public class YtDlpCmdExecutor extends CmdExecutor {
 			}
 			progressSnapshot = parsed;
 			final String progression = YtDlpProgressParser.toProgressionString(parsed);
+			lastProgressActivityToken = YtDlpProgressParser.toActivityToken(parsed, line);
 			if (progression != null) {
 				return progression;
 			}
 			// Keep hung-process detection alive during post-processing without a percentage.
 			return "stage:" + parsed.getStage().name();
 		}
+	}
+
+	@Override
+	protected String progressionActivityTokenFor(final String line, final String progressionResult) {
+		if (lastProgressActivityToken != null) {
+			return lastProgressActivityToken;
+		}
+		return progressionResult;
 	}
 
 	@Override
