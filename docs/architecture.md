@@ -8,10 +8,10 @@ Related: [`development.md`](development.md), [`providers.md`](providers.md),
 ## What the application does
 
 HabiTV scans French TV replay (catch-up) catalogues through **provider
-plugins**, downloads new episodes through **downloader plugins** (usually
-external tools such as yt-dlp, curl, or ffmpeg), and optionally runs
-**exporter** commands. Users select categories in `grabconfig.xml`; a
-daemon or CLI pass downloads only episodes that are not already indexed.
+plugins**, saves new episodes through **tool plugins** (usually external
+tools such as yt-dlp, curl, or ffmpeg), and optionally runs **exporter**
+commands. Users select categories in `grabconfig.xml`; a daemon or CLI pass
+fetches only episodes that are not already indexed.
 
 Interfaces:
 
@@ -64,11 +64,11 @@ next to the application, or resolved from the static update repository.
 | Kind | Role | Examples |
 |------|------|----------|
 | Provider | Categories and episodes | `francetv`, `youtube`, `arte`, `novo19` |
-| Downloader | Fetch media | `youtube` (yt-dlp), `curl`, `ffmpeg`, `aria2` |
-| Exporter | Post-download commands | `cmd`, `rclone` |
+| Downloader | Fetch media (`PluginDownloaderInterface`) | `youtube` (yt-dlp), `curl`, `ffmpeg`, `aria2` |
+| Exporter | Post-fetch commands | `cmd`, `rclone` |
 | Mailbox input | POP3/IMAP ingest | `email` |
 
-A provider may delegate download to another plugin (France.tv and NOVO19
+A provider may delegate media fetch to another plugin (France.tv and NOVO19
 delegate to the YouTube/yt-dlp plugin).
 
 Inventory, status, and legal limits: [`providers.md`](providers.md).

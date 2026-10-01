@@ -66,6 +66,9 @@ Jakarta move, provider rewrites, runtime updater URL changes.
 
 Never commit secrets, tokens, credentials, or generated binaries.
 
+Code comments: English, concise; explain non-obvious *why* (see
+[`AGENTS.md`](AGENTS.md) **Engineering Baseline**).
+
 ## License
 
 No `LICENSE` file is present. Treat sources as proprietary until the

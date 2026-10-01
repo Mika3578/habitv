@@ -1,14 +1,15 @@
 # Providers
 
-HabiTV loads provider, downloader, and exporter JARs at runtime. A compiling
-module is **not** a claim that live download works.
+HabiTV loads provider, tool, and exporter JARs at runtime. A compiling
+module is **not** a claim that live retrieval works.
 
 ## Legal
 
 Only public catalogues and user-authorized, legally accessible workflows.
 
-The project does **not** bypass DRM, encryption, paywalls, or license
-checks, and does **not** extract credentials, cookies, or browser sessions
+The project does **not** circumvent technical protection, encryption,
+subscription-only access, or license checks, and does **not** extract
+credentials, cookies, or browser sessions
 into git. User login material, if ever used, stays in local config or
 environment variables. Optional auth paths stay disabled until the user
 configures them.
@@ -37,12 +38,12 @@ still points at `youtube-dl`, switch it to yt-dlp.
 | Tools / infrastructure | `curl`, `ffmpeg`, `aria2`, `cmd`, `file`, `RSS`, `rclone`, `rtmpDump`, `adobeHDS`, `email`, `plugin-tester` |
 | Historical names only | Pluzz → `francetv`; NRJ12 — no module |
 
-Labels: **working** (validated), **degraded**, **protected** (auth/geo/DRM),
+Labels: **working** (validated), **degraded**, **protected** (auth/geo/rights),
 **obsolete**, **removed**, **unknown**.
 
-France.tv and NOVO19 delegate download to the youtube/yt-dlp plugin when
+France.tv and NOVO19 delegate media fetch to the `youtube`/yt-dlp plugin when
 public URLs exist. Canal+ family and WAT/TF1+ are not treated as freely
-downloadable DRM catalogues.
+accessible protected catalogues.
 
 ## Arte catalogue discovery
 
@@ -65,7 +66,7 @@ Discovery uses the public EMAC API (`https://api.arte.tv/api/emac/v4`) only
   `/web/collections/{id}`; pagination prefers `pagination.links.next`.
 - Playable leaves are `SHOW` items with classic `/videos/NNNNNN-NNN-A/…`
   URLs. `RC-*` entries are collection navigation, not flattened episodes.
-- Downloads stay `ArtePluginManager.download` → youtube/yt-dlp on the
+- Retrieval uses `ArtePluginManager.download` → `youtube`/yt-dlp on the
   public Arte video URL.
 
 Offline fixtures: `plugins/arte/test/resources/fixtures/arte/`. Live checks

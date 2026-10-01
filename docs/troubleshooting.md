@@ -21,13 +21,13 @@ Providers: [`providers.md`](providers.md). Configuration:
 | Command not parsed (spaces) | Missing `<cmdProcessor>` | Windows: `cmd.exe /c #CMD#`. Unix: `/bin/sh -c #CMD#` |
 | Plugin updates at startup | Default on | `-Dhabitv.update.enabled=false` disables plugin-JAR checks; tool plugins may still update binaries |
 | France Télévisions empty | Legacy plugin id | `pluzz` → `francetv` in grab-config |
-| 403 / DNS / empty replay | Obsolete or protected | See providers; no DRM/paywall bypass |
+| 403 / DNS / empty replay | Obsolete or protected | See [`providers.md`](providers.md) |
 | yt-dlp missing / SSL errors | Tool or network | Install yt-dlp; point `<youtube>` at the binary |
-| Windows yt-dlp fails before download (`[PYI-`, `_MEI`, extract errors) | PyInstaller bootstrap / TEMP | Habitv redirects yt-dlp `TEMP`/`TMP` under the bin home and runs `yt-dlp.exe --version` first. Stop Habitv, clear TEMP `_MEI*` folders, replace `yt-dlp.exe`, then run `--version` outside Habitv |
+| Windows yt-dlp fails before retrieval (`[PYI-`, `_MEI`, extract errors) | PyInstaller bootstrap / TEMP | Habitv redirects yt-dlp `TEMP`/`TMP` under the bin home and runs `yt-dlp.exe --version` first. Stop Habitv, clear TEMP `_MEI*` folders, replace `yt-dlp.exe`, then run `--version` outside Habitv |
 
 ## Configuration
 
-Do not delete user downloads or indexes while debugging. Index files
+Do not delete user media files or indexes while debugging. Index files
 store composite episode keys; older files may still use display names.
 Sample `application/consoleView/config.xml` is illustrative only.
 
