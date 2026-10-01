@@ -63,7 +63,7 @@ cmd_norm="$(printf '%s' "$command" | sed -E \
 _strip_i=0
 while [[ $_strip_i -lt 16 ]]; do
   _cmd_next="$(printf '%s' "$cmd_norm" | sed -E \
-    's#(^|[[:space:];&|])([^[:space:]]*/)?git(\.exe)?([[:space:]]+-C[[:space:]]+[^[:space:]]+)*[[:space:]]+-c[[:space:]]+[^[:space:]]+#\1\2git\3#g')"
+    's#(^|[[:space:];&|])([^[:space:]]*/)?git(\.exe)?([[:space:]]+-C[[:space:]]+[^[:space:]]+)*[[:space:]]+-c[[:space:]]+[^[:space:]]+#\1\2git\3\4#g')"
   [[ "$_cmd_next" == "$cmd_norm" ]] && break
   cmd_norm="$_cmd_next"
   _strip_i=$((_strip_i + 1))
