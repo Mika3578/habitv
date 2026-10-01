@@ -64,7 +64,30 @@ if [[ "$cmd_unquoted" =~ (^|[[:space:]])git[[:space:]]+-C[[:space:]]+([^[:space:
   repo_dir="${BASH_REMATCH[2]}"
 fi
 
+# Normalize Windows drive paths when the hook runs under WSL bash.
+if [[ -n "$repo_dir" && ! -d "$repo_dir" && "$repo_dir" =~ ^[A-Za-z]:[\\/] ]]; then
+  drive="$(printf '%s' "${repo_dir:0:1}" | tr '[:upper:]' '[:lower:]')"
+  rest="${repo_dir:2}"
+  rest="${rest//\\//}"
+  wsl_path="/mnt/${drive}${rest}"
+  if [[ -d "$wsl_path" ]]; then
+    repo_dir="$wsl_path"
+  fi
+fi
+
+is_publish=0
+if [[ "$cmd_unquoted" =~ (^|[[:space:];&|])git([[:space:]]+-C[[:space:]]+[^[:space:]]+)?[[:space:]]+(push|commit) ]]; then
+  is_publish=1
+fi
+if [[ "$cmd_unquoted" =~ (^|[[:space:];&|])gh[[:space:]]+pr[[:space:]]+create ]]; then
+  is_publish=1
+fi
+
 if [[ -z "$repo_dir" || ! -d "$repo_dir" ]]; then
+  if [[ "$is_publish" -eq 1 ]]; then
+    printf '%s\n' '{"permission":"deny","agent_message":"Publishing blocked: working directory missing or invalid; cannot validate branch policy."}'
+    exit 0
+  fi
   printf '%s\n' '{"permission":"allow"}'
   exit 0
 fi

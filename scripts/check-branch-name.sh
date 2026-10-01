@@ -17,8 +17,9 @@ fi
 canonical='^(feat|fix|docs|test|refactor|chore|ci)/[a-z0-9]+(-[a-z0-9]+)*$'
 if [[ "$branch" =~ $canonical ]]; then
   # Reject agent-looking trailing hex suffixes such as topic-1a2e.
+  # Require a leading digit so dictionary scopes (cafe, dead) stay valid.
   scope="${branch#*/}"
-  if [[ "$scope" =~ -[0-9a-f]{4}$ ]]; then
+  if [[ "$scope" =~ -[0-9][0-9a-f]{3}$ ]]; then
     echo "check-branch-name: WARN non-canonical generated-looking suffix on '$branch'"
     if [[ "${HABITV_STRICT_BRANCH:-}" == "1" ]]; then
       exit 1
