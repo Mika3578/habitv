@@ -20,4 +20,11 @@ public class FFMPEGConfTest {
 				.contains("-progress pipe:1"));
 	}
 
+	@Test
+	public void windowsAvconvDefaultOmitsProgressFlags() {
+		assertFalse(FFMPEGConf.FFMPEG_CMD_WINDOWS.contains("-progress"));
+		assertFalse(FFMPEGConf.augmentRemuxCommand(FFMPEGConf.FFMPEG_CMD_WINDOWS, "C:\\bin\\avconv.exe")
+				.contains("-progress"));
+	}
+
 }

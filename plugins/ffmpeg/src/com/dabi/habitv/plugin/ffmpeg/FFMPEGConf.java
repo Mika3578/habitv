@@ -27,9 +27,12 @@ public final class FFMPEGConf {
 			+ "\" -c copy -aprofile aac_low -acodec libvo_aacenc -vbsf aac_adtstoasc -y -f " + FrameworkConf.EXTENSION
 			+ " \"" + FrameworkConf.DOWNLOAD_DESTINATION + "\" ";
 
-	public static final String FFMPEG_CMD_WINDOWS_COR = PROGRESS_FLAGS + " -i \"" + FrameworkConf.DOWNLOAD_INPUT
+	/** Default Windows remux body without progress flags (non-ffmpeg binaries). */
+	public static final String FFMPEG_CMD_WINDOWS = " -i \"" + FrameworkConf.DOWNLOAD_INPUT
 			+ "\" -c copy -bsf:a aac_adtstoasc -y -f " + FrameworkConf.EXTENSION + " \"" + FrameworkConf.DOWNLOAD_DESTINATION
 			+ "\" ";
+
+	public static final String FFMPEG_CMD_WINDOWS_COR = PROGRESS_FLAGS + FFMPEG_CMD_WINDOWS;
 
 	public static final String DEFAULT_LINUX_BIN_PATH = "avconv";
 

@@ -28,11 +28,17 @@ public final class YtDlpRuntimeDiagnostics {
 
 	private static boolean preflightEnabled = true;
 
+	private static Long preflightTimeoutMillisForTests;
+
 	private YtDlpRuntimeDiagnostics() {
 	}
 
 	static void setPreflightEnabled(final boolean enabled) {
 		preflightEnabled = enabled;
+	}
+
+	static void setPreflightTimeoutMillisForTests(final Long timeoutMillis) {
+		preflightTimeoutMillisForTests = timeoutMillis;
 	}
 
 	static boolean isPreflightEnabled() {
@@ -105,8 +111,15 @@ public final class YtDlpRuntimeDiagnostics {
 		LOG.info("yt-dlp process TMP: " + tempPath);
 	}
 
-	static long preflightHungProcessTimeoutMillis() {
+	private static long preflightTimeoutMillis() {
+		if (preflightTimeoutMillisForTests != null) {
+			return preflightTimeoutMillisForTests.longValue();
+		}
 		return YT_DLP_PREFLIGHT_TIMEOUT_MILLIS;
+	}
+
+	static long preflightHungProcessTimeoutMillis() {
+		return preflightTimeoutMillis();
 	}
 
 	public static boolean supportsProgressTemplate(final String versionOutput) {
@@ -147,10 +160,11 @@ public final class YtDlpRuntimeDiagnostics {
 		final String versionCmd = executablePath + " --version";
 		LOG.info("yt-dlp preflight command: " + versionCmd);
 		final Map<String, String> env = buildYtDlpEnvironment(binDir);
-		final CmdExecutor versionExecutor = new CmdExecutor(cmdProcessor, versionCmd, YT_DLP_PREFLIGHT_TIMEOUT_MILLIS) {
+		final long preflightTimeoutMillis = preflightTimeoutMillis();
+		final CmdExecutor versionExecutor = new CmdExecutor(cmdProcessor, versionCmd, preflightTimeoutMillis) {
 			@Override
 			protected long getHungProcessTime() {
-				return YT_DLP_PREFLIGHT_TIMEOUT_MILLIS;
+				return preflightTimeoutMillis;
 			}
 
 			@Override

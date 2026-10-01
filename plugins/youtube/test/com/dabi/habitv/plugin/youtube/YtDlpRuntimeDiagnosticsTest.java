@@ -100,4 +100,16 @@ public class YtDlpRuntimeDiagnosticsTest {
 		assertTrue(YtDlpRuntimeDiagnostics.preflightHungProcessTimeoutMillis() >= 5000L);
 	}
 
+	@Test
+	public void preflightHungTimeoutHonorsTestOverride() {
+		final long defaultTimeout = YtDlpRuntimeDiagnostics.preflightHungProcessTimeoutMillis();
+		assertTrue(defaultTimeout >= 5000L);
+		YtDlpRuntimeDiagnostics.setPreflightTimeoutMillisForTests(777L);
+		try {
+			assertEquals(777L, YtDlpRuntimeDiagnostics.preflightHungProcessTimeoutMillis());
+		} finally {
+			YtDlpRuntimeDiagnostics.setPreflightTimeoutMillisForTests(null);
+		}
+	}
+
 }

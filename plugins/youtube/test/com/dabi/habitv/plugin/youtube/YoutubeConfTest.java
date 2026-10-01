@@ -32,9 +32,10 @@ public class YoutubeConfTest {
 				.contains("--progress-template"));
 		assertTrue(YoutubeConf.augmentBuiltInDumpCommand(YoutubeConf.DUMP_CMD, "2023.09.01", "/bin/sh -c #CMD#")
 				.equals(YoutubeConf.DUMP_CMD));
-		assertTrue(YoutubeConf.progressTemplateFlagsFor("cmd.exe /c #CMD#").contains("%%(progress._percent)s"));
+		assertTrue(YoutubeConf.progressTemplateFlagsFor("cmd.exe /c #CMD#").contains("%(progress._percent)s"));
+		assertFalse(YoutubeConf.progressTemplateFlagsFor("cmd.exe /c #CMD#").contains("%%(progress._percent)s"));
 		assertTrue(YoutubeConf.progressTemplateFlagsFor("/bin/sh -c #CMD#").contains("\\\"dest\\\":%(progress.filename)j"));
-		assertTrue(YoutubeConf.progressTemplateFlagsFor("cmd.exe /c #CMD#").contains("\\\"dest\\\":%%(progress.filename)j"));
+		assertTrue(YoutubeConf.progressTemplateFlagsFor("cmd.exe /c #CMD#").contains("\\\"dest\\\":%(progress.filename)j"));
 		assertFalse(YoutubeConf.DUMP_CMD.contains("--audio-quality"));
 		assertFalse(YoutubeConf.DUMP_CMD.contains("--extract-audio"));
 		assertFalse(YoutubeConf.DUMP_CMD.contains("-x"));

@@ -52,7 +52,7 @@ public class FFMPEGPluginDownloader extends BaseUpdatablePlugin implements
 
 	private String getCmd(final String executablePath) {
 		if (OSUtils.isWindows()) {
-			return FFMPEGConf.FFMPEG_CMD_WINDOWS_COR;
+			return FFMPEGConf.augmentRemuxCommand(FFMPEGConf.FFMPEG_CMD_WINDOWS, executablePath);
 		}
 		return FFMPEGConf.augmentRemuxCommand(FFMPEGConf.FFMPEG_CMD_LINUX, executablePath);
 	}

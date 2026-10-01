@@ -53,9 +53,6 @@ public final class YoutubeConf {
 	 * Appends {@link #PROGRESS_TEMPLATE_FLAGS} when the resolved yt-dlp version supports them.
 	 */
 	public static String progressTemplateFlagsFor(final String cmdProcessor) {
-		if (cmdProcessor != null && cmdProcessor.toLowerCase().contains("cmd.exe")) {
-			return PROGRESS_TEMPLATE_FLAGS_RAW.replace("%", "%%");
-		}
 		return PROGRESS_TEMPLATE_FLAGS_RAW;
 	}
 
