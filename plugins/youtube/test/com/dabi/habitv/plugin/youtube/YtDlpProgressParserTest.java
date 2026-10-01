@@ -230,4 +230,14 @@ public class YtDlpProgressParserTest {
 		assertEquals("Vidéo", snapshot.getDetail());
 		assertEquals(0.5d, snapshot.getProgressRatio().doubleValue(), 0.0001d);
 	}
+
+	@Test
+	public void parseHabitvProgressDestWithWindowsPath() {
+		final String line = YoutubeConf.PROGRESS_LINE_PREFIX
+				+ "{\"phase\":\"download\",\"pct\":12.0,\"dest\":\"C:\\\\Users\\\\episode.f137.mp4\"}";
+		final DownloadProgressSnapshot snapshot = YtDlpProgressParser.parse(line, null);
+		assertNotNull(snapshot);
+		assertEquals("Vidéo", snapshot.getDetail());
+		assertEquals(0.12d, snapshot.getProgressRatio().doubleValue(), 0.0001d);
+	}
 }
