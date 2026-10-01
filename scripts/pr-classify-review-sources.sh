@@ -53,7 +53,7 @@ jq -n \
       else
         (($copilot | map(select(.commit.oid == $head))[-1]) as $r |
           [{source:"copilot",
-            execution_state:(if ($r.state == "COMMENTED" or $r.state == "CHANGES_REQUESTED") then "SUBSTANTIVE" else "NO_FINDINGS" end),
+            execution_state:(if $r.state == "APPROVED" then "NO_FINDINGS" else "SUBSTANTIVE" end),
             commit:$r.commit.oid,
             github_state:$r.state}])
       end

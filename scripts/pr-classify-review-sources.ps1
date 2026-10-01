@@ -40,7 +40,7 @@ if ($copilot.Count -eq 0) {
         $r = $onHead[-1]
         $sources.Add([ordered]@{
             source           = 'copilot'
-            execution_state  = if ($r.state -eq 'CHANGES_REQUESTED' -or $r.state -eq 'COMMENTED') { 'SUBSTANTIVE' } else { 'NO_FINDINGS' }
+            execution_state  = if ($r.state -eq 'APPROVED') { 'NO_FINDINGS' } else { 'SUBSTANTIVE' }
             commit           = $r.commit.oid
             github_state     = $r.state
         })
