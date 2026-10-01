@@ -28,10 +28,11 @@ markers=(
   'Written for commit'
   'Summary will update on new commits'
   'CURSOR_AUTOMATION_ID'
+  'CURSOR_SUMMARY'
 )
 
 for marker in "${markers[@]}"; do
-  if printf '%s' "$body" | grep -qF "$marker"; then
+  if printf '%s' "$body" | grep -qiF "$marker"; then
     echo "pr-public-body: forbidden generated block detected: $marker"
     exit 1
   fi

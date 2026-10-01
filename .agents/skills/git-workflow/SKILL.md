@@ -42,7 +42,9 @@ Repository rules **do not** control that initial platform branch creation.
 1. Classify task type and scope; build `<type>/<scope>`.
 2. Search open PRs and branches for duplicate scope.
 3. Create the branch from `origin/develop` locally.
-4. Push the branch to `origin` (`git push -u origin <type>/<scope>`) so the Cloud API `startingRef` exists on the remote.
+4. After explicit user approval in the conversation, push the branch to
+   `origin` (`git push -u origin <type>/<scope>`) so the Cloud API
+   `startingRef` exists on the remote.
 5. Start the Cloud Agent with **`workOnCurrentBranch: true`** and **`repos[].startingRef`** set to that branch name (Cloud Agents API). The v1 API does not accept a separate custom branch name field; pushing on the named ref requires `workOnCurrentBranch`.
 6. Maintainer helper (optional): [`scripts/launch-cloud-agent-strict.ps1`](../../../scripts/launch-cloud-agent-strict.ps1) with `CURSOR_API_KEY` from local secrets only.
 

@@ -212,10 +212,10 @@ if (-not (Test-Path $prReviewSkill)) {
     if ($prReviewText -notmatch "pr-gh-snapshot") {
         Fail "pr-review skill must reference pr-gh-snapshot scripts"
     }
-    if ($prReviewText -notmatch "APPROVAL_ONLY") {
+    if ($prReviewText -cnotmatch "APPROVAL_ONLY") {
         Fail "pr-review skill must distinguish approval-only reviews"
     }
-    if ($prReviewText -notmatch "execution_state") {
+    if ($prReviewText -cnotmatch "execution_state") {
         Fail "pr-review skill must document review execution state"
     }
 }

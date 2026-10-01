@@ -19,7 +19,17 @@ function Test-BodyMatch($text, [string[]] $patterns) {
 $sources = [System.Collections.Generic.List[object]]::new()
 
 # --- Copilot (required final reviewer when policy applies) ---
-$copilot = @($Reviews | Where-Object { $_.author.login -match 'copilot' })
+# Exact bot identities only (do not substring-match "copilot").
+$copilotLogins = @(
+    'copilot-pull-request-reviewer[bot]',
+    'copilot-pull-request-reviewer',
+    'copilot',
+    'github-copilot[bot]'
+)
+$copilot = @($Reviews | Where-Object {
+    $login = $_.author.login
+    $copilotLogins | Where-Object { $_.ToLowerInvariant() -eq $login.ToLowerInvariant() }
+})
 if ($copilot.Count -eq 0) {
     $sources.Add([ordered]@{ source = 'copilot'; execution_state = 'MISSING'; commit = '' })
 } else {
@@ -30,7 +40,7 @@ if ($copilot.Count -eq 0) {
         $r = $onHead[-1]
         $sources.Add([ordered]@{
             source           = 'copilot'
-            execution_state  = if ($r.state -eq 'COMMENTED') { 'SUBSTANTIVE' } else { 'NO_FINDINGS' }
+            execution_state  = if ($r.state -eq 'CHANGES_REQUESTED' -or $r.state -eq 'COMMENTED') { 'SUBSTANTIVE' } else { 'NO_FINDINGS' }
             commit           = $r.commit.oid
             github_state     = $r.state
         })
@@ -46,7 +56,10 @@ if ($aq.Count -gt 0) {
 }
 
 # --- Cursor / routing approval ---
-$cursor = @($Reviews | Where-Object { $_.author.login -match 'cursor' })
+$cursor = @($Reviews | Where-Object {
+    $login = ($_.author.login ?? '').ToLowerInvariant()
+    $login -eq 'cursor' -or $login -eq 'cursor[bot]'
+})
 foreach ($r in $cursor) {
     $st = 'APPROVAL_ONLY'
     if (Test-BodyMatch $r.body @('Bugbot was not present', 'did not report findings that need human review')) {

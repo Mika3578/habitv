@@ -27,11 +27,12 @@ $markers = @(
     "Review in cubic",
     "Written for commit",
     "Summary will update on new commits",
-    "CURSOR_AUTOMATION_ID"
+    "CURSOR_AUTOMATION_ID",
+    "CURSOR_SUMMARY"
 )
 
 foreach ($marker in $markers) {
-    if ($Body.Contains($marker)) {
+    if ($Body.IndexOf($marker, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
         Write-Host "pr-public-body: forbidden generated block detected: $marker"
         exit 1
     }

@@ -288,8 +288,6 @@ batch fixes. Auxiliary tools are not substitutes for the final reviewer.
 ```text
 PRE_REVIEW_GATE  (threads, checks, body, scope)
     ↓
-Ready  (only when PRE_REVIEW_GATE passes + user authorizes)
-    ↓
 REQUEST COPILOT EXPLICITLY  (gh pr edit --add-reviewer @copilot)
     ↓
 verify a Copilot review submission exists
@@ -299,6 +297,8 @@ verify review.commit_id == current HEAD
 classify execution_state (SUBSTANTIVE or NO_FINDINGS)
     ↓
 FINAL_REVIEW_GATE
+    ↓
+Ready  (only when FINAL_REVIEW_GATE + READY_GATE pass + user authorizes)
 ```
 
 If Copilot is `MISSING` or `PENDING` after request, wait and re-fetch; do not
@@ -306,6 +306,7 @@ declare final review complete. If `SKIPPED` / `RATE_LIMITED`, record and
 escalate to maintainer — do not treat as clean.
 
 Do not request Copilot after every intermediate commit.
+Do not mark Ready before Copilot final review on HEAD when required.
 
 ## Live reconciliation (READY_GATE prerequisites)
 

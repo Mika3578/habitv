@@ -29,10 +29,12 @@ real-user functional test when runtime behavior changed
 - Focused commands accelerate development; they do **not** replace the final
   full-reactor gate when the PR touches executable code, build logic, runtime
   behavior, providers, download logic, packaging, startup, or UI.
-- Use the canonical full-reactor commands from
-  [`docs/development.md`](../../../docs/development.md) (CI mirrors
-  `mvn -B -ntp -DskipTests validate`, deterministic tests, and
-  `mvn -B -ntp -DskipTests package` on required checks).
+- Use the required CI jobs as the full-reactor gate
+  ([`docs/development.md`](../../../docs/development.md)):
+  `validate-java8`, `deterministic-tests-java8`, and
+  `compile-and-package-java8`. Locally, prefer matching those commands; the
+  documented package example that excludes `trayView`/`habiTv` is for
+  developer convenience only and is **not** the Ready gate.
 - Record the exact command and outcome in the PR body. Do not claim success
   without actual output.
 - Real-user functional validation is separate; see **Pull request lifecycle**

@@ -23,4 +23,4 @@ Branch, commit, and title formatting examples live in `AGENTS.md` (tables and
 **HabiTV-controlled public text** is PR title/body, commit subjects, and
 orchestrator-written replies. Third-party reviewer bots may post their own
 issue or review comments; classify those in the pr-review loop — they are not
-automatic public-text policy violations.
+public-text policy violations automatically.

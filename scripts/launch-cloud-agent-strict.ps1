@@ -13,7 +13,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet("feat", "fix", "docs", "test", "refactor", "chore", "ci")]
+    [ValidateSet("feat", "fix", "docs", "test", "refactor", "chore", "ci", IgnoreCase = $false)]
     [string] $Type,
 
     [Parameter(Mandatory = $true)]
@@ -28,6 +28,10 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+
+if ($Type -cne $Type.ToLowerInvariant()) {
+    throw "Type must be lowercase (got '$Type')."
+}
 
 if ([string]::IsNullOrWhiteSpace($env:CURSOR_API_KEY)) {
     throw "CURSOR_API_KEY is not set. Use local secret storage; never commit API keys."

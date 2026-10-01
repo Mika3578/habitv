@@ -10,6 +10,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$PSNativeCommandUseErrorActionPreference = $true
 
 if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
     Write-Error "pr-gh-snapshot: gh CLI required"
@@ -21,20 +22,42 @@ $issueComments = @(gh api "repos/$Repo/issues/$PrNumber/comments" --paginate | C
 if ($issueComments.Count -eq 1 -and $null -eq $issueComments[0].id) { $issueComments = @() }
 
 $owner, $name = $Repo.Split("/", 2)
-$gql = @"
-query(`$owner: String!, `$name: String!, `$number: Int!) {
+$nodes = [System.Collections.Generic.List[object]]::new()
+$cursor = $null
+do {
+    $afterArg = if ($cursor) { ', $after: String' } else { '' }
+    $afterVar = if ($cursor) { ', after: $after' } else { '' }
+    $gql = @"
+query(`$owner: String!, `$name: String!, `$number: Int!$afterArg) {
   repository(owner: `$owner, name: `$name) {
     pullRequest(number: `$number) {
-      reviewThreads(first: 100) {
+      reviewThreads(first: 100$afterVar) {
+        pageInfo { hasNextPage endCursor }
         nodes { isResolved isOutdated path }
       }
     }
   }
 }
 "@
-$threadsRaw = gh api graphql -f query=$gql -f owner=$owner -f name=$name -F number=$PrNumber | ConvertFrom-Json
-$nodes = $threadsRaw.data.repository.pullRequest.reviewThreads.nodes
-if (-not $nodes) { $nodes = @() }
+    $ghArgs = @(
+        'api', 'graphql',
+        '-f', "query=$gql",
+        '-f', "owner=$owner",
+        '-f', "name=$name",
+        '-F', "number=$PrNumber"
+    )
+    if ($cursor) {
+        $ghArgs += @('-f', "after=$cursor")
+    }
+    $threadsRaw = & gh @ghArgs | ConvertFrom-Json
+    $page = $threadsRaw.data.repository.pullRequest.reviewThreads
+    foreach ($n in @($page.nodes)) { $nodes.Add($n) }
+    if ($page.pageInfo.hasNextPage) {
+        $cursor = $page.pageInfo.endCursor
+    } else {
+        $cursor = $null
+    }
+} while ($cursor)
 
 $unresolved = @($nodes | Where-Object { -not $_.isResolved }).Count
 $outdated = @($nodes | Where-Object { $_.isOutdated }).Count
@@ -42,7 +65,8 @@ $total = @($nodes).Count
 
 $bodyOk = $false
 $env:PR_BODY = $prJson.body
-& "$PSScriptRoot/validate-pr-public-body.ps1" | Out-Null
+# Redirect all streams: Write-Host uses the information stream and bypasses | Out-Null alone.
+& "$PSScriptRoot/validate-pr-public-body.ps1" *>$null
 if ($LASTEXITCODE -eq 0) { $bodyOk = $true }
 
 $classify = & "$PSScriptRoot/pr-classify-review-sources.ps1" `

@@ -25,20 +25,54 @@ fi
 
 owner="${repo%%/*}"
 name="${repo#*/}"
+tmpdir="$(mktemp -d)"
+trap 'rm -rf "$tmpdir"' EXIT
 
 pr_json="$(gh pr view "$pr" --repo "$repo" --json \
   number,title,isDraft,baseRefName,headRefName,headRefOid,body,reviewRequests,reviews,statusCheckRollup)"
 
-threads_json="$(gh api graphql -f query="
+# Paginate all review threads.
+: >"$tmpdir/nodes.jsonl"
+cursor=""
+while true; do
+  if [[ -n "$cursor" ]]; then
+    threads_json="$(gh api graphql -f query="
+query(\$owner: String!, \$name: String!, \$number: Int!, \$after: String!) {
+  repository(owner: \$owner, name: \$name) {
+    pullRequest(number: \$number) {
+      reviewThreads(first: 100, after: \$after) {
+        pageInfo { hasNextPage endCursor }
+        nodes { isResolved isOutdated path }
+      }
+    }
+  }
+}" -f owner="$owner" -f name="$name" -F number="$pr" -f after="$cursor")"
+  else
+    threads_json="$(gh api graphql -f query="
 query(\$owner: String!, \$name: String!, \$number: Int!) {
   repository(owner: \$owner, name: \$name) {
     pullRequest(number: \$number) {
       reviewThreads(first: 100) {
+        pageInfo { hasNextPage endCursor }
         nodes { isResolved isOutdated path }
       }
     }
   }
 }" -f owner="$owner" -f name="$name" -F number="$pr")"
+  fi
+  jq -c '.data.repository.pullRequest.reviewThreads.nodes[]' <<<"$threads_json" >>"$tmpdir/nodes.jsonl"
+  has_next="$(jq -r '.data.repository.pullRequest.reviewThreads.pageInfo.hasNextPage' <<<"$threads_json")"
+  if [[ "$has_next" != "true" ]]; then
+    break
+  fi
+  cursor="$(jq -r '.data.repository.pullRequest.reviewThreads.pageInfo.endCursor' <<<"$threads_json")"
+done
+
+if [[ -s "$tmpdir/nodes.jsonl" ]]; then
+  nodes_json="$(jq -s '.' "$tmpdir/nodes.jsonl")"
+else
+  nodes_json='[]'
+fi
 
 body="$(jq -r '.body' <<<"$pr_json")"
 body_ok=0
@@ -46,14 +80,19 @@ if PR_BODY="$body" bash "$(dirname "$0")/validate-pr-public-body.sh" >/dev/null 
   body_ok=1
 fi
 
-unresolved="$(jq '[.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false)] | length' <<<"$threads_json")"
-outdated="$(jq '[.data.repository.pullRequest.reviewThreads.nodes[] | select(.isOutdated == true)] | length' <<<"$threads_json")"
-total="$(jq '.data.repository.pullRequest.reviewThreads.nodes | length' <<<"$threads_json")"
+unresolved="$(jq '[.[] | select(.isResolved == false)] | length' <<<"$nodes_json")"
+outdated="$(jq '[.[] | select(.isOutdated == true)] | length' <<<"$nodes_json")"
+total="$(jq 'length' <<<"$nodes_json")"
 
-comments_json="$(gh api "repos/$repo/issues/$pr/comments" --paginate 2>/dev/null || echo '[]')"
+# Fail loudly if comments cannot be fetched (do not pretend there are none).
+comments_raw="$(gh api "repos/$repo/issues/$pr/comments" --paginate)"
+# --paginate may concatenate JSON arrays; slurp into one array.
+comments_json="$(printf '%s' "$comments_raw" | jq -s 'add // []')"
+
 head_sha="$(jq -r '.headRefOid' <<<"$pr_json")"
-reviews_json="$(jq '.reviews' <<<"$pr_json")"
-classify_json="$(bash "$(dirname "$0")/pr-classify-review-sources.sh" "$head_sha" "$reviews_json" "$comments_json")"
+jq '.reviews' <<<"$pr_json" >"$tmpdir/reviews.json"
+printf '%s' "$comments_json" >"$tmpdir/comments.json"
+classify_json="$(bash "$(dirname "$0")/pr-classify-review-sources.sh" "$head_sha" "$tmpdir/reviews.json" "$tmpdir/comments.json")"
 
 jq -n \
   --arg repo "$repo" \

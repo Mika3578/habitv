@@ -14,14 +14,41 @@ input="$(cat)"
 command=""
 cwd=""
 
-if command -v jq >/dev/null 2>&1; then
-  command="$(jq -r '.command // empty' <<<"$input")"
-  cwd="$(jq -r '.cwd // empty' <<<"$input")"
-else
+resolve_jq() {
+  if command -v jq >/dev/null 2>&1; then
+    command -v jq
+    return 0
+  fi
+  local candidate
+  for candidate in \
+    "/mnt/c/Program Files/Git/usr/bin/jq.exe" \
+    "/mnt/c/ProgramData/chocolatey/bin/jq.exe" \
+    /usr/bin/jq \
+    /usr/local/bin/jq
+  do
+    if [[ -x "$candidate" ]]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+  # WinGet jq package path varies by version; glob the common root.
+  local winget_jq
+  winget_jq="$(ls /mnt/c/Users/*/AppData/Local/Microsoft/WinGet/Packages/jqlang.jq_*/jq.exe 2>/dev/null | head -n 1 || true)"
+  if [[ -n "$winget_jq" && -x "$winget_jq" ]]; then
+    printf '%s\n' "$winget_jq"
+    return 0
+  fi
+  return 1
+}
+
+JQ_BIN="$(resolve_jq || true)"
+if [[ -z "$JQ_BIN" ]]; then
   printf '%s\n' '{"permission":"deny","agent_message":"Branch policy hook requires jq for safe JSON parsing. Install jq or use a canonical branch from the repository root."}'
   exit 0
 fi
 
+command="$("$JQ_BIN" -r '.command // empty' <<<"$input")"
+cwd="$("$JQ_BIN" -r '.cwd // empty' <<<"$input")"
 if [[ -n "$command" && "$command" =~ (^|[[:space:];&|])cd[[:space:]]+ ]]; then
   printf '%s\n' '{"permission":"deny","agent_message":"Publishing blocked: do not combine cd with git commit, git push, or gh pr create in one shell command. Run publish commands from the repository working directory."}'
   exit 0

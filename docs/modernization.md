@@ -17,7 +17,7 @@ Durable direction only. Actionable work lives in GitHub issues and PRs.
 ## Out of scope
 
 Circumvention of technical protection, encryption, subscription gates, or
-license restrictions. Never implement that as a dedicated PR goal.
+license restrictions is prohibited in any PR. Never implement that work.
 
 ## Do not mix into random PRs
 
