@@ -47,8 +47,8 @@ if [[ -z "$JQ_BIN" ]]; then
   exit 0
 fi
 
-command="$("$JQ_BIN" -r '.command // empty' <<<"$input")"
-cwd="$("$JQ_BIN" -r '.cwd // empty' <<<"$input")"
+command="$("$JQ_BIN" -r '.command // empty' <<<"$input" | tr -d '\r')"
+cwd="$("$JQ_BIN" -r '.cwd // empty' <<<"$input" | tr -d '\r')"
 
 # Deny only when `cd` is a shell statement before the publish verb (not inside -m text).
 # Strip simple quoted regions before matching.
