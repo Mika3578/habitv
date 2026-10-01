@@ -17,6 +17,9 @@ configures them.
 Keep public git text short and generic. See [`AGENTS.md`](../AGENTS.md)
 (**Public git text**).
 
+Maintainer guides: [`ytdlp-reliability.md`](ytdlp-reliability.md),
+[`provider-triage.md`](provider-triage.md).
+
 ## yt-dlp
 
 Plugin Maven id remains `youtube`. The binary contract is **yt-dlp**
