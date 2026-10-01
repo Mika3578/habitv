@@ -93,7 +93,7 @@ public class SFRPluginManager extends BasePluginWithProxy implements PluginProvi
 
 	}
 
-	private static final Pattern URL_PATTERN = Pattern.compile("var url = \"(.*)\";");
+	private static final Pattern URL_PATTERN = Pattern.compile("var url = \"([^\"]*)\";");
 
 	private String findDownloadlink(String url) {
 		String content = getUrlContent(url);
