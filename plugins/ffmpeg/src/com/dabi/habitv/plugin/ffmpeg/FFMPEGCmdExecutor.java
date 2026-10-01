@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
+import com.dabi.habitv.api.plugin.holder.DownloadProgressSnapshot;
 import com.dabi.habitv.framework.plugin.utils.CmdExecutor;
 
 public class FFMPEGCmdExecutor extends CmdExecutor {
@@ -23,6 +24,10 @@ public class FFMPEGCmdExecutor extends CmdExecutor {
 
 	private Long duration = null;
 
+	private final FfmpegProgressParser.State progressState = new FfmpegProgressParser.State();
+
+	private volatile DownloadProgressSnapshot progressSnapshot;
+
 	public FFMPEGCmdExecutor(final String cmdProcessor, final String cmd) {
 		super(cmdProcessor, cmd, FFMPEGConf.MAX_HUNG_TIME);
 	}
@@ -32,16 +37,29 @@ public class FFMPEGCmdExecutor extends CmdExecutor {
 	}
 
 	@Override
+	public void start() {
+		progressSnapshot = null;
+		super.start();
+	}
+
+	@Override
 	protected String handleProgression(final String line) {
 		LOG.debug(line);
+		final DownloadProgressSnapshot parsed = FfmpegProgressParser.parseLine(line, progressState);
+		if (parsed != null) {
+			progressSnapshot = parsed;
+			final String progression = FfmpegProgressParser.toProgressionString(parsed);
+			if (progression != null) {
+				return progression;
+			}
+			return "stage:" + parsed.getStage().name();
+		}
 		if (duration == null) {
 			duration = findDuration(line);
 		}
 		final Matcher matcher = TIME_PATTERN.matcher(line);
-		// lancement de la recherche de toutes les occurrences
 		final boolean hasMatched = matcher.find();
 		String ret = null;
-		// si recherche fructueuse
 		if (hasMatched && duration != null) {
 			final String stringDuration = matcher.group(matcher.groupCount());
 			final String[] durationTab = stringDuration.split(":");
@@ -66,13 +84,19 @@ public class FFMPEGCmdExecutor extends CmdExecutor {
 		return ret;
 	}
 
+	@Override
+	public DownloadProgressSnapshot getProgressSnapshot() {
+		final DownloadProgressSnapshot snapshot = progressSnapshot;
+		if (snapshot != null) {
+			return snapshot;
+		}
+		return DownloadProgressSnapshot.fromProgressionString(getProgression());
+	}
+
 	private String matchPercentage(final String line) {
-		// création d’un moteur de recherche
 		final Matcher matcher = PERCENTAGE_PATTERN.matcher(line);
-		// lancement de la recherche de toutes les occurrences
 		final boolean hasMatched = matcher.find();
 		String ret = null;
-		// si recherche fructueuse
 		if (hasMatched) {
 			ret = matcher.group(matcher.groupCount());
 		}
@@ -80,12 +104,9 @@ public class FFMPEGCmdExecutor extends CmdExecutor {
 	}
 
 	private static Long findDuration(final String line) {
-		// création d’un moteur de recherche
 		final Matcher matcher = DURATION_PATTERN.matcher(line);
-		// lancement de la recherche de toutes les occurrences
 		final boolean hasMatched = matcher.find();
 		Long ret = null;
-		// si recherche fructueuse
 		if (hasMatched) {
 			final String durationFormatted = matcher
 					.group(matcher.groupCount());

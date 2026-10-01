@@ -50,6 +50,11 @@ public final class YtDlpProgressParser {
 		}
 		final String trimmed = stripAnsi(line).trim();
 
+		final DownloadProgressSnapshot fromTemplate = parseProgressTemplateLine(trimmed, previous);
+		if (fromTemplate != null) {
+			return fromTemplate;
+		}
+
 		final DownloadStage stageFromTag = detectPostProcessingStage(trimmed);
 		if (stageFromTag != null) {
 			return DownloadProgressSnapshot.indeterminate(stageFromTag, shortDetail(trimmed));
@@ -87,6 +92,93 @@ public final class YtDlpProgressParser {
 		}
 
 		return null;
+	}
+
+	static DownloadProgressSnapshot parseProgressTemplateLine(final String trimmed,
+			final DownloadProgressSnapshot previous) {
+		final int prefixIndex = trimmed.indexOf(YoutubeConf.PROGRESS_LINE_PREFIX);
+		if (prefixIndex < 0) {
+			return null;
+		}
+		final String json = trimmed.substring(prefixIndex + YoutubeConf.PROGRESS_LINE_PREFIX.length()).trim();
+		if (json.isEmpty() || !json.startsWith("{")) {
+			return null;
+		}
+		final String phase = jsonStringField(json, "phase");
+		if ("download".equalsIgnoreCase(phase)) {
+			return buildTemplateDownloadSnapshot(json, previous);
+		}
+		if ("postprocess".equalsIgnoreCase(phase)) {
+			final String pp = jsonStringField(json, "pp");
+			final DownloadStage stage = stageFromPostProcessorName(pp);
+			return DownloadProgressSnapshot.indeterminate(stage, pp == null || pp.isEmpty() ? null : pp);
+		}
+		return null;
+	}
+
+	private static DownloadProgressSnapshot buildTemplateDownloadSnapshot(final String json,
+			final DownloadProgressSnapshot previous) {
+		final Double pct = jsonNumberField(json, "pct");
+		final Double ratio = pct == null ? null
+				: Double.valueOf(Math.min(1.0d, Math.max(0.0d, pct.doubleValue() / 100.0d)));
+
+		final String totalToken = jsonStringField(json, "total");
+		final Long totalBytes = parseSizeToBytes(totalToken);
+		Long downloadedBytes = null;
+		if (ratio != null && totalBytes != null) {
+			downloadedBytes = Long.valueOf(Math.round(totalBytes.doubleValue() * ratio.doubleValue()));
+		}
+
+		final Double bytesPerSecond = parseSpeedToBytesPerSecond(jsonStringField(json, "speed"));
+		final Long etaSeconds = parseEtaToSeconds(jsonStringField(json, "eta"));
+
+		final String dest = jsonStringField(json, "dest");
+		final String detail;
+		if (dest != null && !dest.isEmpty()) {
+			detail = detectStreamLabel(dest);
+		} else {
+			detail = resolveStreamDetail(previous, ratio);
+		}
+
+		if (ratio == null) {
+			return DownloadProgressSnapshot.indeterminate(DownloadStage.DOWNLOADING, detail);
+		}
+		return DownloadProgressSnapshot.of(DownloadStage.DOWNLOADING, ratio, downloadedBytes, totalBytes,
+				bytesPerSecond, etaSeconds, detail);
+	}
+
+	static DownloadStage stageFromPostProcessorName(final String postProcessor) {
+		if (postProcessor == null || postProcessor.isEmpty()) {
+			return DownloadStage.POST_PROCESSING;
+		}
+		final String token = postProcessor.trim();
+		final DownloadStage fromTag = detectPostProcessingStage("[" + token + "]");
+		return fromTag == null ? DownloadStage.POST_PROCESSING : fromTag;
+	}
+
+	static String jsonStringField(final String json, final String field) {
+		if (json == null || field == null) {
+			return null;
+		}
+		final Matcher matcher = Pattern.compile("\"" + Pattern.quote(field) + "\"\\s*:\\s*\"([^\"]*)\"")
+				.matcher(json);
+		return matcher.find() ? matcher.group(1) : null;
+	}
+
+	static Double jsonNumberField(final String json, final String field) {
+		if (json == null || field == null) {
+			return null;
+		}
+		final Matcher matcher = Pattern.compile("\"" + Pattern.quote(field) + "\"\\s*:\\s*([0-9]+(?:\\.[0-9]+)?)")
+				.matcher(json);
+		if (!matcher.find()) {
+			return null;
+		}
+		try {
+			return Double.valueOf(parseLocaleNumber(matcher.group(1)));
+		} catch (final NumberFormatException e) {
+			return null;
+		}
 	}
 
 	private static DownloadProgressSnapshot buildDownloadSnapshot(final Matcher matcher,
@@ -250,6 +342,9 @@ public final class YtDlpProgressParser {
 	}
 
 	static Double parseSpeedToBytesPerSecond(final String raw) {
+		if (raw == null || raw.trim().isEmpty()) {
+			return null;
+		}
 		final Long perSecond = parseSizeToBytes(raw.replace("/s", "").trim());
 		return perSecond == null ? null : Double.valueOf(perSecond.doubleValue());
 	}
