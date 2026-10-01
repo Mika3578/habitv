@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 
 import com.dabi.habitv.api.plugin.holder.DownloadProgressSnapshot;
+import com.dabi.habitv.api.plugin.holder.DownloadStage;
 import com.dabi.habitv.framework.plugin.utils.CmdExecutor;
 
 public class FFMPEGCmdExecutor extends CmdExecutor {
@@ -118,7 +119,24 @@ public class FFMPEGCmdExecutor extends CmdExecutor {
 			if (snapshot != null) {
 				return snapshot;
 			}
-			return DownloadProgressSnapshot.fromProgressionString(getProgression());
+			return snapshotFromLegacyProgressionString(getProgression());
+		}
+	}
+
+	static DownloadProgressSnapshot snapshotFromLegacyProgressionString(final String progression) {
+		if (progression == null || progression.trim().isEmpty()) {
+			return DownloadProgressSnapshot.indeterminate(DownloadStage.REMUXING, null);
+		}
+		try {
+			final double percent = Double.parseDouble(progression.trim().replace(',', '.'));
+			if (Double.isNaN(percent) || percent < 0) {
+				return DownloadProgressSnapshot.indeterminate(DownloadStage.REMUXING, null);
+			}
+			final double ratio = Math.min(1.0d, percent / 100.0d);
+			return DownloadProgressSnapshot.of(DownloadStage.REMUXING, Double.valueOf(ratio), null, null, null,
+					null, null);
+		} catch (final NumberFormatException e) {
+			return DownloadProgressSnapshot.indeterminate(DownloadStage.REMUXING, progression);
 		}
 	}
 
