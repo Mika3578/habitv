@@ -90,7 +90,7 @@ public class DownloadFailureDiagnosticsTest {
 						"ERROR: This live event will begin in a few moments",
 						"ERROR: This live event will begin in a few moments", null)));
 		assertEquals("Episode retrieval failed. See the log for sanitized diagnostics.",
-				DownloadFailureDiagnostics.buildUserMessage(null, new ExecutorFailedException("yt-dlp \"url\"",
-						"unexpected failure", "unexpected failure", null)));
+				DownloadFailureDiagnostics.buildUserMessage(null,
+						new ExecutorFailedException("yt-dlp \"url\"", "", "", null)));
 	}
 }

@@ -79,8 +79,8 @@ foreach ($r in $cursor) {
 $codeRabbitLogins = @('coderabbitai[bot]')
 $cr = @($IssueComments | Where-Object { Test-ExactLogin $_.user.login $codeRabbitLogins } |
     Sort-Object { $_.updated_at } | Select-Object -Last 1)
-if ($null -ne $cr) {
-    $body = [string]$cr.body
+if ($cr.Count -gt 0) {
+    $body = [string]$cr[0].body
     $st = if (Test-BodyMatch $body @('does not receive automatic reviews', 'fewer than 10 stars', 'Review skipped')) { 'SKIPPED' } else { 'PENDING' }
     $sources.Add([ordered]@{ source = 'coderabbit'; execution_state = $st })
 }
@@ -88,8 +88,8 @@ if ($null -ne $cr) {
 $sourceryLogins = @('sourcery-ai[bot]')
 $so = @($IssueComments | Where-Object { Test-ExactLogin $_.user.login $sourceryLogins } |
     Sort-Object { $_.updated_at } | Select-Object -Last 1)
-if ($null -ne $so) {
-    $body = [string]$so.body
+if ($so.Count -gt 0) {
+    $body = [string]$so[0].body
     if (Test-BodyMatch $body @('diff characters', 'quota', '6 days', '6 hours')) {
         $sources.Add([ordered]@{ source = 'sourcery'; execution_state = 'RATE_LIMITED' })
     } elseif (Test-BodyMatch $body @("Reviewer's Guide", 'review_guide')) {

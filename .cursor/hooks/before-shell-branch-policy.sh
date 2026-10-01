@@ -54,9 +54,12 @@ resolve_python() {
   for candidate in python3 python; do
     if command -v "$candidate" >/dev/null 2>&1; then
       candidate="$(command -v "$candidate")"
-      if out="$("$candidate" -c "import json; print(json.dumps({'ok': True}))" 2>/dev/null)" && [[ "$out" == *ok* ]]; then
-        printf '%s\n' "$candidate"
-        return 0
+      if out="$("$candidate" -c "import json; print(json.dumps({'ok': True}))" 2>/dev/null || true)"; then
+        out="${out//$'\n'/}"
+        if [[ "$out" == *ok* ]]; then
+          printf '%s\n' "$candidate"
+          return 0
+        fi
       fi
     fi
   done
@@ -65,9 +68,13 @@ resolve_python() {
     /usr/bin/python3 \
     /usr/local/bin/python3
   do
-    if [[ -x "$candidate" ]] && out="$("$candidate" -c "import json; print(1)" 2>/dev/null)" && [[ "$out" == "1" ]]; then
-      printf '%s\n' "$candidate"
-      return 0
+    if [[ -x "$candidate" ]]; then
+      out="$("$candidate" -c "import json; print(1)" 2>/dev/null || true)"
+      out="${out//$'\n'/}"
+      if [[ "$out" == "1" ]]; then
+        printf '%s\n' "$candidate"
+        return 0
+      fi
     fi
   done
   if [[ -n "$user" ]]; then
@@ -75,9 +82,13 @@ resolve_python() {
       /mnt/c/Users/"$user"/AppData/Local/Programs/Python/Python3*/python.exe \
       /c/Users/"$user"/AppData/Local/Programs/Python/Python3*/python.exe
     do
-      if [[ -x "$candidate" ]] && out="$("$candidate" -c "import json; print(1)" 2>/dev/null)" && [[ "$out" == "1" ]]; then
-        printf '%s\n' "$candidate"
-        return 0
+      if [[ -x "$candidate" ]]; then
+        out="$("$candidate" -c "import json; print(1)" 2>/dev/null || true)"
+        out="${out//$'\n'/}"
+        if [[ "$out" == "1" ]]; then
+          printf '%s\n' "$candidate"
+          return 0
+        fi
       fi
     done
   fi
@@ -98,9 +109,9 @@ deny() {
 json_field() {
   local key="$1"
   if [[ -n "${JQ_BIN:-}" ]]; then
-    "$JQ_BIN" -r --arg k "$key" '.[$k] // empty' <<<"$input" | tr -d '\r'
+    "$JQ_BIN" -r --arg k "$key" '.[$k] // empty' <<<"$input" | tr -d '\n'
   elif [[ -n "${PY_BIN:-}" ]]; then
-    "$PY_BIN" -c 'import json,sys; d=json.loads(sys.stdin.read()); v=d.get(sys.argv[1],""); print("" if v is None else v)' "$key" <<<"$input" | tr -d '\r'
+    "$PY_BIN" -c 'import json,sys; d=json.loads(sys.stdin.read()); v=d.get(sys.argv[1],""); print("" if v is None else v)' "$key" <<<"$input" | tr -d '\n'
   else
     printf ''
   fi
