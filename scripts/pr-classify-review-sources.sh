@@ -37,13 +37,27 @@ jq -n \
     ($login // "") | ascii_downcase | . == "copilot-pull-request-reviewer[bot]"
       or . == "copilot-pull-request-reviewer"
       or . == "copilot" or . == "github-copilot[bot]";
+  def is_amazon_q_login($login):
+    ($login // "") | ascii_downcase | . == "amazon-q-developer[bot]"
+      or . == "amazon-q[bot]" or . == "amazon-q";
+  def is_cursor_login($login):
+    ($login // "") | ascii_downcase | . == "cursor" or . == "cursor[bot]";
+  def is_coderabbit_login($login):
+    ($login // "") | ascii_downcase | . == "coderabbitai[bot]"
+      or . == "coderabbitai" or . == "coderabbit";
+  def is_sourcery_login($login):
+    ($login // "") | ascii_downcase | . == "sourcery-ai[bot]"
+      or . == "sourcery-ai" or . == "sourcery";
+  def is_sonar_login($login):
+    ($login // "") | ascii_downcase | . == "sonarqubecloud[bot]"
+      or . == "sonarcloud[bot]" or . == "sonarcloud" or . == "sonar";
 
   ($reviews | map(select(is_copilot_login(.author.login)))) as $copilot |
-  ($reviews | map(select(.author.login | test("amazon-q";"i")))) as $aq |
-  ($reviews | map(select(.author.login | test("^cursor(\\[bot\\])?$";"i")))) as $cursor |
-  ($comments | map(select(.user.login | test("coderabbit";"i")))) as $cr_c |
-  ($comments | map(select(.user.login | test("sourcery";"i")))) as $so_c |
-  ($comments | map(select(.user.login | test("sonar";"i")))) as $sonar_c |
+  ($reviews | map(select(is_amazon_q_login(.author.login)))) as $aq |
+  ($reviews | map(select(is_cursor_login(.author.login)))) as $cursor |
+  ($comments | map(select(is_coderabbit_login(.user.login)))) as $cr_c |
+  ($comments | map(select(is_sourcery_login(.user.login)))) as $so_c |
+  ($comments | map(select(is_sonar_login(.user.login)))) as $sonar_c |
 
   ([]) as $src |
   ($src

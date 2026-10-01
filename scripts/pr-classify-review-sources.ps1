@@ -16,6 +16,15 @@ function Test-BodyMatch($text, [string[]] $patterns) {
     return $false
 }
 
+function Test-ExactLogin([string] $login, [string[]] $allowed) {
+    if (-not $login) { return $false }
+    $lower = $login.ToLowerInvariant()
+    foreach ($a in $allowed) {
+        if ($a.ToLowerInvariant() -eq $lower) { return $true }
+    }
+    return $false
+}
+
 $sources = [System.Collections.Generic.List[object]]::new()
 
 # --- Copilot (required final reviewer when policy applies) ---
@@ -26,10 +35,7 @@ $copilotLogins = @(
     'copilot',
     'github-copilot[bot]'
 )
-$copilot = @($Reviews | Where-Object {
-    $login = $_.author.login
-    $copilotLogins | Where-Object { $_.ToLowerInvariant() -eq $login.ToLowerInvariant() }
-})
+$copilot = @($Reviews | Where-Object { Test-ExactLogin $_.author.login $copilotLogins })
 if ($copilot.Count -eq 0) {
     $sources.Add([ordered]@{ source = 'copilot'; execution_state = 'MISSING'; commit = '' })
 } else {
@@ -48,7 +54,8 @@ if ($copilot.Count -eq 0) {
 }
 
 # --- Amazon Q ---
-$aq = @($Reviews | Where-Object { $_.author.login -match 'amazon-q' })
+$amazonQLogins = @('amazon-q-developer[bot]', 'amazon-q[bot]', 'amazon-q')
+$aq = @($Reviews | Where-Object { Test-ExactLogin $_.author.login $amazonQLogins })
 if ($aq.Count -gt 0) {
     $r = $aq[-1]
     if ($r.commit.oid -ne $HeadSha) {
@@ -63,8 +70,7 @@ if ($aq.Count -gt 0) {
 
 # --- Cursor / routing approval ---
 $cursor = @($Reviews | Where-Object {
-    $login = ($_.author.login ?? '').ToLowerInvariant()
-    $login -eq 'cursor' -or $login -eq 'cursor[bot]'
+    Test-ExactLogin $_.author.login @('cursor', 'cursor[bot]')
 })
 foreach ($r in $cursor) {
     $st = 'APPROVAL_ONLY'
@@ -79,14 +85,16 @@ foreach ($r in $cursor) {
 }
 
 # --- Issue comments (bots that post to conversation, not always as reviews) ---
-$cr = @($IssueComments | Where-Object { $_.user.login -match 'coderabbit' })
+$codeRabbitLogins = @('coderabbitai[bot]', 'coderabbitai', 'coderabbit')
+$cr = @($IssueComments | Where-Object { Test-ExactLogin $_.user.login $codeRabbitLogins })
 if ($cr.Count -gt 0) {
     $body = ($cr | ForEach-Object { $_.body }) -join ' '
     $st = if (Test-BodyMatch $body @('does not receive automatic reviews', 'fewer than 10 stars', 'Review skipped')) { 'SKIPPED' } else { 'PENDING' }
     $sources.Add([ordered]@{ source = 'coderabbit'; execution_state = $st })
 }
 
-$so = @($IssueComments | Where-Object { $_.user.login -match 'sourcery' })
+$sourceryLogins = @('sourcery-ai[bot]', 'sourcery-ai', 'sourcery')
+$so = @($IssueComments | Where-Object { Test-ExactLogin $_.user.login $sourceryLogins })
 if ($so.Count -gt 0) {
     $body = ($so | ForEach-Object { $_.body }) -join ' '
     if (Test-BodyMatch $body @('diff characters', 'quota', '6 days', '6 hours')) {
@@ -98,7 +106,8 @@ if ($so.Count -gt 0) {
     }
 }
 
-$sonar = @($IssueComments | Where-Object { $_.user.login -match 'sonar' })
+$sonarLogins = @('sonarqubecloud[bot]', 'sonarcloud[bot]', 'sonarcloud', 'sonar')
+$sonar = @($IssueComments | Where-Object { Test-ExactLogin $_.user.login $sonarLogins })
 if ($sonar.Count -gt 0) {
     $sources.Add([ordered]@{ source = 'sonarcloud'; execution_state = 'STATIC_ANALYSIS' })
 }
