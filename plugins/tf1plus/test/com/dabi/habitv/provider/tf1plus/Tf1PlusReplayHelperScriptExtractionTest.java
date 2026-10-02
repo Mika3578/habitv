@@ -13,9 +13,9 @@ import org.junit.Test;
 
 import com.dabi.habitv.api.plugin.holder.DownloaderPluginHolder;
 
-public class Tf1PlusPremiumScriptExtractionTest {
+public class Tf1PlusReplayHelperScriptExtractionTest {
 
-	private static final String SCRIPT_ENTRY = "scripts/tf1plus_premium_download.py";
+	private static final String SCRIPT_ENTRY = "scripts/tf1plus_helper.py";
 
 	@Test
 	public void shouldResolveScriptFromTf1PlusJarInPluginsDirectory() throws Exception {
@@ -26,7 +26,7 @@ public class Tf1PlusPremiumScriptExtractionTest {
 		final File fixtureJar = new File(pluginsDir, "tf1plus-fixture.jar");
 		buildFixtureJar(fixtureJar);
 
-		final File extracted = new File(pluginsDir, "tf1plus_premium_download.py");
+		final File extracted = new File(pluginsDir, "tf1plus_helper.py");
 		if (extracted.isFile()) {
 			extracted.delete();
 		}
@@ -51,7 +51,7 @@ public class Tf1PlusPremiumScriptExtractionTest {
 	}
 
 	private static String invokeResolveScriptPath(final DownloaderPluginHolder downloaders) throws Exception {
-		final java.lang.reflect.Method method = Tf1PlusPremiumDownloadExecutor.class
+		final java.lang.reflect.Method method = Tf1PlusReplayHelperExecutor.class
 				.getDeclaredMethod("resolveScriptPath", String.class);
 		method.setAccessible(true);
 		return (String) method.invoke(null, downloaders.getPluginDir());

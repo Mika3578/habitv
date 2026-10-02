@@ -81,8 +81,8 @@ public class XMLUserConfigTest {
 				+ "        <downloadOuput>/tmp/#EPISODE#.mp4</downloadOuput>\n"
 				+ "    </downloadConfig>\n"
 				+ "</ns2:configuration>\n").getBytes(StandardCharsets.UTF_8));
-		final Tf1PlusPremiumReplaySettings settings = XMLUserConfig.readConfigForTest(file)
-				.getTf1PlusPremiumReplaySettings();
+		final Tf1PlusReplayHelperSettings settings = XMLUserConfig.readConfigForTest(file)
+				.getTf1PlusReplayHelperSettings();
 		assertEquals("tf1@example.com", settings.getEmail());
 		assertEquals("secret", settings.getPassword());
 		assertEquals("C:/Tools/tf1plus/device.bin", settings.getDevicePath());

@@ -1,43 +1,32 @@
-package com.dabi.habitv.provider.tf1plus;
+package com.dabi.habitv.framework.plugin.utils;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.dabi.habitv.api.plugin.exception.ExecutorFailedException;
-import com.dabi.habitv.framework.plugin.utils.CmdExecutor;
 
 /**
- * Runs the TF1+ premium Python helper and parses {@code [download] <percent>%}
- * lines for the Habitv download UI (same convention as yt-dlp).
+ * Runs a locally provisioned helper script for a provider's configured
+ * download path (see docs/provider-configured-download.md).
+ *
+ * Executes the helper as a plain argument array; when the user configured
+ * a command processor, the argv is joined and substituted into the
+ * {@code #CMD#} token of that template. Environment overrides and progress
+ * parsing stay provider-specific.
  */
-final class Tf1PlusPremiumCmdExecutor extends CmdExecutor {
+public abstract class ConfiguredScriptCmdExecutor extends CmdExecutor {
 
-	private static final String CMD_TOKEN = "#CMD#";
-
-	private static final Pattern PROGRESS_PATTERN = Pattern.compile(".*\\s(\\d+(?:\\.\\d+)?)%.*");
+	public static final String CMD_TOKEN = "#CMD#";
 
 	private final String cmdProcessorValue;
 
 	private final String[] commandArgv;
 
-	Tf1PlusPremiumCmdExecutor(final String cmdProcessor, final String[] commandArgv, final long maxHungTime) {
+	protected ConfiguredScriptCmdExecutor(final String cmdProcessor, final String[] commandArgv,
+			final long maxHungTime) {
 		super(cmdProcessor, formatCommandForLog(commandArgv), maxHungTime);
 		this.cmdProcessorValue = cmdProcessor;
 		this.commandArgv = commandArgv.clone();
-	}
-
-	@Override
-	protected Map<String, String> getProcessEnvironment() {
-		final Map<String, String> overrides = Tf1PlusPremiumDownloadConfig.buildProcessEnvironmentOverrides();
-		if (overrides == null) {
-			final Map<String, String> unbuffered = new java.util.HashMap<String, String>();
-			unbuffered.put("PYTHONUNBUFFERED", "1");
-			return unbuffered;
-		}
-		overrides.put("PYTHONUNBUFFERED", "1");
-		return overrides;
 	}
 
 	@Override
@@ -69,7 +58,7 @@ final class Tf1PlusPremiumCmdExecutor extends CmdExecutor {
 		return builder.start();
 	}
 
-	static String formatCommandForLog(final String[] commandArgv) {
+	public static String formatCommandForLog(final String[] commandArgv) {
 		return joinArgvForShell(commandArgv);
 	}
 
@@ -92,17 +81,5 @@ final class Tf1PlusPremiumCmdExecutor extends CmdExecutor {
 			return value;
 		}
 		return "\"" + value.replace("\"", "\\\"") + "\"";
-	}
-
-	@Override
-	protected String handleProgression(final String line) {
-		if (line == null || line.isEmpty()) {
-			return null;
-		}
-		final Matcher matcher = PROGRESS_PATTERN.matcher(line);
-		if (matcher.find()) {
-			return matcher.group(1);
-		}
-		return null;
 	}
 }

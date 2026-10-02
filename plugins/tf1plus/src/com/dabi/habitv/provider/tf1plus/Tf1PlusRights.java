@@ -18,19 +18,19 @@ final class Tf1PlusRights {
 	private Tf1PlusRights() {
 	}
 
-	static boolean hasDownloadableRights(final Map<String, Object> video, final boolean premiumDownloadEnabled) {
+	static boolean hasDownloadableRights(final Map<String, Object> video, final boolean replayHelperEnabled) {
 		if (isYtDlpEligible(video)) {
 			return true;
 		}
-		if (!premiumDownloadEnabled) {
+		if (!replayHelperEnabled) {
 			return false;
 		}
 		return hasBasicRights(video) || isSubscriptionOnly(video) || hasMaxRights(video) || hasPremiumRights(video)
 				|| StringUtils.isNotEmpty(Tf1PlusGraphqlClient.resolveMediaStreamId(video));
 	}
 
-	static boolean shouldUsePremiumReplay(final Map<String, Object> video, final boolean premiumDownloadEnabled) {
-		if (!premiumDownloadEnabled || isYtDlpEligible(video)) {
+	static boolean shouldUsePremiumReplay(final Map<String, Object> video, final boolean replayHelperEnabled) {
+		if (!replayHelperEnabled || isYtDlpEligible(video)) {
 			return false;
 		}
 		return hasPremiumRights(video) || hasMaxRights(video) || isAuthEnabled(video)

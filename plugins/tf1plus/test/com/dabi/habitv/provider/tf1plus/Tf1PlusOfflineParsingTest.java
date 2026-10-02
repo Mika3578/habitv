@@ -136,7 +136,7 @@ public class Tf1PlusOfflineParsingTest {
 	}
 
 	@Test
-	public void shouldExcludeMaxOnlyEpisodesWhenPremiumDownloadIsDisabled() {
+	public void shouldExcludeMaxOnlyEpisodesWhenReplayHelperIsDisabled() {
 		Tf1PlusPluginManager plugin = new FixtureTf1PlusPluginManager();
 		CategoryDTO category = new CategoryDTO(Tf1PlusConf.NAME, "Automoto", "https://www.tf1.fr/tf1/automoto",
 				Tf1PlusConf.EXTENSION);
@@ -145,10 +145,10 @@ public class Tf1PlusOfflineParsingTest {
 	}
 
 	@Test
-	public void shouldExposeMaxOnlyAutomotoEpisodeWhenPremiumDownloadIsEnabled() {
+	public void shouldExposeMaxOnlyAutomotoEpisodeWhenReplayHelperIsEnabled() {
 		Tf1PlusPluginManager plugin = new FixtureTf1PlusPluginManager() {
 			@Override
-			protected boolean isPremiumDownloadEnabled() {
+			protected boolean isReplayHelperEnabled() {
 				return true;
 			}
 		};
@@ -159,14 +159,14 @@ public class Tf1PlusOfflineParsingTest {
 		EpisodeDTO episode = episodes.iterator().next();
 		assertEquals("Automoto du 14 juin 2026", episode.getName());
 		assertTrue(episode.getId().contains("#habitvTf1=fa698bd7-1328-467c-8cb3-4167b119973f,premium"));
-		assertTrue(Tf1PlusEpisodeUrl.requiresPremiumDownload(episode.getId()));
+		assertTrue(Tf1PlusEpisodeUrl.requiresReplayHelperDownload(episode.getId()));
 	}
 
 	@Test
-	public void shouldExposeLegacyPremiumEpisodeWhenPremiumDownloadIsEnabled() {
+	public void shouldExposeLegacyPremiumEpisodeWhenReplayHelperIsEnabled() {
 		Tf1PlusPluginManager plugin = new FixtureTf1PlusPluginManager() {
 			@Override
-			protected boolean isPremiumDownloadEnabled() {
+			protected boolean isReplayHelperEnabled() {
 				return true;
 			}
 		};
@@ -179,10 +179,10 @@ public class Tf1PlusOfflineParsingTest {
 	}
 
 	@Test
-	public void shouldTagBasicMaxReplayWithPremiumFragmentWhenPremiumDownloadIsEnabled() {
+	public void shouldTagBasicMaxReplayWithPremiumFragmentWhenReplayHelperIsEnabled() {
 		Tf1PlusPluginManager plugin = new FixtureTf1PlusPluginManager() {
 			@Override
-			protected boolean isPremiumDownloadEnabled() {
+			protected boolean isReplayHelperEnabled() {
 				return true;
 			}
 		};
@@ -192,14 +192,14 @@ public class Tf1PlusOfflineParsingTest {
 		assertEquals(1, episodes.size());
 		EpisodeDTO episode = episodes.iterator().next();
 		assertTrue(episode.getId().contains("#habitvTf1=e72e51c8-af61-4278-b04e-34b1c8302b44,premium"));
-		assertTrue(Tf1PlusEpisodeUrl.requiresPremiumDownload(episode.getId()));
+		assertTrue(Tf1PlusEpisodeUrl.requiresReplayHelperDownload(episode.getId()));
 	}
 
 	@Test
-	public void shouldExposePremiumAndBasicEpisodeWhenPremiumDownloadIsEnabled() {
+	public void shouldExposePremiumAndBasicEpisodeWhenReplayHelperIsEnabled() {
 		Tf1PlusPluginManager plugin = new FixtureTf1PlusPluginManager() {
 			@Override
-			protected boolean isPremiumDownloadEnabled() {
+			protected boolean isReplayHelperEnabled() {
 				return true;
 			}
 		};
@@ -209,12 +209,12 @@ public class Tf1PlusOfflineParsingTest {
 		assertEquals(1, episodes.size());
 		EpisodeDTO episode = episodes.iterator().next();
 		assertTrue(episode.getId().contains("#habitvTf1=14510094,premium"));
-		assertTrue(Tf1PlusEpisodeUrl.requiresPremiumDownload(episode.getId()));
+		assertTrue(Tf1PlusEpisodeUrl.requiresReplayHelperDownload(episode.getId()));
 	}
 
 	@Test
 	public void shouldParsePremiumEpisodeFragment() {
-		assertEquals("14510494", Tf1PlusEpisodeUrl.parsePremiumStreamId(
+		assertEquals("14510494", Tf1PlusEpisodeUrl.parseHelperStreamId(
 				"https://www.tf1.fr/tf1/automoto/videos/automoto-du-31-mai-2026.html#habitvTf1=14510494,premium"));
 		assertEquals("https://www.tf1.fr/tf1/automoto/videos/automoto-du-31-mai-2026.html",
 				Tf1PlusEpisodeUrl.pageUrlWithoutFragment(
@@ -223,7 +223,7 @@ public class Tf1PlusOfflineParsingTest {
 
 	@Test
 	public void shouldParseLegacyPremiumEpisodeFragment() {
-		assertEquals("14510494", Tf1PlusEpisodeUrl.parsePremiumStreamId(
+		assertEquals("14510494", Tf1PlusEpisodeUrl.parseHelperStreamId(
 				"https://www.tf1.fr/tf1/automoto/videos/automoto-du-31-mai-2026.html#habitvTf1=14510494,protected"));
 	}
 

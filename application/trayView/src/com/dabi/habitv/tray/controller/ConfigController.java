@@ -10,7 +10,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import com.dabi.habitv.core.config.Tf1PlusPremiumReplayConfig;
+import com.dabi.habitv.core.config.Tf1PlusReplayHelperValues;
 import com.dabi.habitv.core.config.UserConfig;
 import com.dabi.habitv.core.config.YoutubeApiKeyConfig;
 import com.dabi.habitv.tray.Popin;
@@ -230,7 +230,7 @@ public class ConfigController extends BaseController {
 			public void run() {
 				UserConfig userConfig = getController().loadUserConfig();
 				String currentValue = userConfig.getTf1PlusEmail();
-				String newValue = Tf1PlusPremiumReplayConfig.sanitizePlainValue(normalize(tf1plusEmail.getText()));
+				String newValue = Tf1PlusReplayHelperValues.sanitizePlainValue(normalize(tf1plusEmail.getText()));
 				if (currentValue == null ? newValue != null : !currentValue.equals(newValue)) {
 					userConfig.setTf1PlusEmail(newValue);
 					saveConfig(userConfig);
@@ -245,7 +245,7 @@ public class ConfigController extends BaseController {
 			public void run() {
 				UserConfig userConfig = getController().loadUserConfig();
 				String currentValue = userConfig.getTf1PlusPassword();
-				String newValue = Tf1PlusPremiumReplayConfig.sanitizePlainValue(normalize(tf1plusPassword.getText()));
+				String newValue = Tf1PlusReplayHelperValues.sanitizePlainValue(normalize(tf1plusPassword.getText()));
 				if (currentValue == null ? newValue != null : !currentValue.equals(newValue)) {
 					userConfig.setTf1PlusPassword(newValue);
 					saveConfig(userConfig);
@@ -260,7 +260,7 @@ public class ConfigController extends BaseController {
 			public void run() {
 				UserConfig userConfig = getController().loadUserConfig();
 				String currentValue = userConfig.getTf1PlusDevicePath();
-				String newValue = Tf1PlusPremiumReplayConfig.sanitizePlainValue(normalize(tf1plusDevicePath.getText()));
+				String newValue = Tf1PlusReplayHelperValues.sanitizePlainValue(normalize(tf1plusDevicePath.getText()));
 				if (currentValue == null ? newValue != null : !currentValue.equals(newValue)) {
 					userConfig.setTf1PlusDevicePath(newValue);
 					saveConfig(userConfig);
@@ -275,7 +275,7 @@ public class ConfigController extends BaseController {
 			public void run() {
 				UserConfig userConfig = getController().loadUserConfig();
 				String currentValue = userConfig.getTf1PlusNM3u8dlRe();
-				String newValue = Tf1PlusPremiumReplayConfig.sanitizePlainValue(normalize(tf1plusNM3u8dlRe.getText()));
+				String newValue = Tf1PlusReplayHelperValues.sanitizePlainValue(normalize(tf1plusNM3u8dlRe.getText()));
 				if (currentValue == null ? newValue != null : !currentValue.equals(newValue)) {
 					userConfig.setTf1PlusNM3u8dlRe(newValue);
 					saveConfig(userConfig);

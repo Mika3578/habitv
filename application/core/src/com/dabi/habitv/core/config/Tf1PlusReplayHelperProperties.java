@@ -5,7 +5,7 @@ package com.dabi.habitv.core.config;
  * properties read by the {@code tf1plus} plugin. Environment variables still take
  * precedence in the plugin when set.
  */
-public final class Tf1PlusPremiumReplaySystemProperty {
+public final class Tf1PlusReplayHelperProperties {
 
 	public static final String PROPERTY_EMAIL = "habitv.tf1plus.email";
 
@@ -26,10 +26,10 @@ public final class Tf1PlusPremiumReplaySystemProperty {
 
 	private static boolean appliedFromUserConfig;
 
-	private Tf1PlusPremiumReplaySystemProperty() {
+	private Tf1PlusReplayHelperProperties() {
 	}
 
-	public static void applyFromUserConfig(final Tf1PlusPremiumReplaySettings settings) {
+	public static void applyFromUserConfig(final Tf1PlusReplayHelperSettings settings) {
 		if (settings == null) {
 			clearAppliedProperties();
 			return;
@@ -49,7 +49,7 @@ public final class Tf1PlusPremiumReplaySystemProperty {
 	}
 
 	private static boolean applyDevicePath(final String value) {
-		final String sanitized = Tf1PlusPremiumReplayConfig.sanitizePlainValue(value);
+		final String sanitized = Tf1PlusReplayHelperValues.sanitizePlainValue(value);
 		if (sanitized == null) {
 			clearProperty(PROPERTY_DEVICE_PATH);
 			clearProperty(PROPERTY_WVD_PATH);
@@ -60,7 +60,7 @@ public final class Tf1PlusPremiumReplaySystemProperty {
 	}
 
 	private static boolean applyProperty(final String propertyName, final String value) {
-		final String sanitized = Tf1PlusPremiumReplayConfig.sanitizePlainValue(value);
+		final String sanitized = Tf1PlusReplayHelperValues.sanitizePlainValue(value);
 		if (sanitized != null) {
 			System.setProperty(propertyName, sanitized);
 			return true;

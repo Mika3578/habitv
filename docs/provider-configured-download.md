@@ -11,9 +11,25 @@ downloader plugin (usually yt-dlp). Some hosts need an **extra,
 user-configured** download path that stays **off** until local settings
 exist.
 
-Do not invent a shared mega-framework. Copy the shape per provider in a
-**separate PR**, only when that host actually needs it and E2E proof
-exists.
+The shared execution base lives in
+[`ConfiguredScriptCmdExecutor`](../fwk/framework/src/com/dabi/habitv/framework/plugin/utils/ConfiguredScriptCmdExecutor.java)
+(framework module): argument-array execution, command-processor template
+substitution, environment overrides. Keep it thin; provider-specific
+logic stays in each plugin module.
+
+## Reference projects
+
+How comparable open-source projects shape this:
+
+| Project | Shape | Take-away |
+|---------|-------|-----------|
+| [OqeeRewind](https://github.com/NohamR/OqeeRewind) | One Python project per service (auth → manifest → segments → keys → mux) | Ships the generic code only; the user sources the device file locally |
+| [Catch-up-TV-and-More](https://github.com/Catch-up-TV-and-More/plugin.video.catchuptvandmore) | Thin per-provider module; the player performs the handshake | Keep per-provider code minimal; centralize the heavy lifting |
+| [MediaFlow Proxy](https://github.com/mhdzumair/mediaflow-proxy) | Self-hosted proxy; providers supply manifest + keys | One central point converts and processes streams for all providers |
+
+HabiTV follows the same split: thin per-provider resolvers in plugin
+modules, one shared executor base in the framework, and (optionally) a
+local helper script or a MediaFlow instance as the execution backend.
 
 ## Layers
 
@@ -58,3 +74,15 @@ git text stays short and generic ([`AGENTS.md`](../AGENTS.md)).
 Candidates for a similar shape are listed under “Needs rewrite /
 investigation” in [`providers.md`](providers.md). Each stays a separate
 scoped change after its own E2E check.
+
+## Roadmap (entitled replay providers)
+
+Providers whose content needs a user-configured path reuse this pattern:
+
+1. Thin resolver in the plugin module: authentication, manifest and
+   request candidates (provider-specific, unavoidable).
+2. Shared execution: `ConfiguredScriptCmdExecutor` in the framework.
+3. One local helper script per provider, or a shared helper with
+   subcommands; alternatively route through a local MediaFlow instance.
+4. Device files, credentials, and helper scripts stay local — never
+   committed (see OqeeRewind's precedent).

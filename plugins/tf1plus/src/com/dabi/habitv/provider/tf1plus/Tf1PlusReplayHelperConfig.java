@@ -9,9 +9,9 @@ import java.util.Map;
  * properties set from {@code configuration.xml} at Habitv startup
  * ({@link Tf1PlusConf#PROPERTY_EMAIL}, etc.).
  */
-final class Tf1PlusPremiumDownloadConfig {
+final class Tf1PlusReplayHelperConfig {
 
-	private Tf1PlusPremiumDownloadConfig() {
+	private Tf1PlusReplayHelperConfig() {
 	}
 
 	static boolean isConfigured() {
@@ -33,7 +33,7 @@ final class Tf1PlusPremiumDownloadConfig {
 		if (!hasDownloadBackend()) {
 			return Tf1PlusConf.USER_MESSAGE_TF1_DOWNLOAD_BACKEND_REQUIRED;
 		}
-		return Tf1PlusConf.USER_MESSAGE_PREMIUM_REPLAY_NOT_CONFIGURED;
+		return Tf1PlusConf.USER_MESSAGE_REPLAY_HELPER_NOT_CONFIGURED;
 	}
 
 	/**

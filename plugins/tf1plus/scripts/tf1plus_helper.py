@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-TF1+ premium replay helper for Habitv.
+TF1+ replay helper for Habitv.
 
 Uses TF1 Gigya login, mediainfo delivery, a user-local device file, and an
 external DASH downloader (N_m3u8DL-RE or MediaFlow).
@@ -448,7 +448,7 @@ def attempt_playback_material(device_path, init_data_b64, request_url, request_h
     except ImportError:
         fail_code(
             "TF1_HELPER_DEPS_MISSING",
-            "Premium replay helper dependencies are not installed",
+            "Replay helper dependencies are not installed",
             "pip install -r plugins/tf1plus/scripts/requirements.txt",
         )
 
@@ -477,11 +477,11 @@ def attempt_playback_material(device_path, init_data_b64, request_url, request_h
         material = []
         for entry in cdm.get_keys(session_id):
             if entry.type == "CONTENT":
-                material.append({"kid": entry.kid.hex, "key": entry.key.hex()})
+                material.append({"kid": entry.kid.hex(), "key": entry.key.hex()})
         if not material:
             raise Tf1AccessError(
                 "TF1_SESSION_EMPTY",
-                "Premium replay session returned no playback material",
+                "Replay session returned no playback material",
                 "Check account entitlement and the local device file.",
             )
         return material
@@ -502,7 +502,7 @@ def resolve_playback_material(device_path, init_data_b64, access_candidates):
     if last_error is None:
         fail_code(
             "TF1_SESSION_FAILED",
-            "Premium replay session could not be established",
+            "Replay session could not be established",
             "No playback access candidates were available.",
         )
     fail_code(last_error.code, last_error.message, last_error.hint)
@@ -601,7 +601,7 @@ def download_with_mediaflow(mediaflow_base, mpd_url, material, output_path, ffmp
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Download premium TF1+ replay")
+    parser = argparse.ArgumentParser(description="Download TF1+ replay")
     parser.add_argument("--stream-id", required=True)
     parser.add_argument(
         "--probe",
@@ -626,7 +626,7 @@ def require_env_for_probe(device_required):
     if not email or not password:
         fail_code(
             "TF1_CREDENTIALS_MISSING",
-            "TF1_EMAIL and TF1_PASSWORD environment variables are required for premium replay downloads",
+            "TF1_EMAIL and TF1_PASSWORD environment variables are required for replay helper downloads",
             "Set tf1plusEmail/tf1plusPassword in configuration.xml or export env vars.",
         )
     if device_required:
@@ -634,7 +634,7 @@ def require_env_for_probe(device_required):
     return email, password, device_path
 
 
-def requires_premium_helper(delivery):
+def requires_helper(delivery):
     if delivery.get("drms"):
         return True
     return delivery.get("drm") == "widevine"
@@ -667,10 +667,10 @@ def main():
         )
         return
 
-    if not requires_premium_helper(delivery):
+    if not requires_helper(delivery):
         fail_code(
             "TF1_STREAM_UNSUPPORTED",
-            "This stream is not available through the premium replay helper",
+            "This stream is not available through the replay helper",
             "Try yt-dlp for public replay.",
         )
 
@@ -686,7 +686,7 @@ def main():
         return
 
     if not args.n_m3u8dl_re and not mediaflow_url:
-        fail("Configure N_M3U8DL_RE or MEDIAFLOW_URL for premium TF1+ download")
+        fail("Configure N_M3U8DL_RE or MEDIAFLOW_URL for TF1+ helper download")
 
     if args.n_m3u8dl_re:
         download_with_n_m3u8dl(args.n_m3u8dl_re, mpd_url, material, args.output, mpd_headers)
@@ -694,7 +694,7 @@ def main():
         download_with_mediaflow(mediaflow_url, mpd_url, material, args.output, args.ffmpeg, mediaflow_password)
 
     report_download_progress(100.0)
-    print("TF1+ premium replay download completed: " + args.output)
+    print("TF1+ replay download completed: " + args.output)
 
 
 if __name__ == "__main__":

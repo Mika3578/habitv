@@ -3,7 +3,7 @@ package com.dabi.habitv.core.config;
 /**
  * TF1+ premium-replay credentials and tool paths from {@code configuration.xml}.
  */
-public final class Tf1PlusPremiumReplaySettings {
+public final class Tf1PlusReplayHelperSettings {
 
 	private final String email;
 
@@ -19,7 +19,7 @@ public final class Tf1PlusPremiumReplaySettings {
 
 	private final String pythonCommand;
 
-	public Tf1PlusPremiumReplaySettings(final String email, final String password, final String devicePath,
+	public Tf1PlusReplayHelperSettings(final String email, final String password, final String devicePath,
 			final String nM3u8DlRePath, final String mediaflowUrl, final String mediaflowPassword,
 			final String pythonCommand) {
 		this.email = email;

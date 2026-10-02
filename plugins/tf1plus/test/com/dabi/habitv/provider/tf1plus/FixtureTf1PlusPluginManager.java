@@ -37,7 +37,7 @@ public class FixtureTf1PlusPluginManager extends Tf1PlusPluginManager {
 	}
 
 	@Override
-	protected boolean isPremiumDownloadEnabled() {
+	protected boolean isReplayHelperEnabled() {
 		return false;
 	}
 

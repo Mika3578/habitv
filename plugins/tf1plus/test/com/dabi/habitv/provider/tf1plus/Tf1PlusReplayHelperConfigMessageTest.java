@@ -9,7 +9,7 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
-public class Tf1PlusPremiumDownloadConfigMessageTest {
+public class Tf1PlusReplayHelperConfigMessageTest {
 
 	private String previousEmail;
 
@@ -32,24 +32,24 @@ public class Tf1PlusPremiumDownloadConfigMessageTest {
 
 	@Test
 	public void shouldAskForCredentialsWhenEmailOrPasswordMissing() {
-		assertFalse(Tf1PlusPremiumDownloadConfig.hasCredentials());
+		assertFalse(Tf1PlusReplayHelperConfig.hasCredentials());
 		assertEquals(Tf1PlusConf.USER_MESSAGE_TF1_CREDENTIALS_REQUIRED,
-				Tf1PlusPremiumDownloadConfig.userFacingConfigurationMessage());
+				Tf1PlusReplayHelperConfig.userFacingConfigurationMessage());
 
 		System.setProperty(Tf1PlusConf.PROPERTY_EMAIL, "user@example.com");
-		assertFalse(Tf1PlusPremiumDownloadConfig.hasCredentials());
+		assertFalse(Tf1PlusReplayHelperConfig.hasCredentials());
 		assertEquals(Tf1PlusConf.USER_MESSAGE_TF1_CREDENTIALS_REQUIRED,
-				Tf1PlusPremiumDownloadConfig.userFacingConfigurationMessage());
+				Tf1PlusReplayHelperConfig.userFacingConfigurationMessage());
 	}
 
 	@Test
 	public void shouldReportDevicePathRequiredWhenCredentialsPresentOnly() {
 		System.setProperty(Tf1PlusConf.PROPERTY_EMAIL, "user@example.com");
 		System.setProperty(Tf1PlusConf.PROPERTY_PASSWORD, "secret");
-		assertTrue(Tf1PlusPremiumDownloadConfig.hasCredentials());
-		assertFalse(Tf1PlusPremiumDownloadConfig.isConfigured());
+		assertTrue(Tf1PlusReplayHelperConfig.hasCredentials());
+		assertFalse(Tf1PlusReplayHelperConfig.isConfigured());
 		assertEquals(Tf1PlusConf.USER_MESSAGE_TF1_DEVICE_PATH_REQUIRED,
-				Tf1PlusPremiumDownloadConfig.userFacingConfigurationMessage());
+				Tf1PlusReplayHelperConfig.userFacingConfigurationMessage());
 	}
 
 	private static void assumeNoTf1EnvironmentVariables() {

@@ -4,14 +4,14 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-public class Tf1PlusPremiumDownloadExecutorTest {
+public class Tf1PlusReplayHelperExecutorTest {
 
 	@Test
 	public void shouldBuildArgvWithSeparatePythonExecutableAndFlags() {
-		final String[] argv = Tf1PlusPremiumDownloadExecutor.buildCommandArgv("14510214",
-				"C:\\scripts\\tf1plus_premium_download.py", "C:\\out.mp4.tmp", "ffmpeg");
+		final String[] argv = Tf1PlusReplayHelperExecutor.buildCommandArgv("14510214",
+				"C:\\scripts\\tf1plus_helper.py", "C:\\out.mp4.tmp", "ffmpeg");
 		assertEquals("python", argv[0]);
-		assertEquals("C:\\scripts\\tf1plus_premium_download.py", argv[1]);
+		assertEquals("C:\\scripts\\tf1plus_helper.py", argv[1]);
 		assertEquals("--stream-id", argv[2]);
 		assertEquals("14510214", argv[3]);
 	}
@@ -21,7 +21,7 @@ public class Tf1PlusPremiumDownloadExecutorTest {
 		final String previous = System.getProperty(Tf1PlusConf.PROPERTY_PYTHON);
 		System.setProperty(Tf1PlusConf.PROPERTY_PYTHON, "py -3");
 		try {
-			final String[] argv = Tf1PlusPremiumDownloadExecutor.buildCommandArgv("1", "script.py", "out.tmp",
+			final String[] argv = Tf1PlusReplayHelperExecutor.buildCommandArgv("1", "script.py", "out.tmp",
 					"ffmpeg");
 			assertEquals("py", argv[0]);
 			assertEquals("-3", argv[1]);

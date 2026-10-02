@@ -19,26 +19,26 @@ import com.dabi.habitv.api.plugin.exception.ExecutorFailedException;
 import com.dabi.habitv.api.plugin.holder.DownloaderPluginHolder;
 import com.dabi.habitv.api.plugin.holder.ProcessHolder;
 
-final class Tf1PlusPremiumDownloadExecutor {
+final class Tf1PlusReplayHelperExecutor {
 
-	private static final Logger LOG = Logger.getLogger(Tf1PlusPremiumDownloadExecutor.class);
+	private static final Logger LOG = Logger.getLogger(Tf1PlusReplayHelperExecutor.class);
 
 	private static final long MAX_HUNG_TIME = 900000L;
 
-	private static final String SCRIPT_NAME = "tf1plus_premium_download.py";
+	private static final String SCRIPT_NAME = "tf1plus_helper.py";
 
 	private static final String BUNDLED_SCRIPT_ENTRY = "scripts/" + SCRIPT_NAME;
 
-	private Tf1PlusPremiumDownloadExecutor() {
+	private Tf1PlusReplayHelperExecutor() {
 	}
 
 	static ProcessHolder download(final DownloadParamDTO downloadParam, final DownloaderPluginHolder downloaders)
 			throws DownloadFailedException {
-		if (!Tf1PlusPremiumDownloadConfig.isConfigured()) {
+		if (!Tf1PlusReplayHelperConfig.isConfigured()) {
 			throw new DownloadFailedException(
-					new IllegalStateException(Tf1PlusPremiumDownloadConfig.userFacingConfigurationMessage()));
+					new IllegalStateException(Tf1PlusReplayHelperConfig.userFacingConfigurationMessage()));
 		}
-		final String streamId = Tf1PlusEpisodeUrl.parsePremiumStreamId(downloadParam.getDownloadInput());
+		final String streamId = Tf1PlusEpisodeUrl.parseHelperStreamId(downloadParam.getDownloadInput());
 		if (StringUtils.isEmpty(streamId)) {
 			throw new DownloadFailedException(
 					new IllegalStateException("missing TF1 stream id for premium replay download"));
@@ -49,7 +49,7 @@ final class Tf1PlusPremiumDownloadExecutor {
 		final String[] commandArgv = buildCommandArgv(streamId, scriptPath, downloadParam.getDownloadOutput(),
 				ffmpegPath);
 		try {
-			return new Tf1PlusPremiumCmdExecutor(downloaders.getCmdProcessor(), commandArgv, MAX_HUNG_TIME);
+			return new Tf1PlusReplayHelperCmdExecutor(downloaders.getCmdProcessor(), commandArgv, MAX_HUNG_TIME);
 		} catch (final ExecutorFailedException e) {
 			throw new DownloadFailedException(e);
 		}
@@ -58,7 +58,7 @@ final class Tf1PlusPremiumDownloadExecutor {
 	static String[] buildCommandArgv(final String streamId, final String scriptPath, final String outputPath,
 			final String ffmpegPath) {
 		final List<String> argv = new ArrayList<String>();
-		addPythonTokens(argv, Tf1PlusPremiumDownloadConfig.pythonCommand());
+		addPythonTokens(argv, Tf1PlusReplayHelperConfig.pythonCommand());
 		argv.add(scriptPath);
 		argv.add("--stream-id");
 		argv.add(streamId);
@@ -66,7 +66,7 @@ final class Tf1PlusPremiumDownloadExecutor {
 		argv.add(outputPath);
 		argv.add("--ffmpeg");
 		argv.add(ffmpegPath);
-		final String nM3u8 = Tf1PlusPremiumDownloadConfig.nM3u8DlRePath();
+		final String nM3u8 = Tf1PlusReplayHelperConfig.nM3u8DlRePath();
 		if (StringUtils.isNotEmpty(nM3u8)) {
 			argv.add("--n-m3u8dl-re");
 			argv.add(nM3u8);
@@ -230,7 +230,7 @@ final class Tf1PlusPremiumDownloadExecutor {
 	}
 
 	private static InputStream openBundledScriptStream() {
-		final ClassLoader loader = Tf1PlusPremiumDownloadExecutor.class.getClassLoader();
+		final ClassLoader loader = Tf1PlusReplayHelperExecutor.class.getClassLoader();
 		if (loader == null) {
 			return null;
 		}

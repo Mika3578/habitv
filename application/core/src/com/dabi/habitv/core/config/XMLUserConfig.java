@@ -552,63 +552,63 @@ public class XMLUserConfig implements UserConfig {
 
 	@Override
 	public String getTf1PlusEmail() {
-		return getTf1PlusPremiumReplaySettings().getEmail();
+		return getTf1PlusReplayHelperSettings().getEmail();
 	}
 
 	@Override
 	public String getTf1PlusPassword() {
-		return getTf1PlusPremiumReplaySettings().getPassword();
+		return getTf1PlusReplayHelperSettings().getPassword();
 	}
 
 	@Override
 	public void setTf1PlusEmail(final String email) {
-		setPlainDownloaderValue(TF1PLUS_EMAIL, Tf1PlusPremiumReplayConfig.sanitizePlainValue(email));
+		setPlainDownloaderValue(TF1PLUS_EMAIL, Tf1PlusReplayHelperValues.sanitizePlainValue(email));
 	}
 
 	@Override
 	public void setTf1PlusPassword(final String password) {
-		setPlainDownloaderValue(TF1PLUS_PASSWORD, Tf1PlusPremiumReplayConfig.sanitizePlainValue(password));
+		setPlainDownloaderValue(TF1PLUS_PASSWORD, Tf1PlusReplayHelperValues.sanitizePlainValue(password));
 	}
 
 	@Override
 	public String getTf1PlusDevicePath() {
-		return getTf1PlusPremiumReplaySettings().getDevicePath();
+		return getTf1PlusReplayHelperSettings().getDevicePath();
 	}
 
 	@Override
 	public void setTf1PlusDevicePath(final String devicePath) {
-		setPlainDownloaderValue(TF1PLUS_DEVICE_PATH, Tf1PlusPremiumReplayConfig.sanitizePlainValue(devicePath));
+		setPlainDownloaderValue(TF1PLUS_DEVICE_PATH, Tf1PlusReplayHelperValues.sanitizePlainValue(devicePath));
 	}
 
 	@Override
 	public String getTf1PlusNM3u8dlRe() {
-		return getTf1PlusPremiumReplaySettings().getNM3u8DlRePath();
+		return getTf1PlusReplayHelperSettings().getNM3u8DlRePath();
 	}
 
 	@Override
 	public void setTf1PlusNM3u8dlRe(final String nM3u8dlRePath) {
-		setPlainDownloaderValue(TF1PLUS_N_M3U8DL_RE, Tf1PlusPremiumReplayConfig.sanitizePlainValue(nM3u8dlRePath));
+		setPlainDownloaderValue(TF1PLUS_N_M3U8DL_RE, Tf1PlusReplayHelperValues.sanitizePlainValue(nM3u8dlRePath));
 	}
 
 	@Override
-	public Tf1PlusPremiumReplaySettings getTf1PlusPremiumReplaySettings() {
+	public Tf1PlusReplayHelperSettings getTf1PlusReplayHelperSettings() {
 		final Map<String, String> downloaders = getDownloader();
-		return new Tf1PlusPremiumReplaySettings(
-				Tf1PlusPremiumReplayConfig.sanitizePlainValue(downloaders.get(TF1PLUS_EMAIL)),
-				Tf1PlusPremiumReplayConfig.sanitizePlainValue(downloaders.get(TF1PLUS_PASSWORD)),
+		return new Tf1PlusReplayHelperSettings(
+				Tf1PlusReplayHelperValues.sanitizePlainValue(downloaders.get(TF1PLUS_EMAIL)),
+				Tf1PlusReplayHelperValues.sanitizePlainValue(downloaders.get(TF1PLUS_PASSWORD)),
 				resolveTf1PlusDevicePath(downloaders),
-				Tf1PlusPremiumReplayConfig.sanitizePlainValue(downloaders.get(TF1PLUS_N_M3U8DL_RE)),
-				Tf1PlusPremiumReplayConfig.sanitizePlainValue(downloaders.get(TF1PLUS_MEDIAFLOW_URL)),
-				Tf1PlusPremiumReplayConfig.sanitizePlainValue(downloaders.get(TF1PLUS_MEDIAFLOW_PASSWORD)),
-				Tf1PlusPremiumReplayConfig.sanitizePlainValue(downloaders.get(TF1PLUS_PYTHON)));
+				Tf1PlusReplayHelperValues.sanitizePlainValue(downloaders.get(TF1PLUS_N_M3U8DL_RE)),
+				Tf1PlusReplayHelperValues.sanitizePlainValue(downloaders.get(TF1PLUS_MEDIAFLOW_URL)),
+				Tf1PlusReplayHelperValues.sanitizePlainValue(downloaders.get(TF1PLUS_MEDIAFLOW_PASSWORD)),
+				Tf1PlusReplayHelperValues.sanitizePlainValue(downloaders.get(TF1PLUS_PYTHON)));
 	}
 
 	private static String resolveTf1PlusDevicePath(final Map<String, String> downloaders) {
-		final String devicePath = Tf1PlusPremiumReplayConfig.sanitizePlainValue(downloaders.get(TF1PLUS_DEVICE_PATH));
+		final String devicePath = Tf1PlusReplayHelperValues.sanitizePlainValue(downloaders.get(TF1PLUS_DEVICE_PATH));
 		if (devicePath != null) {
 			return devicePath;
 		}
-		return Tf1PlusPremiumReplayConfig.sanitizePlainValue(downloaders.get(TF1PLUS_WVD_PATH));
+		return Tf1PlusReplayHelperValues.sanitizePlainValue(downloaders.get(TF1PLUS_WVD_PATH));
 	}
 
 	private static boolean isTf1PlusOpaqueConfigTag(final String tagName) {

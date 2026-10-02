@@ -142,49 +142,49 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 
 		final String downloadInput = downloadParam.getDownloadInput();
 
-		if (Tf1PlusEpisodeUrl.requiresPremiumDownload(downloadInput)) {
+		if (Tf1PlusEpisodeUrl.requiresReplayHelperDownload(downloadInput)) {
 
-			LOG.info("TF1+ download route=premium-replay fragment="
+			LOG.info("TF1+ download route=replay-helper fragment="
 
-					+ Tf1PlusEpisodeUrl.parsePremiumStreamId(downloadInput) + " config="
+					+ Tf1PlusEpisodeUrl.parseHelperStreamId(downloadInput) + " config="
 
-					+ Tf1PlusPremiumDownloadConfig.configurationStatusForLog());
+					+ Tf1PlusReplayHelperConfig.configurationStatusForLog());
 
-			return Tf1PlusPremiumDownloadExecutor.download(downloadParam, downloaders);
+			return Tf1PlusReplayHelperExecutor.download(downloadParam, downloaders);
 
 		}
 
-		final String streamId = resolveStreamIdForPremiumDownload(downloadInput);
+		final String streamId = resolveStreamIdForReplayHelper(downloadInput);
 
 		if (StringUtils.isNotEmpty(streamId)) {
 
-			if (!isPremiumDownloadEnabled()) {
+			if (!isReplayHelperEnabled()) {
 
 				LOG.warn("TF1+ premium replay requires local setup (streamId=" + streamId + ") config="
 
-						+ Tf1PlusPremiumDownloadConfig.configurationStatusForLog());
+						+ Tf1PlusReplayHelperConfig.configurationStatusForLog());
 
 				throw new DownloadFailedException(new IllegalStateException(
 
-						Tf1PlusPremiumDownloadConfig.userFacingConfigurationMessage()));
+						Tf1PlusReplayHelperConfig.userFacingConfigurationMessage()));
 
 			}
 
-			LOG.info("TF1+ download route=premium-replay streamId=" + streamId + " config="
+			LOG.info("TF1+ download route=replay-helper streamId=" + streamId + " config="
 
-					+ Tf1PlusPremiumDownloadConfig.configurationStatusForLog());
+					+ Tf1PlusReplayHelperConfig.configurationStatusForLog());
 
-			return Tf1PlusPremiumDownloadExecutor.download(
+			return Tf1PlusReplayHelperExecutor.download(
 
 					DownloadParamDTO.buildDownloadParam(downloadParam,
 
-							Tf1PlusEpisodeUrl.withPremiumStreamId(downloadInput, streamId)),
+							Tf1PlusEpisodeUrl.withHelperStreamId(downloadInput, streamId)),
 
 					downloaders);
 
 		}
 
-		if (isPremiumDownloadEnabled()) {
+		if (isReplayHelperEnabled()) {
 
 			if (!isYtDlpEligibleEpisodeUrl(downloadInput)) {
 
@@ -194,7 +194,7 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 
 				throw new DownloadFailedException(new IllegalStateException(
 
-						Tf1PlusConf.USER_MESSAGE_PREMIUM_REPLAY));
+						Tf1PlusConf.USER_MESSAGE_REPLAY_HELPER));
 
 			}
 
@@ -202,7 +202,7 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 
 		LOG.info("TF1+ download route=yt-dlp config="
 
-				+ Tf1PlusPremiumDownloadConfig.configurationStatusForLog() + " url="
+				+ Tf1PlusReplayHelperConfig.configurationStatusForLog() + " url="
 
 				+ Tf1PlusEpisodeUrl.pageUrlWithoutFragment(downloadInput));
 
@@ -220,7 +220,7 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 
 
 
-	private String resolveStreamIdForPremiumDownload(final String episodeUrl) {
+	private String resolveStreamIdForReplayHelper(final String episodeUrl) {
 
 		final Matcher matcher = VIDEO_PAGE_PATTERN.matcher(Tf1PlusEpisodeUrl.pageUrlWithoutFragment(episodeUrl));
 
@@ -246,7 +246,7 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 
 				}
 
-				final String premiumDeliveryId = Tf1PlusGraphqlClient.resolvePremiumDeliveryId(videoBySlug);
+				final String premiumDeliveryId = Tf1PlusGraphqlClient.resolveHelperDeliveryId(videoBySlug);
 
 				if (StringUtils.isNotEmpty(premiumDeliveryId)) {
 
@@ -274,7 +274,7 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 
 				}
 
-				final String premiumDeliveryId = Tf1PlusGraphqlClient.resolvePremiumDeliveryId(video);
+				final String premiumDeliveryId = Tf1PlusGraphqlClient.resolveHelperDeliveryId(video);
 
 				if (StringUtils.isNotEmpty(premiumDeliveryId)) {
 
@@ -300,9 +300,9 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 
 
 
-	protected boolean isPremiumDownloadEnabled() {
+	protected boolean isReplayHelperEnabled() {
 
-		return Tf1PlusPremiumDownloadConfig.isConfigured();
+		return Tf1PlusReplayHelperConfig.isConfigured();
 
 	}
 
@@ -380,7 +380,7 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 
 			}
 
-			final String premiumDeliveryId = Tf1PlusGraphqlClient.resolvePremiumDeliveryId(video);
+			final String premiumDeliveryId = Tf1PlusGraphqlClient.resolveHelperDeliveryId(video);
 
 			final boolean premiumEpisode = shouldUsePremiumReplay(video);
 
@@ -418,7 +418,7 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 
 			if (premiumEpisode && StringUtils.isNotEmpty(premiumDeliveryId)) {
 
-				url = Tf1PlusEpisodeUrl.withPremiumStreamId(url, premiumDeliveryId);
+				url = Tf1PlusEpisodeUrl.withHelperStreamId(url, premiumDeliveryId);
 
 			}
 
@@ -458,7 +458,7 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 
 		if (episodes.isEmpty()) {
 
-			diagnostics.setRootCauseSummary(isPremiumDownloadEnabled() ? "no-downloadable-rights-episodes-found"
+			diagnostics.setRootCauseSummary(isReplayHelperEnabled() ? "no-downloadable-rights-episodes-found"
 
 					: "no-basic-rights-episodes-found");
 
@@ -670,13 +670,13 @@ public class Tf1PlusPluginManager extends BasePluginWithProxy implements PluginP
 
 	private boolean hasDownloadableRights(final Map<String, Object> video) {
 
-		return Tf1PlusRights.hasDownloadableRights(video, isPremiumDownloadEnabled());
+		return Tf1PlusRights.hasDownloadableRights(video, isReplayHelperEnabled());
 
 	}
 
 	private boolean shouldUsePremiumReplay(final Map<String, Object> video) {
 
-		return Tf1PlusRights.shouldUsePremiumReplay(video, isPremiumDownloadEnabled());
+		return Tf1PlusRights.shouldUsePremiumReplay(video, isReplayHelperEnabled());
 
 	}
 

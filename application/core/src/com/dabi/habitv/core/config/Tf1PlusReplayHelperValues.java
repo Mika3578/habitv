@@ -3,9 +3,9 @@ package com.dabi.habitv.core.config;
 /**
  * Plain-string handling for TF1+ premium-replay entries in user configuration.
  */
-public final class Tf1PlusPremiumReplayConfig {
+public final class Tf1PlusReplayHelperValues {
 
-	private Tf1PlusPremiumReplayConfig() {
+	private Tf1PlusReplayHelperValues() {
 	}
 
 	public static String sanitizePlainValue(final String value) {

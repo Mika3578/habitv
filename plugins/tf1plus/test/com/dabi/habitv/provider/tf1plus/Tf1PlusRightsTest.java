@@ -68,7 +68,7 @@ public class Tf1PlusRightsTest {
 		final Map<String, Object> video = new HashMap<String, Object>();
 		video.put("id", "fa698bd7-1328-467c-8cb3-4167b119973f");
 		assertEquals("fa698bd7-1328-467c-8cb3-4167b119973f",
-				Tf1PlusGraphqlClient.resolvePremiumDeliveryId(video));
+				Tf1PlusGraphqlClient.resolveHelperDeliveryId(video));
 		assertEquals("", Tf1PlusGraphqlClient.resolveMediaStreamId(video));
 	}
 

@@ -73,6 +73,6 @@ public interface UserConfig {
 
 	void setTf1PlusNM3u8dlRe(String nM3u8dlRePath);
 
-	Tf1PlusPremiumReplaySettings getTf1PlusPremiumReplaySettings();
+	Tf1PlusReplayHelperSettings getTf1PlusReplayHelperSettings();
 
 }

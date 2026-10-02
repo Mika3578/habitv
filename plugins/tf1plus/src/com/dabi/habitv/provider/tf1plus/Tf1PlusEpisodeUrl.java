@@ -12,7 +12,7 @@ final class Tf1PlusEpisodeUrl {
 	private Tf1PlusEpisodeUrl() {
 	}
 
-	static String withPremiumStreamId(final String pageUrl, final String streamId) {
+	static String withHelperStreamId(final String pageUrl, final String streamId) {
 		if (StringUtils.isEmpty(pageUrl) || StringUtils.isEmpty(streamId)) {
 			return pageUrl;
 		}
@@ -21,11 +21,11 @@ final class Tf1PlusEpisodeUrl {
 		return base + FRAGMENT_PREFIX + streamId + "," + FRAGMENT_MODE_PREMIUM;
 	}
 
-	static boolean requiresPremiumDownload(final String episodeUrl) {
-		return parsePremiumStreamId(episodeUrl) != null;
+	static boolean requiresReplayHelperDownload(final String episodeUrl) {
+		return parseHelperStreamId(episodeUrl) != null;
 	}
 
-	static String parsePremiumStreamId(final String episodeUrl) {
+	static String parseHelperStreamId(final String episodeUrl) {
 		if (StringUtils.isEmpty(episodeUrl)) {
 			return null;
 		}

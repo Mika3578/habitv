@@ -102,6 +102,10 @@ final class Tf1PlusHtmlCatalogueSupplement {
 		if (StringUtils.isEmpty(title)) {
 			title = anchor.ownText();
 		}
+		if (StringUtils.isEmpty(title)) {
+			// Image-only cards: the alt text is the programme name.
+			title = anchor.select("img[alt]").attr("alt");
+		}
 		return normalizeLabel(title);
 	}
 

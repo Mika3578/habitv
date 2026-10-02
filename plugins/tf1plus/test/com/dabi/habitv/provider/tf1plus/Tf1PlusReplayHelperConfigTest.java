@@ -11,7 +11,7 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
-public class Tf1PlusPremiumDownloadConfigTest {
+public class Tf1PlusReplayHelperConfigTest {
 
 	private String previousEmail;
 
@@ -48,13 +48,13 @@ public class Tf1PlusPremiumDownloadConfigTest {
 		System.setProperty(Tf1PlusConf.PROPERTY_DEVICE_PATH, device.getAbsolutePath());
 		System.setProperty(Tf1PlusConf.PROPERTY_N_M3U8DL_RE, downloader.getAbsolutePath());
 
-		assertTrue(Tf1PlusPremiumDownloadConfig.isConfigured());
-		assertTrue(Tf1PlusPremiumDownloadConfig.configurationStatusForLog()
+		assertTrue(Tf1PlusReplayHelperConfig.isConfigured());
+		assertTrue(Tf1PlusReplayHelperConfig.configurationStatusForLog()
 				.contains("tf1-email-source=configuration-xml"));
 		assertEquals("user@example.com",
-				Tf1PlusPremiumDownloadConfig.buildProcessEnvironmentOverrides().get(Tf1PlusConf.ENV_TF1_EMAIL));
+				Tf1PlusReplayHelperConfig.buildProcessEnvironmentOverrides().get(Tf1PlusConf.ENV_TF1_EMAIL));
 		assertEquals(device.getAbsolutePath(),
-				Tf1PlusPremiumDownloadConfig.buildProcessEnvironmentOverrides().get(Tf1PlusConf.ENV_DEVICE_PATH));
+				Tf1PlusReplayHelperConfig.buildProcessEnvironmentOverrides().get(Tf1PlusConf.ENV_DEVICE_PATH));
 
 		device.delete();
 		downloader.delete();
@@ -66,7 +66,7 @@ public class Tf1PlusPremiumDownloadConfigTest {
 		clearProperty(Tf1PlusConf.PROPERTY_PASSWORD, previousPassword);
 		clearProperty(Tf1PlusConf.PROPERTY_DEVICE_PATH, previousDevice);
 		clearProperty(Tf1PlusConf.PROPERTY_N_M3U8DL_RE, previousDownloader);
-		assertFalse(Tf1PlusPremiumDownloadConfig.isConfigured());
+		assertFalse(Tf1PlusReplayHelperConfig.isConfigured());
 	}
 
 	private static void assumeNoTf1EnvironmentVariables() {

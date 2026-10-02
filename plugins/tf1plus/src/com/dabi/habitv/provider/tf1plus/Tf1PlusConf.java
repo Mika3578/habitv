@@ -139,7 +139,7 @@ interface Tf1PlusConf {
 
 	String USER_MESSAGE_CATALOGUE_UNAVAILABLE = "The TF1+ catalogue is currently unavailable. See logs for details.";
 
-	String USER_MESSAGE_PREMIUM_REPLAY = "This TF1+ replay requires premium-replay configuration on this machine.";
+	String USER_MESSAGE_REPLAY_HELPER = "This TF1+ replay requires replay-helper configuration on this machine.";
 
 	String USER_MESSAGE_TF1_CREDENTIALS_REQUIRED = "Merci de saisir votre e-mail et votre mot de passe TF1+ dans l'onglet Configuration.";
 
@@ -147,7 +147,7 @@ interface Tf1PlusConf {
 
 	String USER_MESSAGE_TF1_DOWNLOAD_BACKEND_REQUIRED = "Configurez N_m3u8DL-RE (onglet Configuration) ou MediaFlow dans configuration.xml pour le replay TF1+.";
 
-	String USER_MESSAGE_PREMIUM_REPLAY_NOT_CONFIGURED = "Le replay TF1+ n'est pas entièrement configuré sur cette machine. Complétez l'onglet Configuration ou configuration.xml.";
+	String USER_MESSAGE_REPLAY_HELPER_NOT_CONFIGURED = "Le replay TF1+ n'est pas entièrement configuré sur cette machine. Complétez l'onglet Configuration ou configuration.xml.";
 
 
 
