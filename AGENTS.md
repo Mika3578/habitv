@@ -75,10 +75,11 @@ See [`docs/providers.md`](docs/providers.md).
 
 See [`docs/providers.md`](docs/providers.md).
 
-- Do not implement or document circumvention of technical protection
-  or license restrictions.
-- No credential, cookie, or browser-session extraction into the repo.
-- User secrets stay in local config or environment variables.
+- Download scope: the project records content the user can access with
+  their own accounts, for personal use. Provider access decisions are
+  maintainer choices documented per provider.
+- No secrets, tokens, cookies, or machine paths in git. User login
+  material, device files, and personal configuration stay local.
 - Do not re-enable legacy hosts (`dabiboo.free.fr`, `ftpperso.free.fr`).
 - Do not delete user media files, indexes, or configs.
 
