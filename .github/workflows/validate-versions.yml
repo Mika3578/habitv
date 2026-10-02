@@ -59,7 +59,6 @@ jobs:
   validate-version-consistency:
     name: Validate Version Bump Consistency
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -133,19 +132,27 @@ jobs:
 
           if [[ "${{ steps.bump.outputs.type }}" == "NONE" ]]; then
             echo "ℹ️  No version bump required for this commit type"
+            if [[ "${{ steps.version.outputs.current }}" != "${{ steps.bump.outputs.expected }}" ]]; then
+              echo "❌ Parent version changed unexpectedly for a non-bumping commit type."
+              echo "    Expected unchanged: ${{ steps.bump.outputs.expected }}"
+              echo "    Actual:             ${{ steps.version.outputs.current }}"
+              exit 1
+            fi
             exit 0
           fi
 
           if [[ "${{ steps.version.outputs.current }}" != "${{ steps.bump.outputs.expected }}" ]]; then
-            echo "⚠️  Version mismatch detected!"
+            echo "❌ Parent version mismatch for commit type ${{ steps.commit.outputs.type }}"
             echo "    Expected: ${{ steps.bump.outputs.expected }}"
             echo "    Actual:   ${{ steps.version.outputs.current }}"
             echo ""
-            echo "This is ADVISORY for now. Not blocking the build."
-            echo "Future: this will fail the build."
-          else
-            echo "✅ Version bump is consistent with commit type"
+            echo "Apply the parent bump (does not clobber plugin overrides):"
+            echo "  bash scripts/apply-parent-version-bump.sh --type ${{ steps.commit.outputs.type }}"
+            echo "See issue #252 and CONTRIBUTING.md (Parent / application versioning)."
+            exit 1
           fi
+
+          echo "✅ Version bump is consistent with commit type"
 
   run-unit-tests:
     name: Run Versioning Unit Tests

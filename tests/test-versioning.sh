@@ -222,6 +222,78 @@ test_bump "MAJOR with -SNAPSHOT: 4.2.0-SNAPSHOT → 5.0.0-SNAPSHOT" \
     "MAJOR|5.0.0-SNAPSHOT"
 
 echo ""
+echo "=== apply-parent-version-bump.sh ==="
+APPLY_SCRIPT="$SCRIPT_DIR/scripts/apply-parent-version-bump.sh"
+
+APPLY_FIXTURE="$(mktemp -d)"
+cleanup_apply_fixture() {
+  rm -rf "$APPLY_FIXTURE"
+}
+trap cleanup_apply_fixture EXIT
+
+mkdir -p "$APPLY_FIXTURE/plugins/demo" "$APPLY_FIXTURE/application/app"
+cat > "$APPLY_FIXTURE/pom.xml" <<'EOF'
+<project>
+  <groupId>com.dabi.habitv</groupId>
+  <artifactId>parent</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+</project>
+EOF
+cat > "$APPLY_FIXTURE/plugins/demo/pom.xml" <<'EOF'
+<project>
+  <parent>
+    <groupId>com.dabi.habitv</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>demo</artifactId>
+  <version>1.0.1-SNAPSHOT</version>
+</project>
+EOF
+cat > "$APPLY_FIXTURE/application/app/pom.xml" <<'EOF'
+<project>
+  <parent>
+    <groupId>com.dabi.habitv</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>app</artifactId>
+</project>
+EOF
+
+echo -n "Testing: apply --check fails before bump ... "
+if bash "$APPLY_SCRIPT" --root "$APPLY_FIXTURE" --type feat --check >/dev/null 2>&1; then
+  echo "❌ (expected failure)"
+  TESTS_FAILED=$((TESTS_FAILED + 1))
+else
+  echo "✅"
+  TESTS_PASSED=$((TESTS_PASSED + 1))
+fi
+
+echo -n "Testing: apply feat bumps parent and preserves plugin override ... "
+bash "$APPLY_SCRIPT" --root "$APPLY_FIXTURE" --type feat >/dev/null
+root_v="$(sed -n 's/.*<version>\([^<]*\)<\/version>.*/\1/p' "$APPLY_FIXTURE/pom.xml" | head -n1 | tr -d '[:space:]')"
+parent_v="$(tr '\n' ' ' < "$APPLY_FIXTURE/plugins/demo/pom.xml" | sed -n 's/.*<parent>\(.*\)<\/parent>.*/\1/p' | sed -n 's/.*<version>\([^<]*\)<\/version>.*/\1/p' | head -n1 | tr -d '[:space:]')"
+plugin_v="$(grep -n '<version>' "$APPLY_FIXTURE/plugins/demo/pom.xml" | tail -n1 | sed -n 's/.*<version>\([^<]*\)<\/version>.*/\1/p' | tr -d '[:space:]')"
+app_parent="$(tr '\n' ' ' < "$APPLY_FIXTURE/application/app/pom.xml" | sed -n 's/.*<parent>\(.*\)<\/parent>.*/\1/p' | sed -n 's/.*<version>\([^<]*\)<\/version>.*/\1/p' | head -n1 | tr -d '[:space:]')"
+if [[ "$root_v" == "1.1.0-SNAPSHOT" && "$parent_v" == "1.1.0-SNAPSHOT" && "$plugin_v" == "1.0.1-SNAPSHOT" && "$app_parent" == "1.1.0-SNAPSHOT" ]]; then
+  echo "✅"
+  TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+  echo "❌ (root=$root_v parent=$parent_v plugin=$plugin_v app=$app_parent)"
+  TESTS_FAILED=$((TESTS_FAILED + 1))
+fi
+echo -n "Testing: apply --check passes after bump ... "
+if bash "$APPLY_SCRIPT" --root "$APPLY_FIXTURE" --to 1.1.0-SNAPSHOT --check >/dev/null 2>&1; then
+  echo "✅"
+  TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+  echo "❌"
+  TESTS_FAILED=$((TESTS_FAILED + 1))
+fi
+
+echo ""
 echo "=== Test Summary ==="
 echo "Passed: $TESTS_PASSED"
 echo "Failed: $TESTS_FAILED"

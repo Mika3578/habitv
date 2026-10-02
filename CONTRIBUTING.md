@@ -46,6 +46,24 @@ Current compiler/CI: Java 8. Target: Java 21, then Java 25.
 Record the command and result in the PR body (not a full log). Live
 provider tests are opt-in (`-Plive-provider-tests`), not default CI.
 
+## Parent / application versioning
+
+The reactor parent version in the root `pom.xml` drives `habiTv`,
+`trayView`, `core`, `framework`, and other modules that inherit it.
+
+Conventional Commit type on the PR title selects the SemVer bump
+(`feat` → minor, `fix` / `refactor` / `perf` → patch, breaking →
+major). CI **Validate Version Bump Consistency** enforces it.
+
+Apply a missing bump without rewriting plugin overrides:
+
+```bash
+bash scripts/apply-parent-version-bump.sh --type feat
+bash scripts/apply-parent-version-bump.sh --type fix --check
+```
+
+`chore`, `docs`, `test`, `ci`, and similar types do not bump the parent.
+
 ## Plugin versioning
 
 Plugins inherit the parent version unless a **user-visible** change
@@ -58,6 +76,9 @@ requires an override:
 Do not bump for fixtures, CI, docs, or internal-only refactors.
 Inside a bumped plugin, depend on `api` / `framework` /
 `plugin-tester` with `${project.parent.version}`.
+
+When the parent version changes, keep the plugin override as-is unless
+that plugin itself needs a user-visible bump.
 
 ## Out of scope unless explicitly requested
 
