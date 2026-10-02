@@ -6,6 +6,8 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
+import com.dabi.habitv.api.plugin.holder.DownloadProgressSnapshot;
+import com.dabi.habitv.api.plugin.holder.DownloadStage;
 import com.dabi.habitv.framework.plugin.utils.CmdExecutor;
 
 public class FFMPEGCmdExecutor extends CmdExecutor {
@@ -23,6 +25,12 @@ public class FFMPEGCmdExecutor extends CmdExecutor {
 
 	private Long duration = null;
 
+	private final FfmpegProgressParser.State progressState = new FfmpegProgressParser.State();
+
+	private volatile DownloadProgressSnapshot progressSnapshot;
+
+	private String lastProgressActivityToken;
+
 	public FFMPEGCmdExecutor(final String cmdProcessor, final String cmd) {
 		super(cmdProcessor, cmd, FFMPEGConf.MAX_HUNG_TIME);
 	}
@@ -32,16 +40,54 @@ public class FFMPEGCmdExecutor extends CmdExecutor {
 	}
 
 	@Override
+	public void start() {
+		synchronized (getProgressLock()) {
+			progressSnapshot = null;
+			duration = null;
+			progressState.clear();
+			lastProgressActivityToken = null;
+		}
+		super.start();
+	}
+
+	@Override
 	protected String handleProgression(final String line) {
 		LOG.debug(line);
+		final DownloadProgressSnapshot parsed;
+		final String progressionResult;
+		synchronized (getProgressLock()) {
+			parsed = FfmpegProgressParser.parseLine(line, progressState);
+			if (parsed != null) {
+				progressSnapshot = parsed;
+				final String progression = FfmpegProgressParser.toProgressionString(parsed);
+				if (progression != null) {
+					progressionResult = progression;
+				} else {
+					progressionResult = "stage:" + parsed.getStage().name();
+				}
+			} else {
+				progressionResult = handleLegacyProgressionLine(line);
+			}
+			lastProgressActivityToken = FfmpegProgressParser.toActivityToken(parsed, progressState, line);
+		}
+		return progressionResult;
+	}
+
+	@Override
+	protected String progressionActivityTokenFor(final String line, final String progressionResult) {
+		if (lastProgressActivityToken != null) {
+			return lastProgressActivityToken;
+		}
+		return progressionResult;
+	}
+
+	private String handleLegacyProgressionLine(final String line) {
 		if (duration == null) {
 			duration = findDuration(line);
 		}
 		final Matcher matcher = TIME_PATTERN.matcher(line);
-		// lancement de la recherche de toutes les occurrences
 		final boolean hasMatched = matcher.find();
 		String ret = null;
-		// si recherche fructueuse
 		if (hasMatched && duration != null) {
 			final String stringDuration = matcher.group(matcher.groupCount());
 			final String[] durationTab = stringDuration.split(":");
@@ -66,13 +112,56 @@ public class FFMPEGCmdExecutor extends CmdExecutor {
 		return ret;
 	}
 
+	@Override
+	public String getProgression() {
+		synchronized (getProgressLock()) {
+			final DownloadProgressSnapshot snapshot = progressSnapshot;
+			if (snapshot != null) {
+				if (snapshot.isIndeterminate()) {
+					return null;
+				}
+				return FfmpegProgressParser.toProgressionString(snapshot);
+			}
+			final String progression = super.getProgression();
+			if (progression != null && progression.startsWith("stage:")) {
+				return null;
+			}
+			return progression;
+		}
+	}
+
+	@Override
+	public DownloadProgressSnapshot getProgressSnapshot() {
+		synchronized (getProgressLock()) {
+			final DownloadProgressSnapshot snapshot = progressSnapshot;
+			if (snapshot != null) {
+				return snapshot;
+			}
+			return snapshotFromLegacyProgressionString(getProgression());
+		}
+	}
+
+	static DownloadProgressSnapshot snapshotFromLegacyProgressionString(final String progression) {
+		if (progression == null || progression.trim().isEmpty()) {
+			return DownloadProgressSnapshot.indeterminate(DownloadStage.REMUXING, null);
+		}
+		try {
+			final double percent = Double.parseDouble(progression.trim().replace(',', '.'));
+			if (Double.isNaN(percent) || percent < 0) {
+				return DownloadProgressSnapshot.indeterminate(DownloadStage.REMUXING, null);
+			}
+			final double ratio = Math.min(1.0d, percent / 100.0d);
+			return DownloadProgressSnapshot.of(DownloadStage.REMUXING, Double.valueOf(ratio), null, null, null,
+					null, null);
+		} catch (final NumberFormatException e) {
+			return DownloadProgressSnapshot.indeterminate(DownloadStage.REMUXING, progression);
+		}
+	}
+
 	private String matchPercentage(final String line) {
-		// création d’un moteur de recherche
 		final Matcher matcher = PERCENTAGE_PATTERN.matcher(line);
-		// lancement de la recherche de toutes les occurrences
 		final boolean hasMatched = matcher.find();
 		String ret = null;
-		// si recherche fructueuse
 		if (hasMatched) {
 			ret = matcher.group(matcher.groupCount());
 		}
@@ -80,12 +169,9 @@ public class FFMPEGCmdExecutor extends CmdExecutor {
 	}
 
 	private static Long findDuration(final String line) {
-		// création d’un moteur de recherche
 		final Matcher matcher = DURATION_PATTERN.matcher(line);
-		// lancement de la recherche de toutes les occurrences
 		final boolean hasMatched = matcher.find();
 		Long ret = null;
-		// si recherche fructueuse
 		if (hasMatched) {
 			final String durationFormatted = matcher
 					.group(matcher.groupCount());

@@ -26,30 +26,34 @@ public class YoutubePluginDownloader extends BaseUpdatablePlugin implements Plug
 		final String binParam = getBinParam(downloaders);
 		String cmd = binParam + " ";
 		final String cmdParam = downloadParam.getParam(FrameworkConf.PARAMETER_ARGS);
+		String builtInDump = null;
 		if (cmdParam == null) {
 			// For video downloads, audio quality is controlled by yt-dlp format selection.
 			// --audio-quality is intentionally not used here because it only applies to
 			// audio extraction/conversion with -x.
 			// Subtitle embedding is opt-in because default downloads should stay video/audio only and must not leave subtitle sidecar files.
 			// Auto-generated subtitles are intentionally not enabled here; they should be added later as a separate advanced option.
-			cmd += YoutubeConf.DUMP_CMD;
+			builtInDump = YoutubeConf.DUMP_CMD;
 			if (isEmbedSubtitlesEnabled(downloadParam)) {
-				cmd += YoutubeConf.DUMP_CMD_EMBED_SUBS;
+				builtInDump += YoutubeConf.DUMP_CMD_EMBED_SUBS;
 			}
+		} else if (YoutubeConf.DUMP_CMD_MP3.equals(cmdParam)) {
+			builtInDump = YoutubeConf.DUMP_CMD_MP3;
 		} else {
 			cmd += cmdParam;
 		}
-		cmd = cmd.replaceFirst(FrameworkConf.DOWNLOAD_INPUT, Matcher.quoteReplacement(downloadParam.getDownloadInput()));
-		cmd = cmd.replaceFirst(FrameworkConf.DOWNLOAD_DESTINATION, Matcher.quoteReplacement(downloadParam.getDownloadOutput()));
-
-		// if (proxyDTO!=null){
-		// youtube-dl supports downloading videos through a proxy, by
-		// setting the http_proxy environment variable to the proxy URL, as in
-		// http://proxy_machine_name:port/.
-		// }
 
 		try {
-			YtDlpRuntimeDiagnostics.runPreflight(downloaders.getCmdProcessor(), binParam, downloaders.getBinDir());
+			final String versionOutput = YtDlpRuntimeDiagnostics.preflightVersionOutput(downloaders.getCmdProcessor(),
+					binParam, downloaders.getBinDir());
+			if (builtInDump != null) {
+				cmd += YoutubeConf.augmentBuiltInDumpCommand(builtInDump, versionOutput,
+						downloaders.getCmdProcessor());
+			}
+			cmd = cmd.replaceFirst(FrameworkConf.DOWNLOAD_INPUT,
+					Matcher.quoteReplacement(downloadParam.getDownloadInput()));
+			cmd = cmd.replaceFirst(FrameworkConf.DOWNLOAD_DESTINATION,
+					Matcher.quoteReplacement(downloadParam.getDownloadOutput()));
 			return new YtDlpCmdExecutor(downloaders.getCmdProcessor(), cmd, binParam, downloaders.getBinDir());
 		} catch (final ExecutorFailedException e) {
 			throw new DownloadFailedException(e);

@@ -17,6 +17,26 @@ public final class YoutubeConf {
 	public static final String NAME = "youtube";
 	public static final String NAME_MP3 = "youtube-mp3";
 	public static final String ENCODING = "UTF-8";
+
+	/**
+	 * Prefix for machine-readable yt-dlp progress lines emitted via {@link #PROGRESS_TEMPLATE_FLAGS}.
+	 */
+	public static final String PROGRESS_LINE_PREFIX = "habitv-progress:";
+
+	/**
+	 * yt-dlp {@code --progress-template} flags for download and post-process phases.
+	 * Requires a yt-dlp build that supports {@code --progress-template}; legacy
+	 * {@code [download]} lines remain parsed when templates are absent or ignored.
+	 */
+	private static final String PROGRESS_TEMPLATE_FLAGS_RAW = " --progress-template \"download:" + PROGRESS_LINE_PREFIX
+			+ "{\\\"phase\\\":\\\"download\\\",\\\"pct\\\":%(progress._percent)j,\\\"total\\\":\\\"%(progress._total_bytes_str)s\\\",\\\"speed\\\":\\\"%(progress._speed_str)s\\\",\\\"eta\\\":\\\"%(progress._eta_str)s\\\",\\\"dest\\\":%(progress.filename)j}\""
+			+ " --progress-template \"postprocess:" + PROGRESS_LINE_PREFIX
+			+ "{\\\"phase\\\":\\\"postprocess\\\",\\\"pp\\\":\\\"%(postprocessor)s\\\"}\"";
+
+	/** @deprecated use {@link #progressTemplateFlagsFor(String)} */
+	@Deprecated
+	public static final String PROGRESS_TEMPLATE_FLAGS = PROGRESS_TEMPLATE_FLAGS_RAW;
+
 	/**
 	 * Default video download flags for yt-dlp (youtube-dl compatible subset).
 	 * Placeholders {@link com.dabi.habitv.framework.FrameworkConf#DOWNLOAD_INPUT} and
@@ -28,6 +48,24 @@ public final class YoutubeConf {
 	 * Default MP3 extraction flags for yt-dlp ({@code --extract-audio} / {@code --audio-format}).
 	 */
 	public static final String DUMP_CMD_MP3 = " \"#VIDEO_URL#\" -o \"#FILE_DEST#\" --extract-audio --audio-format mp3 --newline --no-check-certificate";
+
+	/**
+	 * Appends {@link #PROGRESS_TEMPLATE_FLAGS} when the resolved yt-dlp version supports them.
+	 */
+	public static String progressTemplateFlagsFor(final String cmdProcessor) {
+		return PROGRESS_TEMPLATE_FLAGS_RAW;
+	}
+
+	public static String augmentBuiltInDumpCommand(final String builtInCommand, final String versionOutput,
+			final String cmdProcessor) {
+		if (builtInCommand == null) {
+			return null;
+		}
+		if (!YtDlpRuntimeDiagnostics.supportsProgressTemplate(versionOutput)) {
+			return builtInCommand;
+		}
+		return builtInCommand + progressTemplateFlagsFor(cmdProcessor);
+	}
 
 	public static final long MAX_HUNG_TIME = 300000L;
 	public static final String DEFAULT_WINDOWS_EXE = "yt-dlp.exe";

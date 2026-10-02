@@ -10,6 +10,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import com.dabi.habitv.api.plugin.exception.ExecutorFailedException;
 import com.dabi.habitv.api.plugin.exception.TechnicalException;
 import com.dabi.habitv.framework.plugin.exception.HungProcessException;
@@ -108,5 +111,19 @@ public class CmdExecutorTest {
 	public final void testExecuteNormal() throws ExecutorFailedException {
 		hang = false;
 		cmd.start();
+	}
+
+	@Test
+	public void progressionStalledWhenActivityTokenUnchanged() {
+		final long now = 10_000L;
+		final long lastTime = 0L;
+		assertTrue(CmdExecutor.isProgressionStalled("stage:MERGING", "stage:MERGING", now, lastTime, 500L));
+	}
+
+	@Test
+	public void progressionNotStalledWhenActivityTokenChanges() {
+		final long now = 10_000L;
+		final long lastTime = 0L;
+		assertFalse(CmdExecutor.isProgressionStalled("stage:MERGING", "line:[Merger] step 2", now, lastTime, 500L));
 	}
 }
