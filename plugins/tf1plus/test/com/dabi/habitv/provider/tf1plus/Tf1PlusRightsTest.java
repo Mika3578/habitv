@@ -16,7 +16,9 @@ public class Tf1PlusRightsTest {
 	@Test
 	public void shouldTreatBasicMaxWithAuthAsPremiumReplayCandidate() {
 		final Map<String, Object> video = videoWithRights(true, "BASIC", "MAX");
-		assertTrue(Tf1PlusRights.hasDownloadableRights(video, false));
+		// Premium disabled: only public yt-dlp eligible episodes stay listed.
+		assertFalse(Tf1PlusRights.hasDownloadableRights(video, false));
+		assertTrue(Tf1PlusRights.hasDownloadableRights(video, true));
 		assertFalse(Tf1PlusRights.isYtDlpEligible(video));
 		assertTrue(Tf1PlusRights.shouldUsePremiumReplay(video, true));
 		assertFalse(Tf1PlusRights.shouldUsePremiumReplay(video, false));

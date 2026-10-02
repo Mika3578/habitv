@@ -48,6 +48,7 @@ public class AbstractPluginHolder<E extends PluginBaseInterface> {
 	}
 
 	public Collection<E> getPlugins() {
-		return pluginName2Plugin.values();
+		// Deduplicate instances registered under several names (legacy aliasing).
+		return new java.util.LinkedHashSet<E>(pluginName2Plugin.values());
 	}
 }

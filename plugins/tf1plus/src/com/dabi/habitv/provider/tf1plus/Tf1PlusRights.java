@@ -22,13 +22,10 @@ final class Tf1PlusRights {
 		if (isYtDlpEligible(video)) {
 			return true;
 		}
-		if (hasBasicRights(video)) {
-			return true;
-		}
 		if (!premiumDownloadEnabled) {
 			return false;
 		}
-		return isSubscriptionOnly(video) || hasMaxRights(video) || hasPremiumRights(video)
+		return hasBasicRights(video) || isSubscriptionOnly(video) || hasMaxRights(video) || hasPremiumRights(video)
 				|| StringUtils.isNotEmpty(Tf1PlusGraphqlClient.resolveMediaStreamId(video));
 	}
 

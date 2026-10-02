@@ -25,6 +25,16 @@ public class Tf1PlusOfflineParsingTest {
 			protected String getUrlContent(String url) {
 				return "";
 			}
+
+			@Override
+			public java.io.InputStream getInputStreamFromUrl(String url) {
+				// Deterministic offline stub: never perform live GraphQL requests.
+				if (url != null && url.contains("/graphql/web")) {
+					return new java.io.ByteArrayInputStream(
+							"{\"data\":{}}".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+				}
+				return new java.io.ByteArrayInputStream(new byte[0]);
+			}
 		};
 
 		Set<CategoryDTO> categories = plugin.findCategory();

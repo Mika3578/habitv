@@ -12,12 +12,7 @@ public final class Tf1PlusPremiumReplayConfig {
 		if (value == null) {
 			return null;
 		}
-		String trimmed = value.trim();
-		if (trimmed.length() >= 2
-				&& ((trimmed.startsWith("\"") && trimmed.endsWith("\""))
-						|| (trimmed.startsWith("'") && trimmed.endsWith("'")))) {
-			trimmed = trimmed.substring(1, trimmed.length() - 1).trim();
-		}
+		final String trimmed = value.trim();
 		return trimmed.isEmpty() ? null : trimmed;
 	}
 }

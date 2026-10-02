@@ -95,6 +95,7 @@ final class Tf1PlusCatalogueService {
 
 	Tf1PlusCatalogueRefreshResult refreshLiveCatalogue() {
 		final Tf1PlusCatalogueRefreshResult result = new Tf1PlusCatalogueRefreshResult();
+		boolean hubFetchFailed = false;
 		try {
 			for (final Tf1PlusHubDescriptor hub : Tf1PlusHubRegistry.enabledHubs()) {
 				if (!hub.isEnabled()) {
@@ -104,6 +105,7 @@ final class Tf1PlusCatalogueService {
 				try {
 					catalogueClient.fetchAllProgrammesForHub(hub, result);
 				} catch (IOException hubFailure) {
+					hubFetchFailed = true;
 					result.incrementProgrammesRejected("hub-fetch-failed");
 					result.addHubSummary(hub.getHubId() + "|error=" + hubFailure.getMessage());
 					LOG.debug("TF1+ catalogue hub refresh failed for " + hub.getHubId() + ": " + hubFailure.getMessage());
@@ -131,7 +133,7 @@ final class Tf1PlusCatalogueService {
 					}
 				}
 			}
-			if (!result.entriesView().isEmpty()) {
+			if (!result.entriesView().isEmpty() && !hubFetchFailed) {
 				try {
 					catalogueCache.save(result.entriesView());
 					result.setRefreshSucceeded(true);
@@ -139,6 +141,9 @@ final class Tf1PlusCatalogueService {
 					result.setFailureRootCause("cache-write-failed");
 					LOG.debug("TF1+ catalogue cache write failed: " + cacheFailure.getMessage());
 				}
+			} else if (hubFetchFailed) {
+				// A partial refresh must not replace a previously complete snapshot.
+				result.setFailureRootCause("hub-partial-refresh");
 			} else {
 				result.setFailureRootCause("no-catalogue-entries");
 			}
