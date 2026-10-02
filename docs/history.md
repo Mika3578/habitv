@@ -14,6 +14,7 @@ branch.
   redirects
 - FTP deploy to `ftpperso.free.fr`
 - Provider id `pluzz` (code is `plugins/francetv`; users rename grab-config)
+- Provider id `wat` (code is `plugins/tf1plus`; grab-config `wat` is aliased)
 
 Current updates use
 `https://mika3578.github.io/habitv-repo/repository/`.

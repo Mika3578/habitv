@@ -57,4 +57,22 @@ public interface UserConfig {
 
 	void setEmbedSubtitles(boolean embedSubtitles);
 
+	String getTf1PlusEmail();
+
+	String getTf1PlusPassword();
+
+	void setTf1PlusEmail(String email);
+
+	void setTf1PlusPassword(String password);
+
+	String getTf1PlusDevicePath();
+
+	void setTf1PlusDevicePath(String devicePath);
+
+	String getTf1PlusNM3u8dlRe();
+
+	void setTf1PlusNM3u8dlRe(String nM3u8dlRePath);
+
+	Tf1PlusPremiumReplaySettings getTf1PlusPremiumReplaySettings();
+
 }

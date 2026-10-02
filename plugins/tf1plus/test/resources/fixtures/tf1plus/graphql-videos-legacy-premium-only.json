@@ -1,0 +1,22 @@
+{
+  "data": {
+    "programBySlug": {
+      "videos": {
+        "items": [
+          {
+            "id": "14510494",
+            "slug": "automoto-du-31-mai-2026",
+            "rights": ["PREMIUM"],
+            "date": "2026-05-31T12:00:00.000Z",
+            "decoration": {
+              "label": "Automoto du 31 mai 2026 (legacy PREMIUM)"
+            },
+            "playingInfos": {
+              "duration": 3600
+            }
+          }
+        ]
+      }
+    }
+  }
+}

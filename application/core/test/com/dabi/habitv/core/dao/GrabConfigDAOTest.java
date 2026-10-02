@@ -66,6 +66,20 @@ public class GrabConfigDAOTest {
 	}
 
 	@Test
+	public final void loadMigratesLegacyWatPluginIdToTf1plus() throws IOException {
+		Files.copy(new File("test/com/dabi/habitv/core/dao/fixtures/grabconfig-wat-legacy.xml").toPath(),
+				new File(XML_FILE).toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+		assertTrue(dao.exist());
+
+		final Map<String, CategoryDTO> loaded = dao.load(LoadModeEnum.ALL);
+		assertNotNull(loaded.get("tf1plus"));
+		assertTrue(loaded.containsKey("tf1plus"));
+
+		final Map<String, CategoryDTO> reloaded = dao.load(LoadModeEnum.ALL);
+		assertNotNull(reloaded.get("tf1plus"));
+	}
+
+	@Test
 	@Ignore
 	public final void testLoadOld() throws IOException {
 		File file = new File(XML_FILE);

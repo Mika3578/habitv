@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:grabConfig xmlns:ns2="http://www.dabi.com/habitv/grabconfig/entities">
+    <plugins>
+        <plugin>
+            <name>wat</name>
+            <status>EXIST</status>
+            <categories>
+                <category>
+                    <id>https://www.tf1.fr/automoto</id>
+                    <name>Automoto</name>
+                    <download>false</download>
+                    <downloadable>true</downloadable>
+                    <extension>mp4</extension>
+                    <status>EXIST</status>
+                    <subcategories/>
+                </category>
+            </categories>
+        </plugin>
+    </plugins>
+</ns2:grabConfig>

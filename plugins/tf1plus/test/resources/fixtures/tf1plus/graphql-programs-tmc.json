@@ -1,0 +1,13 @@
+{
+  "data": {
+    "programs": {
+      "items": [
+        {
+          "name": "Fixture replay",
+          "slug": "fixture-replay-show",
+          "categories": []
+        }
+      ]
+    }
+  }
+}
