@@ -75,7 +75,25 @@ final class Tf1PlusCatalogueCache {
 				throw new IOException("unable to create catalogue cache directory: " + parentFile.getAbsolutePath());
 			}
 		}
-		Files.write(cacheFile, MAPPER.writeValueAsString(root).getBytes(StandardCharsets.UTF_8));
+		// Write through a temp file and move atomically: concurrent readers of the
+		// live cache must never observe a truncated or half-written file.
+		final byte[] payload = MAPPER.writeValueAsString(root).getBytes(StandardCharsets.UTF_8);
+		Path tempFile = null;
+		try {
+			tempFile = Files.createTempFile(parent != null ? parent : cacheFile.toAbsolutePath().getParent(),
+					"tf1plus-catalogue-", ".tmp");
+			Files.write(tempFile, payload);
+			try {
+				Files.move(tempFile, cacheFile, java.nio.file.StandardCopyOption.ATOMIC_MOVE,
+						java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+			} catch (final java.nio.file.AtomicMoveNotSupportedException e) {
+				Files.move(tempFile, cacheFile, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+			}
+		} finally {
+			if (tempFile != null) {
+				Files.deleteIfExists(tempFile);
+			}
+		}
 	}
 
 	long resolveTtlMillis() {

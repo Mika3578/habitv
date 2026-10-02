@@ -525,7 +525,9 @@ def write_key_text_file(material):
 
 def download_with_n_m3u8dl(re_binary, mpd_url, material, output_path, mpd_headers):
     output_dir = os.path.dirname(os.path.abspath(output_path))
-    output_name = os.path.splitext(os.path.basename(output_path))[0]
+    base_name = os.path.splitext(os.path.basename(output_path))[0]
+    if base_name.lower().endswith(".mp4"):
+        base_name = base_name[: -len(".mp4")]
     if output_dir and not os.path.isdir(output_dir):
         os.makedirs(output_dir)
     cmd = [
@@ -537,7 +539,7 @@ def download_with_n_m3u8dl(re_binary, mpd_url, material, output_path, mpd_header
         "--save-dir",
         output_dir,
         "--save-name",
-        output_name,
+        base_name,
         "--no-ansi-color",
         "--log-level",
         "WARN",
@@ -561,8 +563,8 @@ def download_with_n_m3u8dl(re_binary, mpd_url, material, output_path, mpd_header
                 pass
     if not os.path.isfile(output_path):
         candidates = [
-            os.path.join(output_dir, output_name + ".mp4"),
-            os.path.join(output_dir, output_name + ".MP4"),
+            os.path.join(output_dir, base_name + ".mp4"),
+            os.path.join(output_dir, base_name + ".MP4"),
         ]
         for candidate in candidates:
             if os.path.isfile(candidate):
