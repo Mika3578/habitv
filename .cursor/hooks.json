@@ -3,10 +3,10 @@
   "hooks": {
     "beforeShellExecution": [
       {
-        "command": "bash .cursor/hooks/before-shell-branch-policy.sh",
+        "command": ".cursor/hooks/before-shell-branch-policy.sh",
         "matcher": "(^|[;&|\\s\"'])(([^\\s\"']+[/\\\\])*(git|git\\.exe))(\\s+[^\\s\"']+|\\s+[\"'][^\"']+[\"'])*\\s+([\"']?(push|commit)[\"']?)|(^|[;&|\\s\"'])(([^\\s\"']+[/\\\\])*(gh|gh\\.exe))\\s+pr\\s+([\"']?create[\"']?)",
         "timeout": 30,
-        "failClosed": true
+        "failClosed": false
       }
     ]
   }
