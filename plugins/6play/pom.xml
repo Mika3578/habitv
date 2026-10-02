@@ -9,15 +9,15 @@
 	</parent>
 	<artifactId>6play</artifactId>
 	<name>6play</name>
-	<version>4.1.1-SNAPSHOT</version>
-	
+	<version>4.1.3-SNAPSHOT</version>
+
 	<dependencies>
 		<dependency>
 			<groupId>com.dabi.habitv</groupId>
 			<artifactId>plugin-tester</artifactId>
 			<version>${project.parent.version}</version>
 			<scope>test</scope>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -26,7 +26,7 @@
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>com.dabi.habitv</groupId>
 			<artifactId>framework</artifactId>

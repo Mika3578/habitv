@@ -8,10 +8,7 @@ import com.dabi.habitv.plugintester.BasePluginProviderTester;
 
 public class SixPlayPluginManagerTest extends BasePluginProviderTester {
 
-	// 6play.fr is now a JavaScript SPA; the legacy .folders__list / .mosaic-programs
-	// markup that this scraper relies on no longer exists in the static HTML, so the
-	// live integration test always returns an empty category list. Re-enable once
-	// the provider is rewritten against the new site (or a recorded fixture).
+	// Live catalogue depends on sitemap + SSR folder pages; keep ignored in default CI.
 	@Test
 	@Ignore
 	public final void testProviderWat() throws InstantiationException, IllegalAccessException, DownloadFailedException {
