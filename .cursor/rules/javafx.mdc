@@ -1,0 +1,22 @@
+---
+description: JavaFX UI conventions for trayView and habiTv modules
+globs: "application/trayView/**/*,application/habiTv/**/*,application/habiTv-*/**/*"
+alwaysApply: false
+---
+
+# JavaFX (HabiTV)
+
+Applies to GUI modules (`trayView`, `habiTv`). Runtime is still **Java 8 +
+JavaFX 2.x** (`jfxrt`) unless an explicit migration task says otherwise.
+
+- Keep UI code in tray/GUI packages; business/download logic stays in
+  `application/core` and plugins.
+- Do not block the JavaFX Application Thread with network or heavy I/O.
+  Background work: patterns like `FxBackgroundRunner`; UI updates via
+  `Platform.runLater`.
+- Controllers live under `…/controller/`; follow existing listener and
+  lifecycle patterns in the same package.
+- Prefer existing resource/FXML loading helpers; do not invent a second
+  UI framework or migrate OpenJFX in a non-migration PR.
+- Remove listeners/subscriptions when controllers tear down if the file
+  already does so for similar hooks.

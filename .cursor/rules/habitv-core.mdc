@@ -1,0 +1,12 @@
+---
+alwaysApply: true
+---
+
+# HabiTV (Cursor)
+
+Project policy: @AGENTS.md (short). Economy habits: Cursor User Rules
+(global) — do not restate them here.
+
+File-scoped rules under `.cursor/rules/` (Java / JavaFX / tests). Long
+workflows: `.agents/skills/` via thin `.cursor/skills/` stubs — load only
+when the task needs them.
