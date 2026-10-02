@@ -1,0 +1,23 @@
+{
+  "data": {
+    "programBySlug": {
+      "videos": {
+        "items": [
+          {
+            "id": "e72e51c8-af61-4278-b04e-34b1c8302b44",
+            "slug": "demain-nous-appartient-du-jeudi-18-juin-2026-episode-2229",
+            "rights": ["BASIC", "MAX"],
+            "authEnabled": true,
+            "date": "2026-06-18T20:00:00.000Z",
+            "decoration": {
+              "label": "Demain nous appartient du jeudi 18 juin 2026 - Episode 2229"
+            },
+            "playingInfos": {
+              "duration": 1560
+            }
+          }
+        ]
+      }
+    }
+  }
+}

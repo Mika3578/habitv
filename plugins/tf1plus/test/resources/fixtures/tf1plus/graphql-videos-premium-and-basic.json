@@ -1,0 +1,23 @@
+{
+  "data": {
+    "programBySlug": {
+      "videos": {
+        "items": [
+          {
+            "id": "14510094",
+            "streamId": "14510094",
+            "slug": "fixture-episode-premium-and-basic",
+            "rights": ["BASIC", "PREMIUM"],
+            "date": "2026-05-29T19:19:00.000Z",
+            "decoration": {
+              "label": "Fixture episode premium and basic"
+            },
+            "playingInfos": {
+              "duration": 2096
+            }
+          }
+        ]
+      }
+    }
+  }
+}

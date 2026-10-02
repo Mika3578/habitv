@@ -32,9 +32,10 @@ still points at `youtube-dl`, switch it to yt-dlp.
 
 | Group | Modules |
 |-------|---------|
-| Recently worked | `francetv` (ex Pluzz), `youtube` (yt-dlp), `novo19` |
+| Recently worked | `francetv` (ex Pluzz), `youtube` (yt-dlp), `novo19`, `tf1plus` (ex `wat`) |
+| Working (validated) | `tf1plus` |
 | Needs rewrite / investigation | `arte`, `6play`, `lequipe`, `footyroom`, `sfr`, `globalnews`, `mlssoccer` |
-| Obsolete / degraded endpoints | `canalPlus` (CStar; D8 removed), `wat`, `beinsport`, `clubic` |
+| Obsolete / degraded endpoints | `canalPlus` (CStar; D8 removed), `beinsport`, `clubic` |
 | Tools / infrastructure | `curl`, `ffmpeg`, `aria2`, `cmd`, `file`, `RSS`, `rclone`, `rtmpDump`, `adobeHDS`, `email`, `plugin-tester` |
 | Historical names only | Pluzz → `francetv`; NRJ12 — no module |
 
@@ -43,7 +44,11 @@ Labels: **working** (validated), **degraded**, **protected** (auth/geo/rights),
 
 France.tv and NOVO19 delegate media fetch to the `youtube`/yt-dlp plugin when
 public URLs exist. Canal+ family and WAT/TF1+ are not treated as freely
-accessible protected catalogues.
+accessible protected catalogues. `tf1plus` replaces obsolete `wat`: GraphQL
+catalogue and download support (validated end-to-end). Legacy grab-config
+plugin id `wat` is aliased to `tf1plus` at runtime. Pattern for a similar
+configured download path on other hosts (separate PRs):
+[`provider-configured-download.md`](provider-configured-download.md).
 
 ## Arte catalogue discovery
 

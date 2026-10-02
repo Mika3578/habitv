@@ -32,10 +32,22 @@ public final class PluginFactory {
 				pluginName2plugins.put(plugin.getName(), pluginClass.cast(plugin));
 			}
 		}
+		registerLegacyPluginAliases(pluginName2plugins);
 		if (pluginName2plugins.isEmpty()) {
 			LOG.info("Aucun plugin " + pluginClass.getSimpleName());
 		}
 		return pluginName2plugins;
+	}
+
+	/**
+	 * Keeps existing grab configs working after provider id renames (wat → tf1plus).
+	 */
+	static <P extends PluginBaseInterface> void registerLegacyPluginAliases(
+			final Map<String, P> pluginName2plugins) {
+		final P tf1plus = pluginName2plugins.get("tf1plus");
+		if (tf1plus != null && !pluginName2plugins.containsKey("wat")) {
+			pluginName2plugins.put("wat", tf1plus);
+		}
 	}
 
 }

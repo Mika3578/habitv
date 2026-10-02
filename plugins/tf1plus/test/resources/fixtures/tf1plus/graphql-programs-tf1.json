@@ -1,0 +1,58 @@
+{
+  "data": {
+    "programs": {
+      "items": [
+        {
+          "name": "Demain nous appartient",
+          "slug": "demain-nous-appartient",
+          "categories": [
+            {
+              "id": "series",
+              "type": "MAIN_SERIES_AND_FICTIONS"
+            }
+          ]
+        },
+        {
+          "name": "Ici tout commence",
+          "slug": "ici-tout-commence",
+          "categories": [
+            {
+              "id": "series",
+              "type": "MAIN_SERIES_AND_FICTIONS"
+            }
+          ]
+        },
+        {
+          "name": "Koh-Lanta",
+          "slug": "koh-lanta",
+          "categories": [
+            {
+              "id": "entertainment",
+              "type": "MAIN_ENTERTAINEMENT"
+            }
+          ]
+        },
+        {
+          "name": "Fixture movie",
+          "slug": "fixture-movie",
+          "categories": [
+            {
+              "id": "movies",
+              "type": "MAIN_MOVIES"
+            }
+          ]
+        },
+        {
+          "name": "Journal de 13 heures",
+          "slug": "journal-de-13-heures",
+          "categories": [
+            {
+              "id": "info",
+              "type": "MAIN_INFOS_MAGAZINE_SPORTS"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

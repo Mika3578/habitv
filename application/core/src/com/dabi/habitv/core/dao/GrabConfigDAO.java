@@ -275,12 +275,30 @@ public class GrabConfigDAO {
 			if (!grabConfig.getChannel().isEmpty()) {
 				grabConfig = convertOldGrabconfig(grabConfig);
 			}
+			grabConfig = migrateLegacyPluginIds(grabConfig);
 		} catch (final JAXBException e) {
 			throw new TechnicalException(e);
 		} catch (final UnsupportedEncodingException e) {
 			throw new TechnicalException(e);
 		} catch (final FileNotFoundException e) {
 			throw new TechnicalException(e);
+		}
+		return grabConfig;
+	}
+
+	private GrabConfig migrateLegacyPluginIds(final GrabConfig grabConfig) {
+		if (grabConfig.getPlugins() == null) {
+			return grabConfig;
+		}
+		boolean changed = false;
+		for (final Plugin plugin : grabConfig.getPlugins().getPlugin()) {
+			if ("wat".equals(plugin.getName())) {
+				plugin.setName("tf1plus");
+				changed = true;
+			}
+		}
+		if (changed) {
+			marshal(grabConfig);
 		}
 		return grabConfig;
 	}
