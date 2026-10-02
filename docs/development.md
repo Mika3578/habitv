@@ -117,6 +117,9 @@ names (see [git-workflow](../.agents/skills/git-workflow/SKILL.md)).
 - `HABITV_SKIP_BRANCH_HOOK=1` is for local debug or emergency only.
 - Offline checks: `scripts/test-branch-policy-hook.sh` (also run via
   `scripts/validate-agent-policy.*`).
+- On Windows, `hooks.json` must invoke the script via non-interactive
+  `bash --noprofile --norc` (not a bare `.sh` path) to avoid Git Bash popup
+  windows.
 
 ## Agent instructions
 
