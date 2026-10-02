@@ -1,0 +1,17 @@
+---
+description: Targeted testing rules for HabiTV unit and plugin tests
+globs: "**/test/**/*.java,**/*Test.java,**/*Tests.java"
+alwaysApply: false
+---
+
+# Tests (HabiTV)
+
+- Run **targeted** module tests first:
+  `mvn -B -ntp -pl <module> -am test`.
+- Add or change tests only when they validate the requested behavior.
+- Do not weaken or rewrite tests solely to hide a production bug.
+- Prefer offline fixtures; live provider tests are opt-in
+  (`-Plive-provider-tests`), never the default proof.
+- Full reactor / package gates only when justified (Ready gate, packaging,
+  or cross-module risk) — see `docs/development.md` and
+  `.agents/skills/code-change-verification/SKILL.md`.

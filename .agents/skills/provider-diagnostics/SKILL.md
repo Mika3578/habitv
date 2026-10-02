@@ -5,8 +5,8 @@ description: Diagnoses replay provider listing or retrieval failures using fixtu
 
 # Provider diagnostics
 
-Provider rules: [`docs/providers.md`](../../../docs/providers.md).
-Safety: [`AGENTS.md`](../../../AGENTS.md) (**Safety and Legal Constraints**).
+Provider scope and safety: [`docs/providers.md`](../../../docs/providers.md).
+Project constraints: [`AGENTS.md`](../../../AGENTS.md).
 
 ## Workflow
 
