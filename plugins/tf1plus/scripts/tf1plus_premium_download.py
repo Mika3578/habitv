@@ -303,8 +303,8 @@ def normalize_mpd_url(mpd_url):
     if scheme == "http":
         scheme = "https"
     hostname = parsed.hostname or ""
-    if "das-q1.tf1.fr" in hostname:
-        hostname = hostname.replace("das-q1.tf1.fr", "das-q1-ssl.tf1.fr")
+    if hostname == "das-q1.tf1.fr":
+        hostname = "das-q1-ssl.tf1.fr"
         netloc = hostname
         if parsed.port:
             netloc += ":" + str(parsed.port)
