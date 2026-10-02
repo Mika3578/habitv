@@ -54,6 +54,8 @@ reliability, then provider repairs, then JDK/packaging migration.
   (**Public git text**).
 - Keep **code comments** concise: explain non-obvious *why*; do not narrate
   parsing, hosts, URLs, or integration mechanics (use `docs/` or tests).
+  Keep wording sober and generic across comments, docs, and tests; describe
+  provider capabilities in user-facing terms.
 - No secrets, tokens, credentials, or machine paths in git.
 - No AI/tool attribution in commits. Agents must not author tool footers
   in PR bodies; third-party appended blocks are tolerated.
