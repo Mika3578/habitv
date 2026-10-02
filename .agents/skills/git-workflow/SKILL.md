@@ -5,8 +5,8 @@ description: Chooses a compliant HabiTV branch name, checks for duplicate scope,
 
 # Git workflow (branch and worktree)
 
-Authoritative branch naming: **Public git text** in [`AGENTS.md`](../../../AGENTS.md).
-Repository workflow: **Git Workflow** in `AGENTS.md`.
+Authoritative branch naming: [public-git-text](../public-git-text/SKILL.md).
+Project constraints: [`AGENTS.md`](../../../AGENTS.md).
 
 ## Canonical branch name
 
