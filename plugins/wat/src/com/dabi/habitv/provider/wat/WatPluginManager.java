@@ -55,6 +55,12 @@ public class WatPluginManager extends BasePluginWithProxy implements PluginProvi
 			}
 		}
 
+		if (categories.isEmpty()) {
+			getLog().warn("provider=wat operation=catalogue sourceUrl=" + WatConf.PROGRAMME_URL
+					+ " rootCause=listing-selectors-obsolete cookiesEnabled=false"
+					+ " note=tf1-html-no-longer-matches-legacy-wat-scraper");
+		}
+
 		return categories;
 	}
 
