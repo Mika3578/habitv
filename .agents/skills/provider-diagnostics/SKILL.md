@@ -15,8 +15,10 @@ Safety: [`AGENTS.md`](../../../AGENTS.md) (**Safety and Legal Constraints**).
 2. **Identify provider/source** — one plugin module per change when possible.
 3. **Collect deterministic diagnostics** — logs, fixture diffs, minimal repro
    commands. No secrets, cookies, tokens, or session data in git.
-4. **Classify failure** — parsing vs network vs external tool vs access limits.
-   Do not bypass protected access or licensing controls.
+4. **Classify failure** — parsing vs network vs external tool vs access
+   limits. Stay within the personal-use scope and maintainer provider
+   decisions in `docs/providers.md`; keep secrets and device files out of
+   git.
 5. **Preserve non-blocking behavior** — avoid breaking unrelated providers.
 6. **Add or update fixtures/tests** — offline proof is the default bar.
 7. **Layer errors** — clear user-facing message; technical detail in logs or

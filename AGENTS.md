@@ -16,17 +16,21 @@ Integration branch: `develop`.
 
 Current **build/runtime baseline is Java 8**; Java 21 is the
 modernization target, Java 25 next. Details:
-[`docs/development.md`](docs/development.md). Do not treat 21/25 as
-supported until compiler and required CI change.
+[`docs/development.md`](docs/development.md). Migrations run as dedicated,
+module-scoped tasks.
 
-Do not rewrite architecture, migrate Java, replace JavaFX, regenerate
-JAXB, restructure the Maven reactor, or rewrite providers unless the
-current task explicitly asks for that scoped work.
+Architecture, Java migration, JavaFX, JAXB, Maven reactor, and provider
+rewrites run as explicitly scoped tasks — one concern per task. The
+compatibility CI jobs are currently diagnostic (continue-on-error) and
+become the required migration gate once the JAXB and JavaFX migrations
+land. Cross-platform packaging (Linux, macOS, Windows,
+Docker) is part of the modernization scope.
 
 ## Current Priorities
 
 Preferred work order: build/CI health, retrieval diagnostics, yt-dlp
-reliability, then provider repairs, then JDK/packaging migration.
+reliability, provider repairs, then JDK/packaging migration and
+cross-platform packaging.
 
 ## Technical routing
 
@@ -54,6 +58,10 @@ reliability, then provider repairs, then JDK/packaging migration.
   (**Public git text**).
 - Keep **code comments** concise: explain non-obvious *why*; do not narrate
   parsing, hosts, URLs, or integration mechanics (use `docs/` or tests).
+  Keep wording sober and generic across comments, docs, tests, and PR
+  text: describe provider capabilities in user-facing terms only, and
+  sweep new code and text for mechanism-specific vocabulary before every
+  publish.
 - No secrets, tokens, credentials, or machine paths in git.
 - No AI/tool attribution in commits. Agents must not author tool footers
   in PR bodies; third-party appended blocks are tolerated.
@@ -73,10 +81,11 @@ See [`docs/providers.md`](docs/providers.md).
 
 See [`docs/providers.md`](docs/providers.md).
 
-- Do not implement or document circumvention of technical protection
-  or license restrictions.
-- No credential, cookie, or browser-session extraction into the repo.
-- User secrets stay in local config or environment variables.
+- Download scope: the project records content the user can access with
+  their own accounts, for personal use. Provider access decisions are
+  maintainer choices documented per provider.
+- No secrets, tokens, cookies, or machine paths in git. User login
+  material, device files, and personal configuration stay local.
 - Do not re-enable legacy hosts (`dabiboo.free.fr`, `ftpperso.free.fr`).
 - Do not delete user media files, indexes, or configs.
 
@@ -181,15 +190,25 @@ Before creating a branch, search open PRs and existing branches for
 the same scope. Do not open a second PR that covers the same module
 or topic.
 
-Never run without explicit approval **in this conversation**:
-`git commit`, `git push`, `git push --force` / `--force-with-lease`,
-`gh pr create`, `gh pr merge`, mark a PR Ready, merge, delete branches,
-rebase when it would rewrite remote history, or destructive git/fs commands.
+Task-level authorization in the conversation covers the batched publishing
+actions of that task: `git commit`, non-force `git push`, and marking a PR
+Ready when the task explicitly authorizes Ready. Separate explicit approval
+per use: `git push --force`, `git push --force-with-lease`, `gh pr create`,
+merge, `gh pr merge`, delete branches, rebase when it would rewrite remote
+history, and destructive git/fs commands.
 
 When the user authorizes finishing or reviewing a **specific** pull request,
 that authorization covers the bounded orchestration loop for that PR only
 ([`.agents/skills/pr-review/SKILL.md`](.agents/skills/pr-review/SKILL.md)).
 It does not authorize merge or unrelated GitHub mutations.
+
+Write-capable orchestration through **RESOLVE** for a named PR requires
+**explicit action intent** (for example: address / finish / review / fix
+this PR, or continue implementation already authorized on that head).
+Mere chat that only names a PR or branch stays **read-only** (inventory
+and report). When write-capable work is already authorized, run the
+orchestrator through **RESOLVE** without waiting for a second "finish"
+phrase. Ready and merge still require separate explicit authorization.
 
 Do not chain those actions. Do not `git add -A`, `git add .`, or
 `git add --all`. Stage explicit paths only.
@@ -217,15 +236,35 @@ duplicate that procedure here.
 Keep every pull request in **Draft** until gates on the **current PR HEAD**
 are satisfied.
 
+- **Proactive review loop:** when write-capable work on an open PR is
+  authorized (explicit action intent or ongoing implementation on that
+  head), load [pr-review](.agents/skills/pr-review/SKILL.md), fetch live
+  GitHub state, and run **INVENTORY** through **RESOLVE** before claiming
+  cleanliness, before Ready, or before switching to unrelated work.
+  Repeat after every push to the PR head and when new review feedback
+  appears.
 - Evaluate every PR against its **current PR HEAD**; new commits invalidate
   prior reviews and checks that do not apply to that HEAD.
 - **Goal:** code that is correct and reviewable. Do not spend cycles on
   third-party PR-body footers, overview meta text, or process theater.
-- Every **actionable code finding** (inline review thread on the diff)
-  is **mandatory**. The agent must investigate, implement or reject with
-  evidence, push the branch, reply on the thread, and resolve only after
-  verification. Do not leave open Copilot/code-review findings and move
-  on. Do not treat them as optional or overview-only noise.
+- Reviewer findings that contradict maintainer policy in `AGENTS.md`
+  (and documents it links) may be rejected on the review thread with a
+  concise rationale and evidence when the finding is non-security and
+  non-privacy (process, public-git wording, provider-scope disputes). Do not
+  minimize silently. Security, secret, compliance, supply-chain, auth,
+  authorization, and data-exposure findings require normal investigation or
+  escalation — never dismiss them via adapter policy alone.
+- Every **reviewer or Copilot review comment** (inline thread or
+  review comment that raises a finding) is **mandatory**. Investigate;
+  implement a fix or reject with evidence; push when a fix is required;
+  then post a **disposition reply on that same thread** that states what
+  was done and **why** (fixed + evidence, or rejected + rationale). Do
+  not leave findings open and move on. Do not treat them as optional or
+  overview-only noise.
+- **Reply before resolve (hard rule):** never mark a review conversation
+  resolved unless an orchestrator disposition reply is already on that
+  thread. Resolution without a reply, or resolve-then-reply, is a
+  policy violation. GitHub `isResolved` alone is not proof of treatment.
 - **Copilot overview** ("Needs a closer look" / "Changes recommended"):
   - If **Findings: None**, or the text only complains about PR-body
     footers / attribution / process: **NON_BLOCKING**. One short reject
@@ -233,9 +272,11 @@ are satisfied.
   - If **Findings ≥ 1** or it points at open inline findings: those
     threads are **BLOCKING** until fixed or rejected with evidence and
     pushed. Fix the code; do not chase the overview badge itself.
-- Addressed inline threads get a concise reply, then resolution only after
-  the fix or rejection is verified; re-fetch GitHub and confirm
-  `isResolved`. Do not resolve unanswered or unexamined threads.
+- When no blocking code findings remain on HEAD, Copilot should submit an
+  **APPROVE** review with a short verification summary (not comment-only).
+- After the disposition reply is posted and the fix or rejection is
+  verified, resolve the thread; re-fetch GitHub and confirm `isResolved`.
+  Do not resolve unanswered, unexamined, or reply-less threads.
 - **Live GitHub PR state is authoritative** over local memory or ledgers.
 - During a review cycle, **only the PR orchestrator** mutates GitHub PR
   metadata (body, draft/ready, replies, resolution, reviewer requests).
@@ -284,6 +325,8 @@ paths but must not hold a second canonical copy.
 - Applicable Draft → Ready gates satisfied on the latest commit before
   Ready (with explicit authorization).
 - Actionable Copilot **code** threads handled (fix or reject with
-  evidence). Overview-only / footer-only items are not merge blockers.
+  evidence, disposition reply on the thread, then resolve). Overview-only
+  / footer-only items are not merge blockers.
 - Developer was asked to test real behavior when runtime/UI is affected.
-- Commit/push/PR wait for explicit approval.
+- Publishing runs under the task-level authorization above; merge and
+  destructive operations wait for separate explicit approval.

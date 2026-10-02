@@ -5,14 +5,13 @@ module is **not** a claim that live retrieval works.
 
 ## Legal
 
-Only public catalogues and user-authorized, legally accessible workflows.
+Personal-use recording of content the user can access with their own
+accounts. Provider access paths (public, entitled, or subscription) are
+maintainer decisions documented per provider.
 
-The project does **not** circumvent technical protection, encryption,
-subscription-only access, or license checks, and does **not** extract
-credentials, cookies, or browser sessions
-into git. User login material, if ever used, stays in local config or
-environment variables. Optional auth paths stay disabled until the user
-configures them.
+Nothing identifying the user goes into git: credentials, cookies, browser
+sessions, and device files stay in local config or environment variables.
+Optional auth paths stay disabled until the user configures them.
 
 Keep public git text short and generic. See [`AGENTS.md`](../AGENTS.md)
 (**Public git text**).
@@ -42,8 +41,8 @@ Labels: **working** (validated), **degraded**, **protected** (auth/geo/rights),
 **obsolete**, **removed**, **unknown**.
 
 France.tv and NOVO19 delegate media fetch to the `youtube`/yt-dlp plugin when
-public URLs exist. Canal+ family and WAT/TF1+ are not treated as freely
-accessible protected catalogues.
+public URLs exist. Canal+ family and WAT/TF1+ remain degraded or obsolete in
+the status table until a dedicated provider change lands.
 
 ## Arte catalogue discovery
 

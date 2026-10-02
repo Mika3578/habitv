@@ -1,6 +1,6 @@
 ---
 name: pr-review
-description: Canonical PR orchestrator — Draft through Ready on current HEAD. Use when continuing, reviewing, or finishing a specific pull request.
+description: Canonical PR orchestrator — Draft through Ready on current HEAD. Use when implementing on, pushing to, continuing, or finishing any open pull request; run INVENTORY through RESOLVE proactively whenever the PR or its review threads may have changed.
 ---
 
 # PR orchestrator
@@ -82,17 +82,45 @@ No credentials, tokens, or session data.
 
 ## Authorization
 
-When the user authorizes **finish this PR**, **address this PR's reviews**,
-or **prepare this PR for final review**, that includes for **that PR only**:
+**Read-only:** chat that only names a PR or branch (status questions,
+explanations) may SNAPSHOT + INVENTORY and report. No publish, reply,
+or resolve.
 
-- adjudicating and fixing findings;
-- concise replies on existing threads;
-- resolving verified threads;
-- re-fetching GitHub state.
+**Write-capable through RESOLVE** for **that PR only** when the user
+gives **explicit action intent** (address / finish / review / fix this
+PR, prepare for final review) **or** when implementation on that head
+is already authorized in the same task (commits, fixes, validation, CI
+on the PR branch):
 
-Still requires separate approval: merge, unrelated issues/PRs, branch
-deletion, unrelated force operations, creating GitHub issues (unless
-explicitly authorized).
+- live INVENTORY and classification on current HEAD;
+- adjudicate; fix or reject with evidence; verify; publish;
+- concise disposition replies on existing threads (**what + why**);
+  resolve **only after** that reply is posted and verified;
+- LIVE_RECONCILE until zero actionable unresolved **code** threads or
+  a documented escalation.
+
+Once write-capable, do not wait for a second "finish this PR" phrase
+before closing open actionable **code** threads.
+
+**Explicit Ready prep:** **finish this PR** / **prepare this PR for
+final review** runs **FINAL_REVIEW** and the **READY_GATE** checklist
+on the same PR. Completing READY_GATE criteria is **not** permission to
+leave Draft. Marking Ready requires a separate explicit user phrase
+(for example: mark Ready, or finish and mark Ready).
+
+Still requires separate approval: merge, mark Ready, unrelated
+issues/PRs, branch deletion, unrelated force operations, creating GitHub
+issues (unless explicitly authorized).
+
+## Proactive trigger
+
+When write-capable on a PR: at session start on that task, after every
+push to the PR head, and after any known new review submission:
+
+1. SNAPSHOT + INVENTORY (live GitHub — never stale memory).
+2. If unresolved actionable **code** threads exist, continue
+   ADJUDICATE → FIX_BATCH → VERIFY → PUBLISH → REPLY → RESOLVE before
+   unrelated work or a "done" report.
 
 ## Orchestration phases
 
@@ -110,11 +138,11 @@ INTAKE → SNAPSHOT → INVENTORY → ADJUDICATE → FIX_BATCH → VERIFY
 | FIX_BATCH | Implement accepted fixes in one coherent batch |
 | VERIFY | Run applicable validation ([code-change-verification](../code-change-verification/SKILL.md)) |
 | PUBLISH | Commit/push; confirm remote HEAD contains fixes |
-| REPLY | Concise disposition in **existing** thread (commit SHA when useful) |
-| RESOLVE | GraphQL/REST resolve; re-query `isResolved` (not `isOutdated`) |
+| REPLY | Concise disposition in **existing** thread: what was done and **why** (fix + SHA/evidence, or reject + rationale). Required before RESOLVE |
+| RESOLVE | Only after REPLY is visible on the thread. GraphQL/REST resolve; re-query `isResolved` (not `isOutdated`). Never resolve a reply-less thread |
 | LIVE_RECONCILE | Full live PR fetch before claiming cleanliness |
 | FINAL_REVIEW | One independent review on exact current HEAD (tier-dependent) |
-| READY_GATE | All gates on current HEAD; explicit user authorization to mark Ready |
+| READY_GATE | All gates on current HEAD; report readiness; mark Ready only with explicit user phrase |
 
 ## Finding lifecycle
 
@@ -125,12 +153,18 @@ DISCOVERED → EVALUATED → FIXED | REJECTED | DUPLICATE | FOLLOW_UP
 
 Editing a file does **not** complete a finding.
 
-**FIXED (valid):** fix → validate → publish → verify on remote HEAD → reply →
-resolve → confirm `isResolved=true`.
+**FIXED (valid):** fix → validate → publish → verify on remote HEAD →
+**reply with disposition + why** → resolve → confirm `isResolved=true`.
 
-**REJECTED (invalid):** technical evidence → reply → resolve → confirm.
+**REJECTED (invalid):** technical evidence → **reply with rationale** →
+resolve → confirm.
 
-**DUPLICATE:** map to canonical thread/finding; no second comment.
+**DUPLICATE:** map to canonical thread/finding; reply on the duplicate
+pointing at the canonical thread; resolve only after that reply.
+
+**Hard rule:** `RESOLVED` requires a prior disposition **REPLY** on that
+thread. Marking resolved without a reply (silent resolve) is forbidden,
+even when the code change already landed.
 
 **FOLLOW_UP:** legitimate but out of scope — record locally; open a GitHub
 issue only when authorized; do not expand the PR.
@@ -349,7 +383,9 @@ All items apply to **current PR HEAD** only:
    Overview-only / footer-only / `Findings: None` items: short reject,
    not a merge blocker.
 6. Every `BLOCKING` **code** finding fixed or rejected with evidence.
-7. Qualifying code threads replied and resolved (`isResolved` verified).
+7. Qualifying code threads have a disposition **reply** (what + why),
+   then are resolved (`isResolved` verified). Never resolve without a
+   reply.
 8. No actionable unresolved code threads.
 9. History cleaned when practical; title current. Third-party body
    footers ignored.
@@ -361,7 +397,8 @@ All items apply to **current PR HEAD** only:
 
 ## Continuing an existing PR
 
-1. INTAKE — user authorized this PR.
+1. INTAKE — write-capable (explicit action intent or ongoing work on the
+   head) or read-only inventory.
 2. SNAPSHOT — `REVIEW_HEAD`, `pr-gh-snapshot`, update `agent_space/pr-<n>/state.json`.
 3. INVENTORY + ADJUDICATE — all sources; map duplicates.
 4. If work remains: FIX_BATCH through RESOLVE; one review request when round complete.
