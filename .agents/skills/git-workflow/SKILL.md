@@ -77,6 +77,10 @@ git branch --show-current
 
 Project hook [`.cursor/hooks/before-shell-branch-policy.sh`](../../../.cursor/hooks/before-shell-branch-policy.sh) blocks publishing from unpublished platform-generated branches but allows branches that already have a published upstream (continuing an existing PR head).
 
+Run `git commit`, `git push`, and `gh pr create` as **direct** shell commands from the
+repository worktree (no `cd ... &&` to another path). Offline regression tests:
+[`scripts/test-branch-policy-hook.sh`](../../../scripts/test-branch-policy-hook.sh).
+
 ## Procedure (new task)
 
 1. Determine task **type** and short **scope**; build the canonical branch name.
