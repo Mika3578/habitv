@@ -1,8 +1,8 @@
-# GitHub Copilot
+# Copilot review instructions
 
-Canonical repository instructions: [`AGENTS.md`](../AGENTS.md).
+Canonical policy: [`../AGENTS.md`](../AGENTS.md).
+Download and legal scope: [`../docs/providers.md`](../docs/providers.md).
 
-Read and follow `AGENTS.md` for policy, validation, and pull request lifecycle.
-Portable task procedures: [`.agents/skills/`](../.agents/skills/).
-
-Do not treat this file as a second constitution.
+Follow those documents for review scope, secret handling, and review
+output (including submitting APPROVE when no blocking findings remain on
+the current HEAD).
