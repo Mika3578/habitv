@@ -21,32 +21,29 @@ public class DownloadBox extends Pane {
 		super();
 		this.episode = actionProgress.getEpisode();
 		setMinWidth(0.0d);
+		setPrefWidth(0.0d);
 		setMaxWidth(Double.MAX_VALUE);
 		getChildren().add(getStateWidget(null, actionProgress));
 	}
 
 	@Override
-	protected double computePrefWidth(final double height) {
-		if (getChildren().isEmpty()) {
-			return super.computePrefWidth(height);
-		}
-		return getChildren().get(0).prefWidth(height);
+	protected double computeMinWidth(final double height) {
+		return 0.0d;
 	}
 
 	@Override
-	protected double computeMinWidth(final double height) {
-		if (getChildren().isEmpty()) {
-			return super.computeMinWidth(height);
-		}
-		return getChildren().get(0).minWidth(height);
+	protected double computePrefWidth(final double height) {
+		return 0.0d;
 	}
 
 	@Override
 	protected void layoutChildren() {
-		final double width = Math.max(getWidth(), computePrefWidth(-1.0d));
-		final double height = Math.max(getHeight(), computePrefHeight(-1.0d));
+		final double width = getWidth();
+		final double height = getHeight();
 		for (final Node child : getChildren()) {
-			child.resizeRelocate(0.0d, 0.0d, width, height);
+			final double childWidth = width > 0.0d ? width : child.prefWidth(-1.0d);
+			final double childHeight = height > 0.0d ? height : child.prefHeight(-1.0d);
+			child.resizeRelocate(0.0d, 0.0d, childWidth, childHeight);
 		}
 	}
 

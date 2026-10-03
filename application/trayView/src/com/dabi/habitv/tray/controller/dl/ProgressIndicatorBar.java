@@ -14,18 +14,16 @@ class ProgressIndicatorBar extends StackPane {
 	private final Label text = new Label();
 	private final Tooltip tooltip = new Tooltip();
 
-	/** Stable preferred width so label text cannot resize the Etat cell. */
-	private static final double PREF_BAR_WIDTH = 148.0d;
-	private static final double MIN_BAR_WIDTH = 80.0d;
 	private static final double MIN_BAR_HEIGHT = 18.0d;
 
 	ProgressIndicatorBar() {
-		setMinWidth(MIN_BAR_WIDTH);
-		setPrefWidth(PREF_BAR_WIDTH);
+		// Width comes from the Etat column / cell; never from label text.
+		setMinWidth(0.0d);
+		setPrefWidth(0.0d);
 		setMaxWidth(Double.MAX_VALUE);
 		setMinHeight(MIN_BAR_HEIGHT);
 		bar.setMinWidth(0.0d);
-		bar.setPrefWidth(PREF_BAR_WIDTH);
+		bar.setPrefWidth(0.0d);
 		bar.setMaxWidth(Double.MAX_VALUE);
 		bar.setMinHeight(MIN_BAR_HEIGHT);
 		bar.setMaxHeight(Double.MAX_VALUE);
@@ -41,12 +39,12 @@ class ProgressIndicatorBar extends StackPane {
 
 	@Override
 	protected double computeMinWidth(final double height) {
-		return MIN_BAR_WIDTH;
+		return 0.0d;
 	}
 
 	@Override
 	protected double computePrefWidth(final double height) {
-		return PREF_BAR_WIDTH;
+		return 0.0d;
 	}
 
 	@Override
