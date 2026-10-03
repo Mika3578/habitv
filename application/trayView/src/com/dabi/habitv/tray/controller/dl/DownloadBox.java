@@ -20,7 +20,18 @@ public class DownloadBox extends Pane {
 	public DownloadBox(final ViewController viewController, final ActionProgress actionProgress) {
 		super();
 		this.episode = actionProgress.getEpisode();
+		setMaxWidth(Double.MAX_VALUE);
 		getChildren().add(getStateWidget(null, actionProgress));
+	}
+
+	@Override
+	protected void layoutChildren() {
+		final double width = getWidth();
+		final double height = getHeight();
+		for (final Node child : getChildren()) {
+			child.resizeRelocate(0.0d, 0.0d, width > 0.0d ? width : child.prefWidth(-1.0d),
+					height > 0.0d ? height : child.prefHeight(-1.0d));
+		}
 	}
 
 	public void update(final ActionProgress actionProgress) {
