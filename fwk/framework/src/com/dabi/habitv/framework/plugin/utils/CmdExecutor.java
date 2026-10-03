@@ -217,7 +217,8 @@ public class CmdExecutor implements ProcessHolder {
 					final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 					String line = "";
 					try {
-						long lastTime = 0;
+						long lastLogSampleTime = 0L;
+						long lastActivityChangeTime = 0L;
 						while ((line = reader.readLine()) != null && !hungThread) {
 							fullOutput.append(line);
 							fullOutput.append("\n");
@@ -230,10 +231,13 @@ public class CmdExecutor implements ProcessHolder {
 									final String newActivity = progressionActivityTokenFor(line, newProgression);
 									LOG.debug(line);
 									final long now = System.currentTimeMillis();
-									if (progression != null && (now - lastTime) > FrameworkConf.TIME_BETWEEN_LOG) {
-										hungThread = isProgressionStalled(lastActivity, newActivity, now, lastTime,
-												maxHungTime);
-										lastTime = now;
+									if (progression != null && (now - lastLogSampleTime) > FrameworkConf.TIME_BETWEEN_LOG) {
+										hungThread = isProgressionStalled(lastActivity, newActivity, now,
+												lastActivityChangeTime, maxHungTime);
+										lastLogSampleTime = now;
+									}
+									if (lastActivity == null || !newActivity.equals(lastActivity)) {
+										lastActivityChangeTime = now;
 									}
 									progressionActivityToken = newActivity;
 								}

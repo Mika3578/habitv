@@ -46,6 +46,16 @@ public class FfmpegProgressParserTest {
 	}
 
 	@Test
+	public void stderrDurationAfterStdoutOutTimeCombinesRatio() {
+		final FfmpegProgressParser.State state = new FfmpegProgressParser.State();
+		assertTrue(FfmpegProgressParser.parseLine("out_time_us=5000000", state).isIndeterminate());
+		final DownloadProgressSnapshot snapshot = FfmpegProgressParser
+				.parseLine("  Duration: 00:00:10.00, start: 0.000000, bitrate: 100 kb/s", state);
+		assertNotNull(snapshot);
+		assertEquals(0.5d, snapshot.getProgressRatio().doubleValue(), 0.05d);
+	}
+
+	@Test
 	public void stderrDurationAndTimeFallback() {
 		final FfmpegProgressParser.State state = new FfmpegProgressParser.State();
 		FfmpegProgressParser.parseLine("  Duration: 00:00:10.00, start: 0.000000, bitrate: 100 kb/s", state);

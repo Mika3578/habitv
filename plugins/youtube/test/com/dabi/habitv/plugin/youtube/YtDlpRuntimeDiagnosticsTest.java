@@ -35,6 +35,13 @@ public class YtDlpRuntimeDiagnosticsTest {
 	}
 
 	@Test
+	public void extractYtDlpVersionLineReturnsEmptyWhenOnlyYoutubeDlMentioned() {
+		assertEquals("", YtDlpRuntimeDiagnostics.extractYtDlpVersionLine("2021.01.01 youtube-dl"));
+		assertEquals("",
+				YtDlpRuntimeDiagnostics.extractYtDlpVersionLine("WARNING: deprecated\n2021.01.01 youtube-dl\n"));
+	}
+
+	@Test
 	public void detectsPyInstallerBootstrapFailure() {
 		assertTrue(YtDlpRuntimeDiagnostics.isBootstrapExtractionFailure(PYINSTALLER_STDERR));
 	}

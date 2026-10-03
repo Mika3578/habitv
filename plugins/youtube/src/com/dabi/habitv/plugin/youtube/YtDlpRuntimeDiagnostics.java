@@ -139,7 +139,7 @@ public final class YtDlpRuntimeDiagnostics {
 				return trimmed;
 			}
 		}
-		return lines[0].trim();
+		return "";
 	}
 
 	public static boolean supportsProgressTemplate(final String versionOutput) {

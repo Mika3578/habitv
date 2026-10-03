@@ -126,4 +126,13 @@ public class CmdExecutorTest {
 		final long lastTime = 0L;
 		assertFalse(CmdExecutor.isProgressionStalled("stage:MERGING", "line:[Merger] step 2", now, lastTime, 500L));
 	}
+
+	@Test
+	public void progressionStalledUsesActivityChangeTimeNotLogSampleTime() {
+		final long activityChangeTime = 1_000L;
+		final long now = activityChangeTime + 600L;
+		final long recentLogSampleTime = now - 100L;
+		assertTrue(CmdExecutor.isProgressionStalled("out:1", "out:1", now, activityChangeTime, 500L));
+		assertFalse(CmdExecutor.isProgressionStalled("out:1", "out:1", now, recentLogSampleTime, 500L));
+	}
 }

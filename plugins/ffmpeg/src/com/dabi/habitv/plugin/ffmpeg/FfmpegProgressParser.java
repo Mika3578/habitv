@@ -63,11 +63,15 @@ public final class FfmpegProgressParser {
 	}
 
 	static DownloadProgressSnapshot parseStderrLine(final String line, final State state) {
+		boolean durationUpdated = false;
 		if (state.durationMicros == null) {
 			final Matcher durationMatcher = STDERR_DURATION.matcher(line);
 			if (durationMatcher.find()) {
 				final Long micros = parseHhMmSsDurationToMicros(durationMatcher.group(1));
-				state.durationMicros = micros == null ? null : Double.valueOf(micros.doubleValue());
+				if (micros != null) {
+					state.durationMicros = Double.valueOf(micros.doubleValue());
+					durationUpdated = true;
+				}
 			}
 		}
 		final Matcher timeMatcher = STDERR_TIME.matcher(line);
@@ -77,6 +81,9 @@ public final class FfmpegProgressParser {
 				state.outTimeMicros = outMicros;
 				return snapshotFromState(state);
 			}
+		}
+		if (durationUpdated && state.outTimeMicros != null) {
+			return snapshotFromState(state);
 		}
 		return null;
 	}
