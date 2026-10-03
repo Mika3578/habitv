@@ -96,6 +96,51 @@ public class XMLUserConfigTest {
 		assertEquals(2, XMLUserConfig.readConfigForTest(file).getMaxConcurrentDownloads());
 	}
 
+	@Test
+	public void uiThemeDefaultsToLightWhenMissing() throws Exception {
+		final XMLUserConfig userConfig = newConfigInstance();
+		assertEquals(UiThemePreference.LIGHT, userConfig.getUiTheme());
+	}
+
+	@Test
+	public void uiThemeRoundTripPersistsDark() throws Exception {
+		final File file = File.createTempFile("habitv-config-", ".xml");
+		file.deleteOnExit();
+		Files.write(file.toPath(), minimalConfigWithoutMaxConcurrent().getBytes(
+				StandardCharsets.UTF_8));
+		final XMLUserConfig config = XMLUserConfig.readConfigForTest(file);
+		config.setUiTheme(UiThemePreference.DARK);
+		XMLUserConfig.saveConfig(file, config);
+		assertEquals(UiThemePreference.DARK,
+				XMLUserConfig.readConfigForTest(file).getUiTheme());
+	}
+
+	@Test
+	public void uiThemeLightRemovesPersistedSoftKey() throws Exception {
+		final File file = File.createTempFile("habitv-config-", ".xml");
+		file.deleteOnExit();
+		Files.write(file.toPath(), ("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+				+ "<ns2:configuration xmlns:ns2=\"http://www.dabi.com/habitv/configuration/entities\">\n"
+				+ "    <proxies/>\n"
+				+ "    <osConfig/>\n"
+				+ "    <downloadConfig>\n"
+				+ "        <downloaders>\n"
+				+ "            <uiTheme>dark</uiTheme>\n"
+				+ "        </downloaders>\n"
+				+ "        <downloadOuput>/tmp/#EPISODE#.mp4</downloadOuput>\n"
+				+ "    </downloadConfig>\n"
+				+ "</ns2:configuration>\n").getBytes(StandardCharsets.UTF_8));
+		final XMLUserConfig config = XMLUserConfig.readConfigForTest(file);
+		assertEquals(UiThemePreference.DARK, config.getUiTheme());
+		config.setUiTheme(UiThemePreference.LIGHT);
+		XMLUserConfig.saveConfig(file, config);
+		final String saved = new String(Files.readAllBytes(file.toPath()),
+				StandardCharsets.UTF_8);
+		assertFalse(saved.contains("uiTheme"));
+		assertEquals(UiThemePreference.LIGHT,
+				XMLUserConfig.readConfigForTest(file).getUiTheme());
+	}
+
 	private static XMLUserConfig newConfigInstance() throws Exception {
 		final Method buildDefaultConfig = XMLUserConfig.class.getDeclaredMethod(
 				"buildDefaultConfig");

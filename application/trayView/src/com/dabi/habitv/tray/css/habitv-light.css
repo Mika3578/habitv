@@ -1,0 +1,27 @@
+/* Light theme: preserve the existing Modena-based look. */
+
+.theme-light {
+    -fx-base: #ececec;
+    -fx-background: #f4f4f4;
+    -fx-control-inner-background: #ffffff;
+    -fx-text-base-color: #1f1f1f;
+    -fx-text-inner-color: #1f1f1f;
+    -fx-focus-color: #039ed3;
+    -fx-faint-focus-color: #039ed322;
+}
+
+.theme-light .root,
+.theme-light {
+    -fx-background-color: -fx-background;
+}
+
+.theme-light .label,
+.theme-light .check-box,
+.theme-light .radio-button {
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.theme-light .tooltip {
+    -fx-background-color: #2b2b2b;
+    -fx-text-fill: #f5f5f5;
+}

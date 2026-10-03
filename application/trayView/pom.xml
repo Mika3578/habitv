@@ -82,6 +82,7 @@
 				<includes>
 					<include>**/*properties</include>
 					<include>**/*fxml</include>
+					<include>**/*css</include>
 				</includes>
 			</resource>
 		</resources>
