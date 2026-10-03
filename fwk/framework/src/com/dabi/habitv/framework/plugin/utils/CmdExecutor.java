@@ -41,6 +41,10 @@ public class CmdExecutor implements ProcessHolder {
 
 	private String progressionActivityToken;
 
+	private long progressionLastLogSampleTime;
+
+	private long progressionLastActivityChangeTime;
+
 	private final Object progressLock = new Object();
 
 	private Thread killThread;
@@ -124,6 +128,8 @@ public class CmdExecutor implements ProcessHolder {
 		lastOutputLine = null;
 		progression = null;
 		progressionActivityToken = null;
+		progressionLastLogSampleTime = 0L;
+		progressionLastActivityChangeTime = 0L;
 
 	}
 
@@ -217,8 +223,6 @@ public class CmdExecutor implements ProcessHolder {
 					final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 					String line = "";
 					try {
-						long lastLogSampleTime = 0L;
-						long lastActivityChangeTime = 0L;
 						while ((line = reader.readLine()) != null && !hungThread) {
 							fullOutput.append(line);
 							fullOutput.append("\n");
@@ -231,13 +235,14 @@ public class CmdExecutor implements ProcessHolder {
 									final String newActivity = progressionActivityTokenFor(line, newProgression);
 									LOG.debug(line);
 									final long now = System.currentTimeMillis();
-									if (progression != null && (now - lastLogSampleTime) > FrameworkConf.TIME_BETWEEN_LOG) {
+									if (progression != null
+											&& (now - progressionLastLogSampleTime) > FrameworkConf.TIME_BETWEEN_LOG) {
 										hungThread = isProgressionStalled(lastActivity, newActivity, now,
-												lastActivityChangeTime, maxHungTime);
-										lastLogSampleTime = now;
+												progressionLastActivityChangeTime, maxHungTime);
+										progressionLastLogSampleTime = now;
 									}
 									if (lastActivity == null || !newActivity.equals(lastActivity)) {
-										lastActivityChangeTime = now;
+										progressionLastActivityChangeTime = now;
 									}
 									progressionActivityToken = newActivity;
 								}

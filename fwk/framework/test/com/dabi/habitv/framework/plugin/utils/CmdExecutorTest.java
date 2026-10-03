@@ -1,6 +1,7 @@
 package com.dabi.habitv.framework.plugin.utils;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -134,5 +135,94 @@ public class CmdExecutorTest {
 		final long recentLogSampleTime = now - 100L;
 		assertTrue(CmdExecutor.isProgressionStalled("out:1", "out:1", now, activityChangeTime, 500L));
 		assertFalse(CmdExecutor.isProgressionStalled("out:1", "out:1", now, recentLogSampleTime, 500L));
+	}
+
+	@Test
+	public void concurrentStreamsSameActivityTokenDoesNotFalseStall() throws ExecutorFailedException {
+		final long delayBeforeStdoutMs = 4_000L;
+		final long delayBeforeStderrMs = 4_020L;
+		final CmdExecutor concurrentCmd = new CmdExecutor("", "", 500) {
+
+			@Override
+			protected Process buildProcess() throws ExecutorFailedException {
+				return new Process() {
+
+					@Override
+					public int waitFor() throws InterruptedException {
+						return 0;
+					}
+
+					@Override
+					public OutputStream getOutputStream() {
+						return null;
+					}
+
+					@Override
+					public InputStream getInputStream() {
+						return new DelayedLineInputStream("prog:stdout\n", delayBeforeStdoutMs);
+					}
+
+					@Override
+					public InputStream getErrorStream() {
+						return new DelayedLineInputStream("prog:stderr\n", delayBeforeStderrMs);
+					}
+
+					@Override
+					public int exitValue() {
+						return 0;
+					}
+
+					@Override
+					public void destroy() {
+					}
+				};
+			}
+
+			@Override
+			protected String handleProgression(final String line) {
+				if (line.startsWith("prog:")) {
+					return line;
+				}
+				return null;
+			}
+
+			@Override
+			protected String progressionActivityTokenFor(final String line, final String progressionResult) {
+				return "shared-activity";
+			}
+		};
+		concurrentCmd.start();
+	}
+
+	private static final class DelayedLineInputStream extends InputStream {
+
+		private final byte[] data;
+
+		private int position;
+
+		private final long delayMs;
+
+		private boolean delayApplied;
+
+		DelayedLineInputStream(final String content, final long delayMs) {
+			this.data = content.getBytes();
+			this.delayMs = delayMs;
+		}
+
+		@Override
+		public int read() throws IOException {
+			if (!delayApplied && delayMs > 0) {
+				delayApplied = true;
+				try {
+					Thread.sleep(delayMs);
+				} catch (final InterruptedException e) {
+					throw new IOException(e);
+				}
+			}
+			if (position >= data.length) {
+				return -1;
+			}
+			return data[position++] & 0xff;
+		}
 	}
 }
