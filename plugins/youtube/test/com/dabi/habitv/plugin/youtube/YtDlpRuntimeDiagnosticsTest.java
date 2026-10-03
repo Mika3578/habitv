@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.UUID;
@@ -11,10 +12,27 @@ import java.util.UUID;
 import org.junit.Test;
 
 import com.dabi.habitv.api.plugin.exception.ExecutorFailedException;
+import com.dabi.habitv.framework.plugin.exception.HungProcessException;
+import com.dabi.habitv.framework.plugin.utils.CmdExecutor;
+import com.dabi.habitv.framework.plugin.utils.OSUtils;
 
 public class YtDlpRuntimeDiagnosticsTest {
 
 	private static final String PYINSTALLER_STDERR = "[PYI-17924:ERROR] Failed to extract entry: Cryptodome\\PublicKey\\_ec_ws.pyd.";
+
+	@Test
+	public void supportsProgressTemplateForRecentYtDlp() {
+		assertTrue(YtDlpRuntimeDiagnostics.supportsProgressTemplate("2024.08.01"));
+		assertFalse(YtDlpRuntimeDiagnostics.supportsProgressTemplate("2023.09.01"));
+		assertFalse(YtDlpRuntimeDiagnostics.supportsProgressTemplate("2021.01.01 youtube-dl"));
+		assertTrue(YtDlpRuntimeDiagnostics.supportsProgressTemplate("WARNING: deprecated flag\n2024.08.01"));
+	}
+
+	@Test
+	public void extractYtDlpVersionLineSkipsWarnings() {
+		assertEquals("2024.08.01",
+				YtDlpRuntimeDiagnostics.extractYtDlpVersionLine("WARNING: test\n2024.08.01\n"));
+	}
 
 	@Test
 	public void detectsPyInstallerBootstrapFailure() {
@@ -89,29 +107,33 @@ public class YtDlpRuntimeDiagnosticsTest {
 	}
 
 	@Test
-	public void runPreflightAllowsStartupLongerThanOneSecond() {
+	public void preflightHungProcessTimeoutAllowsSlowStartup() {
+		assertTrue(YtDlpRuntimeDiagnostics.preflightHungProcessTimeoutMillis() >= 5000L);
+	}
+
+	@Test
+	public void preflightVersionExecutorHonorsHungTimeout() throws Exception {
 		final File parent = new File(System.getProperty("java.io.tmpdir"),
-				"habitv-test-" + UUID.randomUUID());
+				"habitv-preflight-" + UUID.randomUUID());
 		final File binDir = new File(parent, "bin");
-		final File javaHome = new File(System.getProperty("java.home"));
-		final boolean windows = System.getProperty("os.name").toLowerCase().contains("win");
-		final String javaExecName = windows ? "java.exe" : "java";
-		final String cmdProcessor = windows ? "cmd.exe /c #CMD#" : "/bin/sh -c #CMD#";
-		final String javaExec = new File(javaHome, "bin" + File.separator + javaExecName).getAbsolutePath();
-		final String classPath = System.getProperty("java.class.path");
-		final String quotedJavaExec = "\"" + javaExec + "\"";
-		final String quotedClassPath = "\"" + classPath + "\"";
-		final String executablePath = quotedJavaExec + " -cp " + quotedClassPath + " "
-				+ SlowVersionMain.class.getName();
-
+		assertTrue(binDir.mkdirs());
+		// Windows timeout fails when stdin is a pipe; PowerShell sleep stays silent.
+		final String slowCmd = OSUtils.isWindows()
+				? "powershell -NoProfile -Command Start-Sleep -Seconds 8"
+				: "sleep 8";
+		YtDlpRuntimeDiagnostics.setPreflightTimeoutMillisForTests(400L);
+		final CmdExecutor executor = YtDlpRuntimeDiagnostics.createPreflightVersionExecutor("", slowCmd,
+				binDir.getAbsolutePath());
+		final long startedAt = System.currentTimeMillis();
 		try {
-			final long startedAt = System.currentTimeMillis();
-			YtDlpRuntimeDiagnostics.runPreflight(cmdProcessor, executablePath, binDir.getAbsolutePath());
-			final long elapsedMs = System.currentTimeMillis() - startedAt;
-
-			assertTrue("preflight should allow command startup longer than one second, elapsed ms=" + elapsedMs,
-					elapsedMs >= 1200L);
+			try {
+				executor.start();
+				fail("expected hung preflight executor");
+			} catch (HungProcessException expected) {
+				assertTrue(System.currentTimeMillis() - startedAt < 3000L);
+			}
 		} finally {
+			YtDlpRuntimeDiagnostics.setPreflightTimeoutMillisForTests(null);
 			deleteRecursively(parent);
 		}
 	}
@@ -131,11 +153,15 @@ public class YtDlpRuntimeDiagnosticsTest {
 		file.delete();
 	}
 
-	public static class SlowVersionMain {
-
-		public static void main(final String[] args) throws InterruptedException {
-			Thread.sleep(1500L);
-			System.out.println("2026.05.21");
+	@Test
+	public void preflightHungTimeoutHonorsTestOverride() {
+		final long defaultTimeout = YtDlpRuntimeDiagnostics.preflightHungProcessTimeoutMillis();
+		assertTrue(defaultTimeout >= 5000L);
+		YtDlpRuntimeDiagnostics.setPreflightTimeoutMillisForTests(777L);
+		try {
+			assertEquals(777L, YtDlpRuntimeDiagnostics.preflightHungProcessTimeoutMillis());
+		} finally {
+			YtDlpRuntimeDiagnostics.setPreflightTimeoutMillisForTests(null);
 		}
 	}
 

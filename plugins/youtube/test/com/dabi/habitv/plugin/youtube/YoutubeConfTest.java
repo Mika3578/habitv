@@ -27,6 +27,15 @@ public class YoutubeConfTest {
 		assertTrue(YoutubeConf.DUMP_CMD.contains("--merge-output-format mp4"));
 		assertTrue(YoutubeConf.DUMP_CMD.contains("--newline"));
 		assertTrue(YoutubeConf.DUMP_CMD.contains("--no-check-certificate"));
+		assertFalse(YoutubeConf.DUMP_CMD.contains("--progress-template"));
+		assertTrue(YoutubeConf.augmentBuiltInDumpCommand(YoutubeConf.DUMP_CMD, "2024.01.01", "/bin/sh -c #CMD#")
+				.contains("--progress-template"));
+		assertTrue(YoutubeConf.augmentBuiltInDumpCommand(YoutubeConf.DUMP_CMD, "2023.09.01", "/bin/sh -c #CMD#")
+				.equals(YoutubeConf.DUMP_CMD));
+		assertTrue(YoutubeConf.progressTemplateFlagsFor("cmd.exe /c #CMD#").contains("%(progress._percent)j"));
+		assertFalse(YoutubeConf.progressTemplateFlagsFor("cmd.exe /c #CMD#").contains("%(progress._percent)s"));
+		assertTrue(YoutubeConf.progressTemplateFlagsFor("/bin/sh -c #CMD#").contains("\\\"dest\\\":%(progress.filename)j"));
+		assertTrue(YoutubeConf.progressTemplateFlagsFor("cmd.exe /c #CMD#").contains("\\\"dest\\\":%(progress.filename)j"));
 		assertFalse(YoutubeConf.DUMP_CMD.contains("--audio-quality"));
 		assertFalse(YoutubeConf.DUMP_CMD.contains("--extract-audio"));
 		assertFalse(YoutubeConf.DUMP_CMD.contains("-x"));
