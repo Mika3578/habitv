@@ -26,12 +26,21 @@ public class YtDlpRuntimeDiagnosticsTest {
 		assertFalse(YtDlpRuntimeDiagnostics.supportsProgressTemplate("2023.09.01"));
 		assertFalse(YtDlpRuntimeDiagnostics.supportsProgressTemplate("2021.01.01 youtube-dl"));
 		assertTrue(YtDlpRuntimeDiagnostics.supportsProgressTemplate("WARNING: deprecated flag\n2024.08.01"));
+		assertFalse(YtDlpRuntimeDiagnostics.supportsProgressTemplate("WARNING: using legacy mode (2024.08.01)"));
 	}
 
 	@Test
 	public void extractYtDlpVersionLineSkipsWarnings() {
 		assertEquals("2024.08.01",
 				YtDlpRuntimeDiagnostics.extractYtDlpVersionLine("WARNING: test\n2024.08.01\n"));
+	}
+
+	@Test
+	public void extractYtDlpVersionLineIgnoresDateInsideWarning() {
+		assertEquals("",
+				YtDlpRuntimeDiagnostics.extractYtDlpVersionLine("WARNING: using legacy mode (2024.08.01)"));
+		assertEquals("2023.09.01", YtDlpRuntimeDiagnostics.extractYtDlpVersionLine(
+				"WARNING: using legacy mode (2024.08.01)\n2023.09.01\n"));
 	}
 
 	@Test

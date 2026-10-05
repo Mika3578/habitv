@@ -26,6 +26,9 @@ public final class YtDlpRuntimeDiagnostics {
 
 	private static final String[] PYINSTALLER_SIGNATURES = { "[PYI-", "Failed to extract", "Cryptodome", "_MEI" };
 
+	private static final java.util.regex.Pattern YT_DLP_RELEASE_DATE = java.util.regex.Pattern
+			.compile("(20\\d{2})[.](\\d{1,2})[.](\\d{1,2})");
+
 	private static boolean preflightEnabled = true;
 
 	private static Long preflightTimeoutMillisForTests;
@@ -135,7 +138,7 @@ public final class YtDlpRuntimeDiagnostics {
 			if (trimmed.toLowerCase().contains("youtube-dl")) {
 				continue;
 			}
-			if (parseYtDlpReleaseDate(trimmed) > 0) {
+			if (isYtDlpReleaseVersionLine(trimmed)) {
 				return trimmed;
 			}
 		}
@@ -150,12 +153,15 @@ public final class YtDlpRuntimeDiagnostics {
 		return parseYtDlpReleaseDate(line) >= 20231013;
 	}
 
+	static boolean isYtDlpReleaseVersionLine(final String versionLine) {
+		return versionLine != null && YT_DLP_RELEASE_DATE.matcher(versionLine).lookingAt();
+	}
+
 	static int parseYtDlpReleaseDate(final String versionLine) {
 		if (versionLine == null) {
 			return 0;
 		}
-		final java.util.regex.Matcher matcher = java.util.regex.Pattern
-				.compile("(20\\d{2})[.](\\d{1,2})[.](\\d{1,2})").matcher(versionLine);
+		final java.util.regex.Matcher matcher = YT_DLP_RELEASE_DATE.matcher(versionLine);
 		if (!matcher.find()) {
 			return 0;
 		}

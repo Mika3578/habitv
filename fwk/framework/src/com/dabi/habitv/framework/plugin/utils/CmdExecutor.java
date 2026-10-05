@@ -96,7 +96,7 @@ public class CmdExecutor implements ProcessHolder {
 			outputThread.join();
 			ended = true;
 			if (hungThread) {
-				process.destroy();
+				destroyCurrentProcess();
 				throw new HungProcessException(cmd, fullOutput.toString(), lastOutputLine, maxHungTime);
 			} else {
 				process.waitFor();
@@ -117,6 +117,12 @@ public class CmdExecutor implements ProcessHolder {
 			throw buildFailureException(cmd, fullOutput.toString(), lastOutputLine, null);
 		}
 		this.fullOutput = fullOutput.toString();
+	}
+
+	private void destroyCurrentProcess() {
+		if (process != null) {
+			process.destroy();
+		}
 	}
 
 	private void init() {
@@ -150,7 +156,7 @@ public class CmdExecutor implements ProcessHolder {
 					newOutPut = fullOutput.toString();
 					if (oldOutPut != null && oldOutPut.equals(newOutPut)) {
 						hungThread = true;
-						process.destroy();
+						destroyCurrentProcess();
 					} else {
 						oldOutPut = fullOutput.toString();
 					}
@@ -239,6 +245,9 @@ public class CmdExecutor implements ProcessHolder {
 											&& (now - progressionLastLogSampleTime) > FrameworkConf.TIME_BETWEEN_LOG) {
 										hungThread = isProgressionStalled(lastActivity, newActivity, now,
 												progressionLastActivityChangeTime, maxHungTime);
+										if (hungThread) {
+											destroyCurrentProcess();
+										}
 										progressionLastLogSampleTime = now;
 									}
 									if (lastActivity == null || !newActivity.equals(lastActivity)) {
@@ -252,6 +261,9 @@ public class CmdExecutor implements ProcessHolder {
 						reader.close();
 					}
 				} catch (final IOException ioe) {
+					if (hungThread) {
+						return;
+					}
 					throw new TechnicalException(ioe);
 				}
 			}
