@@ -31,14 +31,16 @@ reviews:
         and credential handling defects.
     - path: "fwk/**"
       instructions: >
-        Shared framework changes must stay Java 8 baseline unless the PR is an
-        explicit JDK migration. Watch process execution, progress reporting,
-        and plugin isolation. Do not propose deleting user media, indexes, or
-        configs.
+        Active modernization target is Java 21 (Java 25 next); Java 8 is not a
+        design constraint. Prefer changes that keep the full reactor movable to
+        that target. Watch process execution, progress reporting, and plugin
+        isolation. Do not propose deleting user media, indexes, or configs.
     - path: "application/**"
       instructions: >
-        GUI modules need a JavaFX-capable JDK 8 at runtime. Keep UI changes
-        scoped. Same secret and user-data rules as the rest of the repo.
+        GUI modules must treat JavaFX as an explicit modern-JDK dependency
+        (OpenJFX); do not assume JDK-bundled JavaFX 2.x / jfxrt as the design
+        target. Keep UI changes scoped. Same secret and user-data rules as the
+        rest of the repo.
     - path: "docs/**"
       instructions: >
         One topic per page; link instead of copying. English. Public wording

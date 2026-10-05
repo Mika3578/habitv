@@ -14,10 +14,13 @@ HabiTV is a Maven multi-module replay application (`fwk/`,
 `application/`, `plugins/`). Canonical remote: `Mika3578/habitv`.
 Integration branch: `develop`.
 
-Current **build/runtime baseline is Java 8**; Java 21 is the
-modernization target, Java 25 next. Details:
-[`docs/development.md`](docs/development.md). Migrations run as dedicated,
-module-scoped tasks.
+**Active modernization target is Java 21**; Java 25 is next. The full
+Maven reactor must move together to that target. JavaFX must be handled
+explicitly on modern JDKs (OpenJFX). Java 8 is no longer a design
+constraint; legacy required CI job names still say `*-java8` until CI
+alignment. Details: [`docs/development.md`](docs/development.md),
+[`docs/modernization.md`](docs/modernization.md). Migrations run as
+dedicated, module-scoped tasks.
 
 Architecture, Java migration, JavaFX, JAXB, Maven reactor, and provider
 rewrites run as explicitly scoped tasks — one concern per task. The
@@ -48,9 +51,16 @@ cross-platform packaging.
 
 ## Engineering Baseline
 
-- Language: stay on the **current Java 8** baseline unless the task is
-  an explicit JDK migration. See [`docs/development.md`](docs/development.md).
-- GUI modules need a JavaFX-capable JDK 8 at runtime (`jfxrt`).
+- Language: design and migrate toward **Java 21** (Java 25 next). Do not
+  treat Java 8 as an architectural constraint. Dedicated JDK/JavaFX/JAXB
+  migrations may land as single-concern tasks; the reactor must converge
+  on the active target. See [`docs/development.md`](docs/development.md)
+  and [`docs/modernization.md`](docs/modernization.md).
+- GUI modules must use **explicit JavaFX** on modern JDKs; do not assume
+  JDK-bundled JavaFX 2.x / `jfxrt` as the design target. Legacy CI check
+  names (`validate-java8`, `deterministic-tests-java8`,
+  `compile-and-package-java8`) describe current hosted jobs only — do not
+  rename them in governance-only PRs.
 - Do not add, remove, or upgrade dependencies unless the task requires it.
 - Plugin version overrides must follow [`CONTRIBUTING.md`](CONTRIBUTING.md).
   Internal plugin deps use `${project.parent.version}`.
