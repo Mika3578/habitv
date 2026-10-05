@@ -149,6 +149,7 @@ $onHeadSubstantive = @($sources | Where-Object {
 })
 
 # Human APPROVED on HEAD also satisfies the final gate (any [bot] login does not).
+# CodeRabbit APPROVED is iterative only; it never sets final_review_gate_eligible.
 $humanApprovedOnHead = @($Reviews | Where-Object {
     $_.state -eq 'APPROVED' -and $_.commit.oid -eq $HeadSha -and
     ($_.author.login -notmatch '\[bot\]$')

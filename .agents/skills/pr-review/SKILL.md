@@ -110,7 +110,9 @@ leave Draft. Marking Ready requires a separate explicit user phrase
 
 Still requires separate approval: merge, mark Ready, unrelated
 issues/PRs, branch deletion, unrelated force operations, creating GitHub
-issues (unless explicitly authorized).
+issues (unless explicitly authorized). Never enable GitHub auto-merge.
+Never approve the `merge-develop` environment deployment. Never treat
+CodeRabbit or Cursor Approval Agent `APPROVED` as merge authorization.
 
 ## Proactive trigger
 
@@ -355,10 +357,19 @@ actionable code threads adjudicated (fix or reject + resolve)
 ONE Copilot review on that HEAD (FINAL_REVIEW)
     ↓
 substantive signal on HEAD:
-  Copilot review with findings handled, OR human APPROVED on HEAD
+  Copilot review with findings handled (COMMENTED is enough),
+  OR human APPROVED on HEAD
     ↓
-user authorizes Ready / merge
+user authorizes Ready
+    ↓
+maintainer-merge-gate (merge-develop environment approval on this HEAD)
+    ↓
+maintainer squash merge (auto-merge stays off)
 ```
+
+Do not require Copilot `APPROVED` as a GitHub merge condition. Nits
+without a required code change do not force a new commit. A new HEAD
+invalidates prior `maintainer-merge-gate` approval.
 
 Quota / "unable to review" is not a blocker when CI is green and a human
 approved on HEAD (or code threads are clean and the user authorizes).
@@ -381,7 +392,9 @@ On current HEAD, confirm:
 - functional test: user **explicitly confirms success in the current
   conversation** when runtime behavior may change — else report
   `Functional validation: PENDING USER TEST`;
-- explicit user authorization to mark Ready / merge.
+- explicit user authorization to mark Ready;
+- merge only after `maintainer-merge-gate` on this HEAD (maintainer
+  environment approval); agents must not merge or enable auto-merge.
 
 ```bash
 scripts/pr-gh-snapshot.sh Mika3578/habitv <pr>
@@ -412,7 +425,9 @@ All items apply to **current PR HEAD** only:
     `APPROVED` on HEAD.
 11. User functional confirmation when applicable.
 12. No newer commit invalidates the above.
-13. Explicit authorization to mark Ready / merge.
+13. Explicit authorization to mark Ready.
+14. Merge is a maintainer squash after `maintainer-merge-gate` is green
+    on this HEAD. Do not arm auto-merge.
 
 ## Continuing an existing PR
 
@@ -433,5 +448,6 @@ All items apply to **current PR HEAD** only:
 
 ## Forbidden without conversation authorization
 
-Merge, marking Ready before READY_GATE, unrelated GitHub mutations,
-destructive branch ops, force-push outside approved workflow.
+Merge, enabling auto-merge, approving `merge-develop`, marking Ready
+before READY_GATE, unrelated GitHub mutations, destructive branch ops,
+force-push outside approved workflow.

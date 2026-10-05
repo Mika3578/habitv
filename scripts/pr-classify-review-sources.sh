@@ -2,6 +2,7 @@
 # Classify review execution state (bash).
 # Args: head_sha reviews_json_or_file comments_json_or_file
 # Prints JSON object. Used by pr-gh-snapshot.sh.
+# CodeRabbit APPROVED is iterative only; it never sets final_review_gate_eligible.
 
 set -euo pipefail
 

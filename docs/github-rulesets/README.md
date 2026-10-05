@@ -4,35 +4,93 @@ JSON under this directory documents the intended `protect-develop.json`
 ruleset for the `develop` branch only. Apply changes in the GitHub UI or
 Rulesets API; files here are not applied automatically.
 
-## `protect-develop.json` — recommended follow-ups
+Live snapshot (2026-10-05): `protect-develop` requires one generic
+approving review (any actor, including review apps), dismisses stale
+reviews on push, requires thread resolution, squash only, and required
+checks `validate-java8`, `deterministic-tests-java8`,
+`compile-and-package-java8`, and `dependency-review`. Bypass is off.
 
-After agent-policy CI is stable on `develop`, consider adding required
-status checks (exact context names from a green PR):
+A generic review count is **not** a trusted merge gate. CodeRabbit may
+`APPROVE` as an iterative reviewer; that must not complete merge.
+
+## Maintainer GitHub clicks (required)
+
+This repository is a user-owned repo: ruleset `required_reviewers` is
+team-only and cannot pin a human. Copilot `APPROVED` is not reliable.
+Do **not** add bypass actors or paid review products.
+
+Apply all of the following in the GitHub UI (Settings). The in-repo JSON
+does not change hosted rules by itself.
+
+### 1. Turn off repository auto-merge
+
+1. Open **Settings → General → Pull Requests**.
+2. Uncheck **Allow auto-merge**.
+3. Keep squash as the only allowed merge method (matches the ruleset).
+
+Agents must not re-enable auto-merge.
+
+### 2. Protect environment `merge-develop`
+
+1. Open **Settings → Environments → New environment**.
+2. Name it exactly `merge-develop`.
+3. Enable **Required reviewers** and add `Mika3578` only.
+4. Do **not** enable wait timer unless you want extra delay.
+5. Do **not** allow administrators or apps to bypass this environment.
+6. Save.
+
+Until this environment exists with that required reviewer, the
+`maintainer-merge-gate` job must fail closed.
+
+### 3. Add the required check (do not drop existing checks)
+
+1. Open **Settings → Rules → `protect-develop`**.
+2. Under required status checks, **add** `maintainer-merge-gate`.
+3. **Keep** `validate-java8`, `deterministic-tests-java8`,
+   `compile-and-package-java8`, and `dependency-review`.
+4. Keep **Dismiss stale pull request approvals when new commits are pushed**.
+5. Keep **Require conversation resolution before merging**.
+6. Keep **Required approvals: 1** (do not set to 0).
+7. Keep squash only. Do **not** add bypass actors.
+8. Save.
+
+After this, a Ready PR still needs CI plus one GitHub approval (which
+may be CodeRabbit) **and** a maintainer approval of the `merge-develop`
+deployment for the current HEAD. A new commit starts a new run; the
+previous environment approval does not apply.
+
+### 4. Cursor automations
+
+1. Open the **Pull Request Router and Approver** automation.
+2. Disable any merge or auto-merge action.
+3. Do not run agents whose task is to arm auto-merge.
+
+## `protect-develop.json` — other follow-ups
+
+After agent-policy CI is stable on `develop`, consider also adding:
 
 - `agent-policy`
 - `agent-policy (windows)`
 
-Recommended pull-request rule adjustments (verify current GitHub semantics
-before enabling):
-
-| Setting | Current payload | Recommended |
-|---------|-----------------|-------------|
-| `required_review_thread_resolution` | `true` | keep `true` |
-| `dismiss_stale_reviews_on_push` | `false` | `true` |
-| `require_last_push_approval` | `false` | keep `false` unless a second approval gate is desired |
-| `review_on_push` (Copilot) | `false` | **keep `false`** (Copilot is one final review after Ready-prep, not every push) |
-| `review_draft_pull_requests` (Copilot) | `false` | **keep `false`** |
+| Setting | Intended payload |
+|---------|------------------|
+| `required_approving_review_count` | `1` (not a trusted final gate) |
+| `required_review_thread_resolution` | `true` |
+| `dismiss_stale_reviews_on_push` | `true` |
+| `require_last_push_approval` | `false` |
+| Copilot `review_on_push` | `false` |
+| Copilot `review_draft_pull_requests` | `false` |
 
 Do not enable Copilot automatic review on every push or on Draft PRs.
+Do **not** add CodeRabbit as a required status check.
 
-## CodeRabbit
+Amazon Q remains optional for HIGH_RISK only; it is not a merge gate.
 
-Iterative Draft review uses the in-repo `.coderabbit.yaml` (drafts on,
-incremental on, finishing-touch extra PRs off). Until the repository has
-10 GitHub stars, automatic reviews skip; agents comment `@coderabbitai
-review` after each published fix batch. Do **not** add CodeRabbit as a
-required status check (skip or queued suites would strand PRs). Amazon Q
-remains optional for HIGH_RISK only; it is not a merge gate.
+## Merge method
+
+Default: maintainer **squash merge** in the GitHub UI after
+`maintainer-merge-gate` is green on the current HEAD. Leave auto-merge
+off so an app cannot complete merge when a review bot approves.
 
 ## External PR description tools
 

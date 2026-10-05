@@ -194,8 +194,16 @@ Task-level authorization in the conversation covers the batched publishing
 actions of that task: `git commit`, non-force `git push`, and marking a PR
 Ready when the task explicitly authorizes Ready. Separate explicit approval
 per use: `git push --force`, `git push --force-with-lease`, `gh pr create`,
-merge, `gh pr merge`, delete branches, rebase when it would rewrite remote
-history, and destructive git/fs commands.
+merge, `gh pr merge`, enabling GitHub auto-merge, approving the
+`merge-develop` environment deployment, delete branches, rebase when it
+would rewrite remote history, and destructive git/fs commands.
+
+Agents must never enable auto-merge, never merge, and never approve
+`merge-develop`. CodeRabbit `APPROVED` is iterative only and must not be
+treated as merge authorization. The GitHub merge gate is the
+`maintainer-merge-gate` check (maintainer environment approval on the
+current HEAD) plus a manual squash by the maintainer. Auto-merge stays
+off. A new commit invalidates prior environment approval.
 
 When the user authorizes finishing or reviewing a **specific** pull request,
 that authorization covers the bounded orchestration loop for that PR only
@@ -246,7 +254,9 @@ are satisfied.
 - Inventory CodeRabbit **code** threads the same as Copilot (fix or
   reject, reply, then resolve). Treat CodeRabbit skip or status comments
   (star threshold, drafts, bot author, “Review skipped”) as `SKIPPED`,
-  never as a clean review.
+  never as a clean review. CodeRabbit nits without a required code
+  change do not force a new commit. CodeRabbit `APPROVED` does not
+  authorize merge.
 - **Proactive review loop:** when write-capable work on an open PR is
   authorized (explicit action intent or ongoing implementation on that
   head), load [pr-review](.agents/skills/pr-review/SKILL.md), fetch live
@@ -302,6 +312,9 @@ are satisfied.
   current; resolve addressed code threads. Third-party body footers are
   ignored for Ready/merge.
 - No actionable unresolved **code** feedback remains at Ready.
+- Merge into `develop` is a maintainer action after `maintainer-merge-gate`
+  is green on the current HEAD. Review apps (including CodeRabbit and
+  Cursor Approval Agent) cannot complete that gate.
 
 When runtime behavior may change, keep the PR in Draft until the user
 **explicitly confirms success in the current conversation** after a real

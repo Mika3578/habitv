@@ -139,12 +139,15 @@ before first push). Optional helper:
 [`scripts/launch-cloud-agent-strict.ps1`](../scripts/launch-cloud-agent-strict.ps1)
 (`CURSOR_API_KEY` from local secrets only).
 
-**GitHub enforcement gaps (documented):** `docs/github-rulesets/protect-develop.json`
-sets `dismiss_stale_reviews_on_push` to `false`; prefer `true` in the hosted
-ruleset so approvals of an older diff do not remain valid after new commits
-(see [`github-rulesets/README.md`](github-rulesets/README.md)). Adding
+**GitHub enforcement:** live `protect-develop` dismisses stale reviews on
+push and requires one generic approving review plus the Java 8 required
+checks. That review count can be satisfied by a review app. The intended
+final merge gate is `maintainer-merge-gate` (environment `merge-develop`)
+plus auto-merge off and a maintainer squash. Hosted ruleset and
+environment changes are GitHub UI steps in
+[`github-rulesets/README.md`](github-rulesets/README.md). Adding
 `agent-policy` and `agent-policy (windows)` to required status checks is
-recommended after agent-policy CI is stable on `develop`.
+still recommended after agent-policy CI is stable on `develop`.
 
 ## Workflow
 

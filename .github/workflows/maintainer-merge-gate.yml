@@ -1,0 +1,45 @@
+name: Maintainer merge gate
+
+on:
+  pull_request:
+    branches:
+      - develop
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+      - converted_to_draft
+
+permissions:
+  contents: read
+
+concurrency:
+  group: maintainer-merge-gate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  maintainer-merge-gate:
+    name: maintainer-merge-gate
+    if: github.event.pull_request.base.ref == 'develop' && github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: merge-develop
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Require protected merge-develop environment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api "repos/${GITHUB_REPOSITORY}/environments/merge-develop" > /tmp/merge-develop-env.json
+          bash scripts/maintainer-merge-gate.sh --check-env /tmp/merge-develop-env.json Mika3578
+          echo "HEAD ${{ github.event.pull_request.head.sha }}"
