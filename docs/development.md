@@ -89,6 +89,23 @@ the section above.
 
 Ruleset JSON payloads (admin): `docs/github-rulesets/`.
 
+### Required vs diagnostic checks
+
+| Kind | GitHub context / job | Notes |
+|------|----------------------|--------|
+| Required (ruleset `protect-develop`) | `validate-java8`, `deterministic-tests-java8`, `compile-and-package-java8`, `dependency-review` | Must pass before merge to `develop` |
+| Aggregate (optional ruleset) | `habitv-ci-gate` | Single rollup of the three Java 8 jobs; add to ruleset when adopted |
+| Diagnostic | `compatibility-java17`, `compatibility-java21`, … | `continue-on-error`; not a supported runtime |
+| Diagnostic | `validate-macos`, `full-test-suite` | Signal only |
+| Organization | Snyk, optional review bots | Policy outside the repo; Dependabot JAXB majors via dedicated PRs |
+
+### Merge checklist
+
+1. Rebase the PR branch onto `origin/develop` (linear history).
+2. Wait for required CI contexts to pass (including `dependency-review`).
+3. When `docs/github-rulesets/protect-develop.json` changes, import the JSON into GitHub **Rulesets** (Settings → Rules → `protect-develop`).
+4. Squash-merge into `develop` when checks and review policy are satisfied.
+
 ## Editor (Cursor / VS Code)
 
 Shared workspace files live under `.vscode/` (`settings.json`,
