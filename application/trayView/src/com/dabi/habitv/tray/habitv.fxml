@@ -7,8 +7,16 @@
 
 <VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
 	<children>
+		<HBox fx:id="themeChrome" alignment="CENTER_RIGHT" maxHeight="28.0"
+			minHeight="28.0" spacing="5.0" styleClass="theme-chrome">
+			<children>
+				<Pane HBox.hgrow="ALWAYS" />
+				<ToggleButton fx:id="themeToggle" mnemonicParsing="false"
+					styleClass="theme-toggle" text="☾" />
+			</children>
+		</HBox>
 		<TabPane minHeight="480.0" minWidth="640.0" prefHeight="600.0"
-			prefWidth="800.0" tabClosingPolicy="UNAVAILABLE"
+			prefWidth="800.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS"
 			AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
 			AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 			<tabs>

@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import com.dabi.habitv.api.plugin.exception.TechnicalException;
 import com.dabi.habitv.tray.controller.WindowController;
 import com.dabi.habitv.tray.model.HabitTvViewManager;
+import com.dabi.habitv.tray.theme.UiThemeApplier;
 import com.dabi.habitv.utils.LogUtils;
 
 public class HabitvViewMain extends Application {
@@ -47,6 +48,7 @@ public class HabitvViewMain extends Application {
 
 			VBox root = (VBox) fxmlLoader.load();
 			Scene scene = new Scene(root);
+			UiThemeApplier.apply(scene, manager.getUserConfig().getUiTheme());
 			primaryStage.setScene(scene);
 			primaryStage.show();
 			controller.init(manager, primaryStage);

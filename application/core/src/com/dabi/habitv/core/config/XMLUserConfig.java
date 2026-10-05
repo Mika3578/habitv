@@ -49,6 +49,7 @@ import com.dabi.habitv.utils.XMLUtils;
 public class XMLUserConfig implements UserConfig {
 	private static final String YOUTUBE_API_KEY = "youtubeApiKey";
 	private static final String EMBED_SUBTITLES = "embedSubtitles";
+	private static final String UI_THEME = "uiTheme";
 
 	private static final int DEFAULT_MAX_ATTEMPTS = 5;
 
@@ -406,7 +407,8 @@ public class XMLUserConfig implements UserConfig {
 			for (final Object downloader : downloaders.getAny()) {
 				final String tagName = XMLUtils.getTagName(downloader);
 				String value = XMLUtils.getTagValue(downloader);
-				if (YOUTUBE_API_KEY.equals(tagName) || EMBED_SUBTITLES.equals(tagName)) {
+				if (YOUTUBE_API_KEY.equals(tagName) || EMBED_SUBTITLES.equals(tagName)
+						|| UI_THEME.equals(tagName)) {
 					downloaderName2BinPath.put(tagName, value.replace("\\", "/"));
 					continue;
 				}
@@ -550,6 +552,21 @@ public class XMLUserConfig implements UserConfig {
 	}
 
 	@Override
+	public String getUiTheme() {
+		Downloaders downloaders = config.getDownloadConfig() == null ? null
+				: config.getDownloadConfig().getDownloaders();
+		if (downloaders == null) {
+			return UiThemePreference.DEFAULT;
+		}
+		for (Object downloader : downloaders.getAny()) {
+			if (UI_THEME.equals(XMLUtils.getTagName(downloader))) {
+				return UiThemePreference.normalize(XMLUtils.getTagValue(downloader));
+			}
+		}
+		return UiThemePreference.DEFAULT;
+	}
+
+	@Override
 	public void setMaxAttempts(int maxAttemps) {
 		DownloadConfig downloadConfig = loadDownloadConfig();
 		downloadConfig.setMaxAttempts(maxAttemps);
@@ -632,6 +649,28 @@ public class XMLUserConfig implements UserConfig {
 			downloaders.getAny().add(
 					XMLUtils.buildAnyElement(EMBED_SUBTITLES, Boolean.TRUE
 							.toString()));
+		}
+	}
+
+	@Override
+	public void setUiTheme(String uiTheme) {
+		final String normalized = UiThemePreference.normalize(uiTheme);
+		Downloaders downloaders = loadDownloaders();
+		Iterator<Object> iterator = downloaders.getAny().iterator();
+		while (iterator.hasNext()) {
+			Object downloader = iterator.next();
+			if (UI_THEME.equals(XMLUtils.getTagName(downloader))) {
+				if (UiThemePreference.DEFAULT.equals(normalized)) {
+					iterator.remove();
+				} else {
+					XMLUtils.setTagValue(downloader, normalized);
+				}
+				return;
+			}
+		}
+		if (!UiThemePreference.DEFAULT.equals(normalized)) {
+			downloaders.getAny().add(
+					XMLUtils.buildAnyElement(UI_THEME, normalized));
 		}
 	}
 
