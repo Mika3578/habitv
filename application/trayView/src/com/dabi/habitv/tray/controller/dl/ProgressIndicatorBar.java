@@ -14,15 +14,42 @@ class ProgressIndicatorBar extends StackPane {
 	private final Label text = new Label();
 	private final Tooltip tooltip = new Tooltip();
 
-	private static final int DEFAULT_LABEL_PADDING = 5;
+	private static final double MIN_BAR_HEIGHT = 18.0d;
 
 	ProgressIndicatorBar() {
+		// Width comes from the Etat column / cell; never from label text.
+		setMinWidth(0.0d);
+		setPrefWidth(0.0d);
+		setMaxWidth(Double.MAX_VALUE);
+		setMinHeight(MIN_BAR_HEIGHT);
+		bar.setMinWidth(0.0d);
+		bar.setPrefWidth(0.0d);
 		bar.setMaxWidth(Double.MAX_VALUE);
+		bar.setMinHeight(MIN_BAR_HEIGHT);
+		bar.setMaxHeight(Double.MAX_VALUE);
 		text.setAlignment(Pos.CENTER);
+		text.setMinWidth(0.0d);
+		text.setPrefWidth(0.0d);
 		text.setMaxWidth(Double.MAX_VALUE);
 		text.setTextOverrun(OverrunStyle.CLIP);
 		text.setStyle("-fx-font-size: 11px;");
+		text.maxWidthProperty().bind(widthProperty());
 		getChildren().setAll(bar, text);
+	}
+
+	@Override
+	protected double computeMinWidth(final double height) {
+		return 0.0d;
+	}
+
+	@Override
+	protected double computePrefWidth(final double height) {
+		return 0.0d;
+	}
+
+	@Override
+	protected double computeMaxWidth(final double height) {
+		return Double.MAX_VALUE;
 	}
 
 	/**
@@ -46,9 +73,6 @@ class ProgressIndicatorBar extends StackPane {
 			tooltip.setText(tooltipText);
 			Tooltip.install(this, tooltip);
 		}
-
-		bar.setMinHeight(text.getBoundsInLocal().getHeight() + DEFAULT_LABEL_PADDING * 2);
-		bar.setMinWidth(Math.max(80.0d, text.getBoundsInLocal().getWidth() + DEFAULT_LABEL_PADDING * 2));
 	}
 
 	/**
