@@ -1,5 +1,8 @@
 package com.dabi.habitv.plugin.ffmpeg;
 
+import java.io.File;
+import java.util.Locale;
+
 import com.dabi.habitv.framework.FrameworkConf;
 
 public final class FFMPEGConf {
@@ -12,12 +15,50 @@ public final class FFMPEGConf {
 
 	public static final long MAX_HUNG_TIME = 100000L;
 
-	public static final String FFMPEG_CMD_LINUX = " -i \""+FrameworkConf.DOWNLOAD_INPUT+"\" -c copy -y -f "+FrameworkConf.EXTENSION+" \"" + FrameworkConf.DOWNLOAD_DESTINATION + "\" ";
-	
-	public static final String FFMPEG_CMD_WINDOWS_COR_OLD = " -i \""+FrameworkConf.DOWNLOAD_INPUT+"\" -c copy -aprofile aac_low -acodec libvo_aacenc -vbsf aac_adtstoasc -y -f "+FrameworkConf.EXTENSION+" \"" + FrameworkConf.DOWNLOAD_DESTINATION + "\" ";
-	
-	public static final String FFMPEG_CMD_WINDOWS_COR = " -i \""+FrameworkConf.DOWNLOAD_INPUT+"\" -c copy -bsf:a aac_adtstoasc -y -f "+FrameworkConf.EXTENSION+" \"" + FrameworkConf.DOWNLOAD_DESTINATION + "\" ";
+	public static final String PROGRESS_FLAGS = " -progress pipe:1 -nostats ";
+
+	private static final String FFMPEG_REMUX_BODY = " -i \"" + FrameworkConf.DOWNLOAD_INPUT
+			+ "\" -c copy -y -f " + FrameworkConf.EXTENSION + " \"" + FrameworkConf.DOWNLOAD_DESTINATION + "\" ";
+
+	public static final String FFMPEG_CMD_LINUX = FFMPEG_REMUX_BODY;
+
+	public static final String FFMPEG_CMD_WINDOWS_COR_OLD = PROGRESS_FLAGS + " -i \"" + FrameworkConf.DOWNLOAD_INPUT
+			+ "\" -c copy -aprofile aac_low -acodec libvo_aacenc -vbsf aac_adtstoasc -y -f " + FrameworkConf.EXTENSION
+			+ " \"" + FrameworkConf.DOWNLOAD_DESTINATION + "\" ";
+
+	public static final String FFMPEG_CMD_WINDOWS = " -i \"" + FrameworkConf.DOWNLOAD_INPUT
+			+ "\" -c copy -bsf:a aac_adtstoasc -y -f " + FrameworkConf.EXTENSION + " \"" + FrameworkConf.DOWNLOAD_DESTINATION
+			+ "\" ";
+
+	public static final String FFMPEG_CMD_WINDOWS_COR = PROGRESS_FLAGS + FFMPEG_CMD_WINDOWS;
 
 	public static final String DEFAULT_LINUX_BIN_PATH = "avconv";
+
+	public static boolean supportsProgressPipe(final String executablePath) {
+		if (executablePath == null || executablePath.trim().isEmpty()) {
+			return false;
+		}
+		final String baseName = executableBaseName(executablePath).toLowerCase(Locale.ROOT);
+		return "ffmpeg".equals(baseName) || "ffmpeg.exe".equals(baseName);
+	}
+
+	static String executableBaseName(final String executablePath) {
+		final String normalized = executablePath.trim().replace('\\', '/');
+		final int lastSlash = normalized.lastIndexOf('/');
+		if (lastSlash >= 0 && lastSlash < normalized.length() - 1) {
+			return normalized.substring(lastSlash + 1);
+		}
+		return normalized;
+	}
+
+	public static String augmentRemuxCommand(final String remuxCommandSuffix, final String executablePath) {
+		if (remuxCommandSuffix == null) {
+			return null;
+		}
+		if (!supportsProgressPipe(executablePath)) {
+			return remuxCommandSuffix;
+		}
+		return PROGRESS_FLAGS + remuxCommandSuffix;
+	}
 
 }

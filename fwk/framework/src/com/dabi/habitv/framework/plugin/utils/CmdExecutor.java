@@ -39,6 +39,14 @@ public class CmdExecutor implements ProcessHolder {
 	private String lastOutputLine = null;
 	private String progression;
 
+	private String progressionActivityToken;
+
+	private long progressionLastLogSampleTime;
+
+	private long progressionLastActivityChangeTime;
+
+	private final Object progressLock = new Object();
+
 	private Thread killThread;
 
 	public CmdExecutor(final String cmdProcessor, final String cmd, final long maxHungTime) {
@@ -88,7 +96,7 @@ public class CmdExecutor implements ProcessHolder {
 			outputThread.join();
 			ended = true;
 			if (hungThread) {
-				process.destroy();
+				destroyCurrentProcess();
 				throw new HungProcessException(cmd, fullOutput.toString(), lastOutputLine, maxHungTime);
 			} else {
 				process.waitFor();
@@ -111,6 +119,12 @@ public class CmdExecutor implements ProcessHolder {
 		this.fullOutput = fullOutput.toString();
 	}
 
+	private void destroyCurrentProcess() {
+		if (process != null) {
+			process.destroy();
+		}
+	}
+
 	private void init() {
 		fullOutput = null;
 		hungThread = false;
@@ -119,6 +133,9 @@ public class CmdExecutor implements ProcessHolder {
 		stopped = false;
 		lastOutputLine = null;
 		progression = null;
+		progressionActivityToken = null;
+		progressionLastLogSampleTime = 0L;
+		progressionLastActivityChangeTime = 0L;
 
 	}
 
@@ -139,7 +156,7 @@ public class CmdExecutor implements ProcessHolder {
 					newOutPut = fullOutput.toString();
 					if (oldOutPut != null && oldOutPut.equals(newOutPut)) {
 						hungThread = true;
-						process.destroy();
+						destroyCurrentProcess();
 					} else {
 						oldOutPut = fullOutput.toString();
 					}
@@ -211,22 +228,32 @@ public class CmdExecutor implements ProcessHolder {
 				try {
 					final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 					String line = "";
-					String lastHandledLine;
 					try {
-						long lastTime = 0;
 						while ((line = reader.readLine()) != null && !hungThread) {
 							fullOutput.append(line);
 							fullOutput.append("\n");
 							lastOutputLine = line;
-							lastHandledLine = progression;
-							String newProgression = handleProgression(line);
-							if (newProgression != null) {
-								progression = newProgression;
-								LOG.debug(line);
-								final long now = System.currentTimeMillis();
-								if (progression != null && (now - lastTime) > FrameworkConf.TIME_BETWEEN_LOG) {
-									hungThread = isHungProcess(lastHandledLine, progression, now, lastTime, maxHungTime);
-									lastTime = now;
+							synchronized (getProgressLock()) {
+								final String lastActivity = progressionActivityToken;
+								String newProgression = handleProgression(line);
+								if (newProgression != null) {
+									progression = newProgression;
+									final String newActivity = progressionActivityTokenFor(line, newProgression);
+									LOG.debug(line);
+									final long now = System.currentTimeMillis();
+									if (progression != null
+											&& (now - progressionLastLogSampleTime) > FrameworkConf.TIME_BETWEEN_LOG) {
+										hungThread = isProgressionStalled(lastActivity, newActivity, now,
+												progressionLastActivityChangeTime, maxHungTime);
+										if (hungThread) {
+											destroyCurrentProcess();
+										}
+										progressionLastLogSampleTime = now;
+									}
+									if (lastActivity == null || !newActivity.equals(lastActivity)) {
+										progressionLastActivityChangeTime = now;
+									}
+									progressionActivityToken = newActivity;
 								}
 							}
 						}
@@ -234,6 +261,9 @@ public class CmdExecutor implements ProcessHolder {
 						reader.close();
 					}
 				} catch (final IOException ioe) {
+					if (hungThread) {
+						return;
+					}
 					throw new TechnicalException(ioe);
 				}
 			}
@@ -241,15 +271,23 @@ public class CmdExecutor implements ProcessHolder {
 		return tread;
 	}
 
-	private boolean isHungProcess(final String lastHandledLine, final String currentHandledLine, final long now, final long lastTime,
-	        final long maxHungTime) {
-		LOG.debug("lastHandledLine" + lastHandledLine);
-		LOG.debug("currentHandledLine" + currentHandledLine);
+	static boolean isProgressionStalled(final String lastActivity, final String currentActivity, final long now,
+			final long lastTime, final long maxHungTime) {
+		LOG.debug("lastActivity" + lastActivity);
+		LOG.debug("currentActivity" + currentActivity);
 		LOG.debug("now" + now);
 		LOG.debug("lastTime" + lastTime);
 		LOG.debug("maxHungTime" + maxHungTime);
-		return lastHandledLine != null && currentHandledLine != null && (currentHandledLine.equals(lastHandledLine))
-		        && (now - lastTime) > maxHungTime;
+		// Negative timeout disables progression stall (same sentinel as getHungProcessTime()).
+		if (maxHungTime < 0L) {
+			return false;
+		}
+		return lastActivity != null && currentActivity != null && currentActivity.equals(lastActivity)
+				&& (now - lastTime) > maxHungTime;
+	}
+
+	protected String progressionActivityTokenFor(final String line, final String progressionResult) {
+		return progressionResult;
 	}
 
 	protected String getLastOutputLine() {
@@ -258,6 +296,10 @@ public class CmdExecutor implements ProcessHolder {
 
 	protected boolean isSuccess(final String fullOutput) {
 		return true;
+	}
+
+	protected Object getProgressLock() {
+		return progressLock;
 	}
 
 	protected String handleProgression(final String line) {

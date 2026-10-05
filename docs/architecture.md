@@ -3,7 +3,7 @@
 Current HabiTV layout for maintainers. This is not a redesign proposal.
 
 Related: [`development.md`](development.md), [`providers.md`](providers.md),
-[`configuration.md`](configuration.md).
+[`configuration.md`](configuration.md), [`download-progress.md`](download-progress.md).
 
 ## What the application does
 

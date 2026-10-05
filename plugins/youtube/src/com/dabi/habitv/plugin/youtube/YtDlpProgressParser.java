@@ -5,6 +5,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.dabi.habitv.api.plugin.holder.DownloadProgressSnapshot;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.dabi.habitv.api.plugin.holder.DownloadStage;
 
 /**
@@ -34,6 +37,8 @@ public final class YtDlpProgressParser {
 			"\\[download\\]\\s+Destination:\\s+(.+)",
 			Pattern.CASE_INSENSITIVE);
 
+	private static final ObjectMapper PROGRESS_JSON = new ObjectMapper();
+
 	private YtDlpProgressParser() {
 	}
 
@@ -50,6 +55,11 @@ public final class YtDlpProgressParser {
 		}
 		final String trimmed = stripAnsi(line).trim();
 
+		final DownloadProgressSnapshot fromTemplate = parseProgressTemplateLine(trimmed, previous);
+		if (fromTemplate != null) {
+			return fromTemplate;
+		}
+
 		final DownloadStage stageFromTag = detectPostProcessingStage(trimmed);
 		if (stageFromTag != null) {
 			return DownloadProgressSnapshot.indeterminate(stageFromTag, shortDetail(trimmed));
@@ -58,14 +68,12 @@ public final class YtDlpProgressParser {
 		final Matcher destinationMatcher = DOWNLOAD_DESTINATION.matcher(trimmed);
 		if (destinationMatcher.find()) {
 			final String streamLabel = detectStreamLabel(destinationMatcher.group(1));
-			// Destination announces the next transfer; no numeric progress yet.
 			return DownloadProgressSnapshot.indeterminate(DownloadStage.DOWNLOADING, streamLabel);
 		}
 
 		if (isPreparingLine(trimmed)) {
 			final String detail = shortDetail(trimmed);
 			if (previous != null && previous.getStage() == DownloadStage.DOWNLOADING) {
-				// Do not regress an active download (including Destination) to preparing.
 				return null;
 			}
 			return DownloadProgressSnapshot.indeterminate(DownloadStage.PREPARING, detail);
@@ -87,6 +95,106 @@ public final class YtDlpProgressParser {
 		}
 
 		return null;
+	}
+
+	static DownloadProgressSnapshot parseProgressTemplateLine(final String trimmed,
+			final DownloadProgressSnapshot previous) {
+		final int prefixIndex = trimmed.indexOf(YoutubeConf.PROGRESS_LINE_PREFIX);
+		if (prefixIndex < 0) {
+			return null;
+		}
+		final String json = trimmed.substring(prefixIndex + YoutubeConf.PROGRESS_LINE_PREFIX.length()).trim();
+		if (json.isEmpty() || !json.startsWith("{")) {
+			return null;
+		}
+		final JsonNode root;
+		try {
+			root = PROGRESS_JSON.readTree(json);
+		} catch (final JsonProcessingException e) {
+			return null;
+		}
+		if (root == null || !root.isObject()) {
+			return null;
+		}
+		final String phase = jsonTextField(root, "phase");
+		if ("download".equalsIgnoreCase(phase)) {
+			return buildTemplateDownloadSnapshot(root, previous);
+		}
+		if ("postprocess".equalsIgnoreCase(phase)) {
+			final String pp = jsonTextField(root, "pp");
+			final DownloadStage stage = stageFromPostProcessorName(pp);
+			return DownloadProgressSnapshot.indeterminate(stage, pp == null || pp.isEmpty() ? null : pp);
+		}
+		return null;
+	}
+
+	private static DownloadProgressSnapshot buildTemplateDownloadSnapshot(final JsonNode root,
+			final DownloadProgressSnapshot previous) {
+		final Double pct = jsonNumberField(root, "pct");
+		final Double ratio = pct == null ? null
+				: Double.valueOf(Math.min(1.0d, Math.max(0.0d, pct.doubleValue() / 100.0d)));
+
+		final String totalToken = jsonTextField(root, "total");
+		final Long totalBytes = parseSizeToBytes(totalToken);
+		Long downloadedBytes = null;
+		if (ratio != null && totalBytes != null) {
+			downloadedBytes = Long.valueOf(Math.round(totalBytes.doubleValue() * ratio.doubleValue()));
+		}
+
+		final Double bytesPerSecond = parseSpeedToBytesPerSecond(jsonTextField(root, "speed"));
+		final Long etaSeconds = parseEtaToSeconds(jsonTextField(root, "eta"));
+
+		final String dest = jsonTextField(root, "dest");
+		final String detail;
+		if (dest != null && !dest.isEmpty()) {
+			detail = detectStreamLabel(dest);
+		} else {
+			detail = resolveStreamDetail(previous, ratio);
+		}
+
+		if (ratio == null) {
+			return DownloadProgressSnapshot.indeterminate(DownloadStage.DOWNLOADING, detail);
+		}
+		return DownloadProgressSnapshot.of(DownloadStage.DOWNLOADING, ratio, downloadedBytes, totalBytes,
+				bytesPerSecond, etaSeconds, detail);
+	}
+
+	static DownloadStage stageFromPostProcessorName(final String postProcessor) {
+		if (postProcessor == null || postProcessor.isEmpty()) {
+			return DownloadStage.POST_PROCESSING;
+		}
+		String token = postProcessor.trim();
+		// Class names often include an FFmpeg prefix the legacy tag matcher does not see.
+		if (token.length() > 6 && token.regionMatches(true, 0, "FFmpeg", 0, 6)) {
+			token = token.substring(6);
+		}
+		if ("VideoRemuxer".equalsIgnoreCase(token) || "VideoConvertor".equalsIgnoreCase(token)) {
+			return DownloadStage.REMUXING;
+		}
+		final DownloadStage fromTag = detectPostProcessingStage("[" + token + "]");
+		return fromTag == null ? DownloadStage.POST_PROCESSING : fromTag;
+	}
+
+	static String jsonTextField(final JsonNode root, final String field) {
+		if (root == null || field == null) {
+			return null;
+		}
+		final JsonNode node = root.get(field);
+		if (node == null || node.isNull() || !node.isValueNode()) {
+			return null;
+		}
+		return node.asText();
+	}
+
+	static Double jsonNumberField(final JsonNode root, final String field) {
+		if (root == null || field == null) {
+			return null;
+		}
+		final JsonNode node = root.get(field);
+		if (node == null || node.isNull() || !node.isNumber()) {
+			return null;
+		}
+		return Double.valueOf(node.doubleValue());
 	}
 
 	private static DownloadProgressSnapshot buildDownloadSnapshot(final Matcher matcher,
@@ -123,10 +231,7 @@ public final class YtDlpProgressParser {
 				bytesPerSecond, etaSeconds, detail);
 	}
 
-	/**
-	 * Keeps Vidéo/Audio labels across progress lines. When progress jumps from nearly complete
-	 * back to a low percentage (typical yt-dlp video-then-audio), switch Vidéo → Audio.
-	 */
+	/** Preserve Vidéo/Audio labels; switch when progress resets between transfers. */
 	static String resolveStreamDetail(final DownloadProgressSnapshot previous, final Double ratio) {
 		if (previous == null) {
 			return DETAIL_VIDEO;
@@ -154,7 +259,6 @@ public final class YtDlpProgressParser {
 				|| lower.endsWith(".opus") || lower.endsWith(".ogg") || lower.endsWith(".wma")) {
 			return DETAIL_AUDIO;
 		}
-		// Common YouTube DASH audio format ids in filenames: .f139/.f140/.f249/.f250/.f251
 		if (lower.matches(".*\\.f(139|140|249|250|251)\\.[a-z0-9]+$")) {
 			return DETAIL_AUDIO;
 		}
@@ -216,9 +320,6 @@ public final class YtDlpProgressParser {
 		return Double.parseDouble(raw.trim().replace(',', '.'));
 	}
 
-	/**
-	 * Parses yt-dlp size tokens such as {@code 10.00MiB}, {@code 159.6MiB}, {@code 512KiB}.
-	 */
 	static Long parseSizeToBytes(final String raw) {
 		if (raw == null) {
 			return null;
@@ -250,13 +351,13 @@ public final class YtDlpProgressParser {
 	}
 
 	static Double parseSpeedToBytesPerSecond(final String raw) {
+		if (raw == null || raw.trim().isEmpty()) {
+			return null;
+		}
 		final Long perSecond = parseSizeToBytes(raw.replace("/s", "").trim());
 		return perSecond == null ? null : Double.valueOf(perSecond.doubleValue());
 	}
 
-	/**
-	 * Parses ETA tokens such as {@code 00:18}, {@code 01:04:32}, or {@code 18}.
-	 */
 	static Long parseEtaToSeconds(final String raw) {
 		if (raw == null || raw.isEmpty() || "Unknown".equalsIgnoreCase(raw)) {
 			return null;
@@ -283,10 +384,6 @@ public final class YtDlpProgressParser {
 		return null;
 	}
 
-	/**
-	 * Formats a percentage for the legacy {@link com.dabi.habitv.api.plugin.holder.ProcessHolder#getProgression()}
-	 * string without forcing a useless trailing {@code .0} when the value is integral.
-	 */
 	public static String toProgressionString(final DownloadProgressSnapshot snapshot) {
 		if (snapshot == null || snapshot.getProgressRatio() == null) {
 			return null;
@@ -296,5 +393,22 @@ public final class YtDlpProgressParser {
 			return Long.toString(Math.round(percent));
 		}
 		return String.format(Locale.US, "%.1f", percent);
+	}
+
+	/** Activity token for hung-process detection while UI progression stays constant. */
+	public static String toActivityToken(final DownloadProgressSnapshot snapshot, final String line) {
+		if (line != null && !line.trim().isEmpty()) {
+			return "line:" + line.trim();
+		}
+		if (snapshot != null && snapshot.getDownloadedBytes() != null) {
+			return "bytes:" + snapshot.getDownloadedBytes();
+		}
+		if (snapshot != null && snapshot.getProgressRatio() != null) {
+			return "ratio:" + snapshot.getProgressRatio().doubleValue();
+		}
+		if (snapshot != null) {
+			return "stage:" + snapshot.getStage().name();
+		}
+		return "none";
 	}
 }

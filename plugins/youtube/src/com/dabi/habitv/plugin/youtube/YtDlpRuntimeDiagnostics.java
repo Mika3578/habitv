@@ -26,13 +26,22 @@ public final class YtDlpRuntimeDiagnostics {
 
 	private static final String[] PYINSTALLER_SIGNATURES = { "[PYI-", "Failed to extract", "Cryptodome", "_MEI" };
 
+	private static final java.util.regex.Pattern YT_DLP_RELEASE_DATE = java.util.regex.Pattern
+			.compile("(20\\d{2})[.](\\d{1,2})[.](\\d{1,2})");
+
 	private static boolean preflightEnabled = true;
+
+	private static Long preflightTimeoutMillisForTests;
 
 	private YtDlpRuntimeDiagnostics() {
 	}
 
 	static void setPreflightEnabled(final boolean enabled) {
 		preflightEnabled = enabled;
+	}
+
+	static void setPreflightTimeoutMillisForTests(final Long timeoutMillis) {
+		preflightTimeoutMillisForTests = timeoutMillis;
 	}
 
 	static boolean isPreflightEnabled() {
@@ -105,18 +114,75 @@ public final class YtDlpRuntimeDiagnostics {
 		LOG.info("yt-dlp process TMP: " + tempPath);
 	}
 
-	public static void runPreflight(final String cmdProcessor, final String executablePath, final String binDir) {
-		if (!preflightEnabled) {
-			return;
+	private static long preflightTimeoutMillis() {
+		if (preflightTimeoutMillisForTests != null) {
+			return preflightTimeoutMillisForTests.longValue();
 		}
-		logExecutableDiagnostics(executablePath, binDir);
-		final String versionCmd = executablePath + " --version";
-		LOG.info("yt-dlp preflight command: " + versionCmd);
+		return YT_DLP_PREFLIGHT_TIMEOUT_MILLIS;
+	}
+
+	static long preflightHungProcessTimeoutMillis() {
+		return preflightTimeoutMillis();
+	}
+
+	static String extractYtDlpVersionLine(final String mergedOutput) {
+		if (mergedOutput == null || mergedOutput.trim().isEmpty()) {
+			return "";
+		}
+		final String[] lines = mergedOutput.split("\\R");
+		for (final String line : lines) {
+			final String trimmed = line.trim();
+			if (trimmed.isEmpty()) {
+				continue;
+			}
+			if (trimmed.toLowerCase().contains("youtube-dl")) {
+				continue;
+			}
+			if (isYtDlpReleaseVersionLine(trimmed)) {
+				return trimmed;
+			}
+		}
+		return "";
+	}
+
+	public static boolean supportsProgressTemplate(final String versionOutput) {
+		final String line = extractYtDlpVersionLine(versionOutput);
+		if (line.isEmpty()) {
+			return false;
+		}
+		return parseYtDlpReleaseDate(line) >= 20231013;
+	}
+
+	static boolean isYtDlpReleaseVersionLine(final String versionLine) {
+		return versionLine != null && YT_DLP_RELEASE_DATE.matcher(versionLine).lookingAt();
+	}
+
+	static int parseYtDlpReleaseDate(final String versionLine) {
+		if (versionLine == null) {
+			return 0;
+		}
+		final java.util.regex.Matcher matcher = YT_DLP_RELEASE_DATE.matcher(versionLine);
+		if (!matcher.find()) {
+			return 0;
+		}
+		try {
+			final int year = Integer.parseInt(matcher.group(1));
+			final int month = Integer.parseInt(matcher.group(2));
+			final int day = Integer.parseInt(matcher.group(3));
+			return year * 10000 + month * 100 + day;
+		} catch (final NumberFormatException e) {
+			return 0;
+		}
+	}
+
+	static CmdExecutor createPreflightVersionExecutor(final String cmdProcessor, final String versionCmd,
+			final String binDir) {
 		final Map<String, String> env = buildYtDlpEnvironment(binDir);
-		final CmdExecutor versionExecutor = new CmdExecutor(cmdProcessor, versionCmd, YT_DLP_PREFLIGHT_TIMEOUT_MILLIS) {
+		final long preflightTimeoutMillis = preflightTimeoutMillis();
+		return new CmdExecutor(cmdProcessor, versionCmd, preflightTimeoutMillis) {
 			@Override
 			protected long getHungProcessTime() {
-				return YT_DLP_PREFLIGHT_TIMEOUT_MILLIS;
+				return preflightTimeoutMillis;
 			}
 
 			@Override
@@ -129,6 +195,21 @@ public final class YtDlpRuntimeDiagnostics {
 				return true;
 			}
 		};
+	}
+
+	public static void runPreflight(final String cmdProcessor, final String executablePath, final String binDir) {
+		preflightVersionOutput(cmdProcessor, executablePath, binDir);
+	}
+
+	public static String preflightVersionOutput(final String cmdProcessor, final String executablePath,
+			final String binDir) {
+		if (!preflightEnabled) {
+			return "";
+		}
+		logExecutableDiagnostics(executablePath, binDir);
+		final String versionCmd = executablePath + " --version";
+		LOG.info("yt-dlp preflight command: " + versionCmd);
+		final CmdExecutor versionExecutor = createPreflightVersionExecutor(cmdProcessor, versionCmd, binDir);
 		final long startedAt = System.currentTimeMillis();
 		try {
 			versionExecutor.start();
@@ -142,8 +223,9 @@ public final class YtDlpRuntimeDiagnostics {
 			throw new ExecutorFailedException(versionCmd, fullOutput,
 					buildBootstrapFailureUserMessage(executablePath), null);
 		}
-		final String versionLine = fullOutput == null ? "" : fullOutput.trim();
+		final String versionLine = extractYtDlpVersionLine(fullOutput);
 		LOG.info("yt-dlp version: " + versionLine);
+		return versionLine;
 	}
 
 	static ExecutorFailedException asBootstrapFailureIfNeeded(final String cmd, final String fullOutput,

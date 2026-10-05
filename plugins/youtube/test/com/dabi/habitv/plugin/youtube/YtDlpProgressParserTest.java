@@ -2,6 +2,7 @@ package com.dabi.habitv.plugin.youtube;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -32,6 +33,30 @@ public class YtDlpProgressParserTest {
 				.parse("[download]  45.2% of 10.00MiB at 1.23MiB/s ETA 00:05", null);
 		assertNotNull(snapshot);
 		assertEquals("45.2", YtDlpProgressParser.toProgressionString(snapshot));
+	}
+
+	@Test
+	public void activityTokenUsesRawLineWhenRoundedPercentUnchanged() {
+		final String lineOne = "[download]  12.0% of 1.00GiB at 1.00MiB/s ETA 15:00";
+		final String lineTwo = "[download]  12.0% of 1.00GiB at 2.00MiB/s ETA 07:30";
+		final DownloadProgressSnapshot first = YtDlpProgressParser.parse(lineOne, null);
+		final DownloadProgressSnapshot second = YtDlpProgressParser.parse(lineTwo, first);
+		assertEquals(first.getProgressRatio(), second.getProgressRatio());
+		assertNotEquals(YtDlpProgressParser.toActivityToken(first, lineOne),
+				YtDlpProgressParser.toActivityToken(second, lineTwo));
+	}
+
+	@Test
+	public void activityTokenChangesDuringMergeWhileStageProgressionConstant() {
+		final DownloadProgressSnapshot previous = YtDlpProgressParser
+				.parse("[download] 100.0% of 10.00MiB at 1.00MiB/s ETA 00:00", null);
+		final String lineOne = "[Merger] Merging formats into \"episode.mp4\"";
+		final String lineTwo = "[Merger] Merging formats into \"episode.mp4\" (2/2)";
+		final DownloadProgressSnapshot mergedOne = YtDlpProgressParser.parse(lineOne, previous);
+		final DownloadProgressSnapshot mergedTwo = YtDlpProgressParser.parse(lineTwo, mergedOne);
+		assertEquals("stage:MERGING", "stage:" + mergedTwo.getStage().name());
+		assertNotEquals(YtDlpProgressParser.toActivityToken(mergedOne, lineOne),
+				YtDlpProgressParser.toActivityToken(mergedTwo, lineTwo));
 	}
 
 	@Test
@@ -161,5 +186,113 @@ public class YtDlpProgressParserTest {
 		assertEquals("Vidéo", snapshot.getDetail());
 		snapshot = YtDlpProgressParser.parse("[download]   5.0% of 2.00MiB at 1.00MiB/s ETA 00:02", snapshot);
 		assertEquals("Audio", snapshot.getDetail());
+	}
+
+	@Test
+	public void parseHabitvProgressDownloadTemplate() {
+		final String line = YoutubeConf.PROGRESS_LINE_PREFIX
+				+ "{\"phase\":\"download\",\"pct\":11.4,\"total\":\"159.60MiB\",\"speed\":\"7.80MiB/s\",\"eta\":\"00:18\",\"dest\":\"episode.f137.mp4\"}";
+		final DownloadProgressSnapshot snapshot = YtDlpProgressParser.parse(line, null);
+		assertNotNull(snapshot);
+		assertEquals(DownloadStage.DOWNLOADING, snapshot.getStage());
+		assertEquals(0.114d, snapshot.getProgressRatio().doubleValue(), 0.000001d);
+		assertEquals("Vidéo", snapshot.getDetail());
+		assertEquals(Long.valueOf(18L), snapshot.getEtaSeconds());
+	}
+
+	@Test
+	public void parseHabitvProgressDownloadTemplateWithNullPct() {
+		final String line = YoutubeConf.PROGRESS_LINE_PREFIX
+				+ "{\"phase\":\"download\",\"pct\":null,\"total\":\"NA\",\"speed\":\"NA\",\"eta\":\"NA\"}";
+		final DownloadProgressSnapshot snapshot = YtDlpProgressParser.parse(line, null);
+		assertNotNull(snapshot);
+		assertEquals(DownloadStage.DOWNLOADING, snapshot.getStage());
+		assertTrue(snapshot.isIndeterminate());
+	}
+
+	@Test
+	public void parseHabitvProgressRejectsInvalidUnquotedNaPct() {
+		final String line = YoutubeConf.PROGRESS_LINE_PREFIX
+				+ "{\"phase\":\"download\",\"pct\":NA,\"total\":\"10.00MiB\"}";
+		assertNull(YtDlpProgressParser.parse(line, null));
+	}
+
+	@Test
+	public void parseHabitvProgressPostprocessMerger() {
+		final DownloadProgressSnapshot previous = YtDlpProgressParser.parse(
+				YoutubeConf.PROGRESS_LINE_PREFIX + "{\"phase\":\"download\",\"pct\":100.0}", null);
+		final DownloadProgressSnapshot merged = YtDlpProgressParser.parse(
+				YoutubeConf.PROGRESS_LINE_PREFIX + "{\"phase\":\"postprocess\",\"pp\":\"Merger\"}", previous);
+		assertEquals(DownloadStage.MERGING, merged.getStage());
+		assertTrue(merged.isIndeterminate());
+	}
+
+	@Test
+	public void parseVideoRemuxerPostProcessorTemplateAsRemux() {
+		final DownloadProgressSnapshot remux = YtDlpProgressParser.parse(
+				YoutubeConf.PROGRESS_LINE_PREFIX + "{\"phase\":\"postprocess\",\"pp\":\"VideoRemuxer\"}", null);
+		assertEquals(DownloadStage.REMUXING, remux.getStage());
+	}
+
+	@Test
+	public void mapsKnownPostProcessorClassNamesToStages() {
+		assertEquals(DownloadStage.MERGING, YtDlpProgressParser.stageFromPostProcessorName("FFmpegMerger"));
+		assertEquals(DownloadStage.MERGING, YtDlpProgressParser.stageFromPostProcessorName("Merger"));
+		assertEquals(DownloadStage.REMUXING, YtDlpProgressParser.stageFromPostProcessorName("FFmpegExtractAudio"));
+		assertEquals(DownloadStage.REMUXING, YtDlpProgressParser.stageFromPostProcessorName("FFmpegVideoRemuxer"));
+		assertEquals(DownloadStage.REMUXING, YtDlpProgressParser.stageFromPostProcessorName("FFmpegVideoConvertor"));
+		assertEquals(DownloadStage.METADATA, YtDlpProgressParser.stageFromPostProcessorName("FFmpegMetadata"));
+		assertEquals(DownloadStage.SUBTITLES, YtDlpProgressParser.stageFromPostProcessorName("FFmpegEmbedSubtitle"));
+		assertEquals(DownloadStage.FINALIZING, YtDlpProgressParser.stageFromPostProcessorName("MoveFiles"));
+		assertEquals(DownloadStage.POST_PROCESSING, YtDlpProgressParser.stageFromPostProcessorName("UnknownProcessor"));
+	}
+
+	@Test
+	public void parseHabitvProgressAudioAfterVideoComplete() {
+		DownloadProgressSnapshot snapshot = YtDlpProgressParser.parse(
+				YoutubeConf.PROGRESS_LINE_PREFIX + "{\"phase\":\"download\",\"pct\":99.0,\"dest\":\"episode.f137.mp4\"}",
+				null);
+		snapshot = YtDlpProgressParser.parse(
+				YoutubeConf.PROGRESS_LINE_PREFIX + "{\"phase\":\"download\",\"pct\":8.0,\"dest\":\"episode.f140.m4a\"}",
+				snapshot);
+		assertEquals("Audio", snapshot.getDetail());
+		assertEquals(0.08d, snapshot.getProgressRatio().doubleValue(), 0.0001d);
+	}
+
+	@Test
+	public void legacyStdoutStillParsedWhenTemplateAbsent() {
+		final DownloadProgressSnapshot snapshot = YtDlpProgressParser.parse(
+				"[download]  22.0% of 5.00MiB at 2.00MiB/s ETA 00:03", null);
+		assertEquals(DownloadStage.DOWNLOADING, snapshot.getStage());
+		assertEquals(0.22d, snapshot.getProgressRatio().doubleValue(), 0.0001d);
+	}
+
+	@Test
+	public void invalidHabitvProgressJsonFallsBackToLegacyParsing() {
+		final String line = YoutubeConf.PROGRESS_LINE_PREFIX + "{not json}";
+		final DownloadProgressSnapshot snapshot = YtDlpProgressParser.parse(
+				line + " [download]  30.0% of 1.00MiB at 1.00MiB/s ETA 00:01", null);
+		assertNotNull(snapshot);
+		assertEquals(0.3d, snapshot.getProgressRatio().doubleValue(), 0.0001d);
+	}
+
+	@Test
+	public void parseHabitvProgressDestWithEscapedQuotes() {
+		final String line = YoutubeConf.PROGRESS_LINE_PREFIX
+				+ "{\"phase\":\"download\",\"pct\":50.0,\"dest\":\"ep\\\"isode.f137.mp4\"}";
+		final DownloadProgressSnapshot snapshot = YtDlpProgressParser.parse(line, null);
+		assertNotNull(snapshot);
+		assertEquals("Vidéo", snapshot.getDetail());
+		assertEquals(0.5d, snapshot.getProgressRatio().doubleValue(), 0.0001d);
+	}
+
+	@Test
+	public void parseHabitvProgressDestWithWindowsPath() {
+		final String line = YoutubeConf.PROGRESS_LINE_PREFIX
+				+ "{\"phase\":\"download\",\"pct\":12.0,\"dest\":\"C:\\\\Users\\\\episode.f137.mp4\"}";
+		final DownloadProgressSnapshot snapshot = YtDlpProgressParser.parse(line, null);
+		assertNotNull(snapshot);
+		assertEquals("Vidéo", snapshot.getDetail());
+		assertEquals(0.12d, snapshot.getProgressRatio().doubleValue(), 0.0001d);
 	}
 }
