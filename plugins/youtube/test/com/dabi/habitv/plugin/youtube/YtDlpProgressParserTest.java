@@ -235,6 +235,19 @@ public class YtDlpProgressParserTest {
 	}
 
 	@Test
+	public void mapsKnownPostProcessorClassNamesToStages() {
+		assertEquals(DownloadStage.MERGING, YtDlpProgressParser.stageFromPostProcessorName("FFmpegMerger"));
+		assertEquals(DownloadStage.MERGING, YtDlpProgressParser.stageFromPostProcessorName("Merger"));
+		assertEquals(DownloadStage.REMUXING, YtDlpProgressParser.stageFromPostProcessorName("FFmpegExtractAudio"));
+		assertEquals(DownloadStage.REMUXING, YtDlpProgressParser.stageFromPostProcessorName("FFmpegVideoRemuxer"));
+		assertEquals(DownloadStage.REMUXING, YtDlpProgressParser.stageFromPostProcessorName("FFmpegVideoConvertor"));
+		assertEquals(DownloadStage.METADATA, YtDlpProgressParser.stageFromPostProcessorName("FFmpegMetadata"));
+		assertEquals(DownloadStage.SUBTITLES, YtDlpProgressParser.stageFromPostProcessorName("FFmpegEmbedSubtitle"));
+		assertEquals(DownloadStage.FINALIZING, YtDlpProgressParser.stageFromPostProcessorName("MoveFiles"));
+		assertEquals(DownloadStage.POST_PROCESSING, YtDlpProgressParser.stageFromPostProcessorName("UnknownProcessor"));
+	}
+
+	@Test
 	public void parseHabitvProgressAudioAfterVideoComplete() {
 		DownloadProgressSnapshot snapshot = YtDlpProgressParser.parse(
 				YoutubeConf.PROGRESS_LINE_PREFIX + "{\"phase\":\"download\",\"pct\":99.0,\"dest\":\"episode.f137.mp4\"}",

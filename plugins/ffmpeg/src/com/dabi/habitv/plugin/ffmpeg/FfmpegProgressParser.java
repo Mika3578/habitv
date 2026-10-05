@@ -44,7 +44,7 @@ public final class FfmpegProgressParser {
 		final String trimmed = line.trim();
 		if (trimmed.startsWith("duration=")) {
 			state.durationMicros = parseDurationMicros(trimmed.substring("duration=".length()));
-			return indeterminateRemux();
+			return snapshotFromState(state);
 		}
 		if (trimmed.startsWith("out_time_us=")) {
 			state.outTimeMicros = parseLongValue(trimmed.substring("out_time_us=".length()));

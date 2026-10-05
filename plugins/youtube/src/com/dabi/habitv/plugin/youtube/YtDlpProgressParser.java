@@ -163,9 +163,12 @@ public final class YtDlpProgressParser {
 		if (postProcessor == null || postProcessor.isEmpty()) {
 			return DownloadStage.POST_PROCESSING;
 		}
-		final String token = postProcessor.trim();
-		if ("VideoRemuxer".equalsIgnoreCase(token) || "VideoConvertor".equalsIgnoreCase(token)
-				|| "FFmpegVideoRemuxer".equalsIgnoreCase(token) || "FFmpegVideoConvertor".equalsIgnoreCase(token)) {
+		String token = postProcessor.trim();
+		// Class names often include an FFmpeg prefix the legacy tag matcher does not see.
+		if (token.length() > 6 && token.regionMatches(true, 0, "FFmpeg", 0, 6)) {
+			token = token.substring(6);
+		}
+		if ("VideoRemuxer".equalsIgnoreCase(token) || "VideoConvertor".equalsIgnoreCase(token)) {
 			return DownloadStage.REMUXING;
 		}
 		final DownloadStage fromTag = detectPostProcessingStage("[" + token + "]");
