@@ -140,6 +140,14 @@ public class CmdExecutorTest {
 	}
 
 	@Test
+	public void progressionStallDisabledWhenMaxHungTimeNegative() {
+		final long now = 10_000L;
+		final long lastTime = 0L;
+		assertFalse(CmdExecutor.isProgressionStalled("stage:MERGING", "stage:MERGING", now, lastTime, -1L));
+		assertTrue(CmdExecutor.isProgressionStalled("stage:MERGING", "stage:MERGING", now, lastTime, 500L));
+	}
+
+	@Test
 	public void concurrentStreamsSameActivityTokenDoesNotFalseStall() throws ExecutorFailedException {
 		final long delayBeforeStdoutMs = 4_000L;
 		final long delayBeforeStderrMs = 4_020L;

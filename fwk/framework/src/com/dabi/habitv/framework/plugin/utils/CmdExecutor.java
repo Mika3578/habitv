@@ -278,6 +278,10 @@ public class CmdExecutor implements ProcessHolder {
 		LOG.debug("now" + now);
 		LOG.debug("lastTime" + lastTime);
 		LOG.debug("maxHungTime" + maxHungTime);
+		// Negative timeout disables progression stall (same sentinel as getHungProcessTime()).
+		if (maxHungTime < 0L) {
+			return false;
+		}
 		return lastActivity != null && currentActivity != null && currentActivity.equals(lastActivity)
 				&& (now - lastTime) > maxHungTime;
 	}

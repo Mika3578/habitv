@@ -2,6 +2,7 @@ package com.dabi.habitv.plugin.ffmpeg;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -34,14 +35,32 @@ public class FFMPEGCmdExecutorTest {
 		assertEquals(0.5d, snapshot.getProgressRatio().doubleValue(), 0.05d);
 	}
 
+	@Test
+	public void durationNaLeavesProgressIndeterminateThenAcceptsLaterProgress() {
+		final FFMpegTestExecutor executor = new FFMpegTestExecutor("", "");
+		assertNull(executor.progressLine("  Duration: N/A, start: 0.000000, bitrate: N/A"));
+		DownloadProgressSnapshot snapshot = executor.readSnapshot();
+		assertTrue(snapshot == null || snapshot.isIndeterminate());
+
+		assertNull(executor.progressLine("size=       1kB time=00:00:05.00 bitrate=   1.0kbits/s speed=1x"));
+		snapshot = executor.readSnapshot();
+		assertTrue(snapshot == null || snapshot.isIndeterminate());
+
+		assertEquals("50.0",
+				executor.progressLine("frame=  10 fps=10 q=0.0 size=    1kB time=00:00:01.00 bitrate=N/A speed=1x (50.0%)"));
+		snapshot = FFMPEGCmdExecutor.snapshotFromLegacyProgressionString("50.0");
+		assertEquals(DownloadStage.REMUXING, snapshot.getStage());
+		assertEquals(0.5d, snapshot.getProgressRatio().doubleValue(), 0.0001d);
+	}
+
 	private static final class FFMpegTestExecutor extends FFMPEGCmdExecutor {
 
 		FFMpegTestExecutor(final String cmdProcessor, final String cmd) {
 			super(cmdProcessor, cmd);
 		}
 
-		void progressLine(final String line) {
-			handleProgression(line);
+		String progressLine(final String line) {
+			return handleProgression(line);
 		}
 
 		DownloadProgressSnapshot readSnapshot() {

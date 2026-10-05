@@ -67,6 +67,19 @@ public class FfmpegProgressParserTest {
 	}
 
 	@Test
+	public void stderrDurationNaLeavesProgressIndeterminate() {
+		final FfmpegProgressParser.State state = new FfmpegProgressParser.State();
+		assertNull(FfmpegProgressParser.parseLine("  Duration: N/A, start: 0.000000, bitrate: N/A", state));
+		assertNull(state.getDurationMicros());
+		final DownloadProgressSnapshot stillWaiting = FfmpegProgressParser.parseLine("out_time_us=5000000", state);
+		assertNotNull(stillWaiting);
+		assertTrue(stillWaiting.isIndeterminate());
+		final DownloadProgressSnapshot afterValidDuration = FfmpegProgressParser.parseLine("duration=10.000000",
+				state);
+		assertEquals(0.5d, afterValidDuration.getProgressRatio().doubleValue(), 0.0001d);
+	}
+
+	@Test
 	public void stderrDurationAndTimeFallback() {
 		final FfmpegProgressParser.State state = new FfmpegProgressParser.State();
 		FfmpegProgressParser.parseLine("  Duration: 00:00:10.00, start: 0.000000, bitrate: 100 kb/s", state);

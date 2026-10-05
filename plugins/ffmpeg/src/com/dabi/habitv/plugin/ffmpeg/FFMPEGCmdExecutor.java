@@ -170,21 +170,27 @@ public class FFMPEGCmdExecutor extends CmdExecutor {
 
 	private static Long findDuration(final String line) {
 		final Matcher matcher = DURATION_PATTERN.matcher(line);
-		final boolean hasMatched = matcher.find();
-		Long ret = null;
-		if (hasMatched) {
-			final String durationFormatted = matcher
-					.group(matcher.groupCount());
+		if (!matcher.find()) {
+			return null;
+		}
+		final String durationFormatted = matcher.group(matcher.groupCount()).trim();
+		if (durationFormatted.isEmpty() || "N/A".equalsIgnoreCase(durationFormatted)
+				|| "NA".equalsIgnoreCase(durationFormatted)) {
+			return null;
+		}
+		try {
 			final String[] durationSplitted = durationFormatted.split(":");
+			if (durationSplitted.length < 3) {
+				return null;
+			}
 			final long hours = Long.valueOf(durationSplitted[0]);
 			final long minutes = Long.valueOf(durationSplitted[1]);
-			final long seconds = Double.valueOf(durationSplitted[2])
-					.longValue();
-			ret = TimeUnit.SECONDS.convert(hours, TimeUnit.HOURS)
-					+ TimeUnit.SECONDS.convert(minutes, TimeUnit.MINUTES)
-					+ seconds;
+			final long seconds = Double.valueOf(durationSplitted[2]).longValue();
+			return Long.valueOf(TimeUnit.SECONDS.convert(hours, TimeUnit.HOURS)
+					+ TimeUnit.SECONDS.convert(minutes, TimeUnit.MINUTES) + seconds);
+		} catch (final NumberFormatException e) {
+			return null;
 		}
-		return ret;
 	}
 
 }
