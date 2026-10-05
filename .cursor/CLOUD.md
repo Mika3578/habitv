@@ -25,3 +25,4 @@ Cloud Agents working a same-repository PR follow **Pull request lifecycle**
 in `AGENTS.md` and [pr-review](../.agents/skills/pr-review/SKILL.md).
 Load policy from `origin/develop` when the task is event-driven triage.
 Never merge or mark Ready unless the conversation explicitly authorizes it.
+Do not request Copilot until FINAL_REVIEW.

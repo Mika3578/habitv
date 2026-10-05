@@ -1,0 +1,86 @@
+# HabiTV — iterative review only. Copilot stays the final merge-adjacent AI review.
+language: en-US
+early_access: false
+enable_free_tier: true
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: false
+  high_level_summary_placeholder: ""
+  review_status: true
+  review_details: false
+  collapse_walkthrough: true
+  changed_files_summary: true
+  poem: false
+  sequence_diagrams: false
+  auto_apply_labels: false
+  auto_assign_reviewers: false
+  abort_on_close: true
+  path_filters:
+    - "!**/target/**"
+    - "!**/*.class"
+    - "!**/node_modules/**"
+  path_instructions:
+    - path: "plugins/**"
+      instructions: >
+        One provider or plugin module per change when possible. Prefer offline
+        fixtures and tests over live network. Do not suggest re-enabling
+        retired hosts. Do not ask for secrets, cookies, tokens, or machine
+        paths in git. Describe user-visible listing/retrieval behavior only;
+        do not invent access or delivery internals. Flag process, filesystem,
+        and credential handling defects.
+    - path: "fwk/**"
+      instructions: >
+        Shared framework changes must stay Java 8 baseline unless the PR is an
+        explicit JDK migration. Watch process execution, progress reporting,
+        and plugin isolation. Do not propose deleting user media, indexes, or
+        configs.
+    - path: "application/**"
+      instructions: >
+        GUI modules need a JavaFX-capable JDK 8 at runtime. Keep UI changes
+        scoped. Same secret and user-data rules as the rest of the repo.
+    - path: "docs/**"
+      instructions: >
+        One topic per page; link instead of copying. English. Public wording
+        stays short and generic.
+    - path: ".github/**"
+      instructions: >
+        Do not expand CI permissions or required checks without a dedicated
+        governance PR. Do not add workflows that request Copilot on every push.
+    - path: "AGENTS.md"
+      instructions: >
+        Root AGENTS.md is the only full agent policy. Do not suggest moving
+        substantive rules into tool adapters.
+  auto_review:
+    enabled: true
+    drafts: true
+    auto_incremental_review: true
+    auto_pause_after_reviewed_commits: 8
+    base_branches:
+      - develop
+      - master
+    ignore_title_keywords:
+      - WIP
+      - skip review
+  finishing_touches:
+    docstrings:
+      enabled: false
+    unit_tests:
+      enabled: false
+    simplify:
+      enabled: false
+    autofix:
+      enabled: false
+    fix_ci:
+      enabled: false
+    resolve_merge_conflict:
+      enabled: false
+knowledge_base:
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - "AGENTS.md"
+      - "CONTRIBUTING.md"
+      - "docs/providers.md"
+      - "docs/development.md"
+      - "docs/architecture.md"

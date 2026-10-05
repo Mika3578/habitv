@@ -10,7 +10,7 @@ reviews_arg="${2:-[]}"
 comments_arg="${3:-[]}"
 
 if [[ -z "$head_sha" ]] || ! command -v jq >/dev/null 2>&1; then
-  echo '{"review_sources":[],"substantive_review_on_head":false,"final_review_gate_eligible":false}'
+  echo '{"review_sources":[],"substantive_review_on_head":false,"final_review_gate_eligible":false,"iterative_review_on_head":false}'
   exit 0
 fi
 
@@ -49,9 +49,19 @@ jq -n \
     ($login // "") | ascii_downcase | . == "sonarqubecloud[bot]"
       or . == "sonarcloud[bot]";
 
+  def cr_skip_pats: [
+    "does not receive automatic reviews",
+    "fewer than 10 stars",
+    "Review skipped",
+    "Bot user detected",
+    "Draft PRs are not automatically reviewed",
+    "Draft PR not reviewed"
+  ];
+
   ($reviews | map(select(is_copilot_login(.author.login)))) as $copilot |
   ($reviews | map(select(is_amazon_q_login(.author.login)))) as $aq |
   ($reviews | map(select(is_cursor_login(.author.login)))) as $cursor |
+  ($reviews | map(select(is_coderabbit_login(.author.login)))) as $cr_r |
   ($comments | map(select(is_coderabbit_login(.user.login)))) as $cr_c |
   ($comments | map(select(is_sourcery_login(.user.login)))) as $so_c |
   ($comments | map(select(is_sonar_login(.user.login)))) as $sonar_c |
@@ -88,10 +98,26 @@ jq -n \
         commit:.commit.oid,
         github_state:.state
       }))
-    + if ($cr_c | length) > 0 then
-        (($cr_c[-1].body) as $cr_body |
-          [{source:"coderabbit",execution_state:(if body_has($cr_body; ["does not receive automatic reviews","fewer than 10 stars","Review skipped"]) then "SKIPPED" else "PENDING" end)}])
-      else [] end
+    + (
+        (($cr_r | map(select(.commit.oid == $head))) as $cr_head |
+         ($cr_c[-1].body // "") as $cr_last_comment |
+         if ($cr_head | length) > 0 then
+           (($cr_head[-1]) as $r |
+            if body_has(($r.body // ""); cr_skip_pats) then
+              [{source:"coderabbit",execution_state:"SKIPPED",commit:$r.commit.oid}]
+            elif $r.state == "APPROVED" then
+              [{source:"coderabbit",execution_state:"NO_FINDINGS",commit:$r.commit.oid,github_state:$r.state}]
+            else
+              [{source:"coderabbit",execution_state:"SUBSTANTIVE",commit:$r.commit.oid,github_state:$r.state}]
+            end)
+         elif ($cr_c | length) > 0 and body_has($cr_last_comment; cr_skip_pats) then
+           [{source:"coderabbit",execution_state:"SKIPPED"}]
+         elif ($cr_r | length) > 0 then
+           [{source:"coderabbit",execution_state:"STALE",commit:$cr_r[-1].commit.oid}]
+         elif ($cr_c | length) > 0 then
+           [{source:"coderabbit",execution_state:"PENDING"}]
+         else [] end)
+      )
     + if ($so_c | length) > 0 then
         (($so_c[-1].body) as $so_body |
           [{source:"sourcery",execution_state:(if body_has($so_body; ["diff characters","quota","6 days","6 hours"]) then "RATE_LIMITED"
@@ -110,6 +136,9 @@ jq -n \
     final_review_gate_eligible: (
       ($sources | any(.source == "copilot" and (.execution_state == "SUBSTANTIVE" or .execution_state == "NO_FINDINGS") and .commit == $head))
       or (($human_approved | length) > 0)
+    ),
+    iterative_review_on_head: (
+      ($sources | any(.source == "coderabbit" and (.execution_state == "SUBSTANTIVE" or .execution_state == "NO_FINDINGS") and .commit == $head))
     )
   }
   '

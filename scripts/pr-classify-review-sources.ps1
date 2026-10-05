@@ -75,14 +75,50 @@ foreach ($r in $cursor) {
     $sources.Add([ordered]@{ source = 'cursor'; execution_state = $st; commit = $r.commit.oid; github_state = $r.state })
 }
 
-# --- Issue comments (bots that post to conversation, not always as reviews) ---
+# --- CodeRabbit (Draft iterative). Checks/status are not a review. ---
 $codeRabbitLogins = @('coderabbitai[bot]')
-$cr = @($IssueComments | Where-Object { Test-ExactLogin $_.user.login $codeRabbitLogins } |
-    Sort-Object { $_.updated_at } | Select-Object -Last 1)
-if ($cr.Count -gt 0) {
-    $body = [string]$cr[0].body
-    $st = if (Test-BodyMatch $body @('does not receive automatic reviews', 'fewer than 10 stars', 'Review skipped')) { 'SKIPPED' } else { 'PENDING' }
-    $sources.Add([ordered]@{ source = 'coderabbit'; execution_state = $st })
+$crSkipPhrases = @(
+    'does not receive automatic reviews',
+    'fewer than 10 stars',
+    'Review skipped',
+    'Bot user detected',
+    'Draft PRs are not automatically reviewed',
+    'Draft PR not reviewed'
+)
+$crReviews = @($Reviews | Where-Object { Test-ExactLogin $_.author.login $codeRabbitLogins })
+$crComments = @($IssueComments | Where-Object { Test-ExactLogin $_.user.login $codeRabbitLogins } |
+    Sort-Object { $_.updated_at })
+$crOnHead = @($crReviews | Where-Object { $_.commit.oid -eq $HeadSha })
+$crLastCommentBody = ''
+if ($crComments.Count -gt 0) {
+    $crLastCommentBody = [string]$crComments[-1].body
+}
+if ($crOnHead.Count -gt 0) {
+    $r = $crOnHead[-1]
+    $body = [string]$r.body
+    if (Test-BodyMatch $body $crSkipPhrases) {
+        $sources.Add([ordered]@{ source = 'coderabbit'; execution_state = 'SKIPPED'; commit = $r.commit.oid })
+    } elseif ($r.state -eq 'APPROVED') {
+        $sources.Add([ordered]@{
+            source           = 'coderabbit'
+            execution_state  = 'NO_FINDINGS'
+            commit           = $r.commit.oid
+            github_state     = $r.state
+        })
+    } else {
+        $sources.Add([ordered]@{
+            source           = 'coderabbit'
+            execution_state  = 'SUBSTANTIVE'
+            commit           = $r.commit.oid
+            github_state     = $r.state
+        })
+    }
+} elseif ($crComments.Count -gt 0 -and (Test-BodyMatch $crLastCommentBody $crSkipPhrases)) {
+    $sources.Add([ordered]@{ source = 'coderabbit'; execution_state = 'SKIPPED' })
+} elseif ($crReviews.Count -gt 0) {
+    $sources.Add([ordered]@{ source = 'coderabbit'; execution_state = 'STALE'; commit = $crReviews[-1].commit.oid })
+} elseif ($crComments.Count -gt 0) {
+    $sources.Add([ordered]@{ source = 'coderabbit'; execution_state = 'PENDING' })
 }
 
 $sourceryLogins = @('sourcery-ai[bot]')
@@ -118,9 +154,11 @@ $humanApprovedOnHead = @($Reviews | Where-Object {
     ($_.author.login -notmatch '\[bot\]$')
 }).Count -gt 0
 $copilotEligible = ($onHeadSubstantive | Where-Object { $_.source -eq 'copilot' }).Count -gt 0
+$iterativeOnHead = ($onHeadSubstantive | Where-Object { $_.source -eq 'coderabbit' }).Count -gt 0
 
 return [ordered]@{
     review_sources              = $sources
     substantive_review_on_head  = ($onHeadSubstantive.Count -gt 0 -or $humanApprovedOnHead)
     final_review_gate_eligible  = ($copilotEligible -or $humanApprovedOnHead)
+    iterative_review_on_head    = $iterativeOnHead
 }

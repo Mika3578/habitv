@@ -20,11 +20,19 @@ before enabling):
 | `required_review_thread_resolution` | `true` | keep `true` |
 | `dismiss_stale_reviews_on_push` | `false` | `true` |
 | `require_last_push_approval` | `false` | keep `false` unless a second approval gate is desired |
-| `review_on_push` (Copilot) | `false` | optional; enable with draft review when each push should get Copilot |
-| `review_draft_pull_requests` (Copilot) | `false` | set `true` together with `review_on_push` if Draft PRs should be reviewed |
+| `review_on_push` (Copilot) | `false` | **keep `false`** (Copilot is one final review after Ready-prep, not every push) |
+| `review_draft_pull_requests` (Copilot) | `false` | **keep `false`** |
 
-`review_on_push` alone does not cover Draft PRs while
-`review_draft_pull_requests` remains `false`; enable both when that is desired.
+Do not enable Copilot automatic review on every push or on Draft PRs.
+
+## CodeRabbit
+
+Iterative Draft review uses the in-repo `.coderabbit.yaml` (drafts on,
+incremental on, finishing-touch extra PRs off). Until the repository has
+10 GitHub stars, automatic reviews skip; agents comment `@coderabbitai
+review` after each published fix batch. Do **not** add CodeRabbit as a
+required status check (skip or queued suites would strand PRs). Amazon Q
+remains optional for HIGH_RISK only; it is not a merge gate.
 
 ## External PR description tools
 

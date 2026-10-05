@@ -121,7 +121,8 @@ jq -n \
     status_check_rollup: $pr.statusCheckRollup,
     review_sources: $classify.review_sources,
     substantive_review_on_head: $classify.substantive_review_on_head,
-    final_review_gate_eligible: $classify.final_review_gate_eligible
+    final_review_gate_eligible: $classify.final_review_gate_eligible,
+    iterative_review_on_head: $classify.iterative_review_on_head
   }'
 
 exit 0

@@ -141,7 +141,7 @@ INTAKE → SNAPSHOT → INVENTORY → ADJUDICATE → FIX_BATCH → VERIFY
 | REPLY | Concise disposition in **existing** thread: what was done and **why** (fix + SHA/evidence, or reject + rationale). Required before RESOLVE |
 | RESOLVE | Only after REPLY is visible on the thread. GraphQL/REST resolve; re-query `isResolved` (not `isOutdated`). Never resolve a reply-less thread |
 | LIVE_RECONCILE | Full live PR fetch before claiming cleanliness |
-| FINAL_REVIEW | One independent review on exact current HEAD (tier-dependent) |
+| FINAL_REVIEW | One Copilot (or human) review on exact current HEAD after Ready-prep |
 | READY_GATE | All gates on current HEAD; report readiness; mark Ready only with explicit user phrase |
 
 ## Finding lifecycle
@@ -187,10 +187,11 @@ every AI suggestion blindly.
 ```text
 collect complete round → adjudicate all → fix accepted batch
     → validate → publish once → reply → resolve eligible threads
-    → request next substantive review once
+    → request CodeRabbit once (Draft); Copilot only at FINAL_REVIEW
 ```
 
 Do not loop: one bot comment → one commit → one review request.
+Do not request Copilot after intermediate pushes.
 
 Exceptions: urgent blockers or findings that change implementation strategy.
 
@@ -231,7 +232,9 @@ Fetch live GitHub state:
 
 - HEAD SHA, base, branch, draft flag, title, body;
 - review submissions and requested reviewers;
-- Copilot **inline/thread** comments (code findings);
+- CodeRabbit **inline/thread** comments and reviews (Draft iterative
+  findings); skip/status comments are `SKIPPED`, not a clean review;
+- Copilot **inline/thread** comments (final-review code findings);
 - Copilot overview text only to classify whether it is meta/footer-only
   (`Findings: None`) or points at open code findings;
 - top-level issue/PR comments when they contain actionable code notes;
@@ -294,19 +297,30 @@ Record `execution_state` per source in `agent_space/pr-<n>/state.json`.
 
 ### HabiTV defaults (from real PR experience)
 
-- **Amazon Q:** valuable in Draft rounds; treat as substantive when findings
-  exist; becomes `STALE` when `commit_id ≠ HEAD`.
-- **CodeRabbit:** often `SKIPPED` on this repo (&lt;10 stars) — never count as
-  clean review because status is green.
+- **CodeRabbit:** preferred **Draft** substantive source when
+  `execution_state` is `SUBSTANTIVE` or `NO_FINDINGS`. After FIX_BATCH +
+  PUBLISH, request CodeRabbit **once** (`@coderabbitai review` when
+  auto-review skips: fewer than 10 stars, drafts, or bot author). Treat
+  skip/status comments as `SKIPPED` — never as a clean review. Count
+  CodeRabbit **reviews** on HEAD, not only issue comments. Do not treat
+  a CodeRabbit check `success` or `queued` as a review. Bound to ~3
+  CodeRabbit rounds, then escalate.
+- **Copilot:** **final** substantive source only. Request Copilot **once**
+  at FINAL_REVIEW / READY_GATE on the current HEAD after Draft CodeRabbit
+  findings are closed and required CI is green (or when the user asked to
+  prepare for final review). Do not request Copilot after intermediate
+  pushes. Adjudicate inline findings on that HEAD. A human `APPROVED` on
+  HEAD also satisfies the final review gate when Copilot cannot review.
+  Cursor Approval Agent alone does not. Overview badges alone never block
+  merge. User authorization to mark Ready or merge remains a separate
+  required step.
+- **Amazon Q:** optional second pass for HIGH_RISK only; do not request it
+  every round. Treat as substantive when findings exist; becomes `STALE`
+  when `commit_id ≠ HEAD`.
 - **Sourcery:** `SUMMARY_ONLY` / `RATE_LIMITED` — opportunistic, not a gate.
 - **SonarCloud:** `STATIC_ANALYSIS` only.
 - **Cursor Approval Agent:** `APPROVAL_ONLY` when it approves from checks
   without Bugbot/substantive diff review — **does not** satisfy final review.
-- **Copilot:** preferred substantive reviewer for code. Adjudicate inline
-  findings on HEAD. A human `APPROVED` on HEAD also satisfies the final
-  review gate when Copilot cannot review. Cursor Approval Agent alone
-  does not. Overview badges alone never block merge. User authorization
-  to mark Ready or merge remains a separate required step.
 ## PR body ownership
 
 The orchestrator owns the canonical PR description (template sections).
@@ -328,7 +342,8 @@ when convenient ([`docs/github-rulesets/README.md`](../../../docs/github-ruleset
 **Objective:** code is good and findings on the diff are handled so the
 user can merge. Not: endless body/overview cleanup.
 
-**Draft phase:** implementation, validation, fix real code findings.
+**Draft phase:** implementation, validation, CodeRabbit iterative review,
+fix real code findings. No Copilot.
 
 **Final phase:**
 
@@ -336,6 +351,8 @@ user can merge. Not: endless body/overview cleanup.
 required CI green on HEAD
     ↓
 actionable code threads adjudicated (fix or reject + resolve)
+    ↓
+ONE Copilot review on that HEAD (FINAL_REVIEW)
     ↓
 substantive signal on HEAD:
   Copilot review with findings handled, OR human APPROVED on HEAD
@@ -347,6 +364,7 @@ Quota / "unable to review" is not a blocker when CI is green and a human
 approved on HEAD (or code threads are clean and the user authorizes).
 
 Do not request Copilot after every intermediate commit.
+Do not request Copilot, CodeRabbit, and Amazon Q on the same push.
 Do not block merge on overview-only "Changes recommended" with
 `Findings: None`.
 
@@ -379,9 +397,10 @@ All items apply to **current PR HEAD** only:
 2. Focused tests pass when code changed.
 3. Full reactor validation when applicable.
 4. Required checks green on HEAD.
-5. Actionable Copilot **code** threads inventoried and adjudicated.
-   Overview-only / footer-only / `Findings: None` items: short reject,
-   not a merge blocker.
+5. Actionable CodeRabbit **code** threads (Draft) inventoried and
+   adjudicated. Actionable Copilot **code** threads (final HEAD)
+   inventoried and adjudicated. Overview-only / footer-only /
+   `Findings: None` items: short reject, not a merge blocker.
 6. Every `BLOCKING` **code** finding fixed or rejected with evidence.
 7. Qualifying code threads have a disposition **reply** (what + why),
    then are resolved (`isResolved` verified). Never resolve without a
@@ -401,8 +420,10 @@ All items apply to **current PR HEAD** only:
    head) or read-only inventory.
 2. SNAPSHOT — `REVIEW_HEAD`, `pr-gh-snapshot`, update `agent_space/pr-<n>/state.json`.
 3. INVENTORY + ADJUDICATE — all sources; map duplicates.
-4. If work remains: FIX_BATCH through RESOLVE; one review request when round complete.
-5. LIVE_RECONCILE + FINAL_REVIEW + READY_GATE.
+4. If work remains: FIX_BATCH through RESOLVE; request **CodeRabbit**
+   once after the published batch (`@coderabbitai review` if auto-skip).
+   Do not request Copilot in this step.
+5. LIVE_RECONCILE + FINAL_REVIEW (one Copilot request on HEAD) + READY_GATE.
 
 ## Deferred (not in every PR)
 

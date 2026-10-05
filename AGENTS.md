@@ -236,6 +236,17 @@ duplicate that procedure here.
 Keep every pull request in **Draft** until gates on the **current PR HEAD**
 are satisfied.
 
+- **Two-phase review:** CodeRabbit is the default **iterative** reviewer
+  in Draft. After each published fix batch, request CodeRabbit once
+  (`@coderabbitai review` until the repository has 10 stars). Copilot is
+  **one FINAL_REVIEW** after Ready-prep on the current HEAD. Do not
+  request Copilot after intermediate pushes, and do not call
+  `request_copilot_review` during Draft fix loops. Amazon Q is optional
+  for HIGH_RISK only; do not request it every round.
+- Inventory CodeRabbit **code** threads the same as Copilot (fix or
+  reject, reply, then resolve). Treat CodeRabbit skip or status comments
+  (star threshold, drafts, bot author, “Review skipped”) as `SKIPPED`,
+  never as a clean review.
 - **Proactive review loop:** when write-capable work on an open PR is
   authorized (explicit action intent or ongoing implementation on that
   head), load [pr-review](.agents/skills/pr-review/SKILL.md), fetch live
@@ -254,8 +265,9 @@ are satisfied.
   minimize silently. Security, secret, compliance, supply-chain, auth,
   authorization, and data-exposure findings require normal investigation or
   escalation — never dismiss them via adapter policy alone.
-- Every **reviewer or Copilot review comment** (inline thread or
-  review comment that raises a finding) is **mandatory**. Investigate;
+- Every **reviewer, CodeRabbit, or Copilot review comment** (inline
+  thread or review comment that raises a finding) is **mandatory**.
+  Investigate;
   implement a fix or reject with evidence; push when a fix is required;
   then post a **disposition reply on that same thread** that states what
   was done and **why** (fixed + evidence, or rejected + rationale). Do
@@ -295,7 +307,8 @@ When runtime behavior may change, keep the PR in Draft until the user
 **explicitly confirms success in the current conversation** after a real
 HabiTV test. Automated checks are not a substitute.
 
-Ready gate, batching, Copilot final review, and live reconciliation:
+Ready gate, batching, CodeRabbit iterative review, Copilot final review,
+and live reconciliation:
 [`.agents/skills/pr-review/SKILL.md`](.agents/skills/pr-review/SKILL.md).
 
 ## Documentation
@@ -324,9 +337,9 @@ paths but must not hold a second canonical copy.
 - Links and claims match the repository.
 - Applicable Draft → Ready gates satisfied on the latest commit before
   Ready (with explicit authorization).
-- Actionable Copilot **code** threads handled (fix or reject with
-  evidence, disposition reply on the thread, then resolve). Overview-only
-  / footer-only items are not merge blockers.
+- Actionable CodeRabbit (Draft) and Copilot (final) **code** threads
+  handled (fix or reject with evidence, disposition reply on the thread,
+  then resolve). Overview-only / footer-only items are not merge blockers.
 - Developer was asked to test real behavior when runtime/UI is affected.
 - Publishing runs under the task-level authorization above; merge and
   destructive operations wait for separate explicit approval.
