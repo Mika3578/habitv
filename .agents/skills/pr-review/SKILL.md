@@ -427,14 +427,14 @@ substantive signal on HEAD:
   Copilot review with findings handled (COMMENTED is enough),
   OR human APPROVED on HEAD
     ↓
-maintainer-merge-gate (merge-develop environment approval on this HEAD)
+protected merge-develop deployment (maintainer environment approval)
     ↓
 maintainer squash merge (auto-merge stays off)
 ```
 
 Do not require Copilot `APPROVED` as a GitHub merge condition. Nits
 without a required code change do not force a new commit. A new HEAD
-invalidates prior `maintainer-merge-gate` approval.
+invalidates prior `merge-develop` environment approval.
 
 Quota / "unable to review" is not a blocker when CI is green and a human
 approved on HEAD (or code threads are clean and the user authorizes).
@@ -461,8 +461,9 @@ On current HEAD, confirm:
 - explicit user authorization to mark Ready;
 - after Ready: Copilot findings adjudicated, or human `APPROVED` on
   HEAD (Cursor Approval Agent alone is insufficient);
-- merge only after `maintainer-merge-gate` on this HEAD (maintainer
-  environment approval); agents must not merge or enable auto-merge.
+- merge only after a successful `merge-develop` deployment on this HEAD
+  (maintainer environment approval); agents must not merge, enable
+  auto-merge, or approve that environment.
 
 ```bash
 scripts/pr-gh-snapshot.sh Mika3578/habitv <pr>
@@ -497,8 +498,9 @@ All items apply to **current PR HEAD** only:
 13. No newer commit invalidates the above.
 14. Explicit authorization to mark Ready, then one Copilot review on
     that HEAD.
-15. Merge is a maintainer squash after `maintainer-merge-gate` is green
-    on this HEAD. Do not arm auto-merge.
+15. Merge is a maintainer squash after a successful `merge-develop`
+    deployment on this HEAD. Do not arm auto-merge. Do not approve
+    the environment.
 
 ## Continuing an existing PR
 

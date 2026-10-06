@@ -145,10 +145,11 @@ push and requires one generic approving review plus the legacy required
 checks named `validate-java8`, `deterministic-tests-java8`,
 `compile-and-package-java8`, and `dependency-review` (names describe
 current hosted jobs, not the Java 21 design target). That review count
-can be satisfied by a review app. The intended final merge gate is
-`maintainer-merge-gate` (environment `merge-develop`) plus auto-merge
-off and a maintainer squash. Hosted ruleset and environment changes are
-GitHub UI steps in [`github-rulesets/README.md`](github-rulesets/README.md).
+can be satisfied by a review app. The intended final merge gate is a
+successful `merge-develop` deployment (protected environment) required
+by the ruleset, plus auto-merge off and a maintainer squash. Hosted
+ruleset and environment changes are GitHub UI steps in
+[`github-rulesets/README.md`](github-rulesets/README.md).
 Adding `agent-policy` and `agent-policy (windows)` to required status
 checks is still recommended after agent-policy CI is stable on `develop`.
 

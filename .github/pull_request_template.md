@@ -56,7 +56,7 @@
 - [ ] Draft: CodeRabbit findings on HEAD handled (or skip/quota treated as not a clean review)
 - [ ] Draft: Amazon Q `/q review` on the stabilized HEAD when available; Sourcery only if policy allows
 - [ ] Ready: explicit authorization, then one Copilot review on that HEAD; do not request Copilot in Draft
-- [ ] Merge: maintainer `maintainer-merge-gate` on current HEAD, then manual squash; CodeRabbit `APPROVED` is not merge authorization
+- [ ] Merge: maintainer `merge-develop` environment approval on current HEAD, then manual squash; CodeRabbit `APPROVED` is not merge authorization
 - [ ] If a `plugins/*/pom.xml` `<version>` is bumped, the trigger class is named (parser, endpoint, or configuration), and internal deps use `${project.parent.version}`
 - [ ] No secrets, tokens, local paths, or build outputs committed
 

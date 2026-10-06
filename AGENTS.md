@@ -210,10 +210,11 @@ would rewrite remote history, and destructive git/fs commands.
 
 Agents must never enable auto-merge, never merge, and never approve
 `merge-develop`. CodeRabbit `APPROVED` is iterative only and must not be
-treated as merge authorization. The GitHub merge gate is the
-`maintainer-merge-gate` check (maintainer environment approval on the
-current HEAD) plus a manual squash by the maintainer. Auto-merge stays
-off. A new commit invalidates prior environment approval.
+treated as merge authorization. The GitHub merge gate is a successful
+`merge-develop` deployment (protected environment, reviewer `Mika3578`)
+required by the `protect-develop` ruleset, plus a manual squash by the
+maintainer. Auto-merge stays off. A new commit invalidates prior
+environment approval. Agents never approve that environment.
 
 When the user authorizes finishing or reviewing a **specific** pull request,
 that authorization covers the bounded orchestration loop for that PR only
@@ -341,9 +342,9 @@ are satisfied.
   current; resolve addressed code threads. Third-party body footers are
   ignored for Ready/merge.
 - No actionable unresolved **code** feedback remains at Ready.
-- Merge into `develop` is a maintainer action after `maintainer-merge-gate`
-  is green on the current HEAD. Review apps (including CodeRabbit and
-  Cursor Approval Agent) cannot complete that gate.
+- Merge into `develop` is a maintainer action after a successful
+  `merge-develop` deployment on the current HEAD. Review apps (including
+  CodeRabbit and Cursor Approval Agent) cannot approve that environment.
 
 When runtime behavior may change, keep the PR in Draft until the user
 **explicitly confirms success in the current conversation** after a real

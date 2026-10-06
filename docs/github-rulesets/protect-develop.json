@@ -31,9 +31,14 @@
           { "context": "validate-java8" },
           { "context": "deterministic-tests-java8" },
           { "context": "compile-and-package-java8" },
-          { "context": "dependency-review" },
-          { "context": "maintainer-merge-gate" }
+          { "context": "dependency-review" }
         ]
+      }
+    },
+    {
+      "type": "required_deployments",
+      "parameters": {
+        "required_deployment_environments": ["merge-develop"]
       }
     },
     {

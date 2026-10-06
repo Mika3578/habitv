@@ -23,7 +23,7 @@ PR titles use Conventional Commits.
 
 Target **`Mika3578/habitv`** → **`develop`**. Linear history on work
 branches (rebase, no merge commits). Squash into `develop` only after
-`maintainer-merge-gate` is green; do not use auto-merge.
+a successful `merge-develop` deployment; do not use auto-merge.
 
 ```
 <type>(<scope>): <subject>
