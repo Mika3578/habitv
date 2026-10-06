@@ -193,6 +193,10 @@ require_phrase "explicitly confirms success in the current conversation"
 require_phrase "Do not resolve unanswered"
 require_phrase "Live GitHub PR state is authoritative"
 require_phrase "only the PR orchestrator"
+require_phrase "reviewer-trigger comments"
+require_phrase "@coderabbitai full review"
+require_phrase "/q review"
+require_phrase "Do not request Copilot during Draft"
 
 pr_review_skill=".agents/skills/pr-review/SKILL.md"
 if [[ ! -f "$pr_review_skill" ]]; then
@@ -222,6 +226,67 @@ else
   if ! grep -qF "execution_state" "$pr_review_skill"; then
     fail "pr-review skill must document review execution state"
   fi
+  if ! grep -qF "Agent-owned reviewer triggering" "$pr_review_skill"; then
+    fail "pr-review skill must document agent-owned reviewer triggering"
+  fi
+  if ! grep -qF "@coderabbitai full review" "$pr_review_skill"; then
+    fail "pr-review skill must require @coderabbitai full review before Ready"
+  fi
+  if ! grep -qF "/q review" "$pr_review_skill"; then
+    fail "pr-review skill must document Amazon Q /q review on a stabilized HEAD"
+  fi
+  if ! grep -qF "Do not request Copilot before Ready" "$pr_review_skill"; then
+    fail "pr-review skill must keep Copilot final-only after Ready"
+  fi
+  if ! grep -qF "must not independently post" "$pr_review_skill"; then
+    fail "pr-review skill must keep single-writer reviewer-request rule"
+  fi
+fi
+
+if [[ ! -f .coderabbit.yaml ]]; then
+  fail "missing .coderabbit.yaml"
+else
+  yaml_child_block() {
+    local file="$1"
+    local key="$2"
+    awk -v key="$key" '
+      $0 ~ "^  " key ":" { p = 1; next }
+      p && /^  [^[:space:]]/ { exit }
+      p { print }
+    ' "$file"
+  }
+  yaml_nested_block() {
+    local key="$1"
+    awk -v key="$key" '
+      $0 ~ "^    " key ":" { p = 1; next }
+      p && /^    [^[:space:]]/ { exit }
+      p { print }
+    '
+  }
+  cr=".coderabbit.yaml"
+  if ! grep -qE '^[[:space:]]*profile:[[:space:]]*assertive[[:space:]]*$' "$cr"; then
+    fail ".coderabbit.yaml must set profile: assertive"
+  fi
+  if ! grep -qE '^[[:space:]]*request_changes_workflow:[[:space:]]*false[[:space:]]*$' "$cr"; then
+    fail ".coderabbit.yaml must set request_changes_workflow: false"
+  fi
+  auto_review="$(yaml_child_block "$cr" auto_review)"
+  if ! printf '%s\n' "$auto_review" | grep -qE '^[[:space:]]*enabled:[[:space:]]*true[[:space:]]*$'; then
+    fail ".coderabbit.yaml must set auto_review.enabled: true"
+  fi
+  if ! printf '%s\n' "$auto_review" | grep -qE '^[[:space:]]*drafts:[[:space:]]*true[[:space:]]*$'; then
+    fail ".coderabbit.yaml must set auto_review.drafts: true"
+  fi
+  if ! printf '%s\n' "$auto_review" | grep -qE '^[[:space:]]*auto_incremental_review:[[:space:]]*true[[:space:]]*$'; then
+    fail ".coderabbit.yaml must set auto_review.auto_incremental_review: true"
+  fi
+  finishing="$(yaml_child_block "$cr" finishing_touches)"
+  for feat in autofix fix_ci resolve_merge_conflict; do
+    feat_block="$(printf '%s\n' "$finishing" | yaml_nested_block "$feat")"
+    if ! printf '%s\n' "$feat_block" | grep -qE '^[[:space:]]*enabled:[[:space:]]*false[[:space:]]*$'; then
+      fail ".coderabbit.yaml must disable finishing_touches.${feat}"
+    fi
+  done
 fi
 
 for script in scripts/validate-pr-public-body.sh scripts/validate-pr-public-body.ps1 \

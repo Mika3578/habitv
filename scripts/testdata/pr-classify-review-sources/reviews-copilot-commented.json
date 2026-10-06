@@ -1,0 +1,8 @@
+[
+  {
+    "author": { "login": "copilot-pull-request-reviewer[bot]" },
+    "state": "COMMENTED",
+    "body": "Findings on the diff.",
+    "commit": { "oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }
+  }
+]

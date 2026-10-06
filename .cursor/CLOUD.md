@@ -24,4 +24,9 @@ Fill [`.github/pull_request_template.md`](../.github/pull_request_template.md).
 Cloud Agents working a same-repository PR follow **Pull request lifecycle**
 in `AGENTS.md` and [pr-review](../.agents/skills/pr-review/SKILL.md).
 Load policy from `origin/develop` when the task is event-driven triage.
-Never merge or mark Ready unless the conversation explicitly authorizes it.
+Never merge, never enable GitHub auto-merge, and never approve the
+`merge-develop` environment unless the conversation explicitly
+authorizes that exact action. Post sequenced Draft reviewer-trigger
+comments without asking the maintainer to type them. Do not request
+Copilot until after Ready (FINAL_REVIEW). CodeRabbit `APPROVED` is not
+merge authorization.

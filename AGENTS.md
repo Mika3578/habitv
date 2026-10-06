@@ -14,10 +14,13 @@ HabiTV is a Maven multi-module replay application (`fwk/`,
 `application/`, `plugins/`). Canonical remote: `Mika3578/habitv`.
 Integration branch: `develop`.
 
-Current **build/runtime baseline is Java 8**; Java 21 is the
-modernization target, Java 25 next. Details:
-[`docs/development.md`](docs/development.md). Migrations run as dedicated,
-module-scoped tasks.
+**Active modernization target is Java 21**; Java 25 is next. The full
+Maven reactor must move together to that target. JavaFX must be handled
+explicitly on modern JDKs (OpenJFX). Java 8 is no longer a design
+constraint; legacy required CI job names still say `*-java8` until CI
+alignment. Details: [`docs/development.md`](docs/development.md),
+[`docs/modernization.md`](docs/modernization.md). Migrations run as
+dedicated, module-scoped tasks.
 
 Architecture, Java migration, JavaFX, JAXB, Maven reactor, and provider
 rewrites run as explicitly scoped tasks — one concern per task. The
@@ -48,9 +51,16 @@ cross-platform packaging.
 
 ## Engineering Baseline
 
-- Language: stay on the **current Java 8** baseline unless the task is
-  an explicit JDK migration. See [`docs/development.md`](docs/development.md).
-- GUI modules need a JavaFX-capable JDK 8 at runtime (`jfxrt`).
+- Language: design and migrate toward **Java 21** (Java 25 next). Do not
+  treat Java 8 as an architectural constraint. Dedicated JDK/JavaFX/JAXB
+  migrations may land as single-concern tasks; the reactor must converge
+  on the active target. See [`docs/development.md`](docs/development.md)
+  and [`docs/modernization.md`](docs/modernization.md).
+- GUI modules must use **explicit JavaFX** on modern JDKs; do not assume
+  JDK-bundled JavaFX 2.x / `jfxrt` as the design target. Legacy CI check
+  names (`validate-java8`, `deterministic-tests-java8`,
+  `compile-and-package-java8`) describe current hosted jobs only — do not
+  rename them in governance-only PRs.
 - Do not add, remove, or upgrade dependencies unless the task requires it.
 - Plugin version overrides must follow [`CONTRIBUTING.md`](CONTRIBUTING.md).
   Internal plugin deps use `${project.parent.version}`.
@@ -194,13 +204,23 @@ Task-level authorization in the conversation covers the batched publishing
 actions of that task: `git commit`, non-force `git push`, and marking a PR
 Ready when the task explicitly authorizes Ready. Separate explicit approval
 per use: `git push --force`, `git push --force-with-lease`, `gh pr create`,
-merge, `gh pr merge`, delete branches, rebase when it would rewrite remote
-history, and destructive git/fs commands.
+merge, `gh pr merge`, enabling GitHub auto-merge, approving the
+`merge-develop` environment deployment, delete branches, rebase when it
+would rewrite remote history, and destructive git/fs commands.
+
+Agents must never enable auto-merge, never merge, and never approve
+`merge-develop`. CodeRabbit `APPROVED` is iterative only and must not be
+treated as merge authorization. The GitHub merge gate is a successful
+`merge-develop` deployment (protected environment, reviewer `Mika3578`)
+required by the `protect-develop` ruleset, plus a manual squash by the
+maintainer. Auto-merge stays off. A new commit invalidates prior
+environment approval. Agents never approve that environment.
 
 When the user authorizes finishing or reviewing a **specific** pull request,
 that authorization covers the bounded orchestration loop for that PR only
 ([`.agents/skills/pr-review/SKILL.md`](.agents/skills/pr-review/SKILL.md)).
-It does not authorize merge or unrelated GitHub mutations.
+It includes **reviewer-trigger comments**. It does not authorize merge,
+auto-merge, `merge-develop` approval, or unrelated GitHub mutations.
 
 Write-capable orchestration through **RESOLVE** for a named PR requires
 **explicit action intent** (for example: address / finish / review / fix
@@ -208,7 +228,9 @@ this PR, or continue implementation already authorized on that head).
 Mere chat that only names a PR or branch stays **read-only** (inventory
 and report). When write-capable work is already authorized, run the
 orchestrator through **RESOLVE** without waiting for a second "finish"
-phrase. Ready and merge still require separate explicit authorization.
+phrase, and post routine reviewer-trigger comments without a second
+human confirmation. Ready and merge still require separate explicit
+authorization.
 
 Do not chain those actions. Do not `git add -A`, `git add .`, or
 `git add --all`. Stage explicit paths only.
@@ -236,6 +258,35 @@ duplicate that procedure here.
 Keep every pull request in **Draft** until gates on the **current PR HEAD**
 are satisfied.
 
+- **Agent-owned reviewer triggering:** when write-capable on a named PR,
+  **only the PR orchestrator** posts reviewer-trigger comments. Do not
+  stop and ask the maintainer to type routine review commands.
+  Independent reviewers must not independently post these commands.
+  Deduplicate against live comments, reviews, and current HEAD; never
+  repeat the same command on the same HEAD unless the previous request
+  explicitly failed and one retry is allowed. Sequence reviewers; do
+  not fire CodeRabbit, Amazon Q, and Sourcery on the same push.
+  Allowed orchestrator comments: `@coderabbitai review`,
+  `@coderabbitai full review`, `/q review`, `@sourcery-ai review`.
+- **Draft cadence:** CodeRabbit is the default Draft reviewer. After an
+  ordinary published fix batch, post `@coderabbitai review`. Before
+  Draft → Ready (required CI green, ordinary Draft findings closed),
+  post `@coderabbitai full review` and require a substantive CodeRabbit
+  result on the current HEAD unless skip/quota fallback applies. After
+  that stabilization, post `/q review` for Amazon Q on that HEAD (not
+  after every small push). After Amazon Q findings are closed, optional
+  `@sourcery-ai review` for HIGH_RISK or an extra opinion when quota
+  allows. Copilot is **one final review after Ready** on that exact
+  HEAD. Do not request Copilot during Draft, and do not call
+  `request_copilot_review` before Ready.
+- Inventory CodeRabbit, Amazon Q, and Sourcery **code** threads the same
+  as Copilot (fix or reject, reply, then resolve). `SKIPPED`,
+  `RATE_LIMITED`, `PENDING`, `SUMMARY_ONLY`, and stale reviews are not
+  clean reviews. Do not spam an unavailable bot. CodeRabbit nits without
+  a required code change do not force a new commit. CodeRabbit
+  `APPROVED` does not authorize merge. The orchestrator must not
+  automatically mark Ready, merge, enable auto-merge, or approve
+  `merge-develop`.
 - **Proactive review loop:** when write-capable work on an open PR is
   authorized (explicit action intent or ongoing implementation on that
   head), load [pr-review](.agents/skills/pr-review/SKILL.md), fetch live
@@ -254,8 +305,9 @@ are satisfied.
   minimize silently. Security, secret, compliance, supply-chain, auth,
   authorization, and data-exposure findings require normal investigation or
   escalation — never dismiss them via adapter policy alone.
-- Every **reviewer or Copilot review comment** (inline thread or
-  review comment that raises a finding) is **mandatory**. Investigate;
+- Every **reviewer, CodeRabbit, or Copilot review comment** (inline
+  thread or review comment that raises a finding) is **mandatory**.
+  Investigate;
   implement a fix or reject with evidence; push when a fix is required;
   then post a **disposition reply on that same thread** that states what
   was done and **why** (fixed + evidence, or rejected + rationale). Do
@@ -290,12 +342,17 @@ are satisfied.
   current; resolve addressed code threads. Third-party body footers are
   ignored for Ready/merge.
 - No actionable unresolved **code** feedback remains at Ready.
+- Merge into `develop` is a maintainer action after a successful
+  `merge-develop` deployment on the current HEAD. Review apps (including
+  CodeRabbit and Cursor Approval Agent) cannot approve that environment.
 
 When runtime behavior may change, keep the PR in Draft until the user
 **explicitly confirms success in the current conversation** after a real
 HabiTV test. Automated checks are not a substitute.
 
-Ready gate, batching, Copilot final review, and live reconciliation:
+Ready gate, Draft reviewer-trigger comments, CodeRabbit full review,
+Amazon Q `/q review`, Copilot final-only after Ready, and live
+reconciliation:
 [`.agents/skills/pr-review/SKILL.md`](.agents/skills/pr-review/SKILL.md).
 
 ## Documentation
@@ -324,9 +381,9 @@ paths but must not hold a second canonical copy.
 - Links and claims match the repository.
 - Applicable Draft → Ready gates satisfied on the latest commit before
   Ready (with explicit authorization).
-- Actionable Copilot **code** threads handled (fix or reject with
-  evidence, disposition reply on the thread, then resolve). Overview-only
-  / footer-only items are not merge blockers.
+- Actionable CodeRabbit (Draft) and Copilot (final) **code** threads
+  handled (fix or reject with evidence, disposition reply on the thread,
+  then resolve). Overview-only / footer-only items are not merge blockers.
 - Developer was asked to test real behavior when runtime/UI is affected.
 - Publishing runs under the task-level authorization above; merge and
   destructive operations wait for separate explicit approval.

@@ -1,0 +1,36 @@
+name: Maintainer merge gate
+
+# Creates a GitHub Deployment to the protected merge-develop environment.
+# Merge authorization is the environment protection plus the ruleset
+# required_deployments rule — not this file and not any script from the PR.
+# Do not checkout the pull request. Do not run branch-controlled validators.
+
+on:
+  pull_request:
+    branches:
+      - develop
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+      - converted_to_draft
+
+permissions:
+  contents: read
+  deployments: write
+
+concurrency:
+  group: merge-develop-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  merge-develop:
+    name: merge-develop
+    if: github.event.pull_request.base.ref == 'develop' && github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: merge-develop
+    steps:
+      - name: Record approved HEAD
+        run: echo "merge-develop environment approved for ${{ github.event.pull_request.head.sha }}"
