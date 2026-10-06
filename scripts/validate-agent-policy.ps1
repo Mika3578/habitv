@@ -256,6 +256,69 @@ if (-not (Test-Path $prReviewSkill)) {
 
 if (-not (Test-Path ".coderabbit.yaml")) {
     Fail "missing .coderabbit.yaml"
+} else {
+    function Get-YamlChildBlock([string] $Text, [string] $Key) {
+        $lines = $Text -split "`n"
+        $capture = $false
+        $out = New-Object System.Collections.Generic.List[string]
+        foreach ($line in $lines) {
+            $trimEnd = $line.TrimEnd("`r")
+            if ($trimEnd -match "^  $([regex]::Escape($Key)):") {
+                $capture = $true
+                continue
+            }
+            if ($capture -and $trimEnd -match '^  \S') {
+                break
+            }
+            if ($capture) {
+                [void]$out.Add($trimEnd)
+            }
+        }
+        return ($out -join "`n")
+    }
+    function Get-YamlNestedBlock([string] $Text, [string] $Key) {
+        $lines = $Text -split "`n"
+        $capture = $false
+        $out = New-Object System.Collections.Generic.List[string]
+        foreach ($line in $lines) {
+            $trimEnd = $line.TrimEnd("`r")
+            if ($trimEnd -match "^    $([regex]::Escape($Key)):") {
+                $capture = $true
+                continue
+            }
+            if ($capture -and $trimEnd -match '^    \S') {
+                break
+            }
+            if ($capture) {
+                [void]$out.Add($trimEnd)
+            }
+        }
+        return ($out -join "`n")
+    }
+    $crText = (Get-Content -Raw ".coderabbit.yaml") -replace "`r", ""
+    if ($crText -notmatch '(?m)^[ \t]*profile:[ \t]*assertive[ \t]*$') {
+        Fail ".coderabbit.yaml must set profile: assertive"
+    }
+    if ($crText -notmatch '(?m)^[ \t]*request_changes_workflow:[ \t]*false[ \t]*$') {
+        Fail ".coderabbit.yaml must set request_changes_workflow: false"
+    }
+    $autoReview = Get-YamlChildBlock $crText "auto_review"
+    if ($autoReview -notmatch '(?m)^[ \t]*enabled:[ \t]*true[ \t]*$') {
+        Fail ".coderabbit.yaml must set auto_review.enabled: true"
+    }
+    if ($autoReview -notmatch '(?m)^[ \t]*drafts:[ \t]*true[ \t]*$') {
+        Fail ".coderabbit.yaml must set auto_review.drafts: true"
+    }
+    if ($autoReview -notmatch '(?m)^[ \t]*auto_incremental_review:[ \t]*true[ \t]*$') {
+        Fail ".coderabbit.yaml must set auto_review.auto_incremental_review: true"
+    }
+    $finishing = Get-YamlChildBlock $crText "finishing_touches"
+    foreach ($feat in @("autofix", "fix_ci", "resolve_merge_conflict")) {
+        $featBlock = Get-YamlNestedBlock $finishing $feat
+        if ($featBlock -notmatch '(?m)^[ \t]*enabled:[ \t]*false[ \t]*$') {
+            Fail ".coderabbit.yaml must disable finishing_touches.$feat"
+        }
+    }
 }
 
 @(

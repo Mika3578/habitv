@@ -245,6 +245,48 @@ fi
 
 if [[ ! -f .coderabbit.yaml ]]; then
   fail "missing .coderabbit.yaml"
+else
+  yaml_child_block() {
+    local file="$1"
+    local key="$2"
+    awk -v key="$key" '
+      $0 ~ "^  " key ":" { p = 1; next }
+      p && /^  [^[:space:]]/ { exit }
+      p { print }
+    ' "$file"
+  }
+  yaml_nested_block() {
+    local key="$1"
+    awk -v key="$key" '
+      $0 ~ "^    " key ":" { p = 1; next }
+      p && /^    [^[:space:]]/ { exit }
+      p { print }
+    '
+  }
+  cr=".coderabbit.yaml"
+  if ! grep -qE '^[[:space:]]*profile:[[:space:]]*assertive[[:space:]]*$' "$cr"; then
+    fail ".coderabbit.yaml must set profile: assertive"
+  fi
+  if ! grep -qE '^[[:space:]]*request_changes_workflow:[[:space:]]*false[[:space:]]*$' "$cr"; then
+    fail ".coderabbit.yaml must set request_changes_workflow: false"
+  fi
+  auto_review="$(yaml_child_block "$cr" auto_review)"
+  if ! printf '%s\n' "$auto_review" | grep -qE '^[[:space:]]*enabled:[[:space:]]*true[[:space:]]*$'; then
+    fail ".coderabbit.yaml must set auto_review.enabled: true"
+  fi
+  if ! printf '%s\n' "$auto_review" | grep -qE '^[[:space:]]*drafts:[[:space:]]*true[[:space:]]*$'; then
+    fail ".coderabbit.yaml must set auto_review.drafts: true"
+  fi
+  if ! printf '%s\n' "$auto_review" | grep -qE '^[[:space:]]*auto_incremental_review:[[:space:]]*true[[:space:]]*$'; then
+    fail ".coderabbit.yaml must set auto_review.auto_incremental_review: true"
+  fi
+  finishing="$(yaml_child_block "$cr" finishing_touches)"
+  for feat in autofix fix_ci resolve_merge_conflict; do
+    feat_block="$(printf '%s\n' "$finishing" | yaml_nested_block "$feat")"
+    if ! printf '%s\n' "$feat_block" | grep -qE '^[[:space:]]*enabled:[[:space:]]*false[[:space:]]*$'; then
+      fail ".coderabbit.yaml must disable finishing_touches.${feat}"
+    fi
+  done
 fi
 
 for script in scripts/validate-pr-public-body.sh scripts/validate-pr-public-body.ps1 \
