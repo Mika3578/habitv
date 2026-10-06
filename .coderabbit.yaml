@@ -1,4 +1,7 @@
-# HabiTV — iterative review only. Copilot stays the final merge-adjacent AI review.
+# HabiTV — Draft iterative reviewer. The PR orchestrator posts
+# @coderabbitai review after fix batches and @coderabbitai full review
+# before Ready. Copilot is requested only after Ready. Do not enable
+# finishing-touch auto-PRs.
 language: en-US
 early_access: false
 enable_free_tier: true

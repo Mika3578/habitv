@@ -26,5 +26,7 @@ in `AGENTS.md` and [pr-review](../.agents/skills/pr-review/SKILL.md).
 Load policy from `origin/develop` when the task is event-driven triage.
 Never merge, never enable GitHub auto-merge, and never approve the
 `merge-develop` environment unless the conversation explicitly
-authorizes that exact action. Do not request Copilot until FINAL_REVIEW.
-CodeRabbit `APPROVED` is not merge authorization.
+authorizes that exact action. Post sequenced Draft reviewer-trigger
+comments without asking the maintainer to type them. Do not request
+Copilot until after Ready (FINAL_REVIEW). CodeRabbit `APPROVED` is not
+merge authorization.

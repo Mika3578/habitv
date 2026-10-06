@@ -197,7 +197,11 @@ $agents = Get-Content -Raw "AGENTS.md"
     "explicitly confirms success in the current conversation",
     "Do not resolve unanswered",
     "Live GitHub PR state is authoritative",
-    "only the PR orchestrator"
+    "only the PR orchestrator",
+    "reviewer-trigger comments",
+    "@coderabbitai full review",
+    "/q review",
+    "Do not request Copilot during Draft"
 ) | ForEach-Object {
     if ($agents.IndexOf($_, [StringComparison]::Ordinal) -lt 0) {
         Fail "AGENTS.md missing required phrase: $_"
@@ -233,6 +237,25 @@ if (-not (Test-Path $prReviewSkill)) {
     if ($prReviewText -cnotmatch "execution_state") {
         Fail "pr-review skill must document review execution state"
     }
+    if ($prReviewText.IndexOf("Agent-owned reviewer triggering", [StringComparison]::Ordinal) -lt 0) {
+        Fail "pr-review skill must document agent-owned reviewer triggering"
+    }
+    if ($prReviewText.IndexOf("@coderabbitai full review", [StringComparison]::Ordinal) -lt 0) {
+        Fail "pr-review skill must require @coderabbitai full review before Ready"
+    }
+    if ($prReviewText.IndexOf("/q review", [StringComparison]::Ordinal) -lt 0) {
+        Fail "pr-review skill must document Amazon Q /q review on a stabilized HEAD"
+    }
+    if ($prReviewText.IndexOf("Do not request Copilot before Ready", [StringComparison]::Ordinal) -lt 0) {
+        Fail "pr-review skill must keep Copilot final-only after Ready"
+    }
+    if ($prReviewText.IndexOf("must not independently post", [StringComparison]::Ordinal) -lt 0) {
+        Fail "pr-review skill must keep single-writer reviewer-request rule"
+    }
+}
+
+if (-not (Test-Path ".coderabbit.yaml")) {
+    Fail "missing .coderabbit.yaml"
 }
 
 @(

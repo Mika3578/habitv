@@ -1,17 +1,64 @@
 #!/usr/bin/env bash
 # Classify review execution state (bash).
 # Args: head_sha reviews_json_or_file comments_json_or_file
+#        --self-test
 # Prints JSON object. Used by pr-gh-snapshot.sh.
 # CodeRabbit APPROVED is iterative only; it never sets final_review_gate_eligible.
 
 set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+HEAD_FIXTURE="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+
+run_self_test() {
+  local td="$ROOT/scripts/testdata/pr-classify-review-sources"
+  local out
+  if ! command -v jq >/dev/null 2>&1; then
+    echo "pr-classify-review-sources: jq required for --self-test" >&2
+    exit 1
+  fi
+  expect() {
+    local name="$1"
+    local reviews="$2"
+    local comments="$3"
+    local jqprog="$4"
+    out="$(bash "$ROOT/scripts/pr-classify-review-sources.sh" "$HEAD_FIXTURE" "$reviews" "$comments")"
+    if ! jq -e "$jqprog" >/dev/null <<<"$out"; then
+      echo "pr-classify-review-sources: self-test failed: $name" >&2
+      echo "$out" >&2
+      exit 1
+    fi
+  }
+  expect skip "$td/reviews-empty.json" "$td/comments-skip.json" \
+    'any(.review_sources[]; .source=="coderabbit" and .execution_state=="SKIPPED")'
+  expect rate "$td/reviews-empty.json" "$td/comments-rate-limited.json" \
+    'any(.review_sources[]; .source=="coderabbit" and .execution_state=="RATE_LIMITED")'
+  expect cr_approved "$td/reviews-coderabbit-approved.json" "$td/comments-empty.json" \
+    '.iterative_review_on_head==true and .final_review_gate_eligible==false'
+  expect copilot "$td/reviews-copilot-commented.json" "$td/comments-empty.json" \
+    '.final_review_gate_eligible==true'
+  expect aq_stale "$td/reviews-amazon-q-stale.json" "$td/comments-empty.json" \
+    'any(.review_sources[]; .source=="amazon-q" and .execution_state=="STALE")'
+  expect triggers "$td/reviews-empty.json" "$td/comments-triggers.json" \
+    '((.reviewer_requests | map(.request_command) | index("@coderabbitai full review")) != null)
+     and ((.reviewer_requests | map(.request_command) | index("/q review")) != null)
+     and ((.reviewer_requests | map(.request_command) | index("@sourcery-ai review")) == null)
+     and any(.review_sources[]; .source=="coderabbit" and .execution_state=="PENDING")
+     and any(.review_sources[]; .source=="amazon-q" and .execution_state=="PENDING")'
+  echo "pr-classify-review-sources: self-test OK"
+}
+
+if [[ "${1:-}" == "--self-test" ]]; then
+  run_self_test
+  exit 0
+fi
 
 head_sha="${1:-}"
 reviews_arg="${2:-[]}"
 comments_arg="${3:-[]}"
 
 if [[ -z "$head_sha" ]] || ! command -v jq >/dev/null 2>&1; then
-  echo '{"review_sources":[],"substantive_review_on_head":false,"final_review_gate_eligible":false,"iterative_review_on_head":false}'
+  echo '{"review_sources":[],"reviewer_requests":[],"substantive_review_on_head":false,"final_review_gate_eligible":false,"iterative_review_on_head":false}'
   exit 0
 fi
 
@@ -34,6 +81,8 @@ jq -n \
   def matchp($text; $pat): ($text // "") | index($pat) != null;
   def body_has($text; $pats):
     reduce $pats[] as $p (false; . or matchp($text; $p));
+  def trim:
+    ( . // "" ) | gsub("\r"; "") | gsub("^[[:space:]]+|[[:space:]]+$"; "");
   def is_copilot_login($login):
     ($login // "") | ascii_downcase | . == "copilot-pull-request-reviewer[bot]"
       or . == "github-copilot[bot]";
@@ -58,6 +107,7 @@ jq -n \
     "Draft PRs are not automatically reviewed",
     "Draft PR not reviewed"
   ];
+  def cr_rate_pats: ["Review rate limited"];
 
   ($reviews | map(select(is_copilot_login(.author.login)))) as $copilot |
   ($reviews | map(select(is_amazon_q_login(.author.login)))) as $aq |
@@ -71,6 +121,18 @@ jq -n \
       and (.commit.oid == $head)
       and (((.author.login // "") | test("\\[bot\\]$")) | not)
     ))) as $human_approved |
+  ($comments | map(
+      ((.body | trim) as $t |
+      if $t == "@coderabbitai full review" then
+        {reviewer:"coderabbit",request_command:"@coderabbitai full review"}
+      elif $t == "@coderabbitai review" then
+        {reviewer:"coderabbit",request_command:"@coderabbitai review"}
+      elif $t == "/q review" then
+        {reviewer:"amazon-q",request_command:"/q review"}
+      elif $t == "@sourcery-ai review" then
+        {reviewer:"sourcery",request_command:"@sourcery-ai review"}
+      else empty end)
+    ) | unique_by(.reviewer, .request_command)) as $reqs |
 
   ([]) as $src |
   ($src
@@ -92,6 +154,8 @@ jq -n \
               else "SUBSTANTIVE" end),
             commit:$r.commit.oid,
             github_state:$r.state}])
+      elif ($reqs | any(.reviewer == "amazon-q")) then
+        [{source:"amazon-q",execution_state:"PENDING"}]
       else [] end
     + ($cursor | map({
         source:"cursor",
@@ -104,18 +168,22 @@ jq -n \
          ($cr_c[-1].body // "") as $cr_last_comment |
          if ($cr_head | length) > 0 then
            (($cr_head[-1]) as $r |
-            if body_has(($r.body // ""); cr_skip_pats) then
+            if body_has(($r.body // ""); cr_rate_pats) then
+              [{source:"coderabbit",execution_state:"RATE_LIMITED",commit:$r.commit.oid}]
+            elif body_has(($r.body // ""); cr_skip_pats) then
               [{source:"coderabbit",execution_state:"SKIPPED",commit:$r.commit.oid}]
             elif $r.state == "APPROVED" then
               [{source:"coderabbit",execution_state:"NO_FINDINGS",commit:$r.commit.oid,github_state:$r.state}]
             else
               [{source:"coderabbit",execution_state:"SUBSTANTIVE",commit:$r.commit.oid,github_state:$r.state}]
             end)
+         elif ($cr_c | length) > 0 and body_has($cr_last_comment; cr_rate_pats) then
+           [{source:"coderabbit",execution_state:"RATE_LIMITED"}]
          elif ($cr_c | length) > 0 and body_has($cr_last_comment; cr_skip_pats) then
            [{source:"coderabbit",execution_state:"SKIPPED"}]
          elif ($cr_r | length) > 0 then
            [{source:"coderabbit",execution_state:"STALE",commit:$cr_r[-1].commit.oid}]
-         elif ($cr_c | length) > 0 then
+         elif ($cr_c | length) > 0 or ($reqs | any(.reviewer == "coderabbit")) then
            [{source:"coderabbit",execution_state:"PENDING"}]
          else [] end)
       )
@@ -124,12 +192,15 @@ jq -n \
           [{source:"sourcery",execution_state:(if body_has($so_body; ["diff characters","quota","6 days","6 hours"]) then "RATE_LIMITED"
             elif body_has($so_body; ["Reviewer'\''s Guide","review_guide"]) then "SUMMARY_ONLY"
             else "PENDING" end)}])
+      elif ($reqs | any(.reviewer == "sourcery")) then
+        [{source:"sourcery",execution_state:"PENDING"}]
       else [] end
     + if ($sonar_c | length) > 0 then [{source:"sonarcloud",execution_state:"STATIC_ANALYSIS"}] else [] end
   ) as $sources |
 
   {
     review_sources: $sources,
+    reviewer_requests: $reqs,
     substantive_review_on_head: (
       ($sources | any((.execution_state == "SUBSTANTIVE" or .execution_state == "NO_FINDINGS") and .commit == $head))
       or (($human_approved | length) > 0)

@@ -218,7 +218,8 @@ off. A new commit invalidates prior environment approval.
 When the user authorizes finishing or reviewing a **specific** pull request,
 that authorization covers the bounded orchestration loop for that PR only
 ([`.agents/skills/pr-review/SKILL.md`](.agents/skills/pr-review/SKILL.md)).
-It does not authorize merge or unrelated GitHub mutations.
+It includes **reviewer-trigger comments**. It does not authorize merge,
+auto-merge, `merge-develop` approval, or unrelated GitHub mutations.
 
 Write-capable orchestration through **RESOLVE** for a named PR requires
 **explicit action intent** (for example: address / finish / review / fix
@@ -226,7 +227,9 @@ this PR, or continue implementation already authorized on that head).
 Mere chat that only names a PR or branch stays **read-only** (inventory
 and report). When write-capable work is already authorized, run the
 orchestrator through **RESOLVE** without waiting for a second "finish"
-phrase. Ready and merge still require separate explicit authorization.
+phrase, and post routine reviewer-trigger comments without a second
+human confirmation. Ready and merge still require separate explicit
+authorization.
 
 Do not chain those actions. Do not `git add -A`, `git add .`, or
 `git add --all`. Stage explicit paths only.
@@ -254,19 +257,35 @@ duplicate that procedure here.
 Keep every pull request in **Draft** until gates on the **current PR HEAD**
 are satisfied.
 
-- **Two-phase review:** CodeRabbit is the default **iterative** reviewer
-  in Draft. After each published fix batch, request CodeRabbit once
-  (`@coderabbitai review` until the repository has 10 stars). Copilot is
-  **one FINAL_REVIEW** after Ready-prep on the current HEAD. Do not
-  request Copilot after intermediate pushes, and do not call
-  `request_copilot_review` during Draft fix loops. Amazon Q is optional
-  for HIGH_RISK only; do not request it every round.
-- Inventory CodeRabbit **code** threads the same as Copilot (fix or
-  reject, reply, then resolve). Treat CodeRabbit skip or status comments
-  (star threshold, drafts, bot author, “Review skipped”) as `SKIPPED`,
-  never as a clean review. CodeRabbit nits without a required code
-  change do not force a new commit. CodeRabbit `APPROVED` does not
-  authorize merge.
+- **Agent-owned reviewer triggering:** when write-capable on a named PR,
+  **only the PR orchestrator** posts reviewer-trigger comments. Do not
+  stop and ask the maintainer to type routine review commands.
+  Independent reviewers must not independently post these commands.
+  Deduplicate against live comments, reviews, and current HEAD; never
+  repeat the same command on the same HEAD unless the previous request
+  explicitly failed and one retry is allowed. Sequence reviewers; do
+  not fire CodeRabbit, Amazon Q, and Sourcery on the same push.
+  Allowed orchestrator comments: `@coderabbitai review`,
+  `@coderabbitai full review`, `/q review`, `@sourcery-ai review`.
+- **Draft cadence:** CodeRabbit is the default Draft reviewer. After an
+  ordinary published fix batch, post `@coderabbitai review`. Before
+  Draft → Ready (required CI green, ordinary Draft findings closed),
+  post `@coderabbitai full review` and require a substantive CodeRabbit
+  result on the current HEAD unless skip/quota fallback applies. After
+  that stabilization, post `/q review` for Amazon Q on that HEAD (not
+  after every small push). After Amazon Q findings are closed, optional
+  `@sourcery-ai review` for HIGH_RISK or an extra opinion when quota
+  allows. Copilot is **one final review after Ready** on that exact
+  HEAD. Do not request Copilot during Draft, and do not call
+  `request_copilot_review` before Ready.
+- Inventory CodeRabbit, Amazon Q, and Sourcery **code** threads the same
+  as Copilot (fix or reject, reply, then resolve). `SKIPPED`,
+  `RATE_LIMITED`, `PENDING`, `SUMMARY_ONLY`, and stale reviews are not
+  clean reviews. Do not spam an unavailable bot. CodeRabbit nits without
+  a required code change do not force a new commit. CodeRabbit
+  `APPROVED` does not authorize merge. The orchestrator must not
+  automatically mark Ready, merge, enable auto-merge, or approve
+  `merge-develop`.
 - **Proactive review loop:** when write-capable work on an open PR is
   authorized (explicit action intent or ongoing implementation on that
   head), load [pr-review](.agents/skills/pr-review/SKILL.md), fetch live
@@ -330,8 +349,9 @@ When runtime behavior may change, keep the PR in Draft until the user
 **explicitly confirms success in the current conversation** after a real
 HabiTV test. Automated checks are not a substitute.
 
-Ready gate, batching, CodeRabbit iterative review, Copilot final review,
-and live reconciliation:
+Ready gate, Draft reviewer-trigger comments, CodeRabbit full review,
+Amazon Q `/q review`, Copilot final-only after Ready, and live
+reconciliation:
 [`.agents/skills/pr-review/SKILL.md`](.agents/skills/pr-review/SKILL.md).
 
 ## Documentation

@@ -82,9 +82,16 @@ After agent-policy CI is stable on `develop`, consider also adding:
 | Copilot `review_draft_pull_requests` | `false` |
 
 Do not enable Copilot automatic review on every push or on Draft PRs.
+The PR orchestrator requests Copilot **once after Ready** on that HEAD.
 Do **not** add CodeRabbit as a required status check.
 
-Amazon Q remains optional for HIGH_RISK only; it is not a merge gate.
+Draft review commands (`@coderabbitai review`, `@coderabbitai full review`,
+`/q review`, optional `@sourcery-ai review`) are posted by the PR
+orchestrator. They are not maintainer chores and not merge gates.
+
+Amazon Q is a Draft secondary reviewer on a **stabilized** HEAD after
+CodeRabbit full review. Sourcery is opportunistic. Neither is a merge
+gate.
 
 ## Merge method
 

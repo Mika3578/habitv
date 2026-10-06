@@ -193,6 +193,10 @@ require_phrase "explicitly confirms success in the current conversation"
 require_phrase "Do not resolve unanswered"
 require_phrase "Live GitHub PR state is authoritative"
 require_phrase "only the PR orchestrator"
+require_phrase "reviewer-trigger comments"
+require_phrase "@coderabbitai full review"
+require_phrase "/q review"
+require_phrase "Do not request Copilot during Draft"
 
 pr_review_skill=".agents/skills/pr-review/SKILL.md"
 if [[ ! -f "$pr_review_skill" ]]; then
@@ -222,6 +226,25 @@ else
   if ! grep -qF "execution_state" "$pr_review_skill"; then
     fail "pr-review skill must document review execution state"
   fi
+  if ! grep -qF "Agent-owned reviewer triggering" "$pr_review_skill"; then
+    fail "pr-review skill must document agent-owned reviewer triggering"
+  fi
+  if ! grep -qF "@coderabbitai full review" "$pr_review_skill"; then
+    fail "pr-review skill must require @coderabbitai full review before Ready"
+  fi
+  if ! grep -qF "/q review" "$pr_review_skill"; then
+    fail "pr-review skill must document Amazon Q /q review on a stabilized HEAD"
+  fi
+  if ! grep -qF "Do not request Copilot before Ready" "$pr_review_skill"; then
+    fail "pr-review skill must keep Copilot final-only after Ready"
+  fi
+  if ! grep -qF "must not independently post" "$pr_review_skill"; then
+    fail "pr-review skill must keep single-writer reviewer-request rule"
+  fi
+fi
+
+if [[ ! -f .coderabbit.yaml ]]; then
+  fail "missing .coderabbit.yaml"
 fi
 
 for script in scripts/validate-pr-public-body.sh scripts/validate-pr-public-body.ps1 \

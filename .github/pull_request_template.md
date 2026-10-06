@@ -52,8 +52,10 @@
 - [ ] Actionable CodeRabbit **code** findings addressed in Draft; overview-only / footer-only items are not merge blockers
 - [ ] Actionable review findings addressed; qualifying code threads replied and resolved on GitHub
 - [ ] Validation and required checks recorded for the current PR HEAD
-- [ ] Draft: CodeRabbit findings on HEAD handled (or skip treated as not a review)
-- [ ] Ready: one Copilot (or human) signal on HEAD; Copilot is not requested after intermediate pushes
+- [ ] Draft: orchestrator posted `@coderabbitai review` / `@coderabbitai full review` as needed; maintainer did not type routine review commands
+- [ ] Draft: CodeRabbit findings on HEAD handled (or skip/quota treated as not a clean review)
+- [ ] Draft: Amazon Q `/q review` on the stabilized HEAD when available; Sourcery only if policy allows
+- [ ] Ready: explicit authorization, then one Copilot review on that HEAD; do not request Copilot in Draft
 - [ ] Merge: maintainer `maintainer-merge-gate` on current HEAD, then manual squash; CodeRabbit `APPROVED` is not merge authorization
 - [ ] If a `plugins/*/pom.xml` `<version>` is bumped, the trigger class is named (parser, endpoint, or configuration), and internal deps use `${project.parent.version}`
 - [ ] No secrets, tokens, local paths, or build outputs committed

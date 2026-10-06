@@ -117,7 +117,8 @@ Shared workspace files live under `.vscode/` (`settings.json`,
 
 Pull request orchestration: invariants in `AGENTS.md`; procedure in
 [`.agents/skills/pr-review/SKILL.md`](../.agents/skills/pr-review/SKILL.md).
-Live snapshots: `scripts/pr-gh-snapshot.sh` / `.ps1`.
+Live snapshots: `scripts/pr-gh-snapshot.sh` / `.ps1`. The orchestrator
+posts Draft reviewer-trigger comments; Copilot is final-only after Ready.
 
 **Other agents:** Claude Code, Gemini CLI, Jules, Junie, Cline, Roo, Windsurf,
 Devin, and similar tools should read root `AGENTS.md` when supported. Portable
