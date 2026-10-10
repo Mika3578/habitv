@@ -54,22 +54,35 @@ public class LEquipePluginManager extends BasePluginWithProxy implements
 	@Override
 	public Set<CategoryDTO> findCategory() {
 		final Set<CategoryDTO> categoryDTOs = new LinkedHashSet<>();
-		final Document doc = Jsoup
-				.parse(getUrlContent(LEquipeConf.VIDEO_HOME_URL));
+		try {
+			final Document doc = Jsoup
+					.parse(getUrlContent(LEquipeConf.VIDEO_HOME_URL));
 
-		for (final Element aHref : doc.select("div#nav-inside-global ul li a")) {
-			final String href = aHref.attr("href");
-			if (href.length() > 1) {
-				final String content = aHref.text();
-				final CategoryDTO categoryDTO = new CategoryDTO(
-						LEquipeConf.NAME, content, href, LEquipeConf.EXTENSION);
-				categoryDTO.setDownloadable(true);
-				// categoryDTO.addSubCategories(findSubCategories(href));
-				categoryDTOs.add(categoryDTO);
+			for (final Element aHref : doc.select("div#nav-inside-global ul li a")) {
+				final String href = aHref.attr("href");
+				if (href.length() > 1) {
+					final String content = aHref.text();
+					final CategoryDTO categoryDTO = new CategoryDTO(
+							LEquipeConf.NAME, content, href, LEquipeConf.EXTENSION);
+					categoryDTO.setDownloadable(true);
+					// categoryDTO.addSubCategories(findSubCategories(href));
+					categoryDTOs.add(categoryDTO);
+				}
+
 			}
-
+			if (categoryDTOs.isEmpty()) {
+				getLog().warn("provider=lequipe operation=catalogue sourceUrl=" + LEquipeConf.VIDEO_HOME_URL
+						+ " rootCause=listing-selectors-obsolete cookiesEnabled=false"
+						+ " note=public-video-html-no-longer-matches-legacy-scraper");
+			}
+			return categoryDTOs;
+		} catch (RuntimeException e) {
+			if (LEquipeEndpointAvailability.isUnavailable(e)) {
+				getLog().warn(LEquipeEndpointAvailability.buildCategoryUnavailableMessage(getName(), e));
+				return categoryDTOs;
+			}
+			throw e;
 		}
-		return categoryDTOs;
 	}
 
 	@Override
