@@ -107,16 +107,19 @@ Shared workspace files live under `.vscode/` (`settings.json`,
 
 | Layer | Role |
 |-------|------|
-| [`AGENTS.md`](../AGENTS.md) | Canonical persistent policy (single full constitution) |
-| `docs/` | Technical reference (Java, providers, architecture); URLs and tool flags belong here, not in long source comments |
-| Code comments | Concise *why*; see `AGENTS.md` **Engineering Baseline** |
-| [`.agents/skills/`](../.agents/skills/) | Portable on-demand procedures |
-| Tool adapters (`.cursor/`, `.continue/rules/`, `.github/copilot-instructions.md`) | Thin compatibility; point to `AGENTS.md` |
+| Cursor **User Rules** (global) | Context-economy habits shared across repos — not duplicated here |
+| [`AGENTS.md`](../AGENTS.md) | Short project constitution (Java 8, providers, routing) |
+| `.cursor/rules/*.mdc` | File-scoped conventions (Java, JavaFX, tests); thin always-on pointers |
+| [`.agents/skills/`](../.agents/skills/) | On-demand procedures (PR, bug, modernization, git text, …) |
+| `.cursor/skills/*/SKILL.md` | Thin stubs that point at `.agents/skills/` (required by policy checks) |
+| `docs/` | Technical reference; URLs/tool flags belong here, not long source comments |
+| Tool adapters (`.continue/`, `.github/copilot-instructions.md`, `.cursor/CLOUD.md`) | Thin; point to `AGENTS.md` |
 | `scripts/validate-agent-policy.*` + CI `agent-policy` | Deterministic policy layout checks |
 | `docs/github-rulesets/` | Branch protection payloads (hard enforcement) |
 
-Pull request orchestration: invariants in `AGENTS.md`; procedure in
-[`.agents/skills/pr-review/SKILL.md`](../.agents/skills/pr-review/SKILL.md).
+Pull request orchestration lives in
+[`.agents/skills/pr-review/SKILL.md`](../.agents/skills/pr-review/SKILL.md)
+(not in the always-loaded `AGENTS.md` body).
 Live snapshots: `scripts/pr-gh-snapshot.sh` / `.ps1`.
 
 **Other agents:** Claude Code, Gemini CLI, Jules, Junie, Cline, Roo, Windsurf,

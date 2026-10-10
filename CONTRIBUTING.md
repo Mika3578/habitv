@@ -17,7 +17,7 @@ Format: `<type>/<short-scope>` (English kebab-case). No AI/tool prefixes
 
 Public git text stays short and generic. Module or topic as scope is
 fine (lowercase kebab-case). Detail stays in the diff. Canonical
-wording: [`AGENTS.md`](AGENTS.md) **Public git text**.
+wording: [public-git-text skill](.agents/skills/public-git-text/SKILL.md).
 
 PR titles use Conventional Commits.
 
@@ -66,8 +66,7 @@ Jakarta move, provider rewrites, runtime updater URL changes.
 
 Never commit secrets, tokens, credentials, or generated binaries.
 
-Code comments: English, concise; explain non-obvious *why* (see
-[`AGENTS.md`](AGENTS.md) **Engineering Baseline**).
+Code comments: English, concise; explain non-obvious *why*.
 
 ## License
 
