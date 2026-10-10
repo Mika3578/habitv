@@ -103,6 +103,24 @@ Shared workspace files live under `.vscode/` (`settings.json`,
 - After POM changes, use **Java: Reload Projects** if the Problems view
   looks stale.
 
+### Cursor shell hook (branch policy)
+
+Project hook `.cursor/hooks/before-shell-branch-policy.sh` guards
+`git commit`, `git push`, and `gh pr create` against non-canonical branch
+names (see [git-workflow](../.agents/skills/git-workflow/SKILL.md)).
+
+- Run publish commands **directly** from the repository worktree; do not
+  chain `cd ... && git push` or `cd ... && git commit` unless the `cd`
+  target is the same directory Cursor already uses for that worktree.
+- If the hook denies a publish, fix the branch or command; do not bypass
+  with GitHub API writes.
+- `HABITV_SKIP_BRANCH_HOOK=1` is for local debug or emergency only.
+- Offline checks: `scripts/test-branch-policy-hook.sh` (also run via
+  `scripts/validate-agent-policy.*`).
+- On Windows, `hooks.json` must invoke the script via non-interactive
+  `bash --noprofile --norc` (not a bare `.sh` path) to avoid Git Bash popup
+  windows.
+
 ## Agent instructions
 
 | Layer | Role |
