@@ -64,7 +64,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>33.4.8-jre</version>
+			<version>33.7.2-jre</version>
 		</dependency>
 		
 		<dependency>
@@ -109,12 +109,12 @@
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
-			<version>1.22.1</version>
+			<version>1.23.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.20.0</version>
+			<version>3.21.0</version>
 		</dependency>		
 		<dependency>
 			<groupId>ch.qos.reload4j</groupId>
