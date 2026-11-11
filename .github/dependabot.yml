@@ -20,7 +20,7 @@ updates:
           - "patch"
     # Major bumps are allowed (opened as individual PRs for review) except
     # for artifacts whose major release crosses into the jakarta.* namespace.
-    # Those would violate the Java 8 / no-jakarta-migration hard rule
+    # Those would violate the no-jakarta-migration hard rule
     # (AGENTS.md section 2) and must not be proposed automatically.
     ignore:
       - dependency-name: "javax.xml.bind:jaxb-api"

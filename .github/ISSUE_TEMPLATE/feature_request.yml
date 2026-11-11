@@ -41,5 +41,5 @@ body:
     attributes:
       label: Scope awareness
       options:
-        - label: This stays within Java 8 and current Maven reactor constraints
+        - label: This stays within Java 21 and current Maven reactor constraints
         - label: This may require a dedicated tracker item and small PR series

@@ -89,10 +89,9 @@ Shared workspace files live under `.vscode/` (`settings.json`,
 `.editorconfig`.
 
 - Install the workspace recommended extensions when prompted.
-- Keep the project compile runtime on **JDK 8** (set
+- Keep the project compile runtime on **JDK 21** (set
   `java.configuration.runtimes` in your **user** settings to your local
-  JavaFX-capable JDK 8). Do **not** set `java.jdt.ls.java.home` to JDK 8:
-  the Java extension embeds a newer JRE for the language server.
+  JDK 21).
 - After POM changes, use **Java: Reload Projects** if the Problems view
   looks stale.
 

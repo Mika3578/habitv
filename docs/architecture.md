@@ -17,7 +17,7 @@ Interfaces:
 
 - **Console** (`application/consoleView`) — supported modernization baseline
 - **Tray / JavaFX GUI** (`application/trayView`, `application/habiTv`) —
-  still Java 8 + JavaFX 2.x; packaging is tracked separately
+  Java 21 + OpenJFX; packaging is tracked separately
 
 ## Maven reactor
 
@@ -46,7 +46,7 @@ Default reactor: **35 modules** (`mvn -B -ntp -DskipTests validate` on
 - `application/habiTv-linux`
 - `application/habiTv-windows`
 
-Those two still assume a JavaFX-capable JDK 8 and `${jdk.home}`. Do not
+Those two build on Java 21 with OpenJFX Maven dependencies. Do not
 remove them in a documentation cleanup. Java compiler/CI baseline:
 [`development.md`](development.md).
 
@@ -96,7 +96,7 @@ repository is historical only ([`history.md`](history.md)).
 | Artifact | How to get it | Notes |
 |----------|---------------|--------|
 | Console fat JAR | `mvn -B -ntp -DskipTests -pl "!application/trayView,!application/habiTv" package` | `application/consoleView/target/consoleView-4.1.0-SNAPSHOT-all.jar` |
-| GUI uber JAR | Full package on a **JavaFX-capable JDK 8** | Needs `jfxrt.jar` |
+| GUI uber JAR | Full package on **JDK 21** | OpenJFX comes from Maven dependencies |
 | Windows / Linux installers | Out-of-reactor modules | Not part of the current console baseline |
 
 Exact commands: [`development.md`](development.md).
