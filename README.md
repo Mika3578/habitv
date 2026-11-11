@@ -28,8 +28,8 @@ mvn -B -ntp -DskipTests validate
 
 `fwk/` (API + framework), `application/` (core, console, JavaFX GUI),
 `plugins/` (providers, downloaders, exporters).
-`application/habiTv-linux` and `application/habiTv-windows` are out of the default
-reactor. See [`docs/architecture.md`](docs/architecture.md).
+`application/habiTv-linux` and `application/habiTv-windows` are packaging
+modules in the default reactor. See [`docs/architecture.md`](docs/architecture.md).
 
 ## Providers
 

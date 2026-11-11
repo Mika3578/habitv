@@ -47,7 +47,8 @@ Console fat JAR:
 (copy or rename to `habitv.jar` if you want the commands below).
 
 Native installers (opt-in profiles):
-`mvn -B -ntp -P linux-jpackage package` or `-P windows-jpackage package`.
+`mvn -B -ntp -P linux-jpackage package` or
+`mvn -B -ntp -P windows-jpackage package`.
 
 ## Run (console)
 
