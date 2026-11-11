@@ -25,6 +25,38 @@
 				<plugins>
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<version>3.6.1</version>
+						<executions>
+							<execution>
+								<id>parse-version</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>parse-version</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<version>3.8.1</version>
+						<executions>
+							<execution>
+								<id>copy-installer-input</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>copy-dependencies</goal>
+								</goals>
+								<configuration>
+									<includeScope>runtime</includeScope>
+									<outputDirectory>${project.build.directory}/lib</outputDirectory>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>exec-maven-plugin</artifactId>
 						<version>3.5.0</version>
 						<executions>
@@ -42,7 +74,7 @@
 										<argument>--name</argument>
 										<argument>habiTv</argument>
 										<argument>--app-version</argument>
-										<argument>${project.version}</argument>
+										<argument>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</argument>
 										<argument>--main-class</argument>
 										<argument>com.dabi.habitv.HabitvLauncher</argument>
 										<argument>--main-jar</argument>
