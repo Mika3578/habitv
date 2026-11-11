@@ -144,7 +144,7 @@ jobs:
           case "$event" in
             schedule|workflow_dispatch)
               versions='["21","25"]'
-              reason="Scheduled or manual run: Java 21 baseline plus next LTS preview"
+              reason="Scheduled or manual run: Java 21 baseline plus Java 25 LTS sweep"
               ;;
             *)
               versions='["21"]'
