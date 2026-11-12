@@ -28,12 +28,15 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -43,6 +46,12 @@ import javafx.util.StringConverter;
 public abstract class MyCheckBoxTreeCell<T> extends TreeCell<T> {
 
 	private final CheckBox checkBox;
+
+	private final HBox leadingSlot;
+
+	private final HBox selectionSlot;
+
+	private final HBox graphicRow;
 
 	private ObservableValue<Boolean> booleanProperty;
 
@@ -95,7 +104,15 @@ public abstract class MyCheckBoxTreeCell<T> extends TreeCell<T> {
 
 		this.checkBox = new CheckBox();
 		this.checkBox.setAllowIndeterminate(false);
-		setGraphic(checkBox);
+		// dedicated slots: the checkbox is only ever a child of its slot, so
+		// swapping leading graphics never re-parents it (JavaFX parent conflict)
+		this.leadingSlot = new HBox();
+		this.selectionSlot = new HBox();
+		this.selectionSlot.getChildren().add(this.checkBox);
+		this.graphicRow = new HBox(4);
+		this.graphicRow.setAlignment(Pos.CENTER_LEFT);
+		this.graphicRow.getChildren().addAll(this.leadingSlot, this.selectionSlot);
+		setGraphic(graphicRow);
 	}
 
 	/***************************************************************************
@@ -200,11 +217,13 @@ public abstract class MyCheckBoxTreeCell<T> extends TreeCell<T> {
 				}
 			}
 
-			if (showCheckBox(item)) {
-				setGraphic(checkBox);
-			} else {
-				setGraphic(new Label("     "));
-			}
+			final Node leading = leadingGraphic(item);
+			final Node selectionGraphic = showCheckBox(item) ? checkBox : new Label("     ");
+			// leading/selection live in dedicated slots; the checkbox is never
+			// attached to the cell directly, avoiding parent conflicts on reuse
+			leadingSlot.getChildren().setAll(leading == null ? new Node[0] : new Node[]{leading});
+			selectionSlot.getChildren().setAll(selectionGraphic);
+			setGraphic(graphicRow);
 
 			// uninstall bindings
 			if (booleanProperty != null) {
@@ -246,4 +265,12 @@ public abstract class MyCheckBoxTreeCell<T> extends TreeCell<T> {
 	protected abstract boolean isBold(T item);
 
 	protected abstract boolean showCheckBox(T item);
+
+	/**
+	 * Optional leading graphic (for example a provider/channel logo). Default: none.
+	 * Implementations must never throw; return null to keep text-only rendering.
+	 */
+	protected Node leadingGraphic(T item) {
+		return null;
+	}
 }
