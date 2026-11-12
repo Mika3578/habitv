@@ -1,0 +1,8 @@
+[
+  {
+    "author": { "login": "amazon-q-developer[bot]" },
+    "state": "COMMENTED",
+    "body": "No blocking defects found.",
+    "commit": { "oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" }
+  }
+]

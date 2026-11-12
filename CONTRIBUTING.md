@@ -22,7 +22,8 @@ wording: [`AGENTS.md`](AGENTS.md) **Public git text**.
 PR titles use Conventional Commits.
 
 Target **`Mika3578/habitv`** → **`develop`**. Linear history on work
-branches (rebase, no merge commits).
+branches (rebase, no merge commits). Squash into `develop` only after
+a successful `merge-develop` deployment; do not use auto-merge.
 
 ```
 <type>(<scope>): <subject>
@@ -36,7 +37,8 @@ Allowed types: `feat`, `fix`, `refactor`, `perf`, `docs`, `test`,
 ## Validation
 
 Java baseline and build details: [`docs/development.md`](docs/development.md).
-Current compiler/CI: Java 8. Target: Java 21, then Java 25.
+Active modernization target: Java 21 (Java 25 next). Legacy required CI
+jobs still use `*-java8` check names until CI alignment.
 
 | Change | Minimum |
 |--------|---------|

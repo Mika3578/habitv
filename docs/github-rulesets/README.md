@@ -4,27 +4,117 @@ JSON under this directory documents the intended `protect-develop.json`
 ruleset for the `develop` branch only. Apply changes in the GitHub UI or
 Rulesets API; files here are not applied automatically.
 
-## `protect-develop.json` — recommended follow-ups
+Live snapshot (2026-10-05): `protect-develop` requires one generic
+approving review (any actor, including review apps), dismisses stale
+reviews on push, requires thread resolution, squash only, and required
+checks `validate-java8`, `deterministic-tests-java8`,
+`compile-and-package-java8`, and `dependency-review`. Bypass is off.
 
-After agent-policy CI is stable on `develop`, consider adding required
-status checks (exact context names from a green PR):
+A generic review count is **not** a trusted merge gate. CodeRabbit may
+`APPROVE` as an iterative reviewer; that must not complete merge.
+
+The intended merge authorization is GitHub-native:
+
+1. Protected environment `merge-develop` (required reviewer `Mika3578`,
+   no bypass).
+2. Ruleset rule `required_deployments` for `merge-develop`.
+3. Maintainer manual squash. Auto-merge stays off.
+
+Do **not** treat a branch-supplied script or the `maintainer-merge-gate`
+status check as the merge boundary. Agents must never approve the
+environment, merge, or enable auto-merge.
+
+## Maintainer GitHub clicks (required)
+
+This repository is a user-owned repo: ruleset `required_reviewers` is
+team-only and cannot pin a human. Copilot `APPROVED` is not reliable.
+Do **not** add bypass actors or paid review products.
+
+Apply all of the following in the GitHub UI (Settings). The in-repo JSON
+does not change hosted rules by itself.
+
+### 1. Turn off repository auto-merge
+
+1. Open **Settings → General → Pull Requests**.
+2. Uncheck **Allow auto-merge**.
+3. Keep squash as the only allowed merge method (matches the ruleset).
+
+Agents must not re-enable auto-merge.
+
+### 2. Create and protect environment `merge-develop` first
+
+Do this **before** any Ready PR runs the deployment job. If the
+environment is missing, GitHub may auto-create it **unprotected**.
+
+1. Open **Settings → Environments → New environment**.
+2. Name it exactly `merge-develop`.
+3. Enable **Required reviewers** and add `Mika3578` only.
+4. Do **not** enable wait timer unless you want extra delay.
+5. Do **not** allow administrators or apps to bypass this environment.
+6. Save.
+
+### 3. Require the deployment (do not drop existing checks)
+
+1. Open **Settings → Rules → `protect-develop`**.
+2. Enable **Require deployments to succeed before merging**.
+3. Select environment `merge-develop` only.
+4. **Remove** `maintainer-merge-gate` from required status checks if it
+   is still listed. That job is only a deployment waiter.
+5. **Keep** `validate-java8`, `deterministic-tests-java8`,
+   `compile-and-package-java8`, and `dependency-review`.
+6. Keep **Dismiss stale pull request approvals when new commits are pushed**.
+7. Keep **Require conversation resolution before merging**.
+8. Keep **Required approvals: 1** (do not set to 0).
+9. Keep squash only. Do **not** add bypass actors.
+10. Save.
+
+The Ready-phase workflow (`.github/workflows/maintainer-merge-gate.yml`)
+requests a `merge-develop` deployment and **does not checkout** the PR.
+GitHub holds the job until `Mika3578` approves the environment. A new
+commit starts a new deployment; prior environment approval does not
+apply.
+
+### 4. Cursor automations
+
+1. Open the **Pull Request Router and Approver** automation.
+2. Disable any merge or auto-merge action.
+3. Do not run agents whose task is to arm auto-merge.
+
+## `protect-develop.json` — other follow-ups
+
+After agent-policy CI is stable on `develop`, consider also adding:
 
 - `agent-policy`
 - `agent-policy (windows)`
 
-Recommended pull-request rule adjustments (verify current GitHub semantics
-before enabling):
+| Setting | Intended payload |
+|---------|------------------|
+| `required_approving_review_count` | `1` (not a trusted final gate) |
+| `required_review_thread_resolution` | `true` |
+| `dismiss_stale_reviews_on_push` | `true` |
+| `require_last_push_approval` | `false` |
+| Copilot `review_on_push` | `false` |
+| Copilot `review_draft_pull_requests` | `false` |
+| `required_deployments` | `merge-develop` |
 
-| Setting | Current payload | Recommended |
-|---------|-----------------|-------------|
-| `required_review_thread_resolution` | `true` | keep `true` |
-| `dismiss_stale_reviews_on_push` | `false` | `true` |
-| `require_last_push_approval` | `false` | keep `false` unless a second approval gate is desired |
-| `review_on_push` (Copilot) | `false` | optional; enable with draft review when each push should get Copilot |
-| `review_draft_pull_requests` (Copilot) | `false` | set `true` together with `review_on_push` if Draft PRs should be reviewed |
+Do not enable Copilot automatic review on every push or on Draft PRs.
+The PR orchestrator requests Copilot **once after Ready** on that HEAD.
+Do **not** add CodeRabbit as a required status check.
 
-`review_on_push` alone does not cover Draft PRs while
-`review_draft_pull_requests` remains `false`; enable both when that is desired.
+Draft review commands (`@coderabbitai review`, `@coderabbitai full review`,
+`/q review`, optional `@sourcery-ai review`) are posted by the PR
+orchestrator. They are not maintainer chores and not merge gates.
+
+Amazon Q is a Draft secondary reviewer on a **stabilized** HEAD after
+CodeRabbit full review. Sourcery is opportunistic. Neither is a merge
+gate.
+
+## Merge method
+
+Default: maintainer **squash merge** in the GitHub UI after a successful
+`merge-develop` deployment on the current HEAD (environment approval)
+plus required CI. Leave auto-merge off so an app cannot complete merge
+when a review bot approves.
 
 ## External PR description tools
 

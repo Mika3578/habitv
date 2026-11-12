@@ -36,15 +36,18 @@ During a review cycle for one PR, **only the orchestrating agent** may:
 - edit PR title/body or Draft/Ready;
 - post disposition replies on review threads;
 - resolve threads;
-- request reviewers.
+- request reviewers;
+- post **reviewer-trigger comments**.
 
 **Independent reviewers** (subagents, Copilot, humans as consulted) are
 **read-only** on GitHub. They may inspect diff, tests, and context and
 return findings. They must not post duplicate PR comments, resolve threads,
-change PR metadata, request reviewers, or merge.
+change PR metadata, request reviewers, post reviewer-trigger comments,
+or merge.
 
 The orchestrator deduplicates, adjudicates, batches fixes, publishes,
-replies, resolves, and reconciles live state.
+replies, resolves, posts reviewer-trigger comments, and reconciles live
+state.
 
 ## Local durable state (resumability)
 
@@ -63,6 +66,16 @@ Example `state.json` shape:
   "head_sha": "",
   "review_round": 1,
   "review_head": "",
+  "reviewer_requests": [
+    {
+      "reviewer": "coderabbit|amazon-q|sourcery|copilot",
+      "requested_head": "",
+      "requested_at": "",
+      "request_command": "@coderabbitai review",
+      "execution_state": "PENDING",
+      "completed_head": ""
+    }
+  ],
   "findings": [
     {
       "id": "thread-or-comment-id",
@@ -96,21 +109,28 @@ on the PR branch):
 - adjudicate; fix or reject with evidence; verify; publish;
 - concise disposition replies on existing threads (**what + why**);
   resolve **only after** that reply is posted and verified;
+- post sequenced **reviewer-trigger comments** (no second confirmation);
 - LIVE_RECONCILE until zero actionable unresolved **code** threads or
   a documented escalation.
 
 Once write-capable, do not wait for a second "finish this PR" phrase
-before closing open actionable **code** threads.
+before closing open actionable **code** threads or posting routine
+reviewer-trigger comments.
 
 **Explicit Ready prep:** **finish this PR** / **prepare this PR for
-final review** runs **FINAL_REVIEW** and the **READY_GATE** checklist
-on the same PR. Completing READY_GATE criteria is **not** permission to
-leave Draft. Marking Ready requires a separate explicit user phrase
-(for example: mark Ready, or finish and mark Ready).
+final review** runs Draft stabilization (CodeRabbit full review, then
+Amazon Q) and the **READY_GATE** checklist on the same PR. Completing
+READY_GATE criteria is **not** permission to leave Draft. Marking Ready
+requires a separate explicit user phrase (for example: mark Ready, or
+finish and mark Ready). After Ready, request **one** Copilot review on
+that exact HEAD (**FINAL_REVIEW**).
 
 Still requires separate approval: merge, mark Ready, unrelated
 issues/PRs, branch deletion, unrelated force operations, creating GitHub
-issues (unless explicitly authorized).
+issues (unless explicitly authorized). Never enable GitHub auto-merge.
+Never approve the `merge-develop` environment deployment. Never treat
+CodeRabbit or Cursor Approval Agent `APPROVED` as merge authorization.
+Do not request Copilot before Ready.
 
 ## Proactive trigger
 
@@ -126,7 +146,8 @@ push to the PR head, and after any known new review submission:
 
 ```text
 INTAKE → SNAPSHOT → INVENTORY → ADJUDICATE → FIX_BATCH → VERIFY
-    → PUBLISH → REPLY → RESOLVE → LIVE_RECONCILE → FINAL_REVIEW → READY_GATE
+    → PUBLISH → REPLY → RESOLVE → LIVE_RECONCILE → REQUEST_REVIEW
+    → READY_GATE → (after Ready) FINAL_REVIEW
 ```
 
 | Phase | Purpose |
@@ -141,8 +162,9 @@ INTAKE → SNAPSHOT → INVENTORY → ADJUDICATE → FIX_BATCH → VERIFY
 | REPLY | Concise disposition in **existing** thread: what was done and **why** (fix + SHA/evidence, or reject + rationale). Required before RESOLVE |
 | RESOLVE | Only after REPLY is visible on the thread. GraphQL/REST resolve; re-query `isResolved` (not `isOutdated`). Never resolve a reply-less thread |
 | LIVE_RECONCILE | Full live PR fetch before claiming cleanliness |
-| FINAL_REVIEW | One independent review on exact current HEAD (tier-dependent) |
-| READY_GATE | All gates on current HEAD; report readiness; mark Ready only with explicit user phrase |
+| REQUEST_REVIEW | Orchestrator posts the next sequenced reviewer-trigger comment |
+| READY_GATE | Draft stabilization on current HEAD; report `READY_GATE: satisfied` or remaining blockers; mark Ready only with explicit user phrase |
+| FINAL_REVIEW | After Ready: one Copilot review on that exact HEAD |
 
 ## Finding lifecycle
 
@@ -187,10 +209,12 @@ every AI suggestion blindly.
 ```text
 collect complete round → adjudicate all → fix accepted batch
     → validate → publish once → reply → resolve eligible threads
-    → request next substantive review once
+    → REQUEST_REVIEW once for the next sequenced Draft reviewer
 ```
 
 Do not loop: one bot comment → one commit → one review request.
+Do not request Copilot before Ready. Do not fire CodeRabbit, Amazon Q,
+and Sourcery on the same push.
 
 Exceptions: urgent blockers or findings that change implementation strategy.
 
@@ -225,13 +249,44 @@ Pick the **smallest** tier that safely covers the diff.
 Independent reviewers must not inherit the implementer's conclusions.
 Launch with fresh context and diff evidence only.
 
+## Agent-owned reviewer triggering
+
+When write-capable on a named PR, the orchestrator **must** post the
+next appropriate reviewer-trigger comment. Do not ask the maintainer to
+type routine review commands.
+
+| Command | When |
+|---------|------|
+| `@coderabbitai review` | After an ordinary published fix batch if CodeRabbit has no clean result on the new HEAD |
+| `@coderabbitai full review` | Before Draft → Ready: required CI green and ordinary Draft findings closed |
+| `/q review` | After CodeRabbit Draft stabilization on the current HEAD (Amazon Q) |
+| `@sourcery-ai review` | After Amazon Q findings are closed; HIGH_RISK or extra opinion; quota allowing |
+| Copilot (`request_copilot_review`) | **After Ready only**, on that exact HEAD |
+
+**Dedup before posting:** fetch live comments, reviews, and HEAD. Skip if
+that reviewer already reviewed or was requested for the same HEAD/round.
+Never duplicate the same command on the same HEAD unless the previous
+request explicitly failed and policy allows **one** retry. Record each
+request in `agent_space/pr-<number>/state.json` (`reviewer`,
+`requested_head`, `requested_at`, `request_command`, `execution_state`,
+`completed_head`). Live GitHub overrides the file.
+
+`SKIPPED`, `RATE_LIMITED`, `PENDING`, `SUMMARY_ONLY`, and `STALE` are
+not clean reviews. Do not spam an unavailable bot; record the state and
+follow fallback (next sequenced reviewer, human `APPROVED` on HEAD, or
+escalation).
+
+If a fix creates a new HEAD, prior reviews and requests are stale.
+
 ## Inventory (every round, start and end)
 
 Fetch live GitHub state:
 
 - HEAD SHA, base, branch, draft flag, title, body;
 - review submissions and requested reviewers;
-- Copilot **inline/thread** comments (code findings);
+- CodeRabbit **inline/thread** comments and reviews (Draft iterative
+  findings); skip/status comments are `SKIPPED`, not a clean review;
+- Copilot **inline/thread** comments (final-review code findings);
 - Copilot overview text only to classify whether it is meta/footer-only
   (`Findings: None`) or points at open code findings;
 - top-level issue/PR comments when they contain actionable code notes;
@@ -286,7 +341,9 @@ reviewer integration, record:
 | `MISSING` | No submission on this PR / HEAD when one is required |
 
 [`scripts/pr-gh-snapshot.sh`](../../../scripts/pr-gh-snapshot.sh) (`.ps1`)
-applies deterministic hints via `pr-classify-review-sources.*`. The
+applies deterministic hints via `pr-classify-review-sources.*`, including
+exact-body `reviewer_requests` (`@coderabbitai review`,
+`@coderabbitai full review`, `/q review`, `@sourcery-ai review`). The
 orchestrator must still read live review and issue-comment bodies when
 classifying edge cases.
 
@@ -294,19 +351,32 @@ Record `execution_state` per source in `agent_space/pr-<n>/state.json`.
 
 ### HabiTV defaults (from real PR experience)
 
-- **Amazon Q:** valuable in Draft rounds; treat as substantive when findings
-  exist; becomes `STALE` when `commit_id ≠ HEAD`.
-- **CodeRabbit:** often `SKIPPED` on this repo (&lt;10 stars) — never count as
-  clean review because status is green.
-- **Sourcery:** `SUMMARY_ONLY` / `RATE_LIMITED` — opportunistic, not a gate.
+- **CodeRabbit:** primary **Draft** reviewer. After FIX_BATCH + PUBLISH,
+  the orchestrator posts `@coderabbitai review` (including when
+  auto-review skips: fewer than 10 stars, drafts, or bot author). Before
+  Ready, post `@coderabbitai full review`. Treat skip/status as
+  `SKIPPED` and “Review rate limited” as `RATE_LIMITED` — never as a
+  clean review. Count CodeRabbit **reviews** on HEAD, not only issue
+  comments. Do not treat a CodeRabbit check `success` or `queued` as a
+  review. Bound to ~3 CodeRabbit rounds, then escalate.
+- **Amazon Q:** secondary Draft reviewer. After CodeRabbit stabilization
+  on the current HEAD, the orchestrator posts `/q review`. Do not invoke
+  Amazon Q after every small intermediate push. Treat as substantive
+  when findings exist; `STALE` when `commit_id ≠ HEAD`.
+- **Sourcery:** opportunistic after Amazon Q findings are closed
+  (`@sourcery-ai review`). `SUMMARY_ONLY` / `RATE_LIMITED` are not
+  gates.
+- **Copilot:** **final-only** after Ready. Request Copilot **once** on
+  that exact HEAD. Do not request Copilot in Draft or after intermediate
+  pushes. If Copilot requires a code-changing fix: return to Draft, fix
+  and publish, invalidate stale reviews, rerun Draft stabilization
+  including `@coderabbitai full review`, obtain Ready authorization
+  again when required, then request Copilot on the new HEAD. A human
+  `APPROVED` on HEAD also satisfies the final review gate when Copilot
+  cannot review. Cursor Approval Agent alone does not.
 - **SonarCloud:** `STATIC_ANALYSIS` only.
 - **Cursor Approval Agent:** `APPROVAL_ONLY` when it approves from checks
   without Bugbot/substantive diff review — **does not** satisfy final review.
-- **Copilot:** preferred substantive reviewer for code. Adjudicate inline
-  findings on HEAD. A human `APPROVED` on HEAD also satisfies the final
-  review gate when Copilot cannot review. Cursor Approval Agent alone
-  does not. Overview badges alone never block merge. User authorization
-  to mark Ready or merge remains a separate required step.
 ## PR body ownership
 
 The orchestrator owns the canonical PR description (template sections).
@@ -328,25 +398,49 @@ when convenient ([`docs/github-rulesets/README.md`](../../../docs/github-ruleset
 **Objective:** code is good and findings on the diff are handled so the
 user can merge. Not: endless body/overview cleanup.
 
-**Draft phase:** implementation, validation, fix real code findings.
+**Draft phase:** implementation, validation, sequenced CodeRabbit then
+Amazon Q (optional Sourcery). No Copilot. Orchestrator posts the
+reviewer-trigger comments.
 
-**Final phase:**
+**Ready boundary:** the orchestrator may run all Draft review
+orchestration. It must not automatically mark Ready, request Copilot
+before Ready, merge, enable auto-merge, or approve `merge-develop`.
+When Draft stabilization is complete, report `READY_GATE: satisfied` or
+the exact remaining blockers.
+
+**After explicit Ready authorization:**
 
 ```text
 required CI green on HEAD
     ↓
-actionable code threads adjudicated (fix or reject + resolve)
+CodeRabbit full review on HEAD (or documented skip/quota fallback)
+    ↓
+Amazon Q `/q review` on that stabilized HEAD when available
+    ↓
+actionable Draft code threads adjudicated (fix or reject + resolve)
+    ↓
+user authorizes Ready → mark Ready
+    ↓
+ONE Copilot review on that HEAD (FINAL_REVIEW)
     ↓
 substantive signal on HEAD:
-  Copilot review with findings handled, OR human APPROVED on HEAD
+  Copilot review with findings handled (COMMENTED is enough),
+  OR human APPROVED on HEAD
     ↓
-user authorizes Ready / merge
+protected merge-develop deployment (maintainer environment approval)
+    ↓
+maintainer squash merge (auto-merge stays off)
 ```
+
+Do not require Copilot `APPROVED` as a GitHub merge condition. Nits
+without a required code change do not force a new commit. A new HEAD
+invalidates prior `merge-develop` environment approval.
 
 Quota / "unable to review" is not a blocker when CI is green and a human
 approved on HEAD (or code threads are clean and the user authorizes).
 
-Do not request Copilot after every intermediate commit.
+Do not request Copilot before Ready or after every intermediate commit.
+Do not request Copilot, CodeRabbit, and Amazon Q on the same push.
 Do not block merge on overview-only "Changes recommended" with
 `Findings: None`.
 
@@ -358,12 +452,18 @@ On current HEAD, confirm:
 - full reactor validation when required ([`docs/development.md`](../../../docs/development.md));
 - required GitHub checks pass;
 - zero actionable unresolved **code** threads;
-- substantive signal on HEAD: Copilot findings adjudicated, or human
-  `APPROVED` on HEAD (Cursor Approval Agent alone is insufficient);
+- CodeRabbit full-review (or documented skip/quota fallback) on HEAD;
+- Amazon Q on the stabilized HEAD when available;
+- zero actionable unresolved **code** threads;
 - functional test: user **explicitly confirms success in the current
   conversation** when runtime behavior may change — else report
   `Functional validation: PENDING USER TEST`;
-- explicit user authorization to mark Ready / merge.
+- explicit user authorization to mark Ready;
+- after Ready: Copilot findings adjudicated, or human `APPROVED` on
+  HEAD (Cursor Approval Agent alone is insufficient);
+- merge only after a successful `merge-develop` deployment on this HEAD
+  (maintainer environment approval); agents must not merge, enable
+  auto-merge, or approve that environment.
 
 ```bash
 scripts/pr-gh-snapshot.sh Mika3578/habitv <pr>
@@ -379,9 +479,10 @@ All items apply to **current PR HEAD** only:
 2. Focused tests pass when code changed.
 3. Full reactor validation when applicable.
 4. Required checks green on HEAD.
-5. Actionable Copilot **code** threads inventoried and adjudicated.
-   Overview-only / footer-only / `Findings: None` items: short reject,
-   not a merge blocker.
+5. Actionable CodeRabbit **code** threads (Draft) inventoried and
+   adjudicated. Actionable Copilot **code** threads (final HEAD)
+   inventoried and adjudicated. Overview-only / footer-only /
+   `Findings: None` items: short reject, not a merge blocker.
 6. Every `BLOCKING` **code** finding fixed or rejected with evidence.
 7. Qualifying code threads have a disposition **reply** (what + why),
    then are resolved (`isResolved` verified). Never resolve without a
@@ -389,11 +490,17 @@ All items apply to **current PR HEAD** only:
 8. No actionable unresolved code threads.
 9. History cleaned when practical; title current. Third-party body
    footers ignored.
-10. Substantive signal on HEAD: Copilot findings handled, or human
-    `APPROVED` on HEAD.
-11. User functional confirmation when applicable.
-12. No newer commit invalidates the above.
-13. Explicit authorization to mark Ready / merge.
+10. `@coderabbitai full review` posted by the orchestrator; result on
+    HEAD is substantive or an explicit skip/quota fallback.
+11. `/q review` posted after that stabilization when Amazon Q is
+    available; findings closed.
+12. User functional confirmation when applicable.
+13. No newer commit invalidates the above.
+14. Explicit authorization to mark Ready, then one Copilot review on
+    that HEAD.
+15. Merge is a maintainer squash after a successful `merge-develop`
+    deployment on this HEAD. Do not arm auto-merge. Do not approve
+    the environment.
 
 ## Continuing an existing PR
 
@@ -401,8 +508,11 @@ All items apply to **current PR HEAD** only:
    head) or read-only inventory.
 2. SNAPSHOT — `REVIEW_HEAD`, `pr-gh-snapshot`, update `agent_space/pr-<n>/state.json`.
 3. INVENTORY + ADJUDICATE — all sources; map duplicates.
-4. If work remains: FIX_BATCH through RESOLVE; one review request when round complete.
-5. LIVE_RECONCILE + FINAL_REVIEW + READY_GATE.
+4. If work remains: FIX_BATCH through RESOLVE; REQUEST_REVIEW for the
+   next sequenced Draft reviewer. Do not request Copilot in this step.
+5. LIVE_RECONCILE + READY_GATE. Report `READY_GATE: satisfied` or
+   remaining blockers. After explicit Ready: mark Ready, then
+   FINAL_REVIEW (one Copilot request on that HEAD).
 
 ## Deferred (not in every PR)
 
@@ -412,5 +522,8 @@ All items apply to **current PR HEAD** only:
 
 ## Forbidden without conversation authorization
 
-Merge, marking Ready before READY_GATE, unrelated GitHub mutations,
-destructive branch ops, force-push outside approved workflow.
+Merge, enabling auto-merge, approving `merge-develop`, marking Ready
+without an explicit user phrase, requesting Copilot before Ready,
+unrelated GitHub mutations, destructive branch ops, force-push outside
+approved workflow. Independent reviewers must not independently post
+reviewer-trigger comments.

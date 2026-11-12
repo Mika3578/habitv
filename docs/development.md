@@ -117,7 +117,8 @@ Shared workspace files live under `.vscode/` (`settings.json`,
 
 Pull request orchestration: invariants in `AGENTS.md`; procedure in
 [`.agents/skills/pr-review/SKILL.md`](../.agents/skills/pr-review/SKILL.md).
-Live snapshots: `scripts/pr-gh-snapshot.sh` / `.ps1`.
+Live snapshots: `scripts/pr-gh-snapshot.sh` / `.ps1`. The orchestrator
+posts Draft reviewer-trigger comments; Copilot is final-only after Ready.
 
 **Other agents:** Claude Code, Gemini CLI, Jules, Junie, Cline, Roo, Windsurf,
 Devin, and similar tools should read root `AGENTS.md` when supported. Portable
@@ -139,12 +140,18 @@ before first push). Optional helper:
 [`scripts/launch-cloud-agent-strict.ps1`](../scripts/launch-cloud-agent-strict.ps1)
 (`CURSOR_API_KEY` from local secrets only).
 
-**GitHub enforcement gaps (documented):** `docs/github-rulesets/protect-develop.json`
-sets `dismiss_stale_reviews_on_push` to `false`; prefer `true` in the hosted
-ruleset so approvals of an older diff do not remain valid after new commits
-(see [`github-rulesets/README.md`](github-rulesets/README.md)). Adding
-`agent-policy` and `agent-policy (windows)` to required status checks is
-recommended after agent-policy CI is stable on `develop`.
+**GitHub enforcement:** live `protect-develop` dismisses stale reviews on
+push and requires one generic approving review plus the legacy required
+checks named `validate-java8`, `deterministic-tests-java8`,
+`compile-and-package-java8`, and `dependency-review` (names describe
+current hosted jobs, not the Java 21 design target). That review count
+can be satisfied by a review app. The intended final merge gate is a
+successful `merge-develop` deployment (protected environment) required
+by the ruleset, plus auto-merge off and a maintainer squash. Hosted
+ruleset and environment changes are GitHub UI steps in
+[`github-rulesets/README.md`](github-rulesets/README.md).
+Adding `agent-policy` and `agent-policy (windows)` to required status
+checks is still recommended after agent-policy CI is stable on `develop`.
 
 ## Workflow
 

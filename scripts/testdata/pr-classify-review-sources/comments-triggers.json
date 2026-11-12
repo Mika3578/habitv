@@ -1,0 +1,22 @@
+[
+  {
+    "user": { "login": "cursor[bot]" },
+    "body": "@coderabbitai review",
+    "updated_at": "2026-10-05T13:49:11Z"
+  },
+  {
+    "user": { "login": "cursor[bot]" },
+    "body": "@coderabbitai full review",
+    "updated_at": "2026-10-06T09:00:00Z"
+  },
+  {
+    "user": { "login": "cursor[bot]" },
+    "body": "/q review",
+    "updated_at": "2026-10-06T09:05:00Z"
+  },
+  {
+    "user": { "login": "sourcery-ai[bot]" },
+    "body": "Trigger a new review: Comment `@sourcery-ai review` on the pull request.",
+    "updated_at": "2026-10-05T13:49:12Z"
+  }
+]
