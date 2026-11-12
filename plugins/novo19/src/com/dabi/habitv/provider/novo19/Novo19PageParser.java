@@ -92,13 +92,16 @@ final class Novo19PageParser {
 		if (completeInfo == null) {
 			return content;
 		}
+		// Prefer the complete playback entry over the content identifiers.
 		String href = content.getHref();
-		String assetId = content.getAssetId();
-		if (StringUtils.isEmpty(href)) {
-			href = textValue(completeInfo, "player");
+		final String playbackPlayer = textValue(completeInfo, "player");
+		if (!StringUtils.isEmpty(playbackPlayer)) {
+			href = playbackPlayer;
 		}
-		if (StringUtils.isEmpty(assetId)) {
-			assetId = textValue(completeInfo, "assetId");
+		String assetId = content.getAssetId();
+		final String playbackAssetId = textValue(completeInfo, "assetId");
+		if (!StringUtils.isEmpty(playbackAssetId)) {
+			assetId = playbackAssetId;
 		}
 		if (href == content.getHref() && assetId == content.getAssetId()) {
 			return content;

@@ -44,6 +44,14 @@ final class Novo19InlineFixtures {
 			+ "\"player\":\"/player/film-beta-trailer\"}],\"rails\":[{\"id\":\"reco\",\"title\":\"Recommendations\","
 			+ "\"src\":\"/api/1/public/frontends/web/pages/BFF%7Casset-details,film-beta/sections/reco/tiles\"}]},\"version\":\"0.9.1\"}";
 
+	/** Series detail: content.id is the show id; COMPLETE carries the playable episode asset. */
+	static final String SERIES_DETAILS_SHOW_ID_WITH_COMPLETE_PLAYBACK = "{\"page\":{\"type\":\"DETAILS\","
+			+ "\"id\":\"series-delta\",\"title\":\"Series Delta\",\"content\":{\"id\":\"series-delta_565BFFb\","
+			+ "\"type\":\"SERIE\",\"title\":\"Series Delta\",\"source\":{\"provider\":\"redbee\",\"type\":\"TV_SHOW\","
+			+ "\"id\":\"series-delta_565BFFb\"}},\"playbackInfos\":[{\"type\":\"COMPLETE\","
+			+ "\"assetId\":\"asset-series-delta-episode-delta\",\"player\":\"/player/series-delta-episode-delta\"}],"
+			+ "\"rails\":[]},\"version\":\"0.9.1\"}";
+
 	static final String HISTOIRE_PAGINATION_PAGE_1 = "{\"tiles\":[{\"id\":\"asset-theme-gamma\",\"type\":\"SERIE\","
 			+ "\"title\":\"Theme Gamma Programme\",\"href\":\"/details/theme-gamma-programme\",\"source\":{"
 			+ "\"id\":\"asset-theme-gamma\"}}],\"more\":{\"href\":\"/voir-plus/rail/documentaires-et-magazines/histoire\"},\"version\":\"0.9.1\"}";

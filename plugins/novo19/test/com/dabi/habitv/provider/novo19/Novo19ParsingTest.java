@@ -96,6 +96,17 @@ public class Novo19ParsingTest {
 	}
 
 	@Test
+	public void prefersCompletePlaybackAssetOverSeriesContentId() throws Exception {
+		final Novo19BffPage page = Novo19PageParser.parsePageEnvelope(
+				Novo19InlineFixtures.SERIES_DETAILS_SHOW_ID_WITH_COMPLETE_PLAYBACK, "fixture");
+		assertNotNull(page.getContent());
+		assertEquals("SERIE", page.getContent().getType());
+		assertEquals("series-delta_565BFFb", page.getContent().getId());
+		assertEquals("asset-series-delta-episode-delta", page.getContent().getAssetId());
+		assertEquals("/player/series-delta-episode-delta", page.getContent().getHref());
+	}
+
+	@Test
 	public void excludesMesVideosPath() throws Exception {
 		final Novo19Tile tile = Novo19PageParser.parseTile(new com.fasterxml.jackson.databind.ObjectMapper()
 				.readTree("{\"type\":\"COLLECTION\",\"title\":\"Mes vidéos\",\"href\":\"/mes-videos\"}"));

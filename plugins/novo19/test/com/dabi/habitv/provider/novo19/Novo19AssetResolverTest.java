@@ -52,6 +52,18 @@ public class Novo19AssetResolverTest {
 	}
 
 	@Test
+	public void resolvesPlayableAssetFromSeriesDetailsCompletePlayback() throws Exception {
+		final DownloadParamDTO param = new DownloadParamDTO(
+				"https://novo19.ouest-france.fr/details/series-delta", "out.mp4", Novo19Conf.EXTENSION);
+		final java.util.Map<String, String> responses = new java.util.HashMap<String, String>();
+		responses.put(Novo19UrlBuilder.bffPageByPath("details/series-delta"),
+				Novo19InlineFixtures.SERIES_DETAILS_SHOW_ID_WITH_COMPLETE_PLAYBACK);
+		final String assetId = Novo19AssetResolver.resolveAssetId(param,
+				new Novo19CatalogClient(new MapLoader(responses)));
+		assertEquals("asset-series-delta-episode-delta", assetId);
+	}
+
+	@Test
 	public void excludesLivePlayerPath() throws Exception {
 		final DownloadParamDTO param = new DownloadParamDTO("https://novo19.ouest-france.fr/player/novo19", "out.mp4",
 				Novo19Conf.EXTENSION);
