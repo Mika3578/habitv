@@ -1,8 +1,8 @@
-# Copilot review instructions
+# GitHub Copilot
 
-Canonical policy: [`../AGENTS.md`](../AGENTS.md).
-Download and legal scope: [`../docs/providers.md`](../docs/providers.md).
+Canonical project policy: [`AGENTS.md`](../AGENTS.md) (short).
+Provider scope: [`docs/providers.md`](../docs/providers.md).
+PR lifecycle: [`.agents/skills/pr-review/SKILL.md`](../.agents/skills/pr-review/SKILL.md).
+Other procedures: [`.agents/skills/`](../.agents/skills/).
 
-Follow those documents for review scope, secret handling, and review
-output (including submitting APPROVE when no blocking findings remain on
-the current HEAD).
+Do not treat this file as a second constitution.

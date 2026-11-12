@@ -1,0 +1,20 @@
+---
+description: Java 8 baseline conventions for HabiTV source modules
+globs: "**/*.java"
+alwaysApply: false
+---
+
+# Java (HabiTV)
+
+- Stay on the **Java 8** language/API level unless the task is an explicit
+  JDK migration (`docs/development.md`). No Java 9+ syntax or APIs by default.
+- Match the surrounding file: indentation, naming, package layout, and
+  comment density. Prefer the minimal change that fits existing style.
+- Prefer clear null checks and checked-exception handling consistent with
+  nearby code; do not introduce a new nullability framework.
+- Close streams/resources with patterns already used in the module
+  (try-with-resources when the file already uses it).
+- Do not add/remove/upgrade dependencies unless the task requires it.
+- Do not mass-modernize or reformat unrelated code.
+- Plugin version overrides: `CONTRIBUTING.md`; internal deps use
+  `${project.parent.version}`.

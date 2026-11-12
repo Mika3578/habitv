@@ -181,23 +181,23 @@ if [[ -d .agents/skills ]]; then
 fi
 
 require_phrase() {
-  local phrase="$1"
-  if ! grep -qF "$phrase" AGENTS.md; then
-    fail "AGENTS.md missing required phrase: $phrase"
+  local file="$1"
+  local phrase="$2"
+  if ! grep -qF "$phrase" "$file"; then
+    fail "$file missing required phrase: $phrase"
   fi
 }
-
-require_phrase "Keep every pull request in **Draft**"
-require_phrase "current PR HEAD"
-require_phrase "explicitly confirms success in the current conversation"
-require_phrase "Do not resolve unanswered"
-require_phrase "Live GitHub PR state is authoritative"
-require_phrase "only the PR orchestrator"
 
 pr_review_skill=".agents/skills/pr-review/SKILL.md"
 if [[ ! -f "$pr_review_skill" ]]; then
   fail "missing pr-review skill: $pr_review_skill"
 else
+  require_phrase "$pr_review_skill" "Keep every pull request in **Draft**"
+  require_phrase "$pr_review_skill" "current PR HEAD"
+  require_phrase "$pr_review_skill" "explicitly confirms success in the current conversation"
+  require_phrase "$pr_review_skill" "Do not resolve unanswered"
+  require_phrase "$pr_review_skill" "Live GitHub PR state is authoritative"
+  require_phrase "$pr_review_skill" "only the PR orchestrator"
   if ! grep -qF "REVIEW_HEAD" "$pr_review_skill"; then
     fail "pr-review skill must document HEAD-bound review rounds"
   fi

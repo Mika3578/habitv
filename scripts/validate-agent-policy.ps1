@@ -190,25 +190,23 @@ if (-not (Test-Path $SkillsRoot)) {
     }
 }
 
-$agents = Get-Content -Raw "AGENTS.md"
-@(
-    "Keep every pull request in **Draft**",
-    "current PR HEAD",
-    "explicitly confirms success in the current conversation",
-    "Do not resolve unanswered",
-    "Live GitHub PR state is authoritative",
-    "only the PR orchestrator"
-) | ForEach-Object {
-    if ($agents.IndexOf($_, [StringComparison]::Ordinal) -lt 0) {
-        Fail "AGENTS.md missing required phrase: $_"
-    }
-}
-
 $prReviewSkill = ".agents/skills/pr-review/SKILL.md"
 if (-not (Test-Path $prReviewSkill)) {
     Fail "missing pr-review skill: $prReviewSkill"
 } else {
     $prReviewText = Get-Content -Raw $prReviewSkill
+    @(
+        "Keep every pull request in **Draft**",
+        "current PR HEAD",
+        "explicitly confirms success in the current conversation",
+        "Do not resolve unanswered",
+        "Live GitHub PR state is authoritative",
+        "only the PR orchestrator"
+    ) | ForEach-Object {
+        if ($prReviewText.IndexOf($_, [StringComparison]::Ordinal) -lt 0) {
+            Fail "pr-review skill missing required phrase: $_"
+        }
+    }
     if ($prReviewText -notmatch "REVIEW_HEAD") {
         Fail "pr-review skill must document HEAD-bound review rounds"
     }
@@ -222,7 +220,7 @@ if (-not (Test-Path $prReviewSkill)) {
         Fail "pr-review skill must document finding classification"
     }
     if ($prReviewText -notmatch "Single-writer") {
-        Fail "pr-review skill must document single-writer rule"
+        Fail "pr-review skill must document Single-writer rule"
     }
     if ($prReviewText -notmatch "pr-gh-snapshot") {
         Fail "pr-review skill must reference pr-gh-snapshot scripts"

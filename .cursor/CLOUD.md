@@ -15,13 +15,13 @@ New Cloud tasks and branch recovery:
 
 ## Public git text
 
-Follow **Public git text** in `AGENTS.md`. Procedure:
-[`.agents/skills/public-git-text/SKILL.md`](../.agents/skills/public-git-text/SKILL.md).
+Procedure: [`.agents/skills/public-git-text/SKILL.md`](../.agents/skills/public-git-text/SKILL.md).
 Fill [`.github/pull_request_template.md`](../.github/pull_request_template.md).
 
 ## Pull request review feedback
 
-Cloud Agents working a same-repository PR follow **Pull request lifecycle**
-in `AGENTS.md` and [pr-review](../.agents/skills/pr-review/SKILL.md).
-Load policy from `origin/develop` when the task is event-driven triage.
-Never merge or mark Ready unless the conversation explicitly authorizes it.
+Cloud Agents working a same-repository PR load
+[pr-review](../.agents/skills/pr-review/SKILL.md) (not the full `AGENTS.md`
+procedure). Load policy from `origin/develop` when the task is event-driven
+triage. Never merge or mark Ready unless the conversation explicitly authorizes
+it.

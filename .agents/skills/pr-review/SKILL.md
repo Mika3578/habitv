@@ -5,19 +5,49 @@ description: Canonical PR orchestrator — Draft through Ready on current HEAD. 
 
 # PR orchestrator
 
-Constitutional invariants: [`AGENTS.md`](../../../AGENTS.md) (**Pull request lifecycle**).
+Constitutional invariants: **this skill** (section below). Project pointer:
+[`AGENTS.md`](../../../AGENTS.md).
 Template: [`.github/pull_request_template.md`](../../../.github/pull_request_template.md).
 Public replies: [public-git-text](../public-git-text/SKILL.md).
 Verification: [code-change-verification](../code-change-verification/SKILL.md).
 New PR setup: [git-workflow](../git-workflow/SKILL.md).
 
 This skill is the **only** canonical end-to-end PR procedure. Do not add
-parallel PR-management skills.
+parallel PR-management skills. Load it only when working a pull request.
+
+## Constitutional invariants
+
+Keep every pull request in **Draft** until gates on the **current PR HEAD**
+are satisfied.
+
+- Evaluate every PR against its **current PR HEAD**; new commits invalidate
+  prior reviews and checks that do not apply to that HEAD.
+- Every reviewer or Copilot **code** finding is mandatory: investigate; fix
+  or reject with evidence; push when needed; post a disposition reply
+  (**what + why**); resolve only after that reply. Do not resolve unanswered
+  or unexamined threads. Silent resolve is forbidden.
+- **Reply before resolve:** never mark a conversation resolved without a
+  disposition reply on that thread first.
+- **Proactive loop:** when write-capable on a PR, run **INVENTORY** through
+  **RESOLVE** after each push and when new review feedback appears.
+- Reviewer findings that contradict maintainer policy in `AGENTS.md` (and
+  documents it links) may be rejected with evidence when non-security; never
+  dismiss security/compliance findings via adapter policy alone.
+- **Live GitHub PR state is authoritative** over local memory or ledgers.
+- During a review cycle, **only the PR orchestrator** mutates GitHub PR
+  metadata (body, draft/ready, replies, resolution, reviewer requests).
+  Independent reviewers are read-only.
+- Copilot overview with **Findings: None** / footer-only noise: short reject;
+  not a merge blocker. Findings ≥ 1: treat the inline threads.
+- When runtime behavior may change, keep Draft until the user
+  **explicitly confirms success in the current conversation** after a real
+  HabiTV test.
+- Merge / Ready require separate explicit user authorization.
 
 ## Operating model
 
 ```text
-small global invariants (AGENTS.md)
+project pointer (AGENTS.md)
     → this orchestrator
     → deterministic scripts
     → live GitHub reconciliation

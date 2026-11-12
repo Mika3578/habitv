@@ -1,0 +1,33 @@
+# Cursor indexing exclusions (HabiTV)
+
+# Generated Maven outputs and reports
+**/target/
+**/dependency-reduced-pom.xml
+**/surefire-reports/
+
+# Agent scratch and local runtime layouts
+agent_space/
+local/
+repository/
+
+# Runtime logs, dumps, locks, indexes
+**/habiTv.log*
+*.log
+hs_err_pid*.log
+replay_pid*.log
+**/*.index
+**/habiTv.lock
+
+# Local app data / tool binaries (not source)
+application/core/generated/
+application/core/index/
+application/core/plugins/
+application/core/bin/
+plugins/**/bin/
+
+# IDE / OS noise
+.idea/
+.metadata/
+*.iml
+.DS_Store
+Thumbs.db

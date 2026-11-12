@@ -6,8 +6,8 @@ description: Runs focused then full Maven validation and records evidence before
 # Code change verification
 
 Canonical build baseline and commands: [`docs/development.md`](../../../docs/development.md).
-Policy gates: [`AGENTS.md`](../../../AGENTS.md) (**Testing and Validation**,
-**Pull request lifecycle**). PR orchestration:
+Policy gates: [`AGENTS.md`](../../../AGENTS.md) and
+[`docs/development.md`](../../../docs/development.md). PR orchestration:
 [pr-review](../pr-review/SKILL.md).
 
 ## Workflow
@@ -37,8 +37,8 @@ real-user functional test when runtime behavior changed
   developer convenience only and is **not** the Ready gate.
 - Record the exact command and outcome in the PR body. Do not claim success
   without actual output.
-- Real-user functional validation is separate; see **Pull request lifecycle**
-  in `AGENTS.md` and [`.agents/skills/pr-review/SKILL.md`](../../../.agents/skills/pr-review/SKILL.md).
+- Real-user functional validation is separate; see
+  [`.agents/skills/pr-review/SKILL.md`](../../../.agents/skills/pr-review/SKILL.md).
 
 ## Docs-only exemption
 
