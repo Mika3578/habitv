@@ -9,13 +9,13 @@
 	</parent>
 	<artifactId>clubic</artifactId>
 	<name>clubic</name>
-	<version>4.1.0-SNAPSHOT</version>
+	<version>4.1.1-SNAPSHOT</version>
 
 <dependencies>
 		<dependency>
 			<groupId>com.dabi.habitv</groupId>
 			<artifactId>plugin-tester</artifactId>
-			<version>${project.version}</version>
+			<version>${project.parent.version}</version>
 			<scope>test</scope>
 		</dependency>	
 		<dependency>
