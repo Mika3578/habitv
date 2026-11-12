@@ -34,6 +34,7 @@
 		<module>RSS</module>
 		<module>rtmpDump</module>
 		<module>sfr</module>
+		<module>tv5plus</module>
 		<module>youtube</module>
 		<module>wat</module>
 	</modules>
