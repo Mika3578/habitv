@@ -1,9 +1,10 @@
 package com.dabi.habitv.tray.controller.dl;
 
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
 import com.dabi.habitv.api.plugin.holder.DownloadProgressSnapshot;
@@ -13,13 +14,14 @@ import com.dabi.habitv.tray.model.ActionProgress;
 import com.dabi.habitv.tray.utils.DownloadProgressFormatter;
 import com.dabi.habitv.tray.utils.LabelUtils;
 
-public class DownloadBox extends Pane {
+public class DownloadBox extends StackPane {
 
 	private EpisodeDTO episode;
 
 	public DownloadBox(final ViewController viewController, final ActionProgress actionProgress) {
 		super();
 		this.episode = actionProgress.getEpisode();
+		setAlignment(Pos.CENTER_LEFT);
 		getChildren().add(getStateWidget(null, actionProgress));
 	}
 
@@ -71,7 +73,8 @@ public class DownloadBox extends Pane {
 		if (!snapshot.isIndeterminate() && snapshot.getProgressRatio() != null) {
 			final String percent = DownloadProgressFormatter.formatPercentage(snapshot.getProgressRatio());
 			if (percent != null) {
-				builder.append(" · ").append(percent);
+				// Percentage first so it stays visible when the label is clipped.
+				builder.insert(0, percent + " · ");
 			}
 		} else {
 			builder.append("…");
