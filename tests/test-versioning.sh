@@ -91,6 +91,134 @@ test_bump_failure() {
     fi
 }
 
+# Call the validator with a literal argv message (never eval — payloads may contain $()).
+test_validate_message() {
+    local test_name="$1"
+    local message="$2"
+    local expected_exit="$3"
+
+    echo -n "Testing: $test_name ... "
+
+    set +e
+    "$VALIDATE_SCRIPT" "$message" > /dev/null 2>&1
+    local actual_exit=$?
+    set -e
+
+    if [[ $actual_exit -eq $expected_exit ]]; then
+        echo "✅"
+        TESTS_PASSED=$((TESTS_PASSED + 1))
+    else
+        echo "❌ (expected exit $expected_exit, got $actual_exit)"
+        TESTS_FAILED=$((TESTS_FAILED + 1))
+    fi
+}
+
+# Env passthrough must keep payload as data: no parse error, no $(...) execution.
+test_env_passthrough_does_not_execute() {
+    local test_name="$1"
+    echo -n "Testing: $test_name ... "
+
+    local tmpdir sentinel payload status
+    tmpdir="$(mktemp -d)"
+    sentinel="$tmpdir/injected"
+
+    payload=$(cat <<EOF
+feat(download-progress): add phase-aware parsing (#260)
+
+Body with "quotes", \`backticks\`, and \$(touch '$sentinel').
+<a href="https://example.test" media="(prefers-color-scheme: dark)">link</a>
+EOF
+)
+
+    set +e
+    COMMIT_MESSAGE="$payload" bash -c 'bash "$1" "$COMMIT_MESSAGE"' _ "$VALIDATE_SCRIPT" > /dev/null 2>&1
+    status=$?
+    set -e
+
+    if [[ $status -ne 0 ]]; then
+        echo "❌ (validator rejected env/argv passthrough, exit $status)"
+        TESTS_FAILED=$((TESTS_FAILED + 1))
+        rm -rf "$tmpdir"
+        return
+    fi
+    if [[ -e "$sentinel" ]]; then
+        echo "❌ (command substitution in message was executed)"
+        TESTS_FAILED=$((TESTS_FAILED + 1))
+        rm -rf "$tmpdir"
+        return
+    fi
+
+    echo "✅"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+    rm -rf "$tmpdir"
+}
+
+# Mimic GitHub expanding a quoted expression into generated Bash source.
+test_interpolated_script_is_invalid() {
+    local test_name="$1"
+    echo -n "Testing: $test_name ... "
+
+    local tmpdir unsafe payload status
+    tmpdir="$(mktemp -d)"
+    unsafe="$tmpdir/interpolated.sh"
+
+    payload=$(cat <<'EOF'
+feat(download-progress): add phase-aware parsing (#260)
+
+Body with "quotes", `backticks`, and $(literal text).
+<a href="https://example.test" media="(prefers-color-scheme: dark)">link</a>
+EOF
+)
+
+    {
+        printf '%s\n' '#!/bin/bash'
+        printf 'bash %q "' "$VALIDATE_SCRIPT"
+        printf '%s' "$payload"
+        printf '"\n'
+    } > "$unsafe"
+
+    set +e
+    bash "$unsafe" > /dev/null 2>&1
+    status=$?
+    set -e
+
+    if [[ $status -eq 0 ]]; then
+        echo "❌ (interpolated script unexpectedly parsed)"
+        TESTS_FAILED=$((TESTS_FAILED + 1))
+        rm -rf "$tmpdir"
+        return
+    fi
+
+    echo "✅"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+    rm -rf "$tmpdir"
+}
+
+assert_workflow_uses_env_for_commit_message() {
+    local test_name="$1"
+    local workflow="$SCRIPT_DIR/.github/workflows/validate-versions.yml"
+    echo -n "Testing: $test_name ... "
+
+    if grep -F 'validate-conventional-commit.sh "${{ steps.commit.outputs.message }}"' "$workflow" > /dev/null; then
+        echo "❌ (workflow still interpolates the commit message into Bash source)"
+        TESTS_FAILED=$((TESTS_FAILED + 1))
+        return
+    fi
+    if ! grep -F 'COMMIT_MESSAGE: ${{ steps.commit.outputs.message }}' "$workflow" > /dev/null; then
+        echo "❌ (workflow does not pass the commit message through env)"
+        TESTS_FAILED=$((TESTS_FAILED + 1))
+        return
+    fi
+    if ! grep -F 'bash scripts/validate-conventional-commit.sh "$COMMIT_MESSAGE"' "$workflow" > /dev/null; then
+        echo "❌ (Validate format does not invoke the script with \$COMMIT_MESSAGE)"
+        TESTS_FAILED=$((TESTS_FAILED + 1))
+        return
+    fi
+
+    echo "✅"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+}
+
 echo ""
 echo "=== Conventional Commits Validation Tests ==="
 echo ""
@@ -152,6 +280,16 @@ run_test "Invalid: unknown type" \
 run_test "Invalid: empty message" \
     "$VALIDATE_SCRIPT ''" \
     1
+
+test_validate_message "Valid: multiline body with parentheses, quotes, backticks, and \$() text" \
+    $'feat(test): validate message\n\nBody with (#260), "quotes", `backticks`, and $(literal text)' \
+    0
+
+test_env_passthrough_does_not_execute "Env/argv passthrough does not execute message metacharacters"
+
+test_interpolated_script_is_invalid "Quoted interpolation of a PR-like body is invalid Bash"
+
+assert_workflow_uses_env_for_commit_message "Workflow passes commit message via env, not run-script interpolation"
 
 echo ""
 echo "=== Version Bump Calculation Tests ==="
