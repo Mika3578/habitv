@@ -103,7 +103,13 @@ public final class YtDlpProgressParser {
 		if (prefixIndex < 0) {
 			return null;
 		}
-		final String json = trimmed.substring(prefixIndex + YoutubeConf.PROGRESS_LINE_PREFIX.length()).trim();
+		final String payload = trimmed.substring(prefixIndex + YoutubeConf.PROGRESS_LINE_PREFIX.length());
+		final int phaseEnd = payload.indexOf(':');
+		if (phaseEnd <= 0) {
+			return null;
+		}
+		final String phase = payload.substring(0, phaseEnd);
+		final String json = payload.substring(phaseEnd + 1).trim();
 		if (json.isEmpty() || !json.startsWith("{")) {
 			return null;
 		}
@@ -116,12 +122,11 @@ public final class YtDlpProgressParser {
 		if (root == null || !root.isObject()) {
 			return null;
 		}
-		final String phase = jsonTextField(root, "phase");
-		if ("download".equalsIgnoreCase(phase)) {
+		if (YoutubeConf.PROGRESS_PHASE_DOWNLOAD.equals(phase)) {
 			return buildTemplateDownloadSnapshot(root, previous);
 		}
-		if ("postprocess".equalsIgnoreCase(phase)) {
-			final String pp = jsonTextField(root, "pp");
+		if (YoutubeConf.PROGRESS_PHASE_POSTPROCESS.equals(phase)) {
+			final String pp = jsonTextField(root, "postprocessor");
 			final DownloadStage stage = stageFromPostProcessorName(pp);
 			return DownloadProgressSnapshot.indeterminate(stage, pp == null || pp.isEmpty() ? null : pp);
 		}
@@ -130,21 +135,21 @@ public final class YtDlpProgressParser {
 
 	private static DownloadProgressSnapshot buildTemplateDownloadSnapshot(final JsonNode root,
 			final DownloadProgressSnapshot previous) {
-		final Double pct = jsonNumberField(root, "pct");
+		final Double pct = jsonNumberField(root, "_percent");
 		final Double ratio = pct == null ? null
 				: Double.valueOf(Math.min(1.0d, Math.max(0.0d, pct.doubleValue() / 100.0d)));
 
-		final String totalToken = jsonTextField(root, "total");
+		final String totalToken = jsonTextField(root, "_total_bytes_str");
 		final Long totalBytes = parseSizeToBytes(totalToken);
 		Long downloadedBytes = null;
 		if (ratio != null && totalBytes != null) {
 			downloadedBytes = Long.valueOf(Math.round(totalBytes.doubleValue() * ratio.doubleValue()));
 		}
 
-		final Double bytesPerSecond = parseSpeedToBytesPerSecond(jsonTextField(root, "speed"));
-		final Long etaSeconds = parseEtaToSeconds(jsonTextField(root, "eta"));
+		final Double bytesPerSecond = parseSpeedToBytesPerSecond(jsonTextField(root, "_speed_str"));
+		final Long etaSeconds = parseEtaToSeconds(jsonTextField(root, "_eta_str"));
 
-		final String dest = jsonTextField(root, "dest");
+		final String dest = jsonTextField(root, "filename");
 		final String detail;
 		if (dest != null && !dest.isEmpty()) {
 			detail = detectStreamLabel(dest);

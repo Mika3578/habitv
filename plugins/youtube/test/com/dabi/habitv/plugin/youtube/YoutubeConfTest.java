@@ -18,8 +18,12 @@ public class YoutubeConfTest {
 
 	private static final String WINDOWS_CMD_PROCESSOR = "cmd.exe /c #CMD#";
 	private static final String UNIX_CMD_PROCESSOR = "/bin/sh -c #CMD#";
-	private static final String UNIX_JSON_DEST = "\\\"dest\\\":%(progress.filename)j";
-	private static final String WINDOWS_JSON_DEST = "\"\"dest\"\":%(progress.filename)j";
+	private static final String DOWNLOAD_FIELDS = "%(progress.{_percent,_total_bytes_str,_speed_str,_eta_str,filename})j";
+	private static final String POSTPROCESS_FIELDS = "%(progress.{postprocessor,status})j";
+	/** Sample lines as printed by yt-dlp for the templates above. */
+	private static final String DOWNLOAD_JSON = "{\"_percent\": 11.4, \"_total_bytes_str\": \"  159.60MiB\", "
+			+ "\"_speed_str\": \"  7.80MiB/s\", \"_eta_str\": \"00:18\", \"filename\": \"C:\\\\tmp\\\\episode.f137.mp4\"}";
+	private static final String POSTPROCESS_JSON = "{\"postprocessor\": \"Merger\", \"status\": \"started\"}";
 
 	@Test
 	public void defaultWindowsExecutableIsYtDlpExe() {
@@ -40,14 +44,12 @@ public class YoutubeConfTest {
 		assertTrue(YoutubeConf.DUMP_CMD.contains("--newline"));
 		assertTrue(YoutubeConf.DUMP_CMD.contains("--no-check-certificate"));
 		assertFalse(YoutubeConf.DUMP_CMD.contains("--progress-template"));
-		assertTrue(YoutubeConf.augmentBuiltInDumpCommand(YoutubeConf.DUMP_CMD, "2024.01.01", "/bin/sh -c #CMD#")
+		assertTrue(YoutubeConf.augmentBuiltInDumpCommand(YoutubeConf.DUMP_CMD, "2024.01.01")
 				.contains("--progress-template"));
-		assertTrue(YoutubeConf.augmentBuiltInDumpCommand(YoutubeConf.DUMP_CMD, "2023.09.01", "/bin/sh -c #CMD#")
+		assertTrue(YoutubeConf.augmentBuiltInDumpCommand(YoutubeConf.DUMP_CMD, "2023.09.01")
 				.equals(YoutubeConf.DUMP_CMD));
-		assertTrue(YoutubeConf.progressTemplateFlagsFor(WINDOWS_CMD_PROCESSOR).contains("%(progress._percent)j"));
-		assertFalse(YoutubeConf.progressTemplateFlagsFor(WINDOWS_CMD_PROCESSOR).contains("%(progress._percent)s"));
-		assertTrue(YoutubeConf.progressTemplateFlagsFor(UNIX_CMD_PROCESSOR).contains(UNIX_JSON_DEST));
-		assertTrue(YoutubeConf.progressTemplateFlagsFor(WINDOWS_CMD_PROCESSOR).contains(WINDOWS_JSON_DEST));
+		assertTrue(YoutubeConf.PROGRESS_TEMPLATE_FLAGS.contains(DOWNLOAD_FIELDS));
+		assertTrue(YoutubeConf.PROGRESS_TEMPLATE_FLAGS.contains(POSTPROCESS_FIELDS));
 		assertFalse(YoutubeConf.DUMP_CMD.contains("--audio-quality"));
 		assertFalse(YoutubeConf.DUMP_CMD.contains("--extract-audio"));
 		assertFalse(YoutubeConf.DUMP_CMD.contains("-x"));
@@ -61,25 +63,14 @@ public class YoutubeConfTest {
 	}
 
 	@Test
-	public void unixProgressTemplateKeepsBackslashJsonQuotes() {
-		final String flags = YoutubeConf.progressTemplateFlagsFor(UNIX_CMD_PROCESSOR);
-		assertEquals(YoutubeConf.PROGRESS_TEMPLATE_FLAGS, flags);
-		assertTrue(flags.contains(UNIX_JSON_DEST));
-		assertFalse(flags.contains(WINDOWS_JSON_DEST));
-		assertTrue(flags.contains("%(progress._percent)j"));
-		assertFalse(flags.contains("%%(progress._percent)j"));
-	}
-
-	@Test
-	public void windowsProgressTemplateUsesDoubledJsonQuotes() {
-		final String flags = YoutubeConf.progressTemplateFlagsFor(WINDOWS_CMD_PROCESSOR);
-		assertTrue(flags.contains(WINDOWS_JSON_DEST));
-		assertFalse(flags.contains(UNIX_JSON_DEST));
-		assertTrue(flags.contains("%(progress._percent)j"));
-		assertFalse(flags.contains("%%(progress._percent)j"));
-		assertTrue(YoutubeConf.progressTemplateFlagsFor("C:\\Windows\\System32\\cmd.exe /c #CMD#")
-				.contains(WINDOWS_JSON_DEST));
-		assertTrue(YoutubeConf.progressTemplateFlagsFor("CMD.EXE /c #CMD#").contains(WINDOWS_JSON_DEST));
+	public void progressTemplatesCarryNoNestedQuotes() {
+		final List<String> templates = progressTemplateValues(
+				tokenizeSh(YoutubeConf.augmentBuiltInDumpCommand(YoutubeConf.DUMP_CMD, "2024.01.01")));
+		assertEquals(2, templates.size());
+		for (final String template : templates) {
+			assertFalse(template, template.contains("\""));
+			assertFalse(template, template.contains("\\"));
+		}
 	}
 
 	@Test
@@ -94,8 +85,7 @@ public class YoutubeConfTest {
 
 	private static void assertProgressTemplatesParseAfterUnquote(final String cmdProcessor,
 			final boolean windowsCmd) {
-		final String command = YoutubeConf.augmentBuiltInDumpCommand(YoutubeConf.DUMP_CMD, "2024.01.01",
-				cmdProcessor);
+		final String command = YoutubeConf.augmentBuiltInDumpCommand(YoutubeConf.DUMP_CMD, "2024.01.01");
 		final String afterTokenReplace = replaceCmdToken(cmdProcessor, command);
 		final List<String> args = windowsCmd ? tokenizeCmdExe(afterTokenReplace) : tokenizeSh(afterTokenReplace);
 		final List<String> templates = progressTemplateValues(args);
@@ -137,12 +127,7 @@ public class YoutubeConfTest {
 	}
 
 	private static String instantiatePlaceholders(final String template) {
-		return template.replace("%(progress._percent)j", "11.4")
-				.replace("%(progress._total_bytes_str)s", "159.60MiB")
-				.replace("%(progress._speed_str)s", "7.80MiB/s")
-				.replace("%(progress._eta_str)s", "00:18")
-				.replace("%(progress.filename)j", "\"episode.f137.mp4\"")
-				.replace("%(postprocessor)s", "Merger");
+		return template.replace(DOWNLOAD_FIELDS, DOWNLOAD_JSON).replace(POSTPROCESS_FIELDS, POSTPROCESS_JSON);
 	}
 
 	/**
