@@ -16,8 +16,10 @@
 	<modules>
 		<module>core</module>
 		<module>consoleView</module>
-		<module>trayView</module>		
+		<module>trayView</module>
 		<module>habiTv</module>
+		<module>habiTv-linux</module>
+		<module>habiTv-windows</module>
 	</modules>
 	
 	<dependencyManagement>

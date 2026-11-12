@@ -31,8 +31,8 @@ real-user functional test when runtime behavior changed
   behavior, providers, download logic, packaging, startup, or UI.
 - Use the required CI jobs as the full-reactor gate
   ([`docs/development.md`](../../../docs/development.md)):
-  `validate-java8`, `deterministic-tests-java8`, and
-  `compile-and-package-java8`. Locally, prefer matching those commands; the
+  `validate-java21`, `deterministic-tests-java21`, and
+  `compile-and-package-java21`. Locally, prefer matching those commands; the
   documented package example that excludes `trayView`/`habiTv` is for
   developer convenience only and is **not** the Ready gate.
 - Record the exact command and outcome in the PR body. Do not claim success

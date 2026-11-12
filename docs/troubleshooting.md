@@ -8,10 +8,10 @@ Providers: [`providers.md`](providers.md). Configuration:
 
 | Symptom | Likely cause | What to do |
 |---------|--------------|------------|
-| GUI `package` fails with missing JavaFX / `jfxrt` | Build JDK has no JavaFX | Use a JavaFX-capable JDK 8, or package console only |
+| GUI `package` fails with missing JavaFX classes | OpenJFX dependencies not resolved | Build with JDK 21 and let Maven resolve OpenJFX, or package console only |
 | `mvn test` hits the network | Live `*PluginManagerTest` | Default Surefire excludes them; do not enable `-Plive-provider-tests` unless intended |
-| `mvn verify` used as merge bar | Full lifecycle still gated | Required CI: validate + deterministic tests + Java 8 package |
-| Java 9+ APIs in app code | Baseline drift | Bytecode is **1.8**; `maven.compiler.release` is unset |
+| `mvn verify` used as merge bar | Full lifecycle still gated | Required CI: validate + deterministic tests + Java 21 package |
+| Compile fails on a JDK below 21 | Wrong build JDK | `maven.compiler.release` is `21`; build with JDK 21 |
 
 ## Run
 

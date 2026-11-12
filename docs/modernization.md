@@ -4,7 +4,7 @@ Durable direction only. Actionable work lives in GitHub issues and PRs.
 
 ## Direction
 
-1. Keep the existing Maven application working on the **current Java 8**
+1. Keep the existing Maven application working on the **current Java 21**
    baseline ([`development.md`](development.md)).
 2. Restore providers incrementally with offline fixtures, then live checks.
 3. Treat the console fat JAR as the supported baseline; JavaFX packaging

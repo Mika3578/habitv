@@ -36,12 +36,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Liberica JDK 8 with JavaFX
+      - name: Set up Temurin JDK 21
         uses: ./.github/actions/setup-build-jdk
         with:
-          distribution: liberica
-          java-version: "8"
-          java-package: jdk+fx
+          distribution: temurin
+          java-version: "21"
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4

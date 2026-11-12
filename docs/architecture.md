@@ -17,13 +17,13 @@ Interfaces:
 
 - **Console** (`application/consoleView`) — supported modernization baseline
 - **Tray / JavaFX GUI** (`application/trayView`, `application/habiTv`) —
-  still Java 8 + JavaFX 2.x; packaging is tracked separately
+  Java 21 + OpenJFX; packaging is tracked separately
 
 ## Maven reactor
 
 Root parent: `com.dabi.habitv:parent:4.1.0-SNAPSHOT` (`pom.xml`).
-Default reactor: **35 modules** (`mvn -B -ntp -DskipTests validate` on
-2026-09-19). Out-of-reactor packaging modules are listed below.
+Default reactor: **37 modules** (`mvn -B -ntp -DskipTests validate` on
+2026-11-11), including the packaging modules listed below.
 
 ```
 .
@@ -35,19 +35,16 @@ Default reactor: **35 modules** (`mvn -B -ntp -DskipTests validate` on
 │   ├── core/               # grab/config, tasks, plugin manager
 │   ├── consoleView/        # CLI fat JAR
 │   ├── trayView/           # JavaFX tray UI
-│   └── habiTv/             # GUI launcher
+│   ├── habiTv/             # GUI launcher
+│   ├── habiTv-linux/       # Linux installer packaging
+│   └── habiTv-windows/     # Windows installer packaging
 ├── plugins/                # provider, downloader, and exporter modules
 └── build/static-repo-publisher/   # only with -Pstatic-repo-deploy / -Pstatic-repo-publish
 ```
 
-**Out of the default reactor** (present on disk, not in aggregator
-`<modules>`):
-
-- `application/habiTv-linux`
-- `application/habiTv-windows`
-
-Those two still assume a JavaFX-capable JDK 8 and `${jdk.home}`. Do not
-remove them in a documentation cleanup. Java compiler/CI baseline:
+Packaging modules `application/habiTv-linux` and
+`application/habiTv-windows` build on Java 21 with OpenJFX Maven
+dependencies; installers are produced only with their opt-in profiles. Java compiler/CI baseline:
 [`development.md`](development.md).
 
 Confirm the live module list with:
@@ -96,7 +93,7 @@ repository is historical only ([`history.md`](history.md)).
 | Artifact | How to get it | Notes |
 |----------|---------------|--------|
 | Console fat JAR | `mvn -B -ntp -DskipTests -pl "!application/trayView,!application/habiTv" package` | `application/consoleView/target/consoleView-4.1.0-SNAPSHOT-all.jar` |
-| GUI uber JAR | Full package on a **JavaFX-capable JDK 8** | Needs `jfxrt.jar` |
-| Windows / Linux installers | Out-of-reactor modules | Not part of the current console baseline |
+| GUI uber JAR | Full package on **JDK 21** | OpenJFX comes from Maven dependencies |
+| Windows / Linux installers | Opt-in profiles `windows-jpackage` / `linux-jpackage` | Needs the platform packaging tools |
 
 Exact commands: [`development.md`](development.md).
