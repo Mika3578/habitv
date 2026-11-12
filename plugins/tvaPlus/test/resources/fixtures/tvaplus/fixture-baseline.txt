@@ -1,0 +1,6 @@
+provider=tvaPlus
+strategy=nextjs-catalog-ytdlp
+channels=TVA (/tva public VIDEO_SHOW)
+catalog=/tva A-Z + /ajoutes-recemment TVA episodes
+access=Canada geo (Brightcove); PUBLIC only; illico/subscription excluded
+notes=yt-dlp IE tvaplus; seasons via knownEntities.seasons then Épisodes carousel
