@@ -15,8 +15,11 @@ class ProgressIndicatorBar extends StackPane {
 	private final Tooltip tooltip = new Tooltip();
 
 	private static final int DEFAULT_LABEL_PADDING = 5;
+	private static final double MIN_BAR_WIDTH = 80.0d;
 
 	ProgressIndicatorBar() {
+		setMaxWidth(Double.MAX_VALUE);
+		bar.setMinWidth(MIN_BAR_WIDTH);
 		bar.setMaxWidth(Double.MAX_VALUE);
 		text.setAlignment(Pos.CENTER);
 		text.setMaxWidth(Double.MAX_VALUE);
@@ -47,8 +50,9 @@ class ProgressIndicatorBar extends StackPane {
 			Tooltip.install(this, tooltip);
 		}
 
-		bar.setMinHeight(text.getBoundsInLocal().getHeight() + DEFAULT_LABEL_PADDING * 2);
-		bar.setMinWidth(Math.max(80.0d, text.getBoundsInLocal().getWidth() + DEFAULT_LABEL_PADDING * 2));
+		// Size from the label's preferred height only: its laid-out bounds follow
+		// this pane, so feeding them back into the bar makes it grow on every update.
+		bar.setMinHeight(text.prefHeight(-1) + DEFAULT_LABEL_PADDING * 2);
 	}
 
 	/**
