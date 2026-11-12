@@ -73,7 +73,8 @@ public class DownloadBox extends StackPane {
 		if (!snapshot.isIndeterminate() && snapshot.getProgressRatio() != null) {
 			final String percent = DownloadProgressFormatter.formatPercentage(snapshot.getProgressRatio());
 			if (percent != null) {
-				builder.append(" · ").append(percent);
+				// Percentage first so it stays visible when the label is clipped.
+				builder.insert(0, percent + " · ");
 			}
 		} else {
 			builder.append("…");
