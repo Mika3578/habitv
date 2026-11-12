@@ -232,6 +232,12 @@ for script in scripts/validate-pr-public-body.sh scripts/validate-pr-public-body
   fi
 done
 
+if [[ ! -f scripts/test-branch-policy-hook.sh ]]; then
+  fail "missing branch policy hook test script"
+elif ! bash scripts/test-branch-policy-hook.sh; then
+  fail "branch policy hook tests failed"
+fi
+
 if [[ "$failures" -gt 0 ]]; then
   echo "agent-policy: FAILED ($failures check(s))"
   exit 1

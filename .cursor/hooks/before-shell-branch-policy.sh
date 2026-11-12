@@ -3,15 +3,78 @@
 # the branch already has a published upstream (continuing an open PR head).
 # See .agents/skills/git-workflow/SKILL.md
 #
-# This is a best-effort Cursor shell guard, not a full argv parser. Direct
-# publish forms are classified; ambiguous wrappers fail closed.
+# Best-effort Cursor shell guard, not a full argv parser. Direct publish forms
+# are classified; ambiguous wrappers fail closed.
 
 set -euo pipefail
+
+_HABITV_HOOK_RESPONDED=0
 
 if [[ "${HABITV_SKIP_BRANCH_HOOK:-}" == "1" ]]; then
   printf '%s\n' '{"permission":"allow"}'
   exit 0
 fi
+
+emit_response() {
+  _HABITV_HOOK_RESPONDED=1
+  printf '%s\n' "$1"
+}
+
+json_escape() {
+  local s="$1"
+  s="${s//\\/\\\\}"
+  s="${s//\"/\\\"}"
+  s="${s//$'\n'/\\n}"
+  s="${s//$'\r'/\\r}"
+  s="${s//$'\t'/\\t}"
+  printf '%s' "$s"
+}
+
+allow() {
+  emit_response '{"permission":"allow"}'
+  exit 0
+}
+
+policy_deny() {
+  local msg
+  msg="$(json_escape "$1")"
+  emit_response "{\"permission\":\"deny\",\"agent_message\":\"$msg\"}"
+  exit 0
+}
+
+runtime_deny() {
+  local msg
+  msg="$(json_escape "Branch policy hook runtime: $1")"
+  emit_response "{\"permission\":\"deny\",\"agent_message\":\"$msg\"}"
+  exit 0
+}
+
+dependency_deny() {
+  local msg
+  msg="$(json_escape "Branch policy hook dependency: $1")"
+  emit_response "{\"permission\":\"deny\",\"agent_message\":\"$msg\"}"
+  exit 0
+}
+
+_hook_on_err() {
+  if [[ "${_HABITV_HOOK_RESPONDED}" -eq 1 ]]; then
+    return 0
+  fi
+  runtime_deny "internal error near line ${BASH_LINENO[0]}."
+}
+
+_hook_on_exit() {
+  local ec=$?
+  if [[ "${_HABITV_HOOK_RESPONDED}" -eq 1 ]]; then
+    exit 0
+  fi
+  if [[ "$ec" -ne 0 ]]; then
+    runtime_deny "unexpected exit (code $ec)."
+  fi
+}
+
+trap _hook_on_err ERR
+trap _hook_on_exit EXIT
 
 resolve_jq() {
   if command -v jq >/dev/null 2>&1; then
@@ -33,7 +96,6 @@ resolve_jq() {
       return 0
     fi
   done
-  # Only search the current Windows user profile (no multi-user glob).
   if [[ -n "$user" ]]; then
     for candidate in \
       /mnt/c/Users/"$user"/AppData/Local/Microsoft/WinGet/Packages/jqlang.jq_*/jq.exe \
@@ -95,43 +157,109 @@ resolve_python() {
   return 1
 }
 
-deny() {
-  if [[ -n "${JQ_BIN:-}" ]]; then
-    "$JQ_BIN" -n --arg msg "$1" '{permission:"deny",agent_message:$msg}'
-  elif [[ -n "${PY_BIN:-}" ]]; then
-    "$PY_BIN" -c 'import json,sys; print(json.dumps({"permission":"deny","agent_message":sys.argv[1]}))' "$1"
-  else
-    printf '%s\n' '{"permission":"deny","agent_message":"Publishing blocked by branch policy."}'
-  fi
-  exit 0
-}
-
 json_field() {
   local key="$1"
   if [[ -n "${JQ_BIN:-}" ]]; then
-    "$JQ_BIN" -r --arg k "$key" '.[$k] // empty' <<<"$input" | tr -d '\r\n'
-  elif [[ -n "${PY_BIN:-}" ]]; then
-    "$PY_BIN" -c 'import json,sys; d=json.loads(sys.stdin.read()); v=d.get(sys.argv[1],""); print("" if v is None else v)' "$key" <<<"$input" | tr -d '\r\n'
-  else
-    printf ''
+    "$JQ_BIN" -r --arg k "$key" '.[$k] // empty' <<<"$input" 2>/dev/null | tr -d '\r\n' || true
+    return 0
   fi
+  if [[ -n "${PY_BIN:-}" ]]; then
+    "$PY_BIN" -c 'import json,sys; d=json.loads(sys.stdin.read()); v=d.get(sys.argv[1],""); print("" if v is None else v)' "$key" <<<"$input" 2>/dev/null | tr -d '\r\n' || true
+    return 0
+  fi
+  printf ''
+}
+
+json_field_fallback() {
+  local key="$1"
+  local value=""
+  if [[ "$input" =~ \"$key\"[[:space:]]*:[[:space:]]*\"([^\"]+)\" ]]; then
+    value="${BASH_REMATCH[1]}"
+  fi
+  printf '%s' "$value"
+}
+
+normalize_path_token() {
+  local p="$1"
+  p="${p#\"}"
+  p="${p%\"}"
+  p="${p#\'}"
+  p="${p%\'}"
+  p="${p//\\//}"
+  while [[ "$p" == */ && "$p" != "/" ]]; do
+    p="${p%/}"
+  done
+  if [[ "$p" =~ ^([A-Za-z]):/(.*)$ ]]; then
+    local drive rest
+    drive="$(printf '%s' "${BASH_REMATCH[1]}" | tr '[:upper:]' '[:lower:]')"
+    rest="${BASH_REMATCH[2]}"
+    p="${drive}:/${rest}"
+  fi
+  printf '%s' "$p"
+}
+
+paths_same() {
+  local a="$1" b="$2"
+  local na nb
+  na="$(normalize_path_token "$a")"
+  nb="$(normalize_path_token "$b")"
+  if [[ -n "$na" && "$na" == "$nb" ]]; then
+    return 0
+  fi
+  if [[ -d "$a" && -d "$b" ]]; then
+    local ra rb
+    ra="$(cd "$a" 2>/dev/null && pwd)" || return 1
+    rb="$(cd "$b" 2>/dev/null && pwd)" || return 1
+    [[ "$ra" == "$rb" ]]
+    return
+  fi
+  return 1
+}
+
+cd_blocks_publish() {
+  local cmd_u="$1" cmd_n="$2" repo="$3" hook_cwd="$4"
+  if [[ ! "$cmd_u" =~ (^|[[:space:];&|])cd[[:space:]] ]] && [[ ! "$cmd_n" =~ (^|[[:space:];&|])cd[[:space:]] ]]; then
+    return 1
+  fi
+  local cd_target=""
+  if [[ "$cmd_n" =~ (^|[[:space:];&|])cd[[:space:]]+\"([^\"]+)\" ]]; then
+    cd_target="${BASH_REMATCH[2]}"
+  elif [[ "$cmd_n" =~ (^|[[:space:];&|])cd[[:space:]]+\'([^\']+)\' ]]; then
+    cd_target="${BASH_REMATCH[2]}"
+  elif [[ "$cmd_u" =~ (^|[[:space:];&|])cd[[:space:]]+([^;&|]+) ]]; then
+    cd_target="${BASH_REMATCH[2]}"
+    cd_target="${cd_target%%[[:space:]]&&*}"
+    cd_target="$(printf '%s' "$cd_target" | sed -E 's/[[:space:]]+$//')"
+  fi
+  if [[ -z "$cd_target" ]]; then
+    return 0
+  fi
+  if paths_same "$cd_target" "$repo" || paths_same "$cd_target" "$hook_cwd"; then
+    return 1
+  fi
+  return 0
 }
 
 input="$(cat || true)"
 if [[ -z "$input" ]]; then
-  printf '%s\n' '{"permission":"deny","agent_message":"Branch policy hook received empty input."}'
-  exit 0
+  policy_deny "Branch policy hook received empty input."
 fi
 
 JQ_BIN="$(resolve_jq || true)"
 PY_BIN="$(resolve_python || true)"
-if [[ -z "$JQ_BIN" && -z "$PY_BIN" ]]; then
-  printf '%s\n' '{"permission":"deny","agent_message":"Branch policy hook requires jq or python for safe JSON parsing."}'
-  exit 0
-fi
 
 command="$(json_field command)"
 cwd="$(json_field cwd)"
+if [[ -z "$command" && -z "$JQ_BIN" && -z "$PY_BIN" ]]; then
+  command="$(json_field_fallback command)"
+  cwd="$(json_field_fallback cwd)"
+fi
+if [[ -z "$command" && ( -n "$JQ_BIN" || -n "$PY_BIN" ) ]]; then
+  runtime_deny "could not parse command field from hook input."
+fi
+if [[ -z "$command" && -z "$JQ_BIN" && -z "$PY_BIN" ]]; then
+  dependency_deny "install jq or Python in the hook bash environment, or simplify the shell command JSON."
+fi
 
 # Normalize quoted -C paths, quoted publish verbs, and git -c config flags.
 cmd_norm="$(printf '%s' "$command" | sed -E \
@@ -149,10 +277,8 @@ while [[ $_strip_i -lt 16 ]]; do
   _strip_i=$((_strip_i + 1))
 done
 unset _strip_i _cmd_next
-# Strip remaining simple quotes for cd / wrapper checks.
 cmd_unquoted="$(printf '%s' "$cmd_norm" | sed -E 's/"[^"]*"//g; s/'\''[^'\'']*'\''//g')"
 
-# Ambiguous indirection: fail closed when publish verbs appear.
 ambiguous=0
 if [[ "$cmd_unquoted" =~ (^|[[:space:];&|])([^[:space:]]*/)?(bash|sh|zsh|dash|pwsh|powershell)([[:space:]]|\.exe) ]] || \
    [[ "$cmd_unquoted" =~ (^|[[:space:];&|])(eval|source)[[:space:]] ]]; then
@@ -166,15 +292,14 @@ if [[ "$cmd_unquoted" =~ (push|commit|pr[[:space:]]+create) ]] || \
 fi
 
 if [[ "$ambiguous" -eq 1 && "$looks_publish" -eq 1 ]]; then
-  deny "Publishing blocked: ambiguous wrapper around git/gh publish. Run a direct git commit, git push, or gh pr create from the repository working directory."
+  policy_deny "Publishing blocked: ambiguous wrapper around git/gh publish. Run a direct git commit, git push, or gh pr create from the repository working directory."
 fi
 
-# Deny cd combined with a publish verb in the same shell statement.
-if [[ "$cmd_unquoted" =~ (^|[[:space:];&|])cd[[:space:]] ]] && [[ "$looks_publish" -eq 1 ]]; then
-  deny "Publishing blocked: do not combine cd with git commit, git push, or gh pr create in one shell command. Run publish commands from the repository working directory."
+repo_dir="${cwd:-}"
+if [[ "$looks_publish" -eq 1 ]] && cd_blocks_publish "$cmd_unquoted" "$cmd_norm" "$repo_dir" "$cwd"; then
+  policy_deny "Publishing blocked: do not combine cd with git commit, git push, or gh pr create in one shell command. Run publish commands from the repository working directory."
 fi
 
-# Direct publish: git / git.exe (optional absolute path) with optional -C, then push|commit.
 is_publish=0
 if [[ "$cmd_norm" =~ (^|[[:space:];&|])([^[:space:]]*/)?git(\.exe)?([[:space:]]+-C[[:space:]]+[^[:space:]]+)*([[:space:]]+[^[:space:]]+)*[[:space:]]+(push|commit)([[:space:]]|$) ]]; then
   is_publish=1
@@ -183,8 +308,6 @@ if [[ "$cmd_unquoted" =~ (^|[[:space:];&|])([^[:space:]]*/)?gh(\.exe)?[[:space:]
   is_publish=1
 fi
 
-# Prefer trusted hook cwd. Only honor git -C when the command is a clear direct publish.
-repo_dir="$cwd"
 if [[ "$is_publish" -eq 1 && "$ambiguous" -eq 0 ]]; then
   if [[ "$command" =~ (^|[[:space:]])([^[:space:]]*/)?git(\.exe)?[[:space:]]+-C[[:space:]]+\"([^\"]+)\" ]]; then
     repo_dir="${BASH_REMATCH[4]}"
@@ -195,7 +318,6 @@ if [[ "$is_publish" -eq 1 && "$ambiguous" -eq 0 ]]; then
   fi
 fi
 
-# Normalize Windows drive paths when the hook runs under WSL bash.
 if [[ -n "$repo_dir" && ! -d "$repo_dir" && "$repo_dir" =~ ^[A-Za-z]:[\\/] ]]; then
   drive="$(printf '%s' "${repo_dir:0:1}" | tr '[:upper:]' '[:lower:]')"
   rest="${repo_dir:2}"
@@ -208,48 +330,44 @@ fi
 
 if [[ -z "$repo_dir" || ! -d "$repo_dir" ]]; then
   if [[ "$is_publish" -eq 1 || "$looks_publish" -eq 1 ]]; then
-    deny "Publishing blocked: working directory missing or invalid; cannot validate branch policy."
+    policy_deny "Publishing blocked: working directory missing or invalid; cannot validate branch policy."
   fi
-  printf '%s\n' '{"permission":"allow"}'
-  exit 0
+  allow
 fi
 
-# Non-publish commands: no branch gate.
 if [[ "$is_publish" -eq 0 ]]; then
-  printf '%s\n' '{"permission":"allow"}'
-  exit 0
+  allow
 fi
 
 cd "$repo_dir"
 
 branch="$(git branch --show-current 2>/dev/null || true)"
+branch="${branch//$'\r'/}"
 if [[ -z "$branch" ]]; then
-  deny "Publishing blocked: detached HEAD or empty branch name. Check out a canonical <type>/<scope> branch before git commit, git push, or gh pr create."
+  policy_deny "Publishing blocked: detached HEAD or empty branch name. Check out a canonical <type>/<scope> branch before git commit, git push, or gh pr create."
 fi
 
 canonical='^(feat|fix|docs|test|refactor|chore|ci)/[a-z0-9]+(-[a-z0-9]+)*$'
 if [[ "$branch" =~ $canonical ]]; then
   scope="${branch#*/}"
-  # Match check-branch-name.sh: reject generated-looking -1a2e suffixes.
   if [[ "$scope" =~ -[0-9][0-9a-f]{3}$ ]]; then
-    deny "Publishing blocked: generated-looking branch suffix on '$branch'. Use a canonical <type>/<scope> without agent hex suffixes."
+    policy_deny "Publishing blocked: generated-looking branch suffix on '$branch'. Use a canonical <type>/<scope> without agent hex suffixes."
   fi
-  printf '%s\n' '{"permission":"allow"}'
-  exit 0
+  allow
 fi
 
 platform='^(cursor|claude|codex|ai)/'
 if [[ "$branch" =~ $platform ]]; then
   upstream="$(git rev-parse --abbrev-ref '@{u}' 2>/dev/null || true)"
+  upstream="${upstream//$'\r'/}"
   if [[ -n "$upstream" && "$upstream" == */* ]]; then
     remote="${upstream%%/*}"
     remote_branch="${upstream#*/}"
     if [[ "$remote_branch" == "$branch" ]] && git ls-remote --exit-code --heads "$remote" "$remote_branch" >/dev/null 2>&1; then
-      printf '%s\n' '{"permission":"allow"}'
-      exit 0
+      allow
     fi
   fi
-  deny "Publishing blocked: platform-generated branch. Before first publish, determine canonical <type>/<scope>, create/switch branch from origin/develop, verify with git branch --show-current. Procedure: .agents/skills/git-workflow/SKILL.md"
+  policy_deny "Publishing blocked: platform-generated branch. Before first publish, determine canonical <type>/<scope>, create/switch branch from origin/develop, verify with git branch --show-current. Procedure: .agents/skills/git-workflow/SKILL.md"
 fi
 
-deny "Publishing blocked: branch name must match <type>/<scope> (feat|fix|docs|test|refactor|chore|ci). See .agents/skills/git-workflow/SKILL.md"
+policy_deny "Publishing blocked: branch name must match <type>/<scope> (feat|fix|docs|test|refactor|chore|ci). See .agents/skills/git-workflow/SKILL.md"

@@ -248,6 +248,27 @@ if (-not (Test-Path $prReviewSkill)) {
     }
 }
 
+$hookTests = "scripts/test-branch-policy-hook.sh"
+if (-not (Test-Path $hookTests)) {
+    Fail "missing branch policy hook test script"
+} else {
+    $bash = $null
+    foreach ($candidate in @("bash", "C:\Program Files\Git\bin\bash.exe")) {
+        if (Get-Command $candidate -ErrorAction SilentlyContinue) {
+            $bash = $candidate
+            break
+        }
+    }
+    if (-not $bash) {
+        Fail "bash required to run $hookTests"
+    } else {
+        & $bash $hookTests
+        if ($LASTEXITCODE -ne 0) {
+            Fail "branch policy hook tests failed"
+        }
+    }
+}
+
 if ($failures -gt 0) {
     Write-Host "agent-policy: FAILED ($failures check(s))"
     exit 1
