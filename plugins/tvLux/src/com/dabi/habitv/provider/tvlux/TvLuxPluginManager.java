@@ -1,0 +1,173 @@
+package com.dabi.habitv.provider.tvlux;
+
+import java.io.IOException;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
+import com.dabi.habitv.api.plugin.api.PluginDownloaderInterface.DownloadableState;
+import com.dabi.habitv.api.plugin.api.PluginProviderDownloaderInterface;
+import com.dabi.habitv.api.plugin.dto.CategoryDTO;
+import com.dabi.habitv.api.plugin.dto.DownloadParamDTO;
+import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
+import com.dabi.habitv.api.plugin.dto.EpisodeMetadataDTO;
+import com.dabi.habitv.api.plugin.exception.DownloadFailedException;
+import com.dabi.habitv.api.plugin.holder.DownloaderPluginHolder;
+import com.dabi.habitv.api.plugin.holder.ProcessHolder;
+import com.dabi.habitv.framework.FrameworkConf;
+import com.dabi.habitv.framework.plugin.api.BasePluginWithProxy;
+import com.dabi.habitv.framework.plugin.utils.DownloadFailureDiagnostics;
+import com.dabi.habitv.framework.plugin.utils.DownloadUtils;
+
+/**
+ * TV Lux provider: HTML replay catalogue and Freecaster HLS download via ffmpeg.
+ */
+public class TvLuxPluginManager extends BasePluginWithProxy implements PluginProviderDownloaderInterface {
+
+	private final TvLuxClient client;
+
+	public TvLuxPluginManager() {
+		this.client = new TvLuxClient(new TvLuxClient.ContentLoader() {
+			@Override
+			public String load(final String url) throws IOException {
+				try {
+					return getUrlContent(url);
+				} catch (final RuntimeException e) {
+					throw new IOException(e.getMessage(), e);
+				}
+			}
+		});
+	}
+
+	TvLuxPluginManager(final TvLuxClient client) {
+		this.client = client;
+	}
+
+	@Override
+	public String getName() {
+		return TvLuxConf.NAME;
+	}
+
+	@Override
+	public Set<CategoryDTO> findCategory() {
+		final Set<CategoryDTO> categories = new LinkedHashSet<CategoryDTO>();
+		final TvLuxDiagnostics diagnostics = new TvLuxDiagnostics("catalogue");
+		diagnostics.setSourceUrl(TvLuxUrls.replayIndexUrl());
+		try {
+			final List<TvLuxHtml.ShowRef> shows = client.loadShows();
+			for (final TvLuxHtml.ShowRef show : shows) {
+				final CategoryDTO category = new CategoryDTO(TvLuxConf.NAME, show.title,
+						TvLuxUrls.showCategoryId(show.slug), TvLuxConf.EXTENSION);
+				category.setDownloadable(true);
+				categories.add(category);
+			}
+			diagnostics.setCreatedItems(categories.size());
+			if (categories.isEmpty()) {
+				diagnostics.setRootCauseSummary("empty-catalog");
+			}
+		} catch (final IOException e) {
+			diagnostics.setRootCauseSummary("io-error:" + e.getClass().getSimpleName());
+			getLog().warn("TV Lux catalogue failed: " + e.getClass().getSimpleName());
+		} catch (final RuntimeException e) {
+			diagnostics.setRootCauseSummary("runtime:" + e.getClass().getSimpleName());
+			getLog().warn("TV Lux catalogue failed: " + e.getClass().getSimpleName());
+		}
+		getLog().info(diagnostics.formatLogLine());
+		return categories;
+	}
+
+	@Override
+	public Set<EpisodeDTO> findEpisode(final CategoryDTO category) {
+		final Set<EpisodeDTO> episodes = new LinkedHashSet<EpisodeDTO>();
+		if (category == null || !TvLuxUrls.isShowCategory(category.getId())) {
+			return episodes;
+		}
+		final String slug = TvLuxUrls.showSlugFromCategoryId(category.getId());
+		final TvLuxDiagnostics diagnostics = new TvLuxDiagnostics("episodes");
+		diagnostics.setShowSlug(slug);
+		diagnostics.setSourceUrl(TvLuxUrls.showPageUrl(slug));
+		try {
+			final List<TvLuxHtml.EpisodeRef> refs = client.loadShowEpisodes(slug);
+			for (final TvLuxHtml.EpisodeRef ref : refs) {
+				final EpisodeDTO episode = new EpisodeDTO(category, ref.title, ref.watchUrl);
+				final EpisodeMetadataDTO metadata = new EpisodeMetadataDTO();
+				metadata.setSeriesTitle(category.getName());
+				metadata.setEpisodeTitle(ref.title);
+				metadata.setSourceUrl(ref.watchUrl);
+				metadata.setChannel(TvLuxConf.CHANNEL_LABEL);
+				episode.setMetadata(metadata);
+				episodes.add(episode);
+			}
+			diagnostics.setCreatedItems(episodes.size());
+			if (episodes.isEmpty()) {
+				diagnostics.setRootCauseSummary("empty-replay-list");
+			}
+		} catch (final IOException e) {
+			diagnostics.setRootCauseSummary("io-error:" + e.getClass().getSimpleName());
+			getLog().warn("TV Lux episode listing failed: " + e.getClass().getSimpleName());
+		} catch (final RuntimeException e) {
+			diagnostics.setRootCauseSummary("runtime:" + e.getClass().getSimpleName());
+			getLog().warn("TV Lux episode listing failed: " + e.getClass().getSimpleName());
+		}
+		getLog().info(diagnostics.formatLogLine());
+		return episodes;
+	}
+
+	@Override
+	public ProcessHolder download(final DownloadParamDTO downloadParam, final DownloaderPluginHolder downloaders)
+			throws DownloadFailedException {
+		final TvLuxDiagnostics diagnostics = new TvLuxDiagnostics("download");
+		if (downloadParam == null || downloadParam.getDownloadInput() == null) {
+			diagnostics.setRootCauseSummary("null-download-param");
+			getLog().warn(diagnostics.formatLogLine());
+			throw new DownloadFailedException(TvLuxConf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+		}
+		final String downloadInput = downloadParam.getDownloadInput();
+		final String sanitizedEpisodeUrl = TvLuxUrls.sanitizeEpisodeUrl(downloadInput);
+		diagnostics.setSourceUrl(downloadInput);
+		try {
+			if (sanitizedEpisodeUrl == null) {
+				diagnostics.setRootCauseSummary("unsupported-url");
+				getLog().warn(diagnostics.formatLogLine());
+				throw new DownloadFailedException(TvLuxConf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+			}
+			final String hlsUrl = client.resolveHlsUrl(sanitizedEpisodeUrl);
+			if (hlsUrl == null) {
+				diagnostics.setRootCauseSummary("missing-hls");
+				getLog().warn(diagnostics.formatLogLine());
+				throw new DownloadFailedException(TvLuxConf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+			}
+			diagnostics.setRootCauseSummary("delegate-ffmpeg");
+			getLog().info(diagnostics.formatLogLine());
+			return DownloadUtils.download(DownloadParamDTO.buildDownloadParam(downloadParam, hlsUrl), downloaders,
+					FrameworkConf.FFMPEG);
+		} catch (final DownloadFailedException e) {
+			if (TvLuxConf.DOWNLOAD_UNAVAILABLE_MESSAGE.equals(e.getMessage())) {
+				throw e;
+			}
+			final String classification = DownloadFailureDiagnostics.getClassificationKey(e);
+			diagnostics.setRootCauseSummary(classification == null ? "download-failed" : classification);
+			getLog().warn(diagnostics.formatLogLine());
+			getLog().warn(DownloadFailureDiagnostics.formatLogLine(
+					new EpisodeDTO(null, sanitizedEpisodeUrl, sanitizedEpisodeUrl),
+					TvLuxConf.NAME, e));
+			throw new DownloadFailedException(TvLuxConf.DOWNLOAD_UNAVAILABLE_MESSAGE, e);
+		} catch (final IOException e) {
+			diagnostics.setRootCauseSummary("io-error:" + e.getClass().getSimpleName());
+			getLog().warn(diagnostics.formatLogLine());
+			throw new DownloadFailedException(TvLuxConf.DOWNLOAD_UNAVAILABLE_MESSAGE, e);
+		} catch (final RuntimeException e) {
+			diagnostics.setRootCauseSummary("runtime:" + e.getClass().getSimpleName());
+			getLog().warn(diagnostics.formatLogLine());
+			throw new DownloadFailedException(TvLuxConf.DOWNLOAD_UNAVAILABLE_MESSAGE, e);
+		}
+	}
+
+	@Override
+	public DownloadableState canDownload(final String downloadInput) {
+		if (TvLuxUrls.sanitizeEpisodeUrl(downloadInput) != null) {
+			return DownloadableState.SPECIFIC;
+		}
+		return DownloadableState.IMPOSSIBLE;
+	}
+}
