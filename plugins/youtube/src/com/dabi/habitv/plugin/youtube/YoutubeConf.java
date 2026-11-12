@@ -1,6 +1,5 @@
 package com.dabi.habitv.plugin.youtube;
 
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,10 +9,6 @@ public final class YoutubeConf {
 
 	/** Google API keys for YouTube Data API v3 typically start with {@code AIza}. */
 	private static final Pattern GOOGLE_API_KEY_TOKEN = Pattern.compile("AIza[0-9A-Za-z_-]+");
-
-	/** Unix shells escape a nested quote as {@code \"}; {@code cmd.exe /c} uses {@code ""}. */
-	private static final String UNIX_JSON_QUOTE = "\\\"";
-	private static final String WINDOWS_CMD_JSON_QUOTE = "\"\"";
 
 	private YoutubeConf() {
 
@@ -25,51 +20,30 @@ public final class YoutubeConf {
 
 	public static final String PROGRESS_LINE_PREFIX = "habitv-progress:";
 
-	private static final String PROGRESS_TEMPLATE_FLAGS_RAW = buildProgressTemplateFlags(UNIX_JSON_QUOTE);
+	public static final String PROGRESS_PHASE_DOWNLOAD = "download";
+	public static final String PROGRESS_PHASE_POSTPROCESS = "postprocess";
 
-	/** @deprecated use {@link #progressTemplateFlagsFor(String)} */
-	@Deprecated
-	public static final String PROGRESS_TEMPLATE_FLAGS = PROGRESS_TEMPLATE_FLAGS_RAW;
+	/**
+	 * yt-dlp serializes the JSON itself, so the template carries no nested quotes:
+	 * cmd.exe and POSIX shells do not unescape those the same way.
+	 */
+	public static final String PROGRESS_TEMPLATE_FLAGS = " --progress-template \"download:" + PROGRESS_LINE_PREFIX
+			+ PROGRESS_PHASE_DOWNLOAD + ":%(progress.{_percent,_total_bytes_str,_speed_str,_eta_str,filename})j\""
+			+ " --progress-template \"postprocess:" + PROGRESS_LINE_PREFIX
+			+ PROGRESS_PHASE_POSTPROCESS + ":%(progress.{postprocessor,status})j\"";
 
 	public static final String DUMP_CMD = " \"#VIDEO_URL#\" -o \"#FILE_DEST#\" -f \"bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/bv*+ba/b\" --merge-output-format mp4 --newline --no-check-certificate";
 	public static final String DUMP_CMD_EMBED_SUBS = " --embed-subs --sub-langs \"fr.*,fr,en.*,en,-live_chat\" --sub-format \"srt/vtt/best\"";
 	public static final String DUMP_CMD_MP3 = " \"#VIDEO_URL#\" -o \"#FILE_DEST#\" --extract-audio --audio-format mp3 --newline --no-check-certificate";
 
-	public static String progressTemplateFlagsFor(final String cmdProcessor) {
-		final String jsonQuote = isWindowsCmdProcessor(cmdProcessor) ? WINDOWS_CMD_JSON_QUOTE : UNIX_JSON_QUOTE;
-		return buildProgressTemplateFlags(jsonQuote);
-	}
-
-	static boolean isWindowsCmdProcessor(final String cmdProcessor) {
-		if (cmdProcessor == null || cmdProcessor.isEmpty()) {
-			return false;
-		}
-		final String normalized = cmdProcessor.replace('\\', '/').toLowerCase(Locale.ROOT);
-		return normalized.contains("cmd.exe");
-	}
-
-	private static String buildProgressTemplateFlags(final String jsonQuote) {
-		return " --progress-template \"download:" + PROGRESS_LINE_PREFIX
-				+ "{" + jsonQuote + "phase" + jsonQuote + ":" + jsonQuote + "download" + jsonQuote
-				+ "," + jsonQuote + "pct" + jsonQuote + ":%(progress._percent)j"
-				+ "," + jsonQuote + "total" + jsonQuote + ":" + jsonQuote + "%(progress._total_bytes_str)s" + jsonQuote
-				+ "," + jsonQuote + "speed" + jsonQuote + ":" + jsonQuote + "%(progress._speed_str)s" + jsonQuote
-				+ "," + jsonQuote + "eta" + jsonQuote + ":" + jsonQuote + "%(progress._eta_str)s" + jsonQuote
-				+ "," + jsonQuote + "dest" + jsonQuote + ":%(progress.filename)j}\""
-				+ " --progress-template \"postprocess:" + PROGRESS_LINE_PREFIX
-				+ "{" + jsonQuote + "phase" + jsonQuote + ":" + jsonQuote + "postprocess" + jsonQuote
-				+ "," + jsonQuote + "pp" + jsonQuote + ":" + jsonQuote + "%(postprocessor)s" + jsonQuote + "}\"";
-	}
-
-	public static String augmentBuiltInDumpCommand(final String builtInCommand, final String versionOutput,
-			final String cmdProcessor) {
+	public static String augmentBuiltInDumpCommand(final String builtInCommand, final String versionOutput) {
 		if (builtInCommand == null) {
 			return null;
 		}
 		if (!YtDlpRuntimeDiagnostics.supportsProgressTemplate(versionOutput)) {
 			return builtInCommand;
 		}
-		return builtInCommand + progressTemplateFlagsFor(cmdProcessor);
+		return builtInCommand + PROGRESS_TEMPLATE_FLAGS;
 	}
 
 	public static final long MAX_HUNG_TIME = 300000L;

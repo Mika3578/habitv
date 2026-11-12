@@ -47,8 +47,7 @@ public class YoutubePluginDownloader extends BaseUpdatablePlugin implements Plug
 			final String versionOutput = YtDlpRuntimeDiagnostics.preflightVersionOutput(downloaders.getCmdProcessor(),
 					binParam, downloaders.getBinDir());
 			if (builtInDump != null) {
-				cmd += YoutubeConf.augmentBuiltInDumpCommand(builtInDump, versionOutput,
-						downloaders.getCmdProcessor());
+				cmd += YoutubeConf.augmentBuiltInDumpCommand(builtInDump, versionOutput);
 			}
 			cmd = cmd.replaceFirst(FrameworkConf.DOWNLOAD_INPUT,
 					Matcher.quoteReplacement(downloadParam.getDownloadInput()));
