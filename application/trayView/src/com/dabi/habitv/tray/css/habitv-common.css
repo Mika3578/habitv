@@ -1,0 +1,13 @@
+/* Shared Habitv UI rules (theme-neutral). */
+
+.theme-toggle {
+    -fx-min-width: 34px;
+    -fx-pref-width: 34px;
+    -fx-min-height: 26px;
+    -fx-font-size: 14px;
+    -fx-padding: 2 6 2 6;
+}
+
+.theme-chrome {
+    -fx-padding: 4 8 0 8;
+}

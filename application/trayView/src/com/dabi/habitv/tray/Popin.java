@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import com.dabi.habitv.api.plugin.exception.TechnicalException;
 import com.dabi.habitv.tray.PopinController.ButtonHandler;
 import com.dabi.habitv.tray.controller.TrayController;
+import com.dabi.habitv.tray.theme.UiThemeApplier;
 
 public class Popin extends Application {
 
@@ -47,6 +48,7 @@ public class Popin extends Application {
 
 			GridPane root = (GridPane) fxmlLoader.load();
 			Scene scene = width==null? new Scene(root) : new Scene(root, width, height);
+			UiThemeApplier.apply(scene, UiThemeApplier.getCurrentTheme());
 			primaryStage.setScene(scene);
 			primaryStage.show();
 			controller.init(primaryStage);

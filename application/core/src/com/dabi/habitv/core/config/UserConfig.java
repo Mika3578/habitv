@@ -43,6 +43,12 @@ public interface UserConfig {
 
 	boolean getEmbedSubtitles();
 
+	/**
+	 * Persisted UI theme id ({@code light} or {@code dark}). Missing or invalid
+	 * values resolve to light.
+	 */
+	String getUiTheme();
+
 	void setMaxAttempts(int parseInt);
 
 	void setMaxConcurrentDownloads(int maxConcurrentDownloads);
@@ -56,5 +62,7 @@ public interface UserConfig {
 	void setYoutubeApiKey(String youtubeApiKey);
 
 	void setEmbedSubtitles(boolean embedSubtitles);
+
+	void setUiTheme(String uiTheme);
 
 }

@@ -30,7 +30,10 @@ import javafx.util.Duration;
 import org.apache.log4j.Logger;
 
 import com.dabi.habitv.api.plugin.exception.TechnicalException;
+import com.dabi.habitv.core.config.UiThemePreference;
+import com.dabi.habitv.core.config.XMLUserConfig;
 import com.dabi.habitv.tray.controller.UpdateController;
+import com.dabi.habitv.tray.theme.UiThemeApplier;
 import com.dabi.habitv.utils.DirUtils;
 
 public class HabiTvSplashScreen {
@@ -59,9 +62,20 @@ public class HabiTvSplashScreen {
 		splashLayout = new VBox();
 		splashLayout.getChildren().addAll(splash, loadProgress, progressText);
 		progressText.setAlignment(Pos.CENTER);
-		splashLayout
-				.setStyle("-fx-padding: 5; -fx-background-color: white; -fx-border-width:5; -fx-border-color: black;");
+		applySplashChrome(UiThemePreference.DEFAULT);
 		splashLayout.setEffect(new DropShadow());
+	}
+
+	private void applySplashChrome(final String theme) {
+		if (UiThemePreference.isDark(theme)) {
+			splashLayout
+					.setStyle("-fx-padding: 5; -fx-background-color: #23272e; -fx-border-width:5; -fx-border-color: #4a5160;");
+			progressText.setStyle("-fx-text-fill: #e8eaed;");
+		} else {
+			splashLayout
+					.setStyle("-fx-padding: 5; -fx-background-color: white; -fx-border-width:5; -fx-border-color: black;");
+			progressText.setStyle("");
+		}
 	}
 
 	public void start(final Stage initStage) throws Exception {
@@ -112,6 +126,9 @@ public class HabiTvSplashScreen {
 			}
 		});
 		Scene splashScene = new Scene(splashLayout);
+		final String splashTheme = resolveSplashTheme();
+		applySplashChrome(splashTheme);
+		UiThemeApplier.apply(splashScene, splashTheme);
 		initStage.initStyle(StageStyle.UNDECORATED);
 		final Rectangle2D bounds = Screen.getPrimary().getBounds();
 		initStage.setScene(splashScene);
@@ -120,6 +137,14 @@ public class HabiTvSplashScreen {
 		initStage.setY(bounds.getMinY() + bounds.getHeight() / 2
 				- SPLASH_HEIGHT / 2);
 		initStage.show();
+	}
+
+	private static String resolveSplashTheme() {
+		try {
+			return XMLUserConfig.initConfig().getUiTheme();
+		} catch (RuntimeException e) {
+			return UiThemePreference.DEFAULT;
+		}
 	}
 
 	private static boolean lockInstance(final String lockFile) {

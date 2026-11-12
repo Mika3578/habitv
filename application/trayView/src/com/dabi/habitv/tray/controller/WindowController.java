@@ -15,6 +15,7 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -152,6 +153,9 @@ public class WindowController {
 	@FXML
 	private CheckBox embedSubtitles;
 
+	@FXML
+	private ToggleButton themeToggle;
+
 	private boolean trayMode = false;
 
 	public WindowController() {
@@ -217,6 +221,9 @@ public class WindowController {
 					daemonCheckTimeSec, autoUpdate, youtubeApiKey,
 					maxConcurrentDownloads, embedSubtitles).init(controller,
 					manager, primaryStage);
+
+			new ThemeController(themeToggle).init(controller, manager,
+					primaryStage);
 
 			controller.startDownloadCheckDemon();
 

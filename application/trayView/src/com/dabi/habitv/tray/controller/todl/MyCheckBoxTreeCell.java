@@ -196,7 +196,8 @@ public abstract class MyCheckBoxTreeCell<T> extends TreeCell<T> {
 				if (isFailed(item)) {
 					setTextFill(Color.RED);
 				} else {
-					setTextFill(Color.BLACK);
+					// Let the active theme stylesheet own the default text color.
+					setTextFill(null);
 				}
 			}
 
