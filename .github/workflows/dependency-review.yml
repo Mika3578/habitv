@@ -5,6 +5,7 @@ on:
     branches:
       - develop
       - master
+  merge_group:
 
 permissions:
   contents: read

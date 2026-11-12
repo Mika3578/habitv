@@ -5,6 +5,7 @@ on:
     branches:
       - develop
       - master
+  merge_group:
   push:
     branches:
       - develop
@@ -238,3 +239,35 @@ jobs:
         uses: ./.github/actions/upload-maven-artifacts
         with:
           name: full-test-suite-artifacts
+
+  habitv-ci-gate:
+    name: habitv-ci-gate
+    runs-on: ubuntu-latest
+    needs:
+      - validate-java8
+      - deterministic-tests-java8
+      - compile-and-package-java8
+    if: always()
+    timeout-minutes: 5
+    steps:
+      - name: Aggregate required Java 8 jobs
+        run: |
+          set -euo pipefail
+          check() {
+            local name="$1"
+            local result="$2"
+            case "$result" in
+              success|skipped) echo "OK: $name ($result)" ;;
+              failure|cancelled)
+                echo "FAIL: $name ($result)"
+                exit 1
+                ;;
+              *)
+                echo "FAIL: $name (unexpected: $result)"
+                exit 1
+                ;;
+            esac
+          }
+          check validate-java8 "${{ needs.validate-java8.result }}"
+          check deterministic-tests-java8 "${{ needs.deterministic-tests-java8.result }}"
+          check compile-and-package-java8 "${{ needs.compile-and-package-java8.result }}"
