@@ -366,7 +366,7 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 					@Override
 					public void handle(ActionEvent event) {
 						final EpisodeDTO episode = episodeAtRow();
-						if (episode != null) {
+						if (EpisodeRows.isActionable(episode)) {
 							getController().downloadEpisode(episode);
 						}
 					}
@@ -376,7 +376,7 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 			@Override
 			protected void updateItem(Void item, boolean empty) {
 				super.updateItem(item, empty);
-				setGraphic(empty || episodeAtRow() == null ? null : actionButton);
+				setGraphic(empty || !EpisodeRows.isActionable(episodeAtRow()) ? null : actionButton);
 			}
 
 			private EpisodeDTO episodeAtRow() {
@@ -801,7 +801,10 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 
 			@Override
 			public void handle(ActionEvent event) {
-				getController().downloadEpisode(episodeTableView.getSelectionModel().getSelectedItem());
+				final EpisodeDTO episode = episodeTableView.getSelectionModel().getSelectedItem();
+				if (EpisodeRows.isActionable(episode)) {
+					getController().downloadEpisode(episode);
+				}
 			}
 		});
 		contextMenu.getItems().add(telecharger);
@@ -833,6 +836,9 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 			@Override
 			public void handle(ActionEvent event) {
 				EpisodeDTO episode = episodeTableView.getSelectionModel().getSelectedItem();
+				if (!EpisodeRows.isActionable(episode)) {
+					return;
+				}
 				getController().setDownloaded(episode);
 				filterEpisodeListView(episodeFilter.getText());
 				final String episodeKey = DownloadedDAO.buildEpisodeKey(episode);
