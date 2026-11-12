@@ -21,6 +21,10 @@ public class SixPlayOfflineFixtureBaselineTest {
 			assertTrue("fixture metadata must mention provider", content.contains("provider=6play"));
 			assertTrue("fixture metadata must document offline-only mode",
 					content.contains("network=disabled"));
+			assertTrue("fixture metadata must document parser boundary",
+					content.contains("parserBoundary=sitemap-folders-plus-ssr-hrefs"));
+			assertTrue("fixture metadata must document https home URL",
+					content.contains("homeUrl=https://www.6play.fr/"));
 		}
 	}
 
