@@ -84,6 +84,8 @@ public final class Novo19Conf {
 
 	public static final String DOWNLOAD_UNAVAILABLE_MESSAGE = "This replay is currently unavailable or not supported. See logs for details.";
 
+	public static final String DOWNLOAD_PROTECTED_MESSAGE = "This replay is protected and cannot be downloaded.";
+
 	/**
 	 * yt-dlp audio-only flags for podcast episodes (delegated to the youtube downloader).
 	 */

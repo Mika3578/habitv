@@ -88,28 +88,44 @@ final class Novo19PageParser {
 			return content;
 		}
 		final JsonNode playbackInfos = pageNode.path("playbackInfos");
-		if (!playbackInfos.isArray()) {
+		final JsonNode completeInfo = findCompletePlaybackInfo(playbackInfos);
+		if (completeInfo == null) {
 			return content;
 		}
 		String href = content.getHref();
 		String assetId = content.getAssetId();
-		for (final JsonNode infoNode : playbackInfos) {
-			if (!"COMPLETE".equalsIgnoreCase(textValue(infoNode, "type"))) {
-				continue;
-			}
-			if (StringUtils.isEmpty(href)) {
-				href = textValue(infoNode, "player");
-			}
-			if (StringUtils.isEmpty(assetId)) {
-				assetId = textValue(infoNode, "assetId");
-			}
-			break;
+		if (StringUtils.isEmpty(href)) {
+			href = textValue(completeInfo, "player");
+		}
+		if (StringUtils.isEmpty(assetId)) {
+			assetId = textValue(completeInfo, "assetId");
 		}
 		if (href == content.getHref() && assetId == content.getAssetId()) {
 			return content;
 		}
 		return new Novo19Tile(content.getId(), content.getType(), content.getTitle(), content.getSubtitle(),
 				content.getDescription(), content.getDurationSeconds(), href, assetId, content.getPublishedAt());
+	}
+
+	/**
+	 * Player pages expose a single object; detail pages expose an array.
+	 */
+	private static JsonNode findCompletePlaybackInfo(final JsonNode playbackInfos) {
+		if (playbackInfos == null || playbackInfos.isMissingNode() || playbackInfos.isNull()) {
+			return null;
+		}
+		if (playbackInfos.isObject()) {
+			return "COMPLETE".equalsIgnoreCase(textValue(playbackInfos, "type")) ? playbackInfos : null;
+		}
+		if (!playbackInfos.isArray()) {
+			return null;
+		}
+		for (final JsonNode infoNode : playbackInfos) {
+			if ("COMPLETE".equalsIgnoreCase(textValue(infoNode, "type"))) {
+				return infoNode;
+			}
+		}
+		return null;
 	}
 
 	private static List<String> parseStringArray(final JsonNode arrayNode) {

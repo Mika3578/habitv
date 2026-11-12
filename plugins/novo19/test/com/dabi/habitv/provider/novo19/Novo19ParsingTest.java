@@ -87,6 +87,15 @@ public class Novo19ParsingTest {
 	}
 
 	@Test
+	public void enrichesPlayerContentFromObjectPlaybackInfos() throws Exception {
+		final Novo19BffPage page = Novo19PageParser.parsePageEnvelope(
+				Novo19InlineFixtures.PLAYER_EPISODE_OBJECT_PLAYBACK_INFOS, "fixture");
+		assertNotNull(page.getContent());
+		assertEquals("asset-series-gamma-episode-gamma", page.getContent().getAssetId());
+		assertEquals("/player/series-gamma-episode-gamma", page.getContent().getHref());
+	}
+
+	@Test
 	public void excludesMesVideosPath() throws Exception {
 		final Novo19Tile tile = Novo19PageParser.parseTile(new com.fasterxml.jackson.databind.ObjectMapper()
 				.readTree("{\"type\":\"COLLECTION\",\"title\":\"Mes vidéos\",\"href\":\"/mes-videos\"}"));

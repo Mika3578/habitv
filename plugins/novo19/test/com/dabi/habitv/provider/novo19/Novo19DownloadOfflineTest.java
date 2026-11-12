@@ -60,7 +60,7 @@ public class Novo19DownloadOfflineTest {
 		assertTrue(downloader.lastArgs.contains("--extract-audio"));
 	}
 
-	@Test(expected = DownloadFailedException.class)
+	@Test
 	public void blocksObjectDrmReplayDownload() throws Exception {
 		final Map<String, String> transport = new HashMap<String, String>();
 		transport.put(Novo19UrlBuilder.redBeeAnonymousAuthUrl(),
@@ -77,7 +77,12 @@ public class Novo19DownloadOfflineTest {
 		final DownloadParamDTO param = new DownloadParamDTO(
 				"https://novo19.ouest-france.fr/player/series-beta-episode-beta",
 				"out.mp4", Novo19Conf.EXTENSION);
-		manager.download(param, buildHolder(new RecordingDownloader()));
+		try {
+			manager.download(param, buildHolder(new RecordingDownloader()));
+			throw new AssertionError("expected DownloadFailedException");
+		} catch (final DownloadFailedException e) {
+			assertEquals(Novo19Conf.DOWNLOAD_PROTECTED_MESSAGE, e.getMessage());
+		}
 	}
 
 	@Test(expected = DownloadFailedException.class)

@@ -165,11 +165,13 @@ public class Novo19PluginManager extends BasePluginWithProxy implements PluginPr
 			final String streamUrl = playbackClient.resolveReplayStreamUrl(assetId, diagnostics);
 			if (StringUtils.isEmpty(streamUrl)) {
 				logDiagnostics(diagnostics);
-				throw new DownloadFailedException(Novo19Conf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+				throw new DownloadFailedException(downloadFailureMessage(diagnostics));
 			}
 			logDiagnostics(diagnostics);
 			final DownloadParamDTO delegated = Novo19DownloadMapper.buildDelegatedDownload(downloadParam, streamUrl);
 			return DownloadUtils.download(delegated, downloaders, FrameworkConf.YOUTUBE);
+		} catch (final DownloadFailedException e) {
+			throw e;
 		} catch (final Novo19HttpException e) {
 			diagnostics.setHttpStatus(e.getStatus());
 			diagnostics.setRootCauseSummary(Novo19DownloadMapper.summarizeFailure(
@@ -185,8 +187,8 @@ public class Novo19PluginManager extends BasePluginWithProxy implements PluginPr
 		} catch (final RuntimeException e) {
 			diagnostics.setRootCauseSummary("parse-error:" + e.getClass().getSimpleName());
 			logDiagnostics(diagnostics);
-			getLog().warn("NOVO19 download failed safely: " + e.getMessage());
-			throw new DownloadFailedException(Novo19Conf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+			getLog().warn("NOVO19 download failed safely: " + e.getMessage(), e);
+			throw new DownloadFailedException(Novo19Conf.DOWNLOAD_UNAVAILABLE_MESSAGE, e);
 		}
 	}
 
@@ -500,6 +502,13 @@ public class Novo19PluginManager extends BasePluginWithProxy implements PluginPr
 		} else {
 			getLog().warn(line);
 		}
+	}
+
+	private static String downloadFailureMessage(final Novo19Diagnostics diagnostics) {
+		if (diagnostics != null && "drm-protected".equals(diagnostics.getRootCauseSummary())) {
+			return Novo19Conf.DOWNLOAD_PROTECTED_MESSAGE;
+		}
+		return Novo19Conf.DOWNLOAD_UNAVAILABLE_MESSAGE;
 	}
 
 }

@@ -25,6 +25,13 @@ final class Novo19InlineFixtures {
 			+ "\"title\":\"Episode Beta\",\"source\":{\"provider\":\"redbee\",\"type\":\"EPISODE\","
 			+ "\"id\":\"asset-series-beta-episode-beta\"}}},\"version\":\"0.9.1\"}";
 
+	static final String PLAYER_EPISODE_OBJECT_PLAYBACK_INFOS = "{\"page\":{\"type\":\"PLAYER\",\"id\":\"BFF|episode-player\","
+			+ "\"title\":\"Episode Gamma\",\"content\":{\"id\":\"asset-series-gamma-episode-gamma\",\"type\":\"EPISODE\","
+			+ "\"title\":\"Episode Gamma\",\"source\":{\"provider\":\"redbee\",\"type\":\"EPISODE\","
+			+ "\"id\":\"asset-series-gamma-episode-gamma\"}},\"playbackInfos\":{\"type\":\"COMPLETE\","
+			+ "\"assetId\":\"asset-series-gamma-episode-gamma\",\"player\":\"/player/series-gamma-episode-gamma\"}},"
+			+ "\"version\":\"0.9.1\"}";
+
 	static final String PLAYER_PODCAST_EPISODE_PAGE = "{\"page\":{\"type\":\"PLAYER\",\"id\":\"podcast-alpha-episode-alpha\","
 			+ "\"title\":\"Episode Alpha\",\"content\":{\"id\":\"asset-podcast-alpha-episode-alpha\",\"type\":\"PODCAST\","
 			+ "\"title\":\"Episode Alpha\",\"href\":\"/player/podcast-alpha-episode-alpha\",\"source\":{"
