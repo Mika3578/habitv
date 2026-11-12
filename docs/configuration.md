@@ -10,6 +10,9 @@ Habitv directory when no local config is present):
 | `*.index` | Saved episode keys (legacy files may be display names) |
 | `plugins/` | Runtime plugin JARs |
 
+Top-level `<channel><name>` values must match the plugin id (see bundled
+`application/consoleView/grabconfig.xml` sample).
+
 Samples/schema: `application/core/xsd/`. Preserve existing user files;
 do not change defaults silently or delete media files/indexes.
 
