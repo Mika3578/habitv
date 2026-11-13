@@ -86,6 +86,8 @@ public final class Novo19Conf {
 
 	public static final String DOWNLOAD_PROTECTED_MESSAGE = "This replay is protected and cannot be downloaded.";
 
+	public static final String DOWNLOAD_HELPER_MISSING_MESSAGE = "Local tools for this replay are not configured on this machine.";
+
 	/**
 	 * yt-dlp audio-only flags for podcast episodes (delegated to the youtube downloader).
 	 */

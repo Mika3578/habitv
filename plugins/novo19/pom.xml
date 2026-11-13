@@ -33,4 +33,17 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>scripts</directory>
+				<targetPath>scripts</targetPath>
+				<includes>
+					<include>novo19_helper.py</include>
+					<include>requirements.txt</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
 </project>

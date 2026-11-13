@@ -164,6 +164,14 @@ public class Novo19PluginManager extends BasePluginWithProxy implements PluginPr
 			diagnostics.setAssetId(assetId);
 			final String streamUrl = playbackClient.resolveReplayStreamUrl(assetId, diagnostics);
 			if (StringUtils.isEmpty(streamUrl)) {
+				if ("drm-protected".equals(diagnostics.getRootCauseSummary())) {
+					logDiagnostics(diagnostics);
+					if (Novo19ReplayHelperConfig.isConfigured()) {
+						getLog().info("NOVO19 download route=replay-helper assetId=" + assetId);
+						return Novo19ReplayHelperExecutor.download(assetId, downloadParam, downloaders);
+					}
+					throw new DownloadFailedException(downloadFailureMessage(diagnostics));
+				}
 				logDiagnostics(diagnostics);
 				throw new DownloadFailedException(downloadFailureMessage(diagnostics));
 			}
@@ -506,6 +514,9 @@ public class Novo19PluginManager extends BasePluginWithProxy implements PluginPr
 
 	private static String downloadFailureMessage(final Novo19Diagnostics diagnostics) {
 		if (diagnostics != null && "drm-protected".equals(diagnostics.getRootCauseSummary())) {
+			if (!Novo19ReplayHelperConfig.isConfigured()) {
+				return Novo19Conf.DOWNLOAD_HELPER_MISSING_MESSAGE;
+			}
 			return Novo19Conf.DOWNLOAD_PROTECTED_MESSAGE;
 		}
 		return Novo19Conf.DOWNLOAD_UNAVAILABLE_MESSAGE;

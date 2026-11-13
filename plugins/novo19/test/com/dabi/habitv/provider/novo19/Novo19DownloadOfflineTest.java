@@ -61,7 +61,41 @@ public class Novo19DownloadOfflineTest {
 	}
 
 	@Test
-	public void blocksObjectDrmReplayDownload() throws Exception {
+	public void blocksObjectDrmReplayDownloadWhenHelperDisabled() throws Exception {
+		final String previous = System.getProperty("habitv.novo19.helper.disabled");
+		System.setProperty("habitv.novo19.helper.disabled", "true");
+		try {
+			final Map<String, String> transport = new HashMap<String, String>();
+			transport.put(Novo19UrlBuilder.redBeeAnonymousAuthUrl(),
+					Novo19FixtureSupport.redbeeScenario("authAnonymous"));
+			transport.put(Novo19UrlBuilder.redBeePlayUrl("asset-series-beta-episode-beta"),
+					Novo19FixtureSupport.redbeeScenario("protected"));
+			final Map<String, String> catalogResponses = new HashMap<String, String>();
+			catalogResponses.put(Novo19UrlBuilder.bffPageByPath(
+					"player/series-beta-episode-beta"),
+					Novo19InlineFixtures.PLAYER_SERIES_EPISODE_NO_HREF_PAGE);
+			final Novo19PluginManager manager = new Novo19PluginManager(
+					new Novo19CatalogClient(new CatalogMapLoader(catalogResponses)),
+					new Novo19PlaybackClient(new MapTransport(transport)));
+			final DownloadParamDTO param = new DownloadParamDTO(
+					"https://novo19.ouest-france.fr/player/series-beta-episode-beta",
+					"out.mp4", Novo19Conf.EXTENSION);
+			try {
+				manager.download(param, buildHolder(new RecordingDownloader()));
+				throw new AssertionError("expected DownloadFailedException");
+			} catch (final DownloadFailedException e) {
+				assertEquals(Novo19Conf.DOWNLOAD_HELPER_MISSING_MESSAGE, e.getMessage());
+			}
+		} finally {
+			restoreHelperDisabledProperty(previous);
+		}
+	}
+
+	@Test
+	public void routesObjectDrmReplayToHelperWhenConfigured() throws Exception {
+		if (!Novo19ReplayHelperConfig.isConfigured()) {
+			return;
+		}
 		final Map<String, String> transport = new HashMap<String, String>();
 		transport.put(Novo19UrlBuilder.redBeeAnonymousAuthUrl(),
 				Novo19FixtureSupport.redbeeScenario("authAnonymous"));
@@ -77,11 +111,15 @@ public class Novo19DownloadOfflineTest {
 		final DownloadParamDTO param = new DownloadParamDTO(
 				"https://novo19.ouest-france.fr/player/series-beta-episode-beta",
 				"out.mp4", Novo19Conf.EXTENSION);
-		try {
-			manager.download(param, buildHolder(new RecordingDownloader()));
-			throw new AssertionError("expected DownloadFailedException");
-		} catch (final DownloadFailedException e) {
-			assertEquals(Novo19Conf.DOWNLOAD_PROTECTED_MESSAGE, e.getMessage());
+		final ProcessHolder holder = manager.download(param, buildHolder(new RecordingDownloader()));
+		assertTrue(holder instanceof Novo19ReplayHelperCmdExecutor);
+	}
+
+	private static void restoreHelperDisabledProperty(final String previous) {
+		if (previous == null) {
+			System.clearProperty("habitv.novo19.helper.disabled");
+		} else {
+			System.setProperty("habitv.novo19.helper.disabled", previous);
 		}
 	}
 
