@@ -39,10 +39,9 @@ still points at `youtube-dl`, switch it to yt-dlp.
 Labels: **working** (validated), **degraded**, **protected** (auth/geo/DRM),
 **obsolete**, **removed**, **unknown**.
 
-France.tv and NOVO19 delegate download to the youtube/yt-dlp plugin when
-public URLs exist. RTBF Auvio catalogue discovery is available, but RedBee/DRM
-playback remains unsupported. Canal+ family and WAT/TF1+ are not treated as freely
-downloadable DRM catalogues.
+France.tv, NOVO19, and RTBF Auvio delegate retrieval to the youtube/yt-dlp
+plugin when a usable stream URL is available. Canal+ family and WAT remain
+degraded in the status table until dedicated provider changes land.
 
 Full module list: `plugins/pom.xml`. Offline fixtures live under
 `plugins/<name>/test/resources/fixtures/<name>/`.

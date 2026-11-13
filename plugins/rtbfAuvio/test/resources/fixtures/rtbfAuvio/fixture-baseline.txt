@@ -1,5 +1,4 @@
 provider=rtbfAuvio
-strategy=bff-catalog-redbee-drm-unsupported
-homeUrl=https://auvio.rtbf.be
-channels=La Une,Tipik,La Trois
-note=Public BFF/HTML catalogue; RedBee/Widevine download unsupported.
+strategy=bff-catalog-playback
+catalogue=bff-widgets-and-channel-pages
+note=Channel replay listings via BFF widgets; download when a usable stream is returned.

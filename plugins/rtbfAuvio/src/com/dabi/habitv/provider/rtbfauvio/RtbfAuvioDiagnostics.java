@@ -10,6 +10,12 @@ final class RtbfAuvioDiagnostics {
 
 	private String sourceUrl;
 
+	private String assetId;
+
+	private String endpointHost;
+
+	private int httpStatus;
+
 	private int createdItems;
 
 	private String rootCauseSummary = "ok";
@@ -26,6 +32,18 @@ final class RtbfAuvioDiagnostics {
 		this.sourceUrl = sanitizeUrl(sourceUrl);
 	}
 
+	void setAssetId(final String assetId) {
+		this.assetId = assetId;
+	}
+
+	void setEndpointHost(final String endpointHost) {
+		this.endpointHost = endpointHost;
+	}
+
+	void setHttpStatus(final int httpStatus) {
+		this.httpStatus = httpStatus;
+	}
+
 	void setCreatedItems(final int createdItems) {
 		this.createdItems = createdItems;
 	}
@@ -34,8 +52,16 @@ final class RtbfAuvioDiagnostics {
 		this.rootCauseSummary = rootCauseSummary == null ? "unknown" : rootCauseSummary;
 	}
 
+	String getRootCauseSummary() {
+		return rootCauseSummary;
+	}
+
+	int getHttpStatus() {
+		return httpStatus;
+	}
+
 	String formatLogLine() {
-		final StringBuilder line = new StringBuilder("provider=RTBFAUVIO");
+		final StringBuilder line = new StringBuilder("provider=").append(RtbfAuvioConf.NAME);
 		line.append(" strategy=").append(RtbfAuvioConf.STRATEGY);
 		line.append(" operation=").append(operation);
 		if (channel != null) {
@@ -44,8 +70,16 @@ final class RtbfAuvioDiagnostics {
 		if (sourceUrl != null) {
 			line.append(" sourceUrl=").append(sourceUrl);
 		}
+		if (assetId != null) {
+			line.append(" assetId=").append(assetId);
+		}
+		if (endpointHost != null) {
+			line.append(" endpointHost=").append(endpointHost);
+		}
+		if (httpStatus > 0) {
+			line.append(" httpStatus=").append(httpStatus);
+		}
 		line.append(" createdItems=").append(createdItems);
-		line.append(" cookiesEnabled=false");
 		line.append(" rootCause=").append(rootCauseSummary);
 		return ExecutorOutputSanitizer.redactSecretsInText(line.toString());
 	}

@@ -68,9 +68,9 @@ public class RtbfAuvioOfflineCatalogTest {
 	}
 
 	@Test
-	public void downloadFailsClosedForRedbeeDrm() {
+	public void downloadFailsForUnrecognizedMediaSlug() {
 		final RtbfAuvioPluginManager plugin = new RtbfAuvioPluginManager();
-		final DownloadParamDTO param = new DownloadParamDTO("https://auvio.rtbf.be/media/demo-1", "/tmp/x.mp4",
+		final DownloadParamDTO param = new DownloadParamDTO("https://auvio.rtbf.be/media/demo", "/tmp/x.mp4",
 				RtbfAuvioConf.EXTENSION);
 		try {
 			plugin.download(param, null);

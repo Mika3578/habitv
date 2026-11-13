@@ -17,17 +17,19 @@ import com.dabi.habitv.api.plugin.dto.EpisodeMetadataDTO;
 import com.dabi.habitv.api.plugin.exception.DownloadFailedException;
 import com.dabi.habitv.api.plugin.holder.DownloaderPluginHolder;
 import com.dabi.habitv.api.plugin.holder.ProcessHolder;
+import com.dabi.habitv.framework.FrameworkConf;
 import com.dabi.habitv.framework.plugin.api.BasePluginWithProxy;
+import com.dabi.habitv.framework.plugin.utils.DownloadUtils;
 
-/**
- * RTBF Auvio diagnostics-first provider: public BFF/HTML catalogue for La Une,
- * Tipik and La Trois. RedBee/Widevine download paths are unsupported.
- */
 public class RtbfAuvioPluginManager extends BasePluginWithProxy implements PluginProviderDownloaderInterface {
 
 	private final RtbfAuvioClient client;
 
+	private final RtbfAuvioPlaybackClient playbackClient;
+
 	public RtbfAuvioPluginManager() {
+		final RtbfAuvioHttpClient.Transport transport = RtbfAuvioHttpClient.pluginTransport(getHttpProxy());
+		this.playbackClient = new RtbfAuvioPlaybackClient(transport);
 		this.client = new RtbfAuvioClient(new RtbfAuvioClient.ContentLoader() {
 			@Override
 			public String load(final String url) throws IOException {
@@ -41,7 +43,12 @@ public class RtbfAuvioPluginManager extends BasePluginWithProxy implements Plugi
 	}
 
 	RtbfAuvioPluginManager(final RtbfAuvioClient client) {
+		this(client, new RtbfAuvioPlaybackClient(RtbfAuvioHttpClient.pluginTransport(null)));
+	}
+
+	RtbfAuvioPluginManager(final RtbfAuvioClient client, final RtbfAuvioPlaybackClient playbackClient) {
 		this.client = client;
+		this.playbackClient = playbackClient;
 	}
 
 	@Override
@@ -86,7 +93,7 @@ public class RtbfAuvioPluginManager extends BasePluginWithProxy implements Plugi
 					if (StringUtils.isEmpty(path) || StringUtils.isEmpty(title)) {
 						continue;
 					}
-					final String url = path.startsWith("http") ? path : RtbfAuvioConf.HOME_URL + path;
+					final String url = RtbfAuvioUrlBuilder.mediaUrl(path);
 					final EpisodeDTO episode = new EpisodeDTO(category, title, url);
 					final EpisodeMetadataDTO metadata = new EpisodeMetadataDTO();
 					metadata.setSeriesTitle(firstNonEmpty(asString(item.get("title")), category.getName()));
@@ -121,18 +128,53 @@ public class RtbfAuvioPluginManager extends BasePluginWithProxy implements Plugi
 	public ProcessHolder download(final DownloadParamDTO downloadParam, final DownloaderPluginHolder downloaders)
 			throws DownloadFailedException {
 		final RtbfAuvioDiagnostics diagnostics = new RtbfAuvioDiagnostics("download");
-		diagnostics.setSourceUrl(downloadParam.getDownloadInput());
-		diagnostics.setRootCauseSummary("redbee-drm-unsupported");
-		getLog().warn(diagnostics.formatLogLine());
-		throw new DownloadFailedException(RtbfAuvioConf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+		diagnostics.setSourceUrl(downloadParam == null ? null : downloadParam.getDownloadInput());
+		try {
+			final String assetId = RtbfAuvioAssetResolver.resolveAssetId(downloadParam);
+			if (StringUtils.isEmpty(assetId)) {
+				diagnostics.setRootCauseSummary("unsupported-asset");
+				logDiagnostics(diagnostics);
+				throw new DownloadFailedException(RtbfAuvioConf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+			}
+			diagnostics.setAssetId(assetId);
+			final String streamUrl = playbackClient.resolveReplayStreamUrl(assetId, diagnostics);
+			if (StringUtils.isEmpty(streamUrl)) {
+				logDiagnostics(diagnostics);
+				throw new DownloadFailedException(RtbfAuvioConf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+			}
+			logDiagnostics(diagnostics);
+			final DownloadParamDTO delegated = RtbfAuvioDownloadMapper.buildDelegatedDownload(downloadParam, streamUrl);
+			return DownloadUtils.download(delegated, downloaders, FrameworkConf.YOUTUBE);
+		} catch (final RtbfAuvioHttpException e) {
+			diagnostics.setHttpStatus(e.getStatus());
+			diagnostics.setRootCauseSummary(RtbfAuvioDownloadMapper.summarizeFailure(
+					RtbfAuvioHttpStatus.summarizeFailure(e.getStatus())));
+			logDiagnostics(diagnostics);
+			getLog().warn("RTBF Auvio download failed safely: " + e.getMessage());
+			throw new DownloadFailedException(RtbfAuvioConf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+		} catch (final IOException e) {
+			diagnostics.setRootCauseSummary("io-error:" + e.getClass().getSimpleName());
+			logDiagnostics(diagnostics);
+			getLog().warn("RTBF Auvio download failed safely: " + e.getMessage());
+			throw new DownloadFailedException(RtbfAuvioConf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+		} catch (final RuntimeException e) {
+			diagnostics.setRootCauseSummary("parse-error:" + e.getClass().getSimpleName());
+			logDiagnostics(diagnostics);
+			getLog().warn("RTBF Auvio download failed safely: " + e.getMessage());
+			throw new DownloadFailedException(RtbfAuvioConf.DOWNLOAD_UNAVAILABLE_MESSAGE);
+		}
 	}
 
 	@Override
 	public DownloadableState canDownload(final String downloadInput) {
-		if (StringUtils.isNotEmpty(downloadInput) && downloadInput.contains("auvio.rtbf.be/media/")) {
+		if (RtbfAuvioUrlBuilder.isApprovedPublicDownloadUrl(downloadInput)) {
 			return DownloadableState.SPECIFIC;
 		}
 		return DownloadableState.IMPOSSIBLE;
+	}
+
+	private void logDiagnostics(final RtbfAuvioDiagnostics diagnostics) {
+		getLog().info(diagnostics.formatLogLine());
 	}
 
 	private static String channelSlugFromCategoryUrl(final String categoryUrl) {

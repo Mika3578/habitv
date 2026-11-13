@@ -12,10 +12,10 @@ import org.junit.Test;
 public class RtbfAuvioOfflineFixtureBaselineTest {
 
 	@Test
-	public void baselineDocumentsDrmUnsupportedStrategy() throws IOException {
+	public void baselineDocumentsPlaybackStrategy() throws IOException {
 		final String content = read("test/resources/fixtures/rtbfAuvio/fixture-baseline.txt");
 		assertTrue(content.contains("provider=rtbfAuvio"));
-		assertTrue(content.contains("strategy=bff-catalog-redbee-drm-unsupported"));
+		assertTrue(content.contains("strategy=bff-catalog-playback"));
 		assertTrue(content.contains("channels=La Une,Tipik,La Trois"));
 	}
 
