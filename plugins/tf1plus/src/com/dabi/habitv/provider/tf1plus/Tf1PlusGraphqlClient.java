@@ -62,27 +62,30 @@ final class Tf1PlusGraphqlClient {
 
 	List<Map<String, Object>> fetchProgramsByChannel(final String channelSlug) throws IOException {
 		final List<Map<String, Object>> programs = new ArrayList<Map<String, Object>>();
-		int offset = 0;
-		while (offset < Tf1PlusConf.CATALOGUE_SAFETY_PROGRAMME_LIMIT) {
-			final List<Map<String, Object>> page = fetchProgramItemsPage(channelSlug, offset, PAGE_SIZE);
-			if (page.isEmpty()) {
+		int pageIndex = 0;
+		while (pageIndex * PAGE_SIZE < Tf1PlusConf.CATALOGUE_SAFETY_PROGRAMME_LIMIT) {
+			final GraphqlItemsPage page = fetchProgramItemsPage(channelSlug, pageIndex, PAGE_SIZE);
+			if (page.getItems().isEmpty()) {
 				break;
 			}
-			programs.addAll(page);
-			if (page.size() < PAGE_SIZE) {
+			programs.addAll(page.getItems());
+			if (page.getItems().size() < PAGE_SIZE) {
 				break;
 			}
-			offset += PAGE_SIZE;
+			if (page.getTotal() != null && programs.size() >= page.getTotal().intValue()) {
+				break;
+			}
+			pageIndex++;
 		}
 		return programs;
 	}
 
-	List<Map<String, Object>> fetchProgramItemsPage(final String channelSlug, final int offset, final int limit)
+	GraphqlItemsPage fetchProgramItemsPage(final String channelSlug, final int pageIndex, final int limit)
 			throws IOException {
-		final Map<String, Object> variables = buildProgramVariables(channelSlug, offset, limit);
+		final Map<String, Object> variables = buildProgramVariables(channelSlug, pageIndex, limit);
 		final Map<String, Object> data = fetchGraphql(Tf1PlusConf.GRAPHQL_PROGRAMS_BY_CHANNEL, variables);
 		final Map<String, Object> programsNode = asMap(data.get("programs"));
-		return castItemList(programsNode.get("items"));
+		return new GraphqlItemsPage(castItemList(programsNode.get("items")), intOrNull(programsNode.get("total")));
 	}
 
 
@@ -90,9 +93,9 @@ final class Tf1PlusGraphqlClient {
 	List<Map<String, Object>> fetchVideosByProgram(final String programSlug) throws IOException {
 		final String graphqlSlug = Tf1PlusProgramSlug.resolveForGraphql(programSlug);
 		final List<Map<String, Object>> videos = new ArrayList<Map<String, Object>>();
-		int offset = 0;
-		while (offset < Tf1PlusConf.CATALOGUE_SAFETY_PROGRAMME_LIMIT) {
-			final List<Map<String, Object>> page = fetchVideoItemsPage(graphqlSlug, offset, PAGE_SIZE);
+		int pageIndex = 0;
+		while (pageIndex * PAGE_SIZE < Tf1PlusConf.CATALOGUE_SAFETY_PROGRAMME_LIMIT) {
+			final List<Map<String, Object>> page = fetchVideoItemsPage(graphqlSlug, pageIndex, PAGE_SIZE);
 			if (page.isEmpty()) {
 				break;
 			}
@@ -100,7 +103,7 @@ final class Tf1PlusGraphqlClient {
 			if (page.size() < PAGE_SIZE) {
 				break;
 			}
-			offset += PAGE_SIZE;
+			pageIndex++;
 		}
 		return videos;
 	}
@@ -317,6 +320,45 @@ final class Tf1PlusGraphqlClient {
 			}
 		}
 		return value.length() >= 5;
+	}
+
+	static Integer intOrNull(final Object raw) {
+		if (raw instanceof Number) {
+			return Integer.valueOf(((Number) raw).intValue());
+		}
+		if (raw instanceof String) {
+			final String text = ((String) raw).trim();
+			if (text.isEmpty()) {
+				return null;
+			}
+			try {
+				return Integer.valueOf(Integer.parseInt(text));
+			} catch (final NumberFormatException ignored) {
+				return null;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * GraphQL list page. {@code offset} in the request is a page index.
+	 */
+	static final class GraphqlItemsPage {
+		private final List<Map<String, Object>> items;
+		private final Integer total;
+
+		GraphqlItemsPage(final List<Map<String, Object>> items, final Integer total) {
+			this.items = items == null ? Collections.<Map<String, Object>>emptyList() : items;
+			this.total = total;
+		}
+
+		List<Map<String, Object>> getItems() {
+			return items;
+		}
+
+		Integer getTotal() {
+			return total;
+		}
 	}
 
 }

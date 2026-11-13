@@ -28,10 +28,14 @@ final class Tf1PlusCatalogueClient {
 		this.graphqlClient = graphqlClient;
 	}
 
-	Tf1PlusCataloguePageResult fetchProgramPage(final Tf1PlusHubDescriptor hub, final int offset, final int limit)
+	/**
+	 * @param pageIndex GraphQL catalogue {@code offset} (page index, not item index)
+	 */
+	Tf1PlusCataloguePageResult fetchProgramPage(final Tf1PlusHubDescriptor hub, final int pageIndex, final int limit)
 			throws IOException {
-		final List<Map<String, Object>> items = graphqlClient.fetchProgramItemsPage(hub.getGraphqlChannelSlug(), offset,
-				limit);
+		final Tf1PlusGraphqlClient.GraphqlItemsPage itemsPage = graphqlClient
+				.fetchProgramItemsPage(hub.getGraphqlChannelSlug(), pageIndex, limit);
+		final List<Map<String, Object>> items = itemsPage.getItems();
 		final List<Tf1PlusCatalogueEntry> entries = new ArrayList<Tf1PlusCatalogueEntry>(items.size());
 		for (final Map<String, Object> item : items) {
 			final Tf1PlusCatalogueEntry entry = normalizeProgramme(hub, item);
@@ -39,31 +43,36 @@ final class Tf1PlusCatalogueClient {
 				entries.add(entry);
 			}
 		}
-		final boolean lastPage = items.isEmpty() || items.size() < limit;
-		return new Tf1PlusCataloguePageResult(entries, offset, limit, lastPage);
+		final boolean lastPage = items.isEmpty() || items.size() < limit
+				|| (itemsPage.getTotal() != null && (pageIndex + 1) * limit >= itemsPage.getTotal().intValue());
+		return new Tf1PlusCataloguePageResult(entries, pageIndex, limit, lastPage, itemsPage.getTotal());
 	}
 
 	void fetchAllProgrammesForHub(final Tf1PlusHubDescriptor hub, final Tf1PlusCatalogueRefreshResult refreshResult)
 			throws IOException {
 		final int pageSize = Tf1PlusConf.CATALOGUE_PAGE_SIZE;
 		final int safetyLimit = Tf1PlusConf.CATALOGUE_SAFETY_PROGRAMME_LIMIT;
-		int offset = 0;
+		int pageIndex = 0;
 		int pagesRequested = 0;
 		int hubFetched = 0;
 		int hubAdded = 0;
 		int hubDuplicates = 0;
 		int hubRejected = 0;
 		boolean suspectedCap = false;
+		Integer reportedTotal = null;
 		final Set<String> seenKeys = new HashSet<String>();
 
-		while (offset < safetyLimit) {
+		while (pageIndex * pageSize < safetyLimit) {
 			pagesRequested++;
-			final Tf1PlusCataloguePageResult page = fetchProgramPage(hub, offset, pageSize);
+			final Tf1PlusCataloguePageResult page = fetchProgramPage(hub, pageIndex, pageSize);
+			if (page.getReportedTotal() != null) {
+				reportedTotal = page.getReportedTotal();
+			}
 			hubFetched += page.getEntries().size();
 			refreshResult.addProgrammesFetched(page.getEntries().size());
 
 			if (page.getEntries().isEmpty()) {
-				if (offset > 0 && offset % pageSize == 0) {
+				if (pageIndex > 0 && (reportedTotal == null || hubFetched < reportedTotal.intValue())) {
 					suspectedCap = true;
 				}
 				break;
@@ -97,18 +106,16 @@ final class Tf1PlusCatalogueClient {
 			}
 
 			if (page.isLastPage()) {
-				if (page.getEntries().size() == pageSize && offset == 0) {
-					final Tf1PlusCataloguePageResult probe = fetchProgramPage(hub, pageSize, pageSize);
-					if (probe.getEntries().isEmpty()) {
-						suspectedCap = true;
-					} else {
-						offset += pageSize;
-						continue;
-					}
-				}
 				break;
 			}
-			offset += pageSize;
+			if (reportedTotal != null && hubFetched >= reportedTotal.intValue()) {
+				break;
+			}
+			pageIndex++;
+		}
+
+		if (!suspectedCap && reportedTotal != null && hubFetched < reportedTotal.intValue()) {
+			suspectedCap = true;
 		}
 
 		if (suspectedCap) {
@@ -117,8 +124,9 @@ final class Tf1PlusCatalogueClient {
 
 		refreshResult.addHubSummary(hub.getHubId() + "|label=" + hub.getDisplayLabel() + "|graphqlSlug="
 				+ hub.getGraphqlChannelSlug() + "|urlSlug=" + hub.getUrlSlug() + "|limit=" + pageSize + "|pages="
-				+ pagesRequested + "|offsets=" + offset + "|fetched=" + hubFetched + "|added=" + hubAdded
-				+ "|duplicates=" + hubDuplicates + "|rejected=" + hubRejected + "|apiCap=" + suspectedCap);
+				+ pagesRequested + "|page=" + pageIndex + "|fetched=" + hubFetched + "|added=" + hubAdded
+				+ "|duplicates=" + hubDuplicates + "|rejected=" + hubRejected + "|total="
+				+ (reportedTotal == null ? -1 : reportedTotal.intValue()) + "|apiCap=" + suspectedCap);
 	}
 
 	Tf1PlusCatalogueEntry normalizeProgramme(final Tf1PlusHubDescriptor hub, final Map<String, Object> program) {

@@ -81,6 +81,20 @@ def report_download_progress(percent):
     sys.stdout.flush()
 
 
+def to_hex(value):
+    """Hex-encode bytes/UUID. UUID.hex is a property (str); bytes.hex is a method."""
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        return value.replace("-", "").lower()
+    hex_attr = getattr(value, "hex", None)
+    if isinstance(hex_attr, str):
+        return hex_attr
+    if callable(hex_attr):
+        return hex_attr()
+    return str(value)
+
+
 def parse_percent_from_line(line):
     match = re.search(r"(\d+(?:\.\d+)?)\s*%", line)
     if not match:
@@ -411,7 +425,7 @@ def extract_init_data_from_mpd(mpd_url, token):
     for match in re.finditer(r'<(?:cenc:)?pssh[^>]*>([A-Za-z0-9+/=]+)</(?:cenc:)?pssh>', mpd, re.IGNORECASE):
         try:
             payload = base64.b64decode(match.group(1))
-            hex_value = payload.hex() if hasattr(payload, "hex") else payload.encode("hex")
+            hex_value = to_hex(payload)
             if CONTENT_PROTECTION_UUID in hex_value:
                 return match.group(1)
         except Exception:
@@ -477,7 +491,7 @@ def attempt_playback_material(device_path, init_data_b64, request_url, request_h
         material = []
         for entry in cdm.get_keys(session_id):
             if entry.type == "CONTENT":
-                material.append({"kid": entry.kid.hex(), "key": entry.key.hex()})
+                material.append({"kid": to_hex(entry.kid), "key": to_hex(entry.key)})
         if not material:
             raise Tf1AccessError(
                 "TF1_SESSION_EMPTY",

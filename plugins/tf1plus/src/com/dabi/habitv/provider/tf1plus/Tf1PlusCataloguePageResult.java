@@ -12,14 +12,21 @@ final class Tf1PlusCataloguePageResult {
 	private final int requestedOffset;
 	private final int requestedLimit;
 	private final boolean lastPage;
+	private final Integer reportedTotal;
 
 	Tf1PlusCataloguePageResult(final List<Tf1PlusCatalogueEntry> entries, final int requestedOffset,
 			final int requestedLimit, final boolean lastPage) {
+		this(entries, requestedOffset, requestedLimit, lastPage, null);
+	}
+
+	Tf1PlusCataloguePageResult(final List<Tf1PlusCatalogueEntry> entries, final int requestedOffset,
+			final int requestedLimit, final boolean lastPage, final Integer reportedTotal) {
 		this.entries = entries == null ? Collections.<Tf1PlusCatalogueEntry>emptyList()
 				: Collections.unmodifiableList(entries);
 		this.requestedOffset = requestedOffset;
 		this.requestedLimit = requestedLimit;
 		this.lastPage = lastPage;
+		this.reportedTotal = reportedTotal;
 	}
 
 	List<Tf1PlusCatalogueEntry> getEntries() {
@@ -36,6 +43,10 @@ final class Tf1PlusCataloguePageResult {
 
 	boolean isLastPage() {
 		return lastPage;
+	}
+
+	Integer getReportedTotal() {
+		return reportedTotal;
 	}
 
 }

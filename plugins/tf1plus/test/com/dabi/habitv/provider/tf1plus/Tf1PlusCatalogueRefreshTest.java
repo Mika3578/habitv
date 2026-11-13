@@ -34,9 +34,24 @@ public class Tf1PlusCatalogueRefreshTest {
 		final Tf1PlusCataloguePageResult page0 = client.fetchProgramPage(hub, 0, 2);
 		assertEquals(2, page0.getEntries().size());
 		assertFalse(page0.isLastPage());
-		final Tf1PlusCataloguePageResult page1 = client.fetchProgramPage(hub, 2, 2);
+		final Tf1PlusCataloguePageResult page1 = client.fetchProgramPage(hub, 1, 2);
 		assertEquals(1, page1.getEntries().size());
 		assertTrue(page1.isLastPage());
+	}
+
+	@Test
+	public void shouldFetchAllPagesUsingPageIndexOffset() throws IOException {
+		final MultiPageTf1PlusPluginManager plugin = new MultiPageTf1PlusPluginManager();
+		final Tf1PlusCatalogueClient client = new Tf1PlusCatalogueClient(plugin);
+		final Tf1PlusHubDescriptor hub = Tf1PlusHubDescriptor.flat("tf1", "TF1", "tf1", Tf1PlusConf.TF1_REPLAY_URL);
+		final Tf1PlusCatalogueRefreshResult result = new Tf1PlusCatalogueRefreshResult();
+		client.fetchAllProgrammesForHub(hub, result);
+		final int expected = Tf1PlusConf.CATALOGUE_PAGE_SIZE + 3;
+		assertEquals(expected, result.entriesView().size());
+		assertEquals(2, plugin.pagesRequested);
+		assertFalse(result.formatLogLine().contains("suspectedApiCapReached=true"));
+		assertTrue(result.formatLogLine().contains("total=" + expected));
+		assertTrue(result.formatLogLine().contains("apiCap=false"));
 	}
 
 	@Test
@@ -196,17 +211,46 @@ public class Tf1PlusCatalogueRefreshTest {
 				final int limit = extractLimit(url);
 				final String json;
 				if (offset == 0 && limit == 2) {
-					json = "{\"data\":{\"programs\":{\"items\":["
+					json = "{\"data\":{\"programs\":{\"total\":3,\"items\":["
 							+ "{\"name\":\"Page one A\",\"slug\":\"page-one-a\",\"categories\":[]},"
 							+ "{\"name\":\"Page one B\",\"slug\":\"page-one-b\",\"categories\":[]}"
 							+ "]}}}";
-				} else if (offset == 2 && limit == 2) {
-					json = "{\"data\":{\"programs\":{\"items\":["
+				} else if (offset == 1 && limit == 2) {
+					json = "{\"data\":{\"programs\":{\"total\":3,\"items\":["
 							+ "{\"name\":\"Page two A\",\"slug\":\"page-two-a\",\"categories\":[]}"
 							+ "]}}}";
 				} else {
-					json = "{\"data\":{\"programs\":{\"items\":[]}}}";
+					json = "{\"data\":{\"programs\":{\"total\":3,\"items\":[]}}}";
 				}
+				return new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
+			} catch (UnsupportedEncodingException e) {
+				throw new IllegalStateException(e);
+			}
+		}
+	}
+
+	private static final class MultiPageTf1PlusPluginManager extends Tf1PlusPluginManager {
+		private int pagesRequested;
+
+		@Override
+		public InputStream getInputStreamFromUrl(final String url) {
+			try {
+				final int offset = extractOffset(url);
+				final int limit = extractLimit(url);
+				final int total = Tf1PlusConf.CATALOGUE_PAGE_SIZE + 3;
+				pagesRequested++;
+				final int from = offset * limit;
+				final StringBuilder items = new StringBuilder();
+				int emitted = 0;
+				for (int index = from; index < total && emitted < limit; index++) {
+					if (emitted > 0) {
+						items.append(',');
+					}
+					items.append("{\"name\":\"Show ").append(index).append("\",\"slug\":\"show-").append(index)
+							.append("\",\"categories\":[]}");
+					emitted++;
+				}
+				final String json = "{\"data\":{\"programs\":{\"total\":" + total + ",\"items\":[" + items + "]}}}";
 				return new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
 			} catch (UnsupportedEncodingException e) {
 				throw new IllegalStateException(e);
@@ -229,10 +273,11 @@ public class Tf1PlusCatalogueRefreshTest {
 						items.append("{\"name\":\"Cap ").append(index).append("\",\"slug\":\"cap-")
 								.append(index).append("\",\"categories\":[]}");
 					}
-					final String json = "{\"data\":{\"programs\":{\"items\":[" + items + "]}}}";
+					final String json = "{\"data\":{\"programs\":{\"total\":1500,\"items\":[" + items + "]}}}";
 					return new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
 				}
-				return new ByteArrayInputStream("{\"data\":{\"programs\":{\"items\":[]}}}".getBytes(StandardCharsets.UTF_8));
+				return new ByteArrayInputStream(
+						"{\"data\":{\"programs\":{\"total\":1500,\"items\":[]}}}".getBytes(StandardCharsets.UTF_8));
 			} catch (UnsupportedEncodingException e) {
 				throw new IllegalStateException(e);
 			}

@@ -54,8 +54,13 @@ interface Tf1PlusConf {
 
 	String PUBLIC_SENAT_REPLAY_URL = "https://www.tf1.fr/public-senat/replay";
 
+	/** Page size for GraphQL catalogue requests. */
 	int CATALOGUE_PAGE_SIZE = 500;
 
+	/**
+	 * Safety bound on programmes fetched per hub. Catalogue GraphQL {@code offset}
+	 * is a page index (0, 1, 2…), not an item index.
+	 */
 	int CATALOGUE_SAFETY_PROGRAMME_LIMIT = 10000;
 
 	int CATALOGUE_CACHE_SCHEMA_VERSION = 1;
