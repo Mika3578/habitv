@@ -51,28 +51,41 @@ public class SFRPluginManager extends BasePluginWithProxy implements PluginProvi
 	@Override
 	public Set<CategoryDTO> findCategory() {
 		final Set<CategoryDTO> categoryDTOs = new LinkedHashSet<>();
-		final Document doc = Jsoup.parse(getUrlContent(SFRConf.HOME_URL));
+		try {
+			final Document doc = Jsoup.parse(getUrlContent(SFRConf.HOME_URL));
 
-		for (final Element li : doc.select(".navigation__categories .category--hasCategory")) {
-			Element aHref = li.child(0);
-			final String name = aHref.text();
+			for (final Element li : doc.select(".navigation__categories .category--hasCategory")) {
+				Element aHref = li.child(0);
+				final String name = aHref.text();
 
-			final CategoryDTO categoryDTO = new CategoryDTO(SFRConf.NAME, name, name, SFRConf.EXTENSION);
-			categoryDTO.setDownloadable(false);
-			categoryDTOs.add(categoryDTO);
+				final CategoryDTO categoryDTO = new CategoryDTO(SFRConf.NAME, name, name, SFRConf.EXTENSION);
+				categoryDTO.setDownloadable(false);
+				categoryDTOs.add(categoryDTO);
 
-			for (final Element aHrefCat : li.select("a")) {
-				final String text = aHrefCat.text();
-				String hrefCat = aHrefCat.attr("href");
-				String id = toId(hrefCat);
-				if (!StringUtils.isEmpty(id) && !hrefCat.equals("#")) {
-					final CategoryDTO subCategoryDTO = new CategoryDTO(SFRConf.NAME, text, id, SFRConf.EXTENSION);
-					subCategoryDTO.setDownloadable(true);
-					categoryDTO.addSubCategory(subCategoryDTO);
+				for (final Element aHrefCat : li.select("a")) {
+					final String text = aHrefCat.text();
+					String hrefCat = aHrefCat.attr("href");
+					String id = toId(hrefCat);
+					if (!StringUtils.isEmpty(id) && !hrefCat.equals("#")) {
+						final CategoryDTO subCategoryDTO = new CategoryDTO(SFRConf.NAME, text, id, SFRConf.EXTENSION);
+						subCategoryDTO.setDownloadable(true);
+						categoryDTO.addSubCategory(subCategoryDTO);
+					}
 				}
 			}
+			if (categoryDTOs.isEmpty()) {
+				getLog().warn("provider=sfr operation=catalogue sourceUrl=" + SFRConf.HOME_URL
+						+ " rootCause=listing-selectors-obsolete cookiesEnabled=false"
+						+ " note=public-sport-html-no-longer-matches-legacy-scraper");
+			}
+			return categoryDTOs;
+		} catch (RuntimeException e) {
+			if (SfrEndpointAvailability.isUnavailable(e)) {
+				getLog().warn(SfrEndpointAvailability.buildCategoryUnavailableMessage(getName(), e));
+				return categoryDTOs;
+			}
+			throw e;
 		}
-		return categoryDTOs;
 	}
 
 	private String toId(String hrefCat) {
