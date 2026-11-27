@@ -69,6 +69,11 @@ public class GlobalNewsPluginManager extends BasePluginWithProxy implements Plug
 			}
 
 		}
+		if (categoryDTOs.isEmpty()) {
+			getLog().warn("provider=globalnews operation=catalogue sourceUrl=" + GlobalNewsConf.VIDEO_HOME_URL
+					+ " rootCause=listing-selectors-obsolete cookiesEnabled=false"
+					+ " note=public-video-html-no-longer-matches-legacy-scraper");
+		}
 		return categoryDTOs;
 	}
 
