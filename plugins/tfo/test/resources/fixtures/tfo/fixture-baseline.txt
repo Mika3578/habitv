@@ -1,0 +1,6 @@
+provider=tfo
+strategy=html-catalog-jwplayer-hls
+channels=TFO
+catalogs=series,documentaires,films,animations
+access=public-catalog; playback often Canada-geo-limited
+notes=legacy yt-dlp TFO extractor is broken (Limelight); Habitv uses watch-page JWPlayer HLS
