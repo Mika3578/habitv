@@ -1,14 +1,12 @@
 package com.dabi.habitv.provider.sixplay;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import com.dabi.habitv.api.plugin.api.PluginProviderInterface;
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
@@ -26,72 +24,112 @@ public class SixPlayPluginManager extends BasePluginWithProxy implements PluginP
 	@Override
 	public Set<EpisodeDTO> findEpisode(final CategoryDTO category) {
 		final Set<EpisodeDTO> episodes = new LinkedHashSet<>();
+		if (category == null || StringUtils.isEmpty(category.getId())) {
+			return episodes;
+		}
 
-		Document doc = Jsoup.parse(getUrlContent(category.getId()));
-		for (Element aEp : doc.select(".tvshow-bloc__content ul li a")) {
-			String href = getFullUrl(aEp.attr("href"));
-			Elements titles = aEp.select(".tile__name");
-			if (!titles.isEmpty()) {
-				final String name = titles.first().text();
-				if (!StringUtils.isEmpty(name)) {
-					final String episodeUrl = getFullUrl(href);
-					final EpisodeDTO episode = new EpisodeDTO(category, name, episodeUrl);
-					// 6play program categories map to show/program; tile__name is episode.
-					final EpisodeMetadataDTO metadata = new EpisodeMetadataDTO();
-					if (category.getName() != null && !category.getName().trim().isEmpty()) {
-						metadata.setSeriesTitle(category.getName().trim());
-					}
-					metadata.setEpisodeTitle(name.trim());
-					metadata.setSourceUrl(episodeUrl);
-					if (category.getFatherCategory() != null
-							&& StringUtils.isNotEmpty(category.getFatherCategory().getName())) {
-						metadata.setChannel(category.getFatherCategory().getName().trim());
-					}
-					episode.setMetadata(metadata);
-					episodes.add(episode);
-				}
+		final String html = getUrlContent(category.getId());
+		for (final String episodePath : SixPlayHrefCatalog.episodePathsFromHtml(html)) {
+			final String episodeUrl = SixPlayHrefCatalog.toAbsoluteUrl(episodePath);
+			final String name = SixPlaySlugLabels.episodeTitleFromPath(episodePath);
+			if (StringUtils.isEmpty(name)) {
+				continue;
 			}
+			final EpisodeDTO episode = new EpisodeDTO(category, name, episodeUrl);
+			final EpisodeMetadataDTO metadata = new EpisodeMetadataDTO();
+			if (category.getName() != null && !category.getName().trim().isEmpty()) {
+				metadata.setSeriesTitle(category.getName().trim());
+			}
+			metadata.setEpisodeTitle(name.trim());
+			metadata.setSourceUrl(episodeUrl);
+			if (category.getFatherCategory() != null
+					&& StringUtils.isNotEmpty(category.getFatherCategory().getName())) {
+				metadata.setChannel(category.getFatherCategory().getName().trim());
+			}
+			episode.setMetadata(metadata);
+			episodes.add(episode);
+		}
+
+		if (episodes.isEmpty()) {
+			getLog().warn("provider=6play operation=episodes sourceUrl=" + category.getId()
+					+ " rootCause=no-episode-hrefs-in-html cookiesEnabled=false");
 		}
 		return episodes;
 	}
 
 	@Override
 	public Set<CategoryDTO> findCategory() {
+		final Map<String, CategoryDTO> channelBySlug = new LinkedHashMap<>();
+		for (final Map.Entry<String, String> channel : SixPlayConf.CHANNEL_SLUG_TO_LABEL.entrySet()) {
+			final CategoryDTO channelCat = new CategoryDTO(SixPlayConf.NAME, channel.getValue(),
+					SixPlayHrefCatalog.toAbsoluteUrl("/" + channel.getKey()), SixPlayConf.EXTENSION);
+			channelBySlug.put(channel.getKey(), channelCat);
+		}
+
+		final String sitemapXml = getUrlContent(SixPlayConf.SITEMAP_SERVICE_URL);
+		final Set<String> folderPaths = SixPlayHrefCatalog.channelFolderPathsFromSitemap(sitemapXml);
+		if (folderPaths.isEmpty()) {
+			getLog().warn("provider=6play operation=catalogue sourceUrl=" + SixPlayConf.SITEMAP_SERVICE_URL
+					+ " rootCause=empty-sitemap-folders cookiesEnabled=false");
+		}
+
+		for (final String folderPath : folderPaths) {
+			final String channelSlug = SixPlayHrefCatalog.channelSlugFromPath(folderPath);
+			final CategoryDTO channelCat = channelBySlug.get(channelSlug);
+			if (channelCat == null) {
+				continue;
+			}
+			final String folderUrl = SixPlayHrefCatalog.toAbsoluteUrl(folderPath);
+			final String folderHtml = getUrlContent(folderUrl);
+			addProgramsFromHtml(channelCat, folderHtml);
+		}
+
 		final Set<CategoryDTO> categories = new LinkedHashSet<>();
-
-		final Document doc = Jsoup.parse(getUrlContent(SixPlayConf.HOME_URL));
-
-		for (final Element mainCatA : doc.select(".folders__list a")) {
-			String href = mainCatA.attr("href");
-			if (href != null && href.length() > 5) {
-				String channel = mainCatA.text();
-				CategoryDTO channelCat = new CategoryDTO(SixPlayConf.NAME, channel, getFullUrl(href), SixPlayConf.EXTENSION);
-				channelCat.addSubCategories(findCategoryByMainCat(getFullUrl(href)));
+		for (final CategoryDTO channelCat : channelBySlug.values()) {
+			if (channelCat.getSubCategories() != null && !channelCat.getSubCategories().isEmpty()) {
 				categories.add(channelCat);
 			}
 		}
 
-		return categories;
-	}
-
-	private Collection<CategoryDTO> findCategoryByMainCat(String mainCatUrl) {
-		final Set<CategoryDTO> categories = new LinkedHashSet<>();
-		final Document doc = Jsoup.parse(getUrlContent(mainCatUrl));
-		for (Element aCat : doc.select(".mosaic-programs a")) {
-			Elements title = aCat.select(".tile__title");
-			if (title.size() > 0) {
-				String name = title.first().text();
-				String href = aCat.attr("href");
-				CategoryDTO catCat = new CategoryDTO(SixPlayConf.NAME, name, getFullUrl(href), SixPlayConf.EXTENSION);
-				catCat.setDownloadable(true);
-				categories.add(catCat);
-			}
+		if (categories.isEmpty()) {
+			getLog().warn("provider=6play operation=catalogue sourceUrl=" + SixPlayConf.HOME_URL
+					+ " rootCause=no-programs-discovered cookiesEnabled=false"
+					+ " note=check-sitemap-and-folder-pages");
 		}
 		return categories;
 	}
 
-	private String getFullUrl(String url) {
-		return url.startsWith("/") ? (SixPlayConf.HOME_URL + url) : url;
+	private void addProgramsFromHtml(final CategoryDTO channelCat, final String html) {
+		final Set<String> existingUrls = programUrlsUnderChannel(channelCat);
+		for (final String programPath : SixPlayHrefCatalog.programPathsFromHtml(html)) {
+			final String programUrl = SixPlayHrefCatalog.toAbsoluteUrl(programPath);
+			if (existingUrls.contains(programUrl)) {
+				continue;
+			}
+			final String title = SixPlaySlugLabels.programTitleFromPath(programPath);
+			if (StringUtils.isEmpty(title)) {
+				continue;
+			}
+			final CategoryDTO programCat = new CategoryDTO(SixPlayConf.NAME, title, programUrl,
+					SixPlayConf.EXTENSION);
+			programCat.setDownloadable(true);
+			channelCat.addSubCategory(programCat);
+			existingUrls.add(programUrl);
+		}
+	}
+
+	private Set<String> programUrlsUnderChannel(final CategoryDTO channelCat) {
+		final Set<String> urls = new LinkedHashSet<>();
+		final Collection<CategoryDTO> subs = channelCat.getSubCategories();
+		if (subs == null) {
+			return urls;
+		}
+		for (final CategoryDTO sub : subs) {
+			if (sub != null && StringUtils.isNotEmpty(sub.getId())) {
+				urls.add(sub.getId());
+			}
+		}
+		return urls;
 	}
 
 }

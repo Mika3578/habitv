@@ -1,3 +1,6 @@
 provider=6play
+parserBoundary=sitemap-folders-plus-ssr-hrefs
+homeUrl=https://www.6play.fr/
+sitemapUrl=https://www.m6.fr/sitemap-service.xml
 network=disabled
-note=Fixture placeholder only. The current site behavior is SPA-driven.
+note=Category folders come from the public service sitemap; programs and episodes are parsed from SSR href patterns (-p_ / -c_). Download may still fail (DRM); discovery is best-effort from listed folder pages.
