@@ -38,6 +38,8 @@ import com.dabi.habitv.tray.Popin;
 import com.dabi.habitv.tray.PopinController.ButtonHandler;
 import com.dabi.habitv.tray.controller.BaseController;
 import com.dabi.habitv.tray.controller.todl.CategoryTreeItem.SelectionChangeHandler;
+import com.dabi.habitv.tray.logo.LogoImageCache;
+import com.dabi.habitv.tray.logo.ProviderChannelLogoResolver;
 import com.dabi.habitv.tray.subscriber.CoreSubscriber;
 import com.dabi.habitv.tray.utils.FxBackgroundRunner;
 import com.dabi.habitv.utils.FilterUtils;
@@ -69,10 +71,13 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
@@ -117,6 +122,10 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 	private Button addFilterButton;
 
 	private CheckBox applySavedFilters;
+
+	private final ProviderChannelLogoResolver logoResolver = new ProviderChannelLogoResolver();
+
+	private final LogoImageCache logoImageCache = new LogoImageCache();
 
 	public ToDownloadController(ProgressIndicator searchCategoryProgress, Button refreshCategoryButton, Button cleanCategoryButton,
 	        TreeView<CategoryDTO> toDLTree, Label indicationTextFlow, TableView<EpisodeDTO> episodeTableView,
@@ -1208,7 +1217,7 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 		}
 	};
 
-	private static Callback<TreeView<CategoryDTO>, TreeCell<CategoryDTO>> forTreeView(
+	private Callback<TreeView<CategoryDTO>, TreeCell<CategoryDTO>> forTreeView(
 	        final Callback<TreeItem<CategoryDTO>, ObservableValue<Boolean>> getSelectedProperty) {
 		return new Callback<TreeView<CategoryDTO>, TreeCell<CategoryDTO>>() {
 			@Override
@@ -1240,12 +1249,44 @@ public class ToDownloadController extends BaseController implements CoreSubscrib
 				        return item.getState() == StatusEnum.DELETED;
 			        }
 
+			        @Override
+			        protected javafx.scene.Node leadingGraphic(CategoryDTO item) {
+				        return buildLogoGraphic(item);
+			        }
+
 		        };
 			}
 		};
 	}
 
-	public static Callback<TreeView<CategoryDTO>, TreeCell<CategoryDTO>> forTreeView() {
+	private javafx.scene.Node buildLogoGraphic(final CategoryDTO item) {
+		try {
+			final java.util.Optional<String> resource = logoResolver.resolveClasspathResource(item);
+			if (!resource.isPresent()) {
+				return null;
+			}
+			final Image image = logoImageCache.getOrLoad(resource.get());
+			if (image == null) {
+				return null;
+			}
+			final int boxW = ProviderChannelLogoResolver.displayWidthPx(item);
+			final int boxH = ProviderChannelLogoResolver.displayHeightPx(item);
+			final ImageView view = new ImageView(image);
+			view.setFitWidth(boxW);
+			view.setFitHeight(boxH);
+			view.setPreserveRatio(true);
+			view.setSmooth(true);
+			final StackPane tile = new StackPane(view);
+			tile.setMinSize(boxW, boxH);
+			tile.setPrefSize(boxW, boxH);
+			tile.setMaxSize(boxW, boxH);
+			return tile;
+		} catch (RuntimeException e) {
+			return null;
+		}
+	}
+
+	private Callback<TreeView<CategoryDTO>, TreeCell<CategoryDTO>> forTreeView() {
 		Callback<TreeItem<CategoryDTO>, ObservableValue<Boolean>> getSelectedProperty = new Callback<TreeItem<CategoryDTO>, ObservableValue<Boolean>>() {
 			@Override
 			public ObservableValue<Boolean> call(TreeItem<CategoryDTO> item) {
