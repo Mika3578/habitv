@@ -91,7 +91,8 @@ Priority order (highest user impact first):
    invariants with a controlled technical error instead of an NPE. Add
    deterministic offline tests for null, unresolved-placeholder, and valid
    destination paths. Any runtime change stays in Draft until a real
-   application run is confirmed.
+   application run is confirmed. Implementation in flight: PR
+   [#286](https://github.com/Mika3578/habitv/pull/286).
 2. [#167](https://github.com/Mika3578/habitv/issues/167) — pass the
    configured tool location to the external tool argument list
    (`--ffmpeg-location` equivalent). Small, testable, unblocks quality
