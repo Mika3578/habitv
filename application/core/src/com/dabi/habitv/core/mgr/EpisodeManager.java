@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import com.dabi.habitv.api.plugin.api.PluginProviderInterface;
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
+import com.dabi.habitv.api.plugin.exception.TechnicalException;
 import com.dabi.habitv.api.plugin.holder.DownloaderPluginHolder;
 import com.dabi.habitv.api.plugin.holder.ExporterPluginHolder;
 import com.dabi.habitv.api.plugin.holder.ProviderPluginHolder;
@@ -353,6 +354,10 @@ public final class EpisodeManager extends AbstractManager implements TaskAdder {
 
 	public void restart(EpisodeDTO episode, boolean exportOnly) {
 		if (episode != null) {
+			if (episode.getCategory() == null) {
+				LOG.warn("Restart refused for episode without category: " + episode.getName());
+				throw new TechnicalException("Cannot restart an episode without a category");
+			}
 			final DownloadedDAO dlDAO = new DownloadedDAO(episode.getCategory(), downloader.getIndexDir());
 			final RetrieveTask retreiveTask = new RetrieveTask(episode, retreivePublisher, this, exporter, getProviderPluginHolder()
 					.getPlugin(episode.getCategory().getPlugin(), (PluginProviderInterface) null), downloader, dlDAO, true);

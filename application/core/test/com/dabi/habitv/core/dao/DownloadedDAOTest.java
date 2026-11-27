@@ -4,7 +4,9 @@
 package com.dabi.habitv.core.dao;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +23,7 @@ import org.junit.Test;
 
 import com.dabi.habitv.api.plugin.dto.CategoryDTO;
 import com.dabi.habitv.api.plugin.dto.EpisodeDTO;
+import com.dabi.habitv.api.plugin.exception.TechnicalException;
 import com.dabi.habitv.core.config.HabitTvConf;
 import com.dabi.habitv.utils.FileUtils;
 
@@ -137,6 +140,53 @@ public class DownloadedDAOTest {
 			final EpisodeDTO episode = new EpisodeDTO(legacyCategory, episodeName, "id");
 			assertTrue(DownloadedDAO.containsEpisodeOrLegacyName(
 					legacyDao.findDownloadedFiles(), episode));
+		} finally {
+			deleteRecursively(tempDir);
+		}
+	}
+
+	@Test
+	public final void constructorRejectsNullCategoryWithTechnicalError() {
+		try {
+			new DownloadedDAO(null, ".");
+			fail("a null category must be rejected with a technical error");
+		} catch (final TechnicalException e) {
+			assertNotNull(e.getMessage());
+		} catch (final NullPointerException e) {
+			fail("a null category must not produce a raw NullPointerException");
+		}
+	}
+
+	@Test
+	public final void constructorRejectsMissingIndexDir() {
+		try {
+			new DownloadedDAO(category, null);
+			fail("a null index directory must be rejected with a technical error");
+		} catch (final TechnicalException e) {
+			assertNotNull(e.getMessage());
+		} catch (final NullPointerException e) {
+			fail("a null index directory must not produce a raw NullPointerException");
+		}
+		try {
+			new DownloadedDAO(category, "   ");
+			fail("a blank index directory must be rejected with a technical error");
+		} catch (final TechnicalException e) {
+			assertNotNull(e.getMessage());
+		}
+	}
+
+	@Test
+	public final void treatsUnresolvedTokenInIndexDirAsLiteralPath() throws IOException {
+		final File tempDir = new File(System.getProperty("java.io.tmpdir"),
+				"habitv-token-index-" + System.nanoTime());
+		assertTrue(tempDir.mkdirs());
+		try {
+			final File tokenDir = new File(tempDir, "#MEDIA_SERVER_PATH#");
+			final String tokenIndexDir = tokenDir.getPath();
+			final DownloadedDAO tokenDao = new DownloadedDAO(category, tokenIndexDir);
+			final EpisodeDTO episode = new EpisodeDTO(category, "token-episode", "id");
+			tokenDao.addDownloadedFiles(false, episode);
+			assertTrue(DownloadedDAO.containsEpisode(tokenDao.findDownloadedFiles(), episode));
 		} finally {
 			deleteRecursively(tempDir);
 		}
