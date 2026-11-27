@@ -37,6 +37,13 @@ public class DownloadedDAO {
 
 	public DownloadedDAO(final CategoryDTO category, final String indexDir) {
 		super();
+		if (category == null) {
+			throw new TechnicalException(
+					"Cannot build downloaded index without a category");
+		}
+		if (indexDir == null || indexDir.trim().isEmpty()) {
+			throw new TechnicalException("Cannot build downloaded index without an index directory");
+		}
 		this.indexDir = indexDir;
 		this.category = category;
 		final File indexDirectory = new File(indexDir);
